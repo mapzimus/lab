@@ -19,23 +19,22 @@
     play: ["fun", "play"],
     experiments: ["data", "design", "experiments"],
   };
-  const featuredSlugs = [
-    "coordinate-converter",
-    "geojson-viewer",
-    "map-projection-explorer",
-    "choropleth-map-builder",
-    "geopuesto-playground",
-    "us-fantasy-transit",
-    "bug-wars",
-    "flag-designer",
-  ];
+  function readFavorites() {
+    try {
+      const stored = JSON.parse(localStorage.getItem("mapzimus-favorites") || "[]");
+      return Array.isArray(stored) ? stored : [];
+    } catch {
+      return [];
+    }
+  }
 
   const state = {
     items: [],
+    featuredSlugs: [],
     query: "",
     category: "",
     favoritesOnly: false,
-    favorites: new Set(JSON.parse(localStorage.getItem("mapzimus-favorites") || "[]")),
+    favorites: new Set(readFavorites()),
   };
 
   const featuredSection = document.getElementById("featuredSection");
@@ -54,7 +53,11 @@
   }
 
   function saveFavorites() {
-    localStorage.setItem("mapzimus-favorites", JSON.stringify([...state.favorites]));
+    try {
+      localStorage.setItem("mapzimus-favorites", JSON.stringify([...state.favorites]));
+    } catch {
+      // Storage may be full or blocked (private browsing); favorites still work for this visit.
+    }
   }
 
   function card(item, featured) {
@@ -64,7 +67,7 @@
     const favorite = state.favorites.has(item.slug);
     const cardClass = featured ? "featured-card" : "catalog-card";
     return `<article class="${cardClass}" data-slug="${escapeHtml(item.slug)}">
-      <button class="star" type="button" aria-label="${favorite ? "Remove from" : "Add to"} favorites" aria-pressed="${favorite}">☆</button>
+      <button class="star" type="button" aria-label="${favorite ? "Remove from" : "Add to"} favorites" aria-pressed="${favorite}">${favorite ? "★" : "☆"}</button>
       <a class="card-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener" data-open-slug="${escapeHtml(item.slug)}">
         <div class="card-icon" aria-hidden="true">${escapeHtml(item.icon || "↗")}</div>
         <div class="card-type">${escapeHtml(categoryLabels[item.category] || item.category)}</div>
@@ -113,7 +116,7 @@
       featuredSection.hidden = true;
       return;
     }
-    const featured = featuredSlugs.map(function (slug) {
+    const featured = state.featuredSlugs.map(function (slug) {
       return state.items.find(function (item) { return item.slug === slug; });
     }).filter(Boolean);
     featuredGrid.innerHTML = featured.map(function (item) { return card(item, true); }).join("");
@@ -155,7 +158,9 @@
   Promise.all([
     fetch("/data/tools.json").then(function (response) { return response.json(); }),
     fetch("/data/projects.json").then(function (response) { return response.json(); }),
+    fetch("/data/featured.json").then(function (response) { return response.json(); }),
   ]).then(function (collections) {
+    state.featuredSlugs = collections.pop();
     state.items = collections.flat();
     renderFilters();
     renderFeatured();
