@@ -8,10 +8,15 @@ The first staging scaffold used a `public/` directory and a directly deployed st
 
 ## Local build
 
-```powershell
-node scripts/build.mjs
-npx wrangler pages dev dist
+```sh
+npm run build       # validates the catalog, then builds dist/
+npm run preview     # npx wrangler pages dev dist
 ```
+
+The build fails if the catalog data is invalid: missing required fields,
+duplicate slugs, unknown categories, non-https URLs, or a featured slug that
+isn't in the catalog. GitHub Actions runs the same build on every push and
+pull request.
 
 ## Cloudflare Pages
 
@@ -26,3 +31,8 @@ The committed `wrangler.jsonc` matches those settings. Preview branches use norm
 ## Updating the legacy catalog
 
 `src/data/tools.json` is a normalized snapshot of the cards in `mapzimus/max`. Existing tool URLs are deliberately external during the first migration phase. Update the JSON when a legacy title, description, or tool URL changes.
+
+`src/data/featured.json` controls the "Featured from the lab" shelf on the
+homepage — an ordered list of catalog slugs. The tool count in the hero and the
+"last catalog refresh" date in the footer are derived from the catalog at build
+time, so they stay accurate as the data changes.

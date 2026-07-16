@@ -12,6 +12,45 @@ function assertInsideRoot(target) {
   return resolved;
 }
 
+const knownCategories = new Set(["maps", "data", "design", "teaching", "math", "fun", "play", "experiments"]);
+const requiredFields = ["slug", "title", "description", "category", "url"];
+
+function loadCatalog(name) {
+  return JSON.parse(fs.readFileSync(path.join(source, "data", name), "utf8"));
+}
+
+const tools = loadCatalog("tools.json");
+const projects = loadCatalog("projects.json");
+const featuredSlugs = loadCatalog("featured.json");
+const catalog = [...tools, ...projects];
+
+const problems = [];
+const seenSlugs = new Set();
+for (const item of catalog) {
+  const label = item.slug || item.title || JSON.stringify(item).slice(0, 60);
+  for (const field of requiredFields) {
+    if (!item[field]) problems.push(`${label}: missing "${field}"`);
+  }
+  if (item.slug) {
+    if (seenSlugs.has(item.slug)) problems.push(`${label}: duplicate slug`);
+    seenSlugs.add(item.slug);
+  }
+  if (item.category && !knownCategories.has(item.category)) problems.push(`${label}: unknown category "${item.category}"`);
+  if (item.url && !/^https:\/\//.test(item.url)) problems.push(`${label}: url is not https`);
+}
+for (const slug of featuredSlugs) {
+  if (!seenSlugs.has(slug)) problems.push(`featured.json: "${slug}" is not in the catalog`);
+}
+if (problems.length) {
+  console.error(`Catalog validation failed:\n${problems.map((p) => `  - ${p}`).join("\n")}`);
+  process.exit(1);
+}
+
+const toolCount = tools.length;
+const newestUpdate = catalog.map((item) => item.updated || "").sort().at(-1);
+const [refreshYear, refreshMonth] = newestUpdate.split("-").map(Number);
+const catalogRefresh = new Date(Date.UTC(refreshYear, refreshMonth - 1)).toLocaleString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+
 if (fs.existsSync(output)) fs.rmSync(assertInsideRoot(output), { recursive: true, force: true });
 fs.mkdirSync(output, { recursive: true });
 fs.cpSync(source, output, { recursive: true });
@@ -30,7 +69,7 @@ const pages = {
   tools: {
     path: "tools/index.html",
     title: "Browser tools · Mapzimus",
-    description: "A searchable catalog of 65 standalone browser tools for maps, data, design, teaching, and math.",
+    description: `A searchable catalog of ${toolCount} standalone browser tools for maps, data, design, teaching, and math.`,
     canonical: "https://mapzimus.com/tools/",
     heading: "Tools that get out of the way.",
     intro: "Converters, viewers, classroom helpers, math utilities, and small data tools. Most run entirely in the browser.",
@@ -64,6 +103,9 @@ const pages = {
 for (const [view, page] of Object.entries(pages)) {
   const html = template
     .replaceAll("{{VIEW}}", view)
+    .replaceAll("{{FEATURED_ATTR}}", view === "home" ? "" : " hidden")
+    .replaceAll("{{TOOL_COUNT}}", String(toolCount))
+    .replaceAll("{{CATALOG_REFRESH}}", catalogRefresh)
     .replaceAll("{{TITLE}}", page.title)
     .replaceAll("{{DESCRIPTION}}", page.description)
     .replaceAll("{{CANONICAL}}", page.canonical)

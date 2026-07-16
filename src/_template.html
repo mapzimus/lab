@@ -11,6 +11,8 @@
   <meta property="og:description" content="{{DESCRIPTION}}">
   <meta property="og:url" content="{{CANONICAL}}">
   <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#f4f0e7">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
 </head>
@@ -36,13 +38,13 @@
       <h1>{{HEADING}}</h1>
       <p>{{INTRO}}</p>
       <div class="trust-row" aria-label="Site promises">
-        <span>65 browser tools</span>
+        <span>{{TOOL_COUNT}} browser tools</span>
         <span>No account required</span>
         <span>Files stay in your browser when noted</span>
       </div>
     </section>
 
-    <section class="featured" id="featuredSection" aria-labelledby="featuredHeading">
+    <section class="featured" id="featuredSection" aria-labelledby="featuredHeading"{{FEATURED_ATTR}}>
       <div class="section-heading">
         <div><span class="eyebrow">Start here</span><h2 id="featuredHeading">Featured from the lab</h2></div>
         <p>A changing shelf of useful and unusual things.</p>
@@ -62,12 +64,13 @@
       </div>
       <div class="catalog-grid" id="catalogGrid"></div>
       <div class="empty" id="emptyState" hidden>No matches. Try a broader word or another category.</div>
+      <noscript><div class="empty">The catalog needs JavaScript to search and filter. Everything is still browsable at <a href="https://mapzimus.github.io/max/">the legacy tool library</a>.</div></noscript>
     </section>
   </main>
 
   <footer>
     <p>Mapzimus is the creative lab. For case studies and professional GIS work, visit <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
-    <p class="footer-note">Built as a small static site. Last catalog refresh: July 2026.</p>
+    <p class="footer-note">Built as a small static site. Last catalog refresh: {{CATALOG_REFRESH}}.</p>
   </footer>
 </body>
 </html>
