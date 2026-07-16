@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{TITLE}}</title>
+  <meta name="description" content="{{DESCRIPTION}}">
+  <link rel="canonical" href="{{CANONICAL}}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{TITLE}}">
+  <meta property="og:description" content="{{DESCRIPTION}}">
+  <meta property="og:url" content="{{CANONICAL}}">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body data-view="{{VIEW}}">
+  <a class="skip-link" href="#catalog">Skip to catalog</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Mapzimus home">
+      <span class="brand-mark" aria-hidden="true">MZ</span>
+      <span>Mapzimus</span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="/tools/">Tools</a>
+      <a href="/maps/">Maps</a>
+      <a href="/play/">Play</a>
+      <a href="/experiments/">Experiments</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">A creative lab by Maxwell Howe</div>
+      <h1>{{HEADING}}</h1>
+      <p>{{INTRO}}</p>
+      <div class="trust-row" aria-label="Site promises">
+        <span>65 browser tools</span>
+        <span>No account required</span>
+        <span>Files stay in your browser when noted</span>
+      </div>
+    </section>
+
+    <section class="featured" id="featuredSection" aria-labelledby="featuredHeading">
+      <div class="section-heading">
+        <div><span class="eyebrow">Start here</span><h2 id="featuredHeading">Featured from the lab</h2></div>
+        <p>A changing shelf of useful and unusual things.</p>
+      </div>
+      <div class="featured-grid" id="featuredGrid"></div>
+    </section>
+
+    <section class="catalog" id="catalog" aria-labelledby="catalogHeading">
+      <div class="section-heading">
+        <div><span class="eyebrow">Browse</span><h2 id="catalogHeading">The full shelf</h2></div>
+        <p id="resultCount" aria-live="polite"></p>
+      </div>
+      <div class="catalog-controls">
+        <label class="search-field"><span class="visually-hidden">Search the catalog</span><input id="searchInput" type="search" placeholder="Search tools, maps, and experiments…" autocomplete="off"></label>
+        <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
+        <button class="quiet-button" id="favoritesButton" type="button" aria-pressed="false">Favorites</button>
+      </div>
+      <div class="catalog-grid" id="catalogGrid"></div>
+      <div class="empty" id="emptyState" hidden>No matches. Try a broader word or another category.</div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Mapzimus is the creative lab. For case studies and professional GIS work, visit <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
+    <p class="footer-note">Built as a small static site. Last catalog refresh: July 2026.</p>
+  </footer>
+</body>
+</html>

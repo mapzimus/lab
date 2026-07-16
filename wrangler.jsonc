@@ -1,14 +1,6 @@
 {
-  // Cloudflare Workers config — serves ./public as a static site.
-  // Deploy with: npx wrangler deploy
-  "name": "mapzimus",
-  "compatibility_date": "2026-07-16",
-  "assets": {
-    "directory": "./public",
-    "not_found_handling": "404-page"
-  },
-  "routes": [
-    { "pattern": "mapzimus.com", "custom_domain": true },
-    { "pattern": "www.mapzimus.com", "custom_domain": true }
-  ]
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "mapzimus-lab",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-07-16"
 }

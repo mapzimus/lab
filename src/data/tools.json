@@ -1,0 +1,977 @@
+[
+  {
+    "slug": "coordinate-converter",
+    "title": "Coordinate Converter",
+    "description": "Convert live between Decimal Degrees, DMS, UTM, MGRS and Geohash, with an interactive map. Click or drag the marker to set a location.",
+    "icon": "🧭",
+    "category": "maps",
+    "tags": [
+      "maps",
+      "GIS",
+      "Leaflet"
+    ],
+    "url": "https://mapzimus.github.io/max/coordinate-converter.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "geojson-viewer",
+    "title": "GeoJSON Viewer &amp; Editor",
+    "description": "Paste, drop or load GeoJSON, see it on a map, click features to edit their properties, validate, and re-export.",
+    "icon": "🗾",
+    "category": "maps",
+    "tags": [
+      "GIS",
+      "GeoJSON",
+      "Leaflet"
+    ],
+    "url": "https://mapzimus.github.io/max/geojson-viewer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "bounding-box-picker",
+    "title": "Bounding Box Picker",
+    "description": "Draw or type a geographic bounding box and copy it in the five formats APIs want — CSV, WKT, GeoJSON, Leaflet and Overpass.",
+    "icon": "🔲",
+    "category": "maps",
+    "tags": [
+      "GIS",
+      "bbox",
+      "Leaflet"
+    ],
+    "url": "https://mapzimus.github.io/max/bounding-box-picker.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "static-map-generator",
+    "title": "Static Map Generator",
+    "description": "Compose a map view with pins, then export a ready-to-use PNG image or an OpenStreetMap embed snippet. No API keys.",
+    "icon": "🖼️",
+    "category": "maps",
+    "tags": [
+      "maps",
+      "PNG",
+      "embed"
+    ],
+    "url": "https://mapzimus.github.io/max/static-map-generator.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "batch-geocoder",
+    "title": "Batch Geocoder",
+    "description": "Paste a list of addresses or place names and get coordinates for all of them — on a map and as CSV or GeoJSON.",
+    "icon": "📍",
+    "category": "maps",
+    "tags": [
+      "geocoding",
+      "OSM",
+      "CSV"
+    ],
+    "url": "https://mapzimus.github.io/max/batch-geocoder.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "spatial-data-scraper",
+    "title": "Spatial Data Scraper",
+    "description": "Extract locations from a URL or pasted page text — addresses, cities, landmarks — geocode them, preview on a map, and export JSON, CSV or GeoJSON.",
+    "icon": "🗺️",
+    "category": "maps",
+    "tags": [
+      "GIS",
+      "scraping",
+      "NER"
+    ],
+    "url": "https://mapzimus.github.io/max/spatial-data-scraper.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "sun-calculator",
+    "title": "Sun Calculator",
+    "description": "Sunrise, sunset, twilight and golden hour for any place and date, with a sun-path chart. NOAA-accurate math, no libraries.",
+    "icon": "☀️",
+    "category": "maps",
+    "tags": [
+      "solar",
+      "outdoors",
+      "photography"
+    ],
+    "url": "https://mapzimus.github.io/max/sun-calculator.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "weather",
+    "title": "Weather",
+    "description": "Current conditions, a 24-hour strip with sparkline, a 7-day forecast and a live precipitation radar for any place — offline caching, °C/°F toggle.",
+    "icon": "⛅",
+    "category": "maps",
+    "tags": [
+      "weather",
+      "radar",
+      "no key"
+    ],
+    "url": "https://mapzimus.github.io/max/weather.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "moon-calculator",
+    "title": "Moon Calculator",
+    "description": "Moonrise, moonset, phase and illumination for any place and date, with a live moon disc and a month of phases at a glance.",
+    "icon": "🌙",
+    "category": "maps",
+    "tags": [
+      "astronomy",
+      "outdoors",
+      "photography"
+    ],
+    "url": "https://mapzimus.github.io/max/moon-calculator.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "elevation-profiler",
+    "title": "Elevation Profiler",
+    "description": "Draw a route on the map and see the terrain profile under it — distance, climb, descent and steepest grade.",
+    "icon": "⛰️",
+    "category": "maps",
+    "tags": [
+      "GIS",
+      "hiking",
+      "Open-Meteo"
+    ],
+    "url": "https://mapzimus.github.io/max/elevation-profiler.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "radius-buffer-tool",
+    "title": "Radius &amp; Buffer Tool",
+    "description": "Drop a pin and draw accurate distance rings around it — true geodesic circles, not flat-map approximations — then export GeoJSON.",
+    "icon": "⭕",
+    "category": "maps",
+    "tags": [
+      "GIS",
+      "buffers",
+      "Leaflet"
+    ],
+    "url": "https://mapzimus.github.io/max/radius-buffer-tool.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "flight-plotter",
+    "title": "Flight Route Plotter",
+    "description": "Build a multi-leg route between airports and cities, see true great-circle paths with distances and flight times.",
+    "icon": "✈️",
+    "category": "maps",
+    "tags": [
+      "travel",
+      "great circle",
+      "Leaflet"
+    ],
+    "url": "https://mapzimus.github.io/max/flight-plotter.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "photo-location-viewer",
+    "title": "Photo Location Viewer",
+    "description": "See where your photos were taken from their hidden EXIF GPS data, map them, and save clean copies with the metadata stripped.",
+    "icon": "📷",
+    "category": "maps",
+    "tags": [
+      "privacy",
+      "EXIF",
+      "maps"
+    ],
+    "url": "https://mapzimus.github.io/max/photo-location-viewer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "map-projection-explorer",
+    "title": "Map Projection Explorer",
+    "description": "See the world in 19 map projections, visualize distortion with Tissot's indicatrix, and compare Mercator vs Gall-Peters side by side.",
+    "icon": "🌐",
+    "category": "maps",
+    "tags": [
+      "GIS",
+      "projections",
+      "D3"
+    ],
+    "url": "https://mapzimus.github.io/max/map-projection-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "geojson-diff-viewer",
+    "title": "GeoJSON Diff Viewer",
+    "description": "Compare two GeoJSON files — added, removed and changed features matched by ID or geometry, shown on a map and in a detail list.",
+    "icon": "🆚",
+    "category": "maps",
+    "tags": [
+      "GIS",
+      "GeoJSON",
+      "diff"
+    ],
+    "url": "https://mapzimus.github.io/max/geojson-diff-viewer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "choropleth-map-builder",
+    "title": "Choropleth Map Builder",
+    "description": "Paste CSV data keyed by US state or country, fuzzy-match it to real geography, and get a colored choropleth map with a legend — export SVG or PNG.",
+    "icon": "🗺️",
+    "category": "maps",
+    "tags": [
+      "GIS",
+      "choropleth",
+      "D3"
+    ],
+    "url": "https://mapzimus.github.io/max/choropleth-map-builder.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "quick-chart-maker",
+    "title": "Quick Chart Maker",
+    "description": "Type or paste data and export a chart — bar, line, pie, doughnut or scatter. Edit as a table or raw CSV/TSV, then download a PNG.",
+    "icon": "📊",
+    "category": "data",
+    "tags": [
+      "data",
+      "charts",
+      "PNG export"
+    ],
+    "url": "https://mapzimus.github.io/max/quick-chart-maker.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "csv-explorer",
+    "title": "CSV Explorer",
+    "description": "Open a CSV without a spreadsheet: sort, filter, per-column stats and histograms — then clean it up and re-export.",
+    "icon": "🔎",
+    "category": "data",
+    "tags": [
+      "data",
+      "CSV",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/csv-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "csv-json-converter",
+    "title": "CSV ↔ JSON Converter",
+    "description": "Convert between CSV and JSON in either direction with live preview, delimiter auto-detect, type detection and nested-JSON flattening.",
+    "icon": "🔁",
+    "category": "data",
+    "tags": [
+      "data",
+      "CSV",
+      "JSON"
+    ],
+    "url": "https://mapzimus.github.io/max/csv-json-converter.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "data-generator",
+    "title": "Data Generator",
+    "description": "Set up your columns and generate realistic fake data — names, emails, dates, prices and more — then export as CSV or JSON. Same seed = same data every time.",
+    "icon": "🧪",
+    "category": "data",
+    "tags": [
+      "data",
+      "testing",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/data-generator.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "regex-tester",
+    "title": "Regex Tester &amp; Extractor",
+    "description": "Write a regex, see live match highlighting and a capture-group table, then replace or extract — with a built-in cheatsheet and example patterns.",
+    "icon": "🔤",
+    "category": "data",
+    "tags": [
+      "data",
+      "regex",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/regex-tester.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "json-tree-explorer",
+    "title": "JSON Tree Explorer",
+    "description": "Paste JSON and explore it as a collapsible tree — search keys and values, copy any path, and pluck values out of arrays of objects.",
+    "icon": "🌳",
+    "category": "data",
+    "tags": [
+      "data",
+      "JSON",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/json-tree-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "pivot-table-explorer",
+    "title": "Pivot Table Explorer",
+    "description": "Load a CSV and drag or click fields into Rows, Columns, Values and Filters for a live pivot table — nested groups, subtotals, a quick chart.",
+    "icon": "🧾",
+    "category": "data",
+    "tags": [
+      "data",
+      "CSV",
+      "pivot"
+    ],
+    "url": "https://mapzimus.github.io/max/pivot-table-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "data-anonymizer",
+    "title": "Data Anonymizer",
+    "description": "Mask or fake-replace sensitive CSV columns — shuffle, hash, redact, add noise — with reproducible seeding and a k-anonymity check.",
+    "icon": "🕶️",
+    "category": "data",
+    "tags": [
+      "data",
+      "privacy",
+      "CSV"
+    ],
+    "url": "https://mapzimus.github.io/max/data-anonymizer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "color-palette-generator",
+    "title": "Color Palette Generator",
+    "description": "Generate palettes with harmony rules, lock and edit swatches, extract colors from an image, check WCAG contrast and color-blind safety.",
+    "icon": "🎨",
+    "category": "design",
+    "tags": [
+      "design",
+      "color",
+      "a11y"
+    ],
+    "url": "https://mapzimus.github.io/max/color-palette-generator.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "css-playground",
+    "title": "CSS Playground",
+    "description": "Visually build gradients, layered shadows and border-radius blobs, then copy production-ready CSS.",
+    "icon": "✨",
+    "category": "design",
+    "tags": [
+      "design",
+      "CSS",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/css-playground.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "image-converter",
+    "title": "Image Converter &amp; Resizer",
+    "description": "Convert, resize and compress images right in your browser — nothing is uploaded, and private EXIF data is stripped along the way.",
+    "icon": "🎞️",
+    "category": "design",
+    "tags": [
+      "images",
+      "privacy",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/image-converter.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "qr-code-generator",
+    "title": "QR Code Generator",
+    "description": "Make QR codes for links, Wi-Fi, email, phone or text with custom colors and sizes; download as PNG or SVG.",
+    "icon": "🔳",
+    "category": "design",
+    "tags": [
+      "QR",
+      "PNG/SVG",
+      "sharing"
+    ],
+    "url": "https://mapzimus.github.io/max/qr-code-generator.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "markdown-previewer",
+    "title": "Markdown Previewer",
+    "description": "Write Markdown with a live side-by-side preview and export clean HTML — drafts autosave as you type.",
+    "icon": "📝",
+    "category": "design",
+    "tags": [
+      "writing",
+      "markdown",
+      "export"
+    ],
+    "url": "https://mapzimus.github.io/max/markdown-previewer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "favicon-generator",
+    "title": "Favicon Generator",
+    "description": "Make a complete favicon set from an emoji, letters or an image — real multi-size .ico, all the PNGs, manifest and HTML tags.",
+    "icon": "🔖",
+    "category": "design",
+    "tags": [
+      "web dev",
+      "icons",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/favicon-generator.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "flag-designer",
+    "title": "Flag Designer Studio",
+    "description": "Design a flag from real vexillological building blocks and get live feedback against NAVA's \"good flag\" principles. Export SVG or PNG.",
+    "icon": "🚩",
+    "category": "design",
+    "tags": [
+      "design",
+      "flags",
+      "SVG"
+    ],
+    "url": "https://mapzimus.github.io/max/flag-designer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "pixel-sprite-studio",
+    "title": "Pixel Sprite Studio",
+    "description": "Draw pixel art with retro palettes (Game Boy, NES, PICO-8), animate across frames, and export PNG, sprite sheets or animated GIF.",
+    "icon": "👾",
+    "category": "design",
+    "tags": [
+      "pixel art",
+      "retro",
+      "GIF"
+    ],
+    "url": "https://mapzimus.github.io/max/pixel-sprite-studio.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "flag-analyzer",
+    "title": "Flag Analyzer",
+    "description": "Drop in any flag image and get its dominant colors and percentages, aspect ratio, symmetry scores and a NAVA critique — companion to the Flag Designer.",
+    "icon": "🔍",
+    "category": "design",
+    "tags": [
+      "flags",
+      "color",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/flag-analyzer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "svg-pattern-generator",
+    "title": "SVG Pattern Generator",
+    "description": "Design a seamless tileable pattern — dots, stripes, hexagons, waves and more — preview it tiled, then export SVG, CSS or PNG.",
+    "icon": "🔷",
+    "category": "design",
+    "tags": [
+      "design",
+      "SVG",
+      "patterns"
+    ],
+    "url": "https://mapzimus.github.io/max/svg-pattern-generator.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "crt-effect-lab",
+    "title": "CRT Effect Lab",
+    "description": "Apply retro CRT effects — scanlines, curvature, phosphor glow, chromatic aberration — to text or an image, then copy the CSS or export a PNG.",
+    "icon": "📺",
+    "category": "design",
+    "tags": [
+      "retro",
+      "CSS",
+      "effects"
+    ],
+    "url": "https://mapzimus.github.io/max/crt-effect-lab.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "chiptune-sfx-lab",
+    "title": "Chiptune SFX Lab",
+    "description": "Design retro 8-bit sound effects — sfxr-style presets, waveform, envelope, slides and bit-crushing — and export a WAV.",
+    "icon": "🎮",
+    "category": "design",
+    "tags": [
+      "audio",
+      "retro",
+      "WAV"
+    ],
+    "url": "https://mapzimus.github.io/max/chiptune-sfx-lab.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "flag-lookalike-finder",
+    "title": "Flag Look-Alike Finder",
+    "description": "Design or pick a flag and find its closest real-world matches by color, layout and charges — a similarity score flags \"too close\" designs.",
+    "icon": "🏳️",
+    "category": "design",
+    "tags": [
+      "flags",
+      "design",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/flag-lookalike-finder.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "seating-chart-generator",
+    "title": "Seating Chart Generator",
+    "description": "Paste a roster, pick rows, pods or a U-shape, add constraints — keep these two apart, lock her to the front row — and shuffle until the chart works.",
+    "icon": "🪑",
+    "category": "teaching",
+    "tags": [
+      "teaching",
+      "constraints",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/seating-chart-generator.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "probability-lab",
+    "title": "Probability Lab",
+    "description": "Run coins, dice, spinners, cards, urns and the birthday paradox — and watch empirical results converge to the exact theory in live charts.",
+    "icon": "🎲",
+    "category": "teaching",
+    "tags": [
+      "teaching",
+      "statistics",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/probability-lab.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "class-timer",
+    "title": "Class Timer",
+    "description": "A big, projector-friendly countdown and stopwatch for timing class activities and transitions.",
+    "icon": "⏱️",
+    "category": "teaching",
+    "tags": [
+      "teaching",
+      "timer",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/class-timer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "group-maker",
+    "title": "Group Maker",
+    "description": "Paste a roster and shuffle it into random, balanced groups — by group count or by group size.",
+    "icon": "👥",
+    "category": "teaching",
+    "tags": [
+      "teaching",
+      "random",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/group-maker.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "function-grapher",
+    "title": "Function Grapher",
+    "description": "Plot lines and parabolas and see the slope, intercepts and vertex computed live as you adjust them.",
+    "icon": "📈",
+    "category": "math",
+    "tags": [
+      "math",
+      "graphing",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/function-grapher.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "slope-explorer",
+    "title": "Slope Explorer",
+    "description": "Drag two points on a grid and watch the slope and line equation — slope-intercept and point-slope — update live.",
+    "icon": "📐",
+    "category": "math",
+    "tags": [
+      "math",
+      "algebra",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/slope-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "quadratic-explorer",
+    "title": "Quadratic Explorer",
+    "description": "See a parabola in standard, vertex and factored form at once, with a live graph and roots/vertex readouts.",
+    "icon": "🎢",
+    "category": "math",
+    "tags": [
+      "math",
+      "algebra",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/quadratic-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "systems-explorer",
+    "title": "Systems Explorer",
+    "description": "Two lines on a graph — see their intersection and the solved system live, including parallel and identical cases.",
+    "icon": "🔀",
+    "category": "math",
+    "tags": [
+      "math",
+      "algebra",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/systems-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "exponential-explorer",
+    "title": "Exponential Explorer",
+    "description": "y = a·bˣ with live sliders — see growth vs. decay, a table of values, and an optional linear comparison.",
+    "icon": "🚀",
+    "category": "math",
+    "tags": [
+      "math",
+      "algebra",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/exponential-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "inequality-grapher",
+    "title": "Inequality Grapher",
+    "description": "Shade a linear inequality or a system of them and see the solution region update as you edit the inequalities.",
+    "icon": "🔶",
+    "category": "math",
+    "tags": [
+      "math",
+      "algebra",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/inequality-grapher.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "stats-explorer",
+    "title": "Stats Explorer",
+    "description": "Enter a dataset and get mean, median, mode, quartiles, a histogram and a box plot, all computed live.",
+    "icon": "📊",
+    "category": "math",
+    "tags": [
+      "math",
+      "statistics",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/stats-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "scatter-plot-explorer",
+    "title": "Scatter Plot &amp; Best Fit",
+    "description": "Plot (x, y) data, fit a least-squares trend line, and read off the correlation coefficient live.",
+    "icon": "🔵",
+    "category": "math",
+    "tags": [
+      "math",
+      "statistics",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/scatter-plot-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "transformations-explorer",
+    "title": "Transformations",
+    "description": "Translate, reflect, rotate and dilate a shape on the coordinate grid and see the transformed vertices live.",
+    "icon": "🔄",
+    "category": "math",
+    "tags": [
+      "math",
+      "geometry",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/transformations-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "right-triangle-explorer",
+    "title": "Right Triangle Explorer",
+    "description": "Drag the legs of a right triangle and watch a² + b² = c² prove itself with squares drawn on each side.",
+    "icon": "🔺",
+    "category": "math",
+    "tags": [
+      "math",
+      "geometry",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/right-triangle-explorer.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "formula-sheet",
+    "title": "Formula Sheet",
+    "description": "A searchable high-school math reference — area, volume, coordinate geometry, algebra and finance formulas with worked examples.",
+    "icon": "📖",
+    "category": "math",
+    "tags": [
+      "math",
+      "reference",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/formula-sheet.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "number-converter",
+    "title": "Number Converter",
+    "description": "Convert between fractions, decimals and percents in either direction, with automatic simplification.",
+    "icon": "🔢",
+    "category": "math",
+    "tags": [
+      "math",
+      "arithmetic",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/number-converter.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "geometry-toolbox",
+    "title": "Geometry Toolbox",
+    "description": "Pick a 2D or 3D shape, enter its dimensions, and get area, perimeter, volume and surface area instantly.",
+    "icon": "📏",
+    "category": "math",
+    "tags": [
+      "math",
+      "geometry",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/geometry-toolbox.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "scientific-calculator",
+    "title": "Scientific Calculator",
+    "description": "A full scientific calculator with correct operator precedence, trig/log functions, memory and history.",
+    "icon": "🖩",
+    "category": "math",
+    "tags": [
+      "math",
+      "calculator",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/scientific-calculator.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "math-vocab-flashcards",
+    "title": "Math Vocab Flashcards",
+    "description": "Flip through academic math-vocabulary flashcard decks, term to definition and back, shuffle included.",
+    "icon": "🗂️",
+    "category": "math",
+    "tags": [
+      "math",
+      "vocabulary",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/math-vocab-flashcards.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "practice-problems",
+    "title": "Practice Problems",
+    "description": "Auto-generated arithmetic, integer and equation drills across difficulty levels, with instant answer checking.",
+    "icon": "✏️",
+    "category": "math",
+    "tags": [
+      "math",
+      "practice",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/practice-problems.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "core-skills-builder",
+    "title": "Core Skills Builder",
+    "description": "Drill foundational number skills — fraction operations, simplifying, GCF, LCM, order of operations and more.",
+    "icon": "🧩",
+    "category": "math",
+    "tags": [
+      "math",
+      "practice",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/core-skills-builder.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "equation-solver",
+    "title": "Equation Solver",
+    "description": "Solve linear and quadratic equations step by step, with every move explained like a patient teacher — and the answer checked at the end.",
+    "icon": "🧮",
+    "category": "fun",
+    "tags": [
+      "teaching",
+      "math",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/equation-solver.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "unit-converter",
+    "title": "Unit Converter",
+    "description": "Convert length, area, temperature, running pace and more across 12 categories — including the GIS units nobody remembers.",
+    "icon": "📏",
+    "category": "fun",
+    "tags": [
+      "units",
+      "GIS",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/unit-converter.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "vacation-selector",
+    "title": "Vacation Selector",
+    "description": "A short, adaptive survey — each page tailored to your last answers — matches you to travel destinations from a curated set of ~85 places worldwide, with shareable results.",
+    "icon": "🏝️",
+    "category": "fun",
+    "tags": [
+      "travel",
+      "quiz",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/vacation-selector.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "decision-wheel",
+    "title": "Decision Wheel",
+    "description": "Can't decide? Type your options and spin the wheel — confetti included. Share a link so the group can't blame you.",
+    "icon": "🎡",
+    "category": "fun",
+    "tags": [
+      "fun",
+      "random",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/decision-wheel.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "soccer-tactics-board",
+    "title": "Soccer Tactics Board",
+    "description": "Set up formations on a scale pitch, drag players, draw movement and passing runs, animate a move across frames, then export or share.",
+    "icon": "⚽",
+    "category": "fun",
+    "tags": [
+      "soccer",
+      "tactics",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/soccer-tactics-board.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "bracket-builder",
+    "title": "Tournament Bracket Builder",
+    "description": "Build single- or double-elimination brackets or a round-robin league, enter results, and watch standings and the champion emerge. Works for any contest.",
+    "icon": "🏆",
+    "category": "fun",
+    "tags": [
+      "tournaments",
+      "sports",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/bracket-builder.html",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "shot-map-xg",
+    "title": "Shot Map &amp; xG Visualizer",
+    "description": "Click a pitch to log shots and watch Expected Goals compute live from distance and angle — a shot map plus a cumulative xG race chart.",
+    "icon": "⚽",
+    "category": "fun",
+    "tags": [
+      "soccer",
+      "xG",
+      "no deps"
+    ],
+    "url": "https://mapzimus.github.io/max/shot-map-xg.html",
+    "status": "live",
+    "updated": "2026-07"
+  }
+]

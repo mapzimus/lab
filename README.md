@@ -1,56 +1,28 @@
-# 🗺️ mapzimus
+# Mapzimus Lab
 
-The staging ground for [mapzimus.com](https://mapzimus.com) — a home for in-progress
-projects, active tools, fantasy worlds, and games.
+Source for [mapzimus.com](https://mapzimus.com), the creative lab for Maxwell Howe's browser tools, games, unusual maps, and experiments.
 
-## How it's structured
+The initial release is a front door, not a forced migration. The 65 existing tools remain live at `mapzimus.github.io/max/`; this site provides the curated catalog, search, filters, favorites, and stable category routes. Individual tools can move to `mapzimus.com/tools/{slug}/` later without breaking their original URLs.
 
-Everything under `public/` is the website, served as plain static files:
+The first staging scaffold used a `public/` directory and a directly deployed static-assets Worker. The production implementation now follows the ecosystem plan: one source in `src/`, a reproducible `dist/` build, Cloudflare Pages Git integration, and preview deployments for branches and pull requests.
 
-```
-public/
-├── index.html        # the hub homepage
-├── 404.html          # shown for any missing page
-├── assets/site.css   # shared styles
-├── projects/         # 🚧 in-progress builds and experiments
-├── tools/            # 🛠️ active tools
-├── fantasy/          # 🐉 worldbuilding, maps, lore
-└── games/            # 🎮 playable things
+## Local build
+
+```powershell
+node scripts/build.mjs
+npx wrangler pages dev dist
 ```
 
-To stage something new, drop it into a subfolder (e.g. `public/games/snake/`)
-with its own `index.html`, then add a link to it from that section's index page.
-No build step, no framework — just files.
+## Cloudflare Pages
 
-## Running locally
+- Repository: `mapzimus/lab`
+- Production branch: `main`
+- Build command: `npm run build`
+- Build output directory: `dist`
+- Custom domain: `mapzimus.com`
 
-```sh
-npx wrangler dev
-```
+The committed `wrangler.jsonc` matches those settings. Preview branches use normal Pages preview deployments.
 
-Then open http://localhost:8787. (Or use any static file server pointed at
-`public/`, e.g. `python3 -m http.server -d public`.)
+## Updating the legacy catalog
 
-## Deploying to Cloudflare
-
-The site deploys as a [Cloudflare Worker with static assets](https://developers.cloudflare.com/workers/static-assets/),
-configured in `wrangler.jsonc`.
-
-### One-time setup
-
-1. `npx wrangler login` (opens a browser to authorize with your Cloudflare account)
-2. `npx wrangler deploy`
-
-Since mapzimus.com is already registered through Cloudflare, the zone exists in
-your account, and the `custom_domain` routes in `wrangler.jsonc` will
-automatically create the DNS records for `mapzimus.com` and `www.mapzimus.com`
-on the first deploy. No manual DNS setup needed.
-
-### Deploying updates
-
-```sh
-npx wrangler deploy
-```
-
-That's it. (Later, this can be wired to a GitHub Action or Cloudflare's Workers
-Builds so pushes to `main` deploy automatically.)
+`src/data/tools.json` is a normalized snapshot of the cards in `mapzimus/max`. Existing tool URLs are deliberately external during the first migration phase. Update the JSON when a legacy title, description, or tool URL changes.
