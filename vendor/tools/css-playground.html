@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Gradient &amp; Shadow Playground</title>
+<meta name="description" content="Visually build CSS gradients, layered box-shadows and border-radius shapes, then copy production-ready CSS. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.copyerr { color: var(--danger); border-color: var(--danger); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  /* ---- tabs ---- */
+  .tabs { display: inline-flex; gap: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px; margin-bottom: 16px; }
+  .tab { border: none; background: transparent; color: var(--muted); font-family: var(--sans); font-size: .9rem; padding: 8px 20px; border-radius: 999px; cursor: pointer; }
+  .tab:hover { color: var(--text); }
+  .tab[aria-selected="true"] { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--shadow); }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- panels / shared ---- */
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .panel[hidden] { display: none; }
+  .panelhead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .panelhead h2 { font-size: 1rem; margin: 0; letter-spacing: -0.01em; }
+  .panelhead .sep { flex: 1; }
+  .linklike { border: none; background: none; color: var(--muted); font-size: .8rem; text-decoration: underline; cursor: pointer; padding: 4px; font-family: var(--sans); }
+  .linklike:hover { color: var(--accent); }
+
+  fieldset { border: none; margin: 0; padding: 0; min-width: 0; }
+  .grouplbl, legend { font-size: .78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 0 0 8px; padding: 0; display: block; }
+  label.f { display: inline-flex; align-items: center; gap: 8px; font-size: .86rem; }
+  select, input[type="number"] { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 10px; font-size: .86rem; font-family: var(--sans); }
+  input[type="number"] { width: 76px; }
+  input[type="range"] { accent-color: var(--accent); min-width: 0; }
+  input[type="color"] { inline-size: 40px; block-size: 32px; padding: 2px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; }
+  input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+  .val { font-family: var(--mono); font-size: .8rem; color: var(--muted); min-width: 52px; text-align: right; }
+
+  .ctlrow { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin: 12px 0; }
+  .sliderrow { display: grid; grid-template-columns: 92px 1fr 58px; gap: 10px; align-items: center; margin: 6px 0; }
+  .sliderrow > label { font-size: .84rem; }
+
+  /* gradient */
+  .preview-grad { height: 220px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 14px; }
+  .stoprow { display: grid; grid-template-columns: auto 1fr 58px auto; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px dashed var(--border); }
+  .stoprow:last-child { border-bottom: none; }
+  .iconbtn { border: 1px solid var(--border); background: var(--surface); color: var(--muted); width: 30px; height: 30px; border-radius: 8px; cursor: pointer; font-size: .9rem; line-height: 1; }
+  .iconbtn:hover:not(:disabled) { color: var(--danger); border-color: var(--danger); }
+  .iconbtn:disabled { opacity: .35; cursor: not-allowed; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px 6px 7px; font-size: .82rem; cursor: pointer; font-family: var(--sans); }
+  .chip:hover { border-color: var(--accent); }
+  .chip .sw { width: 20px; height: 20px; border-radius: 50%; border: 1px solid var(--border); flex: none; }
+
+  /* code output */
+  .codebox { position: relative; margin-top: 14px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .codebox pre { margin: 0; font-family: var(--mono); font-size: .82rem; line-height: 1.55; white-space: pre; overflow-x: auto; padding-right: 96px; }
+  .codebox .btn { position: absolute; top: 8px; right: 8px; padding: 6px 11px; font-size: .8rem; }
+
+  /* shadow */
+  .stage { height: 260px; border-radius: var(--radius); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; background: #eef1f5; transition: background .2s; }
+  .stage.dark { background: #12161d; }
+  .stage .card { width: 200px; height: 128px; border-radius: 14px; background: #ffffff; color: #61707f; display: flex; align-items: center; justify-content: center; font-size: .85rem; }
+  .stage.dark .card { background: #232a36; color: #96a2b1; }
+  .stagetoggle { font-size: .8rem; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+  details.layer { border: 1px solid var(--border); border-radius: 10px; margin: 8px 0; background: var(--surface); }
+  details.layer summary { display: flex; align-items: center; gap: 10px; padding: 9px 12px; cursor: pointer; list-style: none; font-size: .86rem; }
+  details.layer summary::-webkit-details-marker { display: none; }
+  details.layer summary::before { content: "▸"; color: var(--muted); font-size: .8rem; transition: transform .15s; }
+  details.layer[open] summary::before { transform: rotate(90deg); }
+  details.layer summary code { font-family: var(--mono); font-size: .76rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  details.layer .lbody { padding: 4px 14px 12px; border-top: 1px dashed var(--border); }
+  details.layer .lmisc { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 8px; }
+
+  /* corners */
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .seg button { border: none; background: var(--surface); color: var(--muted); padding: 7px 14px; font-size: .84rem; cursor: pointer; font-family: var(--sans); }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .cornerwrap { display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 14px;
+    background-image: radial-gradient(color-mix(in srgb, var(--muted) 25%, transparent) 1px, transparent 1px); background-size: 16px 16px; }
+  #cornerPreview { width: 240px; height: 240px; max-width: 100%; }
+  .advgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 26px; margin-top: 10px; }
+  .note { color: var(--muted); font-size: .82rem; }
+  .note.err { color: var(--danger); }
+  .hint { color: var(--muted); font-size: .8rem; }
+
+  @media (max-width: 720px) {
+    .advgrid { grid-template-columns: 1fr; }
+    .sliderrow { grid-template-columns: 80px 1fr 52px; }
+    .stoprow { grid-template-columns: auto 1fr 48px auto; gap: 8px; }
+    .codebox pre { padding-right: 0; padding-top: 34px; }
+    .tabs { width: 100%; justify-content: stretch; }
+    .tab { flex: 1; padding: 8px 8px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>CSS Gradient &amp; Shadow Playground</h1>
+      <p>Build gradients, layered shadows and rounded corners with live sliders, then copy the exact CSS. Your setup is saved in the page address, so you can share it with a link.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Playground sections">
+    <button class="tab" role="tab" id="tabGrad" aria-selected="true" aria-controls="panelGrad" type="button">Gradient</button>
+    <button class="tab" role="tab" id="tabShadow" aria-selected="false" aria-controls="panelShadow" tabindex="-1" type="button">Shadow</button>
+    <button class="tab" role="tab" id="tabCorners" aria-selected="false" aria-controls="panelCorners" tabindex="-1" type="button">Corners</button>
+  </div>
+
+  <!-- ============ GRADIENT ============ -->
+  <section class="panel" id="panelGrad" role="tabpanel" aria-labelledby="tabGrad">
+    <div class="panelhead">
+      <h2>Gradient</h2>
+      <span class="sep"></span>
+      <button class="linklike" id="gradReset" type="button">Reset tab</button>
+    </div>
+
+    <div class="preview-grad" id="gradPreview" role="img" aria-label="Live gradient preview"></div>
+
+    <div class="ctlrow">
+      <label class="f">Type
+        <select id="gradType">
+          <option value="linear">Linear</option>
+          <option value="radial">Radial</option>
+          <option value="conic">Conic</option>
+        </select>
+      </label>
+      <span id="gLinearCtl" class="ctlrow" style="margin:0">
+        <label class="f" for="angRange">Angle</label>
+        <input type="range" id="angRange" min="0" max="360" step="1" value="135" style="width:180px" aria-label="Gradient angle in degrees">
+        <label class="f"><input type="number" id="angNum" min="0" max="360" step="1" value="135" aria-label="Gradient angle, numeric">°</label>
+      </span>
+      <span id="gRadialCtl" class="ctlrow" style="margin:0" hidden>
+        <label class="f">Shape
+          <select id="radShape">
+            <option value="circle">Circle</option>
+            <option value="ellipse">Ellipse</option>
+          </select>
+        </label>
+        <label class="f">Position <select id="radPos" class="posSel"></select></label>
+      </span>
+      <span id="gConicCtl" class="ctlrow" style="margin:0" hidden>
+        <label class="f" for="conRange">From</label>
+        <input type="range" id="conRange" min="0" max="360" step="1" value="0" style="width:150px" aria-label="Conic start angle in degrees">
+        <label class="f"><input type="number" id="conNum" min="0" max="360" step="1" value="0" aria-label="Conic start angle, numeric">°</label>
+        <label class="f">Position <select id="conPos" class="posSel"></select></label>
+      </span>
+    </div>
+
+    <fieldset>
+      <legend>Color stops <span class="hint" style="text-transform:none;font-weight:400;letter-spacing:0">(sorted by position automatically)</span></legend>
+      <div id="stopList"></div>
+      <div class="ctlrow">
+        <button class="btn" id="addStopBtn" type="button">＋ Add stop</button>
+        <button class="btn" id="randomBtn" type="button">🎲 Random</button>
+        <span class="note" id="gradNote" aria-live="polite"></span>
+      </div>
+    </fieldset>
+
+    <div class="grouplbl" style="margin-top:10px">Presets</div>
+    <div class="chips" id="gradPresets" role="group" aria-label="Gradient presets"></div>
+
+    <div class="codebox">
+      <pre id="gradCode" aria-label="Generated gradient CSS"></pre>
+      <button class="btn" id="gradCopy" type="button">Copy CSS</button>
+    </div>
+  </section>
+
+  <!-- ============ SHADOW ============ -->
+  <section class="panel" id="panelShadow" role="tabpanel" aria-labelledby="tabShadow" hidden>
+    <div class="panelhead">
+      <h2>Box shadow</h2>
+      <label class="stagetoggle"><input type="checkbox" id="stageDark"> Dark backdrop (preview only)</label>
+      <span class="sep"></span>
+      <button class="linklike" id="shadowReset" type="button">Reset tab</button>
+    </div>
+
+    <div class="stage" id="shadowStage">
+      <div class="card" id="shadowCard">Aa &nbsp;card</div>
+    </div>
+
+    <fieldset>
+      <legend>Shadow layers</legend>
+      <div id="layerList"></div>
+      <div class="ctlrow">
+        <button class="btn" id="addLayerBtn" type="button">＋ Add layer</button>
+        <span class="note" id="shadowNote" aria-live="polite"></span>
+      </div>
+    </fieldset>
+
+    <div class="grouplbl" style="margin-top:10px">Elevation presets</div>
+    <div class="chips" id="shadowPresets" role="group" aria-label="Shadow presets"></div>
+
+    <div class="codebox">
+      <pre id="shadowCode" aria-label="Generated box-shadow CSS"></pre>
+      <button class="btn" id="shadowCopy" type="button">Copy CSS</button>
+    </div>
+  </section>
+
+  <!-- ============ CORNERS ============ -->
+  <section class="panel" id="panelCorners" role="tabpanel" aria-labelledby="tabCorners" hidden>
+    <div class="panelhead">
+      <h2>Border radius</h2>
+      <span class="hint">The square is filled with your Gradient-tab gradient.</span>
+      <span class="sep"></span>
+      <button class="linklike" id="cornerReset" type="button">Reset tab</button>
+    </div>
+
+    <div class="cornerwrap">
+      <div id="cornerPreview" role="img" aria-label="Live border-radius preview"></div>
+    </div>
+
+    <div class="ctlrow">
+      <span class="seg" role="group" aria-label="Radius mode">
+        <button id="modeLinked" type="button" aria-pressed="true">Linked</button>
+        <button id="modeAdv" type="button" aria-pressed="false">Advanced (blob)</button>
+      </span>
+    </div>
+
+    <div id="linkedPanel">
+      <div class="sliderrow">
+        <label for="linkRange">All corners</label>
+        <input type="range" id="linkRange" min="0" max="120" step="1" value="24">
+        <span class="val" id="linkVal">24px</span>
+      </div>
+      <div class="ctlrow">
+        <span class="seg" role="group" aria-label="Radius unit">
+          <button id="unitPx" type="button" aria-pressed="true">px</button>
+          <button id="unitPct" type="button" aria-pressed="false">%</button>
+        </span>
+      </div>
+    </div>
+
+    <div id="advPanel" hidden>
+      <div class="ctlrow" style="margin-top:0">
+        <button class="btn" id="blobBtn" type="button">🫧 Blob (randomize)</button>
+        <span class="hint">8-value syntax: horizontal radii / vertical radii, per corner.</span>
+      </div>
+      <div class="advgrid">
+        <fieldset><legend>Horizontal radii</legend><div id="advH"></div></fieldset>
+        <fieldset><legend>Vertical radii</legend><div id="advV"></div></fieldset>
+      </div>
+    </div>
+
+    <div class="codebox">
+      <pre id="cornerCode" aria-label="Generated border-radius CSS"></pre>
+      <button class="btn" id="cornerCopy" type="button">Copy CSS</button>
+    </div>
+  </section>
+
+  <footer class="app">Everything runs in your browser — the link in the address bar carries your whole setup · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+/* ==========================================================
+   CSS Gradient & Shadow Playground — standalone, no deps.
+   Single source of truth: each tab builds ONE CSS value
+   string, applies it to the preview AND prints it.
+   ========================================================== */
+const $ = (s) => document.querySelector(s);
+const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+const clone = (o) => JSON.parse(JSON.stringify(o));
+
+// ---------- color helpers ----------
+function hexToRgb(hex){
+  let h = String(hex).replace('#','').trim();
+  if (h.length === 3) h = h.split('').map(c=>c+c).join('');
+  if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
+  const n = parseInt(h,16); return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+}
+function rgbToHex({r,g,b}){ return '#' + [r,g,b].map(v => clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''); }
+function hslToHex(h,s,l){
+  h=((h%360)+360)%360/360; s=clamp(s,0,100)/100; l=clamp(l,0,100)/100;
+  if (s===0){ const v=Math.round(l*255); return rgbToHex({r:v,g:v,b:v}); }
+  const q = l<0.5 ? l*(1+s) : l+s-l*s, p = 2*l-q;
+  const hue = (t)=>{ t=(t%1+1)%1; if(t<1/6) return p+(q-p)*6*t; if(t<1/2) return q; if(t<2/3) return p+(q-p)*(2/3-t)*6; return p; };
+  return rgbToHex({ r:hue(h+1/3)*255, g:hue(h)*255, b:hue(h-1/3)*255 });
+}
+function mixHex(a,b,t){
+  const A=hexToRgb(a)||{r:128,g:128,b:128}, B=hexToRgb(b)||{r:128,g:128,b:128};
+  return rgbToHex({ r:A.r+(B.r-A.r)*t, g:A.g+(B.g-A.g)*t, b:A.b+(B.b-A.b)*t });
+}
+const rand = (a,b) => a + Math.random()*(b-a);
+
+// ---------- state ----------
+const POSITIONS = ['center','top','top right','right','bottom right','bottom','bottom left','left','top left'];
+const DEFAULTS = {
+  grad: { type:'linear', angle:135, shape:'circle', rpos:'center', cangle:0, cpos:'center',
+          stops:[{c:'#667eea',p:0},{c:'#764ba2',p:100}] },
+  shadow: { layers:[{x:0,y:4,blur:12,spread:0,c:'#000000',a:15,inset:false}] },
+  corners: { mode:'linked', unit:'px', linked:24, h:[30,70,70,30], v:[30,30,70,70] },
+};
+let state = clone(DEFAULTS);
+let activeTab = 'g';
+let booting = true;
+
+const MAX_STOPS = 8, MIN_STOPS = 2, MAX_LAYERS = 5, MIN_LAYERS = 1;
+
+// ---------- CSS value builders (single source of truth) ----------
+function gradValue(){
+  const g = state.grad;
+  const stops = [...g.stops].sort((a,b)=>a.p-b.p).map(s=>`${s.c} ${s.p}%`).join(', ');
+  if (g.type === 'radial') return `radial-gradient(${g.shape} at ${g.rpos}, ${stops})`;
+  if (g.type === 'conic')  return `conic-gradient(from ${g.cangle}deg at ${g.cpos}, ${stops})`;
+  return `linear-gradient(${g.angle}deg, ${stops})`;
+}
+function shadowColor(L){
+  if (L.a >= 100) return L.c;
+  const {r,g,b} = hexToRgb(L.c) || {r:0,g:0,b:0};
+  return `rgba(${r}, ${g}, ${b}, ${Math.round(L.a)/100})`;
+}
+function shadowSeg(L){
+  return `${L.inset ? 'inset ' : ''}${L.x}px ${L.y}px ${L.blur}px ${L.spread}px ${shadowColor(L)}`;
+}
+function shadowValue(){ return state.shadow.layers.map(shadowSeg).join(',\n  '); }
+function cornerValue(){
+  const c = state.corners;
+  if (c.mode === 'linked') return `${c.linked}${c.unit}`;
+  return `${c.h.map(v=>v+'%').join(' ')} / ${c.v.map(v=>v+'%').join(' ')}`;
+}
+
+// ---------- output updates (build once → preview + code box) ----------
+function updateGrad(){
+  const v = gradValue();
+  $('#gradPreview').style.background = v;
+  $('#cornerPreview').style.background = v;   // delight: corners square uses the gradient
+  $('#gradCode').textContent = `background: ${v};`;
+  syncHash();
+}
+function updateShadow(){
+  const v = shadowValue();
+  $('#shadowCard').style.boxShadow = v;
+  $('#shadowCode').textContent = `box-shadow: ${v};`;
+  syncHash();
+}
+function updateCorners(){
+  const v = cornerValue();
+  $('#cornerPreview').style.borderRadius = v;
+  $('#cornerCode').textContent = `border-radius: ${v};`;
+  syncHash();
+}
+
+/* ==================== GRADIENT TAB ==================== */
+POSITIONS.forEach(p => {
+  for (const sel of document.querySelectorAll('.posSel')){
+    const o = document.createElement('option');
+    o.value = p; o.textContent = p; sel.appendChild(o);
+  }
+});
+
+function renderGradControls(){
+  const g = state.grad;
+  $('#gradType').value = g.type;
+  $('#gLinearCtl').hidden = g.type !== 'linear';
+  $('#gRadialCtl').hidden = g.type !== 'radial';
+  $('#gConicCtl').hidden  = g.type !== 'conic';
+  $('#angRange').value = g.angle;  $('#angNum').value = g.angle;
+  $('#radShape').value = g.shape;  $('#radPos').value = g.rpos;
+  $('#conRange').value = g.cangle; $('#conNum').value = g.cangle;
+  $('#conPos').value = g.cpos;
+}
+
+function renderStops(){
+  const list = $('#stopList'); list.innerHTML = '';
+  const n = state.grad.stops.length;
+  state.grad.stops.forEach((st, i) => {
+    const row = document.createElement('div');
+    row.className = 'stoprow';
+    row.innerHTML = `
+      <input type="color" value="${st.c}" aria-label="Stop ${i+1} color">
+      <input type="range" min="0" max="100" step="1" value="${st.p}" aria-label="Stop ${i+1} position, percent">
+      <span class="val">${st.p}%</span>
+      <button class="iconbtn" type="button" aria-label="Remove stop ${i+1}" ${n <= MIN_STOPS ? 'disabled' : ''}>✕</button>`;
+    const [color, range, , rm] = row.children;
+    const val = row.querySelector('.val');
+    color.addEventListener('input', () => { st.c = color.value; updateGrad(); });
+    range.addEventListener('input', () => { st.p = +range.value; val.textContent = st.p + '%'; updateGrad(); });
+    range.addEventListener('change', () => {   // pointer released → resort rows by position
+      state.grad.stops.sort((a,b)=>a.p-b.p);
+      renderStops(); updateGrad();
+    });
+    rm.addEventListener('click', () => {
+      if (state.grad.stops.length <= MIN_STOPS) return;
+      state.grad.stops.splice(i,1); renderStops(); updateGrad();
+    });
+    list.appendChild(row);
+  });
+  $('#addStopBtn').disabled = n >= MAX_STOPS;
+}
+
+$('#gradType').addEventListener('change', (e) => { state.grad.type = e.target.value; renderGradControls(); updateGrad(); });
+function bindAngle(rangeId, numId, key){
+  const r = $(rangeId), nI = $(numId);
+  r.addEventListener('input', () => { state.grad[key] = +r.value; nI.value = r.value; updateGrad(); });
+  nI.addEventListener('input', () => {
+    const v = clamp(Math.round(+nI.value || 0), 0, 360);
+    state.grad[key] = v; r.value = v; updateGrad();
+  });
+  nI.addEventListener('change', () => { nI.value = state.grad[key]; });
+}
+bindAngle('#angRange', '#angNum', 'angle');
+bindAngle('#conRange', '#conNum', 'cangle');
+$('#radShape').addEventListener('change', (e) => { state.grad.shape = e.target.value; updateGrad(); });
+$('#radPos').addEventListener('change',  (e) => { state.grad.rpos  = e.target.value; updateGrad(); });
+$('#conPos').addEventListener('change',  (e) => { state.grad.cpos  = e.target.value; updateGrad(); });
+
+$('#addStopBtn').addEventListener('click', () => {
+  const stops = state.grad.stops;
+  if (stops.length >= MAX_STOPS) return;
+  const sorted = [...stops].sort((a,b)=>a.p-b.p);
+  let gi = 0, gap = -1;                       // widest gap between neighbors
+  for (let i=0;i<sorted.length-1;i++){
+    const d = sorted[i+1].p - sorted[i].p;
+    if (d > gap){ gap = d; gi = i; }
+  }
+  const A = sorted[gi], B = sorted[gi+1];
+  stops.push({ c: mixHex(A.c, B.c, .5), p: Math.round((A.p + B.p)/2) });
+  stops.sort((a,b)=>a.p-b.p);
+  renderStops(); updateGrad();
+});
+
+$('#randomBtn').addEventListener('click', () => {
+  const base = rand(0,360), dir = Math.random() < .5 ? -1 : 1;
+  const n = Math.random() < .5 ? 2 : 3;
+  const sat = rand(55,80), li = rand(48,64), span = rand(35,65);
+  const stops = [];
+  for (let i=0;i<n;i++){
+    const t = i/(n-1);
+    stops.push({
+      c: hslToHex(base + dir*t*span, clamp(sat + rand(-6,6), 40, 88), clamp(li + rand(-5,5) + t*4, 34, 72)),
+      p: Math.round(t*100),
+    });
+  }
+  Object.assign(state.grad, { type:'linear', angle: (Math.round(rand(0,24))*15) % 361, stops });
+  renderGradControls(); renderStops(); updateGrad();
+});
+
+const GRAD_PRESETS = [
+  { name:'Dusk',       angle:135, stops:[['#667eea',0],['#764ba2',100]] },
+  { name:'Sunset',     angle:120, stops:[['#f6d365',0],['#fda085',55],['#f5576c',100]] },
+  { name:'Fresh',      angle:135, stops:[['#43e97b',0],['#38f9d7',100]] },
+  { name:'Deep space', angle:160, stops:[['#0f0c29',0],['#302b63',55],['#24243e',100]] },
+  { name:'Soft gray',  angle:180, stops:[['#fdfbfb',0],['#ebedee',100]] },
+  { name:'Brand blue', angle:135, stops:[['#2563eb',0],['#38bdf8',100]] },
+];
+GRAD_PRESETS.forEach(p => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'chip';
+  const mini = `linear-gradient(${p.angle}deg, ${p.stops.map(([c,pos])=>`${c} ${pos}%`).join(', ')})`;
+  b.innerHTML = `<span class="sw" style="background:${mini}" aria-hidden="true"></span>${p.name}`;
+  b.addEventListener('click', () => {
+    state.grad.type = 'linear'; state.grad.angle = p.angle;
+    state.grad.stops = p.stops.map(([c,pos]) => ({ c, p: pos }));
+    renderGradControls(); renderStops(); updateGrad();
+  });
+  $('#gradPresets').appendChild(b);
+});
+
+$('#gradReset').addEventListener('click', () => {
+  state.grad = clone(DEFAULTS.grad);
+  renderGradControls(); renderStops(); updateGrad();
+});
+
+/* ==================== SHADOW TAB ==================== */
+function layerSummary(L){ return `${L.inset ? 'inset ' : ''}${L.x}px ${L.y}px ${L.blur}px ${L.spread}px · ${Math.round(L.a)}%`; }
+
+function renderLayers(){
+  const list = $('#layerList'); list.innerHTML = '';
+  const n = state.shadow.layers.length;
+  state.shadow.layers.forEach((L, i) => {
+    const d = document.createElement('details');
+    d.className = 'layer'; if (i === 0 || n === 1) d.open = true;
+    d.innerHTML = `
+      <summary><strong>Layer ${i+1}</strong><code>${layerSummary(L)}</code>
+        <button class="iconbtn" type="button" aria-label="Remove layer ${i+1}" ${n <= MIN_LAYERS ? 'disabled' : ''}>✕</button>
+      </summary>
+      <div class="lbody">
+        <div class="lmisc">
+          <label class="f">Color <input type="color" value="${L.c}" data-k="c" aria-label="Layer ${i+1} shadow color"></label>
+          <label class="f"><input type="checkbox" data-k="inset" ${L.inset ? 'checked' : ''}> Inset (inner shadow)</label>
+        </div>
+      </div>`;
+    const body = d.querySelector('.lbody');
+    const code = d.querySelector('summary code');
+    const misc = d.querySelector('.lmisc');
+    const mkSlider = (label, k, min, max, unit) => {
+      const row = document.createElement('div');
+      row.className = 'sliderrow';
+      row.innerHTML = `<label>${label}</label>
+        <input type="range" min="${min}" max="${max}" step="1" value="${L[k]}" aria-label="Layer ${i+1} ${label.toLowerCase()}">
+        <span class="val">${L[k]}${unit}</span>`;
+      const r = row.querySelector('input'), val = row.querySelector('.val');
+      r.addEventListener('input', () => {
+        L[k] = +r.value; val.textContent = L[k] + unit;
+        code.textContent = layerSummary(L); updateShadow();
+      });
+      body.insertBefore(row, misc);
+    };
+    mkSlider('X offset', 'x', -50, 50, 'px');
+    mkSlider('Y offset', 'y', -50, 50, 'px');
+    mkSlider('Blur', 'blur', 0, 100, 'px');
+    mkSlider('Spread', 'spread', -50, 50, 'px');
+    mkSlider('Opacity', 'a', 0, 100, '%');
+    misc.querySelector('[data-k="c"]').addEventListener('input', (e) => { L.c = e.target.value; updateShadow(); });
+    misc.querySelector('[data-k="inset"]').addEventListener('change', (e) => {
+      L.inset = e.target.checked; code.textContent = layerSummary(L); updateShadow();
+    });
+    d.querySelector('summary .iconbtn').addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (state.shadow.layers.length <= MIN_LAYERS) return;
+      state.shadow.layers.splice(i,1); renderLayers(); updateShadow();
+    });
+    list.appendChild(d);
+  });
+  $('#addLayerBtn').disabled = n >= MAX_LAYERS;
+}
+
+$('#addLayerBtn').addEventListener('click', () => {
+  if (state.shadow.layers.length >= MAX_LAYERS) return;
+  state.shadow.layers.push({ x:0, y:8, blur:20, spread:-4, c:'#000000', a:16, inset:false });
+  renderLayers(); updateShadow();
+});
+
+const SHADOW_PRESETS = [
+  { name:'Subtle',     layers:[[0,1,2,0,'#000000',8,0]] },
+  { name:'Card',       layers:[[0,1,3,0,'#000000',12,0],[0,1,2,0,'#000000',24,0]] },
+  { name:'Raised',     layers:[[0,4,6,-1,'#000000',10,0],[0,10,20,-2,'#000000',15,0]] },
+  { name:'Floating',   layers:[[0,8,16,-4,'#000000',10,0],[0,25,50,-12,'#000000',25,0]] },
+  { name:'Inner glow', layers:[[0,2,8,0,'#000000',25,1]] },
+];
+SHADOW_PRESETS.forEach(p => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'chip'; b.textContent = p.name;
+  b.addEventListener('click', () => {
+    state.shadow.layers = p.layers.map(([x,y,blur,spread,c,a,inset]) => ({ x, y, blur, spread, c, a, inset: !!inset }));
+    renderLayers(); updateShadow();
+  });
+  $('#shadowPresets').appendChild(b);
+});
+
+$('#stageDark').addEventListener('change', (e) => $('#shadowStage').classList.toggle('dark', e.target.checked));
+$('#shadowReset').addEventListener('click', () => {
+  state.shadow = clone(DEFAULTS.shadow);
+  renderLayers(); updateShadow();
+});
+
+/* ==================== CORNERS TAB ==================== */
+const CORNER_NAMES = ['Top left','Top right','Bottom right','Bottom left'];
+function buildAdvSliders(){
+  [['#advH','h','horizontal'], ['#advV','v','vertical']].forEach(([sel, key, axis]) => {
+    const box = $(sel); box.innerHTML = '';
+    CORNER_NAMES.forEach((nm, i) => {
+      const row = document.createElement('div');
+      row.className = 'sliderrow';
+      row.innerHTML = `<label>${nm}</label>
+        <input type="range" min="0" max="100" step="1" value="${state.corners[key][i]}" aria-label="${nm} ${axis} radius, percent">
+        <span class="val">${state.corners[key][i]}%</span>`;
+      const r = row.querySelector('input'), val = row.querySelector('.val');
+      r.addEventListener('input', () => {
+        state.corners[key][i] = +r.value; val.textContent = r.value + '%'; updateCorners();
+      });
+      box.appendChild(row);
+    });
+  });
+}
+
+function renderCorners(){
+  const c = state.corners;
+  const linked = c.mode === 'linked';
+  $('#modeLinked').setAttribute('aria-pressed', linked);
+  $('#modeAdv').setAttribute('aria-pressed', !linked);
+  $('#linkedPanel').hidden = !linked;
+  $('#advPanel').hidden = linked;
+  $('#unitPx').setAttribute('aria-pressed', c.unit === 'px');
+  $('#unitPct').setAttribute('aria-pressed', c.unit === '%');
+  const r = $('#linkRange');
+  r.max = c.unit === 'px' ? 120 : 50;
+  c.linked = clamp(c.linked, 0, +r.max);
+  r.value = c.linked;
+  $('#linkVal').textContent = c.linked + c.unit;
+  buildAdvSliders();
+}
+
+$('#modeLinked').addEventListener('click', () => { state.corners.mode = 'linked'; renderCorners(); updateCorners(); });
+$('#modeAdv').addEventListener('click', () => { state.corners.mode = 'advanced'; renderCorners(); updateCorners(); });
+$('#unitPx').addEventListener('click', () => { state.corners.unit = 'px'; renderCorners(); updateCorners(); });
+$('#unitPct').addEventListener('click', () => { state.corners.unit = '%'; renderCorners(); updateCorners(); });
+$('#linkRange').addEventListener('input', (e) => {
+  state.corners.linked = +e.target.value;
+  $('#linkVal').textContent = state.corners.linked + state.corners.unit;
+  updateCorners();
+});
+$('#blobBtn').addEventListener('click', () => {
+  const c = state.corners;
+  c.h = c.h.map(() => Math.round(rand(25,75)));
+  c.v = c.h.map((h,i) => clamp(Math.round(100 - h + rand(-15,15)), 20, 80));
+  buildAdvSliders(); updateCorners();
+});
+$('#cornerReset').addEventListener('click', () => {
+  state.corners = clone(DEFAULTS.corners);
+  renderCorners(); updateCorners();
+});
+
+/* ==================== TABS ==================== */
+const TABS = [['g','tabGrad','panelGrad'], ['s','tabShadow','panelShadow'], ['c','tabCorners','panelCorners']];
+function selectTab(key, focus){
+  if (!TABS.some(t => t[0] === key)) key = 'g';
+  activeTab = key;
+  TABS.forEach(([k, tid, pid]) => {
+    const on = k === key;
+    const t = document.getElementById(tid);
+    t.setAttribute('aria-selected', String(on));
+    t.tabIndex = on ? 0 : -1;
+    document.getElementById(pid).hidden = !on;
+  });
+  if (focus) document.getElementById(TABS.find(t => t[0] === key)[1]).focus();
+  syncHash();
+}
+TABS.forEach(([k, tid]) => document.getElementById(tid).addEventListener('click', () => selectTab(k)));
+document.querySelector('.tabs').addEventListener('keydown', (e) => {
+  const idx = TABS.findIndex(t => t[0] === activeTab);
+  let next = null;
+  if (e.key === 'ArrowRight') next = (idx+1) % TABS.length;
+  else if (e.key === 'ArrowLeft') next = (idx+TABS.length-1) % TABS.length;
+  else if (e.key === 'Home') next = 0;
+  else if (e.key === 'End') next = TABS.length-1;
+  if (next !== null){ e.preventDefault(); selectTab(TABS[next][0], true); }
+});
+
+/* ==================== COPY ==================== */
+function flashBtn(b, txt, err){
+  if (!b.dataset.orig) b.dataset.orig = b.textContent;
+  b.textContent = txt; b.classList.add(err ? 'copyerr' : 'copied');
+  setTimeout(() => { b.textContent = b.dataset.orig; b.classList.remove('copied','copyerr'); }, 1200);
+}
+[['#gradCopy','#gradCode'], ['#shadowCopy','#shadowCode'], ['#cornerCopy','#cornerCode']].forEach(([bSel, cSel]) => {
+  $(bSel).addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText($(cSel).textContent); flashBtn($(bSel), '✓ Copied'); }
+    catch (e) { flashBtn($(bSel), 'Copy failed', true); }
+  });
+});
+
+/* ==================== URL HASH (shareable state) ==================== */
+function syncHash(){
+  if (booting) return;
+  const g = state.grad;
+  const stops = g.stops.map(s => s.c.slice(1) + '@' + s.p).join(',');
+  let gs;
+  if (g.type === 'radial')     gs = `r.${g.shape}.${g.rpos.replace(/ /g,'-')}.${stops}`;
+  else if (g.type === 'conic') gs = `c.${g.cangle}.${g.cpos.replace(/ /g,'-')}.${stops}`;
+  else                         gs = `l.${g.angle}.${stops}`;
+  const ss = state.shadow.layers.map(L => [L.x, L.y, L.blur, L.spread, L.c.slice(1), Math.round(L.a), L.inset?1:0].join(',')).join(';');
+  const co = state.corners;
+  const cs = co.mode === 'linked'
+    ? `l,${co.linked},${co.unit === '%' ? 'p' : 'x'}`
+    : `a,${co.h.join(',')},${co.v.join(',')}`;
+  history.replaceState(null, '', `#g=${gs}&s=${ss}&c=${cs}&t=${activeTab}`);
+}
+
+function readHash(){
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (!h) return;
+  const parts = {};
+  for (const kv of h.split('&')){
+    const i = kv.indexOf('=');
+    if (i > 0) parts[kv.slice(0,i)] = kv.slice(i+1);
+  }
+  const validPos = (p) => { p = String(p||'').replace(/-/g,' '); return POSITIONS.includes(p) ? p : 'center'; };
+  try {
+    if (parts.g){
+      const f = parts.g.split('.');
+      const stops = f[f.length-1].split(',').map(t => {
+        const [hex, p] = t.split('@');
+        const rgb = hexToRgb(hex);
+        if (!rgb || !isFinite(+p)) throw new Error('bad stop');
+        return { c: rgbToHex(rgb), p: clamp(Math.round(+p), 0, 100) };
+      });
+      if (stops.length >= MIN_STOPS && stops.length <= MAX_STOPS){
+        const g = state.grad;
+        g.stops = stops.sort((a,b)=>a.p-b.p);
+        if (f[0] === 'r'){ g.type='radial'; g.shape = f[1]==='ellipse'?'ellipse':'circle'; g.rpos = validPos(f[2]); }
+        else if (f[0] === 'c'){ g.type='conic'; g.cangle = clamp(Math.round(+f[1])||0, 0, 360); g.cpos = validPos(f[2]); }
+        else { g.type='linear'; g.angle = clamp(Math.round(+f[1])||0, 0, 360); }
+      }
+    }
+    if (parts.s){
+      const layers = parts.s.split(';').map(seg => {
+        const f = seg.split(',');
+        if (f.length !== 7) throw new Error('bad layer');
+        const rgb = hexToRgb(f[4]);
+        if (!rgb) throw new Error('bad layer color');
+        return {
+          x: clamp(Math.round(+f[0])||0, -50, 50), y: clamp(Math.round(+f[1])||0, -50, 50),
+          blur: clamp(Math.round(+f[2])||0, 0, 100), spread: clamp(Math.round(+f[3])||0, -50, 50),
+          c: rgbToHex(rgb), a: clamp(Math.round(+f[5])||0, 0, 100), inset: f[6] === '1',
+        };
+      });
+      if (layers.length >= MIN_LAYERS && layers.length <= MAX_LAYERS) state.shadow.layers = layers;
+    }
+    if (parts.c){
+      const f = parts.c.split(',');
+      if (f[0] === 'l'){
+        state.corners.mode = 'linked';
+        state.corners.unit = f[2] === 'p' ? '%' : 'px';
+        state.corners.linked = clamp(Math.round(+f[1])||0, 0, state.corners.unit === 'px' ? 120 : 50);
+      } else if (f[0] === 'a' && f.length === 9){
+        const vals = f.slice(1).map(v => clamp(Math.round(+v)||0, 0, 100));
+        state.corners.mode = 'advanced';
+        state.corners.h = vals.slice(0,4);
+        state.corners.v = vals.slice(4,8);
+      }
+    }
+    if (parts.t) activeTab = ['g','s','c'].includes(parts.t) ? parts.t : 'g';
+  } catch (e) {
+    state = clone(DEFAULTS); activeTab = 'g';
+  }
+}
+
+/* ==================== theme toggle ==================== */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+
+/* ==================== boot ==================== */
+readHash();
+renderGradControls(); renderStops();
+renderLayers();
+renderCorners();
+selectTab(activeTab);
+booting = false;
+updateGrad(); updateShadow(); updateCorners();
+</script>
+</body>
+</html>

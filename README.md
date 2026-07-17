@@ -1,22 +1,28 @@
-# Mapzimus Lab
+# Mapzimus
 
-Source for [mapzimus.com](https://mapzimus.com), the creative lab for Maxwell Howe's browser tools, games, unusual maps, and experiments.
+Source for [mapzimus.com](https://mapzimus.com), Maxwell Howe's working shelf of browser tools, maps, games, and experiments.
 
-The initial release is a front door, not a forced migration. The 65 existing tools remain live at `mapzimus.github.io/max/`; this site provides the curated catalog, search, filters, favorites, and stable category routes. Individual tools can move to `mapzimus.com/tools/{slug}/` later without breaking their original URLs.
-
-The first staging scaffold used a `public/` directory and a directly deployed static-assets Worker. The production implementation now follows the ecosystem plan: one source in `src/`, a reproducible `dist/` build, Cloudflare Pages Git integration, and preview deployments for branches and pull requests.
+The site is both the index and the host. The 65 single-file tools that previously opened at `mapzimus.github.io/max/*.html` now build to clean first-party routes such as `/coordinate-converter/`. The six larger projects in the catalog are copied into their own routes as part of the same build.
 
 ## Local build
 
 ```sh
-npm run build       # validates the catalog, then builds dist/
-npm run preview     # npx wrangler pages dev dist
+npm run build
+npm run check
+npm run preview
 ```
 
-The build fails if the catalog data is invalid: missing required fields,
-duplicate slugs, unknown categories, non-https URLs, or a featured slug that
-isn't in the catalog. GitHub Actions runs the same build on every push and
-pull request.
+The build validates the catalog, checks that every hosted source is present, generates the index pages and sitemap, rewrites links between the legacy standalone tools, and assembles the complete static site in `dist/`. `npm run check` rebuilds and then verifies every local `href`/`src` plus all 71 first-party catalog routes.
+
+## Site organization
+
+- `/` is an edited front page: six starting points, task-based shelves, and a shortened recent index.
+- `/tools/` is the complete browser-tool index.
+- `/maps/`, `/data/`, `/design/`, `/teaching/`, `/math/`, `/play/`, and `/experiments/` are focused sections.
+- Each standalone tool lives at `/<tool-slug>/`.
+- Larger apps keep memorable paths such as `/geopuesto/playground/`, `/transit/`, and `/concord-war/`.
+
+Source catalog records retain their previous public URLs as provenance. `scripts/build.mjs` generates `/data/catalog.json` with the new same-domain routes used by the live site.
 
 ## Cloudflare Pages
 
@@ -26,13 +32,8 @@ pull request.
 - Build output directory: `dist`
 - Custom domain: `mapzimus.com`
 
-The committed `wrangler.jsonc` matches those settings. Preview branches use normal Pages preview deployments.
+The global Content Security Policy was intentionally removed when the tools moved on-site: several maps and utilities load third-party tiles, scripts, images, or public APIs. The remaining response headers preserve HTTPS, MIME sniffing, referrer, framing, and browser-permission protections without disabling tool functionality.
 
-## Updating the legacy catalog
+## Updating hosted sources
 
-`src/data/tools.json` is a normalized snapshot of the cards in `mapzimus/max`. Existing tool URLs are deliberately external during the first migration phase. Update the JSON when a legacy title, description, or tool URL changes.
-
-`src/data/featured.json` controls the "Featured from the lab" shelf on the
-homepage — an ordered list of catalog slugs. The tool count in the hero and the
-"last catalog refresh" date in the footer are derived from the catalog at build
-time, so they stay accurate as the data changes.
+`vendor/` contains deployable snapshots rather than Git submodules so Cloudflare can build the private `mapzimus/max` tools and the public projects without additional repository credentials. Update a snapshot from its upstream repository, record the new commit in `vendor/SOURCES.md`, then run the local build and link checks.

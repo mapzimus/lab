@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Converter &amp; Resizer</title>
+<meta name="description" content="Convert images to PNG, JPEG, or WebP, resize them, and shrink file sizes — all in your browser. Nothing is uploaded. Fully client-side.">
+<style>
+  /* ---- Theme tokens: swap these to rebrand per site ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  /* extra tokens for this tool (amber "larger file" badge + checkerboard) */
+  :root { --warn:#9a6700; --check: rgba(17,24,32,.10); }
+  :root[data-theme="dark"] { --warn:#e3b341; --check: rgba(231,236,242,.09); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --warn:#e3b341; --check: rgba(231,236,242,.09); }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); filter: none; }
+  .btn.primary:disabled:hover { color: var(--accent-ink); border-color: var(--accent); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  /* privacy banner */
+  .privacy { display: flex; gap: 10px; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--ok); border-radius: 10px; padding: 10px 14px; font-size: .86rem; margin-bottom: 14px; box-shadow: var(--shadow); }
+  .privacy .ico { flex: none; }
+
+  /* drop zone */
+  .dropzone { border: 2px dashed var(--border); border-radius: var(--radius); background: var(--surface); transition: border-color .15s; }
+  .dropzone.empty { padding: 46px 20px; text-align: center; cursor: pointer; }
+  .dropzone.empty:hover, .dropzone.empty:focus-within { border-color: var(--accent); }
+  .dz-art { font-size: 3rem; line-height: 1; margin-bottom: 12px; }
+  .dz-big { font-size: 1.08rem; font-weight: 600; margin: 0 0 4px; }
+  .dz-sub { color: var(--muted); margin: 0 0 18px; font-size: .88rem; }
+  .dz-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .dropzone:not(.empty) { padding: 10px 14px; }
+  .dz-compact { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: .88rem; color: var(--muted); }
+  .dz-compact .grow { flex: 1; min-width: 180px; }
+  .dropzone.empty .dz-compact { display: none; }
+  .dropzone:not(.empty) .dz-empty { display: none; }
+
+  /* full-page drag veil */
+  .dropveil { position: fixed; inset: 0; z-index: 60; background: rgba(37,99,235,.12); display: flex; align-items: center; justify-content: center; pointer-events: none; }
+  .dropveil[hidden] { display: none; }
+  .dropveil > div { border: 3px dashed var(--accent); color: var(--accent); background: var(--surface); border-radius: 16px; padding: 24px 40px; font-size: 1.15rem; font-weight: 700; box-shadow: var(--shadow); }
+
+  /* notes */
+  .note { color: var(--muted); font-size: .82rem; margin: 8px 2px; }
+  .note.err { color: var(--danger); }
+  .note[hidden] { display: none; }
+
+  /* options */
+  .section { margin: 14px 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px 16px; }
+  .section h2 { font-size: .95rem; margin: 0 0 14px; letter-spacing: -0.01em; }
+  .opt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 16px 24px; }
+  .opt { min-width: 0; }
+  .opt.dim { opacity: .45; }
+  fieldset.opt { border: 0; padding: 0; margin: 0; }
+  .optlabel { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; padding: 0; }
+  .radios { display: flex; flex-direction: column; gap: 7px; }
+  .radios label { display: flex; align-items: baseline; gap: 8px; font-size: .9rem; cursor: pointer; }
+  .radios label.dim { opacity: .45; cursor: not-allowed; }
+  .radios small { color: var(--muted); font-size: .78rem; }
+  input[type="radio"], input[type="checkbox"], input[type="range"] { accent-color: var(--accent); }
+  input[type="range"] { width: 100%; margin: 10px 0 2px; }
+  #qualityVal { font-family: var(--mono); font-size: .82rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 0 6px; margin-left: 6px; text-transform: none; letter-spacing: 0; color: var(--text); }
+  .hint { color: var(--muted); font-size: .78rem; margin: 6px 0 0; }
+  select, input[type="number"] { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 10px; font-size: .88rem; font-family: var(--sans); }
+  select { width: 100%; max-width: 250px; }
+  input[type="number"] { width: 96px; }
+  input[type="color"] { border: 1px solid var(--border); background: var(--surface); border-radius: 9px; padding: 2px; width: 52px; height: 36px; cursor: pointer; }
+  .rf { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; font-size: .85rem; color: var(--muted); }
+  .rf[hidden] { display: none; }
+  .chk { display: inline-flex; align-items: center; gap: 6px; font-size: .84rem; color: var(--text); cursor: pointer; }
+  .bgrow { display: flex; align-items: center; gap: 10px; }
+
+  /* actions */
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 14px 0; }
+  #convertNote { flex: 1; min-width: 220px; margin: 0 2px; }
+
+  /* cards grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 12px; }
+  .grid[hidden] { display: none; }
+  .card { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; }
+  .card .rm { position: absolute; top: 8px; right: 8px; z-index: 2; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; font-size: .78rem; line-height: 1; display: flex; align-items: center; justify-content: center; }
+  .card .rm:hover { color: var(--danger); border-color: var(--danger); }
+  .thumb { height: 124px; display: flex; align-items: center; justify-content: center; background-color: var(--surface-2); background-image: conic-gradient(var(--check) 25%, transparent 0 50%, var(--check) 0 75%, transparent 0); background-size: 14px 14px; font-size: 1.6rem; }
+  .thumb img { max-width: 100%; max-height: 100%; display: block; }
+  .cbody { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .fname { font-size: .85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .fmeta { color: var(--muted); font-size: .75rem; font-family: var(--mono); }
+  .res { margin-top: auto; padding-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+  .rline { font-size: .77rem; font-family: var(--mono); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .delta { font-weight: 700; font-size: .72rem; border-radius: 999px; padding: 1px 7px; border: 1px solid transparent; }
+  .delta.ok { color: var(--ok); border-color: var(--ok); }
+  .delta.warn { color: var(--warn); border-color: var(--warn); }
+  .delta.same { color: var(--muted); border-color: var(--border); }
+  .res .err { font-size: .78rem; margin: 0; }
+  .dl { width: 100%; justify-content: center; padding: 7px 10px; font-size: .82rem; }
+  .convspin { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: .8rem; }
+  .spin { width: 22px; height: 22px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: rot .8s linear infinite; }
+  .spin.small { width: 14px; height: 14px; border-width: 2px; flex: none; }
+  @keyframes rot { to { transform: rotate(360deg); } }
+
+  @media (max-width: 720px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    header.app { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Image Converter &amp; Resizer</h1>
+      <p>Convert photos and graphics to PNG, JPEG, or WebP, shrink their dimensions, and compress file size — right here in your browser. Nothing is ever uploaded.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="privacy" role="note">
+    <span class="ico">🔒</span>
+    <span><strong>Private by design:</strong> your images never leave this device — all conversion happens locally in your browser. Bonus: re-encoding strips hidden EXIF metadata (camera details, timestamps, GPS location) from every converted file.</span>
+  </div>
+
+  <div class="dropzone empty" id="dropzone">
+    <input type="file" id="fileInput" accept="image/*" multiple class="visually-hidden" aria-label="Choose images to convert">
+    <div class="dz-empty">
+      <div class="dz-art" aria-hidden="true">🖼️ ➜ 🗜️</div>
+      <p class="dz-big">Drag &amp; drop images anywhere on this page</p>
+      <p class="dz-sub">PNG, JPEG, WebP, GIF, BMP… anything your browser can open — up to 50 files at once</p>
+      <div class="dz-actions">
+        <button class="btn primary" id="browseBtn" type="button">📂 Choose images</button>
+        <button class="btn" id="sampleBtn" type="button">✨ Try a sample image</button>
+      </div>
+    </div>
+    <div class="dz-compact">
+      <span class="grow" id="dzCount"></span>
+      <button class="btn" id="browseBtn2" type="button">📂 Add images</button>
+      <button class="btn" id="clearBtn" type="button">🗑 Clear all</button>
+    </div>
+  </div>
+  <p class="note" id="inputNote" aria-live="polite" hidden></p>
+  <p class="note" id="gifNote" hidden>🎞️ Heads-up: animated GIFs export their first frame only.</p>
+
+  <section class="section" aria-label="Conversion options">
+    <h2>Output options</h2>
+    <div class="opt-grid">
+      <fieldset class="opt">
+        <legend class="optlabel">Format</legend>
+        <div class="radios">
+          <label><input type="radio" name="fmt" value="image/png" id="fmtPng"> PNG <small>lossless, keeps transparency</small></label>
+          <label><input type="radio" name="fmt" value="image/jpeg" id="fmtJpeg" checked> JPEG <small>small files for photos</small></label>
+          <label id="webpLabel"><input type="radio" name="fmt" value="image/webp" id="fmtWebp"> WebP <small>modern, usually smallest</small></label>
+        </div>
+      </fieldset>
+
+      <div class="opt" id="qualityOpt">
+        <label class="optlabel" for="quality">Quality <output id="qualityVal" for="quality">0.85</output></label>
+        <input type="range" id="quality" min="0.1" max="1" step="0.05" value="0.85">
+        <p class="hint">0.7–0.85 is usually indistinguishable for photos. Not used for PNG (always lossless).</p>
+      </div>
+
+      <div class="opt">
+        <label class="optlabel" for="resizeMode">Resize</label>
+        <select id="resizeMode">
+          <option value="none">None — keep original size</option>
+          <option value="max">Max dimension (longest side)</option>
+          <option value="percent">Percent of original</option>
+          <option value="exact">Exact width × height</option>
+        </select>
+        <div class="rf" data-mode="max" hidden>
+          <input type="number" id="maxDim" min="1" max="20000" step="1" value="1920" aria-label="Longest side in pixels">
+          <span>px longest side — never enlarged</span>
+        </div>
+        <div class="rf" data-mode="percent" hidden>
+          <input type="number" id="percent" min="10" max="100" step="1" value="50" aria-label="Percent of original size">
+          <span>% of original (10–100)</span>
+        </div>
+        <div class="rf" data-mode="exact" hidden>
+          <input type="number" id="exactW" min="1" max="10000" step="1" placeholder="W" aria-label="Width in pixels">
+          <span>×</span>
+          <input type="number" id="exactH" min="1" max="10000" step="1" placeholder="H" aria-label="Height in pixels">
+          <span>px</span>
+          <label class="chk"><input type="checkbox" id="keepAspect" checked> keep aspect ratio</label>
+        </div>
+        <p class="note err" id="resizeNote" hidden></p>
+      </div>
+
+      <div class="opt" id="bgOpt">
+        <label class="optlabel" for="bgColor">Background color</label>
+        <div class="bgrow">
+          <input type="color" id="bgColor" value="#ffffff">
+          <span class="hint" style="margin:0">Used where transparent pixels meet JPEG — JPEG can't store transparency.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="btn primary" id="convertBtn" type="button" disabled>⚙️ Convert all</button>
+    <button class="btn" id="downloadAllBtn" type="button" disabled title="Downloads every converted file — your browser may ask to allow multiple downloads">⬇ Download all</button>
+    <span class="note" id="convertNote" aria-live="polite"></span>
+  </div>
+
+  <div class="grid" id="grid" hidden></div>
+
+  <footer class="app">Everything runs locally — images are never uploaded, and converted files come out without EXIF metadata · a <strong>max</strong> tool</footer>
+</div>
+
+<div class="dropveil" id="dropveil" hidden><div>⬇ Drop images to add them</div></div>
+
+<script type="module">
+/* ============================================================
+   Image Converter & Resizer — standalone, client-side, no deps.
+   ============================================================ */
+const $ = (s) => document.querySelector(s);
+
+const MAX_FILES = 50;
+const items = [];            // { id, file, name, size, type, width, height, thumbUrl, status, error, result }
+const cardEls = new Map();   // id -> element
+let uid = 0;
+let converting = false;
+
+const grid = $('#grid'), dropzone = $('#dropzone'), fileInput = $('#fileInput');
+const convertBtn = $('#convertBtn'), downloadAllBtn = $('#downloadAllBtn');
+const inputNote = $('#inputNote'), convertNote = $('#convertNote'), gifNote = $('#gifNote'), resizeNote = $('#resizeNote');
+
+/* ---------- small utils ---------- */
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const plural = (n, w) => n === 1 ? w : w + 's';
+function fmtBytes(n){
+  if (!Number.isFinite(n)) return '—';
+  if (n < 1024) return n + ' B';
+  if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+  return (n / (1024 * 1024)).toFixed(2) + ' MB';
+}
+function typeLabel(t){
+  const m = { 'image/png':'PNG', 'image/jpeg':'JPEG', 'image/webp':'WebP', 'image/gif':'GIF', 'image/bmp':'BMP', 'image/svg+xml':'SVG', 'image/avif':'AVIF', 'image/tiff':'TIFF' };
+  if (m[t]) return m[t];
+  return t && t.startsWith('image/') ? t.slice(6).toUpperCase() : 'Image';
+}
+function listNames(arr, max = 3){
+  const names = arr.map(x => x.name || 'unnamed').slice(0, max);
+  return names.join(', ') + (arr.length > max ? '…' : '');
+}
+function setNote(el, msg, isErr){
+  el.textContent = msg || '';
+  el.classList.toggle('err', !!isErr);
+  el.hidden = !msg;
+}
+// run async tasks with limited concurrency so 20 large photos don't OOM the tab
+async function pool(tasks, limit){
+  let i = 0;
+  const worker = async () => {
+    while (i < tasks.length){
+      const t = tasks[i++];
+      try { await t(); } catch (e) { /* each task handles its own errors */ }
+    }
+  };
+  await Promise.all(Array.from({ length: Math.max(1, Math.min(limit, tasks.length)) }, worker));
+}
+
+/* ---------- WebP export support detection ---------- */
+let WEBP_OK = false;
+try { WEBP_OK = document.createElement('canvas').toDataURL('image/webp').startsWith('data:image/webp'); } catch (e) {}
+if (!WEBP_OK){
+  const r = $('#fmtWebp');
+  r.disabled = true;
+  const lb = $('#webpLabel');
+  lb.classList.add('dim');
+  lb.title = "Your browser can't export WebP, so this option is disabled.";
+}
+
+/* ---------- decoding (EXIF-aware, with fallback) ---------- */
+// Returns { src, width, height, close() }. Prefers createImageBitmap with
+// imageOrientation:'from-image' so EXIF-rotated JPEGs come out upright;
+// falls back to <img> decode when that fails (older browsers, SVG, …).
+async function decodeFile(file){
+  try {
+    const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    return { src: bmp, width: bmp.width, height: bmp.height, close: () => { try { bmp.close(); } catch (e) {} } };
+  } catch (err) {
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await new Promise((resolve, reject) => {
+        const im = new Image();
+        im.onload = () => resolve(im);
+        im.onerror = () => reject(new Error('decode failed'));
+        im.src = url;
+      });
+      return {
+        src: img, width: img.naturalWidth, height: img.naturalHeight,
+        close: () => { img.onload = img.onerror = null; URL.revokeObjectURL(url); img.src = ''; }
+      };
+    } catch (e) {
+      URL.revokeObjectURL(url);
+      throw e;
+    }
+  }
+}
+
+async function makeThumb(dec){
+  const scale = Math.min(1, 240 / Math.max(dec.width, dec.height));
+  const w = Math.max(1, Math.round(dec.width * scale)), h = Math.max(1, Math.round(dec.height * scale));
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d');
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(dec.src, 0, 0, w, h);
+  const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+  cv.width = cv.height = 0;
+  return blob ? URL.createObjectURL(blob) : null;
+}
+
+/* ---------- adding files ---------- */
+function isImageFile(f){
+  if (f.type) return f.type.startsWith('image/');
+  return /\.(png|jpe?g|webp|gif|bmp|avif|svgz?|ico|tiff?)$/i.test(f.name || '');
+}
+
+async function addFiles(list){
+  const files = [...list];
+  if (!files.length) return;
+  const rejected = files.filter(f => !isImageFile(f));
+  let accepted = files.filter(isImageFile);
+  const room = Math.max(0, MAX_FILES - items.length);
+  const over = Math.max(0, accepted.length - room);
+  if (over) accepted = accepted.slice(0, room);
+
+  const msgs = [];
+  if (rejected.length) msgs.push(`Skipped ${rejected.length} ${plural(rejected.length, 'file')} that ${rejected.length === 1 ? "isn't an image" : "aren't images"}: ${listNames(rejected)}.`);
+  if (over) msgs.push(`This tool handles up to ${MAX_FILES} images at a time — ${over} ${plural(over, 'file')} skipped.`);
+  setNote(inputNote, msgs.join(' '), !!(rejected.length || over));
+
+  const entries = accepted.map(file => ({
+    id: ++uid, file, name: file.name || 'image', size: file.size, type: file.type || '',
+    width: 0, height: 0, thumbUrl: null, status: 'reading', error: null, result: null
+  }));
+  for (const en of entries){ items.push(en); grid.appendChild(makeCard(en)); }
+  refreshUI();
+  if (!entries.length) return;
+
+  await pool(entries.map(en => async () => {
+    try {
+      const dec = await decodeFile(en.file);
+      try {
+        if (!dec.width || !dec.height) throw new Error('empty image');
+        en.width = dec.width; en.height = dec.height;
+        en.thumbUrl = await makeThumb(dec);
+        en.status = 'ready';
+      } finally { dec.close(); }
+    } catch (err) {
+      en.status = 'unreadable';
+    }
+    updateCard(en);
+  }), 2);
+
+  const bad = entries.filter(e => e.status === 'unreadable');
+  if (bad.length){
+    bad.forEach(e => removeItem(e.id));
+    const prev = inputNote.hidden ? '' : inputNote.textContent + ' ';
+    setNote(inputNote, `${prev}Couldn't read ${bad.length} ${plural(bad.length, 'file')}: ${listNames(bad)}.`, true);
+  }
+  refreshUI();
+}
+
+/* ---------- cards ---------- */
+function makeCard(it){
+  const el = document.createElement('article');
+  el.className = 'card';
+  el.dataset.id = String(it.id);
+  el.dataset.name = it.name;
+  el.innerHTML = `
+    <button class="rm" type="button" title="Remove this image">✕</button>
+    <div class="thumb"></div>
+    <div class="cbody">
+      <div class="fname"></div>
+      <div class="fmeta"></div>
+      <div class="res"></div>
+    </div>`;
+  el.querySelector('.rm').setAttribute('aria-label', 'Remove ' + it.name);
+  const fn = el.querySelector('.fname');
+  fn.textContent = it.name; fn.title = it.name;
+  cardEls.set(it.id, el);
+  updateCard(it);
+  return el;
+}
+
+function updateCard(it){
+  const el = cardEls.get(it.id);
+  if (!el) return;
+  el.dataset.status = it.status;
+
+  const thumb = el.querySelector('.thumb');
+  if (it.status === 'reading'){
+    if (!thumb.querySelector('.spin')) thumb.innerHTML = '<div class="spin" role="status" aria-label="Reading image"></div>';
+  } else if (it.thumbUrl){
+    if (!thumb.querySelector('img')){
+      thumb.innerHTML = '';
+      const img = new Image();
+      img.src = it.thumbUrl; img.alt = '';
+      thumb.appendChild(img);
+    }
+  } else if (it.status !== 'unreadable'){
+    thumb.textContent = '🖼️';
+  }
+
+  el.querySelector('.fmeta').textContent = it.width
+    ? `${typeLabel(it.type)} · ${it.width}×${it.height} · ${fmtBytes(it.size)}`
+    : `${typeLabel(it.type)} · ${fmtBytes(it.size)}`;
+
+  const res = el.querySelector('.res');
+  if (it.status === 'converting'){
+    res.innerHTML = '<div class="convspin"><div class="spin small"></div> Converting…</div>';
+  } else if (it.error){
+    res.innerHTML = '';
+    const s = document.createElement('p');
+    s.className = 'note err'; s.textContent = it.error;
+    res.appendChild(s);
+  } else if (it.result){
+    const r = it.result;
+    const b = deltaBadge(it.size, r.size);
+    res.innerHTML = `
+      <div class="rline">${typeLabel(r.type)} · <span class="rdim">${r.width}×${r.height}</span> · <span class="rsize">${fmtBytes(r.size)}</span> <span class="delta ${b.cls}">${b.txt}</span></div>
+      <button class="btn dl" type="button">⬇ Download</button>`;
+    res.querySelector('.dl').title = 'Download ' + r.name;
+  } else {
+    res.innerHTML = '';
+  }
+}
+
+function deltaBadge(before, after){
+  const d = after - before;
+  if (!before || d === 0) return { cls: 'same', txt: '±0%' };
+  const pct = Math.abs(d / before * 100);
+  const num = Math.round(pct) === 0 ? pct.toFixed(1) : String(Math.round(pct));
+  return d < 0 ? { cls: 'ok', txt: '−' + num + '%' } : { cls: 'warn', txt: '+' + num + '%' };
+}
+
+function removeItem(id){
+  const idx = items.findIndex(i => i.id === id);
+  if (idx < 0) return;
+  const it = items[idx];
+  if (it.thumbUrl) URL.revokeObjectURL(it.thumbUrl);
+  it.result = null;
+  items.splice(idx, 1);
+  const el = cardEls.get(id);
+  if (el) el.remove();
+  cardEls.delete(id);
+  refreshUI();
+}
+
+function clearAll(){
+  [...items].forEach(i => removeItem(i.id));
+  setNote(inputNote, '');
+  setNote(convertNote, '');
+}
+
+function refreshUI(){
+  const has = items.length > 0;
+  dropzone.classList.toggle('empty', !has);
+  grid.hidden = !has;
+  $('#dzCount').textContent = has ? `${items.length} ${plural(items.length, 'image')} loaded — drop more anywhere on the page` : '';
+  gifNote.hidden = !items.some(i => i.type === 'image/gif');
+  convertBtn.disabled = converting || !items.some(i => i.status === 'ready' || i.status === 'done');
+  downloadAllBtn.disabled = converting || !items.some(i => i.result);
+}
+
+/* ---------- options ---------- */
+const currentFormat = () => document.querySelector('input[name="fmt"]:checked').value;
+
+function updateOptionStates(){
+  const fmt = currentFormat();
+  const isPng = fmt === 'image/png';
+  $('#quality').disabled = isPng;
+  $('#qualityOpt').classList.toggle('dim', isPng);
+  $('#bgOpt').classList.toggle('dim', fmt !== 'image/jpeg');
+}
+
+function showResizeFields(){
+  const mode = $('#resizeMode').value;
+  document.querySelectorAll('.rf').forEach(el => { el.hidden = el.dataset.mode !== mode; });
+  setNote(resizeNote, '');
+  if (mode === 'exact' && !$('#exactW').value && !$('#exactH').value){
+    const f = items.find(i => i.width && i.height);
+    if (f){ $('#exactW').value = f.width; $('#exactH').value = f.height; }
+  }
+}
+
+function getOptions(){
+  const fail = (msg, focusSel) => { setNote(resizeNote, msg, true); if (focusSel) $(focusSel).focus(); return null; };
+  setNote(resizeNote, '');
+  const opts = {
+    format: currentFormat(),
+    quality: parseFloat($('#quality').value),
+    bg: $('#bgColor').value,
+    mode: $('#resizeMode').value
+  };
+  if (opts.mode === 'max'){
+    const v = parseInt($('#maxDim').value, 10);
+    if (!(v > 0)) return fail('Enter the longest side in pixels.', '#maxDim');
+    opts.maxDim = Math.min(v, 20000);
+  } else if (opts.mode === 'percent'){
+    const v = parseFloat($('#percent').value);
+    if (!(v >= 10 && v <= 100)) return fail('Percent must be between 10 and 100.', '#percent');
+    opts.percent = v;
+  } else if (opts.mode === 'exact'){
+    const w = parseInt($('#exactW').value, 10), h = parseInt($('#exactH').value, 10);
+    if (!(w > 0) || !(h > 0)) return fail('Enter both width and height in pixels.', (w > 0) ? '#exactH' : '#exactW');
+    if (w > 10000 || h > 10000) return fail('Maximum size is 10000 px per side.');
+    opts.w = w; opts.h = h;
+  }
+  return opts;
+}
+
+function targetSize(w, h, o){
+  if (o.mode === 'max'){
+    const s = Math.min(1, o.maxDim / Math.max(w, h)); // never upscale
+    return [Math.max(1, Math.round(w * s)), Math.max(1, Math.round(h * s))];
+  }
+  if (o.mode === 'percent'){
+    const s = o.percent / 100;
+    return [Math.max(1, Math.round(w * s)), Math.max(1, Math.round(h * s))];
+  }
+  if (o.mode === 'exact') return [o.w, o.h];
+  return [w, h];
+}
+
+/* ---------- conversion ---------- */
+function outName(name, mime, w, h, ow, oh){
+  const base = name.replace(/\.[^.\/\\]+$/, '') || 'image';
+  const ext = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp' }[mime] || 'img';
+  const suffix = (w !== ow || h !== oh) ? `-${w}x${h}` : '-converted';
+  return `${base}${suffix}.${ext}`;
+}
+
+async function convertOne(it, opts){
+  const dec = await decodeFile(it.file);
+  try {
+    const [tw, th] = targetSize(dec.width, dec.height, opts);
+    const cv = document.createElement('canvas');
+    cv.width = tw; cv.height = th;
+    const ctx = cv.getContext('2d');
+    if (opts.format === 'image/jpeg'){ ctx.fillStyle = opts.bg; ctx.fillRect(0, 0, tw, th); }
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(dec.src, 0, 0, tw, th);
+    const blob = await new Promise((resolve, reject) =>
+      cv.toBlob(b => b ? resolve(b) : reject(new Error('encode failed')),
+        opts.format, opts.format === 'image/png' ? undefined : opts.quality));
+    cv.width = cv.height = 0; // free canvas memory promptly
+    return { blob, type: opts.format, width: tw, height: th, size: blob.size,
+             name: outName(it.name, opts.format, tw, th, dec.width, dec.height) };
+  } finally {
+    dec.close(); // close bitmap / revoke fallback URL right after draw
+  }
+}
+
+async function convertAll(){
+  if (converting) return;
+  const opts = getOptions();
+  if (!opts) return;
+  const targets = items.filter(i => i.status === 'ready' || i.status === 'done');
+  if (!targets.length) return;
+
+  converting = true;
+  convertBtn.setAttribute('data-busy', '1');
+  targets.forEach(i => { i.result = null; i.error = null; i.status = 'converting'; updateCard(i); });
+  refreshUI();
+  let done = 0, failed = 0;
+  setNote(convertNote, `Converting 0/${targets.length}…`);
+
+  await pool(targets.map(it => async () => {
+    try {
+      it.result = await convertOne(it, opts);
+    } catch (e) {
+      it.error = 'Could not convert this image.';
+      failed++;
+    }
+    it.status = 'done';
+    done++;
+    setNote(convertNote, `Converting ${done}/${targets.length}…`);
+    updateCard(it);
+  }), 2);
+
+  converting = false;
+  convertBtn.removeAttribute('data-busy');
+  const okItems = targets.filter(t => t.result);
+  const before = okItems.reduce((s, t) => s + t.size, 0);
+  const after = okItems.reduce((s, t) => s + t.result.size, 0);
+  let msg = okItems.length ? `Done — ${okItems.length} ${plural(okItems.length, 'image')} converted: ${fmtBytes(before)} → ${fmtBytes(after)} (${deltaBadge(before, after).txt})` : '';
+  if (failed) msg += `${msg ? ' · ' : ''}${failed} ${plural(failed, 'image')} failed`;
+  setNote(convertNote, msg, failed > 0 && !okItems.length);
+  refreshUI();
+}
+
+/* ---------- downloads ---------- */
+function downloadResult(it){
+  if (!it || !it.result) return;
+  const url = URL.createObjectURL(it.result.blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = it.result.name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+async function downloadAll(){
+  const list = items.filter(i => i.result);
+  if (!list.length) return;
+  if (list.length > 1) setNote(convertNote, `Starting ${list.length} downloads — your browser may ask to allow multiple downloads.`);
+  for (const it of list){
+    downloadResult(it);
+    await sleep(150);
+  }
+}
+
+/* ---------- events ---------- */
+$('#browseBtn').addEventListener('click', () => fileInput.click());
+$('#browseBtn2').addEventListener('click', () => fileInput.click());
+$('#clearBtn').addEventListener('click', clearAll);
+dropzone.addEventListener('click', (e) => {
+  if (dropzone.classList.contains('empty') && !e.target.closest('button')) fileInput.click();
+});
+fileInput.addEventListener('change', (e) => { addFiles(e.target.files); e.target.value = ''; });
+
+grid.addEventListener('click', (e) => {
+  const card = e.target.closest('.card');
+  if (!card) return;
+  const id = Number(card.dataset.id);
+  if (e.target.closest('.rm')) removeItem(id);
+  else if (e.target.closest('.dl')) downloadResult(items.find(i => i.id === id));
+});
+
+convertBtn.addEventListener('click', convertAll);
+downloadAllBtn.addEventListener('click', downloadAll);
+
+document.querySelectorAll('input[name="fmt"]').forEach(r => r.addEventListener('change', updateOptionStates));
+$('#quality').addEventListener('input', () => { $('#qualityVal').textContent = parseFloat($('#quality').value).toFixed(2); });
+$('#resizeMode').addEventListener('change', showResizeFields);
+['#maxDim', '#percent', '#exactW', '#exactH'].forEach(sel => $(sel).addEventListener('input', () => setNote(resizeNote, '')));
+
+// "keep aspect ratio" links the two exact fields using the FIRST image's aspect
+function firstAspect(){
+  const f = items.find(i => i.width && i.height);
+  return f ? f.width / f.height : null;
+}
+function syncExact(from){
+  const a = firstAspect();
+  if (!a) return;
+  if (from === 'w'){
+    const w = parseInt($('#exactW').value, 10);
+    if (w > 0) $('#exactH').value = Math.max(1, Math.round(w / a));
+  } else {
+    const h = parseInt($('#exactH').value, 10);
+    if (h > 0) $('#exactW').value = Math.max(1, Math.round(h * a));
+  }
+}
+$('#exactW').addEventListener('input', () => { if ($('#keepAspect').checked) syncExact('w'); });
+$('#exactH').addEventListener('input', () => { if ($('#keepAspect').checked) syncExact('h'); });
+$('#keepAspect').addEventListener('change', () => { if ($('#keepAspect').checked && $('#exactW').value) syncExact('w'); });
+
+/* ---------- drag & drop anywhere ---------- */
+const veil = $('#dropveil');
+let dragDepth = 0;
+const dragHasFiles = (e) => e.dataTransfer && [...(e.dataTransfer.types || [])].includes('Files');
+document.addEventListener('dragenter', (e) => {
+  if (!dragHasFiles(e)) return;
+  e.preventDefault();
+  dragDepth++;
+  veil.hidden = false;
+});
+document.addEventListener('dragover', (e) => { e.preventDefault(); });
+document.addEventListener('dragleave', () => {
+  dragDepth = Math.max(0, dragDepth - 1);
+  if (dragDepth === 0) veil.hidden = true;
+});
+document.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dragDepth = 0;
+  veil.hidden = true;
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
+});
+
+/* ---------- sample image (so the tool is testable with one click) ---------- */
+function rr(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+$('#sampleBtn').addEventListener('click', () => {
+  const W = 800, H = 500;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  // rounded gradient card with a transparent margin (shows JPEG background flattening)
+  rr(ctx, 40, 30, W - 80, H - 60, 28);
+  const g = ctx.createLinearGradient(40, 30, W - 40, H - 30);
+  g.addColorStop(0, '#1e3a8a'); g.addColorStop(.55, '#2563eb'); g.addColorStop(1, '#7c3aed');
+  ctx.fillStyle = g; ctx.fill();
+  ctx.save();
+  rr(ctx, 40, 30, W - 80, H - 60, 28); ctx.clip();
+  ctx.fillStyle = 'rgba(251,191,36,.95)';
+  ctx.beginPath(); ctx.arc(620, 130, 58, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(16,185,129,.85)';
+  ctx.beginPath(); ctx.moveTo(40, H - 30); ctx.quadraticCurveTo(260, 250, 520, H - 30); ctx.fill();
+  ctx.fillStyle = 'rgba(5,150,105,.9)';
+  ctx.beginPath(); ctx.moveTo(300, H - 30); ctx.quadraticCurveTo(560, 290, 780, H - 30); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.65)';
+  for (let i = 0; i < 60; i++){
+    ctx.globalAlpha = .2 + Math.random() * .6;
+    ctx.fillRect(60 + Math.random() * 680, 45 + Math.random() * 160, 2, 2);
+  }
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '700 44px ' + getComputedStyle(document.body).fontFamily;
+  ctx.fillText('Sample image', 76, 112);
+  ctx.font = '400 20px ' + getComputedStyle(document.body).fontFamily;
+  ctx.fillText('800 × 500 · has transparent corners', 78, 146);
+  ctx.restore();
+  // light noise inside the card so compression quality visibly matters
+  const nd = ctx.getImageData(40, 30, W - 80, H - 60);
+  const d = nd.data;
+  for (let i = 0; i < d.length; i += 4){
+    if (d[i + 3] === 0) continue;
+    const n = (Math.random() * 14 - 7) | 0;
+    d[i] += n; d[i + 1] += n; d[i + 2] += n;
+  }
+  ctx.putImageData(nd, 40, 30);
+  cv.toBlob(b => { if (b) addFiles([new File([b], 'sample-image.png', { type: 'image/png' })]); }, 'image/png');
+});
+
+/* ---------- boot ---------- */
+updateOptionStates();
+showResizeFields();
+refreshUI();
+
+/* ---------- theme ---------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

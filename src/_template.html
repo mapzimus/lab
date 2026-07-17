@@ -11,66 +11,112 @@
   <meta property="og:description" content="{{DESCRIPTION}}">
   <meta property="og:url" content="{{CANONICAL}}">
   <meta name="twitter:card" content="summary">
-  <meta name="theme-color" content="#f4f0e7">
+  <meta name="theme-color" content="#f5f1e8">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <script src="/app.js" defer></script>
 </head>
 <body data-view="{{VIEW}}">
-  <a class="skip-link" href="#catalog">Skip to catalog</a>
+  <a class="skip-link" href="#catalog">Skip to the index</a>
+
   <header class="site-header">
     <a class="brand" href="/" aria-label="Mapzimus home">
-      <span class="brand-mark" aria-hidden="true">MZ</span>
-      <span>Mapzimus</span>
+      <span class="brand-mark" aria-hidden="true">M</span>
+      <span class="brand-copy"><strong>Mapzimus</strong><small>by Maxwell Howe</small></span>
     </a>
     <nav aria-label="Primary navigation">
       <a href="/tools/">Tools</a>
       <a href="/maps/">Maps</a>
-      <a href="/play/">Play</a>
+      <a href="/play/">Games</a>
       <a href="/experiments/">Experiments</a>
-      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">GIS portfolio <span aria-hidden="true">↗</span></a>
     </nav>
   </header>
 
   <main>
     <section class="hero">
-      <div class="eyebrow">A creative lab by Maxwell Howe</div>
-      <h1>{{HEADING}}</h1>
-      <p>{{INTRO}}</p>
-      <div class="trust-row" aria-label="Site promises">
-        <span>{{TOOL_COUNT}} browser tools</span>
-        <span>No account required</span>
-        <span>Files stay in your browser when noted</span>
+      <div class="hero-main">
+        <span class="eyebrow">{{EYEBROW}}</span>
+        <h1>{{HEADING}}</h1>
+        <p>{{INTRO}}</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#catalog">Browse the index</a>
+          <button class="button text-button" id="randomButton" type="button">Surprise me <span aria-hidden="true">↗</span></button>
+        </div>
       </div>
+      <aside class="field-note" aria-label="About this site">
+        <span class="note-label">Field note № 01</span>
+        <p>These are working things, not screenshots. Open a tool and use it here.</p>
+        <dl>
+          <div><dt>{{TOOL_COUNT}}</dt><dd>browser tools</dd></div>
+          <div><dt>{{LAB_COUNT}}</dt><dd>things in the lab</dd></div>
+          <div><dt>0</dt><dd>accounts required</dd></div>
+        </dl>
+      </aside>
     </section>
 
     <section class="featured" id="featuredSection" aria-labelledby="featuredHeading"{{FEATURED_ATTR}}>
       <div class="section-heading">
-        <div><span class="eyebrow">Start here</span><h2 id="featuredHeading">Featured from the lab</h2></div>
-        <p>A changing shelf of useful and unusual things.</p>
+        <div>
+          <span class="eyebrow">A good place to start</span>
+          <h2 id="featuredHeading">Six things worth opening</h2>
+        </div>
+        <p>A mix of useful, geographic, and slightly unnecessary.</p>
       </div>
       <div class="featured-grid" id="featuredGrid"></div>
     </section>
 
+    <section class="browse" id="browseSection" aria-labelledby="browseHeading"{{BROWSE_ATTR}}>
+      <div class="section-heading compact-heading">
+        <div>
+          <span class="eyebrow">Browse by shelf</span>
+          <h2 id="browseHeading">What are you here to do?</h2>
+        </div>
+      </div>
+      <div class="shelf-grid" id="shelfGrid"></div>
+    </section>
+
     <section class="catalog" id="catalog" aria-labelledby="catalogHeading">
       <div class="section-heading">
-        <div><span class="eyebrow">Browse</span><h2 id="catalogHeading">The full shelf</h2></div>
-        <p id="resultCount" aria-live="polite"></p>
+        <div>
+          <span class="eyebrow">The index</span>
+          <h2 id="catalogHeading">{{CATALOG_HEADING}}</h2>
+        </div>
+        <p>{{CATALOG_INTRO}}</p>
       </div>
+
       <div class="catalog-controls">
-        <label class="search-field"><span class="visually-hidden">Search the catalog</span><input id="searchInput" type="search" placeholder="Search tools, maps, and experiments…" autocomplete="off"></label>
-        <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
-        <button class="quiet-button" id="favoritesButton" type="button" aria-pressed="false">Favorites</button>
+        <label class="search-field">
+          <span>Search</span>
+          <input id="searchInput" type="search" placeholder="GeoJSON, color, algebra…" autocomplete="off">
+        </label>
+        <label class="select-field">
+          <span>Section</span>
+          <select id="categorySelect" aria-label="Filter by section"></select>
+        </label>
+        <div class="result-block">
+          <span id="resultCount" aria-live="polite"></span>
+          <button class="index-link" id="showAllButton" type="button">Open the complete index</button>
+        </div>
       </div>
+
       <div class="catalog-grid" id="catalogGrid"></div>
-      <div class="empty" id="emptyState" hidden>No matches. Try a broader word or another category.</div>
-      <noscript><div class="empty">The catalog needs JavaScript to search and filter. Everything is still browsable at <a href="https://mapzimus.github.io/max/">the legacy tool library</a>.</div></noscript>
+      <div class="empty" id="emptyState" hidden>No matches. Try a broader word or another section.</div>
+      <noscript><div class="empty">JavaScript is only used to search this index. The hosted tools themselves remain available at their direct URLs.</div></noscript>
     </section>
   </main>
 
   <footer>
-    <p>Mapzimus is the creative lab. For case studies and professional GIS work, visit <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
-    <p class="footer-note">Built as a small static site. Last catalog refresh: {{CATALOG_REFRESH}}.</p>
+    <div>
+      <strong>Mapzimus</strong>
+      <p>A working shelf of maps, browser tools, games, and experiments by Maxwell Howe.</p>
+    </div>
+    <div class="footer-links">
+      <a href="/tools/">Complete index</a>
+      <a href="https://github.com/mapzimus">Source on GitHub <span aria-hidden="true">↗</span></a>
+      <a href="https://maxwellhowegis.com">Professional GIS <span aria-hidden="true">↗</span></a>
+    </div>
+    <p class="footer-note">Catalog checked {{CATALOG_REFRESH}}.</p>
   </footer>
 </body>
 </html>

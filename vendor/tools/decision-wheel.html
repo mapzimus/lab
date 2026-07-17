@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decision Wheel</title>
+<meta name="description" content="Type your options, spin the wheel, and let fate decide. Share your wheel with a link. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+  .btn.primary:disabled:hover { color: var(--accent-ink); filter: none; }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+  /* ---- layout ---- */
+  .layout { display: grid; grid-template-columns: minmax(270px, 340px) 1fr; gap: 18px; align-items: start; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .panel h2 { font-size: .95rem; margin: 0 0 8px; letter-spacing: -0.01em; }
+  label.field { display: block; font-size: .82rem; color: var(--muted); margin-bottom: 6px; }
+  textarea#optionsBox { width: 100%; min-height: 218px; resize: vertical; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 9px; padding: 10px 12px; font-family: var(--sans); font-size: .92rem; line-height: 1.6; }
+  textarea#optionsBox:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  textarea#optionsBox:disabled { opacity: .6; }
+  .note { color: var(--muted); font-size: .8rem; min-height: 1.2em; margin: 7px 0 0; }
+  .note.err { color: var(--danger); }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .check { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: .86rem; cursor: pointer; }
+  .check input { accent-color: var(--accent); width: 16px; height: 16px; }
+
+  /* history */
+  .history { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
+  .history .head { display: flex; justify-content: space-between; align-items: baseline; font-size: .8rem; color: var(--muted); margin-bottom: 8px; }
+  .history .head a { font-size: .78rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px 11px; font-size: .8rem; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chip.latest { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+  /* ---- wheel ---- */
+  .wheelbox { display: flex; flex-direction: column; align-items: center; }
+  .wheel-area { position: relative; width: 100%; max-width: 480px; aspect-ratio: 1; margin: 14px auto 6px; }
+  canvas#wheel { display: block; width: 100%; height: 100%; }
+  canvas#confetti { position: absolute; inset: -40px; width: calc(100% + 80px); height: calc(100% + 80px); pointer-events: none; z-index: 5; }
+  .pointer { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 0; height: 0; z-index: 3;
+    border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 26px solid var(--accent);
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
+  #hubBtn { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 2;
+    width: 26%; aspect-ratio: 1; border-radius: 50%; border: 4px solid var(--surface); background: var(--accent); color: var(--accent-ink);
+    font-family: var(--sans); font-weight: 800; font-size: clamp(.8rem, 3.2vw, 1.05rem); letter-spacing: .06em; cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,.28); }
+  #hubBtn:hover:not(:disabled) { filter: brightness(1.08); }
+  #hubBtn:active:not(:disabled) { transform: translate(-50%,-50%) scale(.96); }
+  #hubBtn:disabled { cursor: not-allowed; filter: saturate(.5) brightness(.9); }
+  #hubBtn:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+  .under { display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+  .kbd { color: var(--muted); font-size: .8rem; }
+  .kbd code { font-family: var(--mono); background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; }
+
+  /* winner */
+  .winner { width: 100%; max-width: 480px; margin-top: 14px; border: 2px solid var(--accent); border-radius: var(--radius); background: var(--surface-2); padding: 14px 16px; text-align: center; }
+  .winner[hidden] { display: none; }
+  .winner .tag { font-size: .74rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
+  .winner .name { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.01em; margin: 2px 0 10px; overflow-wrap: anywhere; }
+  .winner .acts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .wheelbox { order: -1; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Decision Wheel</h1>
+      <p>Can't decide? Type your options, spin the wheel, and let fate pick one. Copy the link to share your wheel — everything stays in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="layout">
+    <section class="panel" aria-label="Wheel options">
+      <h2>Your options</h2>
+      <label class="field" for="optionsBox">One option per line (blank lines are ignored, up to 24 fit on the wheel)</label>
+      <textarea id="optionsBox" spellcheck="false" autocomplete="off"></textarea>
+      <p class="note" id="optNote"></p>
+      <div class="row">
+        <button class="btn" id="shuffleBtn" type="button" title="Reorder the options randomly">🔀 Shuffle</button>
+        <button class="btn" id="copyLinkBtn" type="button" title="Copy a link that opens this wheel with these options">🔗 Copy link</button>
+        <button class="btn" id="soundBtn" type="button" aria-pressed="true" title="Toggle the ticking sound">🔊 Sound</button>
+      </div>
+      <label class="check"><input type="checkbox" id="removeAfter"> Remove winner after each pick</label>
+      <div class="history" id="historyWrap" hidden>
+        <div class="head"><span>Recent picks</span><a href="#" id="clearHist">clear</a></div>
+        <div class="chips" id="historyChips"></div>
+      </div>
+    </section>
+
+    <section class="panel wheelbox" aria-label="The wheel">
+      <div class="wheel-area" id="wheelArea">
+        <div class="pointer" aria-hidden="true"></div>
+        <canvas id="wheel" role="img" aria-label="Decision wheel"></canvas>
+        <button id="hubBtn" type="button" aria-label="Spin the wheel">SPIN</button>
+        <canvas id="confetti" aria-hidden="true"></canvas>
+      </div>
+      <div class="under">
+        <button class="btn primary" id="spinBtn" type="button">🎡 Spin the wheel</button>
+        <span class="kbd">or press <code>Space</code></span>
+      </div>
+      <div class="winner" id="winnerBox" hidden>
+        <div class="tag">🎉 Winner</div>
+        <div class="name" id="winnerName"></div>
+        <div class="acts">
+          <button class="btn" id="removeSpinBtn" type="button">Remove winner &amp; spin again</button>
+          <button class="btn" id="spinAgainBtn" type="button">Spin again</button>
+        </div>
+      </div>
+      <div class="visually-hidden" aria-live="polite" id="live"></div>
+    </section>
+  </div>
+
+  <footer class="app">Nothing you type leaves your browser — options live only in the page and its link · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+/* ============================================================
+   Decision Wheel — standalone, client-side, no deps.
+   Winner is always derived from final rotation geometry.
+   ============================================================ */
+(() => {
+'use strict';
+const $ = (s) => document.querySelector(s);
+const TAU = Math.PI * 2;
+const MAX_OPTIONS = 24;
+const DEFAULTS = ['Pizza 🍕','Sushi 🍣','Tacos 🌮','Burgers 🍔','Ramen 🍜','Thai curry 🍛'];
+
+// 10 hues that read in both light & dark themes (text color is picked per slice)
+const PALETTE = ['#e5484d','#f97316','#eab308','#84cc16','#22a06b','#0d9488','#3b82f6','#6366f1','#a855f7','#ec4899'];
+
+const els = {
+  box: $('#optionsBox'), note: $('#optNote'), wheel: $('#wheel'), confetti: $('#confetti'),
+  area: $('#wheelArea'), hub: $('#hubBtn'), spin: $('#spinBtn'), shuffle: $('#shuffleBtn'),
+  copyLink: $('#copyLinkBtn'), sound: $('#soundBtn'), removeAfter: $('#removeAfter'),
+  winnerBox: $('#winnerBox'), winnerName: $('#winnerName'), removeSpin: $('#removeSpinBtn'),
+  spinAgain: $('#spinAgainBtn'), historyWrap: $('#historyWrap'), historyChips: $('#historyChips'),
+  clearHist: $('#clearHist'), live: $('#live'),
+};
+const ctx = els.wheel.getContext('2d');
+
+// ---------- state ----------
+let options = [];            // [{ label, line }] — line = index into raw textarea lines
+let overflowCount = 0;       // options beyond MAX_OPTIONS (ignored on the wheel)
+let rotation = 0;            // radians; slice 0 starts under the pointer at rotation 0
+let spinning = false;
+let lastWinnerIndex = -1, lastWinnerLabel = '';
+let history = [];            // session only, latest first
+let forcedDuration = null;   // test hook
+let confettiFired = false, confettiRAF = 0;
+
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// crypto-honest uniform random in [0,1)
+function cryptoRand(){ const u = new Uint32Array(1); crypto.getRandomValues(u); return u[0] / 4294967296; }
+
+// ---------- geometry (the single source of truth for who wins) ----------
+// Slice i is drawn from (rotation - PI/2 + i*seg) clockwise; the pointer sits at -PI/2 (top).
+function winnerAt(rot, n){
+  if (n < 1) return -1;
+  const a = ((-rot) % TAU + TAU) % TAU;
+  return Math.min(n - 1, Math.floor(a / (TAU / n)));
+}
+
+// ---------- colors ----------
+function hexToRgb(hex){ const n = parseInt(hex.slice(1), 16); return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 }; }
+function relLum({r,g,b}){
+  const f = (c) => { c/=255; return c<=0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
+  return 0.2126*f(r)+0.7152*f(g)+0.0722*f(b);
+}
+function sliceColor(i, n){
+  const P = PALETTE.length;
+  // avoid first & last slice sharing a color when n wraps around the palette
+  if (n > 1 && i === n - 1 && n % P === 1) return PALETTE[(i + (P >> 1)) % P];
+  return PALETTE[i % P];
+}
+const textOn = (hex) => relLum(hexToRgb(hex)) > 0.45 ? '#1c2530' : '#ffffff';
+
+// ---------- drawing ----------
+function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+function drawWheel(){
+  const size = els.area.clientWidth || 480;
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const px = Math.round(size * dpr);
+  if (els.wheel.width !== px) { els.wheel.width = px; els.wheel.height = px; }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, size, size);
+  const c = size / 2, R = c - 6;
+  const n = options.length;
+  const bg = cssVar('--surface') || '#fff';
+
+  if (n === 0){
+    ctx.beginPath(); ctx.arc(c, c, R, 0, TAU);
+    ctx.fillStyle = cssVar('--surface-2') || '#eee'; ctx.fill();
+    ctx.setLineDash([7, 7]); ctx.strokeStyle = cssVar('--border') || '#ccc'; ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = cssVar('--muted') || '#888';
+    ctx.font = `600 ${Math.max(13, size/28)}px ${cssVar('--sans')}`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Add some options →', c, c);
+    return;
+  }
+
+  const seg = TAU / n;
+  for (let i = 0; i < n; i++){
+    const a0 = rotation - Math.PI/2 + i * seg;
+    ctx.beginPath(); ctx.moveTo(c, c);
+    ctx.arc(c, c, R, a0, a0 + seg); ctx.closePath();
+    ctx.fillStyle = sliceColor(i, n); ctx.fill();
+    if (n > 1){ ctx.strokeStyle = bg; ctx.lineWidth = Math.max(1.5, size/320); ctx.stroke(); }
+  }
+
+  // labels along each slice radius
+  const hubR = size * 0.145;
+  const fontPx = Math.max(9, Math.min(17, size/30 - n * 0.22));
+  const maxW = R - hubR - 26;
+  ctx.textBaseline = 'middle'; ctx.textAlign = 'right';
+  ctx.font = `600 ${fontPx.toFixed(1)}px ${cssVar('--sans')}`;
+  for (let i = 0; i < n; i++){
+    const mid = rotation - Math.PI/2 + (i + 0.5) * seg;
+    let label = options[i].label;
+    if (ctx.measureText(label).width > maxW){
+      while (label.length > 1 && ctx.measureText(label + '…').width > maxW) label = label.slice(0, -1);
+      label += '…';
+    }
+    ctx.save();
+    ctx.translate(c, c); ctx.rotate(mid);
+    ctx.fillStyle = textOn(sliceColor(i, n));
+    ctx.fillText(label, R - 14, 0);
+    ctx.restore();
+  }
+
+  // outer ring
+  ctx.beginPath(); ctx.arc(c, c, R, 0, TAU);
+  ctx.strokeStyle = cssVar('--border') || '#ccc'; ctx.lineWidth = 3; ctx.stroke();
+}
+
+// ---------- options parsing / sync ----------
+function parseFromText(){
+  const lines = els.box.value.split('\n');
+  const found = [];
+  lines.forEach((raw, line) => { const label = raw.trim(); if (label) found.push({ label, line }); });
+  overflowCount = Math.max(0, found.length - MAX_OPTIONS);
+  options = found.slice(0, MAX_OPTIONS);
+  updateUi();
+  drawWheel();
+  syncHash();
+}
+function updateUi(){
+  const n = options.length;
+  const canSpin = n >= 2 && !spinning;
+  els.spin.disabled = !canSpin; els.hub.disabled = !canSpin;
+  els.shuffle.disabled = spinning || n < 2;
+  if (spinning) els.note.textContent = '';
+  else if (n === 0) els.note.textContent = 'Type some options above — one per line.';
+  else if (n === 1) els.note.textContent = 'Add at least 2 options to spin.';
+  else if (overflowCount > 0) els.note.textContent = `Only the first ${MAX_OPTIONS} options fit on the wheel — ${overflowCount} more ignored.`;
+  else els.note.textContent = '';
+  els.wheel.setAttribute('aria-label', n ? `Decision wheel with ${n} options: ${options.map(o=>o.label).join(', ')}` : 'Empty decision wheel');
+}
+let debTimer = 0;
+els.box.addEventListener('input', () => { clearTimeout(debTimer); debTimer = setTimeout(parseFromText, 300); });
+function flushParse(){ clearTimeout(debTimer); parseFromText(); }
+
+function setTextTo(labels){ els.box.value = labels.join('\n'); flushParse(); }
+
+function removeOptionLabel(label){
+  flushParse();
+  const opt = options.find(o => o.label === label);
+  if (!opt) return false;
+  const lines = els.box.value.split('\n');
+  lines.splice(opt.line, 1);
+  els.box.value = lines.join('\n');
+  flushParse();
+  return true;
+}
+
+// ---------- URL hash share ----------
+function b64urlEncode(s){
+  const bytes = new TextEncoder().encode(s);
+  let bin = ''; bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64urlDecode(s){
+  s = s.replace(/-/g,'+').replace(/_/g,'/');
+  while (s.length % 4) s += '=';
+  const bin = atob(s);
+  const bytes = Uint8Array.from(bin, ch => ch.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+function syncHash(){
+  const labels = options.map(o => o.label);
+  const url = labels.length
+    ? '#' + b64urlEncode(labels.join('\n'))
+    : location.pathname + location.search; // no options → drop the hash
+  window.history.replaceState(null, '', url);
+}
+function optionsFromHash(){
+  const h = location.hash.slice(1);
+  if (!h) return null;
+  try {
+    const labels = b64urlDecode(h).split('\n').map(s => s.trim()).filter(Boolean);
+    return labels.length ? labels : null;
+  } catch(e){ return null; }
+}
+
+// ---------- sound ----------
+let audioCtx = null;
+let soundOn = localStorage.getItem('max-wheel-sound') !== 'off';
+function renderSoundBtn(){
+  els.sound.textContent = soundOn ? '🔊 Sound' : '🔇 Muted';
+  els.sound.setAttribute('aria-pressed', String(soundOn));
+}
+els.sound.addEventListener('click', () => {
+  soundOn = !soundOn;
+  localStorage.setItem('max-wheel-sound', soundOn ? 'on' : 'off');
+  renderSoundBtn();
+  if (soundOn){ ensureAudio(); tick(); } // audible confirmation (this click is a user gesture)
+});
+function ensureAudio(){
+  if (audioCtx || !soundOn) return;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return;
+  try { audioCtx = new AC(); } catch(e){ audioCtx = null; }
+}
+function tick(){
+  if (!soundOn || !audioCtx) return;
+  try {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+    osc.type = 'square'; osc.frequency.value = 1000;
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.12, t + 0.003);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.015);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.02);
+  } catch(e){}
+}
+
+// ---------- confetti ----------
+const cctx = els.confetti.getContext('2d');
+function stopConfetti(){
+  if (confettiRAF) cancelAnimationFrame(confettiRAF);
+  confettiRAF = 0;
+  cctx.setTransform(1,0,0,1,0,0);
+  cctx.clearRect(0, 0, els.confetti.width, els.confetti.height);
+}
+function launchConfetti(){
+  confettiFired = true;
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const w = els.confetti.clientWidth, h = els.confetti.clientHeight;
+  els.confetti.width = w * dpr; els.confetti.height = h * dpr;
+  cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const colors = PALETTE.concat([cssVar('--accent') || '#2563eb']);
+  const parts = [];
+  for (let i = 0; i < 120; i++){
+    const ang = Math.random() * TAU;
+    const sp = 120 + Math.random() * 340;
+    parts.push({
+      x: w/2, y: h/2,
+      vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - 160,
+      rot: Math.random() * TAU, vr: (Math.random() - .5) * 12,
+      c: colors[(Math.random() * colors.length) | 0],
+      s: 5 + Math.random() * 5,
+    });
+  }
+  const t0 = performance.now(); let last = t0;
+  function frame(now){
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const life = (now - t0) / 1500;
+    cctx.clearRect(0, 0, w, h);
+    if (life >= 1){ stopConfetti(); return; }
+    cctx.globalAlpha = life > .7 ? 1 - (life - .7) / .3 : 1;
+    for (const p of parts){
+      p.vy += 900 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
+      cctx.save(); cctx.translate(p.x, p.y); cctx.rotate(p.rot);
+      cctx.fillStyle = p.c; cctx.fillRect(-p.s/2, -p.s * 0.8, p.s, p.s * 1.6);
+      cctx.restore();
+    }
+    cctx.globalAlpha = 1;
+    confettiRAF = requestAnimationFrame(frame);
+  }
+  confettiRAF = requestAnimationFrame(frame);
+}
+
+// ---------- spinning ----------
+function setSpinLock(on){
+  spinning = on;
+  els.box.disabled = on;
+  els.removeSpin.disabled = on; els.spinAgain.disabled = on;
+  updateUi();
+}
+function spin(){
+  flushParse();
+  if (spinning || options.length < 2) return;
+  ensureAudio();
+  stopConfetti(); confettiFired = false;
+  els.winnerBox.hidden = true;
+  setSpinLock(true);
+
+  const turns = 4 + cryptoRand() * 3;                 // 4–7 full rotations
+  const delta = turns * TAU + cryptoRand() * TAU;     // + random final angle
+  const start = rotation, target = start + delta;
+  const dur = forcedDuration != null ? forcedDuration : (reducedMotion() ? 800 : 3500 + cryptoRand() * 1000);
+  const n = options.length;
+  let lastIdx = winnerAt(rotation, n);
+  const t0 = performance.now();
+
+  function frame(now){
+    const t = Math.min(1, (now - t0) / dur);
+    const e = 1 - Math.pow(1 - t, 3);                 // cubic ease-out
+    rotation = start + delta * e;
+    const idx = winnerAt(rotation, n);
+    if (idx !== lastIdx){ tick(); lastIdx = idx; }
+    drawWheel();
+    if (t < 1) requestAnimationFrame(frame);
+    else finishSpin(target, n);
+  }
+  requestAnimationFrame(frame);
+}
+function finishSpin(target, n){
+  rotation = ((target % TAU) + TAU) % TAU;            // normalize; same geometry
+  drawWheel();
+  const idx = winnerAt(rotation, n);                  // ← winner derived from final geometry
+  lastWinnerIndex = idx;
+  lastWinnerLabel = options[idx] ? options[idx].label : '';
+  setSpinLock(false);
+
+  els.winnerName.textContent = lastWinnerLabel;
+  els.winnerBox.hidden = false;
+  els.live.textContent = `Winner: ${lastWinnerLabel}`;
+  pushHistory(lastWinnerLabel);
+  if (!reducedMotion()) launchConfetti();
+
+  if (els.removeAfter.checked){
+    removeOptionLabel(lastWinnerLabel);
+    els.removeSpin.hidden = true;                      // already removed
+  } else {
+    els.removeSpin.hidden = false;
+  }
+}
+
+els.spin.addEventListener('click', spin);
+els.hub.addEventListener('click', spin);
+els.spinAgain.addEventListener('click', spin);
+els.removeSpin.addEventListener('click', () => {
+  removeOptionLabel(lastWinnerLabel);
+  els.winnerBox.hidden = true;
+  if (options.length >= 2) spin();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && !/^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(document.activeElement.tagName)){
+    e.preventDefault(); spin();
+  }
+});
+
+// ---------- shuffle ----------
+els.shuffle.addEventListener('click', () => {
+  if (spinning) return;
+  flushParse();
+  const labels = options.map(o => o.label);
+  for (let i = labels.length - 1; i > 0; i--){
+    const j = Math.floor(cryptoRand() * (i + 1));
+    [labels[i], labels[j]] = [labels[j], labels[i]];
+  }
+  setTextTo(labels);
+});
+
+// ---------- copy link ----------
+els.copyLink.addEventListener('click', async (e) => {
+  flushParse();
+  const btn = e.currentTarget;
+  try {
+    await navigator.clipboard.writeText(location.href);
+    btn.classList.add('copied'); const old = btn.textContent; btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1200);
+  } catch(err){
+    els.note.textContent = 'Copy blocked by the browser — copy the address bar instead.';
+  }
+});
+
+// ---------- remove-after checkbox (persisted) ----------
+els.removeAfter.checked = localStorage.getItem('max-wheel-remove') === 'on';
+els.removeAfter.addEventListener('change', () => {
+  localStorage.setItem('max-wheel-remove', els.removeAfter.checked ? 'on' : 'off');
+});
+
+// ---------- history ----------
+function pushHistory(label){
+  history.unshift(label);
+  if (history.length > 10) history.length = 10;
+  renderHistory();
+}
+function renderHistory(){
+  els.historyWrap.hidden = history.length === 0;
+  els.historyChips.innerHTML = '';
+  history.forEach((label, i) => {
+    const d = document.createElement('span');
+    d.className = 'chip' + (i === 0 ? ' latest' : '');
+    d.textContent = label;
+    els.historyChips.appendChild(d);
+  });
+}
+els.clearHist.addEventListener('click', (e) => { e.preventDefault(); history = []; renderHistory(); });
+
+// ---------- redraw on resize / theme ----------
+if ('ResizeObserver' in window) new ResizeObserver(() => drawWheel()).observe(els.area);
+else window.addEventListener('resize', drawWheel);
+new MutationObserver(() => drawWheel()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawWheel); } catch(e){}
+
+// ---------- test hook ----------
+window.__wheelTest = {
+  setDuration(ms){ forcedDuration = ms; },
+  winnerAt,
+  get rotation(){ return rotation; },
+  get lastWinnerIndex(){ return lastWinnerIndex; },
+  get lastWinnerLabel(){ return lastWinnerLabel; },
+  get options(){ return options.map(o => o.label); },
+  get spinning(){ return spinning; },
+  get confettiFired(){ return confettiFired; },
+};
+
+// ---------- theme toggle (shared convention) ----------
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+
+// ---------- boot ----------
+renderSoundBtn();
+const shared = optionsFromHash();
+els.box.value = (shared || DEFAULTS).join('\n');
+parseFromText();
+})();
+</script>
+</body>
+</html>

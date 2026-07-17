@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exponential Explorer</title>
+<meta name="description" content="Drag sliders to explore y = a·bˣ, see growth vs. decay labeled live, compare against a linear function, and read a table of values. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    /* tool-specific extras */
+    --accent2:#0d9488;
+    --warn-bg:#fff8e5; --warn-border:#e8cf8a; --warn-text:#7a5a00;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --accent2:#2dd4bf;
+    --warn-bg:#3a2e12; --warn-border:#5a4a1e; --warn-text:#e8c874;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --accent2:#2dd4bf;
+      --warn-bg:#3a2e12; --warn-border:#5a4a1e; --warn-text:#e8c874;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
+  canvas { display: block; width: 100%; height: auto; border-radius: 10px; }
+  .hint { text-align: center; color: var(--muted); font-size: .82rem; margin: 6px 0 0; }
+  .eqn { text-align: center; font-size: 1.35rem; font-weight: 800; color: var(--accent); margin: 4px 0 6px; font-variant-numeric: tabular-nums; }
+  .tag { text-align: center; font-weight: 700; font-size: .95rem; margin: 0 0 14px; }
+  .tag.growth { color: var(--ok); }
+  .tag.decay { color: var(--warn-text); }
+  .tag.constant { color: var(--muted); }
+  .label { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; font-weight: 700; }
+
+  .ctrl { display: grid; grid-template-columns: auto 1fr auto; gap: 10px 14px; align-items: center; }
+  .ctrl label { font-weight: 700; color: var(--accent); font-size: 1.05rem; }
+  .ctrl input[type=range] { width: 100%; accent-color: var(--accent); }
+  .ctrl input[type=number] { width: 80px; padding: 7px 8px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; text-align: center; background: var(--surface); color: var(--text); }
+  .cmp-ctrl .ctrl label { color: var(--accent2); }
+  .cmp-ctrl .ctrl input[type=range] { accent-color: var(--accent2); }
+
+  .warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-text); border-radius: 10px; padding: 8px 12px; font-size: .85rem; margin-top: 8px; }
+
+  .readouts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ro { background: var(--surface-2); border-radius: 10px; padding: 8px 12px; font-size: .9rem; }
+  .ro b { color: var(--accent); font-variant-numeric: tabular-nums; }
+
+  table { border-collapse: collapse; width: 100%; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  th, td { border: 1px solid var(--border); padding: 6px 8px; text-align: center; font-size: .92rem; }
+  th { background: var(--surface-2); color: var(--muted); font-weight: 700; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+
+  .toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .toggle-row input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent2); }
+  .cmp-ctrl { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+  .legend { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; font-size: .82rem; color: var(--muted); margin-top: 6px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 14px; height: 4px; border-radius: 2px; display: inline-block; }
+  .swatch.exp { background: var(--accent); }
+  .swatch.lin { background: var(--accent2); }
+  .swatch.asy { background: var(--muted); }
+
+  @media (max-width: 480px) {
+    .ctrl { grid-template-columns: auto 1fr; }
+    .ctrl input[type=number] { grid-column: 2; justify-self: end; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← max</a>
+      <h1>Exponential Explorer</h1>
+      <p>Drag the sliders to shape y = a·bˣ and see growth vs. decay update live, with an optional straight-line comparison and a table of values.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="card">
+    <div class="eqn" id="eqn">—</div>
+    <div class="tag" id="tag">—</div>
+    <canvas id="plot" width="640" height="480" aria-label="Graph of an exponential function y = a times b to the x, with an optional comparison line"></canvas>
+    <div class="legend" id="legend">
+      <span><i class="swatch exp"></i> y = a·bˣ</span>
+      <span><i class="swatch asy"></i> asymptote y = 0</span>
+    </div>
+    <div class="hint">Adjust a and b below to see growth vs. decay</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Controls</div>
+    <div class="ctrl" id="controls">
+      <label for="r_a">a =</label>
+      <input type="range" id="r_a" min="-10" max="10" step="0.5" value="1">
+      <input type="number" id="n_a" step="0.5" value="1" aria-label="Value of a">
+      <label for="r_b">b =</label>
+      <input type="range" id="r_b" min="0.1" max="3" step="0.05" value="2">
+      <input type="number" id="n_b" step="0.05" value="2" aria-label="Value of b">
+    </div>
+    <div class="warn" id="warn" hidden></div>
+  </div>
+
+  <div class="card">
+    <div class="toggle-row">
+      <input type="checkbox" id="cmpToggle">
+      <label for="cmpToggle" class="label" style="margin:0;">Compare to a linear function y = mx + c</label>
+    </div>
+    <div class="cmp-ctrl" id="cmpBlock" hidden>
+      <div class="ctrl">
+        <label for="r_m">m =</label>
+        <input type="range" id="r_m" min="-10" max="10" step="0.5" value="1">
+        <input type="number" id="n_m" step="0.5" value="1" aria-label="Value of m">
+        <label for="r_c">c =</label>
+        <input type="range" id="r_c" min="-10" max="10" step="0.5" value="0">
+        <input type="number" id="n_c" step="0.5" value="0" aria-label="Value of c">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">What the graph shows</div>
+    <div class="readouts" id="readouts"></div>
+  </div>
+
+  <div class="card">
+    <div class="label">Table of values</div>
+    <table id="valtable">
+      <thead><tr><th>x</th><th>-2</th><th>-1</th><th>0</th><th>1</th><th>2</th><th>3</th></tr></thead>
+      <tbody>
+        <tr><td>y = a·bˣ</td><td id="tv-2"></td><td id="tv-1"></td><td id="tv0"></td><td id="tv1"></td><td id="tv2"></td><td id="tv3"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="app">Nothing you enter leaves your browser · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var PREFS="max-exponential-explorer-prefs";
+  var prefs={a:1, b:2, cmp:false, m:1, c:0};
+  try{ var s=JSON.parse(localStorage.getItem(PREFS)); if(s) prefs=Object.assign(prefs,s); }catch(e){}
+
+  var canvas=document.getElementById("plot"), ctx=canvas.getContext("2d");
+  var VMIN=-10, VMAX=10;   // fixed square graph window in math units (both axes)
+
+  function fmt(n){ if(!isFinite(n)) return "—"; var r=Math.round(n*100)/100; return (Object.is(r,-0)?0:r).toString(); }
+  function signed(n){ n=Math.round(n*100)/100; if(Object.is(n,-0))n=0; return (n<0?" − "+Math.abs(n):" + "+n); }
+
+  function save(){ try{localStorage.setItem(PREFS,JSON.stringify(prefs));}catch(e){} }
+
+  function safeB(){
+    // guard: b must be > 0 for a real exponential; clamp defensively
+    // in case a typed number input pushes b out of range.
+    var b=prefs.b;
+    if(!isFinite(b) || b<=0) b=0.1;
+    return b;
+  }
+
+  function fExp(x){ return prefs.a*Math.pow(safeB(),x); }
+  function fLin(x){ return prefs.m*x+prefs.c; }
+
+  function equationText(){
+    return "y = "+fmt(prefs.a)+" · "+fmt(safeB())+"ˣ";
+  }
+
+  function updateTag(){
+    var b=safeB(), el=document.getElementById("tag");
+    if(Math.abs(b-1)<1e-9){ el.textContent="Constant (b = 1) — flat line at y = "+fmt(prefs.a); el.className="tag constant"; }
+    else if(b>1){ el.textContent="Exponential growth (b > 1)"; el.className="tag growth"; }
+    else { el.textContent="Exponential decay (0 < b < 1)"; el.className="tag decay"; }
+  }
+
+  function updateWarn(){
+    var warn=document.getElementById("warn");
+    var msgs=[];
+    if(prefs.b<=0) msgs.push("b must be greater than 0 for a true exponential — using b = 0.1 instead.");
+    if(Math.abs(prefs.b-1)<1e-9) msgs.push("b = 1 makes bˣ always equal 1, so the graph is the flat line y = "+fmt(prefs.a)+" (not growth or decay).");
+    if(prefs.a===0) msgs.push("a = 0 makes the whole function 0 — the graph is just the flat line y = 0.");
+    if(msgs.length){ warn.hidden=false; warn.textContent=msgs.join(" "); }
+    else warn.hidden=true;
+  }
+
+  /* ---- theme-aware color lookups ---- */
+  function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+  /* ---- canvas drawing (device-pixel aware, responsive) ---- */
+  function resize(){
+    var cssW=canvas.clientWidth || 640;
+    var cssH=Math.round(cssW*0.75);
+    var dpr=window.devicePixelRatio||1;
+    canvas.width=cssW*dpr; canvas.height=cssH*dpr;
+    canvas.style.height=cssH+"px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    draw();
+  }
+  function toPx(x,y,W,H){
+    return { x:(x-VMIN)/(VMAX-VMIN)*W, y:H-(y-VMIN)/(VMAX-VMIN)*H };
+  }
+
+  function drawCurve(fn,color,W,H){
+    ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.beginPath();
+    var started=false;
+    for(var sx=0; sx<=W; sx++){
+      var mx=VMIN+(sx/W)*(VMAX-VMIN);
+      var my=fn(mx);
+      if(!isFinite(my)){ started=false; continue; }
+      var p=toPx(mx,my,W,H);
+      if(p.y<-5000||p.y>H+5000){ started=false; continue; }
+      if(!started){ ctx.moveTo(p.x,p.y); started=true; } else ctx.lineTo(p.x,p.y);
+    }
+    ctx.stroke();
+  }
+
+  function draw(){
+    document.getElementById("eqn").textContent=equationText();
+    updateTag(); updateWarn();
+
+    var dpr=window.devicePixelRatio||1, W=canvas.width/dpr, H=canvas.height/dpr;
+    var cSurface=cssVar('--surface'), cBorder=cssVar('--border'), cMuted=cssVar('--muted'),
+        cAccent=cssVar('--accent'), cAccent2=cssVar('--accent2');
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=cSurface; ctx.fillRect(0,0,W,H);
+
+    // gridlines
+    ctx.lineWidth=1; ctx.font="11px "+getComputedStyle(document.body).fontFamily; ctx.textAlign="center"; ctx.textBaseline="middle";
+    for(var g=VMIN; g<=VMAX; g++){
+      var v=toPx(g,g,W,H);
+      ctx.strokeStyle = g===0 ? cMuted : cBorder;
+      ctx.beginPath(); ctx.moveTo(v.x,0); ctx.lineTo(v.x,H); ctx.stroke();          // vertical
+      ctx.beginPath(); ctx.moveTo(0,v.y); ctx.lineTo(W,v.y); ctx.stroke();          // horizontal
+    }
+    // axes (thicker) + tick labels
+    var o=toPx(0,0,W,H);
+    ctx.strokeStyle=cMuted; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(o.x,0); ctx.lineTo(o.x,H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,o.y); ctx.lineTo(W,o.y); ctx.stroke();
+    ctx.fillStyle=cMuted;
+    for(var t=VMIN; t<=VMAX; t+=2){ if(t===0) continue;
+      var px=toPx(t,0,W,H); ctx.fillText(t, px.x, o.y+10);
+      var py=toPx(0,t,W,H); ctx.textAlign="right"; ctx.fillText(t, o.x-6, py.y); ctx.textAlign="center";
+    }
+
+    // horizontal asymptote y = 0 (dashed) — same as the x-axis here, drawn distinctly on top
+    ctx.strokeStyle=cMuted; ctx.lineWidth=2; ctx.setLineDash([6,5]);
+    ctx.beginPath(); ctx.moveTo(0,o.y); ctx.lineTo(W,o.y); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // optional linear comparison, drawn first so the exponential sits on top
+    if(prefs.cmp) drawCurve(fLin, cAccent2, W, H);
+
+    // the exponential curve
+    drawCurve(fExp, cAccent, W, H);
+
+    // y-intercept marker (0, a)
+    var yi=toPx(0, prefs.a, W, H);
+    if(yi.y>=-10 && yi.y<=H+10){
+      ctx.fillStyle=cAccent;
+      ctx.beginPath(); ctx.arc(yi.x, yi.y, 5, 0, 2*Math.PI); ctx.fill();
+      ctx.strokeStyle=cSurface; ctx.lineWidth=1.5; ctx.stroke();
+    }
+
+    drawReadouts();
+    drawTable();
+  }
+
+  function drawReadouts(){
+    var host=document.getElementById("readouts"); var html="";
+    function ro(label,val){ return '<span class="ro">'+label+': <b>'+val+'</b></span>'; }
+    html+=ro("y-intercept", "(0, "+fmt(prefs.a)+")");
+    html+=ro("Horizontal asymptote", "y = 0");
+    html+=ro("Growth factor b", fmt(safeB()));
+    html+=ro("Initial value a", fmt(prefs.a));
+    if(prefs.cmp){
+      html+=ro("Linear comparison", "y = "+fmt(prefs.m)+"x"+signed(prefs.c));
+    }
+    host.innerHTML=html;
+  }
+
+  function drawTable(){
+    [-2,-1,0,1,2,3].forEach(function(x){
+      var id = x<0 ? "tv"+x : "tv"+x; // e.g. tv-2, tv0, tv1
+      var cell=document.getElementById(id);
+      if(cell) cell.textContent=fmt(fExp(x));
+    });
+  }
+
+  /* ---- controls wiring ---- */
+  function bindPair(rangeId,numId,key,onchange){
+    var range=document.getElementById(rangeId), num=document.getElementById(numId);
+    range.value=prefs[key]; num.value=prefs[key];
+    range.oninput=function(){ prefs[key]=parseFloat(range.value); num.value=range.value; save(); if(onchange)onchange(); draw(); };
+    num.oninput=function(){ var v=parseFloat(num.value); if(isNaN(v)) return; prefs[key]=v; range.value=Math.max(parseFloat(range.min),Math.min(parseFloat(range.max),v)); save(); if(onchange)onchange(); draw(); };
+  }
+  bindPair("r_a","n_a","a");
+  bindPair("r_b","n_b","b");
+  bindPair("r_m","n_m","m");
+  bindPair("r_c","n_c","c");
+
+  var cmpToggle=document.getElementById("cmpToggle"), cmpBlock=document.getElementById("cmpBlock"), legend=document.getElementById("legend");
+  cmpToggle.checked=prefs.cmp;
+  cmpBlock.hidden=!prefs.cmp;
+  function syncLegend(){
+    var linSwatch=legend.querySelector(".lin-entry");
+    if(prefs.cmp && !linSwatch){
+      var span=document.createElement("span"); span.className="lin-entry";
+      span.innerHTML='<i class="swatch lin"></i> y = mx + c';
+      legend.appendChild(span);
+    } else if(!prefs.cmp && linSwatch){
+      linSwatch.remove();
+    }
+  }
+  cmpToggle.onchange=function(){
+    prefs.cmp=cmpToggle.checked; cmpBlock.hidden=!prefs.cmp; save(); syncLegend(); draw();
+  };
+  syncLegend();
+
+  window.addEventListener("resize", resize);
+
+  /* ---- theme toggle ---- */
+  var root = document.documentElement;
+  var savedTheme = localStorage.getItem('max-theme');
+  if (savedTheme) root.setAttribute('data-theme', savedTheme);
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    var cur = root.getAttribute('data-theme');
+    var isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('max-theme', next);
+    draw();
+  });
+
+  resize();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scientific Calculator</title>
+<meta name="description" content="A full scientific calculator with trig, logs, powers, roots, and calculation history, plus keyboard support. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  footer.app { margin-top: 26px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  /* ---- Calculator ---- */
+  .calc-card { max-width: 420px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+
+  .display { background: #14171d; padding: 16px 18px 12px; min-height: 90px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; }
+  .expr { color: #9aa4b2; font-size: .95rem; min-height: 1.2em; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .result { color: #fff; font-size: 2rem; font-weight: 300; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); }
+  .cbtn { cursor: pointer; border: none; padding: 0; height: 58px; font-size: 1rem; font-weight: 600;
+    font-family: inherit; display: flex; align-items: center; justify-content: center; transition: filter .1s; touch-action: manipulation; }
+  .cbtn:active { filter: brightness(.9); }
+  .cbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .cbtn.fn { background: var(--surface-2); color: var(--accent); font-size: .88rem; }
+  .cbtn.ctrl { background: var(--surface-2); color: var(--text); }
+  .cbtn.op { background: var(--surface-2); color: var(--accent); font-size: 1.2rem; }
+  .cbtn.num { background: var(--surface); color: var(--text); }
+  .cbtn.eq { background: var(--accent); color: var(--accent-ink); font-size: 1.3rem; grid-column: span 3; }
+  .cbtn.zero { grid-column: span 2; }
+
+  .history { padding: 10px 14px; border-top: 1px solid var(--border); }
+  .hist-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 6px; }
+  .hist-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+  .hist-list li { font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-radius: 6px; padding: 2px 4px; }
+  .hist-list li:hover { color: var(--accent); background: var(--surface-2); }
+
+  .hint { max-width: 420px; margin: 10px auto 0; color: var(--muted); font-size: .78rem; text-align: center; }
+  .hint kbd { font-family: var(--mono); background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
+
+  @media (max-width: 480px) {
+    .calc-card { max-width: 100%; }
+    .hint { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">&larr; All tools</a>
+      <h1>Scientific Calculator</h1>
+      <p>Trig, logs, powers, roots, and a running history &mdash; all in your browser. Nothing you type ever leaves this page.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">&#127775; Theme</button>
+  </header>
+
+  <div class="calc-card">
+    <div class="display">
+      <div class="expr" id="expr" aria-live="off"></div>
+      <div class="result" id="result" aria-live="polite">0</div>
+    </div>
+    <div class="grid" id="grid" role="group" aria-label="Calculator buttons"></div>
+    <div class="history" id="histSection" style="display:none">
+      <div class="hist-label">History</div>
+      <ul class="hist-list" id="histList"></ul>
+    </div>
+  </div>
+  <p class="hint">Trig functions use degrees. Keyboard works too: digits, <kbd>+</kbd> <kbd>-</kbd> <kbd>*</kbd> <kbd>/</kbd> <kbd>(</kbd> <kbd>)</kbd> <kbd>%</kbd>, <kbd>Enter</kbd> for =, <kbd>Esc</kbd>/<kbd>Backspace</kbd> to clear.</p>
+
+  <footer class="app">Calculations and history stay in your browser &middot; a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var HKEY="max-calc-history";
+  var history=[];
+  try{var h=JSON.parse(localStorage.getItem(HKEY));if(Array.isArray(h))history=h;}catch(e){}
+
+  var expr="", justEvaled=false;
+  var DEG=Math.PI/180;
+
+  // button layout: [label, type, action]
+  var BUTTONS=[
+    // row 1 — functions
+    ["sin","fn","sin("],["cos","fn","cos("],["tan","fn","tan("],["π","fn","π"],
+    // row 2
+    ["√","fn","√("],["x²","fn","x²"],["log","fn","log("],["ln","fn","ln("],
+    // row 3
+    ["AC","ctrl","AC"],["±","ctrl","±"],["%","ctrl","%"],["÷","op","÷"],
+    // row 4
+    ["7","num","7"],["8","num","8"],["9","num","9"],["×","op","×"],
+    // row 5
+    ["4","num","4"],["5","num","5"],["6","num","6"],["−","op","−"],
+    // row 6
+    ["1","num","1"],["2","num","2"],["3","num","3"],["+","op","+"],
+    // row 7
+    ["0","num zero","0"],  [".","num","."],["(","num","("],
+    // row 8
+    [")","num",")"],["=","eq","="]
+  ];
+
+  function getExprEl(){return document.getElementById("expr");}
+  function getResultEl(){return document.getElementById("result");}
+
+  function setExpr(s){expr=s;getExprEl().textContent=s;}
+  function setResult(s){getResultEl().textContent=s;}
+
+  function computePreview(){
+    if(!expr) return "";
+    try{return String(evaluate(expr));}catch(e){return "";}
+  }
+
+  // safe evaluator: inputs always come from button presses only
+  function evaluate(s){
+    // replace display tokens with JS
+    var js=s
+      .replace(/π/g,"(Math.PI)")
+      .replace(/sin\(/g,"__sin(")
+      .replace(/cos\(/g,"__cos(")
+      .replace(/tan\(/g,"__tan(")
+      .replace(/log\(/g,"__log(")
+      .replace(/ln\(/g,"__ln(")
+      .replace(/√\(/g,"__sqrt(")
+      .replace(/×/g,"*")
+      .replace(/÷/g,"/")
+      .replace(/−/g,"-");
+    // x² means last operand squared: handle by wrapping preceding number/paren
+    js=js.replace(/(\d+|\))\s*__sq/g,"Math.pow($1,2)");
+    js=js.replace(/__sq/g,"**2");
+    var scope={
+      __sin:function(x){return Math.sin(x*DEG);},
+      __cos:function(x){return Math.cos(x*DEG);},
+      __tan:function(x){return Math.tan(x*DEG);},
+      __log:function(x){return Math.log10(x);},
+      __ln:function(x){return Math.log(x);},
+      __sqrt:function(x){return Math.sqrt(x);}
+    };
+    // eslint-disable-next-line no-new-func
+    var fn=new Function(Object.keys(scope).join(","),"return "+js+";");
+    var result=fn.apply(null,Object.values(scope));
+    if(!isFinite(result)) throw new Error("NaN");
+    return Math.round(result*1e10)/1e10;
+  }
+
+  function press(action){
+    if(action==="AC"){setExpr("");setResult("0");justEvaled=false;return;}
+    if(action==="="){
+      if(!expr) return;
+      var e=expr;
+      try{
+        var res=evaluate(e);
+        var resStr=String(res);
+        setResult(resStr);
+        getExprEl().textContent=e+" =";
+        // save to history
+        history.unshift(e+" = "+resStr);
+        if(history.length>8) history.pop();
+        try{localStorage.setItem(HKEY,JSON.stringify(history));}catch(err){}
+        renderHistory();
+        expr=resStr; justEvaled=true;
+      }catch(err){setResult("Error");expr="";justEvaled=false;}
+      return;
+    }
+    if(action==="±"){
+      if(expr&&expr!=="-"){expr=expr.startsWith("-")?expr.slice(1):"-"+expr;setExpr(expr);}
+      return;
+    }
+    if(action==="%"){
+      try{var v=evaluate(expr);setExpr(String(v/100));expr=String(v/100);setResult(String(v/100));}catch(err){}
+      return;
+    }
+    // if just evaluated and pressing an operator, continue from result; if number, start fresh
+    var ops=["÷","×","−","+"];
+    if(justEvaled){
+      if(ops.indexOf(action)>=0){justEvaled=false;}
+      else if(/\d|\./.test(action)){setExpr("");expr="";}
+      else{justEvaled=false;}
+    }
+    if(action==="x²"){
+      expr+="²"; setExpr(expr);
+    } else if(action==="π"){
+      expr+="π"; setExpr(expr);
+    } else {
+      expr+=action; setExpr(expr);
+    }
+    // live preview
+    try{var prev=computePreview();if(prev&&prev!==expr)setResult(prev);}catch(e){}
+  }
+
+  function buildGrid(){
+    var grid=document.getElementById("grid");
+    BUTTONS.forEach(function(row){
+      var label=row[0],cls=row[1],action=row[2];
+      var btn=document.createElement("button");
+      btn.type="button";
+      btn.className="cbtn "+cls;
+      btn.textContent=label;
+      btn.setAttribute("aria-label",label);
+      btn.onclick=function(){press(action);};
+      grid.appendChild(btn);
+    });
+  }
+
+  function renderHistory(){
+    var list=document.getElementById("histList"), sect=document.getElementById("histSection");
+    if(!history.length){sect.style.display="none";return;}
+    sect.style.display="block";
+    list.innerHTML=history.map(function(h){return '<li>'+h.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</li>';}).join('');
+    Array.prototype.forEach.call(list.querySelectorAll("li"),function(li,i){
+      li.onclick=function(){
+        var parts=history[i].split(" = ");
+        if(parts.length>=2){setExpr(parts.slice(0,-1).join(" = "));setResult(parts[parts.length-1]);justEvaled=true;}
+      };
+    });
+  }
+
+  // keyboard support
+  document.addEventListener("keydown",function(e){
+    var map={"0":"0","1":"1","2":"2","3":"3","4":"4","5":"5","6":"6","7":"7","8":"8","9":"9",
+      ".":".","Enter":"=","Backspace":"AC","Escape":"AC",
+      "+":"+","-":"−","*":"×","/":"÷","%":"%","(":"(",")":")","p":"π"};
+    var action=map[e.key];
+    if(action){e.preventDefault();press(action);}
+  });
+
+  buildGrid();
+  renderHistory();
+})();
+
+/* ---------- theme ---------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

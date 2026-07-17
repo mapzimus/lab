@@ -3,8 +3,7 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: SAMEORIGIN
-  Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
+  Permissions-Policy: camera=(self), microphone=(), geolocation=(self)
 
 /data/*
   Cache-Control: public, max-age=3600
@@ -14,3 +13,6 @@
 
 /app.js
   Cache-Control: public, max-age=3600
+
+/favicon.svg
+  Cache-Control: public, max-age=86400

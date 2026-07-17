@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Static Map Generator</title>
+<meta name="description" content="Compose a map view with pins and export it as a PNG image or an embeddable HTML snippet. Uses OpenStreetMap — no API keys needed.">
+
+<!-- Leaflet CSS (map styling). The JS half is background-loaded from the script
+     below so a slow or blocked CDN never freezes the page. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""
+      onerror="window.__leafletCssFailed = true">
+
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:disabled { opacity: .55; cursor: default; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; max-width: 78ch; margin-left: auto; margin-right: auto; }
+  a { color: var(--accent); }
+
+  /* ---- examples & search ---- */
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .examples button { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; }
+  .examples button:hover { border-color: var(--accent); color: var(--accent); }
+  .search-row { display: flex; gap: 8px; margin: 0 0 6px; }
+  .search-row input { flex: 1; }
+  .search-row .btn { flex: none; }
+  .search-results { list-style: none; margin: 6px 0 10px; padding: 0; }
+  .search-results li { padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 4px; cursor: pointer; font-size: .88rem; background: var(--surface); }
+  .search-results li:hover { border-color: var(--accent); color: var(--accent); }
+  .search-results li.none { cursor: default; color: var(--muted); }
+  .search-results li.none:hover { border-color: var(--border); color: var(--muted); }
+
+  /* ---- layout ---- */
+  .grid { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(0,1fr); gap: 20px; align-items: start; margin-top: 10px; }
+  @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+
+  .map-shell { position: relative; height: 520px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  @media (max-width: 880px) { .map-shell { height: 380px; } }
+  #map { width: 100%; height: 100%; }
+  .leaflet-container { font-family: var(--sans); background: var(--surface-2); }
+  .map-fallback { height: 100%; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .92rem; text-align: center; padding: 24px; background: var(--surface-2); }
+
+  #frameBox {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    border: 2px dashed rgba(59,113,246,.95); border-radius: 2px;
+    box-shadow: 0 0 0 9999px rgba(2,6,23,.22);
+    pointer-events: none; z-index: 800;
+  }
+  .frame-badge {
+    position: absolute; left: 10px; bottom: 10px; z-index: 900; pointer-events: none;
+    background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    border-radius: 999px; padding: 3px 10px; font-size: .75rem; box-shadow: var(--shadow);
+  }
+  .smg-pin { background: transparent; border: none; }
+  .smg-pin svg { display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.4)); }
+
+  /* ---- side panel ---- */
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .side { padding: 2px 16px 16px; }
+  .group { border-top: 1px solid var(--border); padding: 14px 0 4px; }
+  .group:first-child { border-top: none; }
+  .group h2 { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+
+  input, select, textarea { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 9px 10px; font-size: .92rem; font-family: var(--sans); }
+  input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+  select { width: 100%; }
+
+  .swatches { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .swatches .lbl { color: var(--muted); font-size: .8rem; margin-right: 2px; }
+  .swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--border); cursor: pointer; padding: 0; flex: none; }
+  .swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--accent); }
+
+  #markerList { list-style: none; margin: 0 0 10px; padding: 0; max-height: 190px; overflow-y: auto; }
+  #markerList li { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; background: var(--surface-2); }
+  .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px rgba(255,255,255,.9), 0 0 0 3px rgba(0,0,0,.15); }
+  .mk-go { flex: 1; min-width: 0; text-align: left; background: none; border: none; color: var(--text); font-family: var(--mono); font-size: .78rem; cursor: pointer; padding: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mk-go:hover { color: var(--accent); }
+  .mk-x { flex: none; background: none; border: none; color: var(--muted); cursor: pointer; font-size: .88rem; line-height: 1; padding: 4px 6px; border-radius: 6px; }
+  .mk-x:hover { color: var(--danger); background: var(--surface); }
+
+  .custom-size { display: flex; align-items: flex-end; gap: 8px; margin-top: 10px; color: var(--muted); }
+  .custom-size label { display: flex; flex-direction: column; gap: 3px; flex: 1; font-size: .72rem; color: var(--muted); }
+  .custom-size input { width: 100%; font-family: var(--mono); }
+  .custom-size .x { padding-bottom: 10px; }
+
+  .note { color: var(--muted); font-size: .8rem; margin: 8px 0 0; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+  .note.warn { color: var(--danger); opacity: .85; }
+  .note:empty { display: none; }
+
+  #previewImg { display: block; max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 8px; margin-top: 10px; background: var(--surface-2); }
+  .row-btns { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+  #embedCode { width: 100%; font-family: var(--mono); font-size: .73rem; line-height: 1.5; resize: vertical; min-height: 104px; }
+  .embed-actions { margin-top: 8px; }
+
+  .hide { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Static Map Generator</h1>
+      <p>Frame a spot on the map, drop a pin or two, then turn it into a PNG image or copy-paste embed code. Everything happens in your browser — no API keys, no accounts.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="examples" id="examples" aria-label="Example locations">
+    <button type="button" data-lat="48.85826" data-lng="2.29450" data-z="15">Eiffel Tower</button>
+    <button type="button" data-lat="40.68925" data-lng="-74.04450" data-z="15">Statue of Liberty</button>
+    <button type="button" data-lat="-33.85680" data-lng="151.21530" data-z="15">Sydney Opera House</button>
+    <button type="button" data-lat="35.65858" data-lng="139.74543" data-z="15">Tokyo Tower</button>
+    <button type="button" id="locateBtn" style="margin-left:auto">📍 Locate me</button>
+  </div>
+
+  <div class="search-row">
+    <input id="placeSearch" type="text" autocomplete="off" placeholder="Search for a place name…" aria-label="Search for a place (results from OpenStreetMap)">
+    <button class="btn" id="searchBtn" type="button">🔍 Search</button>
+  </div>
+  <ul class="search-results hide" id="searchResults"></ul>
+  <p class="note err" id="searchNote"></p>
+
+  <div class="grid">
+    <section>
+      <div class="map-shell" id="mapShell">
+        <div id="map" aria-label="Interactive map. Click to drop a pin."></div>
+        <div id="frameBox" class="hide" aria-hidden="true"></div>
+        <div class="frame-badge hide" id="frameBadge"></div>
+      </div>
+      <p class="note">Click the map to drop a pin · drag / zoom to frame your shot · the dashed box is exactly what gets exported.</p>
+    </section>
+
+    <section class="panel side">
+      <div class="group">
+        <h2>Pins <span id="markerCount"></span></h2>
+        <div class="swatches" role="group" aria-label="Pin color for the next pin">
+          <span class="lbl">Color</span>
+          <!-- swatches injected by JS -->
+        </div>
+        <ul id="markerList"></ul>
+        <p class="note" id="markerEmpty">Click anywhere on the map to drop a pin. Pins are drawn into the exported image.</p>
+        <button class="btn" id="clearMarkers" type="button" disabled>Clear pins</button>
+      </div>
+
+      <div class="group">
+        <h2>Output size</h2>
+        <select id="sizePreset" aria-label="Output size preset">
+          <option value="600x400" selected>600 × 400 — small</option>
+          <option value="800x450">800 × 450 — widescreen</option>
+          <option value="1200x630">1200 × 630 — social / link preview</option>
+          <option value="1080x1080">1080 × 1080 — square</option>
+          <option value="custom">Custom…</option>
+        </select>
+        <div class="custom-size hide" id="customRow">
+          <label>Width (px)<input id="customW" type="number" min="100" max="2000" step="1" value="800" inputmode="numeric"></label>
+          <span class="x">×</span>
+          <label>Height (px)<input id="customH" type="number" min="100" max="2000" step="1" value="450" inputmode="numeric"></label>
+        </div>
+        <p class="note" id="frameWarn"></p>
+      </div>
+
+      <div class="group">
+        <h2>Export PNG</h2>
+        <button class="btn primary" id="genBtn" type="button">🖼 Generate PNG</button>
+        <p class="note" id="genStatus" role="status">Frame a view above, then generate — the map tiles are stitched into one image right here in your browser.</p>
+        <img id="previewImg" class="hide" alt="Generated static map preview">
+        <div class="row-btns hide" id="pngActions">
+          <button class="btn" id="downloadBtn" type="button">⬇ Download PNG</button>
+          <button class="btn" id="copyImgBtn" type="button">⧉ Copy image</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2>Embed on a website</h2>
+        <textarea id="embedCode" readonly rows="6" spellcheck="false" aria-label="Embeddable HTML snippet"></textarea>
+        <div class="embed-actions">
+          <button class="btn" id="copyEmbedBtn" type="button">⧉ Copy snippet</button>
+        </div>
+        <p class="note">An interactive mini-map using openstreetmap.org's official embed — it mirrors the frame and size above, and updates live as you move the map.</p>
+      </div>
+    </section>
+  </div>
+
+  <footer class="app">
+    Map data & search © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors — place search calls the Nominatim service, and the PNG export fetches tiles straight from openstreetmap.org.
+    That's fine for light, personal use; anything heavy or high-traffic should use a commercial tile provider (see the <a href="https://operations.osmfoundation.org/policies/tiles/">OSM tile usage policy</a>). · a <strong>max</strong> tool
+  </footer>
+</div>
+
+<script>
+'use strict';
+/* ============================================================
+   Static Map Generator — standalone, client-side.
+   Only dependency: Leaflet 1.9.4 (background-loaded below).
+   Tile stitching, Web-Mercator math and pin drawing are inline.
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+
+/* ---------------- Web-Mercator math (256px tiles) ---------------- */
+const TILE = 256;
+const MAX_LAT = 85.05112878;
+function worldSize(z) { return TILE * Math.pow(2, z); }
+function lngToX(lng, z) { return (lng + 180) / 360 * worldSize(z); }
+function latToY(lat, z) {
+  const s = Math.sin(Math.max(-MAX_LAT, Math.min(MAX_LAT, lat)) * Math.PI / 180);
+  return (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * worldSize(z);
+}
+function xToLng(x, z) { return x / worldSize(z) * 360 - 180; }
+function yToLat(y, z) {
+  const n = Math.PI - 2 * Math.PI * y / worldSize(z);
+  return 180 / Math.PI * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+}
+const wrapLng = (lng) => ((lng + 540) % 360) - 180;
+
+/* ---------------- state ---------------- */
+const view = { lat: 38.8895, lng: -77.0353, zoom: 13 };   // Washington Monument
+const markers = [];        // { id, lat, lng, color, layer }
+let nextId = 1;
+const COLORS = [
+  ['#e03131', 'Red'], ['#1971c2', 'Blue'], ['#2f9e44', 'Green'],
+  ['#f08c00', 'Orange'], ['#9c36b5', 'Purple'],
+];
+let currentColor = COLORS[0][0];
+let map = null;
+let lastCanvas = null, lastMeta = null;
+let generating = false;
+const TILE_CAP = 60;       // politeness limit on tiles fetched per image
+
+/* ---------------- output size ---------------- */
+const clampSize = (v) => Math.max(100, Math.min(2000, Math.round(Number(v)) || 100));
+function getOutputSize() {
+  const v = $('sizePreset').value;
+  if (v !== 'custom') { const [w, h] = v.split('x').map(Number); return { w, h }; }
+  return { w: clampSize($('customW').value), h: clampSize($('customH').value) };
+}
+
+/* The capture: an output-sized pixel window centered on the current map
+   center, at the map's current integer zoom. */
+function getCapture() {
+  const z = Math.round(view.zoom);
+  const { w, h } = getOutputSize();
+  const cx = lngToX(view.lng, z), cy = latToY(view.lat, z);
+  const left = cx - w / 2, top = cy - h / 2;
+  return {
+    z, w, h, left, top,
+    west: xToLng(left, z), east: xToLng(left + w, z),
+    north: yToLat(top, z), south: yToLat(top + h, z),
+  };
+}
+
+/* ---------------- notes / status helpers ---------------- */
+function setStatus(text, cls) {
+  const el = $('genStatus');
+  el.textContent = text;
+  el.className = 'note' + (cls ? ' ' + cls : '');
+}
+function flash(btn, txt) {
+  const old = btn.textContent;
+  btn.classList.add('copied'); btn.textContent = txt;
+  setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1200);
+}
+function markStale() {
+  if (lastCanvas && !generating) setStatus('Map view changed — generate again to refresh the image.', '');
+}
+
+/* ---------------- pin shape (shared by canvas + map icon) ----------------
+   Classic pin: round head (r=10) whose center sits 27px above the tip,
+   tapered tail, white outline, white center dot. Anchor = the tip.      */
+const PIN = { r: 10, headDy: 27, gamma: 0.9, dot: 3.8, w: 28, h: 40 };
+function pinSVG(color) {
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40">' +
+    '<path d="M14 38 Q11.5 26 6.17 17.22 A10 10 0 1 1 21.83 17.22 Q16.5 26 14 38 Z" fill="' + color + '" stroke="#fff" stroke-width="2"/>' +
+    '<circle cx="14" cy="11" r="3.8" fill="#fff"/></svg>';
+}
+function drawPin(ctx, x, y, color) {
+  const { r, headDy, gamma, dot } = PIN;
+  const hy = y - headDy;
+  const jx = r * Math.sin(gamma), jy = r * Math.cos(gamma);
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.quadraticCurveTo(x - 2.5, y - 12, x - jx, hy + jy);
+  ctx.arc(x, hy, r, Math.PI / 2 + gamma, Math.PI / 2 - gamma, false);
+  ctx.quadraticCurveTo(x + 2.5, y - 12, x, y);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.fill();
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(x, hy, dot, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+}
+
+/* ---------------- markers ---------------- */
+function pinIcon(color) {
+  return L.divIcon({
+    className: 'smg-pin', html: pinSVG(color),
+    iconSize: [PIN.w, PIN.h], iconAnchor: [PIN.w / 2, PIN.h - 2],
+  });
+}
+function addMarker(lat, lng, color) {
+  lng = wrapLng(lng);
+  const m = { id: nextId++, lat, lng, color: color || currentColor, layer: null };
+  if (map) m.layer = L.marker([lat, lng], { icon: pinIcon(m.color), keyboard: false }).addTo(map);
+  markers.push(m);
+  renderMarkers(); updateEmbed(); markStale();
+}
+function removeMarker(id) {
+  const i = markers.findIndex((m) => m.id === id);
+  if (i < 0) return;
+  if (markers[i].layer && map) map.removeLayer(markers[i].layer);
+  markers.splice(i, 1);
+  renderMarkers(); updateEmbed(); markStale();
+}
+function clearAllMarkers() {
+  markers.forEach((m) => { if (m.layer && map) map.removeLayer(m.layer); });
+  markers.length = 0;
+  renderMarkers(); updateEmbed(); markStale();
+}
+function renderMarkers() {
+  const ul = $('markerList');
+  ul.innerHTML = '';
+  markers.forEach((m, i) => {
+    const li = document.createElement('li');
+    li.dataset.lat = m.lat; li.dataset.lng = m.lng; li.dataset.color = m.color;
+    const dot = document.createElement('span');
+    dot.className = 'dot'; dot.style.background = m.color;
+    const go = document.createElement('button');
+    go.type = 'button'; go.className = 'mk-go';
+    go.textContent = m.lat.toFixed(5) + ', ' + m.lng.toFixed(5);
+    go.title = 'Pan the map to this pin';
+    go.addEventListener('click', () => { if (map) map.panTo([m.lat, m.lng]); });
+    const x = document.createElement('button');
+    x.type = 'button'; x.className = 'mk-x'; x.textContent = '✕';
+    x.setAttribute('aria-label', 'Remove pin ' + (i + 1));
+    x.addEventListener('click', () => removeMarker(m.id));
+    li.append(dot, go, x);
+    ul.appendChild(li);
+  });
+  $('markerCount').textContent = markers.length ? '(' + markers.length + ')' : '';
+  $('markerEmpty').classList.toggle('hide', markers.length > 0);
+  $('clearMarkers').disabled = !markers.length;
+}
+$('clearMarkers').addEventListener('click', clearAllMarkers);
+
+/* color swatches */
+(function buildSwatches() {
+  const wrapEl = document.querySelector('.swatches');
+  COLORS.forEach(([hex, name], i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'swatch';
+    b.style.background = hex;
+    b.dataset.color = hex;
+    b.setAttribute('aria-label', name + ' pin color');
+    b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.addEventListener('click', () => {
+      currentColor = hex;
+      wrapEl.querySelectorAll('.swatch').forEach((s) => s.setAttribute('aria-pressed', s === b ? 'true' : 'false'));
+    });
+    wrapEl.appendChild(b);
+  });
+})();
+
+/* ---------------- capture frame overlay ---------------- */
+function updateFrame() {
+  const { w, h } = getOutputSize();
+  const z = Math.round(view.zoom);
+  const fb = $('frameBox');
+  fb.style.width = w + 'px';
+  fb.style.height = h + 'px';
+  $('frameBadge').textContent = w + ' × ' + h + ' px · zoom ' + z;
+  const shell = $('mapShell');
+  const over = w > shell.clientWidth || h > shell.clientHeight;
+  const warn = $('frameWarn');
+  warn.textContent = over
+    ? '⚠ The capture frame extends past the visible map edges — the exported image will show more than you can currently see.'
+    : '';
+}
+
+/* ---------------- output size wiring ---------------- */
+function onSizeChanged() {
+  $('customRow').classList.toggle('hide', $('sizePreset').value !== 'custom');
+  updateFrame(); updateEmbed(); markStale();
+}
+$('sizePreset').addEventListener('change', onSizeChanged);
+['customW', 'customH'].forEach((id) => {
+  $(id).addEventListener('input', () => { updateFrame(); updateEmbed(); markStale(); });
+  $(id).addEventListener('change', () => { $(id).value = clampSize($(id).value); updateFrame(); updateEmbed(); });
+});
+window.addEventListener('resize', updateFrame);
+
+/* ---------------- embed snippet ---------------- */
+function updateEmbed() {
+  const cap = getCapture();
+  const west = Math.max(-180, cap.west), east = Math.min(180, cap.east);
+  const south = Math.max(-MAX_LAT, cap.south), north = Math.min(MAX_LAT, cap.north);
+  const f = (n) => n.toFixed(5);
+  let q = 'bbox=' + f(west) + ',' + f(south) + ',' + f(east) + ',' + f(north) + '&amp;layer=mapnik';
+  let link;
+  if (markers.length) {
+    const m = markers[0];
+    q += '&amp;marker=' + f(m.lat) + ',' + f(m.lng);
+    link = 'https://www.openstreetmap.org/?mlat=' + f(m.lat) + '&amp;mlon=' + f(m.lng) +
+      '#map=' + cap.z + '/' + f(view.lat) + '/' + f(view.lng);
+  } else {
+    link = 'https://www.openstreetmap.org/#map=' + cap.z + '/' + f(view.lat) + '/' + f(view.lng);
+  }
+  $('embedCode').value =
+    '<iframe width="' + cap.w + '" height="' + cap.h + '" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"' +
+    ' src="https://www.openstreetmap.org/export/embed.html?' + q + '"' +
+    ' style="border:1px solid #cbd2d9"></iframe><br/>' +
+    '<small><a href="' + link + '" target="_blank">View larger map</a></small>';
+}
+$('copyEmbedBtn').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText($('embedCode').value);
+    flash($('copyEmbedBtn'), '✓ Copied');
+  } catch (e) { flash($('copyEmbedBtn'), '✗ Blocked'); }
+});
+$('embedCode').addEventListener('focus', () => $('embedCode').select());
+
+/* ---------------- tile fetching ---------------- */
+const tileCache = new Map();   // url -> Promise<HTMLImageElement>
+function fetchTile(z, x, y) {
+  const url = 'https://tile.openstreetmap.org/' + z + '/' + x + '/' + y + '.png';
+  let p = tileCache.get(url);
+  if (!p) {
+    p = new Promise((resolve, reject) => {
+      const img = new Image();
+      const to = setTimeout(() => { img.src = ''; reject(new Error('tile timed out')); }, 20000);
+      img.crossOrigin = 'anonymous';
+      img.onload = () => { clearTimeout(to); resolve(img); };
+      img.onerror = () => { clearTimeout(to); reject(new Error('tile failed')); };
+      img.src = url;
+    });
+    p.catch(() => tileCache.delete(url));   // allow retry on next generate
+    tileCache.set(url, p);
+  }
+  return p;
+}
+
+/* ---------------- attribution chip (baked into the PNG) ---------------- */
+function drawAttribution(ctx, w, h) {
+  const text = '© OpenStreetMap contributors';
+  const fs = w >= 220 ? 11 : 9;
+  ctx.font = fs + 'px system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+  const tw = Math.ceil(ctx.measureText(text).width);
+  const pad = 8, ch = 20;
+  const cw = tw + pad * 2;
+  let x1 = w - 8 - cw;
+  if (x1 < 2) x1 = 2;
+  const y1 = h - 8 - ch, r = ch / 2;
+  ctx.beginPath();
+  ctx.moveTo(x1 + r, y1);
+  ctx.arcTo(x1 + cw, y1, x1 + cw, y1 + ch, r);
+  ctx.arcTo(x1 + cw, y1 + ch, x1, y1 + ch, r);
+  ctx.arcTo(x1, y1 + ch, x1, y1, r);
+  ctx.arcTo(x1, y1, x1 + cw, y1, r);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255,255,255,0.88)';   // light chip + dark text stays legible on map tiles
+  ctx.fill();
+  ctx.fillStyle = '#31404f';
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  ctx.fillText(text, x1 + pad, y1 + ch / 2 + 0.5);
+}
+
+/* ---------------- generate PNG ---------------- */
+async function generate() {
+  if (generating) return;
+  const cap = getCapture();
+  const { z, w, h } = cap;
+  const n = Math.pow(2, z);
+  const L0 = Math.round(cap.left), T0 = Math.round(cap.top);
+  const tx0 = Math.floor(L0 / TILE), tx1 = Math.floor((L0 + w - 1) / TILE);
+  const ty0 = Math.max(0, Math.floor(T0 / TILE));
+  const ty1 = Math.min(n - 1, Math.floor((T0 + h - 1) / TILE));
+
+  const jobs = [];
+  const uniq = new Set();
+  for (let ty = ty0; ty <= ty1; ty++) {
+    for (let tx = tx0; tx <= tx1; tx++) {
+      const wx = ((tx % n) + n) % n;       // wrap longitude
+      uniq.add(z + '/' + wx + '/' + ty);
+      jobs.push({ tx, ty, wx });
+    }
+  }
+  if (uniq.size > TILE_CAP) {
+    setStatus('That view needs ' + uniq.size + ' map tiles — over this tool’s polite limit of ' + TILE_CAP +
+      '. Zoom in or shrink the output size, then try again.', 'err');
+    return;
+  }
+
+  generating = true;
+  $('genBtn').disabled = true;
+  const total = uniq.size;
+  let done = 0, failed = 0;
+  setStatus(total ? 'Loading 0/' + total + ' tiles…' : 'Rendering…', '');
+
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#d8dde3';               // neutral base (shows through failed / out-of-world areas)
+    ctx.fillRect(0, 0, w, h);
+
+    const seen = new Map();
+    const draws = [];
+    for (const j of jobs) {
+      const key = z + '/' + j.wx + '/' + j.ty;
+      let p = seen.get(key);
+      if (!p) {
+        p = fetchTile(z, j.wx, j.ty);
+        seen.set(key, p);
+        p.then(
+          () => { done++; setStatus('Loading ' + done + '/' + total + ' tiles…', ''); },
+          () => { done++; failed++; setStatus('Loading ' + done + '/' + total + ' tiles…', ''); }
+        );
+      }
+      const dx = j.tx * TILE - L0, dy = j.ty * TILE - T0;
+      draws.push(p.then(
+        (img) => { ctx.drawImage(img, dx, dy); },
+        () => { ctx.fillStyle = '#c9ced5'; ctx.fillRect(dx, dy, TILE, TILE); }
+      ));
+    }
+    await Promise.all(draws);
+
+    // pins — drawn north-to-south so closer pins overlap correctly
+    const ws = worldSize(z);
+    const sorted = markers.slice().sort((a, b) => latToY(a.lat, z) - latToY(b.lat, z));
+    for (const m of sorted) {
+      const my = latToY(m.lat, z) - T0;
+      if (my < -10 || my > h + PIN.h + 10) continue;
+      const mx0 = lngToX(m.lng, z);
+      const k0 = Math.ceil((L0 - 40 - mx0) / ws), k1 = Math.floor((L0 + w + 40 - mx0) / ws);
+      for (let k = k0; k <= k1; k++) drawPin(ctx, mx0 + k * ws - L0, my, m.color);
+    }
+
+    drawAttribution(ctx, w, h);
+
+    lastCanvas = canvas;
+    lastMeta = { w, h, z, total, failed };
+    let url;
+    try { url = canvas.toDataURL('image/png'); }
+    catch (err) { throw new Error('the browser blocked image export (tiles arrived without CORS headers).'); }
+    const pv = $('previewImg');
+    pv.src = url;
+    pv.classList.remove('hide');
+    $('pngActions').classList.remove('hide');
+
+    let msg = 'Done — ' + w + '×' + h + ' PNG stitched from ' + total + ' tile' + (total === 1 ? '' : 's') + ' at zoom ' + z + '.';
+    if (failed) msg += ' ' + failed + ' tile' + (failed === 1 ? '' : 's') + ' failed (filled with gray).';
+    setStatus(msg, failed ? 'warn' : 'ok');
+  } catch (err) {
+    setStatus('Could not generate the image — ' + err.message, 'err');
+  } finally {
+    generating = false;
+    $('genBtn').disabled = false;
+  }
+}
+$('genBtn').addEventListener('click', () => { generate().catch((e) => setStatus('Could not generate the image — ' + e.message, 'err')); });
+
+/* ---------------- download / copy image ---------------- */
+$('downloadBtn').addEventListener('click', () => {
+  if (!lastCanvas) return;
+  lastCanvas.toBlob((blob) => {
+    if (!blob) return;
+    const u = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = u;
+    a.download = 'map-' + lastMeta.w + 'x' + lastMeta.h + '-z' + lastMeta.z + '.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(u), 2000);
+  }, 'image/png');
+});
+const copyImgBtn = $('copyImgBtn');
+if (!('clipboard' in navigator) || !window.ClipboardItem) copyImgBtn.classList.add('hide');
+copyImgBtn.addEventListener('click', () => {
+  if (!lastCanvas) return;
+  lastCanvas.toBlob(async (blob) => {
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      flash(copyImgBtn, '✓ Copied');
+    } catch (e) { flash(copyImgBtn, '✗ Blocked'); }
+  }, 'image/png');
+});
+
+/* ---------------- view control ---------------- */
+function setViewTo(lat, lng, z) {
+  view.lat = lat; view.lng = wrapLng(lng); view.zoom = z;
+  if (map) map.setView([lat, view.lng], z);
+  else { updateFrame(); updateEmbed(); }
+}
+function syncView() {
+  const c = map.getCenter();
+  view.lat = c.lat; view.lng = wrapLng(c.lng); view.zoom = map.getZoom();
+}
+
+/* ---------------- examples & locate ---------------- */
+$('examples').addEventListener('click', (ev) => {
+  const b = ev.target.closest('button');
+  if (!b || !b.dataset.lat) return;
+  const lat = parseFloat(b.dataset.lat), lng = parseFloat(b.dataset.lng);
+  setViewTo(lat, lng, parseInt(b.dataset.z, 10) || 15);
+  if (!markers.some((m) => Math.abs(m.lat - lat) < 1e-6 && Math.abs(m.lng - lng) < 1e-6)) addMarker(lat, lng);
+});
+$('locateBtn').addEventListener('click', () => {
+  $('searchNote').textContent = '';
+  if (!navigator.geolocation) { $('searchNote').textContent = 'Geolocation is not supported by your browser.'; return; }
+  const btn = $('locateBtn');
+  btn.textContent = '⏳ Locating…'; btn.disabled = true;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      setViewTo(pos.coords.latitude, pos.coords.longitude, 14);
+      btn.textContent = '📍 Locate me'; btn.disabled = false;
+    },
+    () => {
+      $('searchNote').textContent = 'Location access denied or unavailable.';
+      btn.textContent = '📍 Locate me'; btn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+});
+
+/* ---------------- place search (OpenStreetMap Nominatim, debounced) ---------------- */
+let searchTimer = null;
+function hideResults() { const ul = $('searchResults'); ul.innerHTML = ''; ul.classList.add('hide'); }
+async function runSearch(q) {
+  if (!q) return;
+  const btn = $('searchBtn');
+  btn.disabled = true; btn.textContent = '⏳';
+  try {
+    const resp = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&q=' + encodeURIComponent(q));
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    const ul = $('searchResults');
+    ul.innerHTML = ''; ul.classList.remove('hide');
+    if (!data.length) {
+      const li = document.createElement('li');
+      li.className = 'none'; li.textContent = 'No results found';
+      ul.appendChild(li);
+    } else {
+      data.forEach((r) => {
+        const li = document.createElement('li');
+        li.textContent = r.display_name;
+        li.addEventListener('click', () => {
+          setViewTo(parseFloat(r.lat), parseFloat(r.lon), Math.max(Math.round(view.zoom), 12));
+          $('placeSearch').value = r.display_name;
+          hideResults();
+        });
+        ul.appendChild(li);
+      });
+    }
+  } catch (e) {
+    hideResults();
+    $('searchNote').textContent = 'Search failed — check your connection (search uses the OpenStreetMap Nominatim service).';
+  }
+  btn.disabled = false; btn.textContent = '🔍 Search';
+}
+$('placeSearch').addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  $('searchNote').textContent = '';
+  const q = $('placeSearch').value.trim();
+  if (q.length < 3) { hideResults(); return; }
+  searchTimer = setTimeout(() => { runSearch(q); }, 350);
+});
+$('placeSearch').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { clearTimeout(searchTimer); runSearch($('placeSearch').value.trim()); }
+});
+$('searchBtn').addEventListener('click', () => { clearTimeout(searchTimer); runSearch($('placeSearch').value.trim()); });
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#searchResults') && !e.target.closest('.search-row')) hideResults();
+});
+
+/* ---------------- map (Leaflet, background-loaded) ---------------- */
+function initMap() {
+  if (window.__leafletCssFailed) { mapFail(); return; }
+  map = L.map('map', { worldCopyJump: true }).setView([view.lat, view.lng], view.zoom);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+  map.on('click', (e) => addMarker(e.latlng.lat, e.latlng.lng));
+  map.on('moveend zoomend', () => { syncView(); updateFrame(); updateEmbed(); markStale(); });
+  $('frameBox').classList.remove('hide');
+  $('frameBadge').classList.remove('hide');
+  updateFrame();
+  document.body.dataset.mapReady = '1';
+}
+function mapFail() {
+  const el = document.createElement('div');
+  el.className = 'map-fallback';
+  el.innerHTML = 'Map preview unavailable — the Leaflet library didn’t load.<br>' +
+    'You can still search for a place above, pick a size, and generate the PNG or embed code for that spot.';
+  $('map').replaceWith(el);
+}
+(function loadLeaflet() {
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+  s.crossOrigin = '';
+  s.onload = () => { if (window.L) initMap(); else mapFail(); };
+  s.onerror = () => mapFail();
+  document.head.appendChild(s);
+})();
+
+/* ---------------- boot ---------------- */
+renderMarkers();
+updateFrame();
+updateEmbed();
+
+/* tiny debug/testing handle */
+window.__smg = { get map() { return map; }, markers, view, addMarker, getCapture };
+
+/* ---------------- theme toggle ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flag Analyzer</title>
+<meta name="description" content="Drop in any flag image to get its dominant colors and coverage, aspect ratio, mirror and rotational symmetry, and a live NAVA 'Good Flag, Bad Flag' critique. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --warn:#b8860b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b; --warn:#e2b23a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b; --warn:#e2b23a;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 66ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); text-decoration: none; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.sm { padding: 5px 9px; font-size: .8rem; }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .card + .card { margin-top: 16px; }
+  .card h2 { font-size: 1rem; margin: 0 0 12px; letter-spacing: -0.01em; }
+  .card h2 .sub { font-weight: 400; color: var(--muted); font-size: .82rem; margin-left: 6px; }
+
+  /* dropzone */
+  .drop { border: 2px dashed var(--border); border-radius: var(--radius); background: var(--surface); padding: 26px 18px; text-align: center; transition: border-color .15s, background .15s; }
+  .drop.drag { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+  .drop .big { font-size: 1.5rem; }
+  .drop p { margin: 8px 0 12px; color: var(--muted); font-size: .9rem; }
+  .drop .controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 12px; }
+  .chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; font-family: var(--sans); }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+  .layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; align-items: start; margin-top: 16px; }
+  @media (max-width: 820px){ .layout { grid-template-columns: 1fr; } }
+
+  /* preview */
+  .preview-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .preview-box { width: 100%; background: repeating-conic-gradient(var(--surface-2) 0% 25%, var(--surface) 0% 50%) 0 0 / 20px 20px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 8px; }
+  .preview-box img { max-width: 100%; max-height: 300px; display: block; border-radius: 3px; box-shadow: var(--shadow); }
+  .preview-meta { font-size: .8rem; color: var(--muted); }
+
+  /* colors */
+  .colorlist { display: flex; flex-direction: column; gap: 8px; }
+  .colorrow { display: flex; align-items: center; gap: 10px; }
+  .colorrow .sw { width: 34px; height: 34px; border-radius: 7px; border: 1px solid var(--border); flex: none; }
+  .colorrow .info { flex: 1; min-width: 0; }
+  .colorrow .info .top { display: flex; justify-content: space-between; gap: 8px; font-size: .84rem; }
+  .colorrow .hex { font-family: var(--mono); font-weight: 600; letter-spacing: .02em; text-transform: uppercase; cursor: pointer; }
+  .colorrow .hex:hover { color: var(--accent); }
+  .colorrow .pct { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .bar { height: 6px; border-radius: 4px; background: var(--surface-2); margin-top: 5px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; border-radius: 4px; }
+
+  .statgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; }
+  .stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; }
+  .stat .k { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .stat .v { font-size: 1.15rem; font-weight: 700; margin-top: 2px; font-family: var(--mono); }
+  .stat .d { font-size: .76rem; color: var(--muted); margin-top: 1px; }
+
+  .symrow { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); }
+  .symrow:first-of-type { border-top: none; }
+  .symrow .name { flex: none; width: 130px; font-size: .84rem; font-weight: 600; }
+  .symrow .track { flex: 1; height: 8px; border-radius: 5px; background: var(--surface-2); overflow: hidden; }
+  .symrow .track > span { display: block; height: 100%; background: var(--accent); border-radius: 5px; }
+  .symrow .pct { font-family: var(--mono); font-size: .8rem; width: 44px; text-align: right; }
+  .symrow .lab { font-size: .76rem; color: var(--muted); width: 118px; text-align: right; }
+  @media (max-width: 480px){ .symrow .lab { display:none; } .symrow .name { width: 96px; } }
+
+  /* nava */
+  .nava-overall { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; background: var(--surface-2); margin-bottom: 12px; font-weight: 600; font-size: .92rem; }
+  .nava-overall .big { font-size: 1.3rem; }
+  .principle { display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); }
+  .principle:first-of-type { border-top: none; }
+  .principle .badge { flex: none; width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: .95rem; font-weight: 700; }
+  .badge.ok { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .badge.warn { background: color-mix(in srgb, var(--warn) 22%, transparent); color: var(--warn); }
+  .badge.bad { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+  .badge.info { background: var(--surface-2); color: var(--muted); }
+  .principle .txt strong { display: block; font-size: .86rem; }
+  .principle .txt span { font-size: .8rem; color: var(--muted); }
+
+  .exports { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .hint { font-size: .78rem; color: var(--muted); margin: 8px 0 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Flag Analyzer</h1>
+      <p>Drop in any flag image and see what it's made of — its dominant colors and how much of the flag each one covers, its aspect ratio, whether it's mirror- or rotation-symmetric, and how it scores against NAVA's "Good Flag, Bad Flag" principles. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="drop" id="drop">
+    <div class="big" aria-hidden="true">🏳️</div>
+    <p>Drag &amp; drop a flag image here, or</p>
+    <div class="controls">
+      <button class="btn primary" id="pickBtn" type="button">🖼 Choose image…</button>
+      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/*" class="visually-hidden">
+    </div>
+    <div class="examples" id="examples" aria-label="Example flags"></div>
+    <div class="note" id="dropNote" style="margin-top:10px"></div>
+  </div>
+
+  <div class="layout" id="results" hidden>
+    <div>
+      <div class="card">
+        <h2>Flag <span class="sub" id="sourceLabel"></span></h2>
+        <div class="preview-wrap">
+          <div class="preview-box"><img id="previewImg" alt="Flag preview"></div>
+          <div class="preview-meta" id="previewMeta"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Proportions <span class="sub">width : height</span></h2>
+        <div class="statgrid">
+          <div class="stat"><div class="k">Simplified ratio</div><div class="v" id="ratioSimple">—</div><div class="d">width : height</div></div>
+          <div class="stat"><div class="k">Decimal</div><div class="v" id="ratioDecimal">—</div><div class="d" id="ratioPx">—</div></div>
+          <div class="stat"><div class="k">Closest flag ratio</div><div class="v" id="ratioClosest" style="font-size:.95rem">—</div><div class="d" id="ratioClosestNote">—</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Symmetry <span class="sub">how the flag reads when flipped</span></h2>
+        <div id="symList"></div>
+        <p class="hint">Higher = the flag looks the same after that flip. High left–right symmetry means the flag reads the same from either side (front and back look alike).</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>Dominant colors <span class="sub" id="colorSub"></span></h2>
+        <div class="colorlist" id="colorList"></div>
+        <div class="exports" style="margin-top:12px">
+          <button class="btn sm" data-export="hex">Copy hex list</button>
+          <button class="btn sm" data-export="css">Copy CSS</button>
+          <button class="btn sm" data-export="json">Copy JSON</button>
+          <button class="btn sm" data-export="png">⬇ Palette PNG</button>
+          <span class="note" id="exportNote" style="margin-left:auto"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>NAVA critique <span class="sub">Good Flag, Bad Flag</span></h2>
+        <div class="nava-overall" id="navaOverall"></div>
+        <div id="navaList"></div>
+        <p class="hint">Principles from the North American Vexillological Association. Color count and simplicity are measured from the image; symbolism, lettering and distinctiveness are reminders — a picture can't fully judge those.</p>
+      </div>
+
+      <div class="card">
+        <h2>Make your own</h2>
+        <p class="note" style="margin-bottom:10px">Like what you see, or want to fix a warning? Rebuild it from scratch in the companion tool.</p>
+        <a class="btn" href="./flag-designer.html">🛠 Open Flag Designer</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app">Nothing you upload leaves your browser · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+"use strict";
+const $ = (s)=>document.querySelector(s);
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+
+/* ============ small helpers ============ */
+function rgbToHex(r,g,b){ return '#'+[r,g,b].map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''); }
+function rgbDist(a,b){ return Math.sqrt((a.r-b.r)**2+(a.g-b.g)**2+(a.b-b.b)**2); }
+function gcd(a,b){ a=Math.round(a); b=Math.round(b); while(b){ [a,b]=[b,a%b]; } return a||1; }
+function luminance(r,g,b){ return 0.2126*r+0.7152*g+0.0722*b; }
+function textOn(r,g,b){ return luminance(r,g,b) > 150 ? '#111' : '#fff'; }
+
+/* ============ analysis config ============ */
+const MAX_DIM = 220;        // downscale longest side of analysis buffer
+const MERGE_DIST = 40;      // RGB euclidean distance for merging color buckets into a cluster
+const SIGNIFICANT_PCT = 2;  // a cluster must cover this much to count as a "distinct color"
+const EDGE_THRESH = 60;     // Sobel magnitude above which a pixel counts as an edge
+
+/* ============ analysis buffer ============ */
+function makeBuffer(drawable, natW, natH){
+  const scale = Math.min(1, MAX_DIM/Math.max(natW,natH));
+  const w = Math.max(1, Math.round(natW*scale));
+  const h = Math.max(1, Math.round(natH*scale));
+  const cv = document.createElement('canvas'); cv.width=w; cv.height=h;
+  const ctx = cv.getContext('2d', { willReadFrequently:true });
+  ctx.imageSmoothingEnabled = false; // nearest-neighbour keeps flat flag fields clean & deterministic
+  ctx.drawImage(drawable, 0, 0, w, h);
+  try {
+    const data = ctx.getImageData(0,0,w,h).data;
+    return { w, h, data, tainted:false };
+  } catch(e){
+    return { w, h, data:null, tainted:true };
+  }
+}
+
+/* ============ dominant colors (deterministic quantized histogram + agglomerative merge) ============ */
+function computeColors(data){
+  const buckets = new Map();
+  let total = 0;
+  for (let i=0;i<data.length;i+=4){
+    if (data[i+3] < 128) continue;            // skip transparent
+    const r=data[i], g=data[i+1], b=data[i+2];
+    const key = ((r>>3)<<10) | ((g>>3)<<5) | (b>>3); // 5 bits/channel
+    let e = buckets.get(key);
+    if (!e){ e={ n:0, r:0, g:0, b:0 }; buckets.set(key,e); }
+    e.n++; e.r+=r; e.g+=g; e.b+=b;
+    total++;
+  }
+  // bucket -> average color, sorted by frequency (largest first => stable cluster seeds)
+  const arr = [...buckets.values()]
+    .map(e=>({ n:e.n, r:e.r/e.n, g:e.g/e.n, b:e.b/e.n }))
+    .sort((a,b)=> b.n-a.n || (b.r+b.g+b.b)-(a.r+a.g+a.b));
+  const clusters = [];
+  for (const c of arr){
+    let best=null, bd=Infinity;
+    for (const cl of clusters){ const d=rgbDist(cl,c); if (d<bd){ bd=d; best=cl; } }
+    if (best && bd < MERGE_DIST){
+      const t = best.n + c.n;
+      best.r = (best.r*best.n + c.r*c.n)/t;
+      best.g = (best.g*best.n + c.g*c.n)/t;
+      best.b = (best.b*best.n + c.b*c.n)/t;
+      best.n = t;
+    } else {
+      clusters.push({ n:c.n, r:c.r, g:c.g, b:c.b });
+    }
+  }
+  clusters.sort((a,b)=> b.n-a.n);
+  const colors = clusters.map(c=>({
+    hex: rgbToHex(c.r,c.g,c.b),
+    r:Math.round(c.r), g:Math.round(c.g), b:Math.round(c.b),
+    n:c.n,
+    pct: total ? c.n/total*100 : 0,
+  }));
+  const distinct = colors.filter(c=>c.pct >= SIGNIFICANT_PCT).length || (colors.length?1:0);
+  return { colors, total, distinct };
+}
+
+/* ============ symmetry ============ */
+function computeSymmetry(data,w,h){
+  let lr=0, tb=0, rot=0;
+  for (let y=0;y<h;y++){
+    for (let x=0;x<w;x++){
+      const i=(y*w+x)*4;
+      const iLR=(y*w+(w-1-x))*4;
+      const iTB=((h-1-y)*w+x)*4;
+      const iR =((h-1-y)*w+(w-1-x))*4;
+      lr  += Math.abs(data[i]-data[iLR])  + Math.abs(data[i+1]-data[iLR+1]) + Math.abs(data[i+2]-data[iLR+2]);
+      tb  += Math.abs(data[i]-data[iTB])  + Math.abs(data[i+1]-data[iTB+1]) + Math.abs(data[i+2]-data[iTB+2]);
+      rot += Math.abs(data[i]-data[iR])   + Math.abs(data[i+1]-data[iR+1])  + Math.abs(data[i+2]-data[iR+2]);
+    }
+  }
+  const denom = w*h*3*255;
+  const score = (d)=> Math.max(0, 100*(1 - d/denom));
+  return { leftRight:score(lr), topBottom:score(tb), rotational:score(rot) };
+}
+function symLabel(v){
+  if (v>=95) return 'symmetric';
+  if (v>=82) return 'nearly symmetric';
+  if (v>=60) return 'roughly symmetric';
+  return 'not symmetric';
+}
+
+/* ============ edge density (Sobel on luminance) ============ */
+function computeEdgeDensity(data,w,h){
+  if (w<3 || h<3) return 0;
+  const gray = new Float32Array(w*h);
+  for (let p=0,q=0;q<w*h;p+=4,q++) gray[q]=luminance(data[p],data[p+1],data[p+2]);
+  let edges=0, count=0;
+  for (let y=1;y<h-1;y++){
+    for (let x=1;x<w-1;x++){
+      const gx = -gray[(y-1)*w+(x-1)] -2*gray[y*w+(x-1)] -gray[(y+1)*w+(x-1)]
+                 +gray[(y-1)*w+(x+1)] +2*gray[y*w+(x+1)] +gray[(y+1)*w+(x+1)];
+      const gy = -gray[(y-1)*w+(x-1)] -2*gray[(y-1)*w+x] -gray[(y-1)*w+(x+1)]
+                 +gray[(y+1)*w+(x-1)] +2*gray[(y+1)*w+x] +gray[(y+1)*w+(x+1)];
+      if (Math.hypot(gx,gy) > EDGE_THRESH) edges++;
+      count++;
+    }
+  }
+  return count ? edges/count : 0;
+}
+
+/* ============ aspect ratio ============ */
+const COMMON_RATIOS = [
+  { d:1,      name:'1:1',   note:'square (Switzerland, Vatican)' },
+  { d:4/3,    name:'4:3',   note:'flag 3:4' },
+  { d:3/2,    name:'3:2',   note:'flag 2:3 — most common' },
+  { d:8/5,    name:'8:5',   note:'flag 5:8 (Sweden, Norway)' },
+  { d:5/3,    name:'5:3',   note:'flag 3:5 (Germany)' },
+  { d:20/11,  name:'20:11', note:'flag 11:20' },
+  { d:19/10,  name:'19:10', note:'flag 10:19 (United States)' },
+  { d:2,      name:'2:1',   note:'flag 1:2 (UK, Australia)' },
+];
+function computeRatio(w,h){
+  const g = gcd(w,h);
+  const a = Math.round(w/g), b = Math.round(h/g);
+  const decimal = w/h;
+  // keep the simplified label readable even for odd pixel dimensions
+  let simple = a+':'+b;
+  if (a>40 || b>40){ // fall back to a clean 2-figure form
+    const rounded = COMMON_RATIOS.reduce((p,c)=> Math.abs(c.d-decimal)<Math.abs(p.d-decimal)?c:p);
+    simple = rounded.name;
+  }
+  const closest = COMMON_RATIOS.reduce((p,c)=> Math.abs(c.d-decimal)<Math.abs(p.d-decimal)?c:p);
+  return { simple, decimal, closest, w, h };
+}
+
+/* ============ NAVA critique ============ */
+function computeNava(distinct, edgeDensity){
+  const P = [];
+  // 1. simplicity: distinct colors + edge density
+  const busy = edgeDensity;
+  let simp;
+  if (distinct<=3 && busy<0.06) simp={ b:'✓', cls:'ok',   t:`Clean and flat — ${distinct} main color${distinct===1?'':'s'}, low detail. Easy to draw from memory.` };
+  else if (distinct<=5 && busy<0.16) simp={ b:'⚠', cls:'warn', t:`Some complexity — ${distinct} colors and ${busy>0.09?'a fair amount of':'a little'} fine detail.` };
+  else simp={ b:'✗', cls:'bad', t:`Busy — ${distinct} colors and lots of detail/edges. A child would struggle to redraw it.` };
+  P.push({ title:'Keep it simple', ...simp });
+  // 2. symbolism (reminder)
+  P.push({ title:'Use meaningful symbolism', b:'ℹ', cls:'info', t:'Only a person can judge this — do the colors and shapes carry meaning?' });
+  // 3. colors: 2-3
+  let col;
+  if (distinct<=3) col={ b:'✓', cls:'ok',   t:`${distinct} distinct color${distinct===1?'':'s'} — within the 2–3 ideal.` };
+  else if (distinct===4) col={ b:'⚠', cls:'warn', t:'4 distinct colors — one over the ideal.' };
+  else col={ b:'✗', cls:'bad', t:`${distinct} distinct colors — more than the recommended two or three.` };
+  P.push({ title:'Use 2 or 3 colors', ...col });
+  // 4. lettering / seals (reminder — can't reliably detect text from pixels)
+  P.push({ title:'No lettering or seals', b:'ℹ', cls:'info', t:'Not auto-detected. Check by eye: real letters or a detailed seal are a red flag.' });
+  // 5. distinctive (reminder)
+  P.push({ title:'Be distinctive or be related', b:'ℹ', cls:'info', t:'Does it stand apart from other flags, or deliberately echo a family it belongs to?' });
+
+  const good = simp.cls!=='bad' && col.cls!=='bad';
+  const great = good && simp.cls==='ok' && col.cls==='ok';
+  let overall;
+  if (great) overall={ icon:'🏆', text:'Reads like a good flag.', color:'var(--ok)' };
+  else if (good) overall={ icon:'👍', text:'Solid — mind the warnings.', color:'var(--warn)' };
+  else overall={ icon:'⚑', text:'Breaks a core principle — see below.', color:'var(--danger)' };
+  return { principles:P, overall };
+}
+
+/* ============ full analysis ============ */
+function analyze(drawable, natW, natH){
+  const buf = makeBuffer(drawable, natW, natH);
+  const ratio = computeRatio(natW, natH);
+  if (buf.tainted){
+    return { tainted:true, ratio };
+  }
+  const { colors, total, distinct } = computeColors(buf.data);
+  const symmetry = computeSymmetry(buf.data, buf.w, buf.h);
+  const edgeDensity = computeEdgeDensity(buf.data, buf.w, buf.h);
+  const nava = computeNava(distinct, edgeDensity);
+  return { tainted:false, ratio, colors, total, distinct, symmetry, edgeDensity, nava,
+           bufW:buf.w, bufH:buf.h };
+}
+
+/* ============ render ============ */
+let lastResult = null;
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function renderResults(res, meta){
+  lastResult = res;
+  $('#results').hidden = false;
+  $('#sourceLabel').textContent = meta.label || '';
+  $('#previewImg').src = meta.src;
+  $('#previewMeta').textContent = `${meta.width} × ${meta.height} px`;
+
+  // ratio
+  $('#ratioSimple').textContent = res.ratio.simple;
+  $('#ratioDecimal').textContent = res.ratio.decimal.toFixed(3).replace(/0+$/,'').replace(/\.$/,'');
+  $('#ratioPx').textContent = `${meta.width}:${meta.height} px`;
+  $('#ratioClosest').textContent = res.ratio.closest.name;
+  $('#ratioClosestNote').textContent = res.ratio.closest.note;
+
+  if (res.tainted){
+    $('#colorSub').textContent = '';
+    $('#colorList').innerHTML = `<div class="note err">This image is loaded from another website, so the browser won't let this page read its pixels (CORS). Download it and drop the local file instead — that works fine.</div>`;
+    $('#symList').innerHTML = `<div class="note">Symmetry needs pixel access — unavailable for this cross-origin image.</div>`;
+    $('#navaList').innerHTML = '';
+    $('#navaOverall').innerHTML = `<span class="big">🔒</span> Pixel analysis blocked (cross-origin image).`;
+    $('#navaOverall').style.color = 'var(--muted)';
+    return;
+  }
+
+  // colors
+  const shown = res.colors.slice(0, 8);
+  $('#colorSub').textContent = `${res.distinct} distinct · showing top ${shown.length}`;
+  $('#colorList').innerHTML = shown.map(c=>`
+    <div class="colorrow">
+      <div class="sw" style="background:${c.hex}"></div>
+      <div class="info">
+        <div class="top"><span class="hex" data-hex="${c.hex}" title="Click to copy">${c.hex}</span><span class="pct">${c.pct.toFixed(1)}%</span></div>
+        <div class="bar"><span style="width:${Math.max(2,c.pct).toFixed(1)}%;background:${c.hex}"></span></div>
+      </div>
+    </div>`).join('');
+
+  // symmetry
+  const syms = [
+    ['Left–right mirror', res.symmetry.leftRight],
+    ['Top–bottom mirror', res.symmetry.topBottom],
+    ['180° rotation', res.symmetry.rotational],
+  ];
+  $('#symList').innerHTML = syms.map(([name,v])=>`
+    <div class="symrow">
+      <span class="name">${name}</span>
+      <span class="track"><span style="width:${v.toFixed(1)}%"></span></span>
+      <span class="pct">${Math.round(v)}%</span>
+      <span class="lab">${symLabel(v)}</span>
+    </div>`).join('');
+
+  // nava
+  $('#navaList').innerHTML = res.nava.principles.map(p=>
+    `<div class="principle"><div class="badge ${p.cls}">${p.b}</div><div class="txt"><strong>${esc(p.title)}</strong><span>${esc(p.t)}</span></div></div>`
+  ).join('');
+  const ov = $('#navaOverall');
+  ov.innerHTML = `<span class="big">${res.nava.overall.icon}</span> ${esc(res.nava.overall.text)}`;
+  ov.style.color = res.nava.overall.color;
+}
+
+/* ============ analyze + render a drawable source ============ */
+function analyzeAndRender(drawable, natW, natH, meta){
+  const res = analyze(drawable, natW, natH);
+  renderResults(res, Object.assign({ width:natW, height:natH }, meta));
+  $('#results').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  return res;
+}
+
+/* ============ image / file loading ============ */
+function loadFromFile(file){
+  const note = $('#dropNote');
+  if (!file || !file.type.startsWith('image/')){ flash(note,'That doesn\'t look like an image file.',true); return; }
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = ()=>{
+    let w = img.naturalWidth||img.width, h = img.naturalHeight||img.height;
+    if (!w || !h){ w=300; h=200; } // SVG without intrinsic size
+    analyzeAndRender(img, w, h, { src:url, label:file.name, width:w, height:h });
+    note.textContent='';
+  };
+  img.onerror = ()=>{ URL.revokeObjectURL(url); flash(note,'Could not read that image.',true); };
+  img.src = url;
+}
+
+/* ============ built-in example flags (drawn on a canvas from simple shapes) ============ */
+const EXAMPLES = {
+  'French tricolor':(cv)=>{ // vertical tricolor, 2:3 flag -> 3:2 pixels
+    cv.width=600; cv.height=400; const x=cv.getContext('2d'); const w=cv.width/3;
+    x.fillStyle='#0055A4'; x.fillRect(0,0,w,400);
+    x.fillStyle='#FFFFFF'; x.fillRect(w,0,w,400);
+    x.fillStyle='#EF4135'; x.fillRect(2*w,0,w,400);
+  },
+  'Nordic cross':(cv)=>{ // blue field, gold cross offset to hoist (Sweden-like), 5:8 flag
+    cv.width=640; cv.height=400; const x=cv.getContext('2d');
+    x.fillStyle='#006AA7'; x.fillRect(0,0,640,400);
+    x.fillStyle='#FECC00';
+    const t=80, vx=240; // cross thickness, vertical bar centre
+    x.fillRect(0,(400-t)/2,640,t);       // horizontal bar
+    x.fillRect(vx-t/2,0,t,400);          // vertical bar (offset toward hoist)
+  },
+  'Pride (6 colors)':(cv)=>{ // six horizontal stripes -> many colors
+    cv.width=600; cv.height=360; const x=cv.getContext('2d');
+    const cols=['#E40303','#FF8C00','#FFED00','#008026','#004DFF','#750787'];
+    const h=cv.height/cols.length;
+    cols.forEach((c,i)=>{ x.fillStyle=c; x.fillRect(0,Math.round(i*h),600,Math.ceil(h)+1); });
+  },
+  'Japan':(cv)=>{ // white field, centred red disc, 2:3 flag
+    cv.width=600; cv.height=400; const x=cv.getContext('2d');
+    x.fillStyle='#FFFFFF'; x.fillRect(0,0,600,400);
+    x.fillStyle='#BC002D'; x.beginPath(); x.arc(300,200,120,0,Math.PI*2); x.fill();
+  },
+};
+function loadExample(name){
+  const cv = document.createElement('canvas');
+  EXAMPLES[name](cv);
+  const src = cv.toDataURL('image/png');
+  analyzeAndRender(cv, cv.width, cv.height, { src, label:name, width:cv.width, height:cv.height });
+}
+function renderExamples(){
+  $('#examples').innerHTML = Object.keys(EXAMPLES).map(k=>`<button class="chip" data-ex="${esc(k)}" type="button">${esc(k)}</button>`).join('');
+}
+
+/* ============ exports ============ */
+function paletteHex(){ return (lastResult&&lastResult.colors?lastResult.colors:[]).slice(0,8).map(c=>c.hex.toUpperCase()); }
+$('.exports') && document.querySelectorAll('[data-export]').forEach(()=>{}); // noop guard
+document.addEventListener('click', async (e)=>{
+  const b = e.target.closest('[data-export]');
+  if (!b) return;
+  const kind = b.dataset.export;
+  const cols = (lastResult&&lastResult.colors?lastResult.colors:[]).slice(0,8);
+  if (!cols.length){ flash($('#exportNote'),'Analyze a flag first.',true); return; }
+  if (kind==='png'){ downloadPalettePNG(cols); return; }
+  let text='';
+  if (kind==='hex') text = cols.map(c=>c.hex.toUpperCase()).join(', ');
+  else if (kind==='css') text = ':root {\n' + cols.map((c,i)=>`  --flag-${i+1}: ${c.hex.toUpperCase()}; /* ${c.pct.toFixed(1)}% */`).join('\n') + '\n}';
+  else if (kind==='json') text = JSON.stringify(cols.map(c=>({ hex:c.hex.toUpperCase(), coverage:+c.pct.toFixed(2) })), null, 2);
+  copyText(text, b);
+});
+async function copyText(text, btn){
+  try{
+    await navigator.clipboard.writeText(text);
+    if (btn){ btn.classList.add('copied'); const t=btn.textContent; setTimeout(()=>{ btn.classList.remove('copied'); },1200); }
+    flash($('#exportNote'),'Copied');
+  }catch(_){ flash($('#exportNote'),'Copy blocked by browser',true); }
+}
+function downloadPalettePNG(cols){
+  const w=200, h=240, n=cols.length;
+  const cv=document.createElement('canvas'); cv.width=w*n; cv.height=h;
+  const ctx=cv.getContext('2d');
+  cols.forEach((c,i)=>{
+    ctx.fillStyle=c.hex; ctx.fillRect(i*w,0,w,h);
+    ctx.fillStyle=textOn(c.r,c.g,c.b);
+    ctx.font='600 20px '+getComputedStyle(document.body).fontFamily;
+    ctx.textAlign='center';
+    ctx.fillText(c.hex.toUpperCase(), i*w+w/2, h-40);
+    ctx.font='400 16px '+getComputedStyle(document.body).fontFamily;
+    ctx.fillText(c.pct.toFixed(1)+'%', i*w+w/2, h-18);
+  });
+  cv.toBlob(blob=>{
+    const u=URL.createObjectURL(blob); const a=document.createElement('a');
+    a.href=u; a.download='flag-palette.png'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(u),1500);
+    flash($('#exportNote'),'Palette PNG downloaded');
+  },'image/png');
+}
+
+/* copy hex from a color row */
+$('#colorList').addEventListener('click',(e)=>{
+  const el = e.target.closest('[data-hex]'); if(!el) return;
+  copyText(el.dataset.hex.toUpperCase(), null);
+  const old=el.textContent; el.textContent='✓ copied'; setTimeout(()=>{ el.textContent=old; },1000);
+});
+
+/* ============ input wiring ============ */
+$('#pickBtn').addEventListener('click', ()=>$('#fileInput').click());
+$('#fileInput').addEventListener('change', e=>{ if(e.target.files[0]) loadFromFile(e.target.files[0]); e.target.value=''; });
+$('#examples').addEventListener('click', e=>{ const b=e.target.closest('[data-ex]'); if(b) loadExample(b.dataset.ex); });
+
+const drop=$('#drop');
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('drag'); }));
+['dragleave','dragend'].forEach(ev=>drop.addEventListener(ev,e=>{ if(e.target===drop) drop.classList.remove('drag'); }));
+drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('drag'); if(e.dataTransfer.files[0]) loadFromFile(e.dataTransfer.files[0]); });
+// also accept a drop anywhere on the page
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',e=>{ e.preventDefault(); if(!drop.contains(e.target) && e.dataTransfer.files[0]) loadFromFile(e.dataTransfer.files[0]); });
+
+function flash(el,msg,err){ if(!el) return; el.textContent=msg; el.classList.toggle('err',!!err); if(msg) setTimeout(()=>{ if(el.textContent===msg){ el.textContent=''; el.classList.remove('err'); } },2200); }
+
+/* ============ theme ============ */
+const root=document.documentElement;
+const savedTheme=localStorage.getItem('max-theme');
+if(savedTheme) root.setAttribute('data-theme',savedTheme);
+$('#themeBtn').addEventListener('click',()=>{
+  const cur=root.getAttribute('data-theme');
+  const isDark=cur?cur==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next=isDark?'light':'dark';
+  root.setAttribute('data-theme',next); localStorage.setItem('max-theme',next);
+});
+
+/* ============ debug hook (for tests) ============ */
+window.analyzerDebug = {
+  analyze, analyzeAndRender, loadExample, computeRatio, computeColors, computeSymmetry, computeEdgeDensity,
+  EXAMPLE_KEYS: Object.keys(EXAMPLES),
+  get lastResult(){ return lastResult; },
+};
+
+/* ============ boot ============ */
+renderExamples();
+loadExample('French tricolor');
+</script>
+</body>
+</html>
