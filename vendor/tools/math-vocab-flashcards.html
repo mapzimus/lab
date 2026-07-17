@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Math Vocabulary Flashcards</title>
+<meta name="description" content="Study math vocabulary with spaced-repetition flashcards. Flip, grade, and shuffle terms and definitions; your progress is saved locally. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+
+  .toprow { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  select { padding: 9px 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; font-size: .92rem; font-family: inherit; }
+  .chk { font-size: .88rem; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .chk input { accent-color: var(--accent); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+    min-height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    padding: 28px 22px; cursor: pointer; user-select: none; position: relative;
+  }
+  .card:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .term { font-size: 2.1rem; font-weight: 800; color: var(--accent); }
+  .def { font-size: 1.2rem; line-height: 1.45; }
+  .ex { color: var(--muted); font-style: italic; margin-top: 12px; font-size: 1rem; }
+  .hint { position: absolute; bottom: 12px; left: 0; right: 0; color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; }
+
+  .progress { text-align: center; color: var(--muted); font-size: .85rem; margin: 14px 0; }
+  .controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  @media (max-width: 480px) {
+    .term { font-size: 1.6rem; }
+    .def { font-size: 1.05rem; }
+    .card { min-height: 220px; padding: 22px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← max</a>
+      <h1>Math Vocabulary Flashcards</h1>
+      <p>Study math vocabulary with click-to-flip flashcards. Grade yourself "got it" or "review again" and a spaced-repetition schedule brings due cards back to you. Progress is saved only in this browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="toprow">
+    <select id="deck" aria-label="Choose a deck"></select>
+    <label class="chk"><input type="checkbox" id="dueOnly" checked> Study due only</label>
+  </div>
+
+  <div class="card" id="card" tabindex="0" role="button" aria-label="Flashcard — click or press space to flip">
+    <div id="face"></div>
+    <div class="hint" id="hint">click to flip</div>
+  </div>
+
+  <div class="progress" id="progress"></div>
+
+  <div class="controls">
+    <button class="btn" id="prev">‹ Prev</button>
+    <button class="btn primary" id="flip">Flip</button>
+    <button class="btn" id="next">Next ›</button>
+  </div>
+  <div class="controls" id="gradeControls">
+    <button class="btn" id="again">Review again</button>
+    <button class="btn primary" id="gotit">Got it</button>
+  </div>
+  <div class="controls">
+    <button class="btn" id="shuffle">Shuffle</button>
+    <button class="btn" id="resetProgress">Reset progress</button>
+  </div>
+
+  <footer class="app">Nothing you study ever leaves your browser · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+  /* Flashcard deck data (inlined from the original decks.js companion file).
+   * Each card: { term, def, example? } — kept exactly as authored.
+   */
+  var DECKS = [
+    {
+      id: "alg1",
+      name: "Algebra 1 — Academic Vocabulary",
+      cards: [
+        { term: "Variable", def: "A letter that stands for a number you don't know yet.", example: "In 3x + 2, the variable is x." },
+        { term: "Coefficient", def: "The number multiplied by a variable.", example: "In 5x, the coefficient is 5." },
+        { term: "Constant", def: "A number on its own, with no variable.", example: "In 2x + 7, the constant is 7." },
+        { term: "Term", def: "A single number, variable, or number-times-variable, separated by + or −.", example: "4x, −3, and 2xy are each a term." },
+        { term: "Expression", def: "Numbers and variables combined with operations — no equals sign.", example: "3x + 5 is an expression." },
+        { term: "Equation", def: "Two expressions set equal with an = sign.", example: "3x + 5 = 11 is an equation." },
+        { term: "Inequality", def: "Compares two expressions with <, >, ≤, or ≥ instead of =.", example: "2x > 6" },
+        { term: "Like terms", def: "Terms that have the exact same variable part, so they can be combined.", example: "3x and 5x are like terms; 3x and 3y are not." },
+        { term: "Evaluate", def: "Plug in a number for the variable and compute the value.", example: "Evaluate 2x when x = 4 → 8." },
+        { term: "Simplify", def: "Rewrite an expression in a shorter, equal form by combining like terms.", example: "2x + 3x simplifies to 5x." },
+        { term: "Solution", def: "A value for the variable that makes the equation true.", example: "x = 2 is the solution of x + 3 = 5." },
+        { term: "Solve", def: "Find the value(s) of the variable that make an equation true.", example: "Solve x − 4 = 1 → x = 5." },
+        { term: "Slope", def: "How steep a line is — the rise over the run.", example: "A slope of 2 means up 2 for every 1 to the right." },
+        { term: "y-intercept", def: "Where a line crosses the y-axis (where x = 0).", example: "In y = 2x + 3, the y-intercept is 3." },
+        { term: "x-intercept", def: "Where a line crosses the x-axis (where y = 0).", example: "y = x − 4 has x-intercept 4." },
+        { term: "Linear", def: "An equation whose graph is a straight line; the variable is to the first power.", example: "y = 2x + 1 is linear." },
+        { term: "Function", def: "A rule that gives exactly one output for each input.", example: "y = x + 1: input 3 → output 4." },
+        { term: "Distribute", def: "Multiply the number outside the parentheses by each term inside.", example: "3(x + 2) = 3x + 6." },
+        { term: "Factor", def: "Write an expression as a product — the reverse of distributing.", example: "3x + 6 = 3(x + 2)." },
+        { term: "Substitute", def: "Replace a variable with a number or another expression.", example: "If x = 5, substitute into x + 2 to get 7." },
+        { term: "Exponent", def: "Tells how many times to multiply the base by itself.", example: "2³ = 2 · 2 · 2 = 8." },
+        { term: "Base", def: "The number being multiplied in a power.", example: "In 5², the base is 5." },
+        { term: "Reciprocal", def: "The flip of a number; a number times its reciprocal equals 1.", example: "The reciprocal of 3 is 1/3." },
+        { term: "Absolute value", def: "A number's distance from zero — always zero or positive.", example: "|−4| = 4." },
+        { term: "Integer", def: "A whole number that can be positive, negative, or zero (no fractions).", example: "−3, 0, and 7 are integers." }
+      ]
+    }
+  ];
+
+  (function(){
+    "use strict";
+    var decks = DECKS;
+    var deckSel=document.getElementById("deck"), faceEl=document.getElementById("face"),
+        hintEl=document.getElementById("hint"), dueOnly=document.getElementById("dueOnly"),
+        gradeControls=document.getElementById("gradeControls");
+    var deck, srs, order=[], pos=0, flipped=false;
+
+    // Leitner box -> days added to "due" after a correct ("Got it") answer while the
+    // card was in that box. Box 5 is treated as mastered (still reschedules on review).
+    var BOX_DAYS = {1:1, 2:2, 3:4, 4:7, 5:15};
+
+    if(!decks.length){ faceEl.innerHTML='<div class="def">No decks found.</div>'; return; }
+    decks.forEach(function(d){ var o=document.createElement("option"); o.value=d.id; o.textContent=d.name; deckSel.appendChild(o); });
+
+    // Per-term Leitner records: { "<term>": {box, due, seen} }
+    function srsKey(){ return "max-vocab-flashcards-"+deck.id+"-srs"; }
+    function loadSrs(){ try{ return JSON.parse(localStorage.getItem(srsKey())||"{}"); }catch(e){ return {}; } }
+    function saveSrs(){ try{ localStorage.setItem(srsKey(), JSON.stringify(srs)); }catch(e){} }
+
+    // Only keep records for terms that exist in the current deck.
+    function pruneSrs(){
+      var terms={}; deck.cards.forEach(function(c){ terms[c.term]=true; });
+      var changed=false;
+      Object.keys(srs).forEach(function(t){ if(!terms[t]){ delete srs[t]; changed=true; } });
+      if(changed) saveSrs();
+    }
+
+    function isDue(term){
+      var r=srs[term];
+      return !r || r.due<=Date.now();
+    }
+    function countDue(){ return deck.cards.filter(function(c){ return isDue(c.term); }).length; }
+    function countMastered(){ return deck.cards.filter(function(c){ var r=srs[c.term]; return r && r.box>=5; }).length; }
+
+    function buildOrder(keepPos){
+      var idx=deck.cards.map(function(_,i){return i;});
+      if(dueOnly.checked){
+        idx=idx.filter(function(i){ return isDue(deck.cards[i].term); });
+        idx.sort(function(a,b){
+          var ra=srs[deck.cards[a].term], rb=srs[deck.cards[b].term];
+          var ba=ra?ra.box:1, bb=rb?rb.box:1;
+          if(ba!==bb) return ba-bb;
+          var da=ra?ra.due:0, db=rb?rb.due:0;
+          return da-db;
+        });
+      }
+      order=idx;
+      if(!keepPos) pos=0;
+      if(pos>=order.length) pos=Math.max(0,order.length-1);
+    }
+    function setDeck(id){
+      deck=decks.find(function(d){return d.id===id;})||decks[0];
+      srs=loadSrs();
+      pruneSrs();
+      flipped=false; buildOrder(false); render();
+    }
+    function render(){
+      if(order.length===0){
+        faceEl.innerHTML = dueOnly.checked
+          ? '<div class="def">🎉 All caught up — nothing due right now.<br><span style="font-size:.85rem;color:var(--muted);">More cards will become due later.</span></div>'
+          : '<div class="def">No cards in this deck.</div>';
+        hintEl.style.visibility="hidden";
+        gradeControls.style.display="none";
+        document.getElementById("progress").textContent="Due: "+countDue()+" · Mastered (box 5): "+countMastered()+" / "+deck.cards.length;
+        return;
+      }
+      hintEl.style.visibility="visible";
+      var c=deck.cards[order[pos]];
+      if(!flipped){
+        faceEl.innerHTML='<div class="term"></div>';
+        faceEl.querySelector(".term").textContent=c.term;
+        hintEl.textContent="click to flip";
+        gradeControls.style.display="none";
+      } else {
+        var html='<div class="def"></div>'; if(c.example) html+='<div class="ex"></div>';
+        faceEl.innerHTML=html;
+        faceEl.querySelector(".def").textContent=c.def;
+        if(c.example) faceEl.querySelector(".ex").textContent=c.example;
+        hintEl.textContent="click to flip back";
+        gradeControls.style.display="flex";
+      }
+      document.getElementById("progress").textContent="Card "+(pos+1)+" of "+order.length+" · Due: "+countDue()+" · Mastered (box 5): "+countMastered()+" / "+deck.cards.length;
+    }
+    function flip(){ flipped=!flipped; render(); }
+    function next(){ if(!order.length)return; flipped=false; pos=(pos+1)%order.length; render(); }
+    function prev(){ if(!order.length)return; flipped=false; pos=(pos-1+order.length)%order.length; render(); }
+    function shuffle(){ for(var i=order.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=order[i];order[i]=order[j];order[j]=t;} pos=0; flipped=false; render(); }
+
+    function ensureRecord(term){
+      if(!srs[term]) srs[term]={box:1, due:0, seen:0};
+      return srs[term];
+    }
+    // Advance to the card after the one just graded. If it dropped out of the
+    // (due-filtered) order, the same numeric pos now already points at the next
+    // card; if it's still in the list (browsing mode), step forward explicitly.
+    function advanceAfterGrade(term){
+      buildOrder(true);
+      flipped=false;
+      if(order.length && deck.cards[order[pos]].term===term) pos=(pos+1)%order.length;
+      render();
+    }
+    function gotIt(){
+      if(!order.length) return;
+      var term=deck.cards[order[pos]].term;
+      var rec=ensureRecord(term);
+      var days=BOX_DAYS[rec.box]||BOX_DAYS[5];
+      rec.due=Date.now()+days*86400000;
+      rec.box=Math.min(5, rec.box+1);
+      rec.seen=(rec.seen||0)+1;
+      saveSrs();
+      advanceAfterGrade(term);
+    }
+    function reviewAgain(){
+      if(!order.length) return;
+      var term=deck.cards[order[pos]].term;
+      var rec=ensureRecord(term);
+      rec.box=1;
+      rec.due=Date.now();
+      rec.seen=(rec.seen||0)+1;
+      saveSrs();
+      advanceAfterGrade(term);
+    }
+
+    document.getElementById("card").addEventListener("click",flip);
+    document.getElementById("card").addEventListener("keydown",function(e){
+      if(e.key===" "||e.key==="Enter"){ e.preventDefault(); flip(); }
+      else if(e.key==="ArrowRight"){ next(); } else if(e.key==="ArrowLeft"){ prev(); }
+    });
+    document.getElementById("flip").onclick=flip;
+    document.getElementById("next").onclick=next;
+    document.getElementById("prev").onclick=prev;
+    document.getElementById("gotit").onclick=gotIt;
+    document.getElementById("again").onclick=reviewAgain;
+    document.getElementById("shuffle").onclick=shuffle;
+    document.getElementById("resetProgress").onclick=function(){ srs={}; saveSrs(); buildOrder(false); flipped=false; render(); };
+    dueOnly.onchange=function(){ buildOrder(false); flipped=false; render(); };
+    deckSel.onchange=function(){ setDeck(deckSel.value); };
+
+    setDeck(decks[0].id);
+  })();
+
+  var root = document.documentElement;
+  var savedTheme = localStorage.getItem('max-theme');
+  if (savedTheme) root.setAttribute('data-theme', savedTheme);
+  document.getElementById('themeBtn').addEventListener('click', function() {
+    var cur = root.getAttribute('data-theme');
+    var isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('max-theme', next);
+  });
+</script>
+</body>
+</html>

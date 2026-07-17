@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formula Sheet</title>
+<meta name="description" content="Searchable Grade-10 math reference formulas — area, volume, coordinate geometry, algebra and finance — each with a quick worked example. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  /* ---- formula sheet ---- */
+  #search {
+    width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px;
+    font-size: 1rem; margin-bottom: 8px; background: var(--surface); color: var(--text);
+    font-family: var(--sans);
+  }
+  #search:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  #search::placeholder { color: var(--muted); }
+  .hint { color: var(--muted); font-size: .82rem; margin-bottom: 18px; }
+
+  .cat {
+    font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+    margin: 22px 0 8px; font-weight: 700;
+  }
+  .cat:first-of-type { margin-top: 6px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 16px 18px; margin-bottom: 12px;
+  }
+  .name { font-weight: 700; color: var(--accent); margin-bottom: 8px; font-size: .95rem; }
+  .formula {
+    font-size: 1.3rem; margin: 4px 0 10px; overflow-x: auto;
+    font-family: Cambria, "Times New Roman", Georgia, serif;
+  }
+  .formula i { font-style: italic; }
+  .ex { color: var(--muted); font-size: .92rem; line-height: 1.55; }
+  .ex i { font-style: italic; color: var(--text); }
+  .empty { text-align: center; color: var(--muted); padding: 40px 10px; }
+
+  /* hand-built math primitives (no external math library) */
+  .frac {
+    display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center;
+    font-size: .72em; line-height: 1.15; margin: 0 .16em; position: relative; top: .04em;
+  }
+  .frac .num { border-bottom: 1.4px solid currentColor; padding: 0 .2em .05em; }
+  .frac .den { padding: .05em .2em 0; }
+  .sqrt { position: relative; display: inline-block; padding: .06em .12em 0 .62em; }
+  .sqrt::before { content: "\221A"; position: absolute; left: 0; top: -.03em; font-size: 1.2em; font-style: normal; }
+  .sqrt .rad { border-top: 1.4px solid currentColor; padding: 0 .06em; }
+
+  @media (max-width: 720px) {
+    .formula { font-size: 1.15rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← max</a>
+      <h1>Formula Sheet</h1>
+      <p>Searchable Grade-10 math reference formulas with a worked example each — area, volume, coordinate geometry, algebra and finance.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <input id="search" type="text" placeholder="Search formulas… (e.g. slope, circle, quadratic)" aria-label="Search formulas" autocomplete="off" spellcheck="false">
+  <div class="hint" id="hint"></div>
+  <div id="list"></div>
+
+  <footer class="app">Nothing you type leaves this page · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+'use strict';
+
+// { category, name, formula (HTML), example (HTML) }
+var FORMULAS = [
+  // Area & perimeter
+  { category: "Area & Perimeter", name: "Triangle area",
+    formula: '<i>A</i> = <span class="frac"><span class="num">1</span><span class="den">2</span></span><i>bh</i>',
+    example: 'Base <i>b</i> = 10, height <i>h</i> = 6: <i>A</i> = ½(10)(6) = 30.' },
+  { category: "Area & Perimeter", name: "Rectangle area",
+    formula: '<i>A</i> = <i>ℓw</i>',
+    example: '<i>ℓ</i> = 8, <i>w</i> = 3 ⇒ <i>A</i> = 24.' },
+  { category: "Area & Perimeter", name: "Parallelogram area",
+    formula: '<i>A</i> = <i>bh</i>',
+    example: 'Base times the perpendicular height (not the slant side).' },
+  { category: "Area & Perimeter", name: "Trapezoid area",
+    formula: '<i>A</i> = <span class="frac"><span class="num">1</span><span class="den">2</span></span>(<i>b</i><sub>1</sub> + <i>b</i><sub>2</sub>)<i>h</i>',
+    example: '<i>b</i>₁ = 4, <i>b</i>₂ = 8, <i>h</i> = 5 ⇒ <i>A</i> = ½(12)(5) = 30.' },
+  { category: "Area & Perimeter", name: "Circle area",
+    formula: '<i>A</i> = π<i>r</i><sup>2</sup>',
+    example: '<i>r</i> = 3 ⇒ <i>A</i> = 9π ≈ 28.3.' },
+  { category: "Area & Perimeter", name: "Circle circumference",
+    formula: '<i>C</i> = 2π<i>r</i> = π<i>d</i>',
+    example: '<i>r</i> = 3 ⇒ <i>C</i> = 6π ≈ 18.8.' },
+
+  // Volume & surface area
+  { category: "Volume & Surface Area", name: "Prism / cylinder volume",
+    formula: '<i>V</i> = <i>Bh</i>',
+    example: '<i>B</i> is the base area. Cylinder: <i>V</i> = π<i>r</i>²<i>h</i>.' },
+  { category: "Volume & Surface Area", name: "Cone volume",
+    formula: '<i>V</i> = <span class="frac"><span class="num">1</span><span class="den">3</span></span>π<i>r</i><sup>2</sup><i>h</i>',
+    example: '<i>r</i> = 3, <i>h</i> = 4 ⇒ <i>V</i> = ⅓π(9)(4) = 12π.' },
+  { category: "Volume & Surface Area", name: "Pyramid volume",
+    formula: '<i>V</i> = <span class="frac"><span class="num">1</span><span class="den">3</span></span><i>Bh</i>',
+    example: "One-third of the matching prism's volume." },
+  { category: "Volume & Surface Area", name: "Sphere volume",
+    formula: '<i>V</i> = <span class="frac"><span class="num">4</span><span class="den">3</span></span>π<i>r</i><sup>3</sup>',
+    example: '<i>r</i> = 3 ⇒ <i>V</i> = ⁴⁄₃π(27) = 36π.' },
+  { category: "Volume & Surface Area", name: "Sphere surface area",
+    formula: '<i>S</i> = 4π<i>r</i><sup>2</sup>',
+    example: '<i>r</i> = 3 ⇒ <i>S</i> = 36π.' },
+  { category: "Volume & Surface Area", name: "Cylinder surface area",
+    formula: '<i>S</i> = 2π<i>r</i><sup>2</sup> + 2π<i>rh</i>',
+    example: 'Two circles plus the wrap-around side.' },
+
+  // Coordinate geometry
+  { category: "Coordinate Geometry", name: "Slope",
+    formula: '<i>m</i> = <span class="frac"><span class="num"><i>y</i><sub>2</sub> − <i>y</i><sub>1</sub></span><span class="den"><i>x</i><sub>2</sub> − <i>x</i><sub>1</sub></span></span>',
+    example: 'Through (1, 2) and (4, 8): <i>m</i> = (8 − 2) / (4 − 1) = 2.' },
+  { category: "Coordinate Geometry", name: "Slope-intercept form",
+    formula: '<i>y</i> = <i>mx</i> + <i>b</i>',
+    example: '<i>m</i> is the slope, <i>b</i> is the <i>y</i>-intercept.' },
+  { category: "Coordinate Geometry", name: "Point-slope form",
+    formula: '<i>y</i> − <i>y</i><sub>1</sub> = <i>m</i>(<i>x</i> − <i>x</i><sub>1</sub>)',
+    example: 'Slope 3 through (2, 5): <i>y</i> − 5 = 3(<i>x</i> − 2).' },
+  { category: "Coordinate Geometry", name: "Distance formula",
+    formula: '<i>d</i> = <span class="sqrt"><span class="rad">(<i>x</i><sub>2</sub> − <i>x</i><sub>1</sub>)<sup>2</sup> + (<i>y</i><sub>2</sub> − <i>y</i><sub>1</sub>)<sup>2</sup></span></span>',
+    example: '(0, 0) to (3, 4): <i>d</i> = √(9 + 16) = 5.' },
+  { category: "Coordinate Geometry", name: "Midpoint formula",
+    formula: '<i>M</i> = (<span class="frac"><span class="num"><i>x</i><sub>1</sub> + <i>x</i><sub>2</sub></span><span class="den">2</span></span>, <span class="frac"><span class="num"><i>y</i><sub>1</sub> + <i>y</i><sub>2</sub></span><span class="den">2</span></span>)',
+    example: '(2, 4) and (6, 8): <i>M</i> = (4, 6).' },
+
+  // Algebra & right triangles
+  { category: "Algebra & Right Triangles", name: "Pythagorean theorem",
+    formula: '<i>a</i><sup>2</sup> + <i>b</i><sup>2</sup> = <i>c</i><sup>2</sup>',
+    example: 'Legs 3, 4 ⇒ <i>c</i> = √(9 + 16) = 5 (<i>c</i> is the hypotenuse).' },
+  { category: "Algebra & Right Triangles", name: "Quadratic formula",
+    formula: '<i>x</i> = <span class="frac"><span class="num">−<i>b</i> ± <span class="sqrt"><span class="rad"><i>b</i><sup>2</sup> − 4<i>ac</i></span></span></span><span class="den">2<i>a</i></span></span>',
+    example: 'For <i>ax</i>² + <i>bx</i> + <i>c</i> = 0. Discriminant <i>b</i>² − 4<i>ac</i> tells how many real roots.' },
+  { category: "Algebra & Right Triangles", name: "Difference of squares",
+    formula: '<i>a</i><sup>2</sup> − <i>b</i><sup>2</sup> = (<i>a</i> + <i>b</i>)(<i>a</i> − <i>b</i>)',
+    example: '<i>x</i>² − 9 = (<i>x</i> + 3)(<i>x</i> − 3).' },
+
+  // Finance & growth
+  { category: "Finance & Growth", name: "Simple interest",
+    formula: '<i>I</i> = <i>Prt</i>',
+    example: '<i>P</i> = $500 at <i>r</i> = 0.04 for <i>t</i> = 3 yr: <i>I</i> = $60.' },
+  { category: "Finance & Growth", name: "Compound interest",
+    formula: '<i>A</i> = <i>P</i>(1 + <span class="frac"><span class="num"><i>r</i></span><span class="den"><i>n</i></span></span>)<sup><i>nt</i></sup>',
+    example: '<i>n</i> = compounds per year, <i>t</i> = years.' }
+];
+
+var listEl = document.getElementById('list');
+var hintEl = document.getElementById('hint');
+
+function render(q) {
+  q = (q || '').trim().toLowerCase();
+  var matches = FORMULAS.filter(function (f) {
+    if (!q) return true;
+    return (f.name + ' ' + f.category).toLowerCase().indexOf(q) >= 0;
+  });
+  hintEl.textContent = q
+    ? 'Showing ' + matches.length + ' of ' + FORMULAS.length + ' formulas.'
+    : FORMULAS.length + ' Grade-10 math reference formulas. Search by name or category.';
+  if (!matches.length) {
+    listEl.innerHTML = '<div class="empty">No formulas match “' + q.replace(/[<>&]/g, function (c) {
+      return c === '<' ? '&lt;' : c === '>' ? '&gt;' : '&amp;';
+    }) + '”.</div>';
+    return;
+  }
+  var html = '', lastCat = null;
+  matches.forEach(function (f) {
+    if (f.category !== lastCat) { html += '<div class="cat">' + f.category + '</div>'; lastCat = f.category; }
+    html += '<div class="card">' +
+      '<div class="name">' + f.name + '</div>' +
+      '<div class="formula">' + f.formula + '</div>' +
+      '<div class="ex">' + f.example + '</div>' +
+    '</div>';
+  });
+  listEl.innerHTML = html;
+}
+
+var box = document.getElementById('search');
+box.addEventListener('input', function () { render(box.value); });
+render('');
+
+// ---------- theme toggle ----------
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

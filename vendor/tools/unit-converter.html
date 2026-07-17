@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit Converter</title>
+<meta name="description" content="Instant unit conversions across 12 categories — length, area, volume, mass, speed, temperature, data, angle, pressure, energy, time and fuel economy — with GIS-friendly units like chains, US survey feet and nautical miles. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  /* category chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 7px 13px; font-size: .84rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .chip:focus-visible, .swap:focus-visible, .result:focus-visible, .ucard:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .section + .section { margin-top: 16px; }
+  .section h2 { font-size: .95rem; margin: 0; letter-spacing: -0.01em; }
+  .section .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+  .hint { color: var(--muted); font-size: .8rem; }
+
+  /* converter */
+  .conv-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: end; }
+  .side { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .lbl { font-size: .78rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  .val { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 9px; padding: 12px 14px; font-size: 1.4rem; font-family: var(--mono); width: 100%; }
+  .val:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .val.bad { border-color: var(--danger); }
+  select { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 10px 12px; font-size: .9rem; font-family: var(--sans); width: 100%; cursor: pointer; }
+  .swap { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 999px; width: 44px; height: 44px; font-size: 1.2rem; cursor: pointer; align-self: center; margin-bottom: 30px; }
+  .swap:hover { border-color: var(--accent); color: var(--accent); }
+  .result { position: relative; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 9px; padding: 12px 14px; text-align: left; cursor: pointer; width: 100%; font-family: var(--mono); }
+  .result:hover { border-color: var(--accent); }
+  .result .rv { font-size: 1.4rem; font-weight: 600; overflow-wrap: anywhere; }
+  .result .ru { font-size: .9rem; color: var(--muted); margin-left: 6px; }
+  .formula { margin-top: 12px; color: var(--muted); font-size: .84rem; font-family: var(--mono); min-height: 1.2em; overflow-wrap: anywhere; }
+  .note { font-size: .82rem; color: var(--muted); min-height: 1.15em; display: block; margin-top: 8px; }
+  .note.err { color: var(--danger); }
+  .note:empty { margin-top: 0; min-height: 0; }
+
+  /* all-units grid */
+  .units-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; transition: opacity .15s; }
+  .units-grid.dimmed { opacity: .35; pointer-events: none; }
+  .ucard { position: relative; display: flex; flex-direction: column; gap: 4px; align-items: flex-start; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 9px; padding: 10px 12px; cursor: pointer; text-align: left; font-family: var(--sans); min-width: 0; }
+  .ucard:hover { border-color: var(--accent); }
+  .ucard.active { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .ucard .uname { font-size: .76rem; color: var(--muted); }
+  .ucard .usym { font-weight: 600; }
+  .ucard .uval { font-family: var(--mono); font-size: .98rem; overflow-wrap: anywhere; }
+  .ucard.copied, .result.copied { border-color: var(--ok); }
+  .ucard.copied::after, .result.copied::after { content: "✓ Copied"; position: absolute; top: 6px; right: 9px; font-size: .7rem; font-weight: 700; color: var(--ok); font-family: var(--sans); }
+
+  @media (max-width: 720px) {
+    .conv-grid { grid-template-columns: 1fr; }
+    .swap { margin: 0 auto; transform: rotate(90deg); }
+    .units-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    .val, .result .rv { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Unit Converter</h1>
+      <p>Instant conversions across 12 categories — from length to fuel economy — with map-and-survey extras like chains, US survey feet, nautical miles and NATO mils. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="chips" id="chips" role="group" aria-label="Unit category"></div>
+
+  <section class="section" aria-label="Converter">
+    <div class="conv-grid">
+      <div class="side">
+        <label class="lbl" for="valInput">Value</label>
+        <input class="val" id="valInput" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="errNote">
+        <label class="lbl" for="fromSel">From</label>
+        <select id="fromSel" aria-label="Convert from unit"></select>
+      </div>
+      <button class="swap" id="swapBtn" type="button" title="Swap units" aria-label="Swap the from and to units">⇄</button>
+      <div class="side">
+        <span class="lbl" id="toLbl">To</span>
+        <select id="toSel" aria-labelledby="toLbl" aria-label="Convert to unit"></select>
+        <span class="lbl">Result <span style="text-transform:none;font-weight:400">· click to copy</span></span>
+        <button class="result" id="resultBox" type="button" title="Click to copy the result">
+          <span class="rv" id="resultVal">—</span><span class="ru" id="resultUnit"></span>
+        </button>
+      </div>
+    </div>
+    <span class="note err" id="errNote" role="alert"></span>
+    <span class="note" id="status"></span>
+    <div class="formula" id="formula" aria-live="polite"></div>
+  </section>
+
+  <section class="section" aria-label="All units">
+    <div class="head">
+      <h2>All units</h2>
+      <span class="hint" id="gridHint">your value in every unit of this category — click any card to copy</span>
+    </div>
+    <div class="units-grid" id="grid"></div>
+  </section>
+
+  <footer class="app">Tip: paces accept M:SS (e.g. <code>6:30</code>) and decimals accept commas (<code>3,5</code>) · nothing you enter leaves this page · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+'use strict';
+/* Unit Converter — standalone, client-side, no dependencies. */
+const $ = (s) => document.querySelector(s);
+const PI = Math.PI, GAL = 3.785411784, LB = 0.45359237;
+
+// Linear unit: value * f = base. Reciprocal unit: base = r / value (pace, fuel economy).
+function u(id, name, sym, f){ return { id, name, sym, f }; }
+function ur(id, name, sym, r, pace){ return { id, name, sym, r, pace: !!pace }; }
+
+const CATS = [
+  { id:'length', name:'Length', def:['m','ft','1'], units:[
+    u('mm','millimeter','mm',0.001), u('cm','centimeter','cm',0.01), u('m','meter','m',1), u('km','kilometer','km',1000),
+    u('in','inch','in',0.0254), u('ft','foot','ft',0.3048), u('yd','yard','yd',0.9144), u('mi','mile','mi',1609.344),
+    u('nmi','nautical mile','nmi',1852), u('ch','chain','ch',20.1168), u('ftus','US survey foot','ft (US)',1200/3937) ]},
+  { id:'area', name:'Area', def:['ha','acre','1'], units:[
+    u('m2','square meter','m²',1), u('km2','square kilometer','km²',1e6), u('ha','hectare','ha',1e4),
+    u('acre','acre','ac',4046.8564224), u('ft2','square foot','ft²',0.09290304), u('yd2','square yard','yd²',0.83612736),
+    u('mi2','square mile','mi²',2589988.110336), u('are','are','a',100) ]},
+  { id:'volume', name:'Volume', def:['galus','l','1'], units:[
+    u('ml','milliliter','mL',0.001), u('l','liter','L',1), u('m3','cubic meter','m³',1000),
+    u('tsp','teaspoon (US)','tsp',GAL/768), u('tbsp','tablespoon (US)','tbsp',GAL/256), u('floz','fluid ounce (US)','fl oz',GAL/128),
+    u('cup','cup (US)','cup',GAL/16), u('pt','pint (US)','pt',GAL/8), u('qt','quart (US)','qt',GAL/4),
+    u('galus','gallon (US)','gal (US)',GAL), u('galimp','gallon (imperial)','gal (imp)',4.54609), u('ft3','cubic foot','ft³',28.316846592) ]},
+  { id:'mass', name:'Mass', def:['kg','lb','1'], units:[
+    u('mg','milligram','mg',1e-6), u('g','gram','g',1e-3), u('kg','kilogram','kg',1), u('t','tonne','t',1000),
+    u('oz','ounce','oz',LB/16), u('lb','pound','lb',LB), u('st','stone','st',6.35029318),
+    u('uston','US ton (short)','ton (US)',907.18474), u('impton','imperial ton (long)','ton (imp)',1016.0469088) ]},
+  { id:'speed', name:'Speed', def:['kmh','minkm','10'], units:[
+    u('ms','meter per second','m/s',1), u('kmh','kilometer per hour','km/h',1/3.6), u('mph','mile per hour','mph',0.44704),
+    u('kn','knot','kn',1852/3600), u('fts','foot per second','ft/s',0.3048),
+    ur('minkm','pace, minutes per kilometer','min/km',1000/60,true), ur('minmi','pace, minutes per mile','min/mi',1609.344/60,true) ]},
+  { id:'temp', name:'Temperature', def:['c','f','20'], units:[
+    { id:'c', name:'Celsius', sym:'°C', toB:(v)=>v+273.15, fromB:(b)=>b-273.15 },
+    { id:'f', name:'Fahrenheit', sym:'°F', toB:(v)=>(v-32)*5/9+273.15, fromB:(b)=>(b-273.15)*9/5+32 },
+    { id:'k', name:'Kelvin', sym:'K', toB:(v)=>v, fromB:(b)=>b } ]},
+  { id:'data', name:'Data size', def:['gib','gb','1'], units:[
+    u('bit','bit','bit',0.125), u('b','byte','B',1), u('kb','kilobyte','KB',1e3), u('mb','megabyte','MB',1e6),
+    u('gb','gigabyte','GB',1e9), u('tb','terabyte','TB',1e12), u('kib','kibibyte','KiB',1024),
+    u('mib','mebibyte','MiB',1048576), u('gib','gibibyte','GiB',1073741824), u('tib','tebibyte','TiB',1099511627776) ]},
+  { id:'angle', name:'Angle', def:['deg','rad','90'], units:[
+    u('deg','degree','°',PI/180), u('rad','radian','rad',1), u('grad','gradian','gon',PI/200),
+    u('arcmin','arcminute','′',PI/10800), u('arcsec','arcsecond','″',PI/648000),
+    u('mil','NATO mil (6400/circle)','mil',PI/3200), u('turn','turn','turn',2*PI) ]},
+  { id:'pressure', name:'Pressure', def:['atm','psi','1'], units:[
+    u('pa','pascal','Pa',1), u('kpa','kilopascal','kPa',1e3), u('bar','bar','bar',1e5), u('atm','atmosphere','atm',101325),
+    u('psi','pound per square inch','psi',6894.757293168), u('mmhg','millimeter of mercury','mmHg',133.322387415),
+    u('inhg','inch of mercury','inHg',3386.389) ]},
+  { id:'energy', name:'Energy', def:['kcal','kj','100'], units:[
+    u('j','joule','J',1), u('kj','kilojoule','kJ',1e3), u('wh','watt-hour','Wh',3600), u('kwh','kilowatt-hour','kWh',3.6e6),
+    u('cal','calorie','cal',4.184), u('kcal','kilocalorie','kcal',4184), u('btu','British thermal unit','BTU',1055.05585262) ]},
+  { id:'time', name:'Time', def:['yr','d','1'], units:[
+    u('s','second','s',1), u('min','minute','min',60), u('h','hour','h',3600), u('d','day','d',86400),
+    u('wk','week','wk',604800), u('mo','month (30.44 d)','mo',2630016), u('yr','year (365.25 d)','yr',31557600) ]},
+  { id:'fuel', name:'Fuel economy', def:['l100','mpgus','8'], units:[
+    u('l100','liters per 100 km','L/100km',1), ur('kml','kilometers per liter','km/L',100),
+    ur('mpgus','miles per gallon (US)','MPG (US)',235.215), ur('mpgimp','miles per gallon (imperial)','MPG (imp)',282.481) ]},
+];
+
+const TEMP_FORMULA = {
+  'c>f':'°F = °C × 9/5 + 32',      'f>c':'°C = (°F − 32) × 5/9',
+  'c>k':'K = °C + 273.15',          'k>c':'°C = K − 273.15',
+  'f>k':'K = (°F − 32) × 5/9 + 273.15', 'k>f':'°F = (K − 273.15) × 9/5 + 32',
+};
+
+// ---------- conversion core ----------
+function toBase(un, v){
+  if (un.toB) return un.toB(v);
+  if (un.r != null) return v > 0 ? un.r / v : NaN;   // reciprocal: undefined at 0 / negative
+  return v * un.f;
+}
+function fromBase(un, b){
+  if (un.fromB) return un.fromB(b);
+  if (un.r != null) return b > 0 ? un.r / b : NaN;
+  return b / un.f;
+}
+
+// ---------- formatting ----------
+const nfGroup = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 10 });
+const nfPlain = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 10, useGrouping: false });
+function expFmt(v){
+  return v.toExponential(6).replace(/(\.\d*?)0+e/, '$1e').replace(/\.e/, 'e');
+}
+function fmt(v){ // display: grouping, ≤10 significant digits, sci beyond 1e15 / below 1e-9
+  if (v == null || !isFinite(v)) return '—';
+  if (v === 0) return '0';
+  const a = Math.abs(v);
+  if (a >= 1e15 || a < 1e-9) return expFmt(v);
+  return nfGroup.format(v);
+}
+function fmtCopy(v){ // plain (no grouping) — for clipboard & formula line
+  if (v == null || !isFinite(v)) return '—';
+  if (v === 0) return '0';
+  const a = Math.abs(v);
+  if (a >= 1e15 || a < 1e-9) return expFmt(v);
+  return nfPlain.format(v);
+}
+function fmtPace(v){ // minutes → "M:SS" (tenths of a second when needed)
+  if (v == null || !isFinite(v) || v <= 0) return '—';
+  const total = Math.round(v * 600) / 10; // seconds, to 0.1 s
+  let min = Math.floor(total / 60);
+  let sec = Math.round((total - min * 60) * 10) / 10;
+  if (sec >= 60) { min += 1; sec = 0; }
+  const whole = Math.abs(sec - Math.round(sec)) < 1e-9;
+  const secStr = whole ? String(Math.round(sec)).padStart(2, '0') : sec.toFixed(1).padStart(4, '0');
+  return min + ':' + secStr;
+}
+
+// ---------- input parsing ----------
+function parseValue(raw, un){
+  const s = String(raw).trim();
+  if (!s) return { err: 'Enter a value' };
+  if (un.pace && s.includes(':')){
+    const m = s.match(/^(-?\d+):([0-5]?\d(?:[.,]\d+)?)$/);
+    if (!m) return { err: 'Pace format is minutes:seconds, e.g. 6:30' };
+    const mins = parseInt(m[1], 10);
+    const v = Math.abs(mins) + parseFloat(m[2].replace(',', '.')) / 60;
+    return { v: m[1].startsWith('-') ? -v : v };
+  }
+  let t = s.replace(/[\s_]/g, '');
+  const commas = (t.match(/,/g) || []).length;
+  if (commas){
+    if (t.includes('.') || commas > 1) t = t.replace(/,/g, '');        // commas are thousands separators
+    else {
+      const [before, after] = t.split(',');
+      // "1,234" reads as thousands; "3,5" / "12,75" / "0,5" read as a decimal comma
+      if (after.length === 3 && before.replace(/^[+-]/, '').length <= 3 && !/^[+-]?0$/.test(before)) t = before + after;
+      else t = before + '.' + after;
+    }
+  }
+  if (!/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/.test(t)) return { err: 'That doesn’t look like a number' };
+  const v = Number(t);
+  if (!isFinite(v)) return { err: 'That number is too large' };
+  return { v };
+}
+
+// ---------- state ----------
+const state = { cat: 'length', from: 'm', to: 'ft' };
+let lastCopy = null;   // copy string of the current result ('—' → null)
+let lastBase = NaN;
+let lastHash = '';
+
+const catById  = (id) => CATS.find(c => c.id === id);
+const curCat   = () => catById(state.cat);
+const unitById = (cat, id) => cat.units.find(x => x.id === id);
+
+// ---------- UI construction ----------
+function buildChips(){
+  const box = $('#chips');
+  box.innerHTML = '';
+  CATS.forEach(c => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.dataset.cat = c.id; b.textContent = c.name;
+    b.setAttribute('aria-pressed', 'false');
+    box.appendChild(b);
+  });
+}
+function updateChips(){
+  document.querySelectorAll('.chip').forEach(b => {
+    const on = b.dataset.cat === state.cat;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', String(on));
+  });
+}
+function buildSelects(){
+  const cat = curCat();
+  for (const [sel, cur] of [[$('#fromSel'), state.from], [$('#toSel'), state.to]]){
+    sel.innerHTML = '';
+    cat.units.forEach(un => {
+      const o = document.createElement('option');
+      o.value = un.id; o.textContent = `${un.name} (${un.sym})`;
+      sel.appendChild(o);
+    });
+    sel.value = cur;
+  }
+}
+function buildGrid(){
+  const cat = curCat(), grid = $('#grid');
+  grid.innerHTML = '';
+  cat.units.forEach(un => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'ucard'; b.dataset.unit = un.id;
+    b.title = 'Click to copy this value';
+    b.innerHTML = `<span class="uname"><span class="usym"></span> · <span class="ufull"></span></span><span class="uval">—</span>`;
+    b.querySelector('.usym').textContent = un.sym;
+    b.querySelector('.ufull').textContent = un.name;
+    grid.appendChild(b);
+  });
+  $('#gridHint').textContent = `your value in every ${cat.name.toLowerCase()} unit — click any card to copy`;
+}
+function renderGridValues(){
+  const cat = curCat();
+  document.querySelectorAll('#grid .ucard').forEach(card => {
+    const un = unitById(cat, card.dataset.unit);
+    const out = fromBase(un, lastBase);
+    card.querySelector('.uval').textContent = un.pace ? fmtPace(out) : fmt(out);
+    card.classList.toggle('active', un.id === state.to);
+  });
+}
+function renderFormula(from, to){
+  let txt;
+  if (state.cat === 'temp'){
+    txt = TEMP_FORMULA[from.id + '>' + to.id] || `1 ${from.sym} = 1 ${to.sym}`;
+  } else if (from.id === to.id){
+    txt = `1 ${from.sym} = 1 ${to.sym}`;
+  } else if (from.f != null && to.f != null){
+    txt = `1 ${from.sym} = ${fmtCopy(from.f / to.f)} ${to.sym}`;
+  } else if (from.f != null && to.r != null){
+    txt = `${to.sym} = ${fmtCopy(to.r / from.f)} ÷ ${from.sym}`;
+  } else if (from.r != null && to.f != null){
+    txt = `${to.sym} = ${fmtCopy(from.r / to.f)} ÷ ${from.sym}`;
+  } else {
+    txt = `${to.sym} = ${fmtCopy(to.r / from.r)} × ${from.sym}`;
+  }
+  $('#formula').textContent = '≈  ' + txt;
+}
+
+// ---------- convert ----------
+function convert(){
+  const cat = curCat();
+  const from = unitById(cat, state.from), to = unitById(cat, state.to);
+  const input = $('#valInput');
+  const parsed = parseValue(input.value, from);
+  $('#resultUnit').textContent = to.sym;
+  renderFormula(from, to);
+  if (parsed.err){
+    $('#errNote').textContent = parsed.err;
+    input.classList.add('bad');
+    $('#resultVal').textContent = '—';
+    $('#grid').classList.add('dimmed');
+    lastCopy = null; lastBase = NaN;
+    syncHash();
+    return;
+  }
+  $('#errNote').textContent = '';
+  input.classList.remove('bad');
+  $('#grid').classList.remove('dimmed');
+  lastBase = toBase(from, parsed.v);
+  const out = fromBase(to, lastBase);
+  const disp = to.pace ? fmtPace(out) : fmt(out);
+  $('#resultVal').textContent = disp;
+  lastCopy = disp === '—' ? null : (to.pace ? disp : fmtCopy(out));
+  renderGridValues();
+  syncHash();
+}
+
+// ---------- URL hash ----------
+function syncHash(){
+  const h = `${state.cat}/${state.from}/${state.to}/${encodeURIComponent($('#valInput').value)}`;
+  if (h === lastHash) return;
+  lastHash = h;
+  history.replaceState(null, '', '#' + h);
+}
+function applyHash(){
+  const parts = location.hash.replace(/^#/, '').split('/');
+  if (parts.length < 4) return false;
+  const cat = catById(parts[0]);
+  if (!cat || !unitById(cat, parts[1]) || !unitById(cat, parts[2])) return false;
+  state.cat = cat.id; state.from = parts[1]; state.to = parts[2];
+  let val; try { val = decodeURIComponent(parts.slice(3).join('/')); } catch { val = cat.def[2]; }
+  refreshUI(val);
+  return true;
+}
+function refreshUI(value){
+  buildSelects(); buildGrid(); updateChips();
+  $('#valInput').value = value;
+  convert();
+}
+function setCategory(id){
+  const cat = catById(id); if (!cat) return;
+  state.cat = id; state.from = cat.def[0]; state.to = cat.def[1];
+  refreshUI(cat.def[2]);
+}
+
+// ---------- copy ----------
+async function copyText(text, el){
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; }
+  catch (e) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0.01;pointer-events:none';
+      document.body.appendChild(ta); ta.select();
+      ok = document.execCommand('copy');
+      ta.remove();
+    } catch (e2) { ok = false; }
+  }
+  if (ok && el){
+    el.classList.add('copied');
+    setTimeout(() => el.classList.remove('copied'), 1200);
+  } else if (!ok){
+    const st = $('#status');
+    st.textContent = 'Copy was blocked by the browser — select the value and copy it manually.';
+    st.classList.add('err');
+    setTimeout(() => { st.textContent = ''; st.classList.remove('err'); }, 2500);
+  }
+}
+
+// ---------- events ----------
+$('#chips').addEventListener('click', (e) => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  setCategory(b.dataset.cat);
+});
+$('#valInput').addEventListener('input', convert);
+$('#fromSel').addEventListener('change', (e) => { state.from = e.target.value; convert(); });
+$('#toSel').addEventListener('change', (e) => { state.to = e.target.value; convert(); });
+$('#swapBtn').addEventListener('click', () => {
+  const t = state.from; state.from = state.to; state.to = t;
+  if (lastCopy != null) $('#valInput').value = lastCopy;  // carry the result across so the swap is reversible
+  $('#fromSel').value = state.from; $('#toSel').value = state.to;
+  convert();
+});
+$('#resultBox').addEventListener('click', () => {
+  if (lastCopy != null) copyText(lastCopy, $('#resultBox'));
+});
+$('#grid').addEventListener('click', (e) => {
+  const card = e.target.closest('.ucard'); if (!card || !isFinite(lastBase)) return;
+  const un = unitById(curCat(), card.dataset.unit);
+  const out = fromBase(un, lastBase);
+  const txt = un.pace ? fmtPace(out) : fmtCopy(out);
+  if (txt !== '—') copyText(txt, card);
+});
+window.addEventListener('hashchange', () => {
+  if (location.hash.replace(/^#/, '') !== lastHash){
+    if (!applyHash()) setCategory('length');
+  }
+});
+
+// ---------- theme toggle ----------
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+
+// ---------- boot ----------
+buildChips();
+if (!applyHash()) setCategory('length');
+</script>
+</body>
+</html>

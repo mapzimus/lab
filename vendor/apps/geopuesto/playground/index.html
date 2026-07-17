@@ -1,0 +1,2348 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Geopuesto · Spherical Geometry Sandbox</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    :root {
+      --bg: #0a0e14;
+      --fg: #e8e4d8;
+      /* --muted lightened from #7c8aa8 (≈3.7:1 on --bg, fails WCAG AA) to
+         #9aa7c2 (≈4.7:1) so the pervasive caption/label/meta text clears the
+         4.5:1 body-text minimum. Flagged by the visual + a11y audits. */
+      --muted: #9aa7c2;
+      --pass: #00bfa5;
+      --fail: #ff5a4a;
+      --accent: #f26522;
+      --border: #2a3550;
+      --mono: 'IBM Plex Mono', 'JetBrains Mono', 'Consolas', monospace;
+      --sans: 'IBM Plex Sans', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); }
+    body { padding: 24px 16px 60px; max-width: 960px; margin: 0 auto; }
+    header { border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px; }
+    h1 { margin: 0 0 8px; font-size: 22px; font-weight: 500; letter-spacing: -0.01em; }
+    .tagline { color: var(--muted); font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+    .lede { color: var(--fg); font-family: var(--sans); font-size: 14px; line-height: 1.55; margin: 10px 0 0; max-width: 70ch; opacity: 0.92; }
+    .lede strong { color: var(--accent); font-weight: 600; }
+    section { margin-bottom: 28px; }
+    /* T2-2: section H2s are an INDEX/LANDMARK, not the loudest thing on the
+       page. Demoted from accent-orange + uppercase mono to a soft-bright
+       sans-serif title with a thin accent underline. Frees orange for
+       primary CTAs (Load + render, Run Monte Carlo). */
+    section > h2 { font-size: 17px; font-weight: 500; color: var(--fg); font-family: var(--sans); letter-spacing: -0.005em; text-transform: none; margin: 0 0 14px; padding: 0 0 8px; border-bottom: 1px solid var(--border); position: relative; }
+    section > h2::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 24px; height: 1px; background: var(--accent); }
+    .readout { background: rgba(0, 191, 165, 0.06); border-left: 3px solid var(--pass); padding: 10px 14px; margin-bottom: 8px; font-family: var(--mono); font-size: 13px; }
+    .readout .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .readout .value { color: var(--fg); }
+    .readout.warn { background: rgba(255, 90, 74, 0.08); border-left-color: var(--fail); }
+    .readout.warn .value { color: var(--fail); }
+    #tp-map, #salem-map, #curves-map, #analysis-map { height: 360px; margin-top: 8px; border: 1px solid var(--border); border-radius: 4px; }
+    /* 3D globe view. Black background, no Earth texture by default — the
+       polyhedron geometry reads cleaner against pure black than against a
+       blue marble. User can toggle the texture (TODO comment marks the
+       stylistic decision point). Fixed 520px height — a bit taller than
+       the Leaflet maps so the globe doesn't get cropped on first paint. */
+    #globe-container { height: 520px; margin-top: 8px; background: #000; border: 1px solid var(--border); border-radius: 4px; position: relative; overflow: hidden; }
+    #globe-overlay { position: absolute; top: 10px; left: 10px; padding: 6px 10px; background: rgba(10, 14, 20, 0.7); border: 1px solid var(--border); border-radius: 3px; font-family: var(--mono); font-size: 11px; color: var(--fg); pointer-events: none; max-width: 260px; line-height: 1.5; }
+    #globe-overlay .lbl { color: var(--muted); }
+    .map-caption { color: var(--muted); font-family: var(--mono); font-size: 11px; margin-top: 6px; }
+    .control-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; font-family: var(--mono); font-size: 12px; }
+    .control-row label { display: flex; flex-direction: column; gap: 4px; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .control-row input[type="text"], .control-row select { padding: 6px 10px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--fg); font-family: var(--mono); font-size: 13px; border-radius: 4px; min-width: 200px; text-transform: none; letter-spacing: normal; }
+    /* Visible focus ring (a11y audit P1): the prior `outline:none` left only a
+       ~1px border color change, easy to lose when tabbing. Restore a clear ring
+       on every interactive control. */
+    .control-row input[type="text"]:focus-visible, .control-row select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+    .quick-picks button:focus-visible, .sprintc-buttons button:focus-visible, .control-row button:focus-visible,
+    input[type="range"]:focus-visible, .geo-search-item:focus-visible, #mc-reset-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    /* T2-2: primary CTA buttons get amped. Bigger pad, drop shadow on hover. */
+    .control-row button { padding: 9px 18px; background: var(--accent); color: var(--bg); border: none; cursor: pointer; font-family: var(--mono); font-size: 12px; font-weight: 700; border-radius: 4px; align-self: flex-end; letter-spacing: 0.02em; box-shadow: 0 1px 0 rgba(0,0,0,0.2); transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease; }
+    .control-row button:hover { background: #ff7c3a; box-shadow: 0 2px 8px rgba(242,101,34,0.4); transform: translateY(-1px); }
+    .control-row button:active { transform: translateY(0); box-shadow: 0 1px 0 rgba(0,0,0,0.2); }
+    .control-row button:disabled { background: rgba(124, 138, 168, 0.25); color: var(--muted); box-shadow: none; cursor: not-allowed; transform: none; }
+    .control-row button:disabled:hover { background: rgba(124, 138, 168, 0.25); box-shadow: none; transform: none; }
+    .quick-picks { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; font-family: var(--mono); font-size: 11px; }
+    .quick-picks-label { color: var(--muted); }
+    .quick-picks button { padding: 4px 10px; background: transparent; border: 1px solid var(--border); color: var(--fg); cursor: pointer; font-family: var(--mono); font-size: 11px; border-radius: 4px; }
+    .quick-picks button:hover { border-color: var(--accent); color: var(--accent); }
+    /* City search autocomplete. The dropdown is absolutely positioned to a
+       wrapper around each coordinate input, so it floats over whatever is
+       below without pushing the layout around. */
+    .geo-search-wrap { position: relative; display: block; }
+    .geo-search-results { position: absolute; top: calc(100% + 2px); left: 0; min-width: 220px; width: max-content; max-width: min(340px, calc(100vw - 32px)); z-index: 2000; background: #0d1119; border: 1px solid var(--border); border-radius: 4px; max-height: 244px; overflow-y: auto; box-shadow: 0 8px 22px rgba(0,0,0,0.55); }
+    .geo-search-item { padding: 6px 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: baseline; gap: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .geo-search-item:last-child { border-bottom: none; }
+    .geo-search-item.active, .geo-search-item:hover { background: rgba(242, 101, 34, 0.18); }
+    .geo-search-item .gs-name { font-family: var(--mono); font-size: 13px; color: var(--fg); }
+    .geo-search-item .gs-meta { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; text-transform: uppercase; letter-spacing: 0.04em; }
+    .geo-search-empty { padding: 7px 10px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    /* Visually hidden but available to screen readers — carries live announcements
+       (result counts, "no match", "loading") for the city-search combobox. */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    #poly-spin-display { color: var(--accent); font-weight: 600; }
+    .sprintc-buttons { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .sprintc-buttons button { background: transparent; color: var(--fg); border: 1px solid var(--accent); padding: 8px 14px; font-family: var(--mono); font-size: 12px; cursor: pointer; border-radius: 4px; transition: background 0.15s; }
+    .sprintc-buttons button:hover { background: rgba(242, 101, 34, 0.15); }
+    /* Honesty-meter "Reset session" — a secondary action, styled like the
+       Sprint-C secondary buttons (transparent + accent outline) so it doesn't
+       compete with the primary "Run Monte Carlo" CTA. Its show/hide stays on
+       the inline display + the JS toggle in renderHonestyMeter(), so this rule
+       deliberately sets no `display`. */
+    #mc-reset-btn { background: transparent; color: var(--fg); border: 1px solid var(--accent); padding: 8px 14px; font-family: var(--mono); font-size: 12px; cursor: pointer; border-radius: 4px; transition: background 0.15s; }
+    #mc-reset-btn:hover { background: rgba(242, 101, 34, 0.15); }
+    .share-url { margin-top: 8px; padding: 8px 12px; background: rgba(0, 191, 165, 0.06); border: 1px solid var(--border); border-radius: 4px; font-family: var(--mono); font-size: 11px; word-break: break-all; color: var(--fg); }
+    .share-url .copied { color: var(--pass); margin-left: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    /* T2-4: shared toast container for copy/share/export feedback.
+       Replaces the prior tiny inline "copied" tag (which the audit flagged
+       as too subtle — easy to miss the 1.8s flash). Fixed-position at
+       bottom-center so it doesn't compete with the live readouts. */
+    .toast-container { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 9000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+    .toast { background: var(--bg); color: var(--fg); border: 1px solid var(--border); border-left: 3px solid var(--pass); padding: 10px 16px; font-family: var(--mono); font-size: 12px; border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); pointer-events: auto; opacity: 0; transform: translateY(8px); transition: opacity 0.2s ease, transform 0.2s ease; max-width: 480px; }
+    .toast.toast-show { opacity: 1; transform: translateY(0); }
+    .toast.toast-error { border-left-color: var(--fail); }
+    .toast.toast-info { border-left-color: var(--accent); }
+    .toast strong { color: var(--pass); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; font-size: 10px; margin-right: 8px; }
+    .toast.toast-error strong { color: var(--fail); }
+    .toast.toast-info strong { color: var(--accent); }
+    footer { color: var(--muted); font-family: var(--mono); font-size: 11px; margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ---------------------------------------------------------------
+       Responsive (audit: the file previously had NO @media query at
+       all — every input carried a hard min-width:200px floor and the
+       maps/globe were locked to tall fixed heights, forcing horizontal
+       scroll and ~880px of dead space above the fold on a phone).
+       --------------------------------------------------------------- */
+    @media (max-width: 600px) {
+      body { padding: 16px 12px 48px; }
+      h1 { font-size: 19px; }
+      /* Let inputs and labels shrink to the viewport instead of overflowing. */
+      .control-row { gap: 8px; }
+      .control-row label { width: 100%; }
+      .control-row input[type="text"], .control-row select { min-width: 0; width: 100%; }
+      .control-row button { width: 100%; align-self: stretch; }
+      /* Shorter maps + globe so the page is scannable, not a tower of tiles. */
+      #tp-map, #salem-map, #curves-map, #analysis-map { height: 260px; }
+      #globe-container { height: 320px; }
+      #globe-overlay { max-width: min(260px, 70%); }
+    }
+
+    /* Honor reduced-motion: kill the toast slide/fade transition for users
+       who opt out of animation (the globe is drag-only, no auto-rotate). */
+    @media (prefers-reduced-motion: reduce) {
+      .toast { transition: none; }
+      .control-row button { transition: none; }
+    }
+
+    /* Verdict badge pill. Colors mirror verdict.js tierOf() — JS also sets
+       background-color inline from result.color, so these class colors are a
+       fallback. Dark text reads on all four mid-bright backgrounds. */
+    .verdict-badge {
+      display: inline-block; padding: 4px 12px; border-radius: 999px;
+      font-family: var(--mono); font-size: 12px; font-weight: 700;
+      letter-spacing: 0.04em; color: #0a0e14; margin-bottom: 8px;
+    }
+    .verdict-coincidence { background: #3ea66a; }
+    .verdict-nothing     { background: #8a93a0; }
+    .verdict-mild        { background: #e0a83a; }
+    .verdict-striking    { background: #ff7a3d; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="tagline">Geopuesto · Spherical Geometry Sandbox</div>
+    <h1>Click points. Spin shapes. See what's connected on a sphere.</h1>
+    <!-- TODO (Max): the H1 is the cold-load pitch. Rewrite in your voice if you want.
+         Options to consider:
+         · "Click points. Spin shapes. See what's connected on a sphere."  (terse, three verbs)
+         · "Spherical geometry you can poke at — points, paths, polyhedra, datasets."
+         · "What can you say with two points and a sphere?"
+         The audits flagged the previous H1 ("Two-Point Mode & Polyhedra Suite") as
+         developer-jargon for a brand-new visitor. -->
+    <!-- Plain-language lede (usability audit P1: the page had no "what is this /
+         why care" sentence). Draft below — Max, swap in your own voice freely. -->
+    <p class="lede">A sandbox for sphere geometry. Measure the shortest path between
+      any two places, wrap 3D shapes around the globe, draw navigation curves, and
+      stress-test &ldquo;Earth grid&rdquo; theories against real earthquake data.
+      <strong>Type a city name</strong> into any coordinate box — or click a quick-pick — to start.</p>
+  </header>
+
+  <section>
+    <h2>Two places on Earth</h2>
+    <!-- TODO (Max): plain-language section heading. Previous: "Two-Point Mode · A → B" -->
+    <div class="map-caption" style="margin-bottom: 12px;">
+      Pick two points A and B. The map below shows the great-circle path between
+      them, the locus of points equidistant from both, and the four "named" points
+      that fall out: midpoint M, its antipode −M (the &ldquo;Geomate&rdquo;), and
+      the two poles n / −n of the A&ndash;B great circle. Change A and B with the
+      inputs or the city quick-picks underneath.
+    </div>
+    <!-- T2-3: map-first layout. Boston → Tokyo great-circle arc is the very
+         first visual the page renders, before inputs or readouts. The wow
+         before any interaction. -->
+    <div id="tp-map"></div>
+    <div class="map-caption" id="tp-map-caption">
+      Orange = A. Teal = B. Solid orange arc = the A&rarr;B great circle (the shortest path on a sphere). Dashed teal arc = the perpendicular-bisector great circle (every point on this curve is equidistant from A and B). Blue pins = M and &minus;M (the Geomates). Yellow pins = n and &minus;n (the poles of the A&ndash;B great circle).
+    </div>
+    <div class="control-row" style="margin-top: 14px;">
+      <label>A (origin):
+        <input type="text" id="tp-a-input" value="42.3601,-71.0589" placeholder="Type a city — or lat, lon">
+      </label>
+      <label>B (second point):
+        <input type="text" id="tp-b-input" value="35.6895,139.6917" placeholder="Type a city — or lat, lon">
+      </label>
+    </div>
+    <div class="quick-picks">
+      <span class="quick-picks-label">B quick-picks:</span>
+      <button data-tp-b="35.6895,139.6917">Tokyo</button>
+      <button data-tp-b="51.5074,-0.1278">London</button>
+      <button data-tp-b="-33.8688,151.2093">Sydney</button>
+      <button data-tp-b="-1.286,36.817">Nairobi</button>
+      <button data-tp-b="-22.9068,-43.1729">Rio</button>
+    </div>
+    <div id="bos-tok-readout" style="margin-top: 14px;"></div>
+    <div class="control-row" style="margin-top: 14px;">
+      <label>Test point P (cross/along-track from A&ndash;B great circle):
+        <input type="text" id="tp-p-input" value="51.5074,-0.1278" placeholder="Type a city — or lat, lon">
+      </label>
+    </div>
+    <div id="tp-xt-readout"></div>
+  </section>
+
+  <section>
+    <h2>3D globe</h2>
+    <div class="map-caption" style="margin-bottom: 10px;">
+      Drag to rotate, scroll to zoom. <strong>Double-click</strong> anywhere on the globe to reposition point A.
+      The globe mirrors your two points (above) and the polyhedron you spin up (below) — change either and the globe follows.
+      Vertices are dots; edges are great-circle arcs on the sphere surface.
+    </div>
+    <!-- aria-hidden: the globe is a purely visual 3D mirror of state that's also
+         conveyed by the section maps + text readouts; a WebGL canvas exposes
+         nothing useful to a screen reader (a11y audit P0-2). -->
+    <div id="globe-container" aria-hidden="true">
+      <div id="globe-overlay"><span class="lbl">Loading globe…</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Spin a shape around the globe</h2>
+    <!-- TODO (Max): plain-language section heading. Previous: "Polyhedra Suite · configurable" -->
+    <div class="control-row">
+      <label>Anchor:
+        <input type="text" id="poly-anchor-input" value="42.5195,-70.8967" placeholder="Type a city — or lat, lon">
+      </label>
+      <label>Shape:
+        <select id="poly-shape-select">
+          <!-- T2-5: plain-first ordering with category groups. Per V3_VISION
+               §"UI/UX philosophy" the user should see plain language before
+               the math name. Optgroup labels surface the taxonomy without
+               taking real estate on the option text itself. -->
+          <optgroup label="The five Platonics (regular convex)">
+            <option value="tetrahedron">Pyramid &middot; 4 verts &middot; tetrahedron</option>
+            <option value="cube">Cube &middot; 8 verts</option>
+            <option value="octahedron">Diamond &middot; 6 verts &middot; octahedron</option>
+            <option value="icosahedron">Star &middot; 12 verts &middot; icosahedron</option>
+            <option value="dodecahedron">12-faced gem &middot; 20 verts &middot; dodecahedron</option>
+          </optgroup>
+          <optgroup label="Archimedean / Catalan / soccer-ball family">
+            <option value="cuboctahedron" selected>Vector equilibrium &middot; 12 verts &middot; cuboctahedron</option>
+            <option value="truncatedIcosahedron">Soccer ball &middot; 60 verts &middot; truncated icosahedron / C₆₀</option>
+            <option value="rhombicTriacontahedron">32-vertex grid &middot; 32 verts &middot; rhombic triacontahedron / Becker-Hagens</option>
+          </optgroup>
+          <optgroup label="Parametric (drag the slider after picking)">
+            <option value="fibonacciSphere">Golden-angle lattice &middot; N verts &middot; Fibonacci sphere</option>
+            <option value="geodesicIcosahedron">Geodesic dome &middot; 10k²+2 verts &middot; icosahedral subdivision</option>
+            <option value="nPrism">Prism &middot; 2n verts &middot; n-gonal</option>
+            <option value="nAntiprism">Twisted prism &middot; 2n verts &middot; n-gonal antiprism</option>
+          </optgroup>
+          <optgroup label="Compounds (interpenetrating polyhedra)">
+            <option value="stellaOctangula">Stella Octangula &middot; 8 verts &middot; two tetrahedra</option>
+            <option value="fiveTetrahedraCompound">Five tetrahedra &middot; 20 verts &middot; chiral compound</option>
+            <option value="fiveCubesCompound">Five cubes &middot; 20 verts &middot; achiral compound</option>
+          </optgroup>
+          <optgroup label="Kepler-Poinsot stars">
+            <option value="smallStellatedDodecahedron">Small stellated dodecahedron &middot; 12 verts</option>
+            <option value="greatStellatedDodecahedron">Great stellated dodecahedron &middot; 20 verts</option>
+          </optgroup>
+        </select>
+      </label>
+    </div>
+    <div class="control-row">
+      <label style="flex: 1;">Spin: <span id="poly-spin-display">0&deg;</span>
+        <input type="range" id="poly-spin-slider" min="0" max="360" value="0" step="1" style="width: 100%;">
+      </label>
+    </div>
+    <div class="control-row" id="poly-fibn-row" style="display:none;">
+      <label style="flex: 1;">Fibonacci N points: <span id="poly-fibn-display">100</span>
+        <input type="range" id="poly-fibn-slider" min="6" max="1000" value="100" step="2" style="width: 100%;">
+      </label>
+    </div>
+    <div class="control-row" id="poly-geok-row" style="display:none;">
+      <label style="flex: 1;">Geodesic frequency k: <span id="poly-geok-display">2</span> &mdash; vertex count <span id="poly-geok-verts">42</span>
+        <input type="range" id="poly-geok-slider" min="1" max="10" value="2" step="1" style="width: 100%;">
+      </label>
+    </div>
+    <div class="control-row" id="poly-polyn-row" style="display:none;">
+      <label style="flex: 1;">Prism n (sides): <span id="poly-polyn-display">6</span> &mdash; vertex count <span id="poly-polyn-verts">12</span>
+        <input type="range" id="poly-polyn-slider" min="3" max="32" value="6" step="1" style="width: 100%;">
+      </label>
+    </div>
+    <div id="salem-map"></div>
+    <div class="map-caption" id="poly-caption">
+      Vertex 0 anchored at the input above. Spin rotates the polyhedron around that axis.
+    </div>
+    <div class="sprintc-buttons" style="margin-top: 14px;">
+      <button id="poly-enrich-btn">Enrich vertices (nearest GeoNames city &middot; pop ≥ 50k)</button>
+      <button id="poly-enrich-clear" style="border-color: var(--border);">Clear enrichment</button>
+      <span id="poly-enrich-status" class="map-caption" style="margin-left: 8px;"></span>
+    </div>
+    <div id="poly-vertex-list" style="margin-top: 12px; display: none; max-height: 280px; overflow-y: auto; border: 1px solid var(--border); border-radius: 4px; padding: 10px 14px; font-family: var(--mono); font-size: 12px; line-height: 1.7;"></div>
+  </section>
+
+  <section>
+    <h2>Rings, spirals, and rhumb lines</h2>
+    <!-- TODO (Max): plain-language section heading. Previous: "Curves Suite · loci on the sphere" -->
+    <div class="map-caption" style="margin-bottom: 10px;">
+      Pick a center point P and a curve type. Each variant of the Curves Suite
+      is &ldquo;from a point, draw this kind of line/curve.&rdquo; The unifying
+      abstraction from <a href="docs/V3_ADDITIONS_2026-05-24.md">V3_ADDITIONS</a>.
+    </div>
+    <div class="control-row">
+      <label>Center P:
+        <input type="text" id="curve-p-input" value="42.5195,-70.8967" placeholder="Type a city — or lat, lon">
+      </label>
+      <label>Curve type:
+        <select id="curve-type-select">
+          <!-- Plain-first labels (usability audit P1-4): the math name trails the
+               everyday description, matching the Polyhedra dropdown convention. -->
+          <option value="smallCircle" selected>Ring at a fixed distance &middot; small circle</option>
+          <option value="loxodrome">Constant-compass-heading line &middot; loxodrome / rhumb line</option>
+          <option value="windrose">Compass rose &middot; 32 headings from center &middot; portolan windrose</option>
+          <option value="isoazimuthal">Same-bearing-home ring &middot; isoazimuthal</option>
+        </select>
+      </label>
+    </div>
+    <div class="control-row" id="curve-distkm-row">
+      <label style="flex: 1;">Distance d: <span id="curve-distkm-display">2000</span> km
+        <input type="range" id="curve-distkm-slider" min="100" max="19500" value="2000" step="100" style="width: 100%;">
+      </label>
+    </div>
+    <div class="control-row" id="curve-bearing-row" style="display:none;">
+      <label style="flex: 1;">Bearing β: <span id="curve-bearing-display">45</span>° &nbsp;<span style="opacity:0.6">(0 = N, 90 = E, 180 = S, 270 = W)</span>
+        <input type="range" id="curve-bearing-slider" min="0" max="359" value="45" step="1" style="width: 100%;">
+      </label>
+    </div>
+    <div id="curves-map"></div>
+    <div class="map-caption" id="curve-caption">
+      Small circle: locus of points at angular distance d/R from P. Pure great-circle math (no flat-Earth fudging).
+    </div>
+  </section>
+
+  <section>
+    <h2>Overlay real data &mdash; test the grid</h2>
+    <!-- TODO (Max): plain-language section heading. Previous: "Analysis Suite · dataset overlays (v0)" -->
+    <div class="map-caption" style="margin-bottom: 10px;">
+      Real geophysical data on the sphere. The basic ingredient for the
+      Becker-Hagens spatial-statistics test in
+      <a href="docs/V3_VISION.md">V3_VISION</a> Phase 4 — &ldquo;does this
+      alleged Earth grid coincide with real anomalies more than chance?&rdquo;
+      The current overlay is USGS recent earthquakes; future variants will
+      add volcanoes, magnetic anomalies, shipwrecks, and Monte Carlo
+      null-hypothesis testing.
+    </div>
+    <div class="control-row">
+      <label>Dataset:
+        <select id="analysis-source">
+          <option value="usgs-all-day">USGS earthquakes — every M (last 24 hr, ~300 events)</option>
+          <option value="usgs-25-week" selected>USGS earthquakes (M ≥ 2.5, last 7 days, ~700 events)</option>
+          <option value="usgs-45-month">USGS earthquakes (M ≥ 4.5, last 30 days, the big ones)</option>
+          <option value="usgs-significant-month">USGS significant quakes (last 30 days)</option>
+          <option value="volcanoes" disabled>Smithsonian active volcanoes (coming next)</option>
+        </select>
+      </label>
+      <button id="analysis-load-btn">Load + render</button>
+      <button id="analysis-clear-btn" style="border-color: var(--border); background: transparent; color: var(--fg);">Clear</button>
+    </div>
+    <div id="analysis-map"></div>
+    <div class="map-caption" id="analysis-caption">Click &ldquo;Load + render&rdquo; to fetch the dataset. Markers are sized + colored by magnitude (gray ≤ 4, orange 4-5, red ≥ 5).</div>
+
+    <div style="margin-top: 18px; padding: 14px; background: rgba(242, 101, 34, 0.05); border: 1px solid var(--border); border-radius: 4px;">
+      <h3 style="font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 8px; font-weight: 600;">Monte Carlo null-hypothesis test</h3>
+      <div class="map-caption" style="margin-bottom: 12px;">
+        Counts how many dataset points fall within R km of any polyhedron vertex
+        (the "observed" statistic), then compares against 1000 uniformly-random
+        rotations of the SAME polyhedron. The p-value is the fraction of random
+        rotations that matched or beat the observed count. Small p &rArr;
+        statistically unusual; ~0.5 &rArr; coincidence. Load a dataset above and
+        pick a polyhedron in the Polyhedra Suite first.
+      </div>
+      <div class="quick-picks" style="margin-bottom: 8px;">
+        <span class="quick-picks-label">quick-pick polyhedron:</span>
+        <button data-mc-shape="rhombicTriacontahedron">Becker-Hagens (32 verts)</button>
+        <button data-mc-shape="icosahedron">Icosahedron (12)</button>
+        <button data-mc-shape="cuboctahedron">Cuboctahedron (12)</button>
+        <button data-mc-shape="dodecahedron">Dodecahedron (20)</button>
+      </div>
+      <div id="mc-active-shape" class="map-caption" style="margin-bottom: 8px; font-style: italic;">
+        <!-- Live-updated in renderPolyhedra(): "Testing: [shape] · [N] verts · anchored …" -->
+        Pick a polyhedron above (Polyhedra Suite) first.
+      </div>
+      <div class="control-row" id="mc-radius-row">
+        <label style="flex: 1;">Search radius R: <span id="mc-radius-display">250</span> km
+          <input type="range" id="mc-radius-slider" min="50" max="2000" value="250" step="25" style="width: 100%;">
+        </label>
+        <button id="mc-run-btn" disabled title="Load a dataset above first.">Run Monte Carlo (load a dataset first)</button>
+      </div>
+      <div id="mc-result" style="margin-top: 10px; font-family: var(--mono); font-size: 12px; line-height: 1.55; color: var(--fg);"></div>
+      <div id="mc-honesty" style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); font-family: var(--mono); font-size: 12px; line-height: 1.55; color: var(--fg); display: none;"></div>
+      <button id="mc-reset-btn" style="margin-top: 10px; display: none;">Reset session (start a clean shot)</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Share &amp; export</h2>
+    <!-- TODO (Max): plain-language section heading. Previous: "Sprint C · Share link & export" -->
+    <div class="map-caption" style="margin-bottom: 10px;">
+      Share copies a URL that restores the current configuration — the Two-Point origin and destination, the cross-track test point, the polyhedron anchor, plus its shape and spin. Open the URL in a new tab to verify restore. GeoJSON / KML downloads contain the current polyhedron's vertices + edge segments.
+    </div>
+    <div class="sprintc-buttons">
+      <button id="btn-share">Copy share link</button>
+      <button id="btn-export-geojson">Download GeoJSON</button>
+      <button id="btn-export-kml">Download KML</button>
+    </div>
+    <div id="share-url-display" class="share-url" style="display:none;"></div>
+    <div id="hash-parse-display" class="readout" style="display:none;"></div>
+  </section>
+
+  <footer>
+    Modules: <code>twoPoint.js</code>, <code>bearings.js</code>, <code>rotation.js</code>,
+    <code>shapeEngine.js</code>, <code>vertexCache.js</code>, <code>shareLink.js</code>,
+    <code>exportGeo.js</code>. Spec refs: <a href="docs/V3_VISION.md">V3_VISION.md</a>,
+    <a href="docs/V3_ADDITIONS_2026-05-24.md">V3_ADDITIONS</a>,
+    <a href="docs/V2_PLAN.md">V2_PLAN.md</a>,
+    <a href="docs/geopuesto_master_spec.md">master_spec</a>.
+  </footer>
+
+  <!-- Globe.gl bundles Three.js internally — single script tag, no peer-dep dance. -->
+  <script src="https://unpkg.com/globe.gl@2.30.0/dist/globe.gl.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    // Tell cities.js where to find the dataset. The default fetch path is
+    // relative to the page URL; from playground/ we need to go up one level
+    // to reach the repo root's data/.
+    window.GeopuestoCitiesDataPath = '../data/cities1000.json';
+  </script>
+  <script src="../geometry.js"></script>
+  <script src="../cities.js"></script>
+  <script src="twoPoint.js"></script>
+  <script src="bearings.js"></script>
+  <script src="rotation.js"></script>
+  <script src="shapeEngine.js"></script>
+  <script src="vertexCache.js"></script>
+  <script src="shareLink.js"></script>
+  <script src="exportGeo.js"></script>
+  <script src="verdict.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      const G = window.Geometry;
+      const TP = window.TwoPoint;
+      const B = window.Bearings;
+      const R = window.Rotation;
+      const SE = window.ShapeEngine;
+      const SL = window.ShareLink;
+      const EG = window.ExportGeo;
+
+      // ---------------------------------------------------------------
+      // DOM helper — element(tag, attrs, [children])
+      // ---------------------------------------------------------------
+      function el(tag, attrs, children) {
+        const node = document.createElement(tag);
+        if (attrs) {
+          if (attrs.class) node.className = attrs.class;
+          if (attrs.text != null) node.textContent = attrs.text;
+          if (attrs.id) node.id = attrs.id;
+          if (attrs.style) node.setAttribute('style', attrs.style);
+        }
+        if (children) for (const c of children) if (c) node.appendChild(c);
+        return node;
+      }
+
+      function parseLatLon(s) {
+        if (typeof s !== 'string') return null;
+        const parts = s.split(',').map(function (x) { return parseFloat(x.trim()); });
+        if (parts.length !== 2 || !isFinite(parts[0]) || !isFinite(parts[1])) return null;
+        if (parts[0] < -90 || parts[0] > 90 || parts[1] < -180 || parts[1] > 180) return null;
+        return { lat: parts[0], lon: parts[1] };
+      }
+
+      function fmtCoord(p) {
+        const ns = p.lat >= 0 ? 'N' : 'S';
+        const ew = p.lon >= 0 ? 'E' : 'W';
+        return Math.abs(p.lat).toFixed(2) + '°' + ns + ' / ' + Math.abs(p.lon).toFixed(2) + '°' + ew;
+      }
+
+      function row(parent, label, value, opts) {
+        const cls = 'readout' + (opts && opts.warn ? ' warn' : '');
+        parent.appendChild(el('div', { class: cls }, [
+          el('div', { class: 'label', text: label }),
+          el('div', { class: 'value', text: value }),
+        ]));
+      }
+
+      // Format bearings: starting heading + final heading + signed delta
+      // (positive = clockwise compass rotation along the path).
+      function formatBearings(pair) {
+        let delta = pair.final - pair.initial;
+        while (delta > 180) delta -= 360;
+        while (delta < -180) delta += 360;
+        const dir = delta >= 0 ? 'right' : 'left';
+        return pair.initial.toFixed(0) + '° → ' + pair.final.toFixed(0) +
+               '° (compass rotates ' + Math.abs(delta).toFixed(0) + '° ' + dir + ')';
+      }
+
+      // ---------------------------------------------------------------
+      // Mutable state — three modes share these inputs, render is pure
+      // ---------------------------------------------------------------
+      const state = {
+        A: { lat: 42.3601, lon: -71.0589 },
+        B: { lat: 35.6895, lon: 139.6917 },
+        P: { lat: 51.5074, lon: -0.1278 },
+        anchor: { lat: 42.5195, lon: -70.8967 },
+        shape: 'cuboctahedron',
+        spinDeg: 0,
+        fibN: 100,    // fibonacciSphere
+        geoK: 2,      // geodesicIcosahedron frequency
+        polyN: 6,     // nPrism / nAntiprism
+        curveP: { lat: 42.5195, lon: -70.8967 },  // Curves Suite center
+        curveType: 'smallCircle',
+        curveDistKm: 2000,
+        curveBearingDeg: 45,
+        mcRadiusKm: 250,  // Monte Carlo search radius (km) for vertex-vs-dataset proximity test
+        // Honesty meter: one entry per completed run this session,
+        // { rawP, config }. Session-only — NOT serialized into share links;
+        // every visitor starts their own clean shot.
+        mcAttempts: [],
+      };
+
+      // Has the shape catalog finished loading? `SE.ready` is a Promise (always
+      // truthy once created), so synchronous callers — updateMcActiveShape() and
+      // runMonteCarlo() — need this boolean latch to know it has RESOLVED. It was
+      // previously referenced but never declared, throwing a ReferenceError that
+      // aborted renderPolyhedra()'s success callback mid-flight: the 3D globe
+      // never received its polyhedron and the Monte Carlo "active shape" echo +
+      // run button never updated. (P0 — flagged by the usability + interaction
+      // + functional-correctness audits.)
+      let shapeEngineReady = false;
+
+      // Per-curve-type config: which control rows to show + which math fn to call.
+      // Future variants (isoazimuthal, windrose) follow this pattern.
+      const CURVE_TYPES = {
+        smallCircle:   { needsBearing: false, label: 'small circle' },
+        loxodrome:     { needsBearing: true,  label: 'loxodrome (rhumb line)' },
+        isoazimuthal:  { needsBearing: true,  label: 'isoazimuthal heading ring' },
+        windrose:      { needsBearing: false, label: 'portolan windrose' },
+      };
+
+      // Map each parametric shape to its control row + state key + param name
+      // sent to the generator. Future parametric shapes (e.g. torus parameters,
+      // user-uploaded shape with N points) drop in by adding an entry here.
+      const PARAMETRIC_SHAPES = {
+        fibonacciSphere:     { row: 'poly-fibn-row',  stateKey: 'fibN',  param: 'N', vertCount: function (v) { return v; } },
+        geodesicIcosahedron: { row: 'poly-geok-row',  stateKey: 'geoK',  param: 'k', vertCount: function (k) { return 10 * k * k + 2; } },
+        nPrism:              { row: 'poly-polyn-row', stateKey: 'polyN', param: 'n', vertCount: function (n) { return 2 * n; } },
+        nAntiprism:          { row: 'poly-polyn-row', stateKey: 'polyN', param: 'n', vertCount: function (n) { return 2 * n; } },
+      };
+      const PARAMETRIC_ROWS = ['poly-fibn-row', 'poly-geok-row', 'poly-polyn-row'];
+
+      // ---------------------------------------------------------------
+      // Two-Point readout
+      // ---------------------------------------------------------------
+      function renderTwoPoint() {
+        const root = document.getElementById('bos-tok-readout');
+        root.textContent = '';
+        const d = TP.derive(state.A, state.B);
+        if (d.degenerate) {
+          row(root, 'Status', d.degenerate === 'identical'
+            ? 'A and B are identical — perpendicular bisector is undefined.'
+            : 'A and B are antipodal — every point is equidistant from both.', { warn: true });
+          renderTwoPointMap();  // still clear/redraw to show A and B
+          return;
+        }
+        const p = B.pair(state.A, state.B);
+        row(root, 'Arc distance', d.distanceKm.toFixed(0) + ' km');
+        row(root, 'Bearings A→B (initial / final / delta)', formatBearings(p));
+        row(root, 'Asymmetry', p.asymmetryDeg.toFixed(1) + '°' +
+            (p.asymmetryDeg < 1 ? ' — path is a meridian or equator (constant heading)' : ''));
+        row(root, 'M — midpoint of the A→B great-circle path (halfway between A and B; equidistant from both)', fmtCoord(d.M));
+        row(root, '−M — Geomate, the antipode of M (also equidistant from A and B, but on the OTHER side of Earth)', fmtCoord(d.mAntipode));
+        row(root, 'n — north pole of the A–B great circle (every point on this circle is 90° from BOTH A and B)', fmtCoord(d.n));
+        row(root, '−n — south pole of the same great circle (90° from A and B on the opposite side)', fmtCoord(d.nAntipode));
+        renderTwoPointMap();
+      }
+
+      // ---------------------------------------------------------------
+      // Two-Point Mode map (T2-1: the most-flagged audit finding).
+      // One Leaflet instance, lazy-init, clear-and-redraw per state change.
+      // Pattern mirrors the antipodal app's renderTwoPointOnMapsCurrent
+      // but localized to a single map. A/B/M/-M/n/-n pins + A→B orthodrome
+      // + perpendicular-bisector great circle, all with antimeridian-split.
+      // ---------------------------------------------------------------
+      let tpMap = null;
+      const tpLayers = { lines: null, pins: null };
+
+      function ensureTpMap() {
+        if (tpMap) return tpMap;
+        tpMap = L.map('tp-map', { worldCopyJump: true }).setView([20, 0], 1);
+        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+          attribution: 'Esri Dark Gray Canvas', maxZoom: 16, subdomains: ['', ''],
+        }).addTo(tpMap);
+        tpLayers.lines = L.layerGroup().addTo(tpMap);
+        tpLayers.pins = L.layerGroup().addTo(tpMap);
+        return tpMap;
+      }
+
+      function renderTwoPointMap() {
+        ensureTpMap();
+        tpLayers.lines.clearLayers();
+        tpLayers.pins.clearLayers();
+
+        // Always draw A and B even in the degenerate case.
+        L.circleMarker([state.A.lat, state.A.lon], {
+          radius: 7, color: '#f26522', weight: 2, fillColor: '#f26522', fillOpacity: 1,
+        }).bindTooltip('A · ' + state.A.lat.toFixed(2) + ', ' + state.A.lon.toFixed(2), { direction: 'top' }).addTo(tpLayers.pins);
+        L.circleMarker([state.B.lat, state.B.lon], {
+          radius: 7, color: '#00bfa5', weight: 2, fillColor: '#00bfa5', fillOpacity: 1,
+        }).bindTooltip('B · ' + state.B.lat.toFixed(2) + ', ' + state.B.lon.toFixed(2), { direction: 'top' }).addTo(tpLayers.pins);
+
+        const d = TP.derive(state.A, state.B);
+        if (d.degenerate || !window.Geometry) return;
+
+        // Polylines: orthodrome (orange solid) + perpendicular bisector (teal dashed).
+        const G = window.Geometry;
+        const a = G.latLonToXYZ(state.A.lat, state.A.lon);
+        const b = G.latLonToXYZ(state.B.lat, state.B.lon);
+        const orthoPole = G.normalize(G.cross(a, b));
+        const bisectorPole = G.normalize(G.sub(a, b));
+        const orthoSegs = G.antimeridianSplit(G.sampleGreatCircle(orthoPole, 360));
+        const bisectorSegs = G.antimeridianSplit(G.sampleGreatCircle(bisectorPole, 360));
+        const halo = { color: '#000', weight: 6, opacity: 0.5, interactive: false, smoothFactor: 1.0 };
+        const orthoStyle = { color: '#f26522', weight: 3, opacity: 1.0, interactive: false, smoothFactor: 1.0 };
+        const bisectorStyle = { color: '#00bfa5', weight: 3, opacity: 0.9, dashArray: '8,6', interactive: false, smoothFactor: 1.0 };
+        for (const seg of orthoSegs) {
+          L.polyline(seg, halo).addTo(tpLayers.lines);
+          L.polyline(seg, orthoStyle).addTo(tpLayers.lines);
+        }
+        for (const seg of bisectorSegs) {
+          L.polyline(seg, halo).addTo(tpLayers.lines);
+          L.polyline(seg, bisectorStyle).addTo(tpLayers.lines);
+        }
+
+        // Named-point pins: M and −M in blue, n and −n in yellow.
+        const named = [
+          { p: d.M,         label: 'M',  desc: 'midpoint of A→B arc',  color: '#3b82f6' },
+          { p: d.mAntipode, label: '−M', desc: 'Geomate (antipodal midpoint)', color: '#3b82f6' },
+          { p: d.n,         label: 'n',  desc: 'north pole of A–B great circle', color: '#fbbf24' },
+          { p: d.nAntipode, label: '−n', desc: 'south pole of A–B great circle', color: '#fbbf24' },
+        ];
+        for (const pt of named) {
+          L.circleMarker([pt.p.lat, pt.p.lon], {
+            radius: 6, color: pt.color, weight: 2, fillColor: pt.color, fillOpacity: 0.85,
+          }).bindTooltip(pt.label + ' · ' + pt.desc + '<br>' + pt.p.lat.toFixed(2) + ', ' + pt.p.lon.toFixed(2), { direction: 'top' }).addTo(tpLayers.pins);
+        }
+
+        // Paired update: same state, both rendered onto the 3D globe up top.
+        renderGlobeTwoPoint();
+      }
+
+      // ---------------------------------------------------------------
+      // Cross-track / along-track for P relative to A–B great circle
+      // ---------------------------------------------------------------
+      function renderCrossTrack() {
+        const root = document.getElementById('tp-xt-readout');
+        root.textContent = '';
+        const xt = TP.crossTrackDistanceKm(state.P, state.A, state.B);
+        const at = TP.alongTrackDistanceKm(state.P, state.A, state.B);
+        if (!isFinite(xt) || !isFinite(at)) {
+          row(root, 'Status', 'A=B or A=−B — A–B great circle isn\'t unique.', { warn: true });
+          return;
+        }
+        const side = xt > 0 ? 'left of A→B (same hemisphere as a×b)'
+                   : xt < 0 ? 'right of A→B'
+                   :          'on the great circle';
+        const along = at > 0 ? at.toFixed(0) + ' km forward from A toward B'
+                    : at < 0 ? Math.abs(at).toFixed(0) + ' km behind A (back-azimuth side)'
+                    :          'at A itself';
+        row(root, 'P position', fmtCoord(state.P));
+        row(root, 'Cross-track distance', Math.abs(xt).toFixed(0) + ' km — ' + side);
+        row(root, 'Along-track distance', along);
+        row(root, 'Closer to', TP.closerTo(state.P, state.A, state.B));
+      }
+
+      // ---------------------------------------------------------------
+      // Polyhedra map (re-rendered on every state change)
+      // ---------------------------------------------------------------
+      let polyMap = null;
+      const polyLayers = { edges: null, pins: null };
+
+      function ensurePolyMap() {
+        if (polyMap) return polyMap;
+        polyMap = L.map('salem-map', { worldCopyJump: true }).setView([20, -30], 1);
+        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+          attribution: 'Esri Dark Gray Canvas', maxZoom: 16, subdomains: ['', ''],
+        }).addTo(polyMap);
+        polyLayers.edges = L.layerGroup().addTo(polyMap);
+        polyLayers.pins = L.layerGroup().addTo(polyMap);
+        return polyMap;
+      }
+
+      // ---------------------------------------------------------------
+      // 3D globe (Globe.gl). The globe mirrors BOTH the Polyhedra Suite
+      // state and the Two-Point Mode state, sharing a single sphere so
+      // you can see both at once. Two render slots write into a shared
+      // cache; globeApply() merges and pushes to Globe.gl.
+      //
+      // Render slot         Drives                       Render function
+      // -----------         ------                       ---------------
+      // poly{Points,Arcs}   Polyhedra Suite              renderGlobePolyhedron
+      // tp{Points,Paths}    Two-Point Mode               renderGlobeTwoPoint
+      // ---------------------------------------------------------------
+      let globeViz = null;
+      const globeCache = {
+        polyPoints: [], polyArcs: [],
+        tpPoints: [], tpPaths: [],
+        polyCaption: '', tpCaption: '',
+      };
+
+      // Globe.gl defaults its WebGL canvas to window.innerWidth x innerHeight --
+      // NOT the size of #globe-container. Left unset, the canvas overflows the
+      // fixed-height box (overflow:hidden then clips it), so the sphere renders
+      // off-center AND the drag raycaster maps pointer coords against the wrong
+      // canvas rect, which is why rotation felt broken. Pin the canvas to the
+      // container's measured size and keep it matched whenever the layout reflows.
+      function sizeGlobeToContainer() {
+        if (!globeViz) return;
+        const host = document.getElementById('globe-container');
+        if (!host) return;
+        const w = host.clientWidth || host.offsetWidth;
+        const h = host.clientHeight || host.offsetHeight;
+        if (w > 0 && h > 0) globeViz.width(w).height(h);
+      }
+
+      function ensureGlobe() {
+        if (globeViz) return globeViz;
+        if (typeof Globe !== 'function') return null; // script still loading
+        const host = document.getElementById('globe-container');
+        if (!host) return null;
+        // "Earth in space" treatment. All four textures are CDN images from the
+        //   three-globe example bundle (same package family as the Globe.gl
+        //   script the page already loads), so this stays backend-free. If the
+        //   CDN is unreachable the globe degrades to a plain dark sphere — the
+        //   geometry overlay still renders, so nothing breaks offline.
+        //     globeImageUrl  — NASA Blue Marble daytime surface
+        //     bumpImageUrl   — topology relief so mountains catch the light
+        //     backgroundImageUrl — starfield, sells the "floating in space" look
+        //     showAtmosphere — soft blue limb glow around the silhouette
+        //   NOTE: a bright Earth competes with the thin geometry arcs (teal edges
+        //   can vanish over tropical ocean). The overlay is re-tuned for contrast
+        //   below — arc stroke is heavier than it was against the old black sphere.
+        // TODO(stylistic): initial altitude. Lower (1.5–2.0) = closer-in;
+        //   higher (2.8+) = more of the sphere visible at once.
+        globeViz = Globe()(host)
+          .backgroundColor('#01010a')
+          .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+          .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+          .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+          .showAtmosphere(true)
+          .atmosphereColor('#5aa9e6')
+          .atmosphereAltitude(0.18)
+          // Points (used for both polyhedron vertices and Two-Point pins)
+          .pointAltitude(0.012)
+          .pointRadius('size')
+          .pointColor('color')
+          .pointLabel('label')
+          // Arcs (polyhedron edges)
+          .arcColor(function () { return '#26ffe6'; })
+          .arcStroke(0.75)
+          .arcAltitude(0.005)
+          .arcsTransitionDuration(0)
+          // Paths (Two-Point Mode great circles — orthodrome + bisector)
+          .pathPoints(function (d) { return d.coords; })
+          .pathPointLat(function (p) { return p[0]; })
+          .pathPointLng(function (p) { return p[1]; })
+          .pathColor(function (d) { return [d.color, d.color]; })
+          .pathStroke(2)
+          .pathTransitionDuration(0);
+
+        // Match the canvas to the container now, and keep it matched on reflow.
+        // ResizeObserver catches container-driven changes (e.g. the responsive
+        // height swap below 720px); the window listener is a fallback for UAs
+        // without ResizeObserver.
+        sizeGlobeToContainer();
+        if (typeof ResizeObserver === 'function') {
+          new ResizeObserver(sizeGlobeToContainer).observe(host);
+        }
+        window.addEventListener('resize', sizeGlobeToContainer);
+
+        // Double-click anywhere on the globe surface → reposition point A.
+        // Globe.gl fires onGlobeClick on every click, so we implement
+        // double-click detection ourselves with a 400 ms window.
+        let _dblClickT = 0, _dblClickPos = null;
+        globeViz.onGlobeClick(function (coords) {
+          const now = performance.now();
+          const prev = _dblClickPos;
+          const dt = now - _dblClickT;
+          _dblClickT = now;
+          _dblClickPos = coords;
+          if (dt < 400 && prev &&
+              Math.abs(coords.lat - prev.lat) < 4 &&
+              Math.abs(coords.lng - prev.lng) < 4) {
+            // Confirmed double-click: set A
+            const inp = document.getElementById('tp-a-input');
+            const lat = +coords.lat.toFixed(4), lng = +coords.lng.toFixed(4);
+            inp.value = lat + ',' + lng;
+            delete inp.dataset.latlon;
+            delete inp.dataset.cityLabel;
+            inp.dispatchEvent(new Event('change', { bubbles: true }));
+            _dblClickT = 0; // reset so a third click doesn't re-fire
+          }
+        });
+
+        // Aim the camera at the anchor on first paint.
+        globeViz.pointOfView(
+          { lat: state.anchor.lat, lng: state.anchor.lon, altitude: 2.2 },
+          0
+        );
+        return globeViz;
+      }
+
+      // Merge the two render slots and push to Globe.gl. Cheap — runs on
+      // every Polyhedra or Two-Point change.
+      function globeApply() {
+        const g = ensureGlobe();
+        if (!g) return;
+        g.pointsData(globeCache.polyPoints.concat(globeCache.tpPoints));
+        g.arcsData(globeCache.polyArcs);
+        g.pathsData(globeCache.tpPaths);
+
+        const overlay = document.getElementById('globe-overlay');
+        if (overlay) {
+          while (overlay.firstChild) overlay.removeChild(overlay.firstChild);
+          if (globeCache.polyCaption) {
+            const t = document.createElement('div');
+            t.textContent = globeCache.polyCaption;
+            overlay.appendChild(t);
+          }
+          if (globeCache.tpCaption) {
+            const t = document.createElement('div');
+            t.className = 'lbl';
+            t.textContent = globeCache.tpCaption;
+            overlay.appendChild(t);
+          }
+        }
+      }
+
+      function renderGlobePolyhedron(cfg) {
+        if (!cfg) return;
+        // Vertices → points. Anchor (index 0) gets the orange accent so it
+        // stays readable against the off-white "regular" vertex dots.
+        globeCache.polyPoints = cfg.vertices.map(function (v, i) {
+          const isAnchor = (i === 0);
+          return {
+            lat: v.lat,
+            lng: v.lon,
+            color: isAnchor ? '#f26522' : '#e8e4d8',
+            size: isAnchor ? 0.85 : 0.5,
+            label: 'V' + i + (isAnchor ? ' (anchor)' : '') +
+                   '<br/>' + v.lat.toFixed(2) + ', ' + v.lon.toFixed(2),
+          };
+        });
+        // Edges → arcs. Globe.gl draws the shorter great-circle between
+        // each pair automatically — no antimeridian split needed because
+        // the sphere wraps.
+        const verts = cfg.vertices;
+        globeCache.polyArcs = cfg.edges.map(function (e) {
+          return {
+            startLat: verts[e[0]].lat, startLng: verts[e[0]].lon,
+            endLat:   verts[e[1]].lat, endLng:   verts[e[1]].lon,
+          };
+        });
+        globeCache.polyCaption = cfg.shape.technicalLabel + ' · ' +
+          cfg.vertices.length + ' verts · ' + cfg.edges.length + ' edges';
+        globeApply();
+      }
+
+      function renderGlobeTwoPoint() {
+        const G = window.Geometry;
+        if (!G || !TP) return;
+        // Always draw A and B even in the degenerate case.
+        const basePoints = [
+          { lat: state.A.lat, lng: state.A.lon, color: '#f26522', size: 0.9,
+            label: 'A · ' + state.A.lat.toFixed(2) + ', ' + state.A.lon.toFixed(2) },
+          { lat: state.B.lat, lng: state.B.lon, color: '#00bfa5', size: 0.9,
+            label: 'B · ' + state.B.lat.toFixed(2) + ', ' + state.B.lon.toFixed(2) },
+        ];
+        const d = TP.derive(state.A, state.B);
+        if (d.degenerate) {
+          globeCache.tpPoints = basePoints;
+          globeCache.tpPaths = [];
+          globeCache.tpCaption = 'A = B (or A = −B) — paths undefined';
+          globeApply();
+          return;
+        }
+        // Named-point pins — same color code as the flat map for continuity.
+        const named = [
+          { p: d.M,         label: 'M (midpoint)',         color: '#3b82f6' },
+          { p: d.mAntipode, label: '−M (Geomate)',         color: '#3b82f6' },
+          { p: d.n,         label: 'n (great-circle pole)', color: '#fbbf24' },
+          { p: d.nAntipode, label: '−n',                    color: '#fbbf24' },
+        ];
+        globeCache.tpPoints = basePoints.concat(named.map(function (x) {
+          return { lat: x.p.lat, lng: x.p.lon, color: x.color, size: 0.55, label: x.label };
+        }));
+
+        // Great-circle paths: orthodrome (A→B) in orange, perpendicular
+        // bisector (locus equidistant from A and B) in teal.
+        const a = G.latLonToXYZ(state.A.lat, state.A.lon);
+        const b = G.latLonToXYZ(state.B.lat, state.B.lon);
+        const orthoPole    = G.normalize(G.cross(a, b));
+        const bisectorPole = G.normalize(G.sub(a, b));
+        // sampleGreatCircle returns [[lat, lon], ...] — exactly the shape
+        // our pathPointLat/Lng accessors expect.
+        const orthoSamples    = G.sampleGreatCircle(orthoPole, 360);
+        const bisectorSamples = G.sampleGreatCircle(bisectorPole, 360);
+        globeCache.tpPaths = [
+          { coords: orthoSamples,    color: '#f26522' },
+          { coords: bisectorSamples, color: '#00bfa5' },
+        ];
+        globeCache.tpCaption = 'A→B great-circle (orange) · equidistant locus (teal)';
+        globeApply();
+      }
+
+      function renderPolyhedra() {
+        ensurePolyMap();
+        polyLayers.edges.clearLayers();
+        polyLayers.pins.clearLayers();
+        document.getElementById('poly-spin-display').textContent = state.spinDeg + '°';
+
+        // Show only the parametric row that matches the current shape; hide others.
+        const paramCfg = PARAMETRIC_SHAPES[state.shape];
+        for (const rowId of PARAMETRIC_ROWS) {
+          document.getElementById(rowId).style.display = (paramCfg && paramCfg.row === rowId) ? '' : 'none';
+        }
+        // Sync display labels to current state (cheap, idempotent).
+        document.getElementById('poly-fibn-display').textContent = state.fibN;
+        document.getElementById('poly-geok-display').textContent = state.geoK;
+        document.getElementById('poly-geok-verts').textContent = 10 * state.geoK * state.geoK + 2;
+        document.getElementById('poly-polyn-display').textContent = state.polyN;
+        document.getElementById('poly-polyn-verts').textContent = 2 * state.polyN;
+
+        if (!SE || !SE.ready) return;
+        SE.ready.then(function () {
+          // Latch readiness BEFORE the calls below read it — keeps the flag in
+          // sync on the same callback that needs it, race-free regardless of
+          // Promise-handler registration order.
+          shapeEngineReady = true;
+          let cfg;
+          try {
+            let params;
+            if (paramCfg) {
+              params = {};
+              params[paramCfg.param] = state[paramCfg.stateKey];
+            }
+            cfg = SE.configure(state.shape, state.anchor, state.spinDeg * Math.PI / 180, params);
+          } catch (e) { return; }
+          cfg.edgePolylines.forEach(function (poly) {
+            L.polyline(poly, { color: '#00bfa5', weight: 1.5, opacity: 0.6 }).addTo(polyLayers.edges);
+          });
+          cfg.vertices.forEach(function (v, i) {
+            const isAnchor = (i === 0);
+            L.circleMarker([v.lat, v.lon], {
+              radius: isAnchor ? 7 : 5,
+              color: isAnchor ? '#f26522' : '#e8e4d8',
+              weight: 2,
+              fillColor: isAnchor ? '#f26522' : '#0a0e14',
+              fillOpacity: 1,
+            }).bindTooltip(
+              'Vertex ' + i + (isAnchor ? ' (anchor)' : '') + '<br>' +
+              v.lat.toFixed(2) + ', ' + v.lon.toFixed(2),
+              { direction: 'top' }
+            ).addTo(polyLayers.pins);
+          });
+          document.getElementById('poly-caption').textContent =
+            cfg.shape.technicalLabel + ' · ' + cfg.vertices.length + ' vertices · ' +
+            cfg.edges.length + ' edges · spin ' + state.spinDeg + '°';
+          // Echo the active polyhedron in the Monte Carlo box so the user
+          // knows what they're testing without scrolling between sections.
+          if (typeof updateMcActiveShape === 'function') updateMcActiveShape();
+          if (typeof updateMonteCarloButton === 'function') updateMonteCarloButton();
+          // Mirror the same cfg onto the 3D globe at the top of the page.
+          // Cheap (just .pointsData / .arcsData updates), so we do it on
+          // every render — no debounce needed.
+          renderGlobePolyhedron(cfg);
+        });
+      }
+
+      // ---------------------------------------------------------------
+      // Vertex enrichment (Sprint B Stage 2 polish, deferred from initial
+      // ship). Click "Enrich" → for each polyhedron vertex find the nearest
+      // city in the loaded GeoNames cities1000 dataset (population ≥ 50k
+      // filter for variety), render a list below the map. Cached per-
+      // vertex so subsequent enrichment of the same vertex is instant.
+      // No external API calls — uses already-loaded data via cities.js.
+      // ---------------------------------------------------------------
+      const ENRICH_MIN_POP = 50000;
+
+      function findNearestCity(vertex, cities, minPop) {
+        if (!cities || !cities.length) return null;
+        const target = window.Geometry.latLonToXYZ(vertex.lat, vertex.lon);
+        let bestCos = -2;
+        let best = null;
+        for (let i = 0; i < cities.length; i++) {
+          const c = cities[i];
+          if (c.population < minPop) continue;
+          const cVec = window.Geometry.latLonToXYZ(c.lat, c.lon);
+          // dot product on unit sphere = cos(angular distance). Max cos = min arc.
+          const cos = target[0]*cVec[0] + target[1]*cVec[1] + target[2]*cVec[2];
+          if (cos > bestCos) { bestCos = cos; best = c; }
+        }
+        if (!best) return null;
+        const arcRad = Math.acos(Math.max(-1, Math.min(1, bestCos)));
+        return {
+          name: best.name,
+          country: best.country,
+          population: best.population,
+          lat: best.lat,
+          lon: best.lon,
+          distanceKm: arcRad * window.Geometry.EARTH_R_KM,
+        };
+      }
+
+      function enrichVertices() {
+        const statusEl = document.getElementById('poly-enrich-status');
+        const listEl = document.getElementById('poly-vertex-list');
+        const cities = window.GeopuestoCitiesResolved;
+        if (!cities) {
+          statusEl.textContent = 'cities dataset still loading… try again in a moment.';
+          return;
+        }
+        if (!window.ShapeEngine || !window.ShapeEngine.ready) {
+          statusEl.textContent = 'shape engine not ready.';
+          return;
+        }
+        window.ShapeEngine.ready.then(function () {
+          const paramCfg = PARAMETRIC_SHAPES[state.shape];
+          let params;
+          if (paramCfg) { params = {}; params[paramCfg.param] = state[paramCfg.stateKey]; }
+          let cfg;
+          try {
+            cfg = window.ShapeEngine.configure(state.shape, state.anchor, state.spinDeg * Math.PI / 180, params);
+          } catch (e) { statusEl.textContent = 'shape configure failed: ' + e.message; return; }
+
+          const t0 = performance.now();
+          const results = cfg.vertices.map(function (v, i) {
+            // Check vertex cache first (3-decimal key from V3_VISION's API tier scheme)
+            let r = window.VertexCache.get('nearestCity50k', v);
+            if (!r) {
+              r = findNearestCity(v, cities, ENRICH_MIN_POP);
+              if (r) window.VertexCache.set('nearestCity50k', v, r);
+            }
+            return { index: i, vertex: v, city: r };
+          });
+          const ms = performance.now() - t0;
+
+          // Render the list. Each row: vertex N — nearest city + distance.
+          // Anchor (vertex 0) gets a distinctive orange tag; far cities get
+          // a muted note.
+          listEl.style.display = '';
+          listEl.textContent = '';
+          for (const r of results) {
+            const row = document.createElement('div');
+            const v = r.vertex;
+            const tag = (r.index === 0) ? '⬤ V0 (anchor)' : 'V' + r.index;
+            const head = document.createElement('span');
+            head.style.color = r.index === 0 ? 'var(--accent)' : 'var(--muted)';
+            head.textContent = tag.padEnd(12) + ' ';
+            const body = document.createElement('span');
+            if (r.city) {
+              const loc = [r.city.name, r.city.admin1, r.city.country].filter(Boolean).join(', ');
+              body.textContent = loc +
+                ' — ' + Math.round(r.city.distanceKm).toLocaleString() + ' km' +
+                ' (pop ' + Math.round(r.city.population / 1000).toLocaleString() + 'k)';
+              if (r.city.distanceKm > 1500) {
+                body.style.opacity = '0.55';
+              }
+            } else {
+              body.textContent = 'no city found within population threshold';
+              body.style.opacity = '0.5';
+            }
+            row.appendChild(head);
+            row.appendChild(body);
+            listEl.appendChild(row);
+          }
+          statusEl.textContent = results.length + ' vertices enriched in ' + Math.round(ms) + ' ms.';
+        });
+      }
+
+      function clearEnrichment() {
+        document.getElementById('poly-vertex-list').style.display = 'none';
+        document.getElementById('poly-vertex-list').textContent = '';
+        document.getElementById('poly-enrich-status').textContent = '';
+      }
+
+      // ---------------------------------------------------------------
+      // Curves Suite (V3_ADDITIONS "Open Question" — the third top-level
+      // category alongside Two-Point and Polyhedra). Currently ships with
+      // small-circle-at-distance-d; isoazimuthal / loxodrome / windrose
+      // variants follow the same UI pattern.
+      // ---------------------------------------------------------------
+      let curvesMap = null;
+      const curvesLayer = { polyline: null, pin: null };
+
+      function ensureCurvesMap() {
+        if (curvesMap) return curvesMap;
+        curvesMap = L.map('curves-map', { worldCopyJump: true }).setView([20, -30], 1);
+        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+          attribution: 'Esri Dark Gray Canvas', maxZoom: 16, subdomains: ['', ''],
+        }).addTo(curvesMap);
+        curvesLayer.polyline = L.layerGroup().addTo(curvesMap);
+        curvesLayer.pin = L.layerGroup().addTo(curvesMap);
+        return curvesMap;
+      }
+
+      function renderCurves() {
+        ensureCurvesMap();
+        curvesLayer.polyline.clearLayers();
+        curvesLayer.pin.clearLayers();
+        document.getElementById('curve-distkm-display').textContent = state.curveDistKm;
+        document.getElementById('curve-bearing-display').textContent = state.curveBearingDeg;
+
+        // Show the bearing row iff the current curve type needs a bearing.
+        const typeCfg = CURVE_TYPES[state.curveType] || CURVE_TYPES.smallCircle;
+        document.getElementById('curve-bearing-row').style.display = typeCfg.needsBearing ? '' : 'none';
+
+        if (!window.Geometry) return;
+
+        // Always draw the anchor pin.
+        L.circleMarker([state.curveP.lat, state.curveP.lon], {
+          radius: 7, color: '#f26522', weight: 2, fillColor: '#f26522', fillOpacity: 1,
+        }).bindTooltip(
+          'Center P<br>' + state.curveP.lat.toFixed(3) + ', ' + state.curveP.lon.toFixed(3),
+          { direction: 'top' }
+        ).addTo(curvesLayer.pin);
+
+        // Halo + line styling, identical across curve types.
+        const halo = { color: '#000', weight: 5, opacity: 0.5, interactive: false, smoothFactor: 1.0 };
+        const line = { color: '#00bfa5', weight: 2.5, opacity: 0.95, interactive: false, smoothFactor: 1.0 };
+
+        let samples, caption;
+        if (state.curveType === 'smallCircle') {
+          const dRad = state.curveDistKm / Geometry.EARTH_R_KM;
+          samples = Geometry.sampleSmallCircle(state.curveP, dRad, 360);
+          const angDeg = (dRad * 180 / Math.PI).toFixed(1);
+          const fraction = (dRad / Math.PI).toFixed(3);
+          const note = dRad >= Math.PI - 1e-6
+            ? ' — at antipode (degenerate point)'
+            : dRad >= Math.PI / 2
+              ? ' — past the horizon great circle (P’s great circle is at d = π/2 ≈ 10,007.5 km)'
+              : '';
+          caption = 'Small circle at d = ' + state.curveDistKm + ' km (' + angDeg + '° of arc, ' + fraction + ' of π).' + note;
+        } else if (state.curveType === 'loxodrome') {
+          samples = Geometry.sampleLoxodrome(state.curveP, state.curveBearingDeg, state.curveDistKm, 240);
+          // Tick the destination pin in teal so users can read the rhumb-line endpoint.
+          const tail = samples[samples.length - 1];
+          if (tail) {
+            L.circleMarker([tail[0], tail[1]], {
+              radius: 5, color: '#00bfa5', weight: 2, fillColor: '#00bfa5', fillOpacity: 1,
+            }).bindTooltip(
+              'Rhumb endpoint<br>' + tail[0].toFixed(3) + ', ' + tail[1].toFixed(3),
+              { direction: 'top' }
+            ).addTo(curvesLayer.pin);
+          }
+          const compass = (state.curveBearingDeg + 360) % 360;
+          const card = compass < 22.5 || compass >= 337.5 ? 'N' :
+                       compass < 67.5 ? 'NE' : compass < 112.5 ? 'E' :
+                       compass < 157.5 ? 'SE' : compass < 202.5 ? 'S' :
+                       compass < 247.5 ? 'SW' : compass < 292.5 ? 'W' : 'NW';
+          const polarNote = (tail && Math.abs(tail[0]) >= 89.4)
+            ? ' — path clipped near the pole (rhumb lines spiral infinitely into a pole; truncated at ±89.5°)'
+            : '';
+          caption = 'Loxodrome at constant bearing ' + state.curveBearingDeg + '° (' + card + ') for ' + state.curveDistKm + ' km. Constant compass course — straight line on a Mercator map.' + polarNote;
+        } else if (state.curveType === 'isoazimuthal') {
+          // Locus of points where back-bearing toward P equals θ. Brute-force
+          // azimuth search at 1° resolution; the geometry kernel handles the
+          // search + skip-near-antipode logic.
+          samples = Geometry.sampleIsoazimuthal(state.curveP, state.curveBearingDeg, 180);
+          const compass = (state.curveBearingDeg + 360) % 360;
+          const card = compass < 22.5 || compass >= 337.5 ? 'N' :
+                       compass < 67.5 ? 'NE' : compass < 112.5 ? 'E' :
+                       compass < 157.5 ? 'SE' : compass < 202.5 ? 'S' :
+                       compass < 247.5 ? 'SW' : compass < 292.5 ? 'W' : 'NW';
+          caption = 'Isoazimuthal at θ = ' + state.curveBearingDeg + '° (' + card + '). Every point on this curve is where you would face ' + card +
+                    ' to head back to P along the great-circle path. Distinct from a loxodrome (which has constant bearing along its OWN path) — ' +
+                    'this curve has constant bearing AT EACH POINT toward P.';
+        } else if (state.curveType === 'windrose') {
+          // 32 rhumb lines from P at evenly-spaced bearings (every 11.25°).
+          // This is the navigational pattern in pre-Mercator portolan charts.
+          // Render each as its own polyline so antimeridian-splits work per ray.
+          // Light haloed strokes — 32 lines overlapping the center could get
+          // visually heavy otherwise.
+          const rayHalo = { color: '#000', weight: 3, opacity: 0.4, interactive: false };
+          const rayLine = { color: '#00bfa5', weight: 1.5, opacity: 0.75, interactive: false };
+          for (let i = 0; i < 32; i++) {
+            const beta = (i * 360 / 32);
+            const ray = Geometry.sampleLoxodrome(state.curveP, beta, state.curveDistKm, 120);
+            // Split at antimeridian, then clip at |lat|<=85 so polar-bound rays
+            // don't smear as horizontal stripes across the top/bottom of
+            // Mercator — same fix pattern as renderPersonalEquator in the
+            // consumer app. Web Mercator can't represent |lat|>85.05°.
+            for (const seg of Geometry.antimeridianSplit(ray)) {
+              for (const clipped of Geometry.clipPolylineToLat(seg, 85)) {
+                L.polyline(clipped, rayHalo).addTo(curvesLayer.polyline);
+                L.polyline(clipped, rayLine).addTo(curvesLayer.polyline);
+              }
+            }
+          }
+          // Skip the unified samples → segments → polyline render below.
+          document.getElementById('curve-caption').textContent =
+            '32-ray portolan windrose from P, each ray a rhumb line at ' + state.curveDistKm +
+            ' km. Bearings every 11.25° (360°/32). Pre-Mercator navigators plotted courses ' +
+            'as straight chord-paths between intersecting windroses; this is one node of ' +
+            'such a chart.';
+          return;
+        } else {
+          document.getElementById('curve-caption').textContent =
+            'The "' + typeCfg.label + '" variant is not yet implemented. Try "Small circle at distance d" or "Loxodrome".';
+          return;
+        }
+
+        // Two-stage cleanup: antimeridianSplit handles ±180° wraps; clip at
+        // |lat|<=85 prevents the Mercator polar-stripe artifact when the
+        // curve crosses into the projection's clipped polar caps (small
+        // circles near a pole, loxodromes spiraling toward one, isoazimuthal
+        // rings touching one). Same fix shape as the consumer app's
+        // renderPersonalEquator.
+        const segments = [];
+        for (const seg of Geometry.antimeridianSplit(samples)) {
+          for (const clipped of Geometry.clipPolylineToLat(seg, 85)) {
+            segments.push(clipped);
+          }
+        }
+        for (const seg of segments) {
+          L.polyline(seg, halo).addTo(curvesLayer.polyline);
+          L.polyline(seg, line).addTo(curvesLayer.polyline);
+        }
+        document.getElementById('curve-caption').textContent = caption;
+      }
+
+      function bindCurvesInputs() {
+        document.getElementById('curve-p-input').addEventListener('change', function (e) {
+          const p = readInputLatLon(e.target);
+          if (p) {
+            state.curveP = p;
+            renderCurves();
+          } else {
+            flagBadCoord();
+          }
+        });
+        document.getElementById('curve-type-select').addEventListener('change', function (e) {
+          state.curveType = e.target.value;
+          renderCurves();
+        });
+        document.getElementById('curve-distkm-slider').addEventListener('input', function (e) {
+          state.curveDistKm = parseInt(e.target.value, 10) || 2000;
+          renderCurves();
+        });
+        document.getElementById('curve-bearing-slider').addEventListener('input', function (e) {
+          state.curveBearingDeg = parseInt(e.target.value, 10);
+          if (!isFinite(state.curveBearingDeg)) state.curveBearingDeg = 45;
+          renderCurves();
+        });
+      }
+
+      // ---------------------------------------------------------------
+      // Analysis Suite (v0) — overlay real geophysical datasets on the
+      // sphere. Currently ships with USGS recent earthquakes; future
+      // variants from V3_VISION Phase 4: volcanoes, magnetic anomalies,
+      // shipwrecks, plus Voronoi cells around point sets + Monte Carlo
+      // null-hypothesis tests for "is this grid coincidence real?"
+      // ---------------------------------------------------------------
+      let analysisMap = null;
+      const analysisLayer = L.layerGroup();
+      // Raw dataset retained for Monte Carlo (loadAnalysisDataset populates this
+      // alongside the visual layer). Each entry is { lat, lon, mag, place }.
+      let lastDatasetFeatures = null;
+
+      function ensureAnalysisMap() {
+        if (analysisMap) return analysisMap;
+        analysisMap = L.map('analysis-map', { worldCopyJump: true }).setView([20, 0], 1);
+        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+          attribution: 'Esri Dark Gray Canvas', maxZoom: 16, subdomains: ['', ''],
+        }).addTo(analysisMap);
+        analysisLayer.addTo(analysisMap);
+        return analysisMap;
+      }
+
+      async function loadAnalysisDataset() {
+        const caption = document.getElementById('analysis-caption');
+        const source = document.getElementById('analysis-source').value;
+        ensureAnalysisMap();
+        analysisLayer.clearLayers();
+        caption.textContent = 'Fetching ' + source + '…';
+        // Map each dropdown value to its USGS GeoJSON feed URL. All feeds are
+        // public CORS-friendly endpoints under earthquake.usgs.gov.
+        const USGS_FEEDS = {
+          'usgs-all-day':            'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson',
+          'usgs-25-week':            'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson',
+          'usgs-45-month':           'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geojson',
+          'usgs-significant-month':  'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson',
+        };
+        const url = USGS_FEEDS[source];
+        if (!url) {
+          caption.textContent = 'Unknown dataset ' + source;
+          return;
+        }
+        try {
+          const r = await fetch(url);
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const j = await r.json();
+          const features = j.features || [];
+          const retained = [];  // populate as we iterate, retain for Monte Carlo
+          let minMag = Infinity, maxMag = -Infinity;
+          for (const f of features) {
+            const coords = (f.geometry && f.geometry.coordinates) || null;
+            if (!coords) continue;
+            // GeoJSON stores coordinates as [lon, lat, depth].
+            const lon = coords[0], lat = coords[1];
+            const mag = f.properties.mag != null ? f.properties.mag : 0;
+            retained.push({ lat: lat, lon: lon, mag: mag, place: f.properties.place || '' });
+            if (mag < minMag) minMag = mag;
+            if (mag > maxMag) maxMag = mag;
+            const place = f.properties.place || '(unknown location)';
+            const time = new Date(f.properties.time).toUTCString();
+            const depth = coords[2] != null ? coords[2].toFixed(0) + ' km depth' : '';
+            // Marker scales with magnitude; color tier matches the caption.
+            const radius = Math.max(2, mag * 1.5);
+            const color = mag >= 5 ? '#ff5a4a' : mag >= 4 ? '#f26522' : '#7c8aa8';
+            L.circleMarker([lat, lon], {
+              radius: radius,
+              color: color,
+              weight: 1,
+              fillColor: color,
+              fillOpacity: 0.55,
+            }).bindTooltip(
+              'M' + mag.toFixed(1) + ' — ' + place + '<br>' + time + (depth ? ' · ' + depth : ''),
+              { direction: 'top' }
+            ).addTo(analysisLayer);
+          }
+          lastDatasetFeatures = retained;  // keep alive for Monte Carlo
+          caption.textContent = features.length + ' earthquakes rendered (M ' +
+            (isFinite(minMag) ? minMag.toFixed(1) : '?') + '–' +
+            (isFinite(maxMag) ? maxMag.toFixed(1) : '?') + ', USGS GeoJSON feed). ' +
+            'Compare against polyhedron configurations above — the Becker-Hagens grid (rhombic triacontahedron, 32 verts) is the classic claim to test.';
+          updateMonteCarloButton();
+        } catch (e) {
+          caption.textContent = 'Failed to fetch USGS feed: ' + e.message;
+        }
+      }
+
+      function clearAnalysis() {
+        if (analysisLayer) analysisLayer.clearLayers();
+        lastDatasetFeatures = null;
+        document.getElementById('analysis-caption').textContent = 'Cleared. Click "Load + render" to fetch again.';
+        updateMonteCarloButton();
+      }
+
+      function bindAnalysisInputs() {
+        document.getElementById('analysis-load-btn').addEventListener('click', loadAnalysisDataset);
+        document.getElementById('analysis-clear-btn').addEventListener('click', clearAnalysis);
+        // Monte Carlo quick-pick shapes: select the polyhedra dropdown +
+        // re-render. Surfaces the audit's #2 fix for Task 2 (Becker-Hagens
+        // is buried mid-dropdown; this gives a one-click entry).
+        document.querySelectorAll('[data-mc-shape]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const shapeId = btn.dataset.mcShape;
+            const sel = document.getElementById('poly-shape-select');
+            if (sel) {
+              sel.value = shapeId;
+              state.shape = shapeId;
+              renderPolyhedra();
+              // Smooth-scroll the polyhedra map into view so the user sees
+              // the shape they just selected.
+              const pmap = document.getElementById('salem-map');
+              if (pmap && pmap.scrollIntoView) {
+                // Honor prefers-reduced-motion: jump instead of animate for
+                // users with vestibular sensitivity / motion sickness.
+                const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                pmap.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+              }
+            }
+          });
+        });
+        const mcBtn = document.getElementById('mc-run-btn');
+        if (mcBtn) mcBtn.addEventListener('click', runMonteCarlo);
+        const mcSlider = document.getElementById('mc-radius-slider');
+        if (mcSlider) mcSlider.addEventListener('input', function (e) {
+          const km = Math.max(50, Math.min(5000, parseInt(e.target.value, 10) || 250));
+          document.getElementById('mc-radius-display').textContent = km;
+          state.mcRadiusKm = km;
+        });
+        const mcReset = document.getElementById('mc-reset-btn');
+        if (mcReset) mcReset.addEventListener('click', function () {
+          state.mcAttempts = [];   // back to a clean shot; meter hides on re-render
+          renderHonestyMeter();
+        });
+        updateMonteCarloButton();
+      }
+
+      // ---------------------------------------------------------------
+      // Monte Carlo null-hypothesis test (V3_VISION Phase 4 marquee feature).
+      //
+      // Given the currently configured polyhedron + the loaded analysis
+      // dataset, count how many dataset points fall within R km of ANY
+      // polyhedron vertex (the "observed" statistic). Then generate
+      // N_TRIALS uniformly-random rotations of the polyhedron and
+      // recompute the same statistic for each — that's the null
+      // distribution. p-value = fraction of null trials ≥ observed.
+      //
+      // Small p → "this grid coincidence is statistically unusual."
+      // ~0.5 p → "this is what you'd expect by chance."
+      //
+      // Robust because the SAME polyhedron is rotated for both observed
+      // and null — only the orientation varies. Reduces bias from
+      // polyhedron-specific peculiarities like vertex count.
+      // ---------------------------------------------------------------
+      function updateMonteCarloButton() {
+        const btn = document.getElementById('mc-run-btn');
+        if (!btn) return;
+        const hasDataset = !!lastDatasetFeatures && lastDatasetFeatures.length > 0;
+        const hasShape = !!state.shape;
+        const ready = hasDataset && hasShape;
+        btn.disabled = !ready;
+        btn.style.opacity = ready ? '1' : '0.45';
+        btn.style.cursor = ready ? 'pointer' : 'not-allowed';
+        // Inline reason — surface WHY the button is disabled in its own label,
+        // not just by dimming. (UX audit flagged silent disabled-state as a
+        // top-5 friction point: "user clicks, gets a console error, no idea why".)
+        if (!ready) {
+          if (!hasDataset && !hasShape) {
+            btn.textContent = 'Run Monte Carlo (load a dataset + pick a shape first)';
+          } else if (!hasDataset) {
+            btn.textContent = 'Run Monte Carlo (load a dataset first)';
+          } else {
+            btn.textContent = 'Run Monte Carlo (pick a polyhedron first)';
+          }
+        } else {
+          btn.textContent = 'Run Monte Carlo (1000 trials)';
+        }
+      }
+
+      // Live "active shape" echo so the user knows WHAT polyhedron Monte
+      // Carlo will test — the audits flagged that the polyhedron lives ~600
+      // lines up in a different section.
+      function updateMcActiveShape() {
+        const el = document.getElementById('mc-active-shape');
+        if (!el) return;
+        if (!state.shape || !shapeEngineReady) {
+          el.textContent = 'Pick a polyhedron above (Polyhedra Suite) first.';
+          return;
+        }
+        const paramCfg = PARAMETRIC_SHAPES[state.shape];
+        const paramTxt = paramCfg ? ', ' + paramCfg.param + '=' + state[paramCfg.stateKey] : '';
+        const shapes = window.ShapeEngine.listShapes();
+        const meta = shapes.find(function (s) { return s.id === state.shape; });
+        const label = meta ? meta.technicalLabel : state.shape;
+        el.textContent = 'Testing: ' + label + ' (' + state.shape + paramTxt +
+          ') · anchored ' + state.anchor.lat.toFixed(2) + '°, ' + state.anchor.lon.toFixed(2) +
+          '° · spin ' + state.spinDeg + '°';
+      }
+
+      function llToXyz(lat, lon) {
+        const phi = lat * Math.PI / 180;
+        const lam = lon * Math.PI / 180;
+        const c = Math.cos(phi);
+        return [c * Math.cos(lam), c * Math.sin(lam), Math.sin(phi)];
+      }
+
+      // Count dataset points within angular distance acos(cosThreshold) of
+      // ANY vertex. Early-exit per dataset point — typical case (most points
+      // far from all vertices) is O(M·N) with tight constant, fast.
+      function countPointsNearVertices(datasetXyz, vertsXyz, cosThreshold) {
+        let count = 0;
+        for (let i = 0; i < datasetXyz.length; i++) {
+          const p = datasetXyz[i];
+          for (let j = 0; j < vertsXyz.length; j++) {
+            const v = vertsXyz[j];
+            const cosAng = p[0]*v[0] + p[1]*v[1] + p[2]*v[2];
+            if (cosAng >= cosThreshold) { count++; break; }
+          }
+        }
+        return count;
+      }
+
+      async function runMonteCarlo() {
+        const resultEl = document.getElementById('mc-result');
+        while (resultEl.firstChild) resultEl.removeChild(resultEl.firstChild);
+
+        function appendLine(text) {
+          const div = document.createElement('div');
+          div.textContent = text;
+          resultEl.appendChild(div);
+        }
+
+        if (!lastDatasetFeatures || lastDatasetFeatures.length === 0) {
+          appendLine('No dataset loaded yet. Click "Load + render" above first.');
+          return;
+        }
+        if (!state.shape) {
+          appendLine('No polyhedron selected. Pick one from the Polyhedra Suite dropdown above.');
+          return;
+        }
+        if (!shapeEngineReady) {
+          appendLine('Shape catalog still loading — try again in a moment.');
+          return;
+        }
+        const R_KM = state.mcRadiusKm || 250;
+        const EARTH_R = window.Geometry.EARTH_R_KM;
+        const cosThreshold = Math.cos(R_KM / EARTH_R);
+        const N_TRIALS = 1000;
+
+        const datasetXyz = lastDatasetFeatures.map(function (f) { return llToXyz(f.lat, f.lon); });
+
+        // Resolve canonical (unit-sphere) vertices of the chosen polyhedron.
+        const paramCfg = PARAMETRIC_SHAPES[state.shape];
+        const params = paramCfg ? {} : undefined;
+        if (paramCfg) params[paramCfg.param] = state[paramCfg.stateKey];
+        let canonicalVerts;
+        if (window.ShapeEngine.canonicalVertices) {
+          canonicalVerts = window.ShapeEngine.canonicalVertices(state.shape, params);
+        } else {
+          const cfg = window.ShapeEngine.configure(state.shape, { lat: 0, lon: 0 }, 0, params);
+          canonicalVerts = cfg.vertices.map(function (v) { return llToXyz(v.lat, v.lon); });
+        }
+        const nV = canonicalVerts.length;
+
+        // OBSERVED: polyhedron as currently configured (anchor + spin).
+        const anchorXyz = llToXyz(state.anchor.lat, state.anchor.lon);
+        const v0 = canonicalVerts[0];
+        const alignM = window.Rotation.alignMatrix(v0, anchorXyz);
+        const spinM = window.Rotation.axisAngleMatrix(anchorXyz, state.spinDeg * Math.PI / 180);
+        const fullM = window.Rotation.compose(spinM, alignM);
+        const observedVerts = canonicalVerts.map(function (v) { return window.Rotation.apply(fullM, v); });
+        const observed = countPointsNearVertices(datasetXyz, observedVerts, cosThreshold);
+
+        appendLine('Running ' + N_TRIALS + ' trials…');
+        await new Promise(function (r) { setTimeout(r, 0); });
+
+        // NULL distribution.
+        const nullCounts = new Int32Array(N_TRIALS);
+        const t0 = performance.now();
+        const tmpVerts = new Array(nV);
+        for (let trial = 0; trial < N_TRIALS; trial++) {
+          const M = window.Rotation.randomMatrix();
+          for (let i = 0; i < nV; i++) {
+            tmpVerts[i] = window.Rotation.apply(M, canonicalVerts[i]);
+          }
+          nullCounts[trial] = countPointsNearVertices(datasetXyz, tmpVerts, cosThreshold);
+        }
+        const t1 = performance.now();
+
+        let sum = 0, atOrAbove = 0;
+        let minC = Infinity, maxC = -Infinity;
+        for (let i = 0; i < N_TRIALS; i++) {
+          const c = nullCounts[i];
+          sum += c;
+          if (c >= observed) atOrAbove++;
+          if (c < minC) minC = c;
+          if (c > maxC) maxC = c;
+        }
+        const mean = sum / N_TRIALS;
+        const sorted = Array.from(nullCounts).sort(function (a, b) { return a - b; });
+        const median = sorted[Math.floor(N_TRIALS / 2)];
+        const p025 = sorted[Math.floor(N_TRIALS * 0.025)];
+        const p975 = sorted[Math.floor(N_TRIALS * 0.975)];
+        const pValue = atOrAbove / N_TRIALS;
+
+        // --- Verdict & Honesty layer (spec docs/specs/2026-05-30-…) ---
+        // Build this run's config descriptor (spec §4.2 schema). Used by the
+        // honesty meter and the attempt log.
+        const sourceEl = document.getElementById('analysis-source');
+        const config = {
+          shape: state.shape,
+          anchorLat: state.anchor.lat,
+          anchorLon: state.anchor.lon,
+          spinDeg: state.spinDeg,
+          radiusKm: R_KM,
+          datasetId: sourceEl ? sourceEl.value : null,
+        };
+        // Every completed run is an attempt — switching dataset/shape and
+        // re-running is exactly the forking-paths behavior the meter surfaces.
+        state.mcAttempts.push({ rawP: pValue, config: config });
+
+        // Plain-English verdict (pure module, spec §4.1).
+        const verdict = window.Verdict.interpret({
+          observedCount: observed,
+          rawP: pValue,
+          nDataPoints: lastDatasetFeatures.length,
+          vertexCount: nV,
+          radiusKm: R_KM,
+          datasetNoun: datasetNoun(config.datasetId),
+        });
+
+        // --- Render the verdict card into #mc-result ---
+        while (resultEl.firstChild) resultEl.removeChild(resultEl.firstChild);
+
+        const badge = document.createElement('div');
+        badge.className = 'verdict-badge verdict-' + verdict.tier;
+        badge.style.backgroundColor = verdict.color;  // spec §5: background = result.color
+        badge.textContent = verdict.badge;
+        resultEl.appendChild(badge);
+
+        const sentenceEl = document.createElement('p');
+        sentenceEl.style.margin = '0 0 10px';
+        sentenceEl.textContent = verdict.sentence;
+        resultEl.appendChild(sentenceEl);
+
+        // Diagnostics, demoted into a collapsed expander — nothing is lost.
+        const details = document.createElement('details');
+        details.style.whiteSpace = 'pre-wrap';  // preserve the indented number lines
+        const summaryEl = document.createElement('summary');
+        summaryEl.textContent = 'What does this mean?';
+        summaryEl.style.cursor = 'pointer';
+        details.appendChild(summaryEl);
+        function diag(text) {
+          const d = document.createElement('div');
+          d.textContent = text;
+          details.appendChild(d);
+        }
+        diag('Polyhedron: ' + state.shape + ' (' + nV + ' vertices) anchored at ' + state.anchor.lat.toFixed(2) + ', ' + state.anchor.lon.toFixed(2) + ', spin ' + state.spinDeg + '°');
+        diag('Dataset: ' + lastDatasetFeatures.length + ' points');
+        diag('Radius: ' + R_KM + ' km (' + (R_KM / EARTH_R * 180 / Math.PI).toFixed(2) + '° of arc)');
+        diag('');
+        diag('OBSERVED: ' + observed + ' dataset points within ' + R_KM + ' km of any vertex');
+        diag('NULL DISTRIBUTION (' + N_TRIALS + ' random rotations):');
+        diag('  min ' + minC + ' · median ' + median + ' · mean ' + mean.toFixed(1) + ' · max ' + maxC);
+        diag('  middle 95% ≈ [' + p025 + ', ' + p975 + ']');
+        diag(window.Verdict.formatP(pValue) + '  (' + atOrAbove + ' of ' + N_TRIALS + ' random rotations matched or exceeded the observed count)');
+        diag('');
+        diag('Compute time: ' + (t1 - t0).toFixed(0) + ' ms');
+        resultEl.appendChild(details);
+
+        // Honesty meter (Task 4 fills this in).
+        renderHonestyMeter();
+      }
+
+      // Human plural noun for the active dataset, used in verdict copy.
+      // All current options are USGS earthquakes; volcanoes is the planned next.
+      function datasetNoun(sourceValue) {
+        if (sourceValue && sourceValue.indexOf('volcano') !== -1) return 'volcanoes';
+        return 'earthquakes';
+      }
+
+      // Formats a config descriptor for the "best result" line, e.g.
+      // "rhombicTriacontahedron @ 42.5,-70.9, spin 18°, 250 km, earthquakes".
+      function describeConfig(c) {
+        if (!c) return '(no runs)';
+        return c.shape + ' @ ' + c.anchorLat.toFixed(1) + ',' + c.anchorLon.toFixed(1) +
+               ', spin ' + c.spinDeg + '°, ' + c.radiusKm + ' km, ' + datasetNoun(c.datasetId);
+      }
+
+      // Renders the session honesty meter into #mc-honesty (spec §6). Run #1 is
+      // the "clean shot"; run #2+ shows the Bonferroni-corrected readout. Both
+      // the meter and the Reset button hide when there are no attempts.
+      function renderHonestyMeter() {
+        const host = document.getElementById('mc-honesty');
+        const resetBtn = document.getElementById('mc-reset-btn');
+        if (!host) return;
+        while (host.firstChild) host.removeChild(host.firstChild);
+
+        const attempts = state.mcAttempts;
+        if (!attempts || attempts.length === 0) {
+          host.style.display = 'none';
+          if (resetBtn) resetBtn.style.display = 'none';
+          return;
+        }
+        host.style.display = 'block';
+        if (resetBtn) resetBtn.style.display = 'inline-block';
+
+        const summary = window.Verdict.correctForAttempts(attempts);
+
+        function line(text) {
+          const d = document.createElement('div');
+          d.textContent = text;
+          host.appendChild(d);
+        }
+
+        // Run #1 — the clean shot.
+        if (summary.n === 1) {
+          const h = document.createElement('div');
+          h.style.fontWeight = '700';
+          h.textContent = 'Attempt 1 — your clean shot.';
+          host.appendChild(h);
+          line('One shape, one test. The p-value above means what it says.');
+          return;
+        }
+
+        // Run #2+ — persistent meter.
+        line('Attempts this session: ' + summary.n);
+        line('Best result so far: ' + window.Verdict.formatP(summary.bestRawP) +
+             ' — ' + describeConfig(summary.bestConfig));
+
+        // Corrected p + a session badge (reuse the module so colors never drift).
+        const correctedRow = document.createElement('div');
+        correctedRow.style.margin = '6px 0';
+        correctedRow.appendChild(document.createTextNode(
+          'Corrected for ' + summary.n + ' tries (Bonferroni): ' +
+          window.Verdict.formatP(summary.correctedP) + '  '));
+        const sInfo = window.Verdict.interpret({
+          observedCount: 0, rawP: summary.correctedP, nDataPoints: 0,
+          vertexCount: 0, radiusKm: 0,
+        });
+        const sBadge = document.createElement('span');
+        sBadge.className = 'verdict-badge verdict-' + summary.sessionTier;
+        sBadge.style.backgroundColor = sInfo.color;
+        sBadge.style.fontSize = '11px';
+        sBadge.textContent = sInfo.badge;
+        correctedRow.appendChild(sBadge);
+        host.appendChild(correctedRow);
+
+        // Forking-paths narrative.
+        const narrative = document.createElement('p');
+        narrative.style.margin = '8px 0';
+        narrative.textContent =
+          'Every shape, anchor, spin, and radius you try is another roll of the dice. ' +
+          'Try enough combinations and one will look striking by pure chance. The corrected ' +
+          'value multiplies your best raw p by the number of tries — the honest way to read a ' +
+          'result you went hunting for. The clean version of this test is one shape, chosen ' +
+          'before you looked at the data (pre-registration).';
+        host.appendChild(narrative);
+
+        // Footnote caveat.
+        const foot = document.createElement('p');
+        foot.style.margin = '8px 0 0';
+        foot.style.fontSize = '11px';
+        foot.style.color = 'var(--muted, #9aa7c2)';
+        foot.textContent =
+          'Footnote: Bonferroni assumes your tries were independent. They aren\'t quite — a cube ' +
+          'and a cuboctahedron share structure, so some "tries" overlap, which means this ' +
+          'correction slightly over-penalizes. We round toward skepticism on purpose: a result ' +
+          'that survives an over-strict correction is real; one that doesn\'t, you haven\'t lost ' +
+          'much by doubting.';
+        host.appendChild(foot);
+      }
+
+      // ---------------------------------------------------------------
+      // Sprint C — Share + Export from current state
+      // ---------------------------------------------------------------
+      function currentShareConfig() {
+        // Captures EVERYTHING a user might want to share: the Polyhedra anchor +
+        // shape + spin, the Two-Point A and B (which the audit flagged as
+        // missing — `state.anchor` is Polyhedra-only), test point P, the active
+        // curve type + params, the active dataset selection, and Monte Carlo R.
+        // shareLink.js's serializer ignores fields it doesn't recognize, so
+        // additions here are safe even before serializer support catches up.
+        return {
+          mode: 'polyhedra',
+          A: state.anchor,
+          B: state.B,
+          tpA: state.A,
+          P: state.P,
+          shape: state.shape,
+          spinDeg: state.spinDeg,
+          curveType: state.curveType,
+          curveDistKm: state.curveDistKm,
+          curveBearingDeg: state.curveBearingDeg,
+          curveP: state.curveP,
+          mcRadiusKm: state.mcRadiusKm,
+          analysisSource: (function () {
+            const el = document.getElementById('analysis-source');
+            return el ? el.value : null;
+          })(),
+        };
+      }
+
+      function currentExportBundle() {
+        const paramCfg = PARAMETRIC_SHAPES[state.shape];
+        let params;
+        if (paramCfg) {
+          params = {};
+          params[paramCfg.param] = state[paramCfg.stateKey];
+        }
+        const cfg = SE.configure(state.shape, state.anchor, state.spinDeg * Math.PI / 180, params);
+        return {
+          name: 'Geopuesto playground · ' + cfg.shape.technicalLabel + ' anchored at ' + fmtCoord(state.anchor),
+          points: cfg.vertices.map(function (v, i) {
+            return {
+              lat: v.lat, lon: v.lon,
+              name: i === 0 ? 'Vertex 0 (anchor)' : 'Vertex ' + i,
+              props: { index: i, anchor: i === 0, shape: state.shape, spinDeg: state.spinDeg },
+            };
+          }),
+          polylines: cfg.edgePolylines.map(function (poly, idx) {
+            return { coords: poly, name: 'Edge segment ' + idx };
+          }),
+        };
+      }
+
+      // T2-4: shared toast. Auto-removes after 2.4 s; up to 3 stacked at a time.
+      function showToast(msg, kind) {
+        let host = document.getElementById('toast-container');
+        if (!host) {
+          host = document.createElement('div');
+          host.id = 'toast-container';
+          host.className = 'toast-container';
+          document.body.appendChild(host);
+        }
+        // Cap stack at 3 by dropping oldest.
+        while (host.children.length >= 3) host.removeChild(host.firstChild);
+        const toast = document.createElement('div');
+        toast.className = 'toast' + (kind === 'error' ? ' toast-error' : kind === 'info' ? ' toast-info' : '');
+        const label = document.createElement('strong');
+        label.textContent = kind === 'error' ? 'Error' : kind === 'info' ? 'Info' : '✓';
+        toast.appendChild(label);
+        toast.appendChild(document.createTextNode(msg));
+        host.appendChild(toast);
+        // Defer the class flip so the transition runs.
+        requestAnimationFrame(function () { toast.classList.add('toast-show'); });
+        setTimeout(function () {
+          toast.classList.remove('toast-show');
+          setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 250);
+        }, 2400);
+      }
+
+      // One message, one helper, so every coordinate input fails loudly and
+      // identically. Before this, a typo or an unpicked city name was just
+      // swallowed (the change handler's `if (parsed)` had no else) and the map
+      // sat there unchanged with no hint why — the audit's "silent failure".
+      // City picks never reach here as errors: choose() writes valid "lat,lon"
+      // before dispatching change, so this only fires on genuinely bad text.
+      const BAD_COORD_MSG = 'Could not read that location — pick a city from the list, or type coordinates as "lat, lon".';
+      function flagBadCoord() { showToast(BAD_COORD_MSG, 'error'); }
+
+      function wireSprintC() {
+        document.getElementById('btn-share').addEventListener('click', function () {
+          const url = SL.makeUrl(window.location.href, currentShareConfig());
+          const display = document.getElementById('share-url-display');
+          display.style.display = 'block';
+          display.textContent = url;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(function () {
+              showToast('Share link copied to clipboard');
+            }).catch(function () {
+              showToast('Clipboard blocked — URL is shown above to copy manually', 'info');
+            });
+          } else {
+            showToast('Clipboard unavailable — URL is shown above', 'info');
+          }
+        });
+        document.getElementById('btn-export-geojson').addEventListener('click', function () {
+          // No silent clicks: if the shape-engine module never loaded, say so.
+          if (!SE || !SE.ready) { showToast('Shape engine still loading — try again in a moment.', 'info'); return; }
+          SE.ready.then(function () {
+            const name = 'geopuesto-' + state.shape + '.geojson';
+            EG.download(currentExportBundle(), name);
+            showToast('Downloaded ' + name);
+          });
+        });
+        document.getElementById('btn-export-kml').addEventListener('click', function () {
+          // No silent clicks: if the shape-engine module never loaded, say so.
+          if (!SE || !SE.ready) { showToast('Shape engine still loading — try again in a moment.', 'info'); return; }
+          SE.ready.then(function () {
+            const name = 'geopuesto-' + state.shape + '.kml';
+            EG.downloadKML(currentExportBundle(), name);
+            showToast('Downloaded ' + name);
+          });
+        });
+
+        // Hash-restore: parse URL hash on load, apply to state.
+        // NOTE: `restored.A` carries the Polyhedra anchor (schema key `a`), while
+        // `restored.tpA` carries the Two-Point origin (schema key `tpa`). They are
+        // distinct points — a shared link must restore BOTH or the Two-Point pane
+        // silently reverts to its default origin (the bug the audit caught).
+        const restored = SL.fromCurrentLocation();
+        let restoredAny = false;
+        if (restored.A) { state.anchor = restored.A; restoredAny = true; }
+        if (restored.tpA) { state.A = restored.tpA; restoredAny = true; }
+        if (restored.B) { state.B = restored.B; restoredAny = true; }
+        if (restored.P) { state.P = restored.P; restoredAny = true; }
+        if (restored.shape) { state.shape = restored.shape; restoredAny = true; }
+        if (restored.spinDeg != null) { state.spinDeg = restored.spinDeg; restoredAny = true; }
+        if (restoredAny) {
+          // Push the restored values into the form inputs so the UI matches state.
+          document.getElementById('tp-a-input').value = state.A.lat + ',' + state.A.lon;
+          document.getElementById('tp-b-input').value = state.B.lat + ',' + state.B.lon;
+          document.getElementById('tp-p-input').value = state.P.lat + ',' + state.P.lon;
+          document.getElementById('poly-anchor-input').value = state.anchor.lat + ',' + state.anchor.lon;
+          document.getElementById('poly-shape-select').value = state.shape;
+          document.getElementById('poly-spin-slider').value = state.spinDeg;
+          const display = document.getElementById('hash-parse-display');
+          display.style.display = 'block';
+          display.appendChild(el('div', { class: 'label', text: 'Restored from URL hash' }));
+          display.appendChild(el('div', { class: 'value', text: JSON.stringify(restored, null, 2) }));
+        }
+      }
+
+      // ---------------------------------------------------------------
+      // Wire inputs to state + re-render
+      // ---------------------------------------------------------------
+      // Read lat/lon from an input: prefers dataset.latlon (set when a city was
+      // chosen from the dropdown so the visible value is a city name), falls
+      // back to parsing the visible value as coordinates.
+      function readInputLatLon(el) {
+        return (el.dataset.latlon ? parseLatLon(el.dataset.latlon) : null)
+            || parseLatLon(el.value);
+      }
+
+      function bindTwoPointInputs() {
+        function applyAB() {
+          const a = readInputLatLon(document.getElementById('tp-a-input'));
+          const b = readInputLatLon(document.getElementById('tp-b-input'));
+          if (a) state.A = a;
+          if (b) state.B = b;
+          renderTwoPoint();
+          renderCrossTrack();
+        }
+        // applyAB reads BOTH inputs, so validate only the field that fired —
+        // otherwise editing B would scold you about an untouched A.
+        function onABChange(e) {
+          if (e && e.target && !readInputLatLon(e.target)) flagBadCoord();
+          applyAB();
+        }
+        // Auto-render on input change. The previous explicit "Update" button
+        // was redundant — every other text input on the page auto-renders, and
+        // a dedicated button for Two-Point alone was an inconsistency the audits
+        // flagged. Removed.
+        document.getElementById('tp-a-input').addEventListener('change', onABChange);
+        document.getElementById('tp-b-input').addEventListener('change', onABChange);
+
+        document.querySelectorAll('[data-tp-b]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const b = parseLatLon(btn.dataset.tpB);
+            if (b) {
+              state.B = b;
+              document.getElementById('tp-b-input').value = btn.dataset.tpB;
+              renderTwoPoint();
+              renderCrossTrack();
+            }
+          });
+        });
+
+        document.getElementById('tp-p-input').addEventListener('change', function (e) {
+          const p = readInputLatLon(e.target);
+          if (p) {
+            state.P = p;
+            renderCrossTrack();
+          } else {
+            flagBadCoord();
+          }
+        });
+      }
+
+      function bindPolyhedraInputs() {
+        document.getElementById('poly-anchor-input').addEventListener('change', function (e) {
+          const a = readInputLatLon(e.target);
+          if (a) {
+            state.anchor = a;
+            renderPolyhedra();
+          } else {
+            flagBadCoord();
+          }
+        });
+        document.getElementById('poly-shape-select').addEventListener('change', function (e) {
+          state.shape = e.target.value;
+          renderPolyhedra();
+        });
+        document.getElementById('poly-spin-slider').addEventListener('input', function (e) {
+          state.spinDeg = parseInt(e.target.value, 10) || 0;
+          renderPolyhedra();
+        });
+        document.getElementById('poly-fibn-slider').addEventListener('input', function (e) {
+          state.fibN = Math.max(6, parseInt(e.target.value, 10) || 100);
+          renderPolyhedra();
+        });
+        document.getElementById('poly-geok-slider').addEventListener('input', function (e) {
+          state.geoK = Math.max(1, parseInt(e.target.value, 10) || 2);
+          renderPolyhedra();
+        });
+        document.getElementById('poly-polyn-slider').addEventListener('input', function (e) {
+          state.polyN = Math.max(3, parseInt(e.target.value, 10) || 6);
+          renderPolyhedra();
+        });
+        document.getElementById('poly-enrich-btn').addEventListener('click', enrichVertices);
+        document.getElementById('poly-enrich-clear').addEventListener('click', clearEnrichment);
+      }
+
+      // ---------------------------------------------------------------
+      // City search (keyless geocoder). Nobody arrives knowing "42.36,
+      // -71.06" — they know "Boston." The GeoNames cities1000 dataset is
+      // ALREADY loaded for vertex enrichment, so we reuse it as an instant
+      // offline geocoder. No API, no key, no extra network. Type a name,
+      // pick from the dropdown, the coordinate field fills in and fires its
+      // existing change handler — every input keeps working untouched.
+      // ---------------------------------------------------------------
+
+      // Fold case + strip diacritics so "sao paulo" matches "São Paulo".
+      // The combining-marks range (U+0300–U+036F) is built from an ASCII
+      // string via new RegExp so no raw combining characters live in source
+      // (those get mangled by editors/git/copy-paste).
+      const DIACRITICS_RE = new RegExp('[\\u0300-\\u036f]', 'g');
+      function normForSearch(s) {
+        return (s || '').toLowerCase().normalize('NFD').replace(DIACRITICS_RE, '');
+      }
+
+      // Compact population: 12300000 → "12M", 654000 → "654k".
+      function fmtPop(n) {
+        if (!n) return '';
+        if (n >= 1e6) return (n / 1e6).toFixed(n >= 1e7 ? 0 : 1) + 'M';
+        if (n >= 1e3) return Math.round(n / 1e3) + 'k';
+        return '' + n;
+      }
+
+      // Precompute normalized names once (169k entries) so each keystroke is
+      // a cheap indexOf scan rather than 169k re-normalizations. Rebuilt only
+      // if the underlying cities array identity changes.
+      let _cityIndex = null;
+      function ensureCityIndex() {
+        const cities = window.GeopuestoCitiesResolved;
+        if (!cities) return null;                       // dataset still loading
+        if (_cityIndex && _cityIndex.cities === cities) return _cityIndex;
+        const names = new Array(cities.length);
+        for (let i = 0; i < cities.length; i++) names[i] = normForSearch(cities[i].name);
+        _cityIndex = { cities: cities, names: names };
+        return _cityIndex;
+      }
+
+      // Returns: null = dataset not ready; [] = ready but no match; [...] hits.
+      // Ranking: prefix matches first (so "bos" → Boston, not Strasbourg),
+      // each group sorted by population (so the famous one wins ties).
+      function searchCities(query, limit) {
+        const idx = ensureCityIndex();
+        if (!idx) return null;
+        const q = normForSearch(query.trim());
+        if (q.length < 2) return [];
+        const pre = [], sub = [];
+        const names = idx.names, cities = idx.cities;
+        for (let i = 0; i < names.length; i++) {
+          const pos = names[i].indexOf(q);
+          if (pos === 0) pre.push(cities[i]);
+          else if (pos > 0) sub.push(cities[i]);
+        }
+        const byPop = function (a, b) { return (b.population || 0) - (a.population || 0); };
+        pre.sort(byPop);
+        sub.sort(byPop);
+        return pre.concat(sub).slice(0, limit || 8);
+      }
+
+      function debounce(fn, ms) {
+        let t = null;
+        return function () {
+          const args = arguments, self = this;
+          clearTimeout(t);
+          t = setTimeout(function () { fn.apply(self, args); }, ms);
+        };
+      }
+
+      // Wire an autocomplete dropdown onto an existing coordinate <input>.
+      // On pick we write "lat,lon" back into the box and dispatch a synthetic
+      // 'change' so the input's own handler runs. Keeping coordinates visible
+      // is deliberate — this is a geometry sandbox, the numbers ARE the point.
+      function attachCitySearch(input) {
+        if (!input || input.dataset.citySearch) return;
+        input.dataset.citySearch = '1';
+        input.setAttribute('autocomplete', 'off');
+        input.setAttribute('placeholder', 'Type a city — or "lat, lon"');
+
+        const wrap = document.createElement('span');
+        wrap.className = 'geo-search-wrap';
+        input.parentNode.insertBefore(wrap, input);
+        wrap.appendChild(input);
+
+        const menu = document.createElement('div');
+        menu.className = 'geo-search-results';
+        menu.hidden = true;
+        // ARIA combobox/listbox wiring (a11y audit): without this the whole
+        // autocomplete is invisible to screen readers — they'd see a plain text
+        // box and never learn suggestions exist. The input is the combobox, the
+        // menu is its listbox popup, each row an option referenced by id.
+        const listboxId = input.id + '-listbox';
+        menu.id = listboxId;
+        menu.setAttribute('role', 'listbox');
+        menu.setAttribute('aria-label', 'City suggestions');
+        input.setAttribute('role', 'combobox');
+        input.setAttribute('aria-autocomplete', 'list');
+        input.setAttribute('aria-haspopup', 'listbox');
+        input.setAttribute('aria-controls', listboxId);
+        input.setAttribute('aria-expanded', 'false');
+        wrap.appendChild(menu);
+
+        // Polite live region so result counts and "no match" / "loading" hints
+        // are spoken without stealing focus. Kept OUTSIDE the listbox so the
+        // listbox only ever contains option rows (valid ARIA structure).
+        const live = document.createElement('span');
+        live.className = 'sr-only';
+        live.setAttribute('role', 'status');
+        live.setAttribute('aria-live', 'polite');
+        wrap.appendChild(live);
+
+        let matches = [];
+        let active = -1;
+
+        function setExpanded(on) { input.setAttribute('aria-expanded', on ? 'true' : 'false'); }
+
+        function close() {
+          menu.hidden = true;
+          active = -1;
+          setExpanded(false);
+          input.removeAttribute('aria-activedescendant');
+        }
+
+        function clearMenu() { while (menu.firstChild) menu.removeChild(menu.firstChild); }
+
+        function note(text) {
+          clearMenu();
+          const n = document.createElement('div');
+          n.className = 'geo-search-empty';
+          // Presentational: the hint is mirrored into the live region below, so
+          // marking it presentation avoids a double announcement and keeps the
+          // listbox free of non-option children.
+          n.setAttribute('role', 'presentation');
+          n.textContent = text;
+          menu.appendChild(n);
+          menu.hidden = false;
+          setExpanded(true);
+          input.removeAttribute('aria-activedescendant');
+          live.textContent = text;
+        }
+
+        function choose(city) {
+          // Store the real coordinates in dataset.latlon so readInputLatLon()
+          // can find them even though the visible value is a city name.
+          input.dataset.latlon = city.lat.toFixed(4) + ',' + city.lon.toFixed(4);
+          // Build a friendly label: "Concord, NH, US" or "Paris, FR".
+          // Skip numeric admin1 codes — they mean nothing to a reader.
+          const admin1 = city.admin1 && !/^\d+$/.test(city.admin1) ? city.admin1 : null;
+          const parts = [city.name];
+          if (admin1) parts.push(admin1);
+          parts.push(city.country);
+          const label = parts.join(', ');
+          input.dataset.cityLabel = label;
+          input.value = label;
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+          close();
+        }
+
+        function render() {
+          clearMenu();
+          if (!matches.length) { close(); return; }
+          matches.forEach(function (c, i) {
+            const item = document.createElement('div');
+            item.className = 'geo-search-item' + (i === active ? ' active' : '');
+            item.id = input.id + '-opt-' + i;
+            item.setAttribute('role', 'option');
+            item.setAttribute('aria-selected', i === active ? 'true' : 'false');
+            const name = document.createElement('span');
+            name.className = 'gs-name';
+            name.textContent = c.name;
+            const meta = document.createElement('span');
+            meta.className = 'gs-meta';
+            // Build "NH, US · 43k" or "NSW, AU · 210k" or "FR · 2M".
+            // Only show admin1 when it's alphabetic — numeric GeoNames codes
+            // (e.g. "08" for Argentine provinces) aren't useful to readers.
+            const admin1Display = c.admin1 && !/^\d+$/.test(c.admin1) ? c.admin1 : null;
+            const locationParts = [];
+            if (admin1Display) locationParts.push(admin1Display);
+            if (c.country) locationParts.push(c.country);
+            const locationStr = locationParts.join(', ');
+            meta.textContent = locationStr + (c.population ? ' · ' + fmtPop(c.population) : '');
+            item.appendChild(name);
+            item.appendChild(meta);
+            // mousedown (not click) fires before the input's blur closes us.
+            item.addEventListener('mousedown', function (e) { e.preventDefault(); choose(c); });
+            menu.appendChild(item);
+          });
+          menu.hidden = false;
+          setExpanded(true);
+          // Point the combobox at the highlighted option so AT announces it as
+          // the user arrows through, while real focus stays in the input.
+          if (active >= 0) input.setAttribute('aria-activedescendant', input.id + '-opt-' + active);
+          else input.removeAttribute('aria-activedescendant');
+        }
+
+        function update() {
+          const v = input.value;
+          // No letters → user is typing coordinates; stay out of the way.
+          if (!/[a-z]/i.test(v)) { close(); return; }
+          const res = searchCities(v, 8);
+          if (res === null) { note('Loading city database…'); return; }
+          matches = res;
+          active = res.length ? 0 : -1;
+          if (!res.length) { note('No match — try fewer letters, or type "lat, lon".'); return; }
+          render();
+          // Announce once when the list (re)appears; arrow-key moves are spoken
+          // via aria-activedescendant, so don't repeat the count on every move.
+          live.textContent = res.length + (res.length === 1 ? ' suggestion' : ' suggestions') + '. Use up and down arrows, Enter to choose.';
+        }
+
+        // Clear stored city coords as soon as the user starts typing again —
+        // they are editing freely, not relying on the cached city pick.
+        input.addEventListener('input', function () {
+          delete input.dataset.latlon;
+          delete input.dataset.cityLabel;
+        });
+        input.addEventListener('input', debounce(update, 80));
+        input.addEventListener('focus', function () {
+          if (/[a-z]/i.test(input.value)) update();
+        });
+        input.addEventListener('blur', function () { setTimeout(close, 120); });
+        input.addEventListener('keydown', function (e) {
+          if (menu.hidden || !matches.length) return;
+          if (e.key === 'ArrowDown') { e.preventDefault(); active = Math.min(active + 1, matches.length - 1); render(); }
+          else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(active - 1, 0); render(); }
+          else if (e.key === 'Enter') { if (matches[active]) { e.preventDefault(); choose(matches[active]); } }
+          else if (e.key === 'Escape') { close(); }
+        });
+      }
+
+      function wireCitySearch() {
+        ['tp-a-input', 'tp-b-input', 'tp-p-input', 'poly-anchor-input', 'curve-p-input']
+          .forEach(function (id) { attachCitySearch(document.getElementById(id)); });
+        // Build the search index as soon as the dataset is in memory so the
+        // first keystroke is instant rather than paying the 169k-name cost.
+        if (window.GeopuestoCitiesResolved) {
+          ensureCityIndex();
+        } else {
+          window.addEventListener('geopuesto:cities-ready', function () { ensureCityIndex(); }, { once: true });
+        }
+      }
+
+      // ---------------------------------------------------------------
+      // Boot
+      // ---------------------------------------------------------------
+      wireSprintC();
+      bindTwoPointInputs();
+      bindPolyhedraInputs();
+      bindCurvesInputs();
+      bindAnalysisInputs();
+      wireCitySearch();
+      renderTwoPoint();
+      renderCrossTrack();
+      renderPolyhedra();
+      renderCurves();
+
+      // -------------------------------------------------------------
+      // ?debug=1 — runtime invariant battery (V2_PLAN.md §6)
+      // -------------------------------------------------------------
+      // Append ?debug=1 to the URL to run a batch of math sanity checks
+      // on page load. Results print to console; failures surface in a
+      // visible banner so you can't miss them. Cheap (<50ms total) but
+      // catches catalog typos, normalization slips, and edge-case math
+      // regressions instantly.
+      function runDebugInvariants() {
+        const tests = [];
+        function test(label, pass, detail) { tests.push({ label, pass, detail: detail || '' }); }
+
+        // Geometry kernel invariants
+        const G = window.Geometry;
+        const TP = window.TwoPoint;
+        const Bx = window.Bearings;
+
+        // Two-Point: Boston → Tokyo arc distance ≈ 10800 km
+        const d = TP.derive({ lat: 42.36, lon: -71.06 }, { lat: 35.69, lon: 139.69 });
+        test('Boston→Tokyo arc ~10800 km', Math.abs(d.distanceKm - 10800) < 200,
+             'got ' + d.distanceKm.toFixed(1) + ' km');
+
+        // Bearings: equator due-east = 90°, meridian-along asymmetry = 0
+        const eastB = Bx.initial({ lat: 0, lon: 0 }, { lat: 0, lon: 1 });
+        test('Bearings: equator due-east = 90°', Math.abs(eastB - 90) < 1e-6,
+             'got ' + eastB.toFixed(6) + '°');
+        const merP = Bx.pair({ lat: 0, lon: 0 }, { lat: 60, lon: 0 });
+        test('Bearings: along-meridian asymmetry = 0', Math.abs(merP.asymmetryDeg) < 1e-6,
+             'got ' + merP.asymmetryDeg.toExponential(2));
+
+        // Small circle: 360 samples at distance d_km from P all at angular
+        // distance d_km / R from P.
+        const P = { lat: 42.5, lon: -70.9 };
+        const dRad = 2000 / G.EARTH_R_KM;
+        const sc = G.sampleSmallCircle(P, dRad, 60);
+        const pX = G.latLonToXYZ(P.lat, P.lon);
+        let scMaxErr = 0;
+        for (const [lat, lon] of sc) {
+          const q = G.latLonToXYZ(lat, lon);
+          const arc = Math.acos(G.clamp(G.dot(pX, q), -1, 1));
+          const err = Math.abs(arc - dRad);
+          if (err > scMaxErr) scMaxErr = err;
+        }
+        test('Small circle samples at correct angular distance',
+             scMaxErr < 1e-10, 'max err ' + scMaxErr.toExponential(2) + ' rad');
+
+        // Loxodrome: due-east rhumb stays at constant latitude
+        const lox = G.sampleLoxodrome({ lat: 30, lon: 0 }, 90, 5000, 20);
+        let loxMaxLatErr = 0;
+        for (const [lat, lon] of lox) {
+          const err = Math.abs(lat - 30);
+          if (err > loxMaxLatErr) loxMaxLatErr = err;
+        }
+        test('Loxodrome: due-east stays at constant latitude',
+             loxMaxLatErr < 1e-10, 'max lat err ' + loxMaxLatErr.toExponential(2) + '°');
+
+        // ShapeEngine: every catalog shape resolves to its declared vertexCount
+        // with all vertices on the unit sphere. Async; gated by .ready.
+        window.ShapeEngine.ready.then(function () {
+          const shapes = window.ShapeEngine.listShapes();
+          let allShapeOk = true;
+          const shapeErrs = [];
+          for (const s of shapes) {
+            const params = s.id === 'fibonacciSphere' ? { N: 100 } :
+                           s.id === 'geodesicIcosahedron' ? { k: 2 } :
+                           s.id === 'nPrism' || s.id === 'nAntiprism' ? { n: 6 } : undefined;
+            const cfg = window.ShapeEngine.configure(s.id, { lat: 0, lon: 0 }, 0, params);
+            // Vertex count: skip for parametric where default-N differs.
+            // Unit-sphere check: every vertex's lat/lon should round-trip to a unit vector.
+            let maxErr = 0;
+            for (const v of cfg.vertices) {
+              const xyz = G.latLonToXYZ(v.lat, v.lon);
+              const norm = Math.sqrt(xyz[0]*xyz[0] + xyz[1]*xyz[1] + xyz[2]*xyz[2]);
+              const err = Math.abs(norm - 1);
+              if (err > maxErr) maxErr = err;
+            }
+            if (maxErr > 1e-9) { allShapeOk = false; shapeErrs.push(s.id + ': max norm err ' + maxErr.toExponential(2)); }
+          }
+          test('All ' + shapes.length + ' catalog shapes have unit-length vertices',
+               allShapeOk, shapeErrs.join('; '));
+
+          // Final report.
+          const failed = tests.filter(function (t) { return !t.pass; });
+          const passed = tests.length - failed.length;
+          console.log('%c[?debug=1] ' + passed + '/' + tests.length + ' invariants passed.',
+                       'font-weight:bold;color:' + (failed.length ? '#ff5a4a' : '#00bfa5'));
+          for (const t of tests) {
+            console.log((t.pass ? '✓' : '✗') + ' ' + t.label + (t.detail ? ' — ' + t.detail : ''));
+          }
+          // Visible banner.
+          const banner = document.createElement('div');
+          banner.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:8px 16px;' +
+            'font-family:var(--mono);font-size:12px;z-index:10000;color:#0a0e14;' +
+            'background:' + (failed.length ? '#ff5a4a' : '#00bfa5') + ';';
+          banner.textContent = '[debug] ' + passed + '/' + tests.length + ' invariants pass' +
+            (failed.length ? ' · FAILURES: ' + failed.map(function (t) { return t.label; }).join(', ') : '') +
+            ' · click to dismiss';
+          banner.addEventListener('click', function () { banner.remove(); });
+          document.body.appendChild(banner);
+        });
+      }
+      if (new URLSearchParams(window.location.search).get('debug') === '1') {
+        runDebugInvariants();
+      }
+
+    })();
+  </script>
+</body>
+</html>

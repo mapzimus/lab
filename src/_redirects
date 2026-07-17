@@ -1,3 +1,6 @@
 https://www.mapzimus.com/* https://mapzimus.com/:splat 301
-/max/* https://mapzimus.github.io/max/:splat 302
-/tool/:slug https://mapzimus.github.io/max/:slug.html 302
+/max/:slug.html /:slug/ 301
+/tool/:slug /:slug/ 301
+/tools/:slug /:slug/ 301
+/flipgame /flip-game/ 301
+/flipgame/* /flip-game/:splat 301

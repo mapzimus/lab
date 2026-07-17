@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Generator</title>
+<meta name="description" content="Generate realistic fake data from a custom layout and export as CSV or JSON. Reproducible with a seed. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .grid { display: grid; grid-template-columns: minmax(0,460px) minmax(0,1fr); gap: 20px; align-items: start; }
+  @media (max-width: 960px) { .grid { grid-template-columns: minmax(0,1fr); } }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .cap { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+
+  input, select { font-family: var(--sans); font-size: .88rem; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; }
+  input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  input.num { width: 76px; }
+
+  .fields { display: flex; flex-direction: column; gap: 8px; }
+  .field { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto; gap: 6px; align-items: center; }
+  .field .opts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 2px 0 6px 2px; }
+  .field .opts label { font-size: .76rem; color: var(--muted); display: inline-flex; align-items: center; gap: 4px; }
+  .field .opts input { padding: 5px 7px; }
+  .field .name { width: 100%; font-family: var(--mono); }
+  .field .type { width: 100%; }
+  .iconbtn { border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 1rem; line-height: 1; }
+  .iconbtn:hover { color: var(--danger); border-color: var(--danger); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 13px; font-size: .85rem; cursor: pointer; display:inline-flex; align-items:center; gap:6px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+
+  .toolrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  .toolrow label { font-size: .8rem; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; }
+
+  .previewwrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; max-height: 320px; overflow-y: auto; }
+  table.prev { border-collapse: collapse; width: 100%; font-size: .8rem; font-family: var(--mono); }
+  table.prev th, table.prev td { border: 1px solid var(--border); padding: 5px 8px; text-align: left; white-space: nowrap; }
+  table.prev th { position: sticky; top: 0; background: var(--surface-2); z-index: 1; }
+
+  textarea#out { width: 100%; min-height: 240px; font-family: var(--mono); font-size: .8rem; white-space: pre; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+  .outbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
+  .outbar .spacer { flex: 1; }
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  footer.app { margin-top: 20px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Data Generator</h1>
+      <p>Set up your columns, generate realistic fake data, and export as CSV or JSON. Reproducible with a seed. Everything runs in your browser — no data leaves it.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="grid">
+    <!-- ---- Schema ---- -->
+    <section class="panel">
+      <div class="cap">Columns</div>
+      <div class="fields" id="fields"></div>
+      <div class="toolrow">
+        <button class="btn" id="addField">+ Add field</button>
+      </div>
+      <div class="toolrow" style="margin-top:14px; border-top:1px solid var(--border); padding-top:14px;">
+        <label>Rows <input class="num" id="rowCount" type="number" min="1" max="5000" value="25"></label>
+        <label>Seed <input id="seed" style="width:120px" placeholder="(random)" title="Same seed = same data every time"></label>
+        <button class="btn primary" id="genBtn">⚡ Generate</button>
+      </div>
+      <p class="note" id="schemaNote"></p>
+    </section>
+
+    <!-- ---- Output ---- -->
+    <section class="panel">
+      <div class="cap">Output</div>
+      <div class="previewwrap"><table class="prev" id="preview"></table></div>
+      <div class="outbar">
+        <label>Format
+          <select id="format">
+            <option value="csv">CSV</option>
+            <option value="json">JSON</option>
+          </select>
+        </label>
+        <span class="spacer"></span>
+        <button class="btn" id="copyBtn">⧉ Copy</button>
+        <button class="btn" id="downloadBtn">⬇ Download</button>
+      </div>
+      <textarea id="out" spellcheck="false" readonly aria-label="Generated data output"></textarea>
+      <p class="note" id="outNote"></p>
+    </section>
+  </div>
+
+  <footer class="app">a <strong>max</strong> tool · fake data for testing only</footer>
+</div>
+
+<script type="module">
+/* ============================================================
+   Data Generator — standalone, client-side, no deps.
+   ============================================================ */
+const $ = (s) => document.querySelector(s);
+
+// ---------- seeded PRNG (mulberry32) ----------
+function hashSeed(str){ let h = 1779033703 ^ str.length; for (let i=0;i<str.length;i++){ h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h<<13 | h>>>19; } return (h>>>0); }
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a>>>15, 1 | a); t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t; return ((t ^ t>>>14) >>> 0) / 4294967296; }; }
+let rng = Math.random;
+const ri = (min,max) => Math.floor(rng()*(max-min+1))+min;         // inclusive int
+const pick = (arr) => arr[Math.floor(rng()*arr.length)];
+
+// ---------- data pools ----------
+const FIRST = ['James','Mary','John','Patricia','Robert','Jennifer','Michael','Linda','David','Elizabeth','William','Barbara','Richard','Susan','Joseph','Jessica','Thomas','Sarah','Charles','Karen','Aisha','Wei','Sofia','Omar','Yuki','Ingrid','Mateo','Priya','Kwame','Lena','Diego','Noor','Hana','Tariq','Freya','Kai','Amara','Nikolai','Zara','Bjorn'];
+const LAST = ['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Rodriguez','Martinez','Hernandez','Lopez','Gonzalez','Wilson','Anderson','Thomas','Taylor','Moore','Jackson','Martin','Nguyen','Kim','Patel','Okafor','Rossi','Novak','Haddad','Suzuki','Andersson','Costa','Ivanov','Mensah','Khan','Sato','Dubois','Silva','Cohen','Fischer','Reyes','Larsen'];
+const DOMAINS = ['example.com','mail.com','test.org','demo.net','inbox.io','acme.co','mailinator.com','sample.dev'];
+const COMPANY_STEMS = ['Apex','Nova','Vertex','Summit','Horizon','Cascade','Aurora','Zenith','Quantum','Stellar','Fusion','Catalyst','Beacon','Compass','Harbor','Evergreen','Ironwood','Clearwater','Silverline','Northwind','Cornerstone','Redwood','Atlas','Meridian','Lumen'];
+const COMPANY_SUFFIXES = ['Labs','Group','Co','Industries','Systems','Studio','Works','Partners','& Sons'];
+const JOB_LEVELS = ['Junior ','Senior ','Lead ','Staff ',''];
+const JOBS = ['Engineer','Designer','Analyst','Manager','Developer','Consultant','Director','Coordinator','Specialist','Administrator','Architect','Strategist','Scientist','Technician','Officer','Teacher','Accountant','Editor','Researcher','Recruiter'];
+const CITIES = ['Tokyo','Osaka','Seoul','Beijing','Shanghai','Hong Kong','Singapore','Bangkok','Jakarta','Mumbai','Delhi','Bangalore','Dubai','Istanbul','Cairo','Lagos','Nairobi','Cape Town','Athens','Rome','Milan','Madrid','Barcelona','Lisbon','Paris','London','Dublin','Amsterdam','Brussels','Berlin','Munich','Vienna','Zurich','Prague','Warsaw','Budapest','Stockholm','Oslo','Copenhagen','New York','Los Angeles','Chicago','Houston','San Francisco','Seattle','Boston','Denver','Austin','Toronto','Vancouver','Montreal','Mexico City','São Paulo','Rio de Janeiro','Buenos Aires','Lima','Bogotá','Santiago','Sydney','Melbourne','Auckland'];
+const COUNTRIES = ['United States','Canada','United Kingdom','Germany','France','Japan','Brazil','India','Nigeria','Sweden','Norway','Australia','Mexico','Portugal','Kenya','Colombia','New Zealand','Spain','Italy','Netherlands'];
+const STREET_NAMES = ['Main','Oak','Maple','Cedar','Pine','Elm','Washington','Park','Lake','Hill','River','Sunset','Highland','Church','Walnut','Chestnut','Willow','Birch','Spring','Franklin','Jefferson','Madison','Lincoln','Meadow','Forest','Ridge','Valley','Garden','Prospect','Union'];
+const STREET_SUFFIXES = ['St','Ave','Rd','Blvd','Ln','Dr','Way','Ct'];
+const WORDS = ['the','a','quiet','bright','morning','evening','light','river','wind','garden','harbor','city','path','stone','summer','winter','autumn','meadow','forest','mountain','valley','cloud','rain','sun','moon','shadow','window','door','table','coffee','letter','story','music','voice','gentle','slow','steady','soft','warm','cold','open','early','golden','distant','moves','waits','grows','turns','returns','follows','carries','drifts','settles','between','through','along','toward','around','again','still','almost','together','over','under','near','beyond'];
+
+// ---------- field types ----------
+const TYPES = {
+  id:        { label:'Row number', opts:[{k:'start',t:'num',d:1}] },
+  uuid:      { label:'Unique ID' },
+  firstName: { label:'First name' },
+  lastName:  { label:'Last name' },
+  fullName:  { label:'Full name' },
+  email:     { label:'Email' },
+  username:  { label:'Username' },
+  phone:     { label:'Phone number' },
+  company:   { label:'Company' },
+  jobTitle:  { label:'Job title' },
+  city:      { label:'City' },
+  country:   { label:'Country' },
+  street:    { label:'Street address' },
+  zip:       { label:'Postal code' },
+  lat:       { label:'Latitude' },
+  lng:       { label:'Longitude' },
+  date:      { label:'Date', opts:[{k:'from',t:'text',d:'2020-01-01'},{k:'to',t:'text',d:'2025-12-31'}] },
+  datetime:  { label:'Date & time', opts:[{k:'from',t:'text',d:'2020-01-01'},{k:'to',t:'text',d:'2025-12-31'}] },
+  int:       { label:'Number (whole)', opts:[{k:'min',t:'num',d:0},{k:'max',t:'num',d:100}] },
+  decimal:   { label:'Number (decimal)', opts:[{k:'min',t:'num',d:0},{k:'max',t:'num',d:1000},{k:'places',t:'num',d:2}] },
+  price:     { label:'Price', opts:[{k:'min',t:'num',d:1},{k:'max',t:'num',d:500},{k:'symbol',t:'text',d:'$'}] },
+  bool:      { label:'Yes / No' },
+  color:     { label:'Color code' },
+  list:      { label:'Custom list', opts:[{k:'values',t:'text',d:'red, green, blue'}] },
+  sentence:  { label:'Sentence' },
+};
+
+function genValue(type, opts, i){
+  switch(type){
+    case 'id':        return (parseInt(opts.start,10)||1) + i;
+    case 'uuid':      return uuid4();
+    case 'firstName': return pick(FIRST);
+    case 'lastName':  return pick(LAST);
+    case 'fullName':  return pick(FIRST) + ' ' + pick(LAST);
+    case 'email':     return (pick(FIRST) + '.' + pick(LAST) + (rng()<0.4?ri(1,99):'')).toLowerCase().replace(/[^a-z0-9.]/g,'') + '@' + pick(DOMAINS);
+    case 'username':  return (pick(FIRST).toLowerCase() + pick(LAST).toLowerCase().slice(0,4) + ri(1,999)).replace(/[^a-z0-9]/g,'');
+    case 'phone':     return `(${ri(200,989)}) ${ri(200,989)}-${String(ri(0,9999)).padStart(4,'0')}`;
+    case 'company':   return pick(COMPANY_STEMS) + ' ' + pick(COMPANY_SUFFIXES);
+    case 'jobTitle':  return pick(JOB_LEVELS) + pick(JOBS);
+    case 'city':      return pick(CITIES);
+    case 'country':   return pick(COUNTRIES);
+    case 'street':    return `${ri(1,9999)} ${pick(STREET_NAMES)} ${pick(STREET_SUFFIXES)}`;
+    case 'zip':       return String(ri(10000,99999));
+    case 'lat':       return +(rng()*180-90).toFixed(6);
+    case 'lng':       return +(rng()*360-180).toFixed(6);
+    case 'date':      return randDate(opts.from,opts.to).toISOString().slice(0,10);
+    case 'datetime':  return randDate(opts.from,opts.to).toISOString().slice(0,19)+'Z';
+    case 'int':       { const a=+opts.min||0, b=+opts.max||0; return ri(Math.min(a,b),Math.max(a,b)); }
+    case 'decimal':   { const a=+opts.min||0, b=+opts.max||0, p=Math.max(0,+opts.places||0); return +(rng()*(Math.max(a,b)-Math.min(a,b))+Math.min(a,b)).toFixed(p); }
+    case 'price':     { const a=+opts.min||0, b=+opts.max||0; return (opts.symbol ?? '$') + (rng()*(Math.max(a,b)-Math.min(a,b))+Math.min(a,b)).toFixed(2); }
+    case 'bool':      return rng()<0.5;
+    case 'color':     return '#'+Array.from({length:6},()=>'0123456789abcdef'[ri(0,15)]).join('');
+    case 'list':      { const v=(opts.values||'').split(',').map(s=>s.trim()).filter(Boolean); return v.length?pick(v):''; }
+    case 'sentence':  { const n=ri(6,14); const s=Array.from({length:n},()=>pick(WORDS)).join(' '); return s.charAt(0).toUpperCase()+s.slice(1)+'.'; }
+    default: return '';
+  }
+}
+function uuid4(){ return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{ const r=ri(0,15); const v=c==='x'?r:(r&0x3|0x8); return v.toString(16); }); }
+function randDate(from,to){ const a=Date.parse(from||'2020-01-01')||Date.parse('2020-01-01'); const b=Date.parse(to||'2025-12-31')||Date.parse('2025-12-31'); return new Date(Math.min(a,b)+rng()*Math.abs(b-a)); }
+
+// ---------- schema state ----------
+let fields = [
+  { name:'ID',         type:'id',        opts:{start:1} },
+  { name:'First Name', type:'firstName', opts:{} },
+  { name:'Last Name',  type:'lastName',  opts:{} },
+  { name:'Email',      type:'email',     opts:{} },
+  { name:'Country',    type:'country',   opts:{} },
+  { name:'Signup Date',type:'date',      opts:{from:'2020-01-01',to:'2025-12-31'} },
+  { name:'Age',        type:'int',       opts:{min:18,max:80} },
+  { name:'Active',     type:'bool',      opts:{} },
+];
+let lastRows = [];
+
+// ---------- render schema ----------
+function typeOptions(sel){ return Object.entries(TYPES).map(([k,v])=>`<option value="${k}"${k===sel?' selected':''}>${v.label}</option>`).join(''); }
+function renderFields(){
+  const wrap = $('#fields'); wrap.innerHTML = '';
+  fields.forEach((f, idx) => {
+    const el = document.createElement('div'); el.className = 'field';
+    const optSpecs = TYPES[f.type].opts || [];
+    const optsHtml = optSpecs.map(o => `<label>${o.k} <input data-opt="${o.k}" data-fi="${idx}" ${o.t==='num'?'type="number"':''} value="${f.opts[o.k] ?? o.d}" style="width:${o.t==='num'?'70px':'140px'}"></label>`).join('');
+    const emptyHtml = `<label title="Chance each row leaves this blank"><input type="number" min="0" max="100" data-empty="${idx}" value="${f.pctEmpty ?? 0}" style="width:62px">% empty</label>`;
+    el.innerHTML = `
+      <input class="name" data-name="${idx}" value="${f.name}" spellcheck="false">
+      <select class="type" data-type="${idx}">${typeOptions(f.type)}</select>
+      <button class="iconbtn" data-del="${idx}" title="Remove field"${fields.length<=1?' disabled style="opacity:.4"':''}>✕</button>
+      <div class="opts">${optsHtml}${emptyHtml}</div>
+    `;
+    wrap.appendChild(el);
+  });
+}
+
+$('#fields').addEventListener('input', (e) => {
+  const el = e.target;
+  if (el.dataset.name != null) fields[+el.dataset.name].name = el.value;
+  else if (el.dataset.empty != null) fields[+el.dataset.empty].pctEmpty = Math.max(0, Math.min(100, parseInt(el.value,10) || 0));
+  else if (el.dataset.opt != null) fields[+el.dataset.fi].opts[el.dataset.opt] = el.value;
+});
+$('#fields').addEventListener('change', (e) => {
+  const el = e.target;
+  if (el.dataset.type != null){
+    const i = +el.dataset.type; fields[i].type = el.value; fields[i].opts = {};
+    (TYPES[el.value].opts||[]).forEach(o => fields[i].opts[o.k] = o.d);
+    renderFields();
+  }
+});
+$('#fields').addEventListener('click', (e) => {
+  const d = e.target.dataset.del;
+  if (d != null && fields.length > 1){ fields.splice(+d,1); renderFields(); }
+});
+let fieldCounter = 0;
+$('#addField').addEventListener('click', () => { fieldCounter++; fields.push({ name:'Field '+fieldCounter, type:'firstName', opts:{}, pctEmpty:0 }); renderFields(); });
+
+// ---------- generate ----------
+function generate(){
+  const count = Math.max(1, Math.min(5000, parseInt($('#rowCount').value,10) || 1));
+  $('#rowCount').value = count;
+  const seedStr = $('#seed').value.trim();
+  rng = seedStr ? mulberry32(hashSeed(seedStr)) : Math.random;
+
+  const names = fields.map(f => f.name || 'field');
+  const rows = [];
+  for (let i=0;i<count;i++){
+    const row = {};
+    fields.forEach(f => {
+      let v = genValue(f.type, f.opts, i);
+      const pe = +f.pctEmpty || 0;                    // skip-roll AFTER the value, only when > 0, so seeds stay reproducible
+      if (pe > 0 && rng()*100 < pe) v = null;         // blank: '' in CSV, null in JSON
+      row[f.name || 'field'] = v;
+    });
+    rows.push(row);
+  }
+  lastRows = rows;
+  $('#schemaNote').textContent = `Generated ${count} rows${seedStr?` (seed "${seedStr}")`:''}.`;
+  renderPreview(names, rows);
+  renderOutput();
+}
+
+function renderPreview(names, rows){
+  const t = $('#preview');
+  const head = '<thead><tr>' + names.map(n=>`<th>${escHtml(n)}</th>`).join('') + '</tr></thead>';
+  const body = '<tbody>' + rows.slice(0,12).map(r => '<tr>' + names.map(n=>`<td>${escHtml(fmtCell(r[n]))}</td>`).join('') + '</tr>').join('') + '</tbody>';
+  t.innerHTML = head + body;
+}
+function fmtCell(v){ return v==null?'':v===true?'true':v===false?'false':String(v); }
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ---------- formats ----------
+function renderOutput(){
+  const fmt = $('#format').value;
+  const names = fields.map(f => f.name || 'field');
+  let text = '';
+  if (fmt === 'json') text = toJSON(lastRows);
+  else if (fmt === 'csv') text = toCSV(names, lastRows);
+  $('#out').value = text;
+  $('#outNote').classList.remove('err');
+  $('#outNote').textContent = `${lastRows.length} rows · ${fmt.toUpperCase()} · ${text.length.toLocaleString()} chars`;
+}
+function toJSON(rows){ return JSON.stringify(rows, null, 2); }
+function toCSV(names, rows){
+  const esc = (v) => { const s = fmtCell(v); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+  return [names.join(','), ...rows.map(r => names.map(n => esc(r[n])).join(','))].join('\n');
+}
+$('#format').addEventListener('change', renderOutput);
+$('#genBtn').addEventListener('click', generate);
+
+// ---------- copy / download ----------
+$('#copyBtn').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText($('#out').value);
+    const b=$('#copyBtn'); b.classList.add('copied'); const o=b.innerHTML; b.textContent='✓ Copied'; setTimeout(()=>{b.classList.remove('copied');b.innerHTML=o;},1100);
+    if ($('#outNote').classList.contains('err')) renderOutput();
+  }
+  catch(e){ const n=$('#outNote'); n.classList.add('err'); n.textContent='Copy failed — your browser blocked clipboard access. Select the text above and copy it manually.'; }
+});
+$('#downloadBtn').addEventListener('click', () => {
+  const fmt = $('#format').value;
+  const mime = fmt==='json'?'application/json':'text/csv';
+  const blob = new Blob([$('#out').value], { type: mime });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'generated-data.'+fmt; a.click(); URL.revokeObjectURL(a.href);
+});
+
+// ---------- theme ----------
+const root = document.documentElement;
+const saved = localStorage.getItem('dg-theme');
+if (saved) root.setAttribute('data-theme', saved);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next); localStorage.setItem('dg-theme', next);
+});
+
+// ---------- boot ----------
+renderFields();
+generate();
+</script>
+</body>
+</html>

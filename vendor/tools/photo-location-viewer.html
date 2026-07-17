@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Photo Location Viewer</title>
+<meta name="description" content="Drop photos to see the GPS location hidden in their EXIF data, export it, or save clean copies with all metadata removed. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .privacy-banner {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--ok); border-radius: var(--radius);
+    padding: 10px 14px; margin: 0 0 16px; font-size: .88rem;
+  }
+  .privacy-banner .dot { flex: none; font-size: 1.05rem; }
+  .privacy-banner strong { color: var(--ok); }
+
+  .dropzone {
+    border: 2px dashed var(--border); border-radius: var(--radius); background: var(--surface);
+    padding: 36px 24px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .dropzone:hover, .dropzone.dragover { border-color: var(--accent); background: var(--surface-2); }
+  .dropzone:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .dropzone .big { font-size: 2rem; margin-bottom: 6px; }
+  .dropzone h2 { margin: 0 0 6px; font-size: 1.05rem; }
+  .dropzone p { margin: 0 auto; color: var(--muted); font-size: .88rem; max-width: 56ch; }
+  .dropzone p + p { margin-top: 6px; }
+  .dropzone .pick { margin-top: 14px; }
+
+  .note { font-size: .82rem; color: var(--muted); margin: 8px 0 0; }
+  .note.err { color: var(--danger); }
+
+  .toolbar {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+    margin: 18px 0 14px;
+  }
+  .summary { font-size: .92rem; color: var(--muted); margin-right: auto; }
+  .summary strong { color: var(--text); }
+
+  #mapSection { margin: 0 0 18px; }
+  #map, .map-fallback { height: 380px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
+  @media (max-width: 720px){ #map, .map-fallback { height: 280px; } }
+  .leaflet-container { font-family: var(--sans); background: var(--surface-2); }
+  .map-fallback { background: var(--surface-2); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .9rem; text-align: center; padding: 24px; }
+  .photo-pin {
+    background: var(--accent); color: var(--accent-ink);
+    border: 2px solid #fff; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: .8rem; box-shadow: 0 1px 4px rgba(0,0,0,.4);
+  }
+  .photo-pin.pin-selected { background: var(--danger); }
+  .popup-card { display: flex; gap: 8px; align-items: center; max-width: 220px; }
+  .popup-card img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; flex: none; image-orientation: from-image; }
+  .popup-card .pname { font-weight: 600; font-size: .82rem; word-break: break-all; }
+  .popup-card .pdate { font-size: .76rem; color: #61707f; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 12px; display: flex; gap: 12px;
+  }
+  .card.selected { border-color: var(--accent); outline: 2px solid var(--accent); outline-offset: -1px; }
+  .thumb-box { flex: none; position: relative; }
+  .thumb { width: 92px; height: 92px; object-fit: cover; border-radius: 8px; background: var(--surface-2); display: block; image-orientation: from-image; }
+  .thumb-num {
+    position: absolute; top: -7px; left: -7px; width: 22px; height: 22px;
+    background: var(--accent); color: var(--accent-ink); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: .74rem; font-weight: 700;
+  }
+  .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .fname { font-weight: 600; font-size: .88rem; word-break: break-all; }
+  .meta { font-size: .8rem; color: var(--muted); }
+  .gps { font-size: .82rem; font-family: var(--mono); }
+  .gps.has { color: var(--ok); }
+  .gps.none { color: var(--muted); font-family: var(--sans); }
+  .gps-btn { background: none; border: none; padding: 0; font: inherit; color: inherit; cursor: pointer; text-align: left; text-decoration: underline dotted; }
+  .gps-btn:hover { color: var(--accent); }
+  .card-actions { margin-top: auto; display: flex; gap: 6px; flex-wrap: wrap; padding-top: 6px; }
+  .card-actions .btn { padding: 5px 9px; font-size: .76rem; }
+  .card .remove { margin-left: auto; color: var(--muted); }
+  .card .remove:hover { color: var(--danger); border-color: var(--danger); }
+  @media (max-width: 720px) { .cards { grid-template-columns: 1fr; } }
+
+  .hide { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Photo Location Viewer</h1>
+      <p>Drop in photos to see exactly where they were taken — read straight from the hidden GPS data (EXIF) inside each file. Map it, export it, or save clean copies with the location wiped.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="privacy-banner" role="note">
+    <span class="dot" aria-hidden="true">🔒</span>
+    <span><strong>100% private:</strong> your photos never leave this device. Everything — reading, mapping, cleaning — happens right here in your browser. Nothing is uploaded, ever.</span>
+  </div>
+
+  <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Add photos: drop files here or press to browse">
+    <div class="big" aria-hidden="true">📷 🗺️</div>
+    <h2>Drop photos here</h2>
+    <p>Check what your photos reveal before you share them. Most phone cameras quietly stamp every shot with your exact GPS position, the date, and the device you used.</p>
+    <p>JPEG photos carry readable location data here; up to 100 at a time.</p>
+    <button class="btn primary pick" id="pickBtn" type="button">Choose photos…</button>
+    <input type="file" id="fileInput" accept="image/*" multiple class="hide" aria-hidden="true" tabindex="-1">
+    <p class="note err" id="inputNote"></p>
+  </div>
+
+  <div class="toolbar hide" id="toolbar">
+    <span class="summary" id="summary"></span>
+    <button class="btn" id="dlGeojson" type="button" title="GeoJSON FeatureCollection of the geotagged photos">⬇ GeoJSON</button>
+    <button class="btn" id="dlCsv" type="button" title="CSV of every photo (blank cells where data is missing)">⬇ CSV</button>
+    <button class="btn" id="cleanAll" type="button" title="Download a metadata-free copy of every photo">🧼 Save all clean copies</button>
+    <button class="btn" id="clearAll" type="button">✕ Clear</button>
+  </div>
+  <p class="note hide" id="exportNote"></p>
+
+  <section id="mapSection" class="hide" aria-label="Map of photo locations">
+    <div id="map"></div>
+  </section>
+
+  <div class="cards" id="cards"></div>
+  <p class="note" id="cleanNote" style="text-align:center" hidden>“Save clean copy” re-encodes the photo, which removes EXIF (including GPS). Slight quality loss.</p>
+
+  <footer class="app">Tip: photos shared through most messaging apps are stripped automatically — but email, cloud drives and many websites keep GPS data intact. · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+/* ============================================================
+   Photo Location Viewer — standalone, fully client-side.
+   Only dependency: Leaflet (background-loaded below).
+   EXIF/TIFF parsing implemented inline; no photo bytes ever
+   leave the browser.
+   ============================================================ */
+'use strict';
+const $ = (id) => document.getElementById(id);
+
+/* ---------------- Leaflet: background load with fallback ----------------
+   Injected at runtime so a slow or blocked CDN never freezes the tool.   */
+let leafletState = 'loading'; // 'loading' | 'ready' | 'failed'
+(function loadLeaflet() {
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+  css.crossOrigin = '';
+  document.head.appendChild(css);
+  const js = document.createElement('script');
+  js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  js.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+  js.crossOrigin = '';
+  js.onload = () => { leafletState = window.L ? 'ready' : 'failed'; renderMap(); };
+  js.onerror = () => { leafletState = 'failed'; renderMap(); };
+  document.head.appendChild(js);
+})();
+
+/* ============================================================
+   EXIF parser — pure JS, JPEG only, defensive.
+   Returns whatever it can read; never throws to the caller.
+   ============================================================ */
+const TYPE_SIZE = { 1: 1, 2: 1, 3: 2, 4: 4, 5: 8, 6: 1, 7: 1, 8: 2, 9: 4, 10: 8, 11: 4, 12: 8 };
+
+function extractExif(buf) {
+  const out = {};
+  try {
+    const dv = new DataView(buf);
+    if (dv.byteLength < 4 || dv.getUint16(0) !== 0xFFD8) return out; // not a JPEG
+    let off = 2;
+    while (off + 4 <= dv.byteLength) {
+      if (dv.getUint8(off) !== 0xFF) break;                    // lost sync — give up
+      const marker = dv.getUint8(off + 1);
+      if (marker === 0xFF) { off += 1; continue; }             // fill byte
+      if (marker === 0x01 || (marker >= 0xD0 && marker <= 0xD9)) { off += 2; continue; } // no payload
+      if (marker === 0xDA) break;                              // start of scan: no more metadata
+      const len = dv.getUint16(off + 2);
+      if (len < 2 || off + 2 + len > dv.byteLength) break;     // corrupted length
+      if (marker === 0xE1 && len >= 10 &&
+          dv.getUint32(off + 4) === 0x45786966 /* "Exif" */ &&
+          dv.getUint16(off + 8) === 0 /* "\0\0" */) {
+        parseTiff(dv, off + 10, off + 2 + len, out);
+        return out;
+      }
+      off += 2 + len;
+    }
+  } catch (e) { /* malformed EXIF: return what we have */ }
+  return out;
+}
+
+function parseTiff(dv, base, end, out) {
+  try {
+    if (base + 8 > end) return;
+    const bom = dv.getUint16(base);
+    let le;
+    if (bom === 0x4949) le = true;        // "II"
+    else if (bom === 0x4D4D) le = false;  // "MM"
+    else return;
+    if (dv.getUint16(base + 2, le) !== 42) return;
+
+    const u16 = (o) => { if (o < base || o + 2 > end) throw new RangeError('oob'); return dv.getUint16(o, le); };
+    const u32 = (o) => { if (o < base || o + 4 > end) throw new RangeError('oob'); return dv.getUint32(o, le); };
+
+    // Read one IFD into a tag → entry map (bounds-checked throughout).
+    function readIFD(rel) {
+      const entries = {};
+      const start = base + rel;
+      if (rel < 8 || start + 2 > end) return entries;
+      const n = Math.min(u16(start), 512);          // cap: garbage counts can't loop forever
+      for (let i = 0; i < n; i++) {
+        const e = start + 2 + i * 12;
+        if (e + 12 > end) break;
+        const tag = u16(e), type = u16(e + 2), count = u32(e + 4);
+        const sz = TYPE_SIZE[type];
+        if (!sz || count > 0x100000) continue;
+        const byteLen = sz * count;
+        const voff = byteLen <= 4 ? e + 8 : base + u32(e + 8);
+        if (voff < base || voff + byteLen > end) continue;
+        entries[tag] = { type, count, voff };
+      }
+      return entries;
+    }
+    const ascii = (ent) => {
+      if (!ent || ent.type !== 2) return null;
+      let s = '';
+      for (let i = 0; i < ent.count; i++) {
+        const c = dv.getUint8(ent.voff + i);
+        if (c === 0) break;
+        s += String.fromCharCode(c);
+      }
+      return s.trim() || null;
+    };
+    const firstNum = (ent) => {
+      if (!ent || !ent.count) return null;
+      if (ent.type === 3) return u16(ent.voff);
+      if (ent.type === 4) return u32(ent.voff);
+      if (ent.type === 1) return dv.getUint8(ent.voff);
+      return null;
+    };
+    const rationals = (ent, n) => {
+      if (!ent || ent.type !== 5 || ent.count < n) return null;
+      const vals = [];
+      for (let i = 0; i < n; i++) {
+        const num = u32(ent.voff + i * 8), den = u32(ent.voff + i * 8 + 4);
+        const v = num / den;
+        if (!isFinite(v)) return null;
+        vals.push(v);
+      }
+      return vals;
+    };
+
+    const ifd0 = readIFD(u32(base + 4));
+    try { out.orientation = firstNum(ifd0[0x0112]) || undefined; } catch (e) {}
+    try { out.make = ascii(ifd0[0x010F]) || undefined; } catch (e) {}
+    try { out.model = ascii(ifd0[0x0110]) || undefined; } catch (e) {}
+    try { out.dateTime = ascii(ifd0[0x0132]) || undefined; } catch (e) {}
+
+    // EXIF sub-IFD → DateTimeOriginal
+    try {
+      const p = ifd0[0x8769];
+      if (p && (p.type === 4 || p.type === 3)) {
+        const exifIfd = readIFD(p.type === 4 ? u32(p.voff) : u16(p.voff));
+        out.dateTimeOriginal = ascii(exifIfd[0x9003]) || undefined;
+      }
+    } catch (e) {}
+
+    // GPS sub-IFD → coordinates + altitude
+    try {
+      const p = ifd0[0x8825];
+      if (p && (p.type === 4 || p.type === 3)) {
+        const g = readIFD(p.type === 4 ? u32(p.voff) : u16(p.voff));
+        const latRef = ascii(g[1]), lat = rationals(g[2], 3);
+        const lngRef = ascii(g[3]), lng = rationals(g[4], 3);
+        if (lat && lng) {
+          let la = lat[0] + lat[1] / 60 + lat[2] / 3600;
+          let lo = lng[0] + lng[1] / 60 + lng[2] / 3600;
+          if (latRef && latRef.toUpperCase().startsWith('S')) la = -la;
+          if (lngRef && lngRef.toUpperCase().startsWith('W')) lo = -lo;
+          if (isFinite(la) && isFinite(lo) && Math.abs(la) <= 90 && Math.abs(lo) <= 180) {
+            out.lat = la; out.lng = lo;
+            const alt = rationals(g[6], 1);
+            if (alt) {
+              const ref = firstNum(g[5]);
+              out.altitude = ref === 1 ? -alt[0] : alt[0];
+            }
+          }
+        }
+      }
+    } catch (e) {}
+  } catch (e) { /* keep partial data */ }
+}
+
+/* ============================================================
+   App state
+   ============================================================ */
+const MAX_PHOTOS = 100;
+const photos = [];        // { id, file, name, url, exif, marker }
+let nextId = 1;
+let selectedId = null;
+let map = null;
+let mapFailedShown = false;
+
+const fmtDate = (raw) => {
+  // "2024:05:02 14:22:01" → "2024-05-02 14:22"
+  if (!raw) return null;
+  const m = String(raw).match(/^(\d{4}):(\d{2}):(\d{2})[ T](\d{2}):(\d{2})/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]} ${m[4]}:${m[5]}`;
+  return String(raw);
+};
+const cameraOf = (exif) => {
+  const make = exif.make || '', model = exif.model || '';
+  if (!make && !model) return null;
+  if (model.toLowerCase().startsWith(make.toLowerCase())) return model || make;
+  return (make + ' ' + model).trim();
+};
+const takenOf = (exif) => fmtDate(exif.dateTimeOriginal || exif.dateTime);
+const hasGPS = (p) => typeof p.exif.lat === 'number' && typeof p.exif.lng === 'number';
+const baseName = (name) => name.replace(/\.[^.]+$/, '') || 'photo';
+
+/* ---------------- file intake ---------------- */
+const isJpeg = (file, buf) => {
+  if (buf.byteLength >= 2) {
+    const dv = new DataView(buf);
+    if (dv.getUint16(0) === 0xFFD8) return true;
+  }
+  return false;
+};
+
+async function addFiles(fileList) {
+  const files = Array.from(fileList).filter(f => f && f.size > 0);
+  $('inputNote').textContent = '';
+  let skipped = 0;
+  for (const file of files) {          // sequential: one photo in memory at a time
+    if (photos.length >= MAX_PHOTOS) { skipped++; continue; }
+    let exif = {}, jpeg = false;
+    try {
+      const buf = await file.slice(0, 2 * 1024 * 1024).arrayBuffer(); // EXIF lives at the front
+      jpeg = isJpeg(file, buf);
+      if (jpeg) exif = extractExif(buf);
+    } catch (e) { /* unreadable file: keep card with no data */ }
+    photos.push({
+      id: nextId++, file, name: file.name || 'photo.jpg',
+      url: URL.createObjectURL(file), exif, jpeg, marker: null,
+    });
+  }
+  if (skipped) $('inputNote').textContent = `Limit is ${MAX_PHOTOS} photos — ${skipped} file${skipped > 1 ? 's' : ''} skipped.`;
+  renderAll();
+}
+
+const dz = $('dropzone');
+dz.addEventListener('click', (e) => { if (e.target.id !== 'fileInput') $('fileInput').click(); });
+dz.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('fileInput').click(); } });
+$('pickBtn').addEventListener('click', (e) => e.stopPropagation());
+['dragover', 'dragenter'].forEach(ev => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add('dragover'); }));
+['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove('dragover'); }));
+dz.addEventListener('drop', (e) => { if (e.dataTransfer && e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+$('fileInput').addEventListener('change', (e) => { addFiles(e.target.files); e.target.value = ''; });
+
+/* ---------------- rendering ---------------- */
+function renderAll() { renderCards(); renderSummary(); renderMap(); }
+
+function renderSummary() {
+  const n = photos.length;
+  $('toolbar').classList.toggle('hide', n === 0);
+  $('cleanNote').hidden = n === 0;
+  if (!n) { $('summary').textContent = ''; return; }
+  const withGps = photos.filter(hasGPS).length;
+  const dates = photos.map(p => takenOf(p.exif)).filter(Boolean).map(d => d.slice(0, 10)).sort();
+  let span = '';
+  if (dates.length === 1 || (dates.length && dates[0] === dates[dates.length - 1])) span = ` · taken ${dates[0]}`;
+  else if (dates.length) span = ` · spanning ${dates[0]} → ${dates[dates.length - 1]}`;
+  $('summary').innerHTML = `<strong>${n}</strong> photo${n > 1 ? 's' : ''} · <strong>${withGps}</strong> with location${span}`;
+  $('dlGeojson').disabled = withGps === 0;
+  $('dlGeojson').title = withGps === 0
+    ? 'No geotagged photos yet — GeoJSON needs at least one photo with GPS data'
+    : 'GeoJSON FeatureCollection of the geotagged photos';
+}
+
+function gpsLine(p) {
+  if (!p.jpeg) return { cls: 'none', text: 'No location data readable (only JPEG photos carry readable GPS here — HEIC, PNG and WebP can’t be scanned)' };
+  if (!hasGPS(p)) return { cls: 'none', text: 'No location data' };
+  let t = `📍 ${p.exif.lat.toFixed(5)}, ${p.exif.lng.toFixed(5)}`;
+  if (typeof p.exif.altitude === 'number') t += ` · ${Math.round(p.exif.altitude)} m`;
+  return { cls: 'has', text: t };
+}
+
+function renderCards() {
+  const box = $('cards');
+  box.innerHTML = '';
+  photos.forEach((p, i) => {
+    const card = document.createElement('article');
+    card.className = 'card' + (p.id === selectedId ? ' selected' : '');
+    card.dataset.id = p.id;
+
+    const tb = document.createElement('div');
+    tb.className = 'thumb-box';
+    const img = document.createElement('img');
+    img.className = 'thumb';
+    img.src = p.url;                                   // browser applies EXIF orientation (image-orientation: from-image)
+    img.alt = p.name;
+    img.addEventListener('error', () => { img.replaceWith(Object.assign(document.createElement('div'), { className: 'thumb', textContent: '🖼️', style: 'display:flex;align-items:center;justify-content:center;font-size:1.6rem' })); });
+    const num = document.createElement('span');
+    num.className = 'thumb-num';
+    num.textContent = i + 1;
+    tb.append(img, num);
+
+    const body = document.createElement('div');
+    body.className = 'card-body';
+    const fname = document.createElement('div');
+    fname.className = 'fname'; fname.textContent = p.name;
+    const taken = document.createElement('div');
+    taken.className = 'meta';
+    taken.textContent = '🕓 ' + (takenOf(p.exif) || 'Date unknown');
+    const cam = document.createElement('div');
+    cam.className = 'meta';
+    cam.textContent = '📷 ' + (cameraOf(p.exif) || 'Camera unknown');
+
+    const g = gpsLine(p);
+    const gps = document.createElement('div');
+    gps.className = 'gps ' + g.cls;
+    if (g.cls === 'has') {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'gps-btn';
+      btn.textContent = g.text;
+      btn.title = 'Show on map';
+      btn.setAttribute('aria-label', `Show ${p.name} on the map`);
+      btn.addEventListener('click', () => focusOnMap(p));
+      gps.appendChild(btn);
+    } else {
+      gps.textContent = g.text;
+    }
+
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+    const clean = document.createElement('button');
+    clean.type = 'button'; clean.className = 'btn';
+    clean.textContent = '⬇ Save clean copy';
+    clean.title = 'Re-encoding removes EXIF (including GPS). Slight quality loss.';
+    clean.addEventListener('click', async () => {
+      clean.disabled = true; clean.textContent = '⏳ Cleaning…';
+      const ok = await saveCleanCopy(p);
+      clean.disabled = false;
+      clean.textContent = ok ? '✓ Saved' : '✕ Couldn’t decode';
+      setTimeout(() => { clean.textContent = '⬇ Save clean copy'; }, 1600);
+    });
+    const rm = document.createElement('button');
+    rm.type = 'button'; rm.className = 'btn remove';
+    rm.textContent = '✕';
+    rm.setAttribute('aria-label', `Remove ${p.name}`);
+    rm.addEventListener('click', () => removePhoto(p.id));
+    actions.append(clean, rm);
+
+    body.append(fname, taken, cam, gps, actions);
+    card.append(tb, body);
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      selectPhoto(p.id, false);
+    });
+    box.appendChild(card);
+  });
+}
+
+function removePhoto(id) {
+  const i = photos.findIndex(p => p.id === id);
+  if (i === -1) return;
+  const p = photos[i];
+  URL.revokeObjectURL(p.url);                    // free memory
+  if (p.marker && map) map.removeLayer(p.marker);
+  p.marker = null;
+  photos.splice(i, 1);
+  if (selectedId === id) selectedId = null;
+  renderAll();
+}
+
+$('clearAll').addEventListener('click', () => {
+  photos.forEach(p => { URL.revokeObjectURL(p.url); if (p.marker && map) map.removeLayer(p.marker); });
+  photos.length = 0;
+  selectedId = null;
+  $('exportNote').classList.add('hide');
+  renderAll();
+});
+
+/* ---------------- selection sync (card ↔ marker) ---------------- */
+function selectPhoto(id, scrollCard) {
+  selectedId = id;
+  document.querySelectorAll('.card').forEach(c => c.classList.toggle('selected', Number(c.dataset.id) === id));
+  photos.forEach(p => {
+    if (p.marker) {
+      const el = p.marker.getElement();
+      if (el) {
+        const pin = el.querySelector('.photo-pin') || el;
+        pin.classList.toggle('pin-selected', p.id === id);
+      }
+    }
+  });
+  if (scrollCard) {
+    const card = document.querySelector(`.card[data-id="${id}"]`);
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function focusOnMap(p) {
+  selectPhoto(p.id, false);
+  if (!map || !p.marker) return;
+  $('mapSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  map.setView([p.exif.lat, p.exif.lng], Math.max(map.getZoom(), 12));
+  p.marker.openPopup();
+}
+
+/* ---------------- map ---------------- */
+function renderMap() {
+  const tagged = photos.filter(hasGPS);
+  const section = $('mapSection');
+  if (!tagged.length) {
+    section.classList.add('hide');
+    return;
+  }
+  section.classList.remove('hide');
+
+  if (leafletState === 'failed') {
+    if (!mapFailedShown) {
+      mapFailedShown = true;
+      const el = document.createElement('div');
+      el.className = 'map-fallback';
+      el.innerHTML = 'Map unavailable — the Leaflet library couldn’t load (CDN blocked or offline).<br>Coordinates, exports and metadata cleaning all still work.';
+      $('map').replaceWith(el);
+    }
+    return;
+  }
+  if (leafletState !== 'ready') return;   // still loading; will re-run on load
+
+  if (!map) {
+    map = L.map('map', { worldCopyJump: true });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+  }
+
+  // rebuild markers to keep numbering in sync with the cards
+  photos.forEach(p => { if (p.marker) { map.removeLayer(p.marker); p.marker = null; } });
+  const pts = [];
+  photos.forEach((p, i) => {
+    if (!hasGPS(p)) return;
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="photo-pin${p.id === selectedId ? ' pin-selected' : ''}" style="width:26px;height:26px">${i + 1}</div>`,
+      iconSize: [26, 26], iconAnchor: [13, 13], popupAnchor: [0, -14],
+    });
+    const m = L.marker([p.exif.lat, p.exif.lng], { icon, title: p.name });
+    const pop = document.createElement('div');
+    pop.className = 'popup-card';
+    const pi = document.createElement('img');
+    pi.src = p.url; pi.alt = '';
+    const pt = document.createElement('div');
+    const nm = document.createElement('div'); nm.className = 'pname'; nm.textContent = p.name;
+    const dt = document.createElement('div'); dt.className = 'pdate'; dt.textContent = takenOf(p.exif) || '';
+    pt.append(nm, dt);
+    pop.append(pi, pt);
+    m.bindPopup(pop);
+    m.on('click', () => selectPhoto(p.id, true));
+    m.addTo(map);
+    p.marker = m;
+    pts.push([p.exif.lat, p.exif.lng]);
+  });
+  map.invalidateSize();
+  if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.2), { maxZoom: 12 });
+}
+
+/* ---------------- downloads ---------------- */
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+$('dlGeojson').addEventListener('click', () => {
+  const tagged = photos.filter(hasGPS);
+  const note = $('exportNote');
+  if (!tagged.length) {
+    note.classList.remove('hide');
+    note.textContent = 'Nothing to export yet — none of these photos has GPS data.';
+    return;
+  }
+  note.classList.add('hide');
+  const fc = {
+    type: 'FeatureCollection',
+    features: tagged.map(p => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [Number(p.exif.lng.toFixed(6)), Number(p.exif.lat.toFixed(6))] },
+      properties: {
+        name: p.name,
+        taken: takenOf(p.exif),
+        camera: cameraOf(p.exif),
+        altitude: typeof p.exif.altitude === 'number' ? Number(p.exif.altitude.toFixed(1)) : null,
+      },
+    })),
+  };
+  downloadBlob(new Blob([JSON.stringify(fc, null, 2)], { type: 'application/geo+json' }), 'photo-locations.geojson');
+});
+
+$('dlCsv').addEventListener('click', () => {
+  const esc = (v) => {
+    if (v === null || v === undefined || v === '') return '';
+    const s = String(v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const rows = [['name', 'taken', 'camera', 'lat', 'lng', 'altitude']];
+  photos.forEach(p => rows.push([
+    p.name, takenOf(p.exif) || '', cameraOf(p.exif) || '',
+    hasGPS(p) ? p.exif.lat.toFixed(6) : '',
+    hasGPS(p) ? p.exif.lng.toFixed(6) : '',
+    typeof p.exif.altitude === 'number' ? p.exif.altitude.toFixed(1) : '',
+  ]));
+  const csv = rows.map(r => r.map(esc).join(',')).join('\r\n') + '\r\n';
+  downloadBlob(new Blob([csv], { type: 'text/csv' }), 'photo-locations.csv');
+});
+
+/* ---------------- metadata stripping (clean copies) ----------------
+   Re-encode through a canvas: pixels survive, every byte of metadata
+   (EXIF, GPS, thumbnails, XMP…) is dropped. Orientation is baked in
+   first, so the clean file displays upright everywhere.               */
+async function decodeUpright(p) {
+  try {
+    return await createImageBitmap(p.file, { imageOrientation: 'from-image' });
+  } catch (e) {
+    // Older engines: fall back to an <img> (browsers auto-orient these).
+    return await new Promise((res, rej) => {
+      const im = new Image();
+      im.onload = () => res(im);
+      im.onerror = rej;
+      im.src = p.url;
+    });
+  }
+}
+
+async function saveCleanCopy(p) {
+  try {
+    const src = await decodeUpright(p);
+    const w = src.width || src.naturalWidth, h = src.height || src.naturalHeight;
+    if (!w || !h) throw new Error('empty image');
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(src, 0, 0);
+    if (src.close) src.close();
+    const blob = await new Promise((res, rej) => canvas.toBlob(b => b ? res(b) : rej(new Error('encode failed')), 'image/jpeg', 0.92));
+    downloadBlob(blob, baseName(p.name) + '-clean.jpg');
+    return true;
+  } catch (e) {
+    return false;   // e.g. HEIC the browser can't decode
+  }
+}
+
+$('cleanAll').addEventListener('click', async () => {
+  const btn = $('cleanAll');
+  btn.disabled = true;
+  let done = 0;
+  for (const p of photos.slice()) {
+    btn.textContent = `🧼 Cleaning ${++done}/${photos.length}…`;
+    await saveCleanCopy(p);
+    await new Promise(r => setTimeout(r, 150));   // let the browser accept each download
+  }
+  btn.disabled = false;
+  btn.textContent = '🧼 Save all clean copies';
+});
+
+/* ---------------- theme toggle ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

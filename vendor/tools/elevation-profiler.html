@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elevation Profiler</title>
+<meta name="description" content="Draw a line on the map and see the terrain elevation profile under it — distance, ascent, descent and grade. Elevation data fetched from Open-Meteo.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { border-color: var(--ok); color: var(--ok); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  .hide { display: none !important; }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; }
+  .panel h2 { margin: 0; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+
+  .search-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .search-row input { flex: 1; min-width: 180px; font-family: var(--sans); font-size: .9rem; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+  .search-row input:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .search-row .btn { flex: none; }
+  .search-results { list-style: none; margin: 0 0 10px; padding: 0; }
+  .search-results li { padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 4px; cursor: pointer; font-size: .85rem; background: var(--surface); }
+  .search-results li:hover { border-color: var(--accent); color: var(--accent); }
+
+  .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .toolbar .spacer { flex: 1; }
+  .chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .seg button { border: none; background: var(--surface); color: var(--muted); padding: 6px 13px; font-size: .8rem; cursor: pointer; }
+  .seg button.on { background: var(--accent); color: var(--accent-ink); }
+  .seg button:not(.on):hover { color: var(--accent); }
+
+  #map { height: 420px; border-radius: 10px; border: 1px solid var(--border); }
+  #map.drawing { cursor: crosshair; }
+  #map.drawing .leaflet-interactive, #map.drawing .leaflet-grab { cursor: crosshair !important; }
+  .map-fallback { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; height: 420px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .9rem; text-align: center; padding: 24px; }
+  .leaflet-container { font-family: var(--sans); background: var(--surface-2); }
+  .vertex-dot { background: var(--accent); border: 2px solid var(--surface); border-radius: 50%; width: 100%; height: 100%; box-shadow: 0 0 0 1px rgba(0,0,0,.25); cursor: grab; }
+  @media (max-width: 720px) { #map, .map-fallback { height: 320px; } }
+
+  .status { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 10px 0 0; font-size: .85rem; min-height: 1.3em; }
+  .status .note { margin: 0; }
+  .note.err { color: var(--danger); }
+  .note.busy { color: var(--muted); }
+  .note.hint { color: var(--muted); }
+
+  .chart-panel { margin-top: 16px; }
+  #chartWrapEl { position: relative; }
+  #chart { display: block; width: 100%; height: 240px; border-radius: 8px; touch-action: none; }
+  .chart-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .9rem; text-align: center; padding: 20px; pointer-events: none; }
+
+  .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 14px; }
+  .stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+  .stat .slbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+  .stat .sval { font-family: var(--mono); font-size: 1.05rem; margin-top: 3px; overflow-wrap: break-word; }
+  @media (max-width: 860px) { .stats { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 520px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+  .export-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Elevation Profiler</h1>
+      <p>Draw a line on the map and see the terrain under it — the elevation profile, total climb and descent, and the steepest stretch. Only the line's coordinates are sent out, to the free Open-Meteo elevation service.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <section class="panel">
+    <div class="search-row">
+      <input id="placeSearch" type="text" placeholder="Search a place to move the map (uses OpenStreetMap)…" aria-label="Search for a place name">
+      <button class="btn" id="placeSearchBtn" type="button" title="Search">🔍 Search</button>
+      <button class="btn" id="locateMe" type="button" title="Use your device location">📍 Locate me</button>
+    </div>
+    <ul class="search-results hide" id="searchResults"></ul>
+
+    <div class="toolbar">
+      <button class="btn primary" id="drawBtn" type="button">✏️ Draw route</button>
+      <button class="btn hide" id="finishBtn" type="button">✔ Finish</button>
+      <button class="btn" id="clearBtn" type="button" disabled>✕ Clear</button>
+      <button class="chip" id="exampleBtn" type="button" title="Load a sample ridge walk">⛰ Try an example — Presidential Range, NH</button>
+      <span class="spacer"></span>
+      <div class="seg" role="group" aria-label="Units">
+        <button id="unitMetric" type="button" class="on" aria-pressed="true">km · m</button>
+        <button id="unitImperial" type="button" aria-pressed="false">mi · ft</button>
+      </div>
+    </div>
+
+    <div id="map" aria-label="Map. Use the Draw route button, then click to add points."></div>
+    <div class="status">
+      <p class="note hint" id="statusNote">Click <strong>Draw route</strong>, then click the map to add points. Double-click or press <strong>Finish</strong> to end, Esc to cancel. Drag points to adjust afterwards.</p>
+      <button class="btn hide" id="retryBtn" type="button">↻ Retry</button>
+    </div>
+  </section>
+
+  <section class="panel chart-panel">
+    <div class="panel-head">
+      <h2>Elevation profile</h2>
+      <span class="note hint" id="hoverHint" style="font-size:.78rem">Hover the chart or the map line to inspect a point</span>
+    </div>
+    <div id="chartWrapEl">
+      <canvas id="chart" aria-label="Elevation profile chart"></canvas>
+      <div class="chart-empty" id="chartEmpty">No route yet — draw a line on the map or try the example above.</div>
+    </div>
+
+    <div class="stats" aria-label="Route statistics">
+      <div class="stat"><div class="slbl">Distance</div><div class="sval" id="stDist">–</div></div>
+      <div class="stat"><div class="slbl">Total ascent</div><div class="sval" id="stAsc">–</div></div>
+      <div class="stat"><div class="slbl">Total descent</div><div class="sval" id="stDesc">–</div></div>
+      <div class="stat"><div class="slbl">Min elevation</div><div class="sval" id="stMin">–</div></div>
+      <div class="stat"><div class="slbl">Max elevation</div><div class="sval" id="stMax">–</div></div>
+      <div class="stat"><div class="slbl">Steepest grade</div><div class="sval" id="stGrade">–</div></div>
+    </div>
+
+    <div class="export-row">
+      <button class="btn" id="csvBtn" type="button" disabled>⬇ Download CSV</button>
+      <button class="btn" id="pngBtn" type="button" disabled>⬇ Download PNG</button>
+      <button class="btn" id="copyStatsBtn" type="button" disabled>⧉ Copy stats</button>
+    </div>
+  </section>
+
+  <footer class="app">
+    Elevation data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (Copernicus DEM) · map © OpenStreetMap contributors · a <strong>max</strong> tool
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Elevation Profiler — standalone, client-side.
+   Only dependency: Leaflet 1.9.4 (background-loaded below).
+   Elevation values come from the free Open-Meteo elevation API.
+   ============================================================ */
+'use strict';
+const $ = (id) => document.getElementById(id);
+
+const N_SAMPLES = 150;      // points sampled along the route
+const CHUNK = 100;          // Open-Meteo batch limit per request
+const NOISE_M = 2;          // ascent/descent noise threshold (m)
+const GRADE_WIN = 5;        // samples per "sustained grade" window
+const RAD = Math.PI / 180, DEG = 180 / Math.PI;
+
+const state = {
+  verts: [],        // [{lat,lng}] route vertices
+  samples: null,    // [{lat,lng,dist}] resampled points (dist = m from start)
+  elev: null,       // [m] elevation per sample
+  totalM: 0,
+  stats: null,
+  drawing: false,
+  units: localStorage.getItem('max-elev-units') === 'imperial' ? 'imperial' : 'metric',
+};
+let map = null, routeLine = null, hoverMarker = null;
+let vertexMarkers = [];
+let hoverIdx = -1;
+let fetchToken = 0;
+
+/* ---------------- geodesy ---------------- */
+function havM(a, b) {
+  const R = 6371000;
+  const dp = (b.lat - a.lat) * RAD, dl = (b.lng - a.lng) * RAD;
+  const s = Math.sin(dp / 2) ** 2 + Math.cos(a.lat * RAD) * Math.cos(b.lat * RAD) * Math.sin(dl / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(s)));
+}
+function toVec(p) {
+  const la = p.lat * RAD, lo = p.lng * RAD;
+  return [Math.cos(la) * Math.cos(lo), Math.cos(la) * Math.sin(lo), Math.sin(la)];
+}
+// spherical linear interpolation between two lat/lng points, t in [0,1]
+function slerp(a, b, t) {
+  const va = toVec(a), vb = toVec(b);
+  let dot = va[0] * vb[0] + va[1] * vb[1] + va[2] * vb[2];
+  dot = Math.max(-1, Math.min(1, dot));
+  const om = Math.acos(dot);
+  if (om < 1e-12) return { lat: a.lat, lng: a.lng };
+  const so = Math.sin(om);
+  const f0 = Math.sin((1 - t) * om) / so, f1 = Math.sin(t * om) / so;
+  const v = [va[0] * f0 + vb[0] * f1, va[1] * f0 + vb[1] * f1, va[2] * f0 + vb[2] * f1];
+  return { lat: Math.atan2(v[2], Math.hypot(v[0], v[1])) * DEG, lng: Math.atan2(v[1], v[0]) * DEG };
+}
+// resample the vertex list into n points spaced evenly by distance
+function sampleRoute(verts, n) {
+  const segs = [];
+  let total = 0;
+  for (let i = 0; i < verts.length - 1; i++) { const d = havM(verts[i], verts[i + 1]); segs.push(d); total += d; }
+  if (!(total > 0)) return null;
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const target = (k / (n - 1)) * total;
+    let acc = 0, i = 0;
+    while (i < segs.length - 1 && acc + segs[i] < target) { acc += segs[i]; i++; }
+    const t = segs[i] > 0 ? Math.max(0, Math.min(1, (target - acc) / segs[i])) : 0;
+    const p = slerp(verts[i], verts[i + 1], t);
+    out.push({ lat: p.lat, lng: p.lng, dist: target });
+  }
+  return { samples: out, total };
+}
+
+/* ---------------- units ---------------- */
+const U = {
+  dist(m) { return state.units === 'imperial' ? m / 1609.344 : m / 1000; },
+  distUnit() { return state.units === 'imperial' ? 'mi' : 'km'; },
+  elev(m) { return state.units === 'imperial' ? m * 3.28084 : m; },
+  elevUnit() { return state.units === 'imperial' ? 'ft' : 'm'; },
+};
+function fmtDist(m) { const v = U.dist(m); return `${v >= 100 ? v.toFixed(0) : v.toFixed(2)} ${U.distUnit()}`; }
+function fmtElev(m) { return `${Math.round(U.elev(m))} ${U.elevUnit()}`; }
+
+/* ---------------- status note ---------------- */
+const DEFAULT_HINT = 'Click <strong>Draw route</strong>, then click the map to add points. Double-click or press <strong>Finish</strong> to end, Esc to cancel. Drag points to adjust afterwards.';
+function setStatus(html, kind) {
+  const el = $('statusNote');
+  el.className = 'note ' + (kind || 'hint');
+  el.innerHTML = html;
+  $('retryBtn').classList.toggle('hide', kind !== 'err');
+}
+
+/* ---------------- elevation fetch (Open-Meteo) ---------------- */
+async function fetchElevations() {
+  if (!state.samples) return;
+  const token = ++fetchToken;
+  const pts = state.samples;
+  const chunks = Math.ceil(pts.length / CHUNK);
+  const elevs = [];
+  try {
+    for (let c = 0; c < chunks; c++) {
+      if (token !== fetchToken) return;
+      setStatus(`⏳ Fetching elevation data… ${c + 1}/${chunks}`, 'busy');
+      const part = pts.slice(c * CHUNK, (c + 1) * CHUNK);
+      const lats = part.map(p => p.lat.toFixed(6)).join(',');
+      const lngs = part.map(p => p.lng.toFixed(6)).join(',');
+      const resp = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lats}&longitude=${lngs}`);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json();
+      if (!data || !Array.isArray(data.elevation) || data.elevation.length !== part.length) throw new Error('bad payload');
+      elevs.push(...data.elevation.map(Number));
+    }
+  } catch (e) {
+    if (token !== fetchToken) return;
+    setStatus('Elevation service unreachable — try again.', 'err');
+    return;
+  }
+  if (token !== fetchToken) return;
+  state.elev = elevs;
+  computeStats();
+  setStatus(`Profile ready — ${pts.length} samples over ${fmtDist(state.totalM)}. Drag a point on the map to reshape the route.`, 'hint');
+  renderAll();
+}
+$('retryBtn').addEventListener('click', () => fetchElevations());
+
+/* ---------------- stats ---------------- */
+function computeStats() {
+  const e = state.elev, s = state.samples;
+  if (!e || !s) { state.stats = null; return; }
+  let asc = 0, desc = 0, pend = 0;
+  for (let i = 1; i < e.length; i++) {
+    pend += e[i] - e[i - 1];
+    if (pend >= NOISE_M) { asc += pend; pend = 0; }
+    else if (pend <= -NOISE_M) { desc += -pend; pend = 0; }
+  }
+  let min = Infinity, max = -Infinity;
+  for (const v of e) { if (v < min) min = v; if (v > max) max = v; }
+  let grade = 0;
+  const w = GRADE_WIN - 1; // window spans GRADE_WIN samples
+  for (let i = 0; i + w < e.length; i++) {
+    const dd = s[i + w].dist - s[i].dist;
+    if (dd > 0) grade = Math.max(grade, Math.abs(e[i + w] - e[i]) / dd * 100);
+  }
+  state.stats = { asc, desc, min, max, grade };
+}
+function renderStats() {
+  const st = state.stats;
+  const has = !!st;
+  $('stDist').textContent = has ? fmtDist(state.totalM) : '–';
+  $('stAsc').textContent = has ? '↑ ' + fmtElev(st.asc) : '–';
+  $('stDesc').textContent = has ? '↓ ' + fmtElev(st.desc) : '–';
+  $('stMin').textContent = has ? fmtElev(st.min) : '–';
+  $('stMax').textContent = has ? fmtElev(st.max) : '–';
+  $('stGrade').textContent = has ? st.grade.toFixed(1) + ' %' : '–';
+  ['csvBtn', 'pngBtn', 'copyStatsBtn'].forEach(id => { $(id).disabled = !has; });
+}
+
+/* ---------------- chart ---------------- */
+const canvas = $('chart');
+const PAD = { l: 54, r: 14, t: 12, b: 26 };
+function cssVar(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function hexToRgba(hex, a) {
+  const m = hex.replace('#', '');
+  const n = m.length === 3 ? m.split('').map(c => c + c).join('') : m;
+  const v = parseInt(n, 16);
+  return `rgba(${(v >> 16) & 255},${(v >> 8) & 255},${v & 255},${a})`;
+}
+function niceStep(range, maxTicks) {
+  const raw = range / Math.max(1, maxTicks);
+  const mag = 10 ** Math.floor(Math.log10(raw));
+  const norm = raw / mag;
+  const s = norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10;
+  return s * mag;
+}
+function chartGeom() {
+  const wCss = canvas.clientWidth || canvas.parentElement.clientWidth || 600;
+  const hCss = 240;
+  const e = state.elev;
+  let lo = Math.min(...e), hi = Math.max(...e);
+  if (hi - lo < 10) { const mid = (hi + lo) / 2; lo = mid - 5; hi = mid + 5; }
+  const padE = (hi - lo) * 0.12;
+  const yLo = lo - padE, yHi = hi + padE;
+  const total = state.totalM;
+  const x = (distM) => PAD.l + (distM / total) * (wCss - PAD.l - PAD.r);
+  const y = (elevM) => PAD.t + (1 - (elevM - yLo) / (yHi - yLo)) * (hCss - PAD.t - PAD.b);
+  return { wCss, hCss, lo, hi, yLo, yHi, x, y };
+}
+function drawChart() {
+  const dpr = window.devicePixelRatio || 1;
+  const wCss = canvas.clientWidth || canvas.parentElement.clientWidth || 600;
+  const hCss = 240;
+  canvas.width = Math.round(wCss * dpr);
+  canvas.height = Math.round(hCss * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const cSurface = cssVar('--surface'), cBorder = cssVar('--border'),
+        cMuted = cssVar('--muted'), cText = cssVar('--text'), cAccent = cssVar('--accent');
+  ctx.fillStyle = cSurface;
+  ctx.fillRect(0, 0, wCss, hCss);
+
+  const has = state.elev && state.samples && state.elev.length === state.samples.length;
+  $('chartEmpty').classList.toggle('hide', !!has);
+  if (!has) return;
+
+  const g = chartGeom();
+  const e = state.elev, s = state.samples;
+  ctx.font = '11px ' + (cssVar('--sans') || 'sans-serif');
+
+  /* --- y axis ticks (in display units) --- */
+  const yLoU = U.elev(g.yLo), yHiU = U.elev(g.yHi);
+  const yStep = niceStep(yHiU - yLoU, 5);
+  ctx.strokeStyle = cBorder; ctx.fillStyle = cMuted;
+  ctx.lineWidth = 1; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  const toM = state.units === 'imperial' ? (v) => v / 3.28084 : (v) => v;
+  for (let v = Math.ceil(yLoU / yStep) * yStep; v <= yHiU + 1e-9; v += yStep) {
+    const yy = g.y(toM(v));
+    if (yy < PAD.t - 1 || yy > g.hCss - PAD.b + 1) continue;
+    ctx.beginPath(); ctx.moveTo(PAD.l, yy); ctx.lineTo(g.wCss - PAD.r, yy); ctx.stroke();
+    ctx.fillText(`${Math.round(v)} ${U.elevUnit()}`, PAD.l - 6, yy);
+  }
+
+  /* --- x axis ticks --- */
+  const totU = U.dist(state.totalM);
+  const xStep = niceStep(totU, 7);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  const toDistM = state.units === 'imperial' ? (v) => v * 1609.344 : (v) => v * 1000;
+  for (let v = 0; v <= totU + 1e-9; v += xStep) {
+    const xx = g.x(toDistM(v));
+    ctx.strokeStyle = cBorder;
+    ctx.beginPath(); ctx.moveTo(xx, g.hCss - PAD.b); ctx.lineTo(xx, g.hCss - PAD.b + 4); ctx.stroke();
+    const label = xStep < 1 ? v.toFixed(1) : String(Math.round(v));
+    ctx.fillText(`${label}${v === 0 ? ' ' + U.distUnit() : ''}`, xx, g.hCss - PAD.b + 7);
+  }
+
+  /* --- min / max dashed guide lines --- */
+  ctx.save();
+  ctx.setLineDash([5, 4]);
+  ctx.strokeStyle = cMuted;
+  [g.lo, g.hi].forEach((v) => {
+    const yy = g.y(v);
+    ctx.beginPath(); ctx.moveTo(PAD.l, yy); ctx.lineTo(g.wCss - PAD.r, yy); ctx.stroke();
+  });
+  ctx.restore();
+
+  /* --- filled area + curve --- */
+  const baseY = g.hCss - PAD.b;
+  ctx.beginPath();
+  ctx.moveTo(g.x(s[0].dist), baseY);
+  for (let i = 0; i < e.length; i++) ctx.lineTo(g.x(s[i].dist), g.y(e[i]));
+  ctx.lineTo(g.x(s[e.length - 1].dist), baseY);
+  ctx.closePath();
+  ctx.fillStyle = hexToRgba(cAccent || '#2563eb', 0.22);
+  ctx.fill();
+  ctx.beginPath();
+  for (let i = 0; i < e.length; i++) { const px = g.x(s[i].dist), py = g.y(e[i]); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+  ctx.strokeStyle = cAccent; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
+
+  /* --- axes frame --- */
+  ctx.strokeStyle = cBorder; ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(PAD.l, PAD.t); ctx.lineTo(PAD.l, baseY); ctx.lineTo(g.wCss - PAD.r, baseY);
+  ctx.stroke();
+
+  /* --- hover crosshair + tooltip --- */
+  if (hoverIdx >= 0 && hoverIdx < e.length) {
+    const i = hoverIdx;
+    const px = g.x(s[i].dist), py = g.y(e[i]);
+    ctx.save();
+    ctx.setLineDash([3, 3]); ctx.strokeStyle = cMuted;
+    ctx.beginPath(); ctx.moveTo(px, PAD.t); ctx.lineTo(px, baseY); ctx.stroke();
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2);
+    ctx.fillStyle = cAccent; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = cSurface; ctx.stroke();
+
+    // local grade around the hovered sample
+    const i0 = Math.max(0, i - 1), i1 = Math.min(e.length - 1, i + 1);
+    const dd = s[i1].dist - s[i0].dist;
+    const gr = dd > 0 ? (e[i1] - e[i0]) / dd * 100 : 0;
+    const dv = U.dist(s[i].dist);
+    const line = `${dv >= 100 ? dv.toFixed(0) : dv.toFixed(2)} ${U.distUnit()} · ${fmtElev(e[i])} · ${gr >= 0 ? '+' : ''}${gr.toFixed(1)}%`;
+    ctx.font = '12px ' + (cssVar('--mono') || 'monospace');
+    const tw = ctx.measureText(line).width + 16;
+    const th = 24;
+    let bx = px + 10, by = Math.max(PAD.t, py - th - 8);
+    if (bx + tw > g.wCss - PAD.r) bx = px - tw - 10;
+    ctx.fillStyle = cSurface; ctx.strokeStyle = cBorder; ctx.lineWidth = 1;
+    ctx.beginPath();
+    (ctx.roundRect ? ctx.roundRect.bind(ctx) : (x, y, w, h) => ctx.rect(x, y, w, h))(bx, by, tw, th, 6);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = cText; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText(line, bx + 8, by + th / 2 + 1);
+  }
+}
+function renderAll() { renderStats(); drawChart(); }
+
+/* ---------------- hover sync (chart <-> map) ---------------- */
+function setHover(i) {
+  if (i === hoverIdx) return;
+  hoverIdx = i;
+  drawChart();
+  if (!map || !window.L || !state.samples) return;
+  if (i >= 0) {
+    const p = state.samples[i];
+    if (!hoverMarker) {
+      hoverMarker = L.circleMarker([p.lat, p.lng], { radius: 6, weight: 2, color: cssVar('--accent'), fillColor: cssVar('--surface'), fillOpacity: 1 }).addTo(map);
+    } else {
+      hoverMarker.setLatLng([p.lat, p.lng]);
+      if (!map.hasLayer(hoverMarker)) hoverMarker.addTo(map);
+    }
+  } else if (hoverMarker && map.hasLayer(hoverMarker)) {
+    map.removeLayer(hoverMarker);
+  }
+}
+canvas.addEventListener('mousemove', (ev) => {
+  if (!state.elev || !state.samples) return;
+  const r = canvas.getBoundingClientRect();
+  const px = ev.clientX - r.left;
+  const g = chartGeom();
+  const frac = (px - PAD.l) / (g.wCss - PAD.l - PAD.r);
+  if (frac < -0.02 || frac > 1.02) { setHover(-1); return; }
+  const distM = Math.max(0, Math.min(1, frac)) * state.totalM;
+  // samples are evenly spaced by distance
+  const i = Math.round(distM / state.totalM * (state.samples.length - 1));
+  setHover(i);
+});
+canvas.addEventListener('mouseleave', () => setHover(-1));
+
+function nearestSample(latlng) {
+  const s = state.samples;
+  if (!s) return -1;
+  const cosLat = Math.cos(latlng.lat * RAD);
+  let best = -1, bd = Infinity;
+  for (let i = 0; i < s.length; i++) {
+    const dy = s[i].lat - latlng.lat, dx = (s[i].lng - latlng.lng) * cosLat;
+    const d = dx * dx + dy * dy;
+    if (d < bd) { bd = d; best = i; }
+  }
+  return best;
+}
+
+/* ---------------- route editing on the map ---------------- */
+function vertexIcon() {
+  return L.divIcon({ className: '', html: '<div class="vertex-dot"></div>', iconSize: [14, 14], iconAnchor: [7, 7] });
+}
+function addVertexMarker(latlng, idx) {
+  const m = L.marker(latlng, { icon: vertexIcon(), draggable: true });
+  m._vIdx = idx;
+  m.on('drag', () => {
+    const p = m.getLatLng();
+    state.verts[m._vIdx] = { lat: p.lat, lng: p.lng };
+    if (routeLine) routeLine.setLatLngs(state.verts.map(v => [v.lat, v.lng]));
+  });
+  m.on('dragend', () => { profileRoute(false); });
+  m.addTo(map);
+  vertexMarkers.push(m);
+  return m;
+}
+function updateLine() {
+  if (!map || !window.L) return;
+  const pts = state.verts.map(v => [v.lat, v.lng]);
+  if (!routeLine) {
+    routeLine = L.polyline(pts, { color: cssVar('--accent') || '#2563eb', weight: 4, opacity: 0.9 }).addTo(map);
+    routeLine.on('mousemove', (e) => { if (state.elev) setHover(nearestSample(e.latlng)); });
+    routeLine.on('mouseout', () => setHover(-1));
+  } else {
+    routeLine.setLatLngs(pts);
+  }
+}
+function removeRouteLayers() {
+  if (!map) return;
+  if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
+  vertexMarkers.forEach(m => map.removeLayer(m));
+  vertexMarkers = [];
+  if (hoverMarker && map.hasLayer(hoverMarker)) map.removeLayer(hoverMarker);
+}
+
+function startDraw() {
+  clearAll(true);
+  state.drawing = true;
+  $('drawBtn').disabled = true;
+  $('finishBtn').classList.remove('hide');
+  $('clearBtn').disabled = false;
+  if (map) { map.doubleClickZoom.disable(); $('map').classList.add('drawing'); }
+  setStatus('Drawing — click the map to add points. Double-click or press <strong>Finish</strong> to end, Esc to cancel.', 'hint');
+}
+function endDrawUI() {
+  state.drawing = false;
+  $('drawBtn').disabled = false;
+  $('finishBtn').classList.add('hide');
+  if (map) {
+    $('map').classList.remove('drawing');
+    setTimeout(() => { if (map && !state.drawing) map.doubleClickZoom.enable(); }, 250);
+  }
+}
+function finishDraw() {
+  if (!state.drawing) return;
+  // a double-click adds the same vertex twice — drop the duplicate
+  const v = state.verts;
+  if (v.length >= 2 && havM(v[v.length - 2], v[v.length - 1]) < 1) { v.pop(); const m = vertexMarkers.pop(); if (m) map.removeLayer(m); }
+  endDrawUI();
+  if (v.length < 2) {
+    clearAll();
+    setStatus('A route needs at least two points — press <strong>Draw route</strong> to start again.', 'hint');
+    return;
+  }
+  updateLine();
+  profileRoute(false);
+}
+function cancelDraw() {
+  if (!state.drawing) return;
+  endDrawUI();
+  clearAll();
+  setStatus('Drawing cancelled. ' + DEFAULT_HINT, 'hint');
+}
+function clearAll(silent) {
+  fetchToken++;              // invalidate any in-flight fetch
+  state.verts = [];
+  state.samples = null;
+  state.elev = null;
+  state.totalM = 0;
+  state.stats = null;
+  hoverIdx = -1;
+  removeRouteLayers();
+  renderAll();
+  if (!silent) {
+    $('clearBtn').disabled = true;
+    setStatus(DEFAULT_HINT, 'hint');
+  }
+}
+
+$('drawBtn').addEventListener('click', startDraw);
+$('finishBtn').addEventListener('click', finishDraw);
+$('clearBtn').addEventListener('click', () => { endDrawUI(); clearAll(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cancelDraw(); });
+
+/* re-sample the current vertices, then fetch elevations */
+function profileRoute(fit) {
+  const res = sampleRoute(state.verts, N_SAMPLES);
+  if (!res) { setStatus('Route has no length — add points further apart.', 'err'); $('retryBtn').classList.add('hide'); return; }
+  state.samples = res.samples;
+  state.totalM = res.total;
+  state.elev = null;
+  state.stats = null;
+  hoverIdx = -1;
+  renderAll();
+  if (fit && map && routeLine) map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+  fetchElevations();
+}
+
+/* ---------------- example route: Presidential Range, NH ---------------- */
+const EXAMPLE = [
+  { lat: 44.2705, lng: -71.3033 },  // Mt Washington
+  { lat: 44.2827, lng: -71.3123 },  // Mt Clay
+  { lat: 44.2913, lng: -71.3167 },  // Mt Jefferson
+  { lat: 44.3206, lng: -71.2914 },  // Mt Adams
+  { lat: 44.3287, lng: -71.2775 },  // Mt Madison
+];
+$('exampleBtn').addEventListener('click', () => {
+  endDrawUI();
+  clearAll(true);
+  $('clearBtn').disabled = false;
+  state.verts = EXAMPLE.map(p => ({ ...p }));
+  if (map && window.L) {
+    updateLine();
+    state.verts.forEach((v, i) => addVertexMarker([v.lat, v.lng], i));
+  }
+  profileRoute(true);
+});
+
+/* ---------------- exports ---------------- */
+function downloadBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+$('csvBtn').addEventListener('click', () => {
+  if (!state.elev || !state.samples) return;
+  const rows = ['distance_m,lat,lng,elevation_m'];
+  state.samples.forEach((p, i) => {
+    const e = state.elev[i];
+    rows.push(`${p.dist.toFixed(1)},${p.lat.toFixed(6)},${p.lng.toFixed(6)},${Number.isFinite(e) ? e.toFixed(1) : ''}`);
+  });
+  downloadBlob(new Blob([rows.join('\n') + '\n'], { type: 'text/csv' }), 'elevation-profile.csv');
+});
+$('pngBtn').addEventListener('click', () => {
+  if (!state.elev) return;
+  canvas.toBlob((b) => { if (b) downloadBlob(b, 'elevation-profile.png'); }, 'image/png');
+});
+function statsText() {
+  const st = state.stats;
+  if (!st) return '';
+  return [
+    `Elevation profile (${state.samples.length} samples)`,
+    `Distance: ${fmtDist(state.totalM)}`,
+    `Total ascent: ${fmtElev(st.asc)}`,
+    `Total descent: ${fmtElev(st.desc)}`,
+    `Min elevation: ${fmtElev(st.min)}`,
+    `Max elevation: ${fmtElev(st.max)}`,
+    `Steepest sustained grade: ${st.grade.toFixed(1)} %`,
+    'Elevation data by Open-Meteo (Copernicus DEM)',
+  ].join('\n');
+}
+$('copyStatsBtn').addEventListener('click', async () => {
+  const btn = $('copyStatsBtn');
+  try {
+    await navigator.clipboard.writeText(statsText());
+    const old = btn.textContent;
+    btn.classList.add('copied'); btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1200);
+  } catch (e) { /* clipboard blocked; ignore */ }
+});
+
+/* ---------------- unit toggle ---------------- */
+function setUnits(u) {
+  state.units = u;
+  try { localStorage.setItem('max-elev-units', u); } catch (e) { /* ignore */ }
+  $('unitMetric').classList.toggle('on', u === 'metric');
+  $('unitMetric').setAttribute('aria-pressed', String(u === 'metric'));
+  $('unitImperial').classList.toggle('on', u === 'imperial');
+  $('unitImperial').setAttribute('aria-pressed', String(u === 'imperial'));
+  renderAll();
+}
+$('unitMetric').addEventListener('click', () => setUnits('metric'));
+$('unitImperial').addEventListener('click', () => setUnits('imperial'));
+
+/* ---------------- place search (Nominatim) + locate ---------------- */
+async function searchPlace() {
+  const q = $('placeSearch').value.trim();
+  if (!q) return;
+  const btn = $('placeSearchBtn');
+  btn.textContent = '⏳';
+  try {
+    const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(q)}`);
+    const data = await resp.json();
+    const ul = $('searchResults'); ul.innerHTML = ''; ul.classList.remove('hide');
+    if (!data.length) { ul.innerHTML = '<li style="cursor:default;color:var(--muted)">No results found</li>'; }
+    else data.forEach(r => {
+      const li = document.createElement('li');
+      li.textContent = r.display_name;
+      li.addEventListener('click', () => {
+        if (map) map.setView([parseFloat(r.lat), parseFloat(r.lon)], 13);
+        ul.classList.add('hide');
+        $('placeSearch').value = r.display_name;
+      });
+      ul.appendChild(li);
+    });
+  } catch (e) { setStatus('Place search failed — check your connection.', 'err'); $('retryBtn').classList.add('hide'); }
+  btn.textContent = '🔍 Search';
+}
+$('placeSearchBtn').addEventListener('click', searchPlace);
+$('placeSearch').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchPlace(); });
+$('locateMe').addEventListener('click', () => {
+  if (!navigator.geolocation) { setStatus('Geolocation is not supported by your browser.', 'err'); $('retryBtn').classList.add('hide'); return; }
+  const btn = $('locateMe');
+  btn.textContent = '⏳ Locating…'; btn.disabled = true;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => { if (map) map.setView([pos.coords.latitude, pos.coords.longitude], 13); btn.textContent = '📍 Locate me'; btn.disabled = false; },
+    () => { setStatus('Location access denied or unavailable.', 'err'); $('retryBtn').classList.add('hide'); btn.textContent = '📍 Locate me'; btn.disabled = false; },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+});
+
+/* ---------------- Leaflet: background load with fallback ---------------- */
+function initMap() {
+  if (map || !window.L || !$('map')) return;
+  map = L.map('map', { worldCopyJump: true }).setView([44.27, -71.30], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  map.on('click', (e) => {
+    if (!state.drawing) return;
+    const v = { lat: e.latlng.lat, lng: ((e.latlng.lng + 540) % 360) - 180 };
+    state.verts.push(v);
+    addVertexMarker([v.lat, v.lng], state.verts.length - 1);
+    updateLine();
+    setStatus(`Drawing — ${state.verts.length} point${state.verts.length === 1 ? '' : 's'} so far. Double-click or press <strong>Finish</strong> to end.`, 'hint');
+  });
+  map.on('dblclick', () => { if (state.drawing) finishDraw(); });
+}
+function mapFallback() {
+  if (map || !$('map')) return;
+  const el = document.createElement('div');
+  el.className = 'map-fallback';
+  el.id = 'map';
+  el.innerHTML = 'Map unavailable — the Leaflet library didn\'t load.<br>Check your connection and reload; the example profile still needs the elevation service only.';
+  $('map').replaceWith(el);
+}
+(function loadLeaflet() {
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+  css.crossOrigin = '';
+  document.head.appendChild(css);
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+  s.crossOrigin = '';
+  s.onload = initMap;
+  s.onerror = mapFallback;
+  document.head.appendChild(s);
+  setTimeout(() => { if (!window.L) mapFallback(); }, 8000);
+})();
+
+/* ---------------- theme toggle (shared max-theme key) ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+  drawChart();
+});
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => drawChart());
+window.addEventListener('resize', () => drawChart());
+
+/* ---------------- boot ---------------- */
+setUnits(state.units);
+drawChart();
+
+/* tiny debug/test handle (read-only) */
+window.__elev = {
+  get state() { return state; },
+  get hoverIdx() { return hoverIdx; },
+  get hoverLatLng() {
+    return (hoverMarker && map && map.hasLayer(hoverMarker)) ? hoverMarker.getLatLng() : null;
+  },
+};
+</script>
+</body>
+</html>
