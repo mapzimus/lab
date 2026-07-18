@@ -42,7 +42,7 @@
   const repoCard = (r) =>
     card(r.name, r.url, r.desc, [r.lang, `★ ${fmt.format(r.stars)}`], r.isNew);
   const hfCard = (h) =>
-    card(h.id, h.url, h.pipeline || "", [`♥ ${fmt.format(h.likes)}`, h.downloads ? `${fmt.format(h.downloads)} downloads` : null], false);
+    card(h.id, h.url, h.desc || "", [h.pipeline, `♥ ${fmt.format(h.likes)}`, h.downloads ? `${fmt.format(h.downloads)} downloads` : null], false);
 
   const gh = data.github || { relevant: [], general: [] };
   const hf = data.huggingface || { models: [], datasets: [], spaces: [], general: [] };

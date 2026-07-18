@@ -149,6 +149,40 @@ async function collectHuggingFace() {
     .sort((a, b) => b.rank - a.rank);
 }
 
+// Fetch a one-line caption for a Hugging Face item from its card README:
+// first meaningful prose line after the YAML frontmatter, markdown stripped.
+async function hfCaption(kind, id) {
+  const prefix = kind === "models" ? "" : `${kind}/`;
+  const url = `https://huggingface.co/${prefix}${id}/raw/main/README.md`;
+  try {
+    const res = await fetch(url, { headers: { "User-Agent": "mapzimus-radar" } });
+    if (!res.ok) return "";
+    let text = (await res.text()).slice(0, 20000).replace(/^---\n[\s\S]*?\n---/, "");
+    for (let line of text.split("\n")) {
+      line = line
+        .replace(/!\[[^\]]*\]\([^)]*\)/g, "") // images
+        .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1") // links -> text
+        .replace(/<[^>]+>/g, "") // html tags
+        .replace(/[*_`#>|]/g, "")
+        .replace(/&[a-z]+;|&#\d+;/g, " ") // html entities
+        .replace(/\s+/g, " ")
+        .trim();
+      // skip headings-turned-empty, badges, separators, and boilerplate
+      if (line.length < 25 || /^(:?-|=|\||!)/.test(line)) continue;
+      if (/configuration reference|join our (wechat|discord)|^path\s*:|license\s*:|huggingface\.co\/docs/i.test(line)) continue;
+      const sentence = line.match(/^.{25,180}?[.!?](\s|$)/)?.[0].trim() ?? line;
+      return sentence.length > 180 ? sentence.slice(0, 177).trimEnd() + "…" : sentence;
+    }
+  } catch { /* caption is best-effort */ }
+  return "";
+}
+
+async function addCaptions(items) {
+  await Promise.all(items.map(async (it) => {
+    it.desc = await hfCaption(it.kind, it.id);
+  }));
+}
+
 // ---------------------------------------------------------------------------
 // Render
 // ---------------------------------------------------------------------------
@@ -160,7 +194,7 @@ function renderRepo(r) {
 function renderHF(h) {
   const bits = [h.pipeline, `♥ ${h.likes}`, h.downloads ? `${h.downloads.toLocaleString("en-US")} dl` : null]
     .filter(Boolean).join(" · ");
-  return `- [${h.id}](${h.url}) (${bits})`;
+  return `- [${h.id}](${h.url}) (${bits})${h.desc ? ` — ${h.desc}` : ""}`;
 }
 
 function section(title, lines) {
@@ -174,6 +208,7 @@ async function main() {
   const ghGeneral = gh.filter((r) => !r.relevant && r.isNew).slice(0, 10);
   const byKind = (k) => hf.filter((h) => h.kind === k && h.relevant).slice(0, 8);
   const hfGeneral = hf.filter((h) => !h.relevant).slice(0, 8);
+  await addCaptions([...byKind("models"), ...byKind("datasets"), ...byKind("spaces"), ...hfGeneral]);
 
   const md = [
     `# Mapzimus Radar — ${today}`,
