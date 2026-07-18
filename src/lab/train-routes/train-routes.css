@@ -1,0 +1,52 @@
+:root {
+  --paper: #f4f0e7; --ink: #171a20; --muted: #63656d; --line: #c9c2b4;
+  --card: #fffdf8; --acid: #d7ff4f; --cyan: #50d7d3; --coral: #ff6b4a; --purple: #7455d9;
+  --green: #2f9e44; --amber: #c47f17;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 1.5; }
+a { color: inherit; }
+.top { max-width: 1240px; margin: 0 auto; padding: 18px 26px; display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; }
+.top a.back { font: 600 13px var(--mono); text-decoration: none; color: var(--purple); }
+.top h1 { margin: 0; font-size: clamp(1.4rem, 3vw, 2rem); letter-spacing: -.03em; }
+.top .eyebrow { color: var(--purple); font: 700 11px var(--mono); text-transform: uppercase; letter-spacing: .12em; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 26px 40px; display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+@media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+.panel, .map-frame { background: var(--card); border: 1px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); }
+.panel { padding: 18px; align-self: start; display: flex; flex-direction: column; max-height: 680px; }
+.panel h2 { margin: 0 0 4px; font-size: 1rem; letter-spacing: -.02em; }
+.panel p.hint { margin: 0 0 12px; color: var(--muted); font-size: .85rem; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.filters button { padding: 6px 10px; border: 1px solid var(--ink); background: var(--card); cursor: pointer; font: 600 12px var(--mono); }
+.filters button[aria-pressed="true"] { background: var(--acid); box-shadow: 3px 3px 0 var(--ink); }
+.filters button:hover { background: var(--cyan); }
+.readout { margin: 0 0 10px; display: flex; gap: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 8px 0; }
+.readout div { display: flex; flex-direction: column; }
+.readout dt { font: 700 10px var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+.readout dd { margin: 0; font: 600 15px var(--mono); }
+.route-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; }
+.route-list li { border: 1px solid var(--line); margin-bottom: 8px; }
+.route-list button { display: block; width: 100%; text-align: left; padding: 9px 11px; border: 0; background: var(--card); cursor: pointer; font-family: var(--sans); }
+.route-list li.selected { border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+.route-list li.selected button { background: var(--acid); }
+.route-list button:hover { background: var(--cyan); }
+.route-name { display: flex; align-items: center; gap: 7px; font-weight: 700; font-size: .85rem; letter-spacing: -.01em; }
+.route-dot { width: 10px; height: 10px; border: 1px solid var(--ink); flex: none; }
+.route-meta { margin-top: 2px; color: var(--muted); font: 500 11px var(--mono); }
+.map-frame { position: relative; min-height: 620px; }
+#map { position: absolute; inset: 0; background: #101318; }
+.maplibregl-map { font-family: var(--sans); }
+.maplibregl-popup-content { border-radius: 0; border: 1px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); background: var(--card); padding: 12px 14px; font-family: var(--sans); }
+.maplibregl-popup-close-button { font-size: 16px; padding: 2px 7px; }
+.maplibregl-popup-tip { display: none; }
+.popup h3 { margin: 0 0 2px; font-size: .95rem; letter-spacing: -.02em; }
+.popup .cat { display: inline-block; margin-bottom: 8px; padding: 1px 7px; border: 1px solid var(--ink); font: 700 10px var(--mono); text-transform: uppercase; letter-spacing: .08em; color: #fff; }
+.popup .endpoints { margin: 0 0 8px; font: 600 12px var(--mono); }
+.popup .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; margin: 0 0 8px; }
+.popup .specs dt { font: 700 10px var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+.popup .specs dd { margin: 0; font: 600 13px var(--mono); }
+.popup .blurb { margin: 0; font-size: .8rem; color: var(--muted); max-width: 280px; }
+footer { max-width: 1240px; margin: 0 auto; padding: 0 26px 40px; color: var(--muted); font-size: .85rem; }
+footer code { font-family: var(--mono); }
