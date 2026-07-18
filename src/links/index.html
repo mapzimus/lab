@@ -4,55 +4,75 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Links · Mapzimus</title>
-  <meta name="description" content="All of Maxwell Howe's sites, code, and socials in one place.">
+  <meta name="description" content="Every Maxwell Howe site and profile in one place: Mapzimus, the GIS portfolio, GitHub, and Hugging Face.">
   <link rel="canonical" href="https://mapzimus.com/links/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Links · Mapzimus">
-  <meta property="og:description" content="All of Maxwell Howe's sites, code, and socials in one place.">
+  <meta property="og:description" content="Every Maxwell Howe site and profile in one place.">
   <meta property="og:url" content="https://mapzimus.com/links/">
   <meta name="twitter:card" content="summary">
-  <meta name="theme-color" content="#f4f0e7">
+  <meta name="theme-color" content="#f5f1e6">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/links/links.css">
-  <script src="/links/links.js" defer></script>
+  <script src="/theme.js"></script>
 </head>
 <body data-view="links">
+<div class="sheet">
   <a class="skip-link" href="#links">Skip to links</a>
   <header class="site-header">
     <a class="brand" href="/" aria-label="Mapzimus home">
       <span class="brand-mark" aria-hidden="true">MZ</span>
-      <span>Mapzimus</span>
+      <span class="brand-name">Mapzimus</span>
     </a>
-    <nav aria-label="Primary navigation">
-      <a href="/lab/">Lab</a>
+    <nav class="site-nav" aria-label="Primary navigation">
       <a href="/tools/">Tools</a>
       <a href="/maps/">Maps</a>
-      <a href="/field-notes/">Field Notes</a>
       <a href="/games/">Games</a>
+      <a href="/lab/">Lab</a>
+      <a href="/field-notes/">Notes</a>
       <a href="/radars/">Radars</a>
       <a href="/links/" aria-current="page">Links</a>
       <a href="/about/">About</a>
-      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Portfolio ↗</a>
     </nav>
+    <details class="menu">
+      <summary aria-label="Open menu">Menu</summary>
+      <div class="menu-panel">
+        <a href="/tools/">Tools</a>
+        <a href="/maps/">Maps</a>
+        <a href="/games/">Games</a>
+        <a href="/lab/">Lab</a>
+        <a href="/field-notes/">Field Notes</a>
+        <a href="/radars/">Radars</a>
+        <a href="/links/" aria-current="page">Links</a>
+        <a href="/about/">About</a>
+        <a href="https://maxwellhowegis.com">Portfolio ↗</a>
+      </div>
+    </details>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme">
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+    </button>
   </header>
 
   <main>
     <section class="hero">
-      <div class="eyebrow">Everything, everywhere</div>
-      <h1>Links.</h1>
-      <p>All my sites, code, and socials in one place.</p>
+      <span class="coord coord-ne" aria-hidden="true">42°31′ N</span>
+      <span class="coord coord-sw" aria-hidden="true">70°54′ W · SALEM, MASS.</span>
+      <div class="eyebrow">Directory</div>
+      <h1>Links</h1>
+      <p>My sites, code, and profiles in one place.</p>
     </section>
 
-    <section class="link-groups" id="links" aria-label="Link groups">
-      <p class="empty" id="linksEmpty">Loading links…</p>
-    </section>
+    <section class="link-groups" id="links" aria-label="Link groups">{{LINK_GROUPS}}</section>
   </main>
 
   <footer>
-    <p>Mapzimus is the creative lab of Maxwell Howe.</p>
-    <p class="footer-note">Edit src/data/links.json to add more.</p>
+    <p>Mapzimus is the lab of Maxwell Howe — browser tools, maps, and games, all free.<br>Professional GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
+    <p class="footer-note">MAPZIMUS QUADRANGLE · STATIC SITE · NO TRACKING</p>
   </footer>
-
+</div>
 </body>
 </html>
