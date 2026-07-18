@@ -46,4 +46,11 @@ against the lab's interest profile, and writes `radar/YYYY-MM-DD.md` plus
 `radar/latest.md`. The `Daily radar` GitHub Actions workflow runs it every
 day and commits the digest; run it locally with `node scripts/radar.mjs`
 (set `GITHUB_TOKEN` for a higher API rate limit). Tune the `INTERESTS`
-table at the top of the script to change what ranks highly.
+table in `scripts/radar-lib.mjs` to change what ranks highly.
+
+The dashboard at [mapzimus.com/radar/](https://mapzimus.com/radar/) shows the
+data live: it fetches `/api/radar` (a Cloudflare Pages Function that runs the
+same sweep and caches it at the edge for an hour) and falls back to the
+committed `src/data/radar.json` baseline if the live sweep fails. Optionally
+set a `GITHUB_TOKEN` secret on the Pages project so edge GitHub searches
+avoid the unauthenticated per-IP rate limit.

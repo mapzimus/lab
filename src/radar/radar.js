@@ -4,12 +4,17 @@
   const dateEl = document.getElementById("radarDate");
   const countsEl = document.getElementById("radarCounts");
 
+  // Live sweep first (edge-cached hourly); fall back to the committed daily baseline.
   let data;
-  try {
-    const res = await fetch("/data/radar.json", { cache: "no-cache" });
-    if (!res.ok) throw new Error(res.statusText);
-    data = await res.json();
-  } catch {
+  for (const url of ["/api/radar", "/data/radar.json"]) {
+    try {
+      const res = await fetch(url, { cache: "no-cache" });
+      if (!res.ok) continue;
+      const body = await res.json();
+      if (!body.error) { data = body; break; }
+    } catch { /* try the next source */ }
+  }
+  if (!data) {
     emptyEl.textContent = "The radar data could not be loaded. Try again in a moment.";
     dateEl.textContent = "Unavailable";
     return;
