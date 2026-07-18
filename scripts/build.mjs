@@ -116,7 +116,7 @@ for (const [view, page] of Object.entries(pages)) {
   fs.writeFileSync(target, html, "utf8");
 }
 
-const urls = [...Object.values(pages).map((page) => page.canonical), "https://mapzimus.com/radar/"];
+const urls = [...Object.values(pages).map((page) => page.canonical), "https://mapzimus.com/radar/", "https://mapzimus.com/geo-radar/"];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n`;
 fs.writeFileSync(path.join(output, "sitemap.xml"), sitemap, "utf8");
 console.log(`Built ${Object.keys(pages).length} Mapzimus pages in dist/.`);

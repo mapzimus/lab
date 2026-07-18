@@ -6,7 +6,7 @@
 
   // Live sweep first (edge-cached hourly); fall back to the committed daily baseline.
   let data;
-  for (const url of ["/api/radar", "/data/radar.json"]) {
+  for (const url of ["/api/geo-radar", "/data/geo-radar.json"]) {
     try {
       const res = await fetch(url, { cache: "no-cache" });
       if (!res.ok) continue;
@@ -44,33 +44,21 @@
     return cardEl;
   }
 
-  const repoCard = (r) =>
-    card(r.name, r.url, r.desc, [r.lang, `★ ${fmt.format(r.stars)}`], r.isNew);
-  const hfCard = (h) =>
-    card(h.id, h.url, h.desc || "", [h.pipeline, `♥ ${fmt.format(h.likes)}`, h.downloads ? `${fmt.format(h.downloads)} downloads` : null], false);
+  const titledCard = (label) => (i) => card(i.title, i.url, i.desc || "", [label, i.org].filter(Boolean), false);
+  const releaseCard = (r) => card(r.title, r.url, r.desc || "", [r.repo, r.publishedAt], r.isFresh);
+  const questionCard = (q) => card(q.title, q.url, "", [`▲ ${fmt.format(q.score)}`, `${fmt.format(q.answers)} answers`], false);
 
-  const hnCard = (h) =>
-    card(h.title, h.url, "", [`▲ ${fmt.format(h.points)}`, `${fmt.format(h.comments)} comments`, h.isShow ? "Show HN" : null], false);
-  const paperCard = (p) => card(p.title, p.url, p.desc, [`▲ ${fmt.format(p.upvotes)}`], false);
-  const titledCard = (i) => card(i.title, i.url, i.desc || "", [i.org, i.votes != null ? `▲ ${fmt.format(i.votes)}` : null], false);
-
-  const gh = data.github || { relevant: [], general: [] };
-  const hf = data.huggingface || { models: [], datasets: [], spaces: [], general: [] };
-  const hn = data.hackernews || { relevant: [], general: [] };
-
+  const news = data.news || { mapsmania: [], georealm: [], geoworld: [] };
   const sections = [
-    ["github", "GitHub — picked for the lab", "New and active repos matching the lab's interests.", gh.relevant.map(repoCard)],
-    ["hackernews", "Hacker News — picked for the lab", "Front page and recent Show HN, filtered for lab interests.", hn.relevant.map(hnCard)],
-    ["huggingface", "Hugging Face — models", "Trending models relevant to maps, vision, and small on-device work.", hf.models.map(hfCard)],
-    ["huggingface", "Hugging Face — datasets", "Trending datasets worth a look.", hf.datasets.map(hfCard)],
-    ["huggingface", "Hugging Face — spaces", "Trending demos and apps.", hf.spaces.map(hfCard)],
-    ["papers", "Papers", "From Hugging Face Daily Papers, filtered for lab interests.", (data.papers || []).map(paperCard)],
-    ["papers", "arXiv — fresh and relevant", "Newest vision, graphics, and HCI submissions matching lab interests.", (data.arxiv || []).map(titledCard)],
-    ["data", "Kaggle — hottest datasets", "Trending Kaggle datasets (needs Kaggle API credentials).", (data.kaggle || []).map(titledCard)],
-    ["games", "itch.io — new browser games", "New and popular free HTML5 games.", (data.itch || []).map(titledCard)],
-    ["github", "GitHub — trending everywhere", "The loudest brand-new repos regardless of topic.", gh.general.map(repoCard)],
-    ["huggingface", "Hugging Face — trending everywhere", "The biggest general movers on the Hub.", hf.general.map(hfCard)],
-    ["hackernews", "Hacker News — front page", "What everyone else is reading today.", hn.general.map(hnCard)],
+    ["news", "Maps Mania", "Interactive and unusual web maps, daily.", news.mapsmania.map(titledCard("Maps Mania"))],
+    ["news", "Geography Realm", "GIS techniques, tooling, and geography writing.", news.georealm.map(titledCard("Geography Realm"))],
+    ["news", "Geospatial World", "Industry news and analysis.", news.geoworld.map(titledCard("Geospatial World"))],
+    ["tools", "QGIS — new & updated plugins", "Fresh GIS tooling from the QGIS plugin repository.", (data.qgis || []).map(titledCard("QGIS plugin"))],
+    ["releases", "Library releases", "Latest releases of the geospatial stack that matters.", (data.releases || []).map(releaseCard)],
+    ["data", "NASA Earthdata — recently updated", "Earth-observation collections fresh off the press.", (data.nasa || []).map(titledCard(null))],
+    ["data", "Data.gov — new geodata", "Newly published datasets in the geo themes.", (data.datagov || []).map(titledCard(null))],
+    ["community", "GIS Stack Exchange — hot questions", "What practitioners are wrestling with today.", (data.gisse || []).map(questionCard)],
+    ["community", "OSM pulse", "Latest issues of weeklyOSM.", (data.osm || []).map((o) => card(o.title, o.url, "", ["weeklyOSM"], false))],
   ];
 
   sectionsEl.textContent = "";

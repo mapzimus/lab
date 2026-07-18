@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Radar · Mapzimus</title>
+  <title>Dev Radar · Mapzimus</title>
   <meta name="description" content="A daily scan of GitHub, Hugging Face, Hacker News, and more, ranked for the Mapzimus lab: maps, GIS, data tools, generative design, and browser experiments.">
   <link rel="canonical" href="https://mapzimus.com/radar/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Radar · Mapzimus">
+  <meta property="og:title" content="Dev Radar · Mapzimus">
   <meta property="og:description" content="A daily scan of GitHub and Hugging Face, ranked for the Mapzimus lab.">
   <meta property="og:url" content="https://mapzimus.com/radar/">
   <meta name="twitter:card" content="summary">
@@ -29,7 +29,8 @@
       <a href="/maps/">Maps</a>
       <a href="/play/">Play</a>
       <a href="/experiments/">Experiments</a>
-      <a href="/radar/" aria-current="page">Radar</a>
+      <a href="/radar/" aria-current="page">Dev Radar</a>
+      <a href="/geo-radar/">Geo Radar</a>
       <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
     </nav>
   </header>
@@ -37,8 +38,8 @@
   <main>
     <section class="hero radar-hero">
       <div class="eyebrow">Fresh every day</div>
-      <h1>The lab's radar.</h1>
-      <p>A daily scan of GitHub, Hugging Face, Hacker News, ML papers, and the OSM world, ranked for what this lab cares about: maps and GIS, browser data tools, generative design, math, teaching, games, and the small-web stack.</p>
+      <h1>The dev radar.</h1>
+      <p>A daily scan of GitHub, Hugging Face, Hacker News, ML papers, Kaggle, and itch.io, ranked for what this lab cares about: maps and GIS, browser data tools, generative design, math, teaching, games, and the small-web stack.</p>
       <div class="trust-row">
         <span id="radarDate">Loading…</span>
         <span id="radarCounts" hidden></span>
@@ -59,8 +60,7 @@
           <button class="filter" data-source="papers" aria-pressed="false">Papers</button>
           <button class="filter" data-source="data" aria-pressed="false">Data</button>
           <button class="filter" data-source="games" aria-pressed="false">Games</button>
-          <button class="filter" data-source="osm" aria-pressed="false">OSM</button>
-        </div>
+                  </div>
       </div>
       <div id="radarSections">
         <p class="empty" id="radarEmpty">Loading today's radar…</p>
@@ -70,7 +70,7 @@
 
   <footer>
     <p>Mapzimus is the creative lab of Maxwell Howe. Radar data refreshes daily via GitHub Actions.</p>
-    <p class="footer-note">Sources: GitHub · Hugging Face · Hacker News · HF Daily Papers · weeklyOSM</p>
+    <p class="footer-note">Sources: GitHub · Hugging Face · Hacker News · HF Daily Papers · arXiv · Kaggle · itch.io</p>
   </footer>
 </body>
 </html>

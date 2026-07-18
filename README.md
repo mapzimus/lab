@@ -37,7 +37,7 @@ homepage — an ordered list of catalog slugs. The tool count in the hero and th
 "last catalog refresh" date in the footer are derived from the catalog at build
 time, so they stay accurate as the data changes.
 
-## Daily radar
+## Daily radars (dev + geospatial)
 
 `scripts/radar.mjs` scans GitHub (new fast-rising repos plus GIS, maps,
 cartography, data-viz, generative-art, WebGL, and Cloudflare Workers topics)
@@ -48,9 +48,16 @@ day and commits the digest; run it locally with `node scripts/radar.mjs`
 (set `GITHUB_TOKEN` for a higher API rate limit). Tune the `INTERESTS`
 table in `scripts/radar-lib.mjs` to change what ranks highly.
 
-The dashboard at [mapzimus.com/radar/](https://mapzimus.com/radar/) shows the
-data live: it fetches `/api/radar` (a Cloudflare Pages Function that runs the
-same sweep and caches it at the edge for an hour) and falls back to the
-committed `src/data/radar.json` baseline if the live sweep fails. Optionally
+Two dashboards show the data live, each backed by a Cloudflare Pages
+Function that runs the same sweep and caches it at the edge for an hour,
+falling back to the committed baseline JSON if the live sweep fails:
+
+- [mapzimus.com/radar/](https://mapzimus.com/radar/) — **Dev Radar**
+  (`/api/radar`, `src/data/radar.json`): GitHub, Hugging Face, Hacker News,
+  HF Daily Papers, arXiv, Kaggle, itch.io.
+- [mapzimus.com/geo-radar/](https://mapzimus.com/geo-radar/) — **Geospatial
+  Radar** (`/api/geo-radar`, `src/data/geo-radar.json`): Maps Mania,
+  Geography Realm, Geospatial World, new QGIS plugins, geospatial library
+  releases, GIS Stack Exchange, NASA Earthdata, Data.gov, weeklyOSM. Optionally
 set a `GITHUB_TOKEN` secret on the Pages project so edge GitHub searches
 avoid the unauthenticated per-IP rate limit.

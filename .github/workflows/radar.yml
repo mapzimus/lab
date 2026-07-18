@@ -26,6 +26,6 @@ jobs:
         run: |
           git config user.name "mapzimus-radar[bot]"
           git config user.email "actions@github.com"
-          git add radar/ src/data/radar.json
+          git add radar/ src/data/radar.json src/data/geo-radar.json
           git diff --cached --quiet || git commit -m "Radar digest $(date -u +%F)"
           git push

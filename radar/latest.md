@@ -46,12 +46,12 @@ Daily scan of GitHub and Hugging Face, ranked for the lab: maps & GIS, browser d
 ## Hacker News — front page
 
 - [misa77 - a codec that decodes 2x faster than LZ4 (at better ratios)](https://github.com/welcome-to-the-sunny-side/misa77) (▲ 159 · [48 comments](https://news.ycombinator.com/item?id=48922838) · Show HN)
-- [Watch bots interact with an SSH honeypot in real time](https://honeypotlive.cc/) (▲ 137 · [49 comments](https://news.ycombinator.com/item?id=48947548) · Show HN)
-- [AWS: Inaccurate Estimated Billing Data – $1.7 billion](https://news.ycombinator.com/item?id=48945241) (▲ 1015 · [633 comments](https://news.ycombinator.com/item?id=48945241))
+- [Watch bots interact with an SSH honeypot in real time](https://honeypotlive.cc/) (▲ 138 · [49 comments](https://news.ycombinator.com/item?id=48947548) · Show HN)
+- [AWS: Inaccurate Estimated Billing Data – $1.7 billion](https://news.ycombinator.com/item?id=48945241) (▲ 1019 · [635 comments](https://news.ycombinator.com/item?id=48945241))
 - [One More Letter](https://playonemoreletter.com/) (▲ 87 · [58 comments](https://news.ycombinator.com/item?id=48928402) · Show HN)
 - [Leaves – A text-UI disk usage treemap visualizer](https://github.com/patonw/leaves) (▲ 86 · [26 comments](https://news.ycombinator.com/item?id=48936389) · Show HN)
 - [Mojibake – A low-level Unicode library written in C](https://mojibake.zaerl.com/) (▲ 74 · [22 comments](https://news.ycombinator.com/item?id=48941123) · Show HN)
-- [A zoomable timeline of 4M Wikipedia events](https://app.everything.diena.co/) (▲ 49 · [23 comments](https://news.ycombinator.com/item?id=48950774) · Show HN)
+- [A zoomable timeline of 4M Wikipedia events](https://app.everything.diena.co/) (▲ 50 · [23 comments](https://news.ycombinator.com/item?id=48950774) · Show HN)
 - [Be the ChatBOT](https://bethechatbot.com/) (▲ 48 · [22 comments](https://news.ycombinator.com/item?id=48938524) · Show HN)
 - [I've built a words game based on binary search](https://hilogame.cc/) (▲ 48 · [66 comments](https://news.ycombinator.com/item?id=48934092) · Show HN)
 - [Make senders work to get into your inbox](https://www.captchainbox.com) (▲ 44 · [68 comments](https://news.ycombinator.com/item?id=48919489) · Show HN)
@@ -80,19 +80,10 @@ Daily scan of GitHub and Hugging Face, ranked for the lab: maps & GIS, browser d
 - [Parameter-efficient Prompt Tuning of Vision Foundation Model With Adaptive Focal Loss for Interpretable MCI Screening](http://arxiv.org/abs/2607.15047v1) — Mild Cognitive Impairment is a critical early stage of cognitive decline that frequently precedes Alzheimer's disease, yet its automated detection from neuropsychological drawing tests remains fundame
 - [Authoring Narrative Visualization in Motion: Visual Storytelling in Swimming Videos](http://arxiv.org/abs/2607.14924v1) — We investigate how to support authoring narrative visualizations in motion in sports videos, drawing on automated data preparation, systematic analysis, technology probe design, and evaluation, using 
 
-## Data.gov — new geodata
-
-- [Civil Rights Data Collection (CRDC) for the 2017-18 school year](https://catalog.data.gov/dataset/civil-rights-data-collection-crdc-for-the-2017-18-school-year) — The Civil Rights Data Collection, 2017-18 (CRDC 2017-18) is part of the Civil Rights Data Collection (CRDC) program; program data are available beginning with t
-- [Civil Rights Data Collection (CRDC) for the 2015-16  school year](https://catalog.data.gov/dataset/civil-rights-data-collection-crdc-for-the-2015-16-school-year) — The Civil Rights Data Collection, 2015-16 (CRDC 2015-16) is part of the Civil Rights Data Collection (CRDC) program; program data are available beginning with t
-- [Civil Rights Data Collection (CRDC)](https://catalog.data.gov/dataset/civil-rights-data-collection-crdc) — Since 1968, OCR has collected civil rights data related to students' access and barriers to educational opportunity from early childhood through grade 12.
-- [2015-16 Harassment or Bullying Estimations by Basis Category](https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-estimations-by-basis-category) — This set of Excel files contains data on students reported as harassed or bullied or disciplined for harassment or bullying on the basis of sex, race, or disabi
-- [2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection](https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-by-basis-category-civil-rights-data-collection) — The 2015-16 tables are based on data collected from all of the nation’s school districts and schools—approximately 17,300 school districts and 96,300 schools.
-- [2017-18 Harassment or Bullying Civil Rights Data Collection](https://catalog.data.gov/dataset/2017-18-harassment-or-bullying-civil-rights-data-collection) — This set of Excel files contains data on students reported as harassed or bullied or disciplined for harassment or bullying on the basis of sex, race, or disabi
-- [2013-14 Mathematics and Science Civil Rights Data Collection](https://catalog.data.gov/dataset/2013-14-mathematics-and-science-civil-rights-data-collection) — The 2013-14 tables are based on data collected from all of the nation’s school districts and schools—approximately 16,500 school districts and 96,500 schools.
-- [2017-18 Student Enrollment Civil Rights Data Collection](https://catalog.data.gov/dataset/2017-18-student-enrollment-civil-rights-data-collection) — This set of Excel files contains data for all states on overall enrollment, enrollment of students served under IDEA, enrollment of students served under Sectio
-
 ## itch.io — new browser games
 
+- [Leap Of Faith (Demo) [Free] [Platformer]](https://ricegames-yt.itch.io/leap-of-faith) — A minimalist 2D platformer, where you only see shadows and must figure out the world around you.
+- [Between the Ticks [Free] [Adventure] [Windows]](https://christoph-berger.itch.io/between-the-ticks) — A Greybox Prototype in which you will see how your reality collapses.
 - [Realistic Fishin' [Free] [Simulation]](https://otrain13.itch.io/realistic-fishin) — Finally a realistic fishin' game
 - [Five Nights at Diddy's [Free]](https://jc-inc.itch.io/five-nights-at-diddys)
 - [Ape Horror [Free] [Windows] [Android]](https://pepsi1121.itch.io/ape-horror) — still in beta
@@ -100,11 +91,3 @@ Daily scan of GitHub and Hugging Face, ranked for the lab: maps & GIS, browser d
 - [Snack puzzle [Free]](https://treecats-co.itch.io/snack-puzzle) — Game 14/30 of my "30 games in 1 month" challenge
 - [Ghost cannon [Free] [Windows] [macOS] [Android]](https://tupakiiin.itch.io/ghost-cannon) — hit the target
 - [Tras las Huellas de Bamsa [Free] [Platformer] [Windows]](https://tha-maese.itch.io/tras-las-huellas-de-bamsa) — ¡Han secuestrado a Bamsa! Juega como Azael y Davide en Bio-Maze (Sitges 2025). Creado por el dúo indie Canayne.
-- [untitled gull game [Free]](https://dannium.itch.io/untitled-gull-game) — Protect your sandcastle from enemies
-- [Down the Pipe 2 - Lost in Space [Free] [Shooter]](https://df-design.itch.io/down-the-pipe-2-lost-in-space) — Old School Shooter
-
-## OSM pulse
-
-- [weeklyOSM 833](https://weeklyosm.eu/archives/18704)
-- [weeklyOSM 832](https://weeklyosm.eu/archives/18690)
-- [weeklyOSM 831](https://weeklyosm.eu/archives/18672)

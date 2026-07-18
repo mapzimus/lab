@@ -13,7 +13,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { sweep } from "./radar-lib.mjs";
+import { sweep, sweepGeo } from "./radar-lib.mjs";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = path.join(ROOT, "radar");
@@ -44,11 +44,14 @@ const renderOSM = (o) => `- [${o.title}](${o.url})`;
 const renderTitled = (i) => `- [${i.title}](${i.url})${i.desc ? ` — ${i.desc}` : ""}`;
 
 async function main() {
-  const data = await sweep(today, process.env.GITHUB_TOKEN, {
-    username: process.env.KAGGLE_USERNAME,
-    key: process.env.KAGGLE_KEY,
-  });
-  const { github: gh, huggingface: hf, hackernews: hn, papers, osm } = data;
+  const [data, geo] = await Promise.all([
+    sweep(today, process.env.GITHUB_TOKEN, {
+      username: process.env.KAGGLE_USERNAME,
+      key: process.env.KAGGLE_KEY,
+    }),
+    sweepGeo(today, process.env.GITHUB_TOKEN),
+  ]);
+  const { github: gh, huggingface: hf, hackernews: hn, papers } = data;
 
   const md = [
     `# Mapzimus Radar — ${today}`,
@@ -65,16 +68,33 @@ async function main() {
     section("Hacker News — front page", hn.general.map(renderHN)),
     section("Papers", papers.map(renderPaper)),
     section("arXiv — fresh and relevant", data.arxiv.map(renderTitled)),
-    section("Data.gov — new geodata", data.datagov.map(renderTitled)),
     section("Kaggle — hottest datasets", data.kaggle.map(renderTitled)),
     section("itch.io — new browser games", data.itch.map(renderTitled)),
-    section("OSM pulse", osm.map(renderOSM)),
+  ].filter(Boolean).join("\n");
+
+  const geoMd = [
+    `# Mapzimus Geospatial Radar — ${today}`,
+    "",
+    "Daily sweep of geospatial news, tools, releases, data, and community.",
+    "",
+    section("Maps Mania", geo.news.mapsmania.map(renderTitled)),
+    section("Geography Realm", geo.news.georealm.map(renderTitled)),
+    section("Geospatial World", geo.news.geoworld.map(renderTitled)),
+    section("QGIS — new & updated plugins", geo.qgis.map(renderTitled)),
+    section("Library releases", geo.releases.map((r) => `- [${r.title}](${r.url}) (${r.publishedAt})${r.desc ? ` — ${r.desc}` : ""}`)),
+    section("GIS Stack Exchange — hot questions", geo.gisse.map((q) => `- [${q.title}](${q.url}) (▲ ${q.score} · ${q.answers} answers)`)),
+    section("NASA Earthdata — recently updated collections", geo.nasa.map(renderTitled)),
+    section("Data.gov — new geodata", geo.datagov.map(renderTitled)),
+    section("OSM pulse", geo.osm.map(renderOSM)),
   ].filter(Boolean).join("\n");
 
   await mkdir(OUT_DIR, { recursive: true });
   await writeFile(path.join(OUT_DIR, `${today}.md`), md);
   await writeFile(path.join(OUT_DIR, "latest.md"), md);
+  await writeFile(path.join(OUT_DIR, `geo-${today}.md`), geoMd);
+  await writeFile(path.join(OUT_DIR, "geo-latest.md"), geoMd);
   await writeFile(path.join(ROOT, "src", "data", "radar.json"), JSON.stringify(data, null, 2) + "\n");
+  await writeFile(path.join(ROOT, "src", "data", "geo-radar.json"), JSON.stringify(geo, null, 2) + "\n");
   const relevantHF = hf.models.length + hf.datasets.length + hf.spaces.length;
   console.log(`Wrote radar/${today}.md (${gh.relevant.length + gh.general.length} repos, ${relevantHF} relevant HF items)`);
 }

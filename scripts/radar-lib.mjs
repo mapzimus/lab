@@ -172,21 +172,50 @@ async function collectPapers() {
     .sort((a, b) => b.rank - a.rank);
 }
 
-// weeklyOSM: latest issues from the RSS feed (regex-parsed; no XML dep).
-async function collectWeeklyOSM() {
+// Generic RSS/Atom collector, regex-parsed (no XML dep, Workers-safe).
+const decodeEntities = (s) => s
+  .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+  .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+  .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&nbsp;/g, " ");
+
+function cleanText(s, max = 160) {
+  const t = decodeEntities((s ?? "").replace(/<!\[CDATA\[|\]\]>/g, "").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+  const sentence = t.match(/^.{25,}?[.!?](\s|$)/)?.[0].trim() ?? t;
+  return sentence.length > max ? sentence.slice(0, max - 3).trimEnd() + "…" : sentence;
+}
+
+async function collectRSS(url, limit = 6) {
   try {
-    const res = await fetch("https://weeklyosm.eu/feed", { headers: { "User-Agent": "mapzimus-radar" } });
+    const res = await fetch(url, { headers: { "User-Agent": "mapzimus-radar" } });
     if (!res.ok) return [];
-    const xml = (await res.text()).slice(0, 100000);
+    const xml = (await res.text()).slice(0, 400000);
+    const field = (block, tag) =>
+      block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))?.[1] ?? "";
     const items = [];
-    for (const m of xml.matchAll(/<item>[\s\S]*?<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>[\s\S]*?<link>([\s\S]*?)<\/link>[\s\S]*?<\/item>/g)) {
-      items.push({ title: m[1].trim(), url: m[2].trim() });
-      if (items.length >= 3) break;
+    // Field order varies per generator (Blogspot puts <link> last), so grab
+    // each item/entry block and extract fields independently.
+    for (const m of xml.matchAll(/<(item|entry)[\s>][\s\S]*?<\/\1>/g)) {
+      const block = m[0];
+      const link = field(block, "link").trim() ||
+        block.match(/<link[^>]*?href=['"]([^'"]+)['"]/)?.[1] || "";
+      const title = cleanText(field(block, "title"), 120);
+      if (!title || !link) continue;
+      items.push({
+        title,
+        url: decodeEntities(link),
+        desc: cleanText(field(block, "description") || field(block, "summary")),
+      });
+      if (items.length >= limit) break;
     }
     return items;
   } catch {
     return [];
   }
+}
+
+// weeklyOSM: latest issues from the RSS feed.
+async function collectWeeklyOSM() {
+  return (await collectRSS("https://weeklyosm.eu/feed", 3)).map(({ title, url }) => ({ title, url }));
 }
 
 // arXiv: newest submissions in vision/graphics/HCI, Atom XML regex-parsed.
@@ -300,6 +329,120 @@ async function collectKaggle(username, key) {
   }
 }
 
+// QGIS new plugins: the modern plugin repository exposes no feed, so scrape
+// the "fresh" (created in the last 30 days) listing page.
+async function collectQgisPlugins(limit = 8) {
+  try {
+    const res = await fetch("https://plugins.qgis.org/plugins/fresh/", { headers: { "User-Agent": "mapzimus-radar" } });
+    if (!res.ok) return [];
+    const html = await res.text();
+    const NON_PLUGIN = new Set(["stable", "server", "popular", "new_qgis_ready", "most_voted", "most_downloaded", "latest", "fresh", "experimental", "deprecated", "best_rated", "author", "tags", "user"]);
+    const seen = new Set();
+    const items = [];
+    for (const m of html.matchAll(/<a href="\/plugins\/([a-zA-Z0-9_.-]+)\/"[^>]*>\s*([^<>{}][^<>]{1,80}?)\s*<\/a>/g)) {
+      const slug = m[1];
+      if (NON_PLUGIN.has(slug) || seen.has(slug)) continue;
+      seen.add(slug);
+      items.push({ title: cleanText(m[2], 100), url: `https://plugins.qgis.org/plugins/${slug}/` });
+      if (items.length >= limit) break;
+    }
+    return items;
+  } catch {
+    return [];
+  }
+}
+
+// Geospatial library releases via the GitHub releases API.
+const GEO_RELEASE_REPOS = [
+  "maplibre/maplibre-gl-js",
+  "Leaflet/Leaflet",
+  "Turfjs/turf",
+  "OSGeo/gdal",
+  "postgis/postgis",
+  "qgis/QGIS",
+  "visgl/deck.gl",
+  "duckdb/duckdb",
+  "felt/tippecanoe",
+  "protomaps/PMTiles",
+];
+
+async function collectGeoReleases(daysAgo, token) {
+  const headers = { Accept: "application/vnd.github+json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const results = await Promise.all(GEO_RELEASE_REPOS.map(async (repo) => {
+    try {
+      const r = await getJSON(`https://api.github.com/repos/${repo}/releases/latest`, headers);
+      return {
+        repo,
+        title: `${repo.split("/")[1]} ${r.tag_name ?? r.name ?? ""}`.trim(),
+        url: r.html_url,
+        desc: cleanText(r.body ?? "", 160),
+        publishedAt: (r.published_at ?? "").slice(0, 10),
+        isFresh: (r.published_at ?? "") >= daysAgo(30),
+      };
+    } catch {
+      return null;
+    }
+  }));
+  return results.filter(Boolean).sort((a, b) => (b.publishedAt > a.publishedAt ? 1 : -1));
+}
+
+// GIS Stack Exchange hot questions (Stack Exchange API, keyless).
+async function collectGisSE() {
+  try {
+    const data = await getJSON("https://api.stackexchange.com/2.3/questions?order=desc&sort=hot&site=gis&pagesize=10");
+    return (data.items ?? []).map((q) => ({
+      title: cleanText(q.title, 140),
+      url: q.link,
+      score: q.score ?? 0,
+      answers: q.answer_count ?? 0,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+// NASA Earthdata CMR: recently updated earth-observation collections.
+async function collectNasaCMR() {
+  try {
+    const data = await getJSON("https://cmr.earthdata.nasa.gov/search/collections.json?sort_key=-revision_date&page_size=10&has_granules=true");
+    return (data.feed?.entry ?? []).map((c) => ({
+      title: cleanText(c.title ?? c.dataset_id ?? "", 140),
+      url: `https://search.earthdata.nasa.gov/search?q=${encodeURIComponent(c.short_name ?? c.title ?? "")}`,
+      desc: cleanText(c.summary ?? "", 160),
+      org: c.data_center ?? "",
+    }));
+  } catch {
+    return [];
+  }
+}
+
+// Run the geospatial sweep: geo news, tools, releases, data, and community.
+export async function sweepGeo(today, githubToken) {
+  const daysAgo = (n) => new Date(Date.parse(today) - n * 86400000).toISOString().slice(0, 10);
+  const [mapsmania, georealm, geoworld, qgis, releases, gisse, nasa, datagov, osm] = await Promise.all([
+    collectRSS("https://googlemapsmania.blogspot.com/feeds/posts/default?alt=rss", 8),
+    collectRSS("https://www.geographyrealm.com/feed/", 6),
+    collectRSS("https://geospatialworld.net/feed/", 6),
+    collectQgisPlugins(8),
+    collectGeoReleases(daysAgo, githubToken),
+    collectGisSE(),
+    collectNasaCMR(),
+    collectDataGov(),
+    collectWeeklyOSM(),
+  ]);
+  return {
+    generatedAt: today,
+    news: { mapsmania, georealm, geoworld },
+    qgis,
+    releases,
+    gisse,
+    nasa,
+    datagov,
+    osm,
+  };
+}
+
 // Fetch a one-line caption for a Hugging Face item from its card README:
 // first meaningful prose line after the YAML frontmatter, markdown stripped.
 async function hfCaption(kind, id) {
@@ -338,15 +481,13 @@ async function addCaptions(items) {
 // `today` is a YYYY-MM-DD string; `githubToken` is optional.
 export async function sweep(today, githubToken, kaggle = {}) {
   const daysAgo = (n) => new Date(Date.parse(today) - n * 86400000).toISOString().slice(0, 10);
-  const [gh, hf, hn, papers, osm, arxiv, itch, datagov, kaggleSets] = await Promise.all([
+  const [gh, hf, hn, papers, arxiv, itch, kaggleSets] = await Promise.all([
     collectGitHub(daysAgo, githubToken),
     collectHuggingFace(),
     collectHackerNews(daysAgo),
     collectPapers(),
-    collectWeeklyOSM(),
     collectArxiv(),
     collectItch(),
-    collectDataGov(),
     collectKaggle(kaggle.username, kaggle.key),
   ]);
 
@@ -373,8 +514,6 @@ export async function sweep(today, githubToken, kaggle = {}) {
     papers: papers.filter((p) => p.relevant).slice(0, 10),
     arxiv,
     itch,
-    datagov,
     kaggle: kaggleSets,
-    osm,
   };
 }
