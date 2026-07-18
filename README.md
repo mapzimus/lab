@@ -12,7 +12,9 @@ Navigation: Lab (in development), Tools (full catalog with per-type pages at
 `/tools/{category}/`), Maps (all map projects), Field Notes (blog / LinkedIn
 staging — posts in `src/data/field-notes.json`, drafts hidden unless
 `?drafts`), Games (everything playable), Radars (index of the daily scraping
-trackers at `/radars/`, data in `src/data/radars.json`), Links
+trackers at `/radars/`, data in `src/data/radars.json`), Skills (downloadable
+Claude skills at `/skills/` — packaged `.skill` zips in `src/skills/files/`,
+catalog in `src/data/skills.json`, sources under `.claude/skills/`), Links
 (`src/data/links.json`), and About. `/play/` and `/experiments/` redirect to
 `/games/` and `/lab/`.
 

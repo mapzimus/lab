@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Skills · Mapzimus</title>
+  <meta name="description" content="Downloadable Claude skills from the Mapzimus lab — packaged know-how for maps, GIS, and cartography that any Claude session can install and use.">
+  <link rel="canonical" href="https://mapzimus.com/skills/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Skills · Mapzimus">
+  <meta property="og:description" content="Downloadable Claude skills from the Mapzimus lab — packaged know-how for maps, GIS, and cartography that any Claude session can install and use.">
+  <meta property="og:url" content="https://mapzimus.com/skills/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#f4f0e7">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/skills/skills.css">
+  <script src="/skills/skills.js" defer></script>
+</head>
+<body data-view="skills">
+  <a class="skip-link" href="#skills">Skip to skills</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Mapzimus home">
+      <span class="brand-mark" aria-hidden="true">MZ</span>
+      <span>Mapzimus</span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="/lab/">Lab</a>
+      <a href="/tools/">Tools</a>
+      <a href="/maps/">Maps</a>
+      <a href="/field-notes/">Field Notes</a>
+      <a href="/games/">Games</a>
+      <a href="/radars/">Radars</a>
+      <a href="/skills/" aria-current="page">Skills</a>
+      <a href="/links/">Links</a>
+      <a href="/about/">About</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">Teach your AI some cartography</div>
+      <h1>Skills.</h1>
+      <p>Packaged know-how for Claude: install a skill once and every future session knows how to do the thing — the setup, the gotchas, the working starter code. Distilled from real builds in this lab.</p>
+    </section>
+
+    <section class="skill-list" id="skills" aria-label="Available skills">
+      <p class="empty" id="skillsEmpty">Loading skills…</p>
+    </section>
+
+    <section class="install-guide" aria-labelledby="installHeading">
+      <h2 id="installHeading">How to install a skill</h2>
+      <div class="install-cols">
+        <div>
+          <h3>Claude.ai / Claude apps</h3>
+          <p>Download the <code>.skill</code> file, then upload it in a chat or in your Capabilities settings and choose <strong>Save skill</strong>. It becomes part of your profile — available in every conversation.</p>
+        </div>
+        <div>
+          <h3>Claude Code</h3>
+          <p>A <code>.skill</code> file is just a zip of the skill folder. Unzip it into <code>~/.claude/skills/</code> for every project, or commit it to a repo's <code>.claude/skills/</code> to share it with everyone who works there.</p>
+        </div>
+      </div>
+      <p class="install-note">After installing you rarely invoke a skill by name — Claude reads the description and reaches for it when your request matches. Skills are plain instructions and reference files; open the zip and read them.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Mapzimus is the creative lab of Maxwell Howe.</p>
+    <p class="footer-note">Skill sources live in the repo under .claude/skills/; add catalog entries in src/data/skills.json.</p>
+  </footer>
+
+</body>
+</html>
