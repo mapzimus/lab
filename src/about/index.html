@@ -4,65 +4,88 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>About · Mapzimus</title>
-  <meta name="description" content="About Maxwell Howe and the Mapzimus creative lab — plus a mini portfolio if you landed here first.">
+  <meta name="description" content="Mapzimus is the personal lab of Maxwell Howe — free browser tools, maps, and games, built by a GIS analyst and math teacher in Salem, Massachusetts.">
   <link rel="canonical" href="https://mapzimus.com/about/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="About · Mapzimus">
-  <meta property="og:description" content="About Maxwell Howe and the Mapzimus creative lab.">
+  <meta property="og:description" content="Mapzimus is the personal lab of Maxwell Howe.">
   <meta property="og:url" content="https://mapzimus.com/about/">
   <meta name="twitter:card" content="summary">
-  <meta name="theme-color" content="#f4f0e7">
+  <meta name="theme-color" content="#f5f1e6">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/about/about.css">
-  <script src="/about/about.js" defer></script>
+  <script src="/theme.js"></script>
 </head>
 <body data-view="about">
+<div class="sheet">
   <a class="skip-link" href="#about">Skip to content</a>
   <header class="site-header">
     <a class="brand" href="/" aria-label="Mapzimus home">
       <span class="brand-mark" aria-hidden="true">MZ</span>
-      <span>Mapzimus</span>
+      <span class="brand-name">Mapzimus</span>
     </a>
-    <nav aria-label="Primary navigation">
-      <a href="/lab/">Lab</a>
+    <nav class="site-nav" aria-label="Primary navigation">
       <a href="/tools/">Tools</a>
       <a href="/maps/">Maps</a>
-      <a href="/field-notes/">Field Notes</a>
       <a href="/games/">Games</a>
+      <a href="/lab/">Lab</a>
+      <a href="/field-notes/">Notes</a>
       <a href="/radars/">Radars</a>
       <a href="/skills/">Skills</a>
       <a href="/links/">Links</a>
       <a href="/about/" aria-current="page">About</a>
-      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Portfolio ↗</a>
     </nav>
+    <details class="menu">
+      <summary aria-label="Open menu">Menu</summary>
+      <div class="menu-panel">
+        <a href="/tools/">Tools</a>
+        <a href="/maps/">Maps</a>
+        <a href="/games/">Games</a>
+        <a href="/lab/">Lab</a>
+        <a href="/field-notes/">Field Notes</a>
+        <a href="/radars/">Radars</a>
+        <a href="/links/">Links</a>
+        <a href="/about/" aria-current="page">About</a>
+        <a href="https://maxwellhowegis.com">Portfolio ↗</a>
+      </div>
+    </details>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme">
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+    </button>
   </header>
 
   <main>
     <section class="hero">
-      <div class="eyebrow">The person behind the lab</div>
-      <h1>About.</h1>
-      <p>Mapzimus is the creative lab of Maxwell Howe — GIS professional by trade, maker of browser tools, unusual maps, and small games by compulsion.</p>
+      <span class="coord coord-ne" aria-hidden="true">42°31′ N</span>
+      <span class="coord coord-sw" aria-hidden="true">70°54′ W · SALEM, MASS.</span>
+      <div class="eyebrow">About</div>
+      <h1>The person behind the lab</h1>
+      <p>Mapzimus is the personal lab of Maxwell Howe — GIS analyst and math teacher on Massachusetts' North Shore.</p>
     </section>
 
-    <section class="about" id="about">
-      <p>If you found this site instead of the polished portfolio: welcome, this is the fun one. Mapzimus is where everything lives — every tool, every map, every game, every experiment, whether it behaves like a portfolio piece or not.</p>
-      <p>The curated professional GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>. The lab's process notes are in <a href="/field-notes/">Field Notes</a>, and everything I've built is browsable from the sections above.</p>
+    <section class="prose" id="about">
+      <p>This is the fun half of my work. I build small browser tools I actually use — coordinate converters, geocoders, chart makers, classroom helpers — along with maps, games, and experiments that don't need to justify themselves. Everything here is free, runs in your browser, and asks for nothing.</p>
+      <p>The serious half lives at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>: case studies, professional GIS work, and the projects I'd show an employer. If you're deciding whether to hire me, start there. If you just want a good sun calculator, stay here.</p>
+      <p>Notes on what I'm building are in <a href="/field-notes/">Field Notes</a>, and the <a href="/radars/">radars</a> track what's new in GIS and dev tooling every day.</p>
     </section>
 
     <section class="featured mini-portfolio" aria-labelledby="miniHeading">
       <div class="section-heading">
-        <div><span class="eyebrow">Mini portfolio</span><h2 id="miniHeading">A few favorites</h2></div>
-        <p>A sampler in case you never make it to the full catalog.</p>
+        <div><span class="eyebrow">Sampler</span><h2 id="miniHeading">A few favorites</h2></div>
+        <p>{{TOOL_COUNT}} tools and counting — these are good places to start.</p>
       </div>
-      <div class="featured-grid" id="miniGrid"></div>
+      <div class="featured-grid">{{MINI_CARDS}}</div>
     </section>
   </main>
 
   <footer>
-    <p>Mapzimus is the creative lab of Maxwell Howe.</p>
-    <p class="footer-note">The mini portfolio reuses the site's featured shelf (src/data/featured.json).</p>
+    <p>Mapzimus is the lab of Maxwell Howe — browser tools, maps, and games, all free.<br>Professional GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
+    <p class="footer-note">MAPZIMUS QUADRANGLE · STATIC SITE · NO TRACKING</p>
   </footer>
-
+</div>
 </body>
 </html>

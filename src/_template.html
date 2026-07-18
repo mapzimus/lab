@@ -11,71 +11,95 @@
   <meta property="og:description" content="{{DESCRIPTION}}">
   <meta property="og:url" content="{{CANONICAL}}">
   <meta name="twitter:card" content="summary">
-  <meta name="theme-color" content="#f4f0e7">
+  <meta name="theme-color" content="#f5f1e6">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
+  <script src="/theme.js"></script>
   <script src="/app.js" defer></script>
 </head>
 <body data-view="{{VIEW}}" data-category="{{CATEGORY}}">
+<div class="sheet">
   <a class="skip-link" href="#catalog">Skip to catalog</a>
   <header class="site-header">
     <a class="brand" href="/" aria-label="Mapzimus home">
       <span class="brand-mark" aria-hidden="true">MZ</span>
-      <span>Mapzimus</span>
+      <span class="brand-name">Mapzimus</span>
     </a>
-    <nav aria-label="Primary navigation">
-      <a href="/lab/">Lab</a>
-      <a href="/tools/">Tools</a>
-      <a href="/maps/">Maps</a>
-      <a href="/field-notes/">Field Notes</a>
-      <a href="/games/">Games</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="/tools/"{{NAV_TOOLS}}>Tools</a>
+      <a href="/maps/"{{NAV_MAPS}}>Maps</a>
+      <a href="/games/"{{NAV_GAMES}}>Games</a>
+      <a href="/lab/"{{NAV_LAB}}>Lab</a>
+      <a href="/field-notes/">Notes</a>
       <a href="/radars/">Radars</a>
       <a href="/skills/">Skills</a>
       <a href="/links/">Links</a>
       <a href="/about/">About</a>
-      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Portfolio ↗</a>
     </nav>
+    <details class="menu">
+      <summary aria-label="Open menu">Menu</summary>
+      <div class="menu-panel">
+        <a href="/tools/"{{NAV_TOOLS}}>Tools</a>
+        <a href="/maps/"{{NAV_MAPS}}>Maps</a>
+        <a href="/games/"{{NAV_GAMES}}>Games</a>
+        <a href="/lab/"{{NAV_LAB}}>Lab</a>
+        <a href="/field-notes/">Field Notes</a>
+        <a href="/radars/">Radars</a>
+        <a href="/links/">Links</a>
+        <a href="/about/">About</a>
+        <a href="https://maxwellhowegis.com">Portfolio ↗</a>
+      </div>
+    </details>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme">
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+    </button>
   </header>
 
   <main>
     <section class="hero">
-      <div class="eyebrow">A creative lab by Maxwell Howe</div>
+      <span class="coord coord-ne" aria-hidden="true">42°31′ N</span>
+      <span class="coord coord-sw" aria-hidden="true">70°54′ W · SALEM, MASS.</span>
+      <div class="eyebrow">{{EYEBROW}}</div>
       <h1>{{HEADING}}</h1>
       <p>{{INTRO}}</p>
-      <div class="trust-row" aria-label="Site promises">
+      <div class="trust-row" aria-label="Site facts">
         <span>{{TOOL_COUNT}} browser tools</span>
-        <span>No account required</span>
-        <span>Files stay in your browser when noted</span>
+        <span>Free — no accounts</span>
+        <span>No installs, no tracking</span>
       </div>
     </section>
 
     <section class="featured" id="featuredSection" aria-labelledby="featuredHeading"{{FEATURED_ATTR}}>
       <div class="section-heading">
-        <div><span class="eyebrow">Start here</span><h2 id="featuredHeading">Featured from the lab</h2></div>
-        <p>A changing shelf of useful and unusual things.</p>
+        <div><span class="eyebrow">Start here</span><h2 id="featuredHeading">Featured</h2></div>
+        <p>A short list of favorites, updated now and then.</p>
       </div>
-      <div class="featured-grid" id="featuredGrid"></div>
+      <div class="featured-grid" id="featuredGrid">{{FEATURED_CARDS}}</div>
     </section>
 
     <section class="catalog" id="catalog" aria-labelledby="catalogHeading">
       <div class="section-heading">
-        <div><span class="eyebrow">Browse</span><h2 id="catalogHeading">The full shelf</h2></div>
-        <p id="resultCount" aria-live="polite"></p>
+        <div><span class="eyebrow">Browse</span><h2 id="catalogHeading">{{CATALOG_HEADING}}</h2></div>
+        <p id="resultCount" aria-live="polite">{{RESULT_COUNT}}</p>
       </div>
       <div class="catalog-controls">
-        <label class="search-field"><span class="visually-hidden">Search the catalog</span><input id="searchInput" type="search" placeholder="Search tools, maps, and experiments…" autocomplete="off"></label>
-        <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
-        <button class="quiet-button" id="favoritesButton" type="button" aria-pressed="false">Favorites</button>
+        <label class="search-field"><span class="visually-hidden">Search the catalog</span><input id="searchInput" type="search" placeholder="Search by name, tag, or what it does…" autocomplete="off"><kbd>/</kbd></label>
+        <div class="filters" id="filters" role="group" aria-label="Filter by category">{{FILTERS}}</div>
+        <button class="quiet-button" id="favoritesButton" type="button" aria-pressed="false">★ Favorites</button>
       </div>
-      <div class="catalog-grid" id="catalogGrid"></div>
-      <div class="empty" id="emptyState" hidden>No matches. Try a broader word or another category.</div>
-      <noscript><div class="empty">The catalog needs JavaScript to search and filter. Everything is still browsable at <a href="https://mapzimus.com/tools/">the legacy tool library</a>.</div></noscript>
+      <div class="catalog-grid" id="catalogGrid">{{CATALOG_CARDS}}</div>
+      <div class="empty" id="emptyState" hidden>No matches. Try a shorter search or a different category.</div>
+      <noscript><div class="empty">Search and filters need JavaScript, but every card above is a plain link — everything still works.</div></noscript>
     </section>
   </main>
 
   <footer>
-    <p>Mapzimus is the creative lab. For case studies and professional GIS work, visit <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
-    <p class="footer-note">Built as a small static site. Last catalog refresh: {{CATALOG_REFRESH}}.</p>
+    <p>Mapzimus is the lab of Maxwell Howe — browser tools, maps, and games, all free.<br>Professional GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
+    <p class="footer-note">MAPZIMUS QUADRANGLE · CATALOG EDITION {{CATALOG_REFRESH}} · STATIC SITE · NO TRACKING</p>
   </footer>
+</div>
 </body>
 </html>
