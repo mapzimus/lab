@@ -20,6 +20,17 @@
   ! Content-Security-Policy
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://tile.openstreetmap.org; worker-src 'self' blob:; child-src 'self' blob:; font-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
 
+# Housing-crisis tract explorer: same policy shape as train-routes — vendored
+# MapLibre GL under /lab/housing-crisis/vendor/, OSM raster tiles via fetch()
+# (connect-src), workers from blob: URLs.
+/lab/housing-crisis/
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://tile.openstreetmap.org; worker-src 'self' blob:; child-src 'self' blob:; font-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
+
+/lab/housing-crisis/*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://tile.openstreetmap.org; worker-src 'self' blob:; child-src 'self' blob:; font-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
+
 # Packaged Claude skills: force download with a sensible filename.
 /skills/files/*
   Content-Type: application/zip
