@@ -121,6 +121,74 @@ async function collectHuggingFace() {
     .sort((a, b) => b.rank - a.rank);
 }
 
+// Hacker News via the Algolia API: current front page plus recent Show HN.
+async function collectHackerNews(daysAgo) {
+  const base = "https://hn.algolia.com/api/v1";
+  const since = Math.floor(Date.parse(daysAgo(3)) / 1000);
+  const [front, show] = await Promise.all([
+    getJSON(`${base}/search?tags=front_page&hitsPerPage=30`).catch(() => ({ hits: [] })),
+    getJSON(`${base}/search_by_date?tags=show_hn&numericFilters=points>20,created_at_i>${since}&hitsPerPage=30`).catch(() => ({ hits: [] })),
+  ]);
+  const seen = new Map();
+  for (const h of [...front.hits, ...show.hits]) {
+    if (!seen.has(h.objectID)) seen.set(h.objectID, h);
+  }
+  return [...seen.values()]
+    .map((h) => {
+      const isShow = /^show hn/i.test(h.title ?? "");
+      const text = `${h.title ?? ""} ${h.url ?? ""}`;
+      return {
+        title: (h.title ?? "").replace(/^show hn:\s*/i, ""),
+        url: h.url || `https://news.ycombinator.com/item?id=${h.objectID}`,
+        hnUrl: `https://news.ycombinator.com/item?id=${h.objectID}`,
+        points: h.points ?? 0,
+        comments: h.num_comments ?? 0,
+        isShow,
+        rank: score(text) * 10 + Math.log10(1 + (h.points ?? 0)) * 2 + (isShow ? 2 : 0),
+        relevant: score(text) > 0,
+      };
+    })
+    .sort((a, b) => b.rank - a.rank);
+}
+
+// Hugging Face Daily Papers: curated trending ML papers.
+async function collectPapers() {
+  const items = await getJSON("https://huggingface.co/api/daily_papers?limit=50").catch(() => []);
+  return items
+    .map((it) => {
+      const p = it.paper ?? it;
+      const summary = (p.summary ?? "").replace(/\s+/g, " ").trim();
+      const text = `${p.title ?? ""} ${summary}`;
+      const firstSentence = summary.match(/^.{25,220}?[.!?](\s|$)/)?.[0].trim() ?? summary.slice(0, 200);
+      return {
+        title: p.title ?? "",
+        url: `https://huggingface.co/papers/${p.id}`,
+        desc: firstSentence,
+        upvotes: p.upvotes ?? 0,
+        rank: score(text) * 10 + Math.log10(1 + (p.upvotes ?? 0)) * 2,
+        relevant: score(text) > 0,
+      };
+    })
+    .sort((a, b) => b.rank - a.rank);
+}
+
+// weeklyOSM: latest issues from the RSS feed (regex-parsed; no XML dep).
+async function collectWeeklyOSM() {
+  try {
+    const res = await fetch("https://weeklyosm.eu/feed", { headers: { "User-Agent": "mapzimus-radar" } });
+    if (!res.ok) return [];
+    const xml = (await res.text()).slice(0, 100000);
+    const items = [];
+    for (const m of xml.matchAll(/<item>[\s\S]*?<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>[\s\S]*?<link>([\s\S]*?)<\/link>[\s\S]*?<\/item>/g)) {
+      items.push({ title: m[1].trim(), url: m[2].trim() });
+      if (items.length >= 3) break;
+    }
+    return items;
+  } catch {
+    return [];
+  }
+}
+
 // Fetch a one-line caption for a Hugging Face item from its card README:
 // first meaningful prose line after the YAML frontmatter, markdown stripped.
 async function hfCaption(kind, id) {
@@ -159,13 +227,20 @@ async function addCaptions(items) {
 // `today` is a YYYY-MM-DD string; `githubToken` is optional.
 export async function sweep(today, githubToken) {
   const daysAgo = (n) => new Date(Date.parse(today) - n * 86400000).toISOString().slice(0, 10);
-  const [gh, hf] = await Promise.all([collectGitHub(daysAgo, githubToken), collectHuggingFace()]);
+  const [gh, hf, hn, papers, osm] = await Promise.all([
+    collectGitHub(daysAgo, githubToken),
+    collectHuggingFace(),
+    collectHackerNews(daysAgo),
+    collectPapers(),
+    collectWeeklyOSM(),
+  ]);
 
   const ghRelevant = gh.filter((r) => r.relevant).slice(0, 20);
   const ghGeneral = gh.filter((r) => !r.relevant && r.isNew).slice(0, 10);
   const byKind = (k) => hf.filter((h) => h.kind === k && h.relevant).slice(0, 8);
   const hfGeneral = hf.filter((h) => !h.relevant).slice(0, 8);
-  await addCaptions([...byKind("models"), ...byKind("datasets"), ...byKind("spaces"), ...hfGeneral]);
+  // Cap caption fetches to stay well under the Workers subrequest limit.
+  await addCaptions([...byKind("models"), ...byKind("datasets"), ...byKind("spaces"), ...hfGeneral].slice(0, 20));
 
   return {
     generatedAt: today,
@@ -176,5 +251,11 @@ export async function sweep(today, githubToken) {
       spaces: byKind("spaces"),
       general: hfGeneral,
     },
+    hackernews: {
+      relevant: hn.filter((h) => h.relevant).slice(0, 12),
+      general: hn.filter((h) => !h.relevant).slice(0, 10),
+    },
+    papers: papers.filter((p) => p.relevant).slice(0, 10),
+    osm,
   };
 }

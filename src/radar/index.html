@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Radar · Mapzimus</title>
-  <meta name="description" content="A daily scan of GitHub and Hugging Face, ranked for the Mapzimus lab: maps, GIS, data tools, generative design, and browser experiments.">
+  <meta name="description" content="A daily scan of GitHub, Hugging Face, Hacker News, and more, ranked for the Mapzimus lab: maps, GIS, data tools, generative design, and browser experiments.">
   <link rel="canonical" href="https://mapzimus.com/radar/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Radar · Mapzimus">
@@ -38,7 +38,7 @@
     <section class="hero radar-hero">
       <div class="eyebrow">Fresh every day</div>
       <h1>The lab's radar.</h1>
-      <p>A daily scan of GitHub and Hugging Face, ranked for what this lab cares about: maps and GIS, browser data tools, generative design, math, teaching, games, and the small-web stack.</p>
+      <p>A daily scan of GitHub, Hugging Face, Hacker News, ML papers, and the OSM world, ranked for what this lab cares about: maps and GIS, browser data tools, generative design, math, teaching, games, and the small-web stack.</p>
       <div class="trust-row">
         <span id="radarDate">Loading…</span>
         <span id="radarCounts" hidden></span>
@@ -55,6 +55,9 @@
           <button class="filter" data-source="all" aria-pressed="true">All</button>
           <button class="filter" data-source="github" aria-pressed="false">GitHub</button>
           <button class="filter" data-source="huggingface" aria-pressed="false">Hugging Face</button>
+          <button class="filter" data-source="hackernews" aria-pressed="false">Hacker News</button>
+          <button class="filter" data-source="papers" aria-pressed="false">Papers</button>
+          <button class="filter" data-source="osm" aria-pressed="false">OSM</button>
         </div>
       </div>
       <div id="radarSections">
@@ -65,7 +68,7 @@
 
   <footer>
     <p>Mapzimus is the creative lab of Maxwell Howe. Radar data refreshes daily via GitHub Actions.</p>
-    <p class="footer-note">Sources: GitHub Search API · Hugging Face Hub API</p>
+    <p class="footer-note">Sources: GitHub · Hugging Face · Hacker News · HF Daily Papers · weeklyOSM</p>
   </footer>
 </body>
 </html>

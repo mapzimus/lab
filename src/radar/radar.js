@@ -49,16 +49,26 @@
   const hfCard = (h) =>
     card(h.id, h.url, h.desc || "", [h.pipeline, `♥ ${fmt.format(h.likes)}`, h.downloads ? `${fmt.format(h.downloads)} downloads` : null], false);
 
+  const hnCard = (h) =>
+    card(h.title, h.url, "", [`▲ ${fmt.format(h.points)}`, `${fmt.format(h.comments)} comments`, h.isShow ? "Show HN" : null], false);
+  const paperCard = (p) => card(p.title, p.url, p.desc, [`▲ ${fmt.format(p.upvotes)}`], false);
+  const osmCard = (o) => card(o.title, o.url, "", ["weeklyOSM"], false);
+
   const gh = data.github || { relevant: [], general: [] };
   const hf = data.huggingface || { models: [], datasets: [], spaces: [], general: [] };
+  const hn = data.hackernews || { relevant: [], general: [] };
 
   const sections = [
     ["github", "GitHub — picked for the lab", "New and active repos matching the lab's interests.", gh.relevant.map(repoCard)],
+    ["hackernews", "Hacker News — picked for the lab", "Front page and recent Show HN, filtered for lab interests.", hn.relevant.map(hnCard)],
     ["huggingface", "Hugging Face — models", "Trending models relevant to maps, vision, and small on-device work.", hf.models.map(hfCard)],
     ["huggingface", "Hugging Face — datasets", "Trending datasets worth a look.", hf.datasets.map(hfCard)],
     ["huggingface", "Hugging Face — spaces", "Trending demos and apps.", hf.spaces.map(hfCard)],
+    ["papers", "Papers", "From Hugging Face Daily Papers, filtered for lab interests.", (data.papers || []).map(paperCard)],
+    ["osm", "OSM pulse", "Latest issues of weeklyOSM.", (data.osm || []).map(osmCard)],
     ["github", "GitHub — trending everywhere", "The loudest brand-new repos regardless of topic.", gh.general.map(repoCard)],
     ["huggingface", "Hugging Face — trending everywhere", "The biggest general movers on the Hub.", hf.general.map(hfCard)],
+    ["hackernews", "Hacker News — front page", "What everyone else is reading today.", hn.general.map(hnCard)],
   ];
 
   sectionsEl.textContent = "";

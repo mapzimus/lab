@@ -36,9 +36,14 @@ function section(title, lines) {
   return lines.length ? `## ${title}\n\n${lines.join("\n")}\n` : "";
 }
 
+const renderHN = (h) =>
+  `- [${h.title}](${h.url}) (▲ ${h.points} · [${h.comments} comments](${h.hnUrl})${h.isShow ? " · Show HN" : ""})`;
+const renderPaper = (p) => `- [${p.title}](${p.url}) (▲ ${p.upvotes})${p.desc ? ` — ${p.desc}` : ""}`;
+const renderOSM = (o) => `- [${o.title}](${o.url})`;
+
 async function main() {
   const data = await sweep(today, process.env.GITHUB_TOKEN);
-  const { github: gh, huggingface: hf } = data;
+  const { github: gh, huggingface: hf, hackernews: hn, papers, osm } = data;
 
   const md = [
     `# Mapzimus Radar — ${today}`,
@@ -51,6 +56,10 @@ async function main() {
     section("Hugging Face — datasets", hf.datasets.map(renderHF)),
     section("Hugging Face — spaces", hf.spaces.map(renderHF)),
     section("Hugging Face — trending everywhere", hf.general.map(renderHF)),
+    section("Hacker News — relevant to the lab", hn.relevant.map(renderHN)),
+    section("Hacker News — front page", hn.general.map(renderHN)),
+    section("Papers", papers.map(renderPaper)),
+    section("OSM pulse", osm.map(renderOSM)),
   ].filter(Boolean).join("\n");
 
   await mkdir(OUT_DIR, { recursive: true });

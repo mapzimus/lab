@@ -21,10 +21,10 @@
         "kind": "models",
         "id": "prism-ml/Bonsai-27B-gguf",
         "url": "https://huggingface.co/prism-ml/Bonsai-27B-gguf",
-        "likes": 390,
+        "likes": 391,
         "downloads": 1045182,
         "pipeline": "text-generation",
-        "rank": 63.68435351479174,
+        "rank": 63.686572134040915,
         "relevant": true,
         "desc": "Full 27B-class reasoning in binary transformer weights, for llama.cpp (CUDA, Metal, CPU)"
       },
@@ -181,8 +181,8 @@
         "kind": "spaces",
         "id": "webml-community/bonsai-webgpu-kernels",
         "url": "https://huggingface.co/spaces/webml-community/bonsai-webgpu-kernels",
-        "likes": 183,
-        "rank": 52.129635646019075,
+        "likes": 184,
+        "rank": 52.23434345680603,
         "relevant": true,
         "desc": ""
       },
@@ -215,7 +215,7 @@
         "likes": 2271,
         "downloads": 2096147,
         "pipeline": "image-text-to-text",
-        "rank": 30.812816654077963,
+        "rank": 30.71281665407796,
         "relevant": false,
         "desc": "Qwythos-9B-Claude-Mythos-5-1M-GGUF"
       },
@@ -227,8 +227,7 @@
         "downloads": 534698,
         "pipeline": "text-generation",
         "rank": 29.819402204758802,
-        "relevant": false,
-        "desc": "📖 Check out the GLM-5.2 blog and GLM-5 Technical report."
+        "relevant": false
       },
       {
         "kind": "models",
@@ -238,8 +237,7 @@
         "downloads": 9383,
         "pipeline": "image-text-to-text",
         "rank": 24.634000682241798,
-        "relevant": false,
-        "desc": "ThinkingCap: Qwen 3.6 27B"
+        "relevant": false
       },
       {
         "kind": "models",
@@ -248,8 +246,7 @@
         "likes": 344,
         "downloads": 0,
         "rank": 23.37563819014655,
-        "relevant": false,
-        "desc": "v1.2 (recommended): krea2identityeditv12.safetensors — better face"
+        "relevant": false
       },
       {
         "kind": "models",
@@ -259,8 +256,7 @@
         "downloads": 2295313,
         "pipeline": "image-text-to-text",
         "rank": 22.90295881024972,
-        "relevant": false,
-        "desc": "Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive"
+        "relevant": false
       },
       {
         "kind": "models",
@@ -270,8 +266,7 @@
         "downloads": 83160,
         "pipeline": "audio-text-to-text",
         "rank": 19.992398694191472,
-        "relevant": false,
-        "desc": "MOSS-Transcribe-Diarize 0.9B is an end-to-end audio understanding model for long-form multi-speaker transcription, diarization, timestamps, and acoustic event awareness."
+        "relevant": false
       },
       {
         "kind": "models",
@@ -281,9 +276,230 @@
         "downloads": 12719,
         "pipeline": "text-generation",
         "rank": 19.32868631423888,
-        "relevant": false,
-        "desc": "Hy3 is a 295B-parameter Mixture-of-Experts (MoE) model with 21B active parameters and 3.8B MTP layer parameters, developed by the Tencent Hy Team."
+        "relevant": false
       }
     ]
-  }
+  },
+  "hackernews": {
+    "relevant": [
+      {
+        "title": "Painterly – Turn pictures into digital paintings without generative AI",
+        "url": "https://github.com/jbunke/painterly",
+        "hnUrl": "https://news.ycombinator.com/item?id=48923842",
+        "points": 21,
+        "comments": 4,
+        "isShow": true,
+        "rank": 34.68484536164441,
+        "relevant": true
+      },
+      {
+        "title": "Firefox in WebAssembly",
+        "url": "https://developer.puter.com/labs/firefox-wasm/",
+        "hnUrl": "https://news.ycombinator.com/item?id=48926939",
+        "points": 257,
+        "comments": 126,
+        "isShow": true,
+        "rank": 26.82323941192646,
+        "relevant": true
+      }
+    ],
+    "general": [
+      {
+        "title": "misa77 - a codec that decodes 2x faster than LZ4 (at better ratios)",
+        "url": "https://github.com/welcome-to-the-sunny-side/misa77",
+        "hnUrl": "https://news.ycombinator.com/item?id=48922838",
+        "points": 159,
+        "comments": 48,
+        "isShow": true,
+        "rank": 6.40823996531185,
+        "relevant": false
+      },
+      {
+        "title": "Watch bots interact with an SSH honeypot in real time",
+        "url": "https://honeypotlive.cc/",
+        "hnUrl": "https://news.ycombinator.com/item?id=48947548",
+        "points": 137,
+        "comments": 49,
+        "isShow": true,
+        "rank": 6.279758172802473,
+        "relevant": false
+      },
+      {
+        "title": "AWS: Inaccurate Estimated Billing Data – $1.7 billion",
+        "url": "https://news.ycombinator.com/item?id=48945241",
+        "hnUrl": "https://news.ycombinator.com/item?id=48945241",
+        "points": 1012,
+        "comments": 629,
+        "isShow": false,
+        "rank": 6.011218890720561,
+        "relevant": false
+      },
+      {
+        "title": "One More Letter",
+        "url": "https://playonemoreletter.com/",
+        "hnUrl": "https://news.ycombinator.com/item?id=48928402",
+        "points": 87,
+        "comments": 58,
+        "isShow": true,
+        "rank": 5.888965344300337,
+        "relevant": false
+      },
+      {
+        "title": "Leaves – A text-UI disk usage treemap visualizer",
+        "url": "https://github.com/patonw/leaves",
+        "hnUrl": "https://news.ycombinator.com/item?id=48936389",
+        "points": 86,
+        "comments": 26,
+        "isShow": true,
+        "rank": 5.8790385052372365,
+        "relevant": false
+      },
+      {
+        "title": "Mojibake – A low-level Unicode library written in C",
+        "url": "https://mojibake.zaerl.com/",
+        "hnUrl": "https://news.ycombinator.com/item?id=48941123",
+        "points": 74,
+        "comments": 22,
+        "isShow": true,
+        "rank": 5.7501225267834,
+        "relevant": false
+      },
+      {
+        "title": "A zoomable timeline of 4M Wikipedia events",
+        "url": "https://app.everything.diena.co/",
+        "hnUrl": "https://news.ycombinator.com/item?id=48950774",
+        "points": 49,
+        "comments": 23,
+        "isShow": true,
+        "rank": 5.3979400086720375,
+        "relevant": false
+      },
+      {
+        "title": "Be the ChatBOT",
+        "url": "https://bethechatbot.com/",
+        "hnUrl": "https://news.ycombinator.com/item?id=48938524",
+        "points": 48,
+        "comments": 22,
+        "isShow": true,
+        "rank": 5.380392160057028,
+        "relevant": false
+      },
+      {
+        "title": "I've built a words game based on binary search",
+        "url": "https://hilogame.cc/",
+        "hnUrl": "https://news.ycombinator.com/item?id=48934092",
+        "points": 48,
+        "comments": 66,
+        "isShow": true,
+        "rank": 5.380392160057028,
+        "relevant": false
+      },
+      {
+        "title": "Make senders work to get into your inbox",
+        "url": "https://www.captchainbox.com",
+        "hnUrl": "https://news.ycombinator.com/item?id=48919489",
+        "points": 44,
+        "comments": 68,
+        "isShow": true,
+        "rank": 5.306425027550688,
+        "relevant": false
+      }
+    ]
+  },
+  "papers": [
+    {
+      "title": "Registers Matter for Pixel-Space Diffusion Transformers",
+      "url": "https://huggingface.co/papers/2605.16147",
+      "desc": "Vision Transformers (ViTs) are known to exhibit high-norm patch-token outliers that degrade feature map quality, a problem effectively mitigated by register tokens.",
+      "upvotes": 21,
+      "rank": 62.68484536164441,
+      "relevant": true
+    },
+    {
+      "title": "SUFLECA: Scaling Up Feature Learning for CAD-to-image Alignment",
+      "url": "https://huggingface.co/papers/2607.15058",
+      "desc": "CAD-to-image alignment aims to estimate an object's 9D pose (rotation, translation, and anisotropic scale) from a single RGB image, enabling applications in robotics and augmented reality.",
+      "upvotes": 3,
+      "rank": 61.204119982655925,
+      "relevant": true
+    },
+    {
+      "title": "Token Time Continuous Diffusion for Language Modeling",
+      "url": "https://huggingface.co/papers/2607.14106",
+      "desc": "In this paper we introduce token time continuous diffusion (TTCD), a new diffusion language model which (a) operates in continuous space, deterministically mapping Gaussian noise to a final token canv",
+      "upvotes": 2,
+      "rank": 60.954242509439325,
+      "relevant": true
+    },
+    {
+      "title": "Harness Handbook: Making Evolving Agent Harnesses Readable,Navigable, and Editable",
+      "url": "https://huggingface.co/papers/2607.13285",
+      "desc": "The capability of a modern AI agent depends not only on its foundation model but also on its harness, which constructs prompts, manages state, invokes tools, and coordinates execution.",
+      "upvotes": 187,
+      "rank": 34.54831569852736,
+      "relevant": true
+    },
+    {
+      "title": "SearchOS-V1: Towards Robust Open-Domain Information-Seeking Agent Collaboration",
+      "url": "https://huggingface.co/papers/2607.15257",
+      "desc": "Recent advances in Tool-Integrated Large Language Models have made web search a core capability of information-seeking agents.",
+      "upvotes": 49,
+      "rank": 33.39794000867204,
+      "relevant": true
+    },
+    {
+      "title": "MetaView: Monocular Novel View Synthesis with Scale-Aware Implicit Geometry Priors",
+      "url": "https://huggingface.co/papers/2607.12000",
+      "desc": "Current visual generation models are capable of producing high-quality content, yet they lack a coherent perception of the spatial structure.",
+      "upvotes": 30,
+      "rank": 32.98272338766854,
+      "relevant": true
+    },
+    {
+      "title": "From Pixels to States: Rethinking Interactive World Models as Game Engines",
+      "url": "https://huggingface.co/papers/2607.14076",
+      "desc": "Building interactive worlds that respond coherently to player actions has long been a shared goal of computer graphics, games, and artificial intelligence.",
+      "upvotes": 23,
+      "rank": 32.76042248342321,
+      "relevant": true
+    },
+    {
+      "title": "Spectral Rewiring for Exploration, Purification, and Model Merging",
+      "url": "https://huggingface.co/papers/2607.03065",
+      "desc": "Reinforcement learning has become a standard post-training recipe for large language models, but dense full-parameter updates create two deployment-relevant bottlenecks: suppressed reasoning performan",
+      "upvotes": 20,
+      "rank": 32.64443858946784,
+      "relevant": true
+    },
+    {
+      "title": "Video = World + Event Stream",
+      "url": "https://huggingface.co/papers/2607.15038",
+      "desc": "We present Wan-Streamer v0.3, which reframes our native-streaming interaction model under a single organizing view: a video is a world plus an event stream.",
+      "upvotes": 15,
+      "rank": 32.40823996531185,
+      "relevant": true
+    },
+    {
+      "title": "Hallo4D: Multi-Modal Hallucination Mitigation for Consistent Spatio-Temporal Generation",
+      "url": "https://huggingface.co/papers/2607.12752",
+      "desc": "While recent advances in 3D generation have enabled impressive visual synthesis, existing methods often rely on 2D diffusion supervision without explicit mechanisms for geometric consistency, leading ",
+      "upvotes": 15,
+      "rank": 32.40823996531185,
+      "relevant": true
+    }
+  ],
+  "osm": [
+    {
+      "title": "weeklyOSM 833",
+      "url": "https://weeklyosm.eu/archives/18704"
+    },
+    {
+      "title": "weeklyOSM 832",
+      "url": "https://weeklyosm.eu/archives/18690"
+    },
+    {
+      "title": "weeklyOSM 831",
+      "url": "https://weeklyosm.eu/archives/18672"
+    }
+  ]
 }
