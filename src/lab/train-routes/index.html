@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Train Route Atlas · Mapzimus Lab</title>
+  <meta name="description" content="An interactive atlas of twelve legendary train routes — high-speed, scenic, night, and classic — drawn as GeoJSON on a Leaflet map, all client-side.">
+  <link rel="canonical" href="https://mapzimus.com/lab/train-routes/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Train Route Atlas · Mapzimus Lab">
+  <meta property="og:description" content="An interactive atlas of twelve legendary train routes — high-speed, scenic, night, and classic — drawn as GeoJSON on a Leaflet map, all client-side.">
+  <meta property="og:url" content="https://mapzimus.com/lab/train-routes/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#f4f0e7">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/train-routes/vendor/leaflet.css">
+  <link rel="stylesheet" href="/lab/train-routes/train-routes.css">
+  <script src="/lab/train-routes/vendor/leaflet.js" defer></script>
+  <script src="/lab/train-routes/train-routes.js" defer></script>
+</head>
+<body>
+  <div class="top">
+    <a class="back" href="/lab/">← Lab</a>
+    <div>
+      <span class="eyebrow">Mapzimus Lab experiment</span>
+      <h1>Train Route Atlas</h1>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <aside class="panel">
+      <h2>Twelve legendary routes</h2>
+      <p class="hint">Click a route on the map or in the list. Filter by category to compare like with like.</p>
+      <div class="filters" role="group" aria-label="Route category filter">
+        <button type="button" data-cat="all" aria-pressed="true">all</button>
+        <button type="button" data-cat="high-speed" aria-pressed="false">high-speed</button>
+        <button type="button" data-cat="scenic" aria-pressed="false">scenic</button>
+        <button type="button" data-cat="night" aria-pressed="false">night</button>
+        <button type="button" data-cat="classic" aria-pressed="false">classic</button>
+      </div>
+      <dl class="readout" id="readout"></dl>
+      <ul class="route-list" id="routeList"></ul>
+    </aside>
+
+    <div class="map-frame"><div id="map" aria-label="Interactive map of train routes"></div></div>
+  </div>
+
+  <footer>
+    <p>Every route is a hand-drawn GeoJSON <code>LineString</code> through its major stops, styled and
+      filtered entirely in your browser — no server does any GIS. Rendering by
+      <a href="https://leafletjs.com/">Leaflet</a> (1.9.4, self-hosted),
+      tiles © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.
+      Route specs are approximate and drawn from public timetables. The recipe for scaling this to
+      hundreds of routes with real track geometry lives in the repo at <code>docs/train-route-maps.md</code>.</p>
+  </footer>
+</body>
+</html>

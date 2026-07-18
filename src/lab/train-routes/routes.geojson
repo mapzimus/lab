@@ -1,0 +1,317 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "tokaido-shinkansen",
+        "name": "Tokaido Shinkansen",
+        "category": "high-speed",
+        "countries": "Japan",
+        "endpoints": "Tokyo — Shin-Osaka",
+        "km": 515,
+        "duration": "2 h 21 min",
+        "topSpeed": "285 km/h",
+        "operator": "JR Central",
+        "opened": 1964,
+        "blurb": "The original bullet train, opened days before the 1964 Tokyo Olympics. Still the busiest high-speed line on Earth, with N700S trainsets departing every few minutes."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [139.767, 35.681], [139.617, 35.507], [139.155, 35.257],
+          [138.389, 34.972], [137.734, 34.769], [137.061, 34.963],
+          [136.882, 35.171], [136.457, 35.315], [135.759, 34.985],
+          [135.500, 34.734]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "eurostar",
+        "name": "Eurostar",
+        "category": "high-speed",
+        "countries": "United Kingdom, France",
+        "endpoints": "London St Pancras — Paris Gare du Nord",
+        "km": 492,
+        "duration": "2 h 16 min",
+        "topSpeed": "300 km/h",
+        "operator": "Eurostar",
+        "opened": 1994,
+        "blurb": "Under the Channel in twenty minutes, then flat-out across the Pas-de-Calais. The train that made London–Paris a day trip."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-0.126, 51.531], [0.320, 51.442], [0.876, 51.143],
+          [1.281, 51.096], [1.811, 50.930], [2.373, 50.749],
+          [3.075, 50.639], [2.782, 50.286], [2.531, 49.507],
+          [2.355, 48.881]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "beijing-shanghai-hsr",
+        "name": "Beijing–Shanghai High-Speed Railway",
+        "category": "high-speed",
+        "countries": "China",
+        "endpoints": "Beijing South — Shanghai Hongqiao",
+        "km": 1318,
+        "duration": "4 h 18 min",
+        "topSpeed": "350 km/h",
+        "operator": "China Railway",
+        "opened": 2011,
+        "blurb": "The world's fastest scheduled service. Fuxing trainsets cover the distance of London to Rome in the time of a long lunch."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [116.378, 39.865], [116.966, 38.310], [116.999, 36.675],
+          [117.129, 35.399], [117.190, 34.261], [118.310, 33.021],
+          [118.797, 31.968], [119.559, 31.799], [120.302, 31.578],
+          [120.620, 31.336], [121.320, 31.194]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "ave-madrid-barcelona",
+        "name": "AVE Madrid–Barcelona",
+        "category": "high-speed",
+        "countries": "Spain",
+        "endpoints": "Madrid Atocha — Barcelona Sants",
+        "km": 621,
+        "duration": "2 h 30 min",
+        "topSpeed": "310 km/h",
+        "operator": "Renfe",
+        "opened": 2008,
+        "blurb": "Across the Aragonese steppe at 310 km/h. The line that flipped Spain's busiest air corridor to rail."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-3.690, 40.407], [-3.006, 40.632], [-2.155, 40.941],
+          [-1.610, 41.230], [-0.877, 41.659], [-0.093, 41.590],
+          [0.632, 41.620], [1.263, 41.222], [1.717, 41.290],
+          [2.140, 41.379]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "glacier-express",
+        "name": "Glacier Express",
+        "category": "scenic",
+        "countries": "Switzerland",
+        "endpoints": "Zermatt — St. Moritz",
+        "km": 291,
+        "duration": "8 h",
+        "topSpeed": "90 km/h",
+        "operator": "MGB + RhB",
+        "opened": 1930,
+        "blurb": "The famous \"slowest express train in the world\": 291 bridges, 91 tunnels, and the 2,033 m Oberalp Pass between two ski resorts."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [7.747, 46.024], [7.881, 46.294], [7.988, 46.319],
+          [8.305, 46.483], [8.594, 46.635], [8.855, 46.700],
+          [9.222, 46.723], [9.440, 46.697], [9.529, 46.853],
+          [9.559, 46.750], [9.678, 46.674], [9.783, 46.594],
+          [9.847, 46.498]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "bernina-express",
+        "name": "Bernina Express",
+        "category": "scenic",
+        "countries": "Switzerland, Italy",
+        "endpoints": "Chur — Tirano",
+        "km": 144,
+        "duration": "4 h",
+        "topSpeed": "65 km/h",
+        "operator": "Rhaetian Railway",
+        "opened": 1910,
+        "blurb": "A UNESCO World Heritage railway over the 2,253 m Bernina Pass — the highest rail crossing of the Alps, ending with the spiral viaduct at Brusio."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [9.529, 46.853], [9.440, 46.697], [9.678, 46.674],
+          [9.783, 46.594], [9.896, 46.492], [10.022, 46.410],
+          [10.058, 46.323], [10.104, 46.255], [10.169, 46.218]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "california-zephyr",
+        "name": "California Zephyr",
+        "category": "scenic",
+        "countries": "United States",
+        "endpoints": "Chicago — Emeryville (San Francisco Bay)",
+        "km": 3924,
+        "duration": "51 h 20 min",
+        "topSpeed": "127 km/h",
+        "operator": "Amtrak",
+        "opened": 1949,
+        "blurb": "Fifty-one hours across the Plains, the Rockies via the Moffat Tunnel, and the Sierra Nevada over Donner Pass. Widely called Amtrak's most beautiful run."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-87.639, 41.879], [-90.575, 41.522], [-91.588, 41.010],
+          [-95.940, 41.256], [-99.081, 40.700], [-101.724, 40.089],
+          [-104.991, 39.752], [-106.373, 39.643], [-107.325, 39.550],
+          [-108.550, 39.064], [-109.548, 38.573], [-110.965, 39.243],
+          [-111.891, 40.761], [-114.474, 40.732], [-116.943, 40.836],
+          [-119.813, 39.530], [-120.183, 39.328], [-121.500, 38.582],
+          [-122.036, 38.245], [-122.290, 37.841]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "west-highland-line",
+        "name": "West Highland Line",
+        "category": "scenic",
+        "countries": "United Kingdom",
+        "endpoints": "Glasgow Queen Street — Mallaig",
+        "km": 264,
+        "duration": "5 h 20 min",
+        "topSpeed": "97 km/h",
+        "operator": "ScotRail",
+        "opened": 1901,
+        "blurb": "Across desolate Rannoch Moor and over the curving Glenfinnan Viaduct to the fishing port of Mallaig. Regularly voted the world's most scenic railway."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-4.251, 55.862], [-4.635, 55.951], [-4.763, 56.004],
+          [-4.891, 56.199], [-4.828, 56.412], [-4.716, 56.526],
+          [-4.578, 56.687], [-4.348, 56.688], [-4.446, 56.850],
+          [-4.688, 56.882], [-4.902, 56.786], [-5.106, 56.820],
+          [-5.222, 56.855], [-5.072, 56.943], [-4.943, 57.005],
+          [-5.435, 56.871], [-5.663, 56.980], [-5.828, 57.006]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "caledonian-sleeper",
+        "name": "Caledonian Sleeper (Lowlander)",
+        "category": "night",
+        "countries": "United Kingdom",
+        "endpoints": "London Euston — Edinburgh Waverley",
+        "km": 643,
+        "duration": "7 h 30 min",
+        "topSpeed": "160 km/h",
+        "operator": "Caledonian Sleeper",
+        "opened": 1873,
+        "blurb": "Board at Euston after dinner, wake up under the Castle. One of only two sleeper services left in Britain, running the West Coast Main Line by night."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-0.133, 51.528], [-0.727, 51.999], [-1.145, 52.410],
+          [-1.966, 52.687], [-2.442, 53.090], [-2.633, 53.400],
+          [-2.699, 53.756], [-2.751, 54.322], [-2.933, 54.891],
+          [-3.061, 55.415], [-3.442, 55.622], [-3.188, 55.952]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "nightjet-vienna-paris",
+        "name": "Nightjet Vienna–Paris",
+        "category": "night",
+        "countries": "Austria, Germany, France",
+        "endpoints": "Wien Hbf — Paris Est",
+        "km": 1210,
+        "duration": "14 h 20 min",
+        "topSpeed": "200 km/h",
+        "operator": "ÖBB",
+        "opened": 2021,
+        "blurb": "The flagship of Europe's night-train revival — relaunched by ÖBB after the route sat abandoned for years, with new-generation sleeping cars."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [16.376, 48.185], [14.292, 48.290], [13.045, 47.813],
+          [12.100, 47.870], [11.558, 48.140], [10.886, 48.365],
+          [9.983, 48.399], [9.182, 48.784], [8.402, 49.009],
+          [7.735, 48.585], [7.448, 48.262], [6.174, 48.690],
+          [4.365, 48.955], [2.359, 48.877]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "trans-siberian",
+        "name": "Trans-Siberian Railway",
+        "category": "classic",
+        "countries": "Russia",
+        "endpoints": "Moscow — Vladivostok",
+        "km": 9289,
+        "duration": "6 days",
+        "topSpeed": "120 km/h",
+        "operator": "Russian Railways",
+        "opened": 1916,
+        "blurb": "The longest railway in the world: seven time zones, 9,289 km, and the southern shore of Lake Baikal between the capital and the Pacific."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [37.620, 55.751], [40.397, 56.129], [44.002, 56.324],
+          [46.005, 56.632], [50.155, 57.652], [56.248, 58.010],
+          [60.605, 56.838], [65.534, 55.441], [73.368, 54.989],
+          [82.897, 55.030], [86.087, 55.355], [92.870, 56.010],
+          [99.033, 56.112], [103.764, 56.132], [104.281, 52.287],
+          [106.807, 51.827], [107.584, 51.834], [113.501, 52.034],
+          [117.973, 51.100], [121.919, 50.591], [124.713, 53.487],
+          [127.541, 50.916], [129.475, 49.789], [135.072, 48.481],
+          [134.560, 47.790], [132.076, 44.980], [131.887, 43.116]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "slug": "the-ghan",
+        "name": "The Ghan",
+        "category": "classic",
+        "countries": "Australia",
+        "endpoints": "Adelaide — Darwin",
+        "km": 2979,
+        "duration": "54 h",
+        "topSpeed": "115 km/h",
+        "operator": "Journey Beyond",
+        "opened": 2004,
+        "blurb": "Named for the Afghan cameleers who opened the Outback. The full transcontinental run to Darwin only became possible in 2004, when the last rails reached the Top End."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [138.601, -34.929], [138.396, -33.184], [137.765, -32.492],
+          [137.180, -31.204], [136.828, -30.442], [135.449, -29.011],
+          [134.756, -28.113], [133.866, -25.909], [133.871, -23.698],
+          [133.912, -21.532], [134.189, -19.649], [133.868, -17.556],
+          [132.264, -14.465], [131.083, -13.242], [130.845, -12.460]
+        ]
+      }
+    }
+  ]
+}

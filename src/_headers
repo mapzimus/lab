@@ -18,6 +18,17 @@
   ! Content-Security-Policy
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self'; font-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
 
+# Train route atlas: same tile allowance as the Turf playground, same
+# both-blocks-detach-first pattern. Leaflet is vendored under
+# /lab/train-routes/vendor/, the GeoJSON is same-origin.
+/lab/train-routes/
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self'; font-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
+
+/lab/train-routes/*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self'; font-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
+
 /data/*
   Cache-Control: public, max-age=3600
 
