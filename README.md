@@ -6,6 +6,16 @@ The initial release is a front door, not a forced migration. The 65 existing too
 
 The first staging scaffold used a `public/` directory and a directly deployed static-assets Worker. The production implementation now follows the ecosystem plan: one source in `src/`, a reproducible `dist/` build, Cloudflare Pages Git integration, and preview deployments for branches and pull requests.
 
+## Site sections
+
+Navigation: Lab (in development), Tools (full catalog with per-type pages at
+`/tools/{category}/`), Maps (all map projects), Field Notes (blog / LinkedIn
+staging — posts in `src/data/field-notes.json`, drafts hidden unless
+`?drafts`), Games (everything playable), Radars (index of the daily scraping
+trackers at `/radars/`, data in `src/data/radars.json`), Links
+(`src/data/links.json`), and About. `/play/` and `/experiments/` redirect to
+`/games/` and `/lab/`.
+
 ## Local build
 
 ```sh
@@ -37,7 +47,7 @@ homepage — an ordered list of catalog slugs. The tool count in the hero and th
 "last catalog refresh" date in the footer are derived from the catalog at build
 time, so they stay accurate as the data changes.
 
-## Daily radar
+## Daily radars (dev + geospatial)
 
 `scripts/radar.mjs` scans GitHub (new fast-rising repos plus GIS, maps,
 cartography, data-viz, generative-art, WebGL, and Cloudflare Workers topics)
@@ -46,4 +56,18 @@ against the lab's interest profile, and writes `radar/YYYY-MM-DD.md` plus
 `radar/latest.md`. The `Daily radar` GitHub Actions workflow runs it every
 day and commits the digest; run it locally with `node scripts/radar.mjs`
 (set `GITHUB_TOKEN` for a higher API rate limit). Tune the `INTERESTS`
-table at the top of the script to change what ranks highly.
+table in `scripts/radar-lib.mjs` to change what ranks highly.
+
+Two dashboards show the data live, each backed by a Cloudflare Pages
+Function that runs the same sweep and caches it at the edge for an hour,
+falling back to the committed baseline JSON if the live sweep fails:
+
+- [mapzimus.com/radar/](https://mapzimus.com/radar/) — **Dev Radar**
+  (`/api/radar`, `src/data/radar.json`): GitHub, Hugging Face, Hacker News,
+  HF Daily Papers, arXiv, Kaggle, itch.io.
+- [mapzimus.com/geo-radar/](https://mapzimus.com/geo-radar/) — **Geospatial
+  Radar** (`/api/geo-radar`, `src/data/geo-radar.json`): Maps Mania,
+  Geography Realm, Geospatial World, new QGIS plugins, geospatial library
+  releases, GIS Stack Exchange, NASA Earthdata, Data.gov, weeklyOSM. Optionally
+set a `GITHUB_TOKEN` secret on the Pages project so edge GitHub searches
+avoid the unauthenticated per-IP rate limit.

@@ -14,10 +14,10 @@
   };
   const viewCategories = {
     home: null,
+    lab: ["experiments"],
     tools: ["maps", "data", "design", "teaching", "math", "fun"],
     maps: ["maps"],
-    play: ["fun", "play"],
-    experiments: ["data", "design", "experiments"],
+    games: ["fun", "play"],
   };
   function readFavorites() {
     try {
@@ -32,7 +32,7 @@
     items: [],
     featuredSlugs: [],
     query: "",
-    category: "",
+    category: document.body.dataset.category || "",
     favoritesOnly: false,
     favorites: new Set(readFavorites()),
   };
@@ -80,6 +80,7 @@
   }
 
   function allowedByView(item) {
+    if (view === "lab" && (item.status || "live") !== "live") return true;
     const allowed = viewCategories[view];
     return !allowed || allowed.includes(item.category);
   }
@@ -105,9 +106,9 @@
 
   function renderFilters() {
     const categories = [...new Set(state.items.filter(allowedByView).map(function (item) { return item.category; }))];
-    filters.innerHTML = [`<button class="filter" type="button" data-category="" aria-pressed="true">All</button>`]
+    filters.innerHTML = [`<button class="filter" type="button" data-category="" aria-pressed="${state.category === ""}">All</button>`]
       .concat(categories.map(function (category) {
-        return `<button class="filter" type="button" data-category="${escapeHtml(category)}" aria-pressed="false">${escapeHtml(categoryLabels[category] || category)}</button>`;
+        return `<button class="filter" type="button" data-category="${escapeHtml(category)}" aria-pressed="${state.category === category}">${escapeHtml(categoryLabels[category] || category)}</button>`;
       })).join("");
   }
 

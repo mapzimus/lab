@@ -1,0 +1,7 @@
+.notes { max-width: 760px; padding: 60px 0 90px; }
+.note { border: 1px solid var(--ink); background: var(--card); box-shadow: 6px 6px 0 var(--line); padding: 28px 30px; margin-bottom: 26px; }
+.note.draft { border-style: dashed; opacity: .85; }
+.note-date { color: var(--muted); font: 700 11px var(--mono); text-transform: uppercase; letter-spacing: .1em; }
+.note h2 { font-size: clamp(1.4rem, 3vw, 2rem); margin: 8px 0 14px; }
+.note p { margin: 0 0 14px; color: var(--ink); }
+.note .tags { margin-top: 6px; }
