@@ -51,11 +51,19 @@ Full index: <https://turfjs.org/docs/>
 
 ## Two ways to load it
 
-**CDN global — fits the lab's vanilla-JS pages.** One tag, one `turf` global:
+**CDN global — the generic quick start.** One tag, one `turf` global:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
 ```
+
+> **On this site, CDN tags don't work.** `src/_headers` ships a site-wide
+> `Content-Security-Policy` with `script-src 'self'` and no `unsafe-inline`,
+> which blocks third-party *and* inline scripts (and `img-src` blocks tile
+> servers). Lab pages must self-host their libraries (see
+> `src/lab/turf-playground/vendor/`), keep JS/CSS in same-origin files, and
+> add a per-path `_headers` override for anything external like basemap
+> tiles. The playground is the reference implementation of this pattern.
 
 **npm, modular — for anything bundled.** The meta-package is tree-shakeable,
 or install only the modules a tool uses:
