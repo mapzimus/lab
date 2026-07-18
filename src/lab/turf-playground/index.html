@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Turf.js Playground · Mapzimus Lab</title>
+  <meta name="description" content="An interactive tour of Turf.js — buffers, spatial joins, Voronoi, hex binning, and great-circle measurement, all client-side.">
+  <link rel="canonical" href="https://mapzimus.com/lab/turf-playground/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Turf.js Playground · Mapzimus Lab">
+  <meta property="og:description" content="An interactive tour of Turf.js — buffers, spatial joins, Voronoi, hex binning, and great-circle measurement, all client-side.">
+  <meta property="og:url" content="https://mapzimus.com/lab/turf-playground/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#f4f0e7">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/turf-playground/vendor/leaflet.css">
+  <link rel="stylesheet" href="/lab/turf-playground/turf-playground.css">
+  <script src="/lab/turf-playground/vendor/leaflet.js" defer></script>
+  <script src="/lab/turf-playground/vendor/turf.min.js" defer></script>
+  <script src="/lab/turf-playground/turf-playground.js" defer></script>
+</head>
+<body>
+  <div class="top">
+    <a class="back" href="/lab/">← Lab</a>
+    <div>
+      <span class="eyebrow">Mapzimus Lab experiment</span>
+      <h1>Turf.js Playground</h1>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <aside class="panel">
+      <h2>Pick an operation</h2>
+      <p class="hint" id="modeHint">Click the map to drop a buffer and count the points inside it.</p>
+      <div class="modes" role="group" aria-label="Analysis mode">
+        <button type="button" data-mode="buffer" aria-pressed="true">buffer + spatial join</button>
+        <button type="button" data-mode="voronoi" aria-pressed="false">voronoi</button>
+        <button type="button" data-mode="hex" aria-pressed="false">hex binning</button>
+        <button type="button" data-mode="measure" aria-pressed="false">great-circle measure</button>
+      </div>
+
+      <div id="bufferControls">
+        <label class="slider" for="radius">Buffer radius: <span id="radiusLabel">1.0</span> km</label>
+        <input type="range" id="radius" min="0.2" max="5" step="0.1" value="1">
+      </div>
+      <div id="hexControls" hidden>
+        <label class="slider" for="cell">Hex cell size: <span id="cellLabel">0.6</span> km</label>
+        <input type="range" id="cell" min="0.3" max="2" step="0.1" value="0.6">
+      </div>
+
+      <button class="quiet-button" id="rescatter" type="button">Re-scatter points</button>
+
+      <dl class="readout" id="readout"></dl>
+
+      <div class="calls">
+        <h3>Turf calls behind this</h3>
+        <div id="callLog"></div>
+      </div>
+    </aside>
+
+    <div class="map-frame"><div id="map" aria-label="Interactive map"></div></div>
+  </div>
+
+  <footer>
+    <p>Everything on this page runs in your browser — no server does any GIS. Geometry math by
+      <a href="https://turfjs.org/">Turf.js</a> (v7.3.5, self-hosted), rendering by
+      <a href="https://leafletjs.com/">Leaflet</a> (1.9.4, self-hosted),
+      tiles © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.
+      Remember: Turf speaks GeoJSON, so coordinates are <code>[longitude, latitude]</code> — the
+      reverse of Leaflet's <code>[lat, lng]</code>.</p>
+  </footer>
+</body>
+</html>
