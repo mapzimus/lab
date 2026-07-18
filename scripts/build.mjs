@@ -132,10 +132,10 @@ const pages = {
   home: {
     path: "index.html",
     title: "Mapzimus · Browser tools, maps, and games by Maxwell Howe",
-    description: `${toolCount} free browser tools for maps, data, teaching, and math — plus games, unusual maps, and experiments. No accounts, no installs.`,
+    description: `${toolCount} free browser tools for maps, data, teaching, and math — plus games and experiments. No accounts, no installs.`,
     canonical: "https://mapzimus.com/",
     eyebrow: "The lab of Maxwell Howe",
-    heading: "Useful tools. Unusual maps. Small games.",
+    heading: "Useful tools. Maps. Small games.",
     intro: `Everything I build for fun and everyday use, in one place: ${toolCount} browser tools for maps, data, teaching, and math, plus games and experiments. It all runs right in your browser.`,
     catalogHeading: "The whole catalog",
   },
@@ -166,7 +166,7 @@ const pages = {
     canonical: "https://mapzimus.com/maps/",
     eyebrow: "Maps & GIS",
     heading: "Map projects and map tools",
-    intro: "Client-side GIS utilities next to projection experiments and fantasy transit networks. Useful and unusual, side by side.",
+    intro: "Client-side GIS utilities next to projection experiments and fantasy transit networks.",
     catalogHeading: "All maps",
   },
   games: {
