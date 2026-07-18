@@ -2,6 +2,7 @@
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [SimCity Meets AI: Exploring New York’s New Digital Twin](http://googlemapsmania.blogspot.com/2026/07/simcity-meets-ai-exploring-new-yorks.html) — NYCSim is a truly impressive digital twin for New York City.
 - [The Global Map of Agricultural Decline](http://googlemapsmania.blogspot.com/2026/07/the-global-map-of-agricultural-decline.html) — This animated map reveals how agricultural productivity is expected to be affected by climate change around the world throughout this century.
 - [Where's Downtown?](http://googlemapsmania.blogspot.com/2026/07/wheres-downtown.html) — Where is Downtown? is an interactive map surveying tool designed to crowdsource the boundaries of "downtown" for any city.
 - [This is Still Not Normal](http://googlemapsmania.blogspot.com/2026/07/this-is-still-not-normal.html) — Last month I posted a review of Klimadashboard's European Heat Tracker, which visualizes how many people across Europe are exposed to extreme heat in real time.
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [The World's Greatest Train Journeys](http://googlemapsmania.blogspot.com/2026/07/the-worlds-greatest-train-journeys.html) — If you've ever looked at a railway map and wondered which routes are truly worth travelling, then TrainRouter has the answer.
 - [The Entire History of Human Warfare](http://googlemapsmania.blogspot.com/2026/07/the-entire-history-of-human-warfare.html) — Launched in late 2025, Prakrit Ojha's War Atlas is an interactive map that visualizes more than 8,500 historical battles.
 - [Waterworld](http://googlemapsmania.blogspot.com/2026/07/waterworld.html) — My house disappears under water at around 2 metres of sea level rise.
-- [How Maps Save Lives](http://googlemapsmania.blogspot.com/2026/07/how-maps-save-lives.html) — Fifty thousand people were killed on February 6, 2023, when a 7.8-magnitude earthquake struck southern and central Türkiye and northern and western Syria.
 
 ## Geography Realm
 
@@ -40,18 +40,42 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [GEAQUA Capture Zones](https://plugins.qgis.org/plugins/GEAQUA_Capture_Zones/)
 - [PeruSpatial Hub](https://plugins.qgis.org/plugins/peruspatial_hub/)
 
+## Library releases
+
+- [deck.gl v9.3.7](https://github.com/visgl/deck.gl/releases/tag/v9.3.7) (2026-07-16) — - fix(core): do not write View clearColor into the picking buffer (#10431) - fix(mapbox): avoid crash when MapboxOverlay beforeId layer is removed (#10425) -…
+- [QGIS final-3_44_12](https://github.com/qgis/QGIS/releases/tag/final-3_44_12) (2026-07-03) — https://github.com/qgis/QGIS/compare/final-3_44_11%5E...final-3_44_12
+- [duckdb v1.5.4](https://github.com/duckdb/duckdb/releases/tag/v1.5.4) (2026-06-17) — This is a bug fix release for various issues discovered after we released v1.5.3.
+- [gdal v3.13.1](https://github.com/OSGeo/gdal/releases/tag/v3.13.1) (2026-06-05) — Bug fix release. See release notes: https://github.com/OSGeo/gdal/blob/v3.13.1/NEWS.md
+- [maplibre-gl-js v5.24.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v5.24.0) (2026-04-23) — ### ✨ Features and improvements - GPU performance optimization: Render halo and glyph in a single pass (-40% Time Reduction) ([#7436](https://github.com/mapl…
+- [turf v7.3.5](https://github.com/Turfjs/turf/releases/tag/v7.3.5) (2026-04-20) — ## What's Changed Main goal of this release was to revert a build breaking performance improvement introduced in v7.3.2 that was affecting CommonJS environme…
+- [tippecanoe 2.79.0](https://github.com/felt/tippecanoe/releases/tag/2.79.0) (2025-07-24) — # 2.79.0 * When deduplicating features by ID in tippecanoe-overzoom, be careful to track even features that have been clipped away.
+- [Leaflet v1.9.4](https://github.com/Leaflet/Leaflet/releases/tag/v1.9.4) (2023-05-18) — ### 🐞 Bug fixes - Fix tile gaps in Chromium-based browsers ([#8891](https://github.com/Leaflet/Leaflet/pull/8891) by [@IvanSanchez](https://github.com/IvanS…
+
+## GIS Stack Exchange — hot questions
+
+- [Convert AutoCAD (.dwg) file to GIS](https://gis.stackexchange.com/questions/501148/convert-autocad-dwg-file-to-gis) (▲ 0 · 1 answers)
+- [Simplest way to show an image and get the mouse click coordinates](https://gis.stackexchange.com/questions/501143/simplest-way-to-show-an-image-and-get-the-mouse-click-coordinates) (▲ -1 · 1 answers)
+- [Improving GPS accuracy and repeatability in European beech and broadleaved forest](https://gis.stackexchange.com/questions/501152/improving-gps-accuracy-and-repeatability-in-european-beech-and-broadleaved-fores) (▲ 2 · 0 answers)
+- [Display of OSM buildings when zoomed out at higher scale using Esri](https://gis.stackexchange.com/questions/501142/display-of-osm-buildings-when-zoomed-out-at-higher-scale-using-esri) (▲ 0 · 0 answers)
+- [How to create a layer filter based on value in different layer](https://gis.stackexchange.com/questions/501146/how-to-create-a-layer-filter-based-on-value-in-different-layer) (▲ 1 · 1 answers)
+- [Shortcut commands in QGIS 4](https://gis.stackexchange.com/questions/501140/shortcut-commands-in-qgis-4) (▲ 1 · 2 answers)
+- [Request for selecting Python type for geomatics and geoinformatics](https://gis.stackexchange.com/questions/501144/request-for-selecting-python-type-for-geomatics-and-geoinformatics) (▲ -2 · 0 answers)
+- [Add a Lat-Long trace in a CSV file to a Google Maps](https://gis.stackexchange.com/questions/501137/add-a-lat-long-trace-in-a-csv-file-to-a-google-maps) (▲ 0 · 1 answers)
+- [How can I update an incorrect business address in OpenStreetMap?](https://gis.stackexchange.com/questions/501134/how-can-i-update-an-incorrect-business-address-in-openstreetmap) (▲ 1 · 2 answers)
+- [ESRI Map - Scaling roads adjust thickness with QGIS symbol layers](https://gis.stackexchange.com/questions/501136/esri-map-scaling-roads-adjust-thickness-with-qgis-symbol-layers) (▲ 0 · 0 answers)
+
 ## NASA Earthdata — recently updated collections
 
-- [MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo NIR Daily L3 Global 30ArcSec CMG V006](https://search.earthdata.nasa.gov/search?q=MCD43D60) — The MCD43D60 Version 6 data product was decommissioned on July 31, 2023.
-- [MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo VIS Daily L3 Global 30ArcSec CMG V006](https://search.earthdata.nasa.gov/search?q=MCD43D59) — The MCD43D59 Version 6 data product was decommissioned on July 31, 2023.
-- [MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band7 Daily L3 Global 30ArcSec CMG V006](https://search.earthdata.nasa.gov/search?q=MCD43D58) — The MCD43D58 Version 6 data product was decommissioned on July 31, 2023.
-- [MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band6 Daily L3 Global 30ArcSec CMG V006](https://search.earthdata.nasa.gov/search?q=MCD43D57) — The MCD43D57 Version 6 data product was decommissioned on July 31, 2023.
-- [MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band5 Daily L3 Global 30ArcSec CMG V006](https://search.earthdata.nasa.gov/search?q=MCD43D56) — The MCD43D56 Version 6 data product was decommissioned on July 31, 2023.
-- [MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band4 Daily L3 Global 30ArcSec CMG V006](https://search.earthdata.nasa.gov/search?q=MCD43D55) — The MCD43D55 Version 6 data product was decommissioned on July 31, 2023.
-- [MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band3 Daily L3 Global 30ArcSec CMG V006](https://search.earthdata.nasa.gov/search?q=MCD43D54) — The MCD43D54 Version 6 data product was decommissioned on July 31, 2023.
-- [MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band2 Daily L3 Global 30ArcSec CMG V006](https://search.earthdata.nasa.gov/search?q=MCD43D53) — The MCD43D53 Version 6 data product was decommissioned on July 31, 2023.
-- [MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band1 Daily L3 Global 30ArcSec CMG V006](https://search.earthdata.nasa.gov/search?q=MCD43D52) — The MCD43D52 Version 6 data product was decommissioned on July 31, 2023.
-- [MODIS/Terra+Aqua BRDF/Albedo Black Sky Albedo Shortwave Daily L3 Global 30ArcSec CMG V006](https://search.earthdata.nasa.gov/search?q=MCD43D51) — The MCD43D51 Version 6 data product was decommissioned on July 31, 2023.
+- [UAVSAR_POLSAR_STOKES](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES) — UAVSAR PolSAR Scene Stokes
+- [UAVSAR_POLSAR_SLOPE](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE) — UAVSAR PolSAR Scene Slope
+- [UAVSAR_POLSAR_PAULI](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI) — UAVSAR PolSAR Scene Pauli Decomposition
+- [UAVSAR_POLSAR_ML_COMPLEX_SLANT](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT) — UAVSAR PolSAR Scene Complex
+- [UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5) — UAVSAR PolSAR Scene Projected Multilook 5x5
+- [UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3) — UAVSAR PolSAR Scene Projected Multilook 3x3
+- [UAVSAR_POLSAR_ML_COMPLEX_GRD](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD) — UAVSAR PolSAR Scene Projected
+- [UAVSAR_POLSAR_METADATA](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META) — UAVSAR PolSAR Scene Metadata
+- [UAVSAR_POLSAR_KMZ](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ) — UAVSAR PolSAR Scene KMZ
+- [UAVSAR_POLSAR_INCIDENCE](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC) — UAVSAR PolSAR Scene Incidence Angle
 
 ## Data.gov — new geodata
 

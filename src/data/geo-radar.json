@@ -3,6 +3,11 @@
   "news": {
     "mapsmania": [
       {
+        "title": "SimCity Meets AI: Exploring New York’s New Digital Twin",
+        "url": "http://googlemapsmania.blogspot.com/2026/07/simcity-meets-ai-exploring-new-yorks.html",
+        "desc": "NYCSim is a truly impressive digital twin for New York City."
+      },
+      {
         "title": "The Global Map of Agricultural Decline",
         "url": "http://googlemapsmania.blogspot.com/2026/07/the-global-map-of-agricultural-decline.html",
         "desc": "This animated map reveals how agricultural productivity is expected to be affected by climate change around the world throughout this century."
@@ -36,11 +41,6 @@
         "title": "Waterworld",
         "url": "http://googlemapsmania.blogspot.com/2026/07/waterworld.html",
         "desc": "My house disappears under water at around 2 metres of sea level rise."
-      },
-      {
-        "title": "How Maps Save Lives",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/how-maps-save-lives.html",
-        "desc": "Fifty thousand people were killed on February 6, 2023, when a 7.8-magnitude earthquake struck southern and central Türkiye and northern and western Syria."
       }
     ],
     "georealm": [
@@ -142,68 +142,194 @@
       "url": "https://plugins.qgis.org/plugins/peruspatial_hub/"
     }
   ],
-  "releases": [],
-  "gisse": [],
+  "releases": [
+    {
+      "repo": "visgl/deck.gl",
+      "title": "deck.gl v9.3.7",
+      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.7",
+      "desc": "- fix(core): do not write View clearColor into the picking buffer (#10431) - fix(mapbox): avoid crash when MapboxOverlay beforeId layer is removed (#10425) -…",
+      "publishedAt": "2026-07-16",
+      "isFresh": true
+    },
+    {
+      "repo": "qgis/QGIS",
+      "title": "QGIS final-3_44_12",
+      "url": "https://github.com/qgis/QGIS/releases/tag/final-3_44_12",
+      "desc": "https://github.com/qgis/QGIS/compare/final-3_44_11%5E...final-3_44_12",
+      "publishedAt": "2026-07-03",
+      "isFresh": true
+    },
+    {
+      "repo": "duckdb/duckdb",
+      "title": "duckdb v1.5.4",
+      "url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.4",
+      "desc": "This is a bug fix release for various issues discovered after we released v1.5.3.",
+      "publishedAt": "2026-06-17",
+      "isFresh": false
+    },
+    {
+      "repo": "OSGeo/gdal",
+      "title": "gdal v3.13.1",
+      "url": "https://github.com/OSGeo/gdal/releases/tag/v3.13.1",
+      "desc": "Bug fix release. See release notes: https://github.com/OSGeo/gdal/blob/v3.13.1/NEWS.md",
+      "publishedAt": "2026-06-05",
+      "isFresh": false
+    },
+    {
+      "repo": "maplibre/maplibre-gl-js",
+      "title": "maplibre-gl-js v5.24.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v5.24.0",
+      "desc": "### ✨ Features and improvements - GPU performance optimization: Render halo and glyph in a single pass (-40% Time Reduction) ([#7436](https://github.com/mapl…",
+      "publishedAt": "2026-04-23",
+      "isFresh": false
+    },
+    {
+      "repo": "Turfjs/turf",
+      "title": "turf v7.3.5",
+      "url": "https://github.com/Turfjs/turf/releases/tag/v7.3.5",
+      "desc": "## What's Changed Main goal of this release was to revert a build breaking performance improvement introduced in v7.3.2 that was affecting CommonJS environme…",
+      "publishedAt": "2026-04-20",
+      "isFresh": false
+    },
+    {
+      "repo": "felt/tippecanoe",
+      "title": "tippecanoe 2.79.0",
+      "url": "https://github.com/felt/tippecanoe/releases/tag/2.79.0",
+      "desc": "# 2.79.0 * When deduplicating features by ID in tippecanoe-overzoom, be careful to track even features that have been clipped away.",
+      "publishedAt": "2025-07-24",
+      "isFresh": false
+    },
+    {
+      "repo": "Leaflet/Leaflet",
+      "title": "Leaflet v1.9.4",
+      "url": "https://github.com/Leaflet/Leaflet/releases/tag/v1.9.4",
+      "desc": "### 🐞 Bug fixes - Fix tile gaps in Chromium-based browsers ([#8891](https://github.com/Leaflet/Leaflet/pull/8891) by [@IvanSanchez](https://github.com/IvanS…",
+      "publishedAt": "2023-05-18",
+      "isFresh": false
+    }
+  ],
+  "gisse": [
+    {
+      "title": "Convert AutoCAD (.dwg) file to GIS",
+      "url": "https://gis.stackexchange.com/questions/501148/convert-autocad-dwg-file-to-gis",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Simplest way to show an image and get the mouse click coordinates",
+      "url": "https://gis.stackexchange.com/questions/501143/simplest-way-to-show-an-image-and-get-the-mouse-click-coordinates",
+      "score": -1,
+      "answers": 1
+    },
+    {
+      "title": "Improving GPS accuracy and repeatability in European beech and broadleaved forest",
+      "url": "https://gis.stackexchange.com/questions/501152/improving-gps-accuracy-and-repeatability-in-european-beech-and-broadleaved-fores",
+      "score": 2,
+      "answers": 0
+    },
+    {
+      "title": "Display of OSM buildings when zoomed out at higher scale using Esri",
+      "url": "https://gis.stackexchange.com/questions/501142/display-of-osm-buildings-when-zoomed-out-at-higher-scale-using-esri",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "How to create a layer filter based on value in different layer",
+      "url": "https://gis.stackexchange.com/questions/501146/how-to-create-a-layer-filter-based-on-value-in-different-layer",
+      "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "Shortcut commands in QGIS 4",
+      "url": "https://gis.stackexchange.com/questions/501140/shortcut-commands-in-qgis-4",
+      "score": 1,
+      "answers": 2
+    },
+    {
+      "title": "Request for selecting Python type for geomatics and geoinformatics",
+      "url": "https://gis.stackexchange.com/questions/501144/request-for-selecting-python-type-for-geomatics-and-geoinformatics",
+      "score": -2,
+      "answers": 0
+    },
+    {
+      "title": "Add a Lat-Long trace in a CSV file to a Google Maps",
+      "url": "https://gis.stackexchange.com/questions/501137/add-a-lat-long-trace-in-a-csv-file-to-a-google-maps",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "How can I update an incorrect business address in OpenStreetMap?",
+      "url": "https://gis.stackexchange.com/questions/501134/how-can-i-update-an-incorrect-business-address-in-openstreetmap",
+      "score": 1,
+      "answers": 2
+    },
+    {
+      "title": "ESRI Map - Scaling roads adjust thickness with QGIS symbol layers",
+      "url": "https://gis.stackexchange.com/questions/501136/esri-map-scaling-roads-adjust-thickness-with-qgis-symbol-layers",
+      "score": 0,
+      "answers": 0
+    }
+  ],
   "nasa": [
     {
-      "title": "MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo NIR Daily L3 Global 30ArcSec CMG V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=MCD43D60",
-      "desc": "The MCD43D60 Version 6 data product was decommissioned on July 31, 2023.",
-      "org": "LPCLOUD"
+      "title": "UAVSAR_POLSAR_STOKES",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
+      "desc": "UAVSAR PolSAR Scene Stokes",
+      "org": "ASF"
     },
     {
-      "title": "MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo VIS Daily L3 Global 30ArcSec CMG V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=MCD43D59",
-      "desc": "The MCD43D59 Version 6 data product was decommissioned on July 31, 2023.",
-      "org": "LPCLOUD"
+      "title": "UAVSAR_POLSAR_SLOPE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
+      "desc": "UAVSAR PolSAR Scene Slope",
+      "org": "ASF"
     },
     {
-      "title": "MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band7 Daily L3 Global 30ArcSec CMG V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=MCD43D58",
-      "desc": "The MCD43D58 Version 6 data product was decommissioned on July 31, 2023.",
-      "org": "LPCLOUD"
+      "title": "UAVSAR_POLSAR_PAULI",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
+      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
+      "org": "ASF"
     },
     {
-      "title": "MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band6 Daily L3 Global 30ArcSec CMG V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=MCD43D57",
-      "desc": "The MCD43D57 Version 6 data product was decommissioned on July 31, 2023.",
-      "org": "LPCLOUD"
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
+      "desc": "UAVSAR PolSAR Scene Complex",
+      "org": "ASF"
     },
     {
-      "title": "MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band5 Daily L3 Global 30ArcSec CMG V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=MCD43D56",
-      "desc": "The MCD43D56 Version 6 data product was decommissioned on July 31, 2023.",
-      "org": "LPCLOUD"
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
+      "org": "ASF"
     },
     {
-      "title": "MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band4 Daily L3 Global 30ArcSec CMG V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=MCD43D55",
-      "desc": "The MCD43D55 Version 6 data product was decommissioned on July 31, 2023.",
-      "org": "LPCLOUD"
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
+      "org": "ASF"
     },
     {
-      "title": "MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band3 Daily L3 Global 30ArcSec CMG V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=MCD43D54",
-      "desc": "The MCD43D54 Version 6 data product was decommissioned on July 31, 2023.",
-      "org": "LPCLOUD"
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
+      "desc": "UAVSAR PolSAR Scene Projected",
+      "org": "ASF"
     },
     {
-      "title": "MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band2 Daily L3 Global 30ArcSec CMG V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=MCD43D53",
-      "desc": "The MCD43D53 Version 6 data product was decommissioned on July 31, 2023.",
-      "org": "LPCLOUD"
+      "title": "UAVSAR_POLSAR_METADATA",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
+      "desc": "UAVSAR PolSAR Scene Metadata",
+      "org": "ASF"
     },
     {
-      "title": "MODIS/Terra+Aqua BRDF/Albedo White Sky Albedo Band1 Daily L3 Global 30ArcSec CMG V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=MCD43D52",
-      "desc": "The MCD43D52 Version 6 data product was decommissioned on July 31, 2023.",
-      "org": "LPCLOUD"
+      "title": "UAVSAR_POLSAR_KMZ",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
+      "desc": "UAVSAR PolSAR Scene KMZ",
+      "org": "ASF"
     },
     {
-      "title": "MODIS/Terra+Aqua BRDF/Albedo Black Sky Albedo Shortwave Daily L3 Global 30ArcSec CMG V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=MCD43D51",
-      "desc": "The MCD43D51 Version 6 data product was decommissioned on July 31, 2023.",
-      "org": "LPCLOUD"
+      "title": "UAVSAR_POLSAR_INCIDENCE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
+      "desc": "UAVSAR PolSAR Scene Incidence Angle",
+      "org": "ASF"
     }
   ],
   "datagov": [
