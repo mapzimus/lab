@@ -2,14 +2,14 @@
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
-- [The Global Map of Agricultural Decline](http://googlemapsmania.blogspot.com/feeds/7717518585841553992/comments/default) — This animated map reveals how agricultural productivity is expected to be affected by climate change around the world throughout this century.
-- [Where's Downtown?](http://googlemapsmania.blogspot.com/feeds/1715506806626750896/comments/default) — Where is Downtown? is an interactive map surveying tool designed to crowdsource the boundaries of "downtown" for any city.
-- [This is Still Not Normal](http://googlemapsmania.blogspot.com/feeds/7833875759577340909/comments/default) — Last month I posted a review of Klimadashboard's European Heat Tracker, which visualizes how many people across Europe are exposed to extreme heat in real time.
-- [Fly the Real World Flight Sim](http://googlemapsmania.blogspot.com/feeds/5293508646475538332/comments/default) — TripGeo Air is an impressive new browser-based flight simulator that lets you fly over a photorealistic 3D model of the real world.What makes TripGeo Air par…
-- [The World's Greatest Train Journeys](http://googlemapsmania.blogspot.com/feeds/8770751794604703123/comments/default) — If you've ever looked at a railway map and wondered which routes are truly worth travelling, then TrainRouter has the answer.
-- [The Entire History of Human Warfare](http://googlemapsmania.blogspot.com/feeds/1460742713862859391/comments/default) — Launched in late 2025, Prakrit Ojha's War Atlas is an interactive map that visualizes more than 8,500 historical battles.
-- [Waterworld](http://googlemapsmania.blogspot.com/feeds/1820216825593372700/comments/default) — My house disappears under water at around 2 metres of sea level rise.
-- [How Maps Save Lives](http://googlemapsmania.blogspot.com/feeds/6505466152804544940/comments/default) — Fifty thousand people were killed on February 6, 2023, when a 7.8-magnitude earthquake struck southern and central Türkiye and northern and western Syria.
+- [The Global Map of Agricultural Decline](http://googlemapsmania.blogspot.com/2026/07/the-global-map-of-agricultural-decline.html) — This animated map reveals how agricultural productivity is expected to be affected by climate change around the world throughout this century.
+- [Where's Downtown?](http://googlemapsmania.blogspot.com/2026/07/wheres-downtown.html) — Where is Downtown? is an interactive map surveying tool designed to crowdsource the boundaries of "downtown" for any city.
+- [This is Still Not Normal](http://googlemapsmania.blogspot.com/2026/07/this-is-still-not-normal.html) — Last month I posted a review of Klimadashboard's European Heat Tracker, which visualizes how many people across Europe are exposed to extreme heat in real time.
+- [Fly the Real World Flight Sim](http://googlemapsmania.blogspot.com/2026/07/fly-real-world-flight-sim.html) — TripGeo Air is an impressive new browser-based flight simulator that lets you fly over a photorealistic 3D model of the real world.What makes TripGeo Air par…
+- [The World's Greatest Train Journeys](http://googlemapsmania.blogspot.com/2026/07/the-worlds-greatest-train-journeys.html) — If you've ever looked at a railway map and wondered which routes are truly worth travelling, then TrainRouter has the answer.
+- [The Entire History of Human Warfare](http://googlemapsmania.blogspot.com/2026/07/the-entire-history-of-human-warfare.html) — Launched in late 2025, Prakrit Ojha's War Atlas is an interactive map that visualizes more than 8,500 historical battles.
+- [Waterworld](http://googlemapsmania.blogspot.com/2026/07/waterworld.html) — My house disappears under water at around 2 metres of sea level rise.
+- [How Maps Save Lives](http://googlemapsmania.blogspot.com/2026/07/how-maps-save-lives.html) — Fifty thousand people were killed on February 6, 2023, when a 7.8-magnitude earthquake struck southern and central Türkiye and northern and western Syria.
 
 ## Geography Realm
 

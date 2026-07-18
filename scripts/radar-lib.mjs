@@ -197,6 +197,8 @@ async function collectRSS(url, limit = 6) {
     for (const m of xml.matchAll(/<(item|entry)[\s>][\s\S]*?<\/\1>/g)) {
       const block = m[0];
       const link = field(block, "link").trim() ||
+        block.match(/<link[^>]*?rel=['"]alternate['"][^>]*?href=['"]([^'"]+)['"]/)?.[1] ||
+        block.match(/<link[^>]*?href=['"]([^'"]+)['"][^>]*?rel=['"]alternate['"]/)?.[1] ||
         block.match(/<link[^>]*?href=['"]([^'"]+)['"]/)?.[1] || "";
       const title = cleanText(field(block, "title"), 120);
       if (!title || !link) continue;
