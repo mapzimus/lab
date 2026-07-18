@@ -6,6 +6,16 @@ The initial release is a front door, not a forced migration. The 65 existing too
 
 The first staging scaffold used a `public/` directory and a directly deployed static-assets Worker. The production implementation now follows the ecosystem plan: one source in `src/`, a reproducible `dist/` build, Cloudflare Pages Git integration, and preview deployments for branches and pull requests.
 
+## Site sections
+
+Navigation: Lab (in development), Tools (full catalog with per-type pages at
+`/tools/{category}/`), Maps (all map projects), Field Notes (blog / LinkedIn
+staging — posts in `src/data/field-notes.json`, drafts hidden unless
+`?drafts`), Games (everything playable), Radars (index of the daily scraping
+trackers at `/radars/`, data in `src/data/radars.json`), Links
+(`src/data/links.json`), and About. `/play/` and `/experiments/` redirect to
+`/games/` and `/lab/`.
+
 ## Local build
 
 ```sh

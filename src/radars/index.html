@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Radars · Mapzimus</title>
+  <meta name="description" content="Daily scraping trackers from the Mapzimus lab: dashboards that sweep the web for trends worth knowing about.">
+  <link rel="canonical" href="https://mapzimus.com/radars/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Radars · Mapzimus">
+  <meta property="og:description" content="Daily scraping trackers from the Mapzimus lab.">
+  <meta property="og:url" content="https://mapzimus.com/radars/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#f4f0e7">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/radars/radars.js" defer></script>
+</head>
+<body data-view="radars">
+  <a class="skip-link" href="#radars">Skip to radars</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Mapzimus home">
+      <span class="brand-mark" aria-hidden="true">MZ</span>
+      <span>Mapzimus</span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="/lab/">Lab</a>
+      <a href="/tools/">Tools</a>
+      <a href="/maps/">Maps</a>
+      <a href="/field-notes/">Field Notes</a>
+      <a href="/games/">Games</a>
+      <a href="/radars/" aria-current="page">Radars</a>
+      <a href="/links/">Links</a>
+      <a href="/about/">About</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero radar-hero">
+      <div class="eyebrow">Always sweeping</div>
+      <h1>The radars.</h1>
+      <p>Daily scraping trackers, each one a dashboard that sweeps part of the web and ranks what it finds for this lab. More radars join the array as they get built.</p>
+    </section>
+
+    <section class="featured" id="radars" aria-labelledby="radarsHeading">
+      <div class="section-heading">
+        <div><span class="eyebrow">The array</span><h2 id="radarsHeading">Active radars</h2></div>
+        <p>Fresh data daily via GitHub Actions, hourly at the edge.</p>
+      </div>
+      <div class="featured-grid" id="radarsGrid"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Mapzimus is the creative lab of Maxwell Howe.</p>
+    <p class="footer-note">Each radar refreshes itself. You just look at it.</p>
+  </footer>
+
+</body>
+</html>

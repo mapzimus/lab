@@ -1,0 +1,6 @@
+.link-groups { max-width: 760px; padding: 60px 0 90px; }
+.link-group h2 { font-size: clamp(1.3rem, 2.5vw, 1.8rem); margin: 34px 0 14px; }
+.link-row { display: block; border: 1px solid var(--ink); background: var(--card); box-shadow: 4px 4px 0 var(--line); padding: 16px 20px; margin-bottom: 10px; text-decoration: none; }
+.link-row:hover h3 { color: var(--purple); }
+.link-row h3 { display: inline; font-size: 1.05rem; }
+.link-row .card-copy { margin: 4px 0 0; }
