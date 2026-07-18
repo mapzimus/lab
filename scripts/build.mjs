@@ -41,6 +41,7 @@ const hostedProjectUrls = {
   "bug-wars": "/bug-wars/",
   "flip-game": "/flip-game/",
   "true-scale": "/true-scale/",
+  "interstate-challenge": "/interstate-challenge/",
 };
 
 const tools = loadCatalog("tools.json");
@@ -66,7 +67,11 @@ for (const slug of featuredSlugs) {
   if (!seenSlugs.has(slug)) problems.push(`featured.json: "${slug}" is not in the catalog`);
 }
 for (const project of projects) {
-  if (!hostedProjectUrls[project.slug]) problems.push(`${project.slug}: missing hosted project route`);
+  // Entries marked external live elsewhere (e.g. tappymaps.com) and keep
+  // their own URL; everything else must have a first-party hosted route.
+  if (!project.external && !hostedProjectUrls[project.slug]) {
+    problems.push(`${project.slug}: missing hosted project route`);
+  }
 }
 if (problems.length) {
   console.error(`Catalog validation failed:\n${problems.map((problem) => `  - ${problem}`).join("\n")}`);
@@ -85,7 +90,7 @@ const publicProjects = projects.map((item) => ({
   ...item,
   title: decodeText(item.title),
   description: decodeText(item.description),
-  url: hostedProjectUrls[item.slug],
+  url: item.external ? item.url : hostedProjectUrls[item.slug],
   sourceUrl: item.url,
   collection: "project",
 }));
@@ -254,6 +259,7 @@ const appRoutes = {
   "bug-wars": "bug-wars",
   "flip-game": "flip-game",
   "true-scale": "true-scale",
+  "interstate-challenge": "interstate-challenge",
 };
 for (const [sourceName, route] of Object.entries(appRoutes)) {
   const appSource = requirePath(path.join(vendor, "apps", sourceName), `vendor/apps/${sourceName}`);

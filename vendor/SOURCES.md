@@ -11,5 +11,6 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/true-scale/` | `mapzimus/true-scale` | `14fed32d23d7ca4a303627e2ad42814f7d27963e` |
 | `/concord-war/` | built from `mapzimus/concord-war` | `ddaa852bbde7cba3dc797e80c8873a35aaecc968` |
 | `/transit/` | `transit/` in `mapzimus/maxwellhowegis` | `b520e5c9daacb1216a44cc60ec7aeb85c56cd5b0` |
+| `/interstate-challenge/` | `interstate-challenge/` in `mapzimus/maxwellhowegis` | `a2e826de083811000c552a1d92e15d5e3b7f243e` |
 
 Documentation, source-only scripts, Android wrappers, and other non-deployable files are omitted from the snapshots.

@@ -47,6 +47,7 @@ for (const file of htmlFiles) {
 
 const catalog = JSON.parse(fs.readFileSync(path.join(output, "data", "catalog.json"), "utf8"));
 for (const item of catalog) {
+  if (item.external) continue; // external entries (e.g. tappymaps.com) keep their own URL
   if (!item.url.startsWith("/")) failures.push(`${item.slug}: catalog URL is not first-party (${item.url})`);
   const target = localTarget(path.join(output, "index.html"), item.url);
   if (!target || !fs.existsSync(target)) failures.push(`${item.slug}: hosted route is missing (${item.url})`);
