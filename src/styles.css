@@ -22,30 +22,8 @@
   font-display: swap;
 }
 
+/* Night chart is the default; the toggle stores "light" to opt into paper. */
 :root {
-  --paper: #f5f1e6;
-  --card: #fbf8f0;
-  --well: #ede7d8;
-  --ink: #20241f;
-  --muted: #62665a;
-  --line: #d5ccb6;
-  --line-soft: #e4dcc8;
-  --grid: rgba(32, 36, 31, 0.075);
-  --accent: #b43a30;            /* survey red */
-  --c-maps: #22689f;            /* hydrographic blue */
-  --c-data: #8a5a28;            /* contour brown */
-  --c-design: #6f56b8;          /* photorevision purple */
-  --c-teaching: #3c7a38;        /* woodland green */
-  --c-math: #b43a30;            /* survey red */
-  --c-fun: #c1670f;
-  --c-play: #b3437e;
-  --c-experiments: #22766f;
-  --shadow: 0 14px 28px rgba(46, 42, 30, 0.11);
-  --sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
-}
-
-html[data-theme="dark"] {
   --paper: #121721;
   --card: #1a202b;
   --well: #161c26;
@@ -54,16 +32,39 @@ html[data-theme="dark"] {
   --line: #313a47;
   --line-soft: #262e3a;
   --grid: rgba(233, 228, 214, 0.055);
-  --accent: #e0796e;
-  --c-maps: #6aa9dd;
-  --c-data: #c99a63;
-  --c-design: #a891e8;
-  --c-teaching: #7fb87a;
-  --c-math: #e0796e;
+  --accent: #e0796e;            /* survey red, night-brightened */
+  --c-maps: #6aa9dd;            /* hydrographic blue */
+  --c-data: #c99a63;            /* contour brown */
+  --c-design: #a891e8;          /* photorevision purple */
+  --c-teaching: #7fb87a;        /* woodland green */
+  --c-math: #e0796e;            /* survey red */
   --c-fun: #dd9a52;
   --c-play: #d987b1;
   --c-experiments: #6dbdb4;
   --shadow: 0 14px 28px rgba(0, 0, 0, 0.45);
+  --sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+
+html[data-theme="light"] {
+  --paper: #f5f1e6;
+  --card: #fbf8f0;
+  --well: #ede7d8;
+  --ink: #20241f;
+  --muted: #62665a;
+  --line: #d5ccb6;
+  --line-soft: #e4dcc8;
+  --grid: rgba(32, 36, 31, 0.075);
+  --accent: #b43a30;
+  --c-maps: #22689f;
+  --c-data: #8a5a28;
+  --c-design: #6f56b8;
+  --c-teaching: #3c7a38;
+  --c-math: #b43a30;
+  --c-fun: #c1670f;
+  --c-play: #b3437e;
+  --c-experiments: #22766f;
+  --shadow: 0 14px 28px rgba(46, 42, 30, 0.11);
 }
 
 /* ---- Base ---- */
@@ -109,8 +110,8 @@ main, footer, .site-header { padding-inline: clamp(20px, 4vw, 44px); }
 .theme-toggle { width: 34px; height: 34px; border: 1px solid var(--line); background: var(--card); cursor: pointer; display: grid; place-items: center; padding: 0; }
 .theme-toggle:hover { border-color: var(--ink); }
 .theme-toggle svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; }
-html[data-theme="dark"] .theme-toggle .sun { display: none; }
-html:not([data-theme="dark"]) .theme-toggle .moon { display: none; }
+html[data-theme="light"] .theme-toggle .moon { display: none; }
+html:not([data-theme="light"]) .theme-toggle .sun { display: none; }
 
 /* Mobile menu: <details>, works without JavaScript. */
 .menu { display: none; position: relative; }
