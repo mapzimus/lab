@@ -15,5 +15,124 @@
     "version": "1.0",
     "updated": "2026-07",
     "source": "https://github.com/mapzimus/lab/tree/main/.claude/skills/globe-maps"
+  },
+  {
+    "slug": "turf-analysis",
+    "title": "Turf Analysis",
+    "tagline": "Client-side GIS in the browser",
+    "description": "Teaches Claude browser-side spatial analysis with Turf.js — buffers, spatial joins, Voronoi, hex binning, clustering, interpolation, and geodesic measurement, with no server.",
+    "teaches": [
+      "The GeoJSON-in, GeoJSON-out pipeline: Turf computes, the map library draws",
+      "A pick-the-function table across measurement, transformation, joins, grids, and interpolation",
+      "Canonical patterns: buffer + spatial join, hexGrid + collect, Voronoi with bbox",
+      "The gotchas: [lng, lat] order, planar-ish math at planet scale, explicit units, caching heavy ops"
+    ],
+    "file": "/skills/files/turf-analysis.skill",
+    "sizeKb": 3,
+    "version": "1.0",
+    "updated": "2026-07",
+    "source": "https://github.com/mapzimus/lab/tree/main/.claude/skills/turf-analysis"
+  },
+  {
+    "slug": "spherical-geometry",
+    "title": "Spherical Geometry",
+    "tagline": "Exact geodesy as 3D vectors",
+    "description": "Teaches Claude exact sphere math for maps — great circles, loxodromes, small circles, isoazimuthals, antipodes, cross-track distance — rendered without antimeridian or polar artifacts. Ships a battle-tested geometry kernel.",
+    "teaches": [
+      "The discipline: compute as unit vectors, convert to lat/lon at the edge, split at ±180°",
+      "One-liner constructions: great circles as plane normals, midpoints, equidistant loci, antipodes",
+      "Curve sampling: great circles, small circles, loxodromes, isoazimuthals",
+      "The rendering pipeline: antimeridianSplit + polar clipping, plus the numerical edge cases"
+    ],
+    "file": "/skills/files/spherical-geometry.skill",
+    "sizeKb": 11,
+    "version": "1.0",
+    "updated": "2026-07",
+    "source": "https://github.com/mapzimus/lab/tree/main/.claude/skills/spherical-geometry"
+  },
+  {
+    "slug": "map-csp",
+    "title": "Map CSP",
+    "tagline": "Maps under a strict Content-Security-Policy",
+    "description": "Teaches Claude to run Leaflet, MapLibre GL, Turf, and Globe.gl on locked-down sites — the exact CSP directives each library needs, the vendoring pattern, and Cloudflare Pages _headers tricks.",
+    "teaches": [
+      "A per-library directive table: tile hosts, MapLibre's blob: workers, fonts",
+      "The vendoring convention: self-hosted libraries with versioned, licensed READMEs",
+      "Cloudflare Pages _headers patterns: detach-first CSP overrides, forced downloads",
+      "A debugging checklist for blank maps and silently dead workers"
+    ],
+    "file": "/skills/files/map-csp.skill",
+    "sizeKb": 3,
+    "version": "1.0",
+    "updated": "2026-07",
+    "source": "https://github.com/mapzimus/lab/tree/main/.claude/skills/map-csp"
+  },
+  {
+    "slug": "choropleth",
+    "title": "Choropleth",
+    "tagline": "Area maps that don't lie",
+    "description": "Teaches Claude to make statistically honest, cartographically clean choropleths in geopandas or QGIS — projection choice, normalization, classification, FIPS joins, color ramps, and no-data handling.",
+    "teaches": [
+      "Projection-first: EPSG:5070 for the US, Equal Earth for the world, and why Mercator lies",
+      "Normalize, never map raw counts — and FIPS/GEOID as strings with zfill",
+      "Classification: quantiles vs Jenks, 5–7 classes, diverging ramps centered on meaning",
+      "MAUP, small-denominator instability, and honest no-data styling"
+    ],
+    "file": "/skills/files/choropleth.skill",
+    "sizeKb": 3,
+    "version": "1.0",
+    "updated": "2026-07",
+    "source": "https://github.com/mapzimus/lab/tree/main/.claude/skills/choropleth"
+  },
+  {
+    "slug": "census-data",
+    "title": "Census Data",
+    "tagline": "ACS, TIGER, and GEOIDs decoded",
+    "description": "Teaches Claude to pull US Census numbers and shapes the reliable way — ACS/Decennial API queries, variable-code decoding, the geography hierarchy, TIGER vs cartographic boundaries, and joins that don't leak.",
+    "teaches": [
+      "API query anatomy: datasets, get/for/in, and decoding B19013_001E-style variable codes",
+      "The geography hierarchy with GEOID digit counts, from state to block group",
+      "TIGER/Line vs cartographic boundary files — and which one maps should use",
+      "Join hygiene: strings with leading zeros, vintage matching, sentinel values, MOEs"
+    ],
+    "file": "/skills/files/census-data.skill",
+    "sizeKb": 3,
+    "version": "1.0",
+    "updated": "2026-07",
+    "source": "https://github.com/mapzimus/lab/tree/main/.claude/skills/census-data"
+  },
+  {
+    "slug": "overpass-osm",
+    "title": "Overpass OSM",
+    "tagline": "Getting features out of OpenStreetMap",
+    "description": "Teaches Claude to extract OSM features — Overpass queries that don't time out, route-relation stitching, bulk Geofabrik extracts, and ODbL compliance.",
+    "teaches": [
+      "Overpass QL anatomy: area-first bounding, nwr tag filters, out center vs geom",
+      "The route-relation pattern: pulling named train/bus/hiking routes and stitching members",
+      "The timeout escalation path, and when to switch to Geofabrik/osmium/osm2pgsql",
+      "ODbL license rules: attribution, share-alike databases, freely-licensed produced works"
+    ],
+    "file": "/skills/files/overpass-osm.skill",
+    "sizeKb": 3,
+    "version": "1.0",
+    "updated": "2026-07",
+    "source": "https://github.com/mapzimus/lab/tree/main/.claude/skills/overpass-osm"
+  },
+  {
+    "slug": "map-poster",
+    "title": "Map Poster",
+    "tagline": "The last mile: map to share-ready graphic",
+    "description": "Teaches Claude the finishing pass that turns a correct map into a striking one — QGIS print layouts, social-media dimensions, SVG-to-Illustrator handoff, typography, and attribution conventions.",
+    "teaches": [
+      "Canvas-first sizing for Instagram, stories, and print, with DPI rules",
+      "The QGIS print-layout workflow and the SVG → Illustrator handoff",
+      "Design rules: visual hierarchy, margins, two-font discipline, dark vs editorial identity",
+      "A pre-publish checklist from legend honesty to thumbnail readability"
+    ],
+    "file": "/skills/files/map-poster.skill",
+    "sizeKb": 3,
+    "version": "1.0",
+    "updated": "2026-07",
+    "source": "https://github.com/mapzimus/lab/tree/main/.claude/skills/map-poster"
   }
 ]
