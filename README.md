@@ -36,3 +36,14 @@ The committed `wrangler.jsonc` matches those settings. Preview branches use norm
 homepage — an ordered list of catalog slugs. The tool count in the hero and the
 "last catalog refresh" date in the footer are derived from the catalog at build
 time, so they stay accurate as the data changes.
+
+## Daily radar
+
+`scripts/radar.mjs` scans GitHub (new fast-rising repos plus GIS, maps,
+cartography, data-viz, generative-art, WebGL, and Cloudflare Workers topics)
+and Hugging Face (trending models, datasets, and spaces), ranks everything
+against the lab's interest profile, and writes `radar/YYYY-MM-DD.md` plus
+`radar/latest.md`. The `Daily radar` GitHub Actions workflow runs it every
+day and commits the digest; run it locally with `node scripts/radar.mjs`
+(set `GITHUB_TOKEN` for a higher API rate limit). Tune the `INTERESTS`
+table at the top of the script to change what ranks highly.
