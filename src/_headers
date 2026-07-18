@@ -6,20 +6,9 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
 
-# Turf playground: same policy as /* but img-src also allows OSM basemap tiles.
-# Both blocks are identical and both detach first, so whether or not the splat
-# matches the bare path, exactly one CSP header ships. Scripts/styles stay
-# 'self' — Leaflet and Turf are vendored under /lab/turf-playground/vendor/.
-/lab/turf-playground/
-  ! Content-Security-Policy
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self'; font-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
-
-/lab/turf-playground/*
-  ! Content-Security-Policy
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self'; font-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'
-
-# Train route atlas: same tile allowance as the Turf playground, same
-# both-blocks-detach-first pattern. MapLibre GL is vendored under
+# Train route atlas: same policy as /* plus the OSM tile host. Both blocks are
+# identical and both detach first, so whether or not the splat matches the
+# bare path, exactly one CSP header ships. MapLibre GL is vendored under
 # /lab/train-routes/vendor/; it fetches raster tiles with fetch() (hence
 # connect-src, not img-src, for the tile host) and spawns its workers from
 # blob: URLs (hence worker-src/child-src blob:).
