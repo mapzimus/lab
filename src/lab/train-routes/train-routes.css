@@ -36,10 +36,11 @@ a { color: inherit; }
 .route-dot { width: 10px; height: 10px; border: 1px solid var(--ink); flex: none; }
 .route-meta { margin-top: 2px; color: var(--muted); font: 500 11px var(--mono); }
 .map-frame { position: relative; min-height: 620px; }
-#map { position: absolute; inset: 0; background: var(--paper); }
-.leaflet-container { font-family: var(--sans); }
-.leaflet-popup-content-wrapper { border-radius: 0; border: 1px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); background: var(--card); }
-.leaflet-popup-content { margin: 12px 14px; font-family: var(--sans); }
+#map { position: absolute; inset: 0; background: #101318; }
+.maplibregl-map { font-family: var(--sans); }
+.maplibregl-popup-content { border-radius: 0; border: 1px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); background: var(--card); padding: 12px 14px; font-family: var(--sans); }
+.maplibregl-popup-close-button { font-size: 16px; padding: 2px 7px; }
+.maplibregl-popup-tip { display: none; }
 .popup h3 { margin: 0 0 2px; font-size: .95rem; letter-spacing: -.02em; }
 .popup .cat { display: inline-block; margin-bottom: 8px; padding: 1px 7px; border: 1px solid var(--ink); font: 700 10px var(--mono); text-transform: uppercase; letter-spacing: .08em; color: #fff; }
 .popup .endpoints { margin: 0 0 8px; font: 600 12px var(--mono); }

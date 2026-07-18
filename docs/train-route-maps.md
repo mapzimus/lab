@@ -66,13 +66,58 @@ distortion that makes Mercator wrong for choropleths. Only if you compute
 distances (route length, average speed) do you need care: use geodesic math
 (`turf.length`, PostGIS `geography`), never planar math on degrees.
 
-## Rendering: Leaflet now, MapLibre at scale
+## Rendering: the 3D globe
 
-- **Leaflet + raster OSM tiles** (the demo): trivial to set up, renders
-  GeoJSON as SVG. Comfortable to roughly 50–100 routes / a few thousand
-  vertices; beyond that the SVG DOM gets heavy.
-- **MapLibre GL JS**: WebGL rendering, smooth with hundreds of routes, and
-  data-driven styling replaces per-layer style code:
+The demo uses **MapLibre GL JS with its `globe` projection** — the same
+presentation TrainRouter uses. Since v5, globe is one line in the style:
+
+```js
+const map = new maplibregl.Map({
+  container: "map",
+  style: {
+    version: 8,
+    projection: { type: "globe" },
+    sky: { "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0] },
+    sources: { osm: { type: "raster", tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"], tileSize: 256 } },
+    layers: [{ id: "osm", type: "raster", source: "osm" }],
+  },
+});
+```
+
+Everything else — GeoJSON sources, line layers, popups, filters — is
+ordinary MapLibre; the globe is purely a projection choice, and the map
+seamlessly unrolls to Mercator as you zoom in. Three gotchas:
+
+- **Densify your lines.** MapLibre interpolates between vertices in
+  projected space, so a two-point line cuts a visible chord across the
+  globe. Insert a vertex every degree or so (the demo's `densify()`, or
+  `turf.greatCircle` if you want true geodesics).
+- **CSP.** MapLibre spawns tile workers from blob: URLs and fetches raster
+  tiles with `fetch()` — so a locked-down site needs `worker-src blob:`,
+  `child-src blob:`, and the tile host under `connect-src` (not `img-src`).
+- **Weight.** maplibre-gl.js is ~900 KB vs Leaflet's ~145 KB. Worth it the
+  moment you want the globe or WebGL line counts.
+
+Porting an existing Leaflet page (e.g. the Geopuesto playground) is
+mechanical: `L.map` → `maplibregl.Map` with the style above,
+`L.geoJSON`/`L.polyline` → a geojson source + line layer, `bindPopup` →
+`maplibregl.Popup`, and remember MapLibre speaks GeoJSON order
+(`[lng, lat]`) everywhere — no more Leaflet `[lat, lng]` flipping. Spherical
+constructions (great circles, equidistant rings) render *better* on the
+globe: generate them as densified GeoJSON with Turf and they follow the
+sphere they were computed on.
+
+### Alternatives
+
+- **Leaflet + raster OSM tiles**: trivial to set up, renders GeoJSON as
+  SVG, flat Mercator only. Comfortable to roughly 50–100 routes / a few
+  thousand vertices; beyond that the SVG DOM gets heavy.
+- **Globe.gl / three.js or CesiumJS**: heavier scene-graph globes — the
+  right tool for arcs-in-space or terrain, overkill for draped route lines.
+- **D3 orthographic**: no tiles at all; beautiful for static/editorial
+  globes with Natural Earth coastlines.
+
+MapLibre's data-driven styling replaces per-layer style code:
 
   ```js
   map.addSource("routes", { type: "geojson", data: "/routes.geojson" });
