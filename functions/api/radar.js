@@ -19,7 +19,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const today = new Date().toISOString().slice(0, 10);
   let data;
   try {
-    data = await sweep(today, env.GITHUB_TOKEN);
+    data = await sweep(today, env.GITHUB_TOKEN, { username: env.KAGGLE_USERNAME, key: env.KAGGLE_KEY });
   } catch (err) {
     return new Response(JSON.stringify({ error: `sweep failed: ${err.message}` }), {
       status: 502,

@@ -41,8 +41,13 @@ const renderHN = (h) =>
 const renderPaper = (p) => `- [${p.title}](${p.url}) (▲ ${p.upvotes})${p.desc ? ` — ${p.desc}` : ""}`;
 const renderOSM = (o) => `- [${o.title}](${o.url})`;
 
+const renderTitled = (i) => `- [${i.title}](${i.url})${i.desc ? ` — ${i.desc}` : ""}`;
+
 async function main() {
-  const data = await sweep(today, process.env.GITHUB_TOKEN);
+  const data = await sweep(today, process.env.GITHUB_TOKEN, {
+    username: process.env.KAGGLE_USERNAME,
+    key: process.env.KAGGLE_KEY,
+  });
   const { github: gh, huggingface: hf, hackernews: hn, papers, osm } = data;
 
   const md = [
@@ -59,6 +64,10 @@ async function main() {
     section("Hacker News — relevant to the lab", hn.relevant.map(renderHN)),
     section("Hacker News — front page", hn.general.map(renderHN)),
     section("Papers", papers.map(renderPaper)),
+    section("arXiv — fresh and relevant", data.arxiv.map(renderTitled)),
+    section("Data.gov — new geodata", data.datagov.map(renderTitled)),
+    section("Kaggle — hottest datasets", data.kaggle.map(renderTitled)),
+    section("itch.io — new browser games", data.itch.map(renderTitled)),
     section("OSM pulse", osm.map(renderOSM)),
   ].filter(Boolean).join("\n");
 

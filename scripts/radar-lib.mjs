@@ -189,6 +189,117 @@ async function collectWeeklyOSM() {
   }
 }
 
+// arXiv: newest submissions in vision/graphics/HCI, Atom XML regex-parsed.
+async function collectArxiv() {
+  const q = "cat:cs.CV+OR+cat:cs.GR+OR+cat:cs.HC";
+  const url = `https://export.arxiv.org/api/query?search_query=${q}&sortBy=submittedDate&sortOrder=descending&max_results=50`;
+  try {
+    const res = await fetch(url, { headers: { "User-Agent": "mapzimus-radar" } });
+    if (!res.ok) return [];
+    const xml = await res.text();
+    const items = [];
+    for (const m of xml.matchAll(/<entry>[\s\S]*?<id>([\s\S]*?)<\/id>[\s\S]*?<title>([\s\S]*?)<\/title>[\s\S]*?<summary>([\s\S]*?)<\/summary>[\s\S]*?<\/entry>/g)) {
+      const title = m[2].replace(/\s+/g, " ").trim();
+      const summary = m[3].replace(/\s+/g, " ").trim();
+      const s = score(`${title} ${summary}`);
+      if (s <= 0) continue;
+      items.push({
+        title,
+        url: m[1].trim(),
+        desc: summary.match(/^.{25,220}?[.!?](\s|$)/)?.[0].trim() ?? summary.slice(0, 200),
+        rank: s * 10,
+      });
+    }
+    return items.sort((a, b) => b.rank - a.rank).slice(0, 8);
+  } catch {
+    return [];
+  }
+}
+
+// itch.io: new & popular free browser (HTML5) games, RSS regex-parsed.
+// The filtered feed sits behind bot protection on some networks; fall back
+// to the global new-games feed.
+async function collectItch() {
+  try {
+    let xml = "";
+    for (const feed of ["https://itch.io/games/new-and-popular/free/html5.xml", "https://itch.io/feed/new.xml"]) {
+      const res = await fetch(feed, { headers: { "User-Agent": "mapzimus-radar" } });
+      if (!res.ok) continue;
+      const body = (await res.text()).slice(0, 200000);
+      if (body.includes("<rss")) { xml = body; break; }
+    }
+    if (!xml) return [];
+    const items = [];
+    for (const m of xml.matchAll(/<item>[\s\S]*?<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>[\s\S]*?<link>([\s\S]*?)<\/link>[\s\S]*?(?:<description>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/description>)?[\s\S]*?<\/item>/g)) {
+      const decode = (s) => s
+        .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+        .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"');
+      const desc = decode((m[3] ?? "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim());
+      items.push({
+        title: decode(m[1].trim()),
+        url: m[2].trim(),
+        desc: desc.length > 160 ? desc.slice(0, 157).trimEnd() + "…" : desc,
+      });
+      if (items.length >= 9) break;
+    }
+    return items;
+  } catch {
+    return [];
+  }
+}
+
+// Data.gov: recently modified datasets matching geo/data themes, via the
+// catalog's Solr-backed JSON search (the CKAN API was retired in 2025).
+async function collectDataGov() {
+  const params = new URLSearchParams({ _q: "geospatial", _sort: "-modified", _format: "json" });
+  try {
+    const data = await getJSON(`https://catalog.data.gov/search?${params}`);
+    return (data.results ?? [])
+      .map((d) => {
+        const notes = (d.description ?? "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+        return {
+          title: d.title ?? d.slug,
+          url: `https://catalog.data.gov/dataset/${d.slug}`,
+          desc: notes.match(/^.{25,180}?[.!?](\s|$)/)?.[0].trim() ?? notes.slice(0, 160),
+          org: d.organization?.name ?? "",
+          rank: score(`${d.title ?? ""} ${notes} ${(d.keyword ?? []).join(" ")}`) + (d.has_spatial ? 2 : 0),
+        };
+      })
+      .filter((d) => d.rank > 0)
+      .sort((a, b) => b.rank - a.rank)
+      .slice(0, 8);
+  } catch (err) {
+    console.error(`Data.gov failed: ${err.message}`);
+    return [];
+  }
+}
+
+// Kaggle: hottest datasets. Needs KAGGLE_USERNAME + KAGGLE_KEY credentials
+// (Pages project secrets / Actions secrets); silently skipped without them.
+async function collectKaggle(username, key) {
+  if (!username || !key) return [];
+  try {
+    const auth = btoa(`${username}:${key}`);
+    const items = await getJSON("https://www.kaggle.com/api/v1/datasets/list?sortBy=hottest&pageSize=40", {
+      Authorization: `Basic ${auth}`,
+    });
+    return (Array.isArray(items) ? items : [])
+      .map((d) => ({
+        title: d.title ?? d.ref,
+        url: d.url ?? `https://www.kaggle.com/datasets/${d.ref}`,
+        desc: (d.subtitle ?? "").trim(),
+        votes: d.voteCount ?? 0,
+        rank: score(`${d.title ?? ""} ${d.subtitle ?? ""}`) * 10 + Math.log10(1 + (d.voteCount ?? 0)) * 2,
+        relevant: score(`${d.title ?? ""} ${d.subtitle ?? ""}`) > 0,
+      }))
+      .sort((a, b) => b.rank - a.rank)
+      .slice(0, 8);
+  } catch (err) {
+    console.error(`Kaggle failed: ${err.message}`);
+    return [];
+  }
+}
+
 // Fetch a one-line caption for a Hugging Face item from its card README:
 // first meaningful prose line after the YAML frontmatter, markdown stripped.
 async function hfCaption(kind, id) {
@@ -225,14 +336,18 @@ async function addCaptions(items) {
 
 // Run the full sweep and return the structured radar payload.
 // `today` is a YYYY-MM-DD string; `githubToken` is optional.
-export async function sweep(today, githubToken) {
+export async function sweep(today, githubToken, kaggle = {}) {
   const daysAgo = (n) => new Date(Date.parse(today) - n * 86400000).toISOString().slice(0, 10);
-  const [gh, hf, hn, papers, osm] = await Promise.all([
+  const [gh, hf, hn, papers, osm, arxiv, itch, datagov, kaggleSets] = await Promise.all([
     collectGitHub(daysAgo, githubToken),
     collectHuggingFace(),
     collectHackerNews(daysAgo),
     collectPapers(),
     collectWeeklyOSM(),
+    collectArxiv(),
+    collectItch(),
+    collectDataGov(),
+    collectKaggle(kaggle.username, kaggle.key),
   ]);
 
   const ghRelevant = gh.filter((r) => r.relevant).slice(0, 20);
@@ -256,6 +371,10 @@ export async function sweep(today, githubToken) {
       general: hn.filter((h) => !h.relevant).slice(0, 10),
     },
     papers: papers.filter((p) => p.relevant).slice(0, 10),
+    arxiv,
+    itch,
+    datagov,
+    kaggle: kaggleSets,
     osm,
   };
 }

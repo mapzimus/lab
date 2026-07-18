@@ -30,7 +30,7 @@ Daily scan of GitHub and Hugging Face, ranked for the lab: maps & GIS, browser d
 ## Hugging Face — trending everywhere
 
 - [thinkingmachines/Inkling](https://huggingface.co/thinkingmachines/Inkling) (image-text-to-text · ♥ 954 · 7,870 dl) — Inkling is a general-purpose multimodal model that accepts text, image and audio inputs and generates text outputs.
-- [empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF](https://huggingface.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF) (image-text-to-text · ♥ 2271 · 2,096,147 dl) — Qwythos-9B-Claude-Mythos-5-1M-GGUF
+- [empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF](https://huggingface.co/empero-ai/Qwythos-9B-Claude-Mythos-5-1M-GGUF) (image-text-to-text · ♥ 2272 · 2,096,147 dl) — Qwythos-9B-Claude-Mythos-5-1M-GGUF
 - [zai-org/GLM-5.2](https://huggingface.co/zai-org/GLM-5.2) (text-generation · ♥ 4070 · 534,698 dl)
 - [bottlecapai/ThinkingCap-Qwen3.6-27B](https://huggingface.co/bottlecapai/ThinkingCap-Qwen3.6-27B) (image-text-to-text · ♥ 413 · 9,383 dl)
 - [conradlocke/krea2-identity-edit](https://huggingface.co/conradlocke/krea2-identity-edit) (♥ 344)
@@ -47,7 +47,7 @@ Daily scan of GitHub and Hugging Face, ranked for the lab: maps & GIS, browser d
 
 - [misa77 - a codec that decodes 2x faster than LZ4 (at better ratios)](https://github.com/welcome-to-the-sunny-side/misa77) (▲ 159 · [48 comments](https://news.ycombinator.com/item?id=48922838) · Show HN)
 - [Watch bots interact with an SSH honeypot in real time](https://honeypotlive.cc/) (▲ 137 · [49 comments](https://news.ycombinator.com/item?id=48947548) · Show HN)
-- [AWS: Inaccurate Estimated Billing Data – $1.7 billion](https://news.ycombinator.com/item?id=48945241) (▲ 1012 · [629 comments](https://news.ycombinator.com/item?id=48945241))
+- [AWS: Inaccurate Estimated Billing Data – $1.7 billion](https://news.ycombinator.com/item?id=48945241) (▲ 1015 · [633 comments](https://news.ycombinator.com/item?id=48945241))
 - [One More Letter](https://playonemoreletter.com/) (▲ 87 · [58 comments](https://news.ycombinator.com/item?id=48928402) · Show HN)
 - [Leaves – A text-UI disk usage treemap visualizer](https://github.com/patonw/leaves) (▲ 86 · [26 comments](https://news.ycombinator.com/item?id=48936389) · Show HN)
 - [Mojibake – A low-level Unicode library written in C](https://mojibake.zaerl.com/) (▲ 74 · [22 comments](https://news.ycombinator.com/item?id=48941123) · Show HN)
@@ -68,6 +68,40 @@ Daily scan of GitHub and Hugging Face, ranked for the lab: maps & GIS, browser d
 - [Spectral Rewiring for Exploration, Purification, and Model Merging](https://huggingface.co/papers/2607.03065) (▲ 20) — Reinforcement learning has become a standard post-training recipe for large language models, but dense full-parameter updates create two deployment-relevant bottlenecks: suppressed reasoning performan
 - [Video = World + Event Stream](https://huggingface.co/papers/2607.15038) (▲ 15) — We present Wan-Streamer v0.3, which reframes our native-streaming interaction model under a single organizing view: a video is a world plus an event stream.
 - [Hallo4D: Multi-Modal Hallucination Mitigation for Consistent Spatio-Temporal Generation](https://huggingface.co/papers/2607.12752) (▲ 15) — While recent advances in 3D generation have enabled impressive visual synthesis, existing methods often rely on 2D diffusion supervision without explicit mechanisms for geometric consistency, leading 
+
+## arXiv — fresh and relevant
+
+- [Ray-based phase error correction for miniaturized DOE projector-based FPP under single-directional hyperbolic projection](http://arxiv.org/abs/2607.15139v1) — Fringe Projection Profilometry (FPP) systems using miniaturized DOE pro-jectors often suffer from severe phase artifacts due to nonlinear projection characteristics and limited pattern controllability.
+- [SUFLECA: Scaling Up Feature Learning for CAD-to-image Alignment](http://arxiv.org/abs/2607.15058v1) — CAD-to-image alignment aims to estimate an object's 9D pose (rotation, translation, and anisotropic scale) from a single RGB image, enabling applications in robotics and augmented reality.
+- [Weakly-Supervised RGB-D Salient Object Detection via SAM-driven Pseudo Annotation and State Space Interaction-based Diffusion](http://arxiv.org/abs/2607.15041v1) — Weakly-supervised RGB-D Salient Object Detection (SOD) is explored to reduce the heavy burden of pixel-level annotations.
+- [Rotational Motion-Induced Error Compensation for Phase-Shifting Profilometry-Based Eye Reconstruction](http://arxiv.org/abs/2607.14876v1) — With the proliferation of immersive Head-Mounted Displays (HMDs) for Virtual and Augmented Reality (VR/AR), reliable and high-precision eye tracking has become increasingly important.
+- [HoloGeo: Mitigating Landmark Bias in Geo-localization via Evidence-Driven Reasoning](http://arxiv.org/abs/2607.15255v1) — Recent advances in Vision-Language Models (VLMs) have significantly improved image geo-localization, yet existing models remain susceptible to landmark bias, causing them to overlook geographical cues
+- [Quantifying Training Membership Information in the Hyperspherical Embedding Geometry of Face Recognition Models](http://arxiv.org/abs/2607.15084v1) — Face recognition models represent each face as an embedding vector on the unit hypersphere by clustering embeddings of the same identity while pushing different identities apart through angular-margin losses.
+- [Parameter-efficient Prompt Tuning of Vision Foundation Model With Adaptive Focal Loss for Interpretable MCI Screening](http://arxiv.org/abs/2607.15047v1) — Mild Cognitive Impairment is a critical early stage of cognitive decline that frequently precedes Alzheimer's disease, yet its automated detection from neuropsychological drawing tests remains fundame
+- [Authoring Narrative Visualization in Motion: Visual Storytelling in Swimming Videos](http://arxiv.org/abs/2607.14924v1) — We investigate how to support authoring narrative visualizations in motion in sports videos, drawing on automated data preparation, systematic analysis, technology probe design, and evaluation, using 
+
+## Data.gov — new geodata
+
+- [Civil Rights Data Collection (CRDC) for the 2017-18 school year](https://catalog.data.gov/dataset/civil-rights-data-collection-crdc-for-the-2017-18-school-year) — The Civil Rights Data Collection, 2017-18 (CRDC 2017-18) is part of the Civil Rights Data Collection (CRDC) program; program data are available beginning with t
+- [Civil Rights Data Collection (CRDC) for the 2015-16  school year](https://catalog.data.gov/dataset/civil-rights-data-collection-crdc-for-the-2015-16-school-year) — The Civil Rights Data Collection, 2015-16 (CRDC 2015-16) is part of the Civil Rights Data Collection (CRDC) program; program data are available beginning with t
+- [Civil Rights Data Collection (CRDC)](https://catalog.data.gov/dataset/civil-rights-data-collection-crdc) — Since 1968, OCR has collected civil rights data related to students' access and barriers to educational opportunity from early childhood through grade 12.
+- [2015-16 Harassment or Bullying Estimations by Basis Category](https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-estimations-by-basis-category) — This set of Excel files contains data on students reported as harassed or bullied or disciplined for harassment or bullying on the basis of sex, race, or disabi
+- [2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection](https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-by-basis-category-civil-rights-data-collection) — The 2015-16 tables are based on data collected from all of the nation’s school districts and schools—approximately 17,300 school districts and 96,300 schools.
+- [2017-18 Harassment or Bullying Civil Rights Data Collection](https://catalog.data.gov/dataset/2017-18-harassment-or-bullying-civil-rights-data-collection) — This set of Excel files contains data on students reported as harassed or bullied or disciplined for harassment or bullying on the basis of sex, race, or disabi
+- [2013-14 Mathematics and Science Civil Rights Data Collection](https://catalog.data.gov/dataset/2013-14-mathematics-and-science-civil-rights-data-collection) — The 2013-14 tables are based on data collected from all of the nation’s school districts and schools—approximately 16,500 school districts and 96,500 schools.
+- [2017-18 Student Enrollment Civil Rights Data Collection](https://catalog.data.gov/dataset/2017-18-student-enrollment-civil-rights-data-collection) — This set of Excel files contains data for all states on overall enrollment, enrollment of students served under IDEA, enrollment of students served under Sectio
+
+## itch.io — new browser games
+
+- [Realistic Fishin' [Free] [Simulation]](https://otrain13.itch.io/realistic-fishin) — Finally a realistic fishin' game
+- [Five Nights at Diddy's [Free]](https://jc-inc.itch.io/five-nights-at-diddys)
+- [Ape Horror [Free] [Windows] [Android]](https://pepsi1121.itch.io/ape-horror) — still in beta
+- [Sohybrids BONUSES! [Free] [Visual Novel] [Windows] [macOS] [Linux] [Android]](https://tehguthroth.itch.io/sohybrids-bonuses) — Saucier scenarios not canon to main game! Still some asexual options!
+- [Snack puzzle [Free]](https://treecats-co.itch.io/snack-puzzle) — Game 14/30 of my "30 games in 1 month" challenge
+- [Ghost cannon [Free] [Windows] [macOS] [Android]](https://tupakiiin.itch.io/ghost-cannon) — hit the target
+- [Tras las Huellas de Bamsa [Free] [Platformer] [Windows]](https://tha-maese.itch.io/tras-las-huellas-de-bamsa) — ¡Han secuestrado a Bamsa! Juega como Azael y Davide en Bio-Maze (Sitges 2025). Creado por el dúo indie Canayne.
+- [untitled gull game [Free]](https://dannium.itch.io/untitled-gull-game) — Protect your sandcastle from enemies
+- [Down the Pipe 2 - Lost in Space [Free] [Shooter]](https://df-design.itch.io/down-the-pipe-2-lost-in-space) — Old School Shooter
 
 ## OSM pulse
 

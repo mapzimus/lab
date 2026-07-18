@@ -53,6 +53,7 @@
     card(h.title, h.url, "", [`▲ ${fmt.format(h.points)}`, `${fmt.format(h.comments)} comments`, h.isShow ? "Show HN" : null], false);
   const paperCard = (p) => card(p.title, p.url, p.desc, [`▲ ${fmt.format(p.upvotes)}`], false);
   const osmCard = (o) => card(o.title, o.url, "", ["weeklyOSM"], false);
+  const titledCard = (i) => card(i.title, i.url, i.desc || "", [i.org, i.votes != null ? `▲ ${fmt.format(i.votes)}` : null], false);
 
   const gh = data.github || { relevant: [], general: [] };
   const hf = data.huggingface || { models: [], datasets: [], spaces: [], general: [] };
@@ -65,6 +66,10 @@
     ["huggingface", "Hugging Face — datasets", "Trending datasets worth a look.", hf.datasets.map(hfCard)],
     ["huggingface", "Hugging Face — spaces", "Trending demos and apps.", hf.spaces.map(hfCard)],
     ["papers", "Papers", "From Hugging Face Daily Papers, filtered for lab interests.", (data.papers || []).map(paperCard)],
+    ["papers", "arXiv — fresh and relevant", "Newest vision, graphics, and HCI submissions matching lab interests.", (data.arxiv || []).map(titledCard)],
+    ["data", "Data.gov — new geodata", "Newly published datasets in the geo/data themes.", (data.datagov || []).map(titledCard)],
+    ["data", "Kaggle — hottest datasets", "Trending Kaggle datasets (needs Kaggle API credentials).", (data.kaggle || []).map(titledCard)],
+    ["games", "itch.io — new browser games", "New and popular free HTML5 games.", (data.itch || []).map(titledCard)],
     ["osm", "OSM pulse", "Latest issues of weeklyOSM.", (data.osm || []).map(osmCard)],
     ["github", "GitHub — trending everywhere", "The loudest brand-new repos regardless of topic.", gh.general.map(repoCard)],
     ["huggingface", "Hugging Face — trending everywhere", "The biggest general movers on the Hub.", hf.general.map(hfCard)],
