@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Radar · Mapzimus</title>
+  <meta name="description" content="A daily scan of GitHub and Hugging Face, ranked for the Mapzimus lab: maps, GIS, data tools, generative design, and browser experiments.">
+  <link rel="canonical" href="https://mapzimus.com/radar/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Radar · Mapzimus">
+  <meta property="og:description" content="A daily scan of GitHub and Hugging Face, ranked for the Mapzimus lab.">
+  <meta property="og:url" content="https://mapzimus.com/radar/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#f4f0e7">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/radar/radar.css">
+  <script src="/radar/radar.js" defer></script>
+</head>
+<body data-view="radar">
+  <a class="skip-link" href="#radar">Skip to radar</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Mapzimus home">
+      <span class="brand-mark" aria-hidden="true">MZ</span>
+      <span>Mapzimus</span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="/tools/">Tools</a>
+      <a href="/maps/">Maps</a>
+      <a href="/play/">Play</a>
+      <a href="/experiments/">Experiments</a>
+      <a href="/radar/" aria-current="page">Radar</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero radar-hero">
+      <div class="eyebrow">Fresh every day</div>
+      <h1>The lab's radar.</h1>
+      <p>A daily scan of GitHub and Hugging Face, ranked for what this lab cares about: maps and GIS, browser data tools, generative design, math, teaching, games, and the small-web stack.</p>
+      <div class="trust-row">
+        <span id="radarDate">Loading…</span>
+        <span id="radarCounts" hidden></span>
+      </div>
+    </section>
+
+    <section class="catalog" id="radar" aria-labelledby="radarHeading">
+      <div class="section-heading">
+        <div><span class="eyebrow">Today's sweep</span><h2 id="radarHeading">What's moving</h2></div>
+        <p>Relevance-ranked picks first; the loudest general trends at the end for context.</p>
+      </div>
+      <div class="catalog-controls radar-controls">
+        <div class="filters" role="group" aria-label="Filter sources" id="radarFilters">
+          <button class="filter" data-source="all" aria-pressed="true">All</button>
+          <button class="filter" data-source="github" aria-pressed="false">GitHub</button>
+          <button class="filter" data-source="huggingface" aria-pressed="false">Hugging Face</button>
+        </div>
+      </div>
+      <div id="radarSections">
+        <p class="empty" id="radarEmpty">Loading today's radar…</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Mapzimus is the creative lab of Maxwell Howe. Radar data refreshes daily via GitHub Actions.</p>
+    <p class="footer-note">Sources: GitHub Search API · Hugging Face Hub API</p>
+  </footer>
+</body>
+</html>

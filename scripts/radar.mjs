@@ -4,7 +4,8 @@
 // (maps/GIS, browser data tools, generative design, math viz, teaching,
 // small games, Cloudflare/edge, vanilla-JS web tooling).
 //
-// Zero dependencies. Writes radar/YYYY-MM-DD.md and radar/latest.md.
+// Zero dependencies. Writes radar/YYYY-MM-DD.md, radar/latest.md, and
+// src/data/radar.json (consumed by the /radar/ dashboard on mapzimus.com).
 // Usage: node scripts/radar.mjs [--date YYYY-MM-DD]
 // Optional: GITHUB_TOKEN env var raises the GitHub API rate limit.
 
@@ -190,6 +191,18 @@ async function main() {
   await mkdir(OUT_DIR, { recursive: true });
   await writeFile(path.join(OUT_DIR, `${today}.md`), md);
   await writeFile(path.join(OUT_DIR, "latest.md"), md);
+
+  const json = {
+    generatedAt: today,
+    github: { relevant: ghRelevant, general: ghGeneral },
+    huggingface: {
+      models: byKind("models"),
+      datasets: byKind("datasets"),
+      spaces: byKind("spaces"),
+      general: hfGeneral,
+    },
+  };
+  await writeFile(path.join(ROOT, "src", "data", "radar.json"), JSON.stringify(json, null, 2) + "\n");
   console.log(`Wrote radar/${today}.md (${ghRelevant.length + ghGeneral.length} repos, ${hf.filter((h) => h.relevant).length} relevant HF items)`);
 }
 

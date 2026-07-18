@@ -2,7 +2,7 @@
 Daily scan of GitHub and Hugging Face, ranked for the lab: maps & GIS, browser data tools, generative design, math viz, teaching tools, games, and the Cloudflare/vanilla-JS stack.
 ## Hugging Face — models
 
-- [prism-ml/Ternary-Bonsai-27B-gguf](https://huggingface.co/prism-ml/Ternary-Bonsai-27B-gguf) (text-generation · ♥ 678 · 200,774 dl)
+- [prism-ml/Ternary-Bonsai-27B-gguf](https://huggingface.co/prism-ml/Ternary-Bonsai-27B-gguf) (text-generation · ♥ 679 · 200,774 dl)
 - [prism-ml/Bonsai-27B-gguf](https://huggingface.co/prism-ml/Bonsai-27B-gguf) (text-generation · ♥ 390 · 1,045,182 dl)
 - [ATH-MaaS/OvisOCR2](https://huggingface.co/ATH-MaaS/OvisOCR2) (image-text-to-text · ♥ 153 · 10,795 dl)
 - [baidu/Unlimited-OCR](https://huggingface.co/baidu/Unlimited-OCR) (image-text-to-text · ♥ 2019 · 1,992,355 dl)
