@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "metrics": [
+    {
+      "key": "population",
+      "label": "Civilian population",
+      "west": "30,755",
+      "east": "13,221",
+      "unit": "people",
+      "advantage": "West",
+      "source_url": "https://www.concordnh.gov/DocumentCenter/View/14065/City-Overview"
+    },
+    {
+      "key": "himars_launchers",
+      "label": "HIMARS launchers (M142, 227mm GMLRS/ATACMS)",
+      "west": "0",
+      "east": "up to 18",
+      "unit": "launchers (doctrinal bn)",
+      "advantage": "East",
+      "source_url": "https://en.wikipedia.org/wiki/197th_Field_Artillery_Regiment"
+    },
+    {
+      "key": "black_hawks",
+      "label": "Black Hawk helicopters (UH-60 lift + HH-60 MEDEVAC)",
+      "west": "0",
+      "east": "~8-12",
+      "unit": "aircraft (est.)",
+      "advantage": "East",
+      "source_url": "https://currentops.com/installations/us/nh/nh-arng-aasf"
+    },
+    {
+      "key": "armored_vehicle",
+      "label": "Armored tactical vehicle (Lenco BearCat)",
+      "west": "1",
+      "east": "0",
+      "unit": "vehicles",
+      "advantage": "West",
+      "source_url": "https://patch.com/new-hampshire/concord-nh/concord-city-council-approves-bearcat-grant"
+    },
+    {
+      "key": "armed_personnel",
+      "label": "Armed/uniformed personnel (defensive manpower)",
+      "west": "~340",
+      "east": "~300+",
+      "unit": "personnel (est.)",
+      "advantage": "Contested",
+      "source_url": "https://www.nhpr.org/nh-news/2023-10-16/concord-city-council-gives-police-half-million-dollar-boost-for-officer-retention"
+    },
+    {
+      "key": "national_guard_ground",
+      "label": "Deployable Guard ground force (237th Military Police Co.)",
+      "west": "0",
+      "east": "~120",
+      "unit": "soldiers",
+      "advantage": "East",
+      "source_url": "https://www.breitbart.com/border/2022/10/03/new-hampshire-national-guard-military-police-units-deploy-to-texas-mexico-border/"
+    },
+    {
+      "key": "hospital_beds",
+      "label": "Hospital beds (Concord Hospital, Level II adult / III pediatric trauma)",
+      "west": "295",
+      "east": "0",
+      "unit": "licensed beds",
+      "advantage": "West",
+      "source_url": "https://en.wikipedia.org/wiki/Concord_Hospital_(New_Hampshire)"
+    },
+    {
+      "key": "prison_capacity",
+      "label": "State prison detention capacity (NH State Prison for Men)",
+      "west": "~1,408",
+      "east": "0",
+      "unit": "inmate capacity",
+      "advantage": "West",
+      "source_url": "https://www.corrections.nh.gov/locations/nhsp-m"
+    },
+    {
+      "key": "water_treatment",
+      "label": "Drinking-water treatment capacity (Hutchins St WTP)",
+      "west": "10",
+      "east": "0",
+      "unit": "MGD (design)",
+      "advantage": "West",
+      "source_url": "https://www.concordnh.gov/Archive.aspx?ADID=223"
+    },
+    {
+      "key": "wastewater_treatment",
+      "label": "Wastewater treatment capacity (Hall St + Penacook WWTP)",
+      "west": "~11.3",
+      "east": "0",
+      "unit": "MGD (design)",
+      "advantage": "West",
+      "source_url": "https://www.concordnh.gov/1353/Wastewater-Treatment"
+    },
+    {
+      "key": "water_storage",
+      "label": "Treated-water storage (5 system tanks)",
+      "west": "7.5",
+      "east": "0",
+      "unit": "million gallons",
+      "advantage": "West",
+      "source_url": "https://www.concordnh.gov/Archive.aspx?ADID=223"
+    },
+    {
+      "key": "power_substations",
+      "label": "Power-distribution substations / switching hubs",
+      "west": "2",
+      "east": "0",
+      "unit": "substations (Bridge St + McGuire St)",
+      "advantage": "West",
+      "source_url": "https://www.concordmonitor.com/2025/11/08/concord-nh-bridge-street-substation-electric/"
+    },
+    {
+      "key": "power_generation",
+      "label": "On-bank electrical generation (Garvins Falls hydro mid-river; landfill solar W of I-93)",
+      "west": "0",
+      "east": "0",
+      "unit": "MW (Garvins 12.4 + solar 6.7 both Contested)",
+      "advantage": "Contested",
+      "source_url": "https://www.gridinfo.com/plant/garvins-falls/2357"
+    },
+    {
+      "key": "tanks",
+      "label": "Tanks / tracked armor",
+      "west": "0",
+      "east": "present",
+      "unit": "State Military Reservation",
+      "advantage": "East",
+      "source_url": "NH National Guard State Military Reservation (reported on-site)"
+    }
+  ]
+}

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs && node scripts/check-links.mjs",
     "preview": "npx wrangler pages dev dist"
   }
 }

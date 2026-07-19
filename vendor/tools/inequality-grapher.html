@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inequality Grapher</title>
+<meta name="description" content="Shade linear inequalities and systems of inequalities on a coordinate plane, with a draggable test point to check any coordinate. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --ineq1:#2563eb; --ineq2:#7c3aed; --overlap:#d97706;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --ineq1:#4f86ff; --ineq2:#a78bfa; --overlap:#f5b942;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --ineq1:#4f86ff; --ineq2:#a78bfa; --overlap:#f5b942;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
+  canvas { display: block; width: 100%; height: auto; border-radius: 10px; touch-action: none; background: var(--surface); }
+  .hint { text-align: center; color: var(--muted); font-size: .82rem; margin: 8px 0 0; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 22px; justify-content: center; margin-top: 12px; font-size: .85rem; font-weight: 600; }
+  .leg-item { display: flex; align-items: center; gap: 7px; }
+  .swatch { width: 14px; height: 14px; border-radius: 4px; display: inline-block; flex: none; }
+  .swatch.l1 { background: var(--ineq1); }
+  .swatch.l2 { background: var(--ineq2); }
+  .swatch.l3 { background: var(--overlap); }
+
+  h2.sec-h { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; margin: 0 0 10px; }
+
+  .preset-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .preset-btn { border: 1.5px solid var(--border); background: transparent; color: var(--text); border-radius: 10px; padding: 8px 12px; font-size: .85rem; font-weight: 600; font-family: inherit; cursor: pointer; }
+  .preset-btn:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); border-color: var(--accent); }
+
+  fieldset.ineq-fs { border: 2px solid var(--border); border-radius: 12px; padding: 6px 14px 14px; margin: 0; }
+  fieldset.ineq-fs.i1 { border-color: var(--ineq1); }
+  fieldset.ineq-fs.i1 legend { color: var(--ineq1); }
+  fieldset.ineq-fs.i2 { border-color: var(--ineq2); }
+  fieldset.ineq-fs.i2 legend { color: var(--ineq2); }
+  .ineq-fs legend { font-weight: 800; padding: 0 6px; font-size: .95rem; }
+  .num-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .num-row label { display: block; font-size: .78rem; color: var(--muted); margin: 10px 0 4px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+  .num-row input { width: 100%; padding: 9px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; font-family: inherit; background: var(--bg); color: var(--text); }
+  .num-row input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+
+  .dir-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .dir-pill { border: 1.5px solid var(--border); background: transparent; color: var(--text); border-radius: 999px; padding: 7px 14px; font-size: .9rem; font-weight: 700; font-family: inherit; cursor: pointer; }
+  .dir-pill.on.i1 { background: color-mix(in srgb, var(--ineq1) 16%, transparent); border-color: var(--ineq1); color: var(--ineq1); }
+  .dir-pill.on.i2 { background: color-mix(in srgb, var(--ineq2) 16%, transparent); border-color: var(--ineq2); color: var(--ineq2); }
+
+  .eq-line { margin-top: 12px; font-size: 1.15rem; font-weight: 800; }
+  .eq-line.i1 { color: var(--ineq1); }
+  .eq-line.i2 { color: var(--ineq2); }
+  .desc-line { font-size: .85rem; color: var(--muted); margin-top: 3px; }
+
+  .toggle-btn { border: 1.5px solid var(--border); background: transparent; color: var(--text); border-radius: 10px; padding: 10px 14px; font-size: .9rem; font-weight: 700; font-family: inherit; cursor: pointer; width: 100%; text-align: left; }
+  .toggle-btn[aria-pressed="true"] { background: color-mix(in srgb, var(--ineq2) 14%, transparent); border-color: var(--ineq2); color: var(--ineq2); }
+  .toggle-btn.pt[aria-pressed="true"] { background: color-mix(in srgb, var(--overlap) 18%, transparent); border-color: var(--overlap); color: var(--overlap); }
+
+  .sys-readout { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--overlap) 14%, transparent); border: 1.5px solid var(--overlap); font-size: .88rem; }
+  .sys-readout b { color: var(--overlap); }
+
+  .ro { background: var(--surface-2); border-radius: 12px; padding: 12px 14px; margin-top: 10px; }
+  .ro .rlab { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; margin-bottom: 3px; }
+  .ro .rval { font-size: 1rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .verdict.yes { color: var(--ok); }
+  .verdict.no { color: var(--danger); }
+
+  @media (max-width: 480px) { .num-row { grid-template-columns: 1fr; } }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← max</a>
+      <h1>Inequality Grapher</h1>
+      <p>Shade linear inequalities on a coordinate plane, build a system of two, and drag a test point around to see which region it satisfies.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="card">
+    <canvas id="plot" width="640" height="480" aria-label="Coordinate plane showing shaded half-plane inequalities"></canvas>
+    <div class="legend" id="legend">
+      <div class="leg-item"><span class="swatch l1"></span><span id="eqLegend1">y ≥ x</span></div>
+      <div class="leg-item" id="legItem2" hidden><span class="swatch l2"></span><span id="eqLegend2">—</span></div>
+      <div class="leg-item" id="legItem3" hidden><span class="swatch l3"></span><span>Overlap = system solution</span></div>
+    </div>
+    <div class="hint">Edit m and b, or drag the test point (gold) once it's shown</div>
+    <div class="sr-only" id="sr-announce" aria-live="polite"></div>
+  </div>
+
+  <div class="card">
+    <h2 class="sec-h">Presets</h2>
+    <div class="preset-row" id="presets">
+      <button class="preset-btn" type="button" data-preset="0">y ≥ x</button>
+      <button class="preset-btn" type="button" data-preset="1">y &lt; −x + 4</button>
+      <button class="preset-btn" type="button" data-preset="2">System: y ≤ 2x+1 and y &gt; −x</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <fieldset class="ineq-fs i1">
+      <legend>Inequality 1</legend>
+      <div class="num-row">
+        <div>
+          <label for="m1">Slope (m)</label>
+          <input type="number" id="m1" step="0.5" inputmode="decimal">
+        </div>
+        <div>
+          <label for="b1">Y-intercept (b)</label>
+          <input type="number" id="b1" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+      <div class="dir-row" id="dir1" role="group" aria-label="Inequality 1 direction">
+        <button class="dir-pill" type="button" data-op="lt">y &lt;</button>
+        <button class="dir-pill" type="button" data-op="le">y ≤</button>
+        <button class="dir-pill" type="button" data-op="gt">y &gt;</button>
+        <button class="dir-pill" type="button" data-op="ge">y ≥</button>
+      </div>
+      <div class="eq-line i1" id="eqText1">y ≥ x</div>
+      <div class="desc-line" id="descText1">Shade above a solid line.</div>
+    </fieldset>
+  </div>
+
+  <div class="card">
+    <button class="toggle-btn" type="button" id="addI2Btn" aria-pressed="false">+ Add a second inequality</button>
+    <fieldset class="ineq-fs i2" id="i2Fs" style="margin-top:14px;" hidden>
+      <legend>Inequality 2</legend>
+      <div class="num-row">
+        <div>
+          <label for="m2">Slope (m)</label>
+          <input type="number" id="m2" step="0.5" inputmode="decimal">
+        </div>
+        <div>
+          <label for="b2">Y-intercept (b)</label>
+          <input type="number" id="b2" step="0.5" inputmode="decimal">
+        </div>
+      </div>
+      <div class="dir-row" id="dir2" role="group" aria-label="Inequality 2 direction">
+        <button class="dir-pill" type="button" data-op="lt">y &lt;</button>
+        <button class="dir-pill" type="button" data-op="le">y ≤</button>
+        <button class="dir-pill" type="button" data-op="gt">y &gt;</button>
+        <button class="dir-pill" type="button" data-op="ge">y ≥</button>
+      </div>
+      <div class="eq-line i2" id="eqText2">y ≤ 2x − 3</div>
+      <div class="desc-line" id="descText2">Shade below a solid line.</div>
+    </fieldset>
+    <div class="sys-readout" id="sysReadout" hidden>
+      <b>System solution:</b> the darker overlapping region satisfies <em>both</em> inequalities at once — that double-shaded wedge is the solution set of the system.
+    </div>
+  </div>
+
+  <div class="card">
+    <button class="toggle-btn pt" type="button" id="ptBtn" aria-pressed="false">◉ Show a draggable test point</button>
+    <div class="ro" id="ptReadout" hidden>
+      <div class="rlab">Test point</div>
+      <div class="rval" id="ptCoord">(2, 2)</div>
+      <div style="margin-top:8px;font-size:.85rem;">
+        <div id="ptV1">Inequality 1: —</div>
+        <div id="ptV2" hidden>Inequality 2: —</div>
+        <div id="ptVSys" hidden style="margin-top:4px;font-weight:800;">System: —</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app">Nothing you enter leaves this page · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var SKEY="max-ineqGrapher.v1";
+  var SYM={lt:"<",le:"≤",gt:">",ge:"≥"};
+
+  var state={
+    i1:{m:1,b:0,op:"ge"},
+    useI2:false,
+    i2:{m:2,b:-3,op:"le"},
+    showPoint:false,
+    point:{x:2,y:2}
+  };
+  try{
+    var s=JSON.parse(localStorage.getItem(SKEY));
+    if(s&&s.i1&&s.i2&&s.point) state=s;
+  }catch(e){}
+
+  var PRESETS=[
+    {i1:{m:1,b:0,op:"ge"}, useI2:false, i2:{m:2,b:-3,op:"le"}},
+    {i1:{m:-1,b:4,op:"lt"}, useI2:false, i2:{m:2,b:-3,op:"le"}},
+    {i1:{m:2,b:1,op:"le"}, useI2:true, i2:{m:-1,b:0,op:"gt"}}
+  ];
+
+  var canvas=document.getElementById("plot"), ctx=canvas.getContext("2d");
+  var VMIN=-10,VMAX=10;
+  var DRAG=false, HANDLE_R=10;
+
+  function save(){try{localStorage.setItem(SKEY,JSON.stringify(state));}catch(e){}}
+
+  function cssVar(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim();}
+
+  function r2(n){var v=Math.round(n*100)/100; return Object.is(v,-0)?0:v;}
+  function signedTerm(n){var r=r2(n); return r>=0?" + "+r:" − "+Math.abs(r);}
+
+  function formatIneq(ineq){
+    var mr=r2(ineq.m), br=r2(ineq.b);
+    var parts=[];
+    if(mr===1) parts.push("x");
+    else if(mr===-1) parts.push("−x");
+    else if(mr!==0) parts.push(mr+"x");
+    var rhs;
+    if(parts.length===0){
+      rhs = br<0 ? "−"+Math.abs(br) : String(br);
+    } else if(br!==0){
+      rhs = parts.join("")+signedTerm(br);
+    } else {
+      rhs = parts.join("");
+    }
+    return "y "+SYM[ineq.op]+" "+rhs;
+  }
+
+  function describeIneq(ineq){
+    var strict=(ineq.op==="lt"||ineq.op==="gt");
+    var above=(ineq.op==="gt"||ineq.op==="ge");
+    return "Shade "+(above?"above":"below")+" a "+(strict?"dashed":"solid")+" line.";
+  }
+
+  function satisfies(ineq,pt){
+    var y=ineq.m*pt.x+ineq.b;
+    switch(ineq.op){
+      case "lt": return pt.y<y;
+      case "le": return pt.y<=y;
+      case "gt": return pt.y>y;
+      case "ge": return pt.y>=y;
+    }
+  }
+
+  function resize(){
+    var dpr=window.devicePixelRatio||1, W=canvas.clientWidth||640, H=Math.round(W*0.75);
+    canvas.width=W*dpr; canvas.height=H*dpr; canvas.style.height=H+"px";
+    ctx.setTransform(dpr,0,0,dpr,0,0); draw();
+  }
+  function toScreen(mx,my,W,H){
+    return{x:(mx-VMIN)/(VMAX-VMIN)*W, y:H-(my-VMIN)/(VMAX-VMIN)*H};
+  }
+  function toMath(sx,sy,W,H){
+    return{x:sx/W*(VMAX-VMIN)+VMIN, y:(1-sy/H)*(VMAX-VMIN)+VMIN};
+  }
+
+  // full-width polygon path for the half-plane described by an inequality
+  function regionPath(ineq,W,H){
+    var yL=ineq.m*VMIN+ineq.b, yR=ineq.m*VMAX+ineq.b;
+    var sL=toScreen(VMIN,yL,W,H), sR=toScreen(VMAX,yR,W,H);
+    var above=(ineq.op==="gt"||ineq.op==="ge");
+    var p=new Path2D();
+    p.moveTo(0,sL.y); p.lineTo(W,sR.y);
+    if(above){ p.lineTo(W,0); p.lineTo(0,0); } else { p.lineTo(W,H); p.lineTo(0,H); }
+    p.closePath();
+    return p;
+  }
+
+  function strokeBoundary(ineq,color,W,H){
+    var yL=ineq.m*VMIN+ineq.b, yR=ineq.m*VMAX+ineq.b;
+    var sL=toScreen(VMIN,yL,W,H), sR=toScreen(VMAX,yR,W,H);
+    var strict=(ineq.op==="lt"||ineq.op==="gt");
+    ctx.save();
+    ctx.strokeStyle=color; ctx.lineWidth=2.75;
+    ctx.setLineDash(strict?[9,7]:[]);
+    ctx.beginPath(); ctx.moveTo(sL.x,sL.y); ctx.lineTo(sR.x,sR.y); ctx.stroke();
+    ctx.restore();
+  }
+
+  function draw(){
+    var dpr=window.devicePixelRatio||1, W=canvas.width/dpr, H=canvas.height/dpr;
+    var cBg=cssVar('--surface')||"#fff", cGrid=cssVar('--border')||"#ddd", cAxis=cssVar('--muted')||"#888",
+        cText=cssVar('--text')||"#111", cIneq1=cssVar('--ineq1')||"#2563eb", cIneq2=cssVar('--ineq2')||"#7c3aed",
+        cOverlap=cssVar('--overlap')||"#d97706";
+
+    ctx.clearRect(0,0,W,H); ctx.fillStyle=cBg; ctx.fillRect(0,0,W,H);
+
+    // grid
+    ctx.lineWidth=1; ctx.font="11px -apple-system,Arial,sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    var o=toScreen(0,0,W,H);
+    for(var g=VMIN;g<=VMAX;g++){
+      var v=toScreen(g,g,W,H);
+      ctx.strokeStyle=g===0?cAxis:cGrid;
+      ctx.beginPath();ctx.moveTo(v.x,0);ctx.lineTo(v.x,H);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(0,v.y);ctx.lineTo(W,v.y);ctx.stroke();
+    }
+    // axis labels
+    ctx.fillStyle=cAxis;
+    for(var t=VMIN;t<=VMAX;t+=2){if(t===0)continue;
+      var px=toScreen(t,0,W,H),py=toScreen(0,t,W,H);
+      ctx.textAlign="center"; ctx.fillText(t,px.x,o.y+10);
+      ctx.textAlign="right"; ctx.fillText(t,o.x-5,py.y);
+    }
+    // bold axes
+    ctx.strokeStyle=cAxis; ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(o.x,0);ctx.lineTo(o.x,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,o.y);ctx.lineTo(W,o.y);ctx.stroke();
+
+    // shaded half-planes (semi-transparent so the grid still shows through)
+    ctx.save(); ctx.globalAlpha=0.20; ctx.fillStyle=cIneq1; ctx.fill(regionPath(state.i1,W,H)); ctx.restore();
+    if(state.useI2){
+      ctx.save(); ctx.globalAlpha=0.20; ctx.fillStyle=cIneq2; ctx.fill(regionPath(state.i2,W,H)); ctx.restore();
+      // overlap = intersection of both half-planes, emphasized with a darker gold fill
+      ctx.save();
+      ctx.clip(regionPath(state.i1,W,H));
+      ctx.clip(regionPath(state.i2,W,H));
+      ctx.globalAlpha=0.42; ctx.fillStyle=cOverlap;
+      ctx.fillRect(0,0,W,H);
+      ctx.restore();
+    }
+
+    // boundary lines
+    strokeBoundary(state.i1,cIneq1,W,H);
+    if(state.useI2) strokeBoundary(state.i2,cIneq2,W,H);
+
+    // test point handle
+    if(state.showPoint){
+      var pp=toScreen(state.point.x,state.point.y,W,H);
+      ctx.fillStyle=cOverlap; ctx.strokeStyle=cText; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(pp.x,pp.y,HANDLE_R,0,2*Math.PI); ctx.fill(); ctx.stroke();
+      ctx.fillStyle=cText; ctx.font="bold 12px -apple-system,Arial,sans-serif";
+      ctx.textAlign=pp.x>W-60?"right":"left"; ctx.textBaseline="bottom";
+      ctx.fillText("("+r2(state.point.x)+", "+r2(state.point.y)+")", pp.x+(pp.x>W-60?-12:12), pp.y-10);
+    }
+
+    updateReadouts();
+  }
+
+  function updateReadouts(){
+    document.getElementById("eqText1").textContent=formatIneq(state.i1);
+    document.getElementById("descText1").textContent=describeIneq(state.i1);
+    document.getElementById("eqLegend1").textContent=formatIneq(state.i1);
+
+    document.getElementById("legItem2").hidden=!state.useI2;
+    document.getElementById("legItem3").hidden=!state.useI2;
+    document.getElementById("sysReadout").hidden=!state.useI2;
+    if(state.useI2){
+      document.getElementById("eqText2").textContent=formatIneq(state.i2);
+      document.getElementById("descText2").textContent=describeIneq(state.i2);
+      document.getElementById("eqLegend2").textContent=formatIneq(state.i2);
+    }
+
+    var label="Coordinate plane. Inequality 1: "+formatIneq(state.i1)+", "+describeIneq(state.i1).toLowerCase();
+    if(state.useI2) label+=" Inequality 2: "+formatIneq(state.i2)+", "+describeIneq(state.i2).toLowerCase()+" The darker overlap is the system's solution region.";
+    canvas.setAttribute("aria-label",label);
+
+    document.getElementById("ptReadout").hidden=!state.showPoint;
+    document.getElementById("ptV2").hidden=!state.useI2;
+    document.getElementById("ptVSys").hidden=!state.useI2;
+    if(state.showPoint){
+      document.getElementById("ptCoord").textContent="("+r2(state.point.x)+", "+r2(state.point.y)+")";
+      var ok1=satisfies(state.i1,state.point);
+      setVerdict("ptV1","Inequality 1 ("+formatIneq(state.i1)+")",ok1);
+      var sr=document.getElementById("sr-announce");
+      var msg="Test point "+r2(state.point.x)+", "+r2(state.point.y)+" "+(ok1?"satisfies":"does not satisfy")+" inequality 1.";
+      if(state.useI2){
+        var ok2=satisfies(state.i2,state.point);
+        setVerdict("ptV2","Inequality 2 ("+formatIneq(state.i2)+")",ok2);
+        var okSys=ok1&&ok2;
+        setVerdict("ptVSys","System",okSys,okSys?"satisfies the system":"does not satisfy the system");
+        msg+=" "+(ok2?"Satisfies":"Does not satisfy")+" inequality 2. "+(okSys?"Satisfies the system.":"Does not satisfy the system.");
+      }
+      sr.textContent=msg;
+    }
+  }
+
+  function setVerdict(id,label,ok,customTail){
+    var el=document.getElementById(id);
+    var tail=customTail||(ok?"satisfied":"not satisfied");
+    el.innerHTML=label+": <span class=\"verdict "+(ok?"yes":"no")+"\">"+(ok?"✓ ":"✗ ")+tail+"</span>";
+  }
+
+  // ---- inputs ----
+  function syncInputs(){
+    document.getElementById("m1").value=state.i1.m;
+    document.getElementById("b1").value=state.i1.b;
+    document.getElementById("m2").value=state.i2.m;
+    document.getElementById("b2").value=state.i2.b;
+    setPills("dir1",state.i1.op,"i1");
+    setPills("dir2",state.i2.op,"i2");
+    document.getElementById("addI2Btn").setAttribute("aria-pressed",String(state.useI2));
+    document.getElementById("addI2Btn").textContent=(state.useI2?"− Remove":"+ Add")+" a second inequality";
+    document.getElementById("i2Fs").hidden=!state.useI2;
+    document.getElementById("ptBtn").setAttribute("aria-pressed",String(state.showPoint));
+    document.getElementById("ptBtn").textContent=(state.showPoint?"◉ Hide":"◉ Show")+" a draggable test point";
+  }
+  function setPills(groupId,op,cls){
+    var buttons=document.querySelectorAll("#"+groupId+" .dir-pill");
+    buttons.forEach(function(btn){
+      var on=btn.getAttribute("data-op")===op;
+      btn.classList.toggle("on",on);
+      btn.classList.toggle(cls,on);
+      if(!on){btn.classList.remove("i1");btn.classList.remove("i2");}
+    });
+  }
+  function bindNum(id,ineq,key){
+    document.getElementById(id).addEventListener("input",function(e){
+      var v=parseFloat(e.target.value);
+      if(isFinite(v)){ineq[key]=v; save(); draw();}
+    });
+  }
+  bindNum("m1",state.i1,"m"); bindNum("b1",state.i1,"b");
+  bindNum("m2",state.i2,"m"); bindNum("b2",state.i2,"b");
+
+  document.querySelectorAll("#dir1 .dir-pill").forEach(function(btn){
+    btn.addEventListener("click",function(){state.i1.op=btn.getAttribute("data-op"); save(); syncInputs(); draw();});
+  });
+  document.querySelectorAll("#dir2 .dir-pill").forEach(function(btn){
+    btn.addEventListener("click",function(){state.i2.op=btn.getAttribute("data-op"); save(); syncInputs(); draw();});
+  });
+
+  document.getElementById("addI2Btn").addEventListener("click",function(){
+    state.useI2=!state.useI2; save(); syncInputs(); draw();
+  });
+  document.getElementById("ptBtn").addEventListener("click",function(){
+    state.showPoint=!state.showPoint; save(); syncInputs(); draw();
+  });
+
+  document.querySelectorAll(".preset-btn").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var p=PRESETS[parseInt(btn.getAttribute("data-preset"),10)];
+      state.i1={m:p.i1.m,b:p.i1.b,op:p.i1.op};
+      state.i2={m:p.i2.m,b:p.i2.b,op:p.i2.op};
+      state.useI2=p.useI2;
+      save(); syncInputs(); draw();
+    });
+  });
+
+  // ---- test point drag ----
+  function eventPos(e){
+    var r=canvas.getBoundingClientRect();
+    var src=e.touches?e.touches[0]:e;
+    return{sx:src.clientX-r.left, sy:src.clientY-r.top};
+  }
+  function hitPoint(sx,sy,W,H){
+    if(!state.showPoint) return false;
+    var p=toScreen(state.point.x,state.point.y,W,H);
+    return Math.hypot(sx-p.x,sy-p.y)<HANDLE_R*1.8;
+  }
+  function onDown(e){
+    var dpr=window.devicePixelRatio||1, W=canvas.width/dpr, H=canvas.height/dpr;
+    var pos=eventPos(e);
+    if(hitPoint(pos.sx,pos.sy,W,H)){ DRAG=true; e.preventDefault(); }
+  }
+  function onMove(e){
+    if(!DRAG) return; e.preventDefault();
+    var dpr=window.devicePixelRatio||1, W=canvas.width/dpr, H=canvas.height/dpr;
+    var pos=eventPos(e);
+    var m=toMath(pos.sx,pos.sy,W,H);
+    m.x=Math.max(VMIN,Math.min(VMAX,r2(m.x)));
+    m.y=Math.max(VMIN,Math.min(VMAX,r2(m.y)));
+    state.point=m; save(); draw();
+  }
+  function onUp(){DRAG=false;}
+
+  canvas.addEventListener("mousedown",onDown);
+  canvas.addEventListener("mousemove",onMove);
+  canvas.addEventListener("mouseup",onUp);
+  canvas.addEventListener("touchstart",onDown,{passive:false});
+  canvas.addEventListener("touchmove",onMove,{passive:false});
+  canvas.addEventListener("touchend",onUp);
+  window.addEventListener("resize",resize);
+  if(window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){draw();});
+  }
+
+  syncInputs();
+  resize();
+
+  // ---- theme ----
+  var root = document.documentElement;
+  var savedTheme = localStorage.getItem('max-theme');
+  if (savedTheme) root.setAttribute('data-theme', savedTheme);
+  document.getElementById('themeBtn').addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme');
+    var isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('max-theme', next);
+    draw();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "resources_energy",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "name": "Rymes Propane & Oil", "category": "energy", "side": "E", "actual_side": "E", "note": "on-site fuel storage", "src": "census" }, "geometry": { "type": "Point", "coordinates": [ -71.483298167051004, 43.219318798003989 ] } },
+{ "type": "Feature", "properties": { "name": "Transfer Station + 6.7 MW solar", "category": "energy", "side": "E", "actual_side": "E", "note": "waste + power", "src": "census" }, "geometry": { "type": "Point", "coordinates": [ -71.516609798681998, 43.200760647648003 ] } }
+]
+}

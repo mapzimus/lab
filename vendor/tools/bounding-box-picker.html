@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bounding Box Picker</title>
+<meta name="description" content="Draw or type a geographic bounding box and get it in every format APIs want — CSV, WKT, GeoJSON, Leaflet bounds and Overpass QL. Runs in your browser.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1150px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn:disabled { opacity: .55; cursor: default; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+  .btn.primary:disabled:hover { color: var(--accent-ink); filter: none; }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  /* ---- search & examples ---- */
+  .search-row { display: flex; gap: 8px; margin: 0 0 10px; }
+  .search-row input { flex: 1; font-family: var(--sans); font-size: .9rem; }
+  .search-row button { flex: none; width: auto; padding: 0 14px; font-size: .9rem; }
+  .search-results { list-style: none; margin: 0 0 12px; padding: 0; }
+  .search-results li { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 4px; cursor: pointer; font-size: .88rem; background: var(--surface); }
+  .search-results li:hover { border-color: var(--accent); color: var(--accent); }
+  .bb-tag { flex: none; color: var(--accent); font-size: .73rem; border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+  .hide { display: none !important; }
+  .examples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 16px; }
+  .examples .examples-lbl { color: var(--muted); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; }
+  .examples button { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 5px 12px; font-size: .82rem; cursor: pointer; }
+  .examples button:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---- layout ---- */
+  .grid { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr); gap: 20px; align-items: start; }
+  @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+
+  .map-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .map-hint { color: var(--muted); font-size: .8rem; }
+  #map { height: 480px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
+  @media (max-width: 880px) { #map { height: 360px; } }
+  .leaflet-container { font-family: var(--sans); background: var(--surface-2); }
+  .map-fallback { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); height: 480px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .92rem; text-align: center; padding: 24px; }
+  @media (max-width: 880px) { .map-fallback { height: 360px; } }
+
+  /* the box + its corner handles */
+  .bbox-rect { stroke: var(--accent); fill: var(--accent); fill-opacity: .08; }
+  .bbox-rect-tmp { fill-opacity: .04; }
+  .bbox-handle { background: var(--accent); border: 2px solid var(--surface); border-radius: 3px; box-shadow: 0 0 0 1px rgba(0,0,0,.25); }
+  .bbox-handle-nw, .bbox-handle-se { cursor: nwse-resize; }
+  .bbox-handle-ne, .bbox-handle-sw { cursor: nesw-resize; }
+  .bbp-drawing, .bbp-drawing * { cursor: crosshair !important; }
+  .bbp-drawing .leaflet-interactive, .bbp-drawing .bbox-handle { pointer-events: none !important; }
+
+  /* info strip */
+  .info-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; margin-top: 12px; padding: 11px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); font-size: .9rem; }
+  .info-item { display: flex; align-items: center; gap: 7px; }
+  .info-lbl { color: var(--muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
+  .info-val { font-family: var(--mono); font-size: .86rem; }
+
+  /* panels */
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; }
+  .panel + .panel { margin-top: 16px; }
+  .panel h2 { margin: 0 0 12px; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+  .edge-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+  @media (max-width: 1060px) { .edge-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  .edge-grid .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .edge-grid label { font-size: .78rem; color: var(--muted); }
+  input[type=number], input[type=text] { width: 100%; font-family: var(--mono); font-size: .92rem; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 9px 10px; }
+  input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  .err { color: var(--danger); font-size: .8rem; min-height: 1.1em; margin: 8px 0 0; }
+  .note { color: var(--muted); font-size: .8rem; margin: 4px 0 0; min-height: 0; }
+  .paste-row { display: flex; gap: 8px; margin-top: 14px; }
+  .paste-row input { flex: 1; }
+  .paste-row .btn { flex: none; }
+
+  /* outputs */
+  .out-row { border-top: 1px solid var(--border); padding: 11px 0; }
+  .out-row:first-child { border-top: none; padding-top: 0; }
+  .out-row:last-child { padding-bottom: 2px; }
+  .out-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .out-name { font-weight: 600; font-size: .85rem; }
+  .out-where { color: var(--muted); font-size: .75rem; text-align: right; }
+  .out-line { display: flex; gap: 8px; align-items: stretch; }
+  .out-code { flex: 1; min-width: 0; font-family: var(--mono); font-size: .8rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; white-space: pre-wrap; word-break: break-all; min-height: 2.2em; }
+
+  .copy { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 8px; width: 38px; cursor: pointer; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; }
+  .copy:hover { color: var(--accent); border-color: var(--accent); }
+  .copy.copied { color: var(--ok); border-color: var(--ok); }
+  .copy.small { width: 28px; height: 26px; font-size: .85rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Bounding Box Picker</h1>
+      <p>Draw a box on the map — or type its edges — and grab it in every format APIs want: CSV, WKT, GeoJSON, Leaflet bounds and Overpass&nbsp;QL. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="search-row">
+    <input id="placeSearch" type="text" placeholder="Search for a place — results with a boundary become the box…" aria-label="Search for a place name">
+    <button class="copy" id="placeSearchBtn" type="button" title="Search">🔍</button>
+  </div>
+  <ul class="search-results hide" id="searchResults"></ul>
+  <p class="err" id="searchErr" style="margin:0 0 8px"></p>
+
+  <div class="examples" id="examples" aria-label="Example bounding boxes">
+    <span class="examples-lbl">Try:</span>
+    <button type="button" data-bbox="-109.05,37,-102.05,41">Colorado</button>
+    <button type="button" data-bbox="5.9,45.8,10.5,47.8">The Alps</button>
+    <button type="button" data-bbox="-24.6,63.2,-13.4,66.6">Iceland</button>
+    <button type="button" data-bbox="-0.51,51.28,0.33,51.69">Greater London</button>
+  </div>
+
+  <div class="grid">
+    <!-- ---- Map ---- -->
+    <section aria-label="Map">
+      <div class="map-actions">
+        <button class="btn primary" id="drawBtn" type="button" disabled>▦ Draw box</button>
+        <button class="btn" id="viewBtn" type="button" disabled>⛶ Use current view</button>
+        <span class="map-hint" id="mapHint">Loading map…</span>
+      </div>
+      <div id="map" aria-label="Map. Draw or resize the bounding box here."></div>
+      <div class="info-strip" aria-label="Box dimensions">
+        <div class="info-item"><span class="info-lbl">Size</span><span class="info-val" id="dimTxt">—</span></div>
+        <div class="info-item"><span class="info-lbl">Area</span><span class="info-val" id="areaTxt">—</span></div>
+        <div class="info-item"><span class="info-lbl">Center</span><span class="info-val" id="centerTxt">—</span>
+          <button class="copy small" type="button" data-copy="centerTxt" title="Copy center lat, lng">⧉</button></div>
+      </div>
+    </section>
+
+    <!-- ---- Numbers ---- -->
+    <section aria-label="Coordinates and outputs">
+      <div class="panel">
+        <h2>Edges (decimal degrees)</h2>
+        <div class="edge-grid">
+          <div class="field"><label for="inW">West (min lng)</label>
+            <input id="inW" type="number" step="0.000001" min="-180" max="180" inputmode="decimal" autocomplete="off"></div>
+          <div class="field"><label for="inS">South (min lat)</label>
+            <input id="inS" type="number" step="0.000001" min="-85" max="85" inputmode="decimal" autocomplete="off"></div>
+          <div class="field"><label for="inE">East (max lng)</label>
+            <input id="inE" type="number" step="0.000001" min="-180" max="180" inputmode="decimal" autocomplete="off"></div>
+          <div class="field"><label for="inN">North (max lat)</label>
+            <input id="inN" type="number" step="0.000001" min="-85" max="85" inputmode="decimal" autocomplete="off"></div>
+        </div>
+        <p class="err" id="edgeErr"></p>
+        <p class="note" id="edgeNote"></p>
+        <div class="paste-row">
+          <input id="pasteIn" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="Paste a bbox: west, south, east, north"
+                 aria-label="Paste a bounding box as four numbers">
+          <button class="btn" id="pasteBtn" type="button">Apply</button>
+        </div>
+        <p class="err" id="pasteErr"></p>
+        <p class="note" id="pasteNote"></p>
+      </div>
+
+      <div class="panel">
+        <h2>Every format APIs want</h2>
+        <div id="outputs"></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="app">
+    Share this exact box with the URL — it stores <code>west,south,east,north</code> in the <code>#hash</code>.
+    Place search is the only network call (OpenStreetMap Nominatim) · a <strong>max</strong> tool
+  </footer>
+</div>
+
+<script>
+'use strict';
+/* ============================================================
+   Bounding Box Picker — standalone, client-side.
+   Only dependency: Leaflet 1.9.4 (background-loaded below; the
+   whole tool keeps working if the CDN is slow or blocked).
+   Single source of truth: `state` = {w,s,e,n}. Every event
+   updates state once, then render() fans out one direction.
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+const LAT_MAX = 85;            // Web-Mercator-friendly latitude limit
+const MINSEP = 0.000001;       // minimum edge separation (one 6-decimal step)
+const state = { w: -109.05, s: 37, e: -102.05, n: 41 };   // Colorado — never start empty
+let map = null, rect = null, handles = null;
+let updating = false;          // guard: render() must never re-trigger input handlers
+
+const clampLat = (v) => Math.max(-LAT_MAX, Math.min(LAT_MAX, v));
+const clampLng = (v) => Math.max(-180, Math.min(180, v));
+
+// 6 decimals, trailing zeros trimmed ("41.100000" -> "41.1", "37.000000" -> "37")
+function fmt(v) {
+  let s = (+v).toFixed(6);
+  s = s.replace(/0+$/, '').replace(/\.$/, '');
+  return s === '-0' ? '0' : s;
+}
+function fmtKm(v) {
+  const d = v >= 100 ? 0 : v >= 10 ? 1 : v >= 1 ? 2 : 3;
+  return v.toLocaleString('en-US', { maximumFractionDigits: d });
+}
+
+/* ---------------- outputs ---------------- */
+const OUTPUTS = [
+  { id: 'outCsv', name: 'CSV — W,S,E,N', where: 'most common: GDAL, STAC, many REST APIs',
+    make: (b) => `${fmt(b.w)},${fmt(b.s)},${fmt(b.e)},${fmt(b.n)}` },
+  { id: 'outWkt', name: 'WKT polygon', where: 'PostGIS, Shapely, BigQuery, SQL Server',
+    make: (b) => `POLYGON((${fmt(b.w)} ${fmt(b.s)}, ${fmt(b.e)} ${fmt(b.s)}, ${fmt(b.e)} ${fmt(b.n)}, ${fmt(b.w)} ${fmt(b.n)}, ${fmt(b.w)} ${fmt(b.s)}))` },
+  { id: 'outGeojson', name: 'GeoJSON Feature', where: 'web maps, Turf.js, geojson.io, GitHub',
+    make: (b) => {
+      const ring = [[+fmt(b.w), +fmt(b.s)], [+fmt(b.e), +fmt(b.s)], [+fmt(b.e), +fmt(b.n)], [+fmt(b.w), +fmt(b.n)], [+fmt(b.w), +fmt(b.s)]];
+      return JSON.stringify({ type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } });
+    } },
+  { id: 'outLeaflet', name: 'Leaflet bounds', where: 'L.latLngBounds / map.fitBounds — [[S,W],[N,E]]',
+    make: (b) => `[[${fmt(b.s)}, ${fmt(b.w)}], [${fmt(b.n)}, ${fmt(b.e)}]]` },
+  { id: 'outOverpass', name: 'Overpass QL bbox', where: 'Overpass API / overpass turbo — (S,W,N,E)',
+    make: (b) => `(${fmt(b.s)},${fmt(b.w)},${fmt(b.n)},${fmt(b.e)})` },
+];
+
+function buildOutputs() {
+  const host = $('outputs');
+  for (const o of OUTPUTS) {
+    const row = document.createElement('div');
+    row.className = 'out-row';
+    row.innerHTML =
+      '<div class="out-meta"><span class="out-name"></span><span class="out-where"></span></div>' +
+      `<div class="out-line"><code class="out-code" id="${o.id}"></code>` +
+      `<button class="copy" type="button" data-copy="${o.id}">⧉</button></div>`;
+    row.querySelector('.out-name').textContent = o.name;
+    row.querySelector('.out-where').textContent = o.where;
+    row.querySelector('.copy').title = 'Copy ' + o.name;
+    row.querySelector('.copy').setAttribute('aria-label', 'Copy ' + o.name);
+    host.appendChild(row);
+  }
+}
+
+/* ---------------- rendering (state -> everything) ---------------- */
+function cornerLL(k, b) { return [k[0] === 'n' ? b.n : b.s, k[1] === 'w' ? b.w : b.e]; }
+
+function render(source, fit) {
+  updating = true;
+  const b = state;
+
+  if (source !== 'inputs') {
+    $('inW').value = fmt(b.w); $('inS').value = fmt(b.s);
+    $('inE').value = fmt(b.e); $('inN').value = fmt(b.n);
+  }
+
+  for (const o of OUTPUTS) $(o.id).textContent = o.make(b);
+
+  // geodesic approximation at the box's mid-latitude
+  const midLat = (b.s + b.n) / 2;
+  const widthKm = (b.e - b.w) * 111.320 * Math.cos(midLat * Math.PI / 180);
+  const heightKm = (b.n - b.s) * 110.574;
+  const areaKm2 = widthKm * heightKm;
+  $('dimTxt').textContent = `${fmtKm(widthKm)} × ${fmtKm(heightKm)} km`;
+  $('areaTxt').textContent = `≈ ${fmtKm(areaKm2)} km²`;
+  $('areaTxt').dataset.km2 = String(areaKm2);
+  $('centerTxt').textContent = `${fmt(midLat)}, ${fmt((b.w + b.e) / 2)}`;
+
+  history.replaceState(null, '', `#${fmt(b.w)},${fmt(b.s)},${fmt(b.e)},${fmt(b.n)}`);
+
+  if (map) {
+    const bounds = [[b.s, b.w], [b.n, b.e]];
+    rect.setBounds(bounds);
+    for (const k in handles) {
+      if (source === 'handle:' + k) continue;   // don't fight the handle being dragged
+      handles[k].setLatLng(cornerLL(k, b));
+    }
+    if (fit) map.fitBounds(bounds, { padding: [36, 36] });
+  }
+  updating = false;
+}
+
+function setBBox(b, source, fit) {
+  state.w = b.w; state.s = b.s; state.e = b.e; state.n = b.n;
+  render(source, fit);
+}
+
+/* ---------------- numeric inputs ---------------- */
+function onInputs() {
+  if (updating) return;
+  $('edgeErr').textContent = ''; $('edgeNote').textContent = '';
+  const raw = {
+    w: parseFloat($('inW').value), s: parseFloat($('inS').value),
+    e: parseFloat($('inE').value), n: parseFloat($('inN').value),
+  };
+  if (![raw.w, raw.s, raw.e, raw.n].every(isFinite)) return;   // mid-typing
+  const b = { w: clampLng(raw.w), s: clampLat(raw.s), e: clampLng(raw.e), n: clampLat(raw.n) };
+  const notes = [];
+  if (b.s !== raw.s || b.n !== raw.n) notes.push(`Latitude was clamped to ±${LAT_MAX} (the map's Web-Mercator limit).`);
+  if (b.w !== raw.w || b.e !== raw.e) notes.push('Longitude was clamped to ±180.');
+  if (!(b.w < b.e)) {
+    $('edgeErr').textContent = "West must be less than East — boxes crossing the date line aren't supported.";
+    return;
+  }
+  if (!(b.s < b.n)) {
+    $('edgeErr').textContent = 'South must be less than North.';
+    return;
+  }
+  $('edgeNote').textContent = notes.join(' ');
+  setBBox(b, 'inputs', true);
+}
+['inW', 'inS', 'inE', 'inN'].forEach((id) => $(id).addEventListener('input', onInputs));
+
+/* ---------------- paste-a-bbox ---------------- */
+function applyPaste() {
+  $('pasteErr').textContent = ''; $('pasteNote').textContent = '';
+  const t = $('pasteIn').value.trim();
+  if (!t) return;
+  const nums = t.split(/[,;\s]+/).filter(Boolean).map(Number);
+  if (nums.length !== 4 || !nums.every(isFinite)) {
+    $('pasteErr').textContent = 'Need exactly four numbers, e.g. “-109.05, 37, -102.05, 41”.';
+    return;
+  }
+  const [a, b2, c, d] = nums;
+  const isLat = (v) => Math.abs(v) <= 90, isLng = (v) => Math.abs(v) <= 180;
+  let box = null, note = '';
+  if (isLng(a) && isLat(b2) && isLng(c) && isLat(d) && a < c && b2 < d) {
+    box = { w: a, s: b2, e: c, n: d };                       // W,S,E,N (preferred)
+  } else if (isLat(a) && isLng(b2) && isLat(c) && isLng(d) && b2 < d && a < c) {
+    box = { w: b2, s: a, e: d, n: c };                       // S,W,N,E fallback
+    note = 'Those numbers only make sense as S,W,N,E — read them in that order.';
+  }
+  if (!box) {
+    $('pasteErr').textContent = 'Could not read that as a box — need west < east, south < north, and valid lat/lng ranges.';
+    return;
+  }
+  const cb = { w: clampLng(box.w), s: clampLat(box.s), e: clampLng(box.e), n: clampLat(box.n) };
+  if (cb.s !== box.s || cb.n !== box.n) note += (note ? ' ' : '') + `Latitude clamped to ±${LAT_MAX}.`;
+  if (!(cb.s < cb.n) || !(cb.w < cb.e)) {
+    $('pasteErr').textContent = 'That box collapses to nothing after clamping latitude to ±' + LAT_MAX + '.';
+    return;
+  }
+  $('pasteNote').textContent = note;
+  setBBox(cb, 'paste', true);
+}
+$('pasteBtn').addEventListener('click', applyPaste);
+$('pasteIn').addEventListener('keydown', (e) => { if (e.key === 'Enter') applyPaste(); });
+
+/* ---------------- example boxes ---------------- */
+$('examples').addEventListener('click', (ev) => {
+  const b = ev.target.closest('button[data-bbox]');
+  if (!b) return;
+  const [w, s, e, n] = b.dataset.bbox.split(',').map(Number);
+  setBBox({ w, s, e, n }, 'preset', true);
+});
+
+/* ---------------- copy buttons (delegated) ---------------- */
+document.addEventListener('click', async (ev) => {
+  const btn = ev.target.closest('button.copy[data-copy]');
+  if (!btn) return;
+  try {
+    await navigator.clipboard.writeText($(btn.dataset.copy).textContent);
+    const old = btn.textContent;
+    btn.classList.add('copied'); btn.textContent = '✓';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1200);
+  } catch (e) { /* clipboard blocked; ignore */ }
+});
+
+/* ---------------- map ---------------- */
+function initMap() {
+  map = L.map('map');
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+  rect = L.rectangle([[state.s, state.w], [state.n, state.e]],
+    { className: 'bbox-rect', interactive: false, weight: 2 }).addTo(map);
+  handles = {};
+  for (const k of ['nw', 'ne', 'sw', 'se']) {
+    const mk = L.marker(cornerLL(k, state), {
+      draggable: true, keyboard: false, autoPan: true,
+      icon: L.divIcon({ className: 'bbox-handle bbox-handle-' + k, iconSize: [14, 14] }),
+      title: 'Drag this corner to resize the box',
+    }).addTo(map);
+    mk.on('drag', (ev) => onHandleDrag(k, ev));
+    mk.on('dragend', () => render(null, false));   // snap everything once the drag settles
+    handles[k] = mk;
+  }
+  map.fitBounds([[state.s, state.w], [state.n, state.e]], { padding: [36, 36] });
+  $('drawBtn').disabled = false;
+  $('viewBtn').disabled = false;
+  $('mapHint').textContent = 'Drag a corner square to resize the box.';
+}
+
+// dragging a corner moves exactly its two edges
+function onHandleDrag(k, ev) {
+  const p = ev.target.getLatLng();
+  const b = { w: state.w, s: state.s, e: state.e, n: state.n };
+  const lat = clampLat(p.lat), lng = clampLng(p.lng);
+  if (k[0] === 'n') b.n = Math.max(lat, b.s + MINSEP); else b.s = Math.min(lat, b.n - MINSEP);
+  if (k[1] === 'w') b.w = Math.min(lng, b.e - MINSEP); else b.e = Math.max(lng, b.w + MINSEP);
+  const c = cornerLL(k, b);
+  if (c[0] !== p.lat || c[1] !== p.lng) ev.target.setLatLng(c);   // pin to the clamped corner
+  setBBox(b, 'handle:' + k, false);
+}
+
+/* ---------------- one-shot draw mode ---------------- */
+let drawOn = false, drawTmp = null, drawA = null, drawB = null;
+
+$('drawBtn').addEventListener('click', () => { drawOn ? disarmDraw() : armDraw(); });
+
+function armDraw() {
+  if (!map || drawOn) return;
+  drawOn = true;
+  $('drawBtn').textContent = '✕ Cancel (Esc)';
+  $('mapHint').textContent = 'Press, drag, release on the map to draw the box.';
+  map.getContainer().classList.add('bbp-drawing');
+  map.dragging.disable();
+  map.on('mousedown', drawStart);
+  document.addEventListener('keydown', drawKey);
+}
+function drawKey(ev) { if (ev.key === 'Escape') disarmDraw(); }
+function drawStart(ev) {
+  if (ev.originalEvent && ev.originalEvent.button !== 0) return;   // left button only
+  drawA = ev.latlng; drawB = null;
+  drawTmp = L.rectangle([drawA, drawA],
+    { className: 'bbox-rect bbox-rect-tmp', interactive: false, weight: 2, dashArray: '5 5' }).addTo(map);
+  map.on('mousemove', drawMove);
+  map.on('mouseup', drawUp);
+  window.addEventListener('mouseup', drawUp);   // fallback if released off-map
+  L.DomEvent.preventDefault(ev.originalEvent);
+}
+function drawMove(ev) {
+  drawB = ev.latlng;
+  drawTmp.setBounds(L.latLngBounds(drawA, drawB));
+}
+function drawUp(ev) {
+  if (!drawOn) return;
+  const a = drawA, b = (ev && ev.latlng) ? ev.latlng : drawB;
+  disarmDraw();
+  if (!a || !b) return;                                           // click without drag: cancel
+  const w = clampLng(Math.min(a.lng, b.lng)), e = clampLng(Math.max(a.lng, b.lng));
+  const s = clampLat(Math.min(a.lat, b.lat)), n = clampLat(Math.max(a.lat, b.lat));
+  if (e - w < MINSEP || n - s < MINSEP) return;                   // degenerate: cancel
+  setBBox({ w, s, e, n }, 'draw', false);
+}
+function disarmDraw() {
+  drawOn = false;
+  $('drawBtn').textContent = '▦ Draw box';
+  if (map) {
+    $('mapHint').textContent = 'Drag a corner square to resize the box.';
+    map.getContainer().classList.remove('bbp-drawing');
+    map.dragging.enable();
+    map.off('mousedown', drawStart);
+    map.off('mousemove', drawMove);
+    map.off('mouseup', drawUp);
+    if (drawTmp) map.removeLayer(drawTmp);
+  }
+  drawTmp = null; drawA = null; drawB = null;
+  window.removeEventListener('mouseup', drawUp);
+  document.removeEventListener('keydown', drawKey);
+}
+
+/* ---------------- use current view ---------------- */
+$('viewBtn').addEventListener('click', () => {
+  if (!map) return;
+  const b = map.getBounds();
+  let w = clampLng(b.getWest()), e = clampLng(b.getEast());
+  const s = clampLat(b.getSouth()), n = clampLat(b.getNorth());
+  if (!(w < e)) { w = -180; e = 180; }     // view wrapped around the antimeridian
+  if (!(s < n)) return;
+  setBBox({ w, s, e, n }, 'view', false);
+});
+
+/* ---------------- place search (Nominatim) ---------------- */
+async function searchPlace() {
+  const q = $('placeSearch').value.trim();
+  if (!q) return;
+  $('searchErr').textContent = '';
+  $('placeSearchBtn').textContent = '⏳';
+  try {
+    const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(q)}`);
+    const data = await resp.json();
+    const ul = $('searchResults');
+    ul.innerHTML = ''; ul.classList.remove('hide');
+    if (!data.length) {
+      ul.innerHTML = '<li style="cursor:default;color:var(--muted)">No results found</li>';
+    } else data.forEach((r) => {
+      const li = document.createElement('li');
+      const bb = Array.isArray(r.boundingbox) && r.boundingbox.length === 4 ? r.boundingbox.map(Number) : null;
+      const hasBox = bb && bb.every(isFinite);
+      const name = document.createElement('span');
+      name.textContent = r.display_name;
+      li.appendChild(name);
+      if (hasBox) {
+        const tag = document.createElement('span');
+        tag.className = 'bb-tag';
+        tag.textContent = '⤢ use its box';
+        li.appendChild(tag);
+      }
+      li.addEventListener('click', () => {
+        ul.classList.add('hide');
+        $('placeSearch').value = r.display_name;
+        if (hasBox) {   // Nominatim order: [south, north, west, east]
+          const s = clampLat(bb[0]), n = clampLat(bb[1]), w = clampLng(bb[2]), e = clampLng(bb[3]);
+          if (w < e && s < n) { setBBox({ w, s, e, n }, 'search', true); return; }
+        }
+        if (map) map.setView([parseFloat(r.lat), parseFloat(r.lon)], Math.max(map.getZoom() || 0, 10));
+      });
+      ul.appendChild(li);
+    });
+  } catch (e) {
+    $('searchErr').textContent = 'Search failed — check your connection.';
+  }
+  $('placeSearchBtn').textContent = '🔍';
+}
+$('placeSearchBtn').addEventListener('click', searchPlace);
+$('placeSearch').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchPlace(); });
+
+/* ---------------- boot ---------------- */
+buildOutputs();
+(function restoreHash() {
+  const m = location.hash.slice(1).match(/^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/);
+  if (!m) return;
+  const w = clampLng(+m[1]), s = clampLat(+m[2]), e = clampLng(+m[3]), n = clampLat(+m[4]);
+  if ([w, s, e, n].every(isFinite) && w < e && s < n) { state.w = w; state.s = s; state.e = e; state.n = n; }
+})();
+render(null, false);
+
+/* Leaflet 1.9.4, pinned + SRI, loaded in the BACKGROUND so a slow or blocked
+   CDN never freezes the tool. Everything except the map works without it. */
+(function loadLeaflet() {
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+  css.crossOrigin = '';
+  document.head.appendChild(css);
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+  s.crossOrigin = '';
+  s.onload = () => { if (window.L) { initMap(); render(null, false); } };
+  s.onerror = () => {
+    const el = document.createElement('div');
+    el.className = 'map-fallback';
+    el.id = 'map';
+    el.innerHTML = 'Map unavailable — the Leaflet library didn\'t load.<br>Typing, pasting and every output format still work.';
+    $('map').replaceWith(el);
+    $('mapHint').textContent = 'Map unavailable.';
+  };
+  document.head.appendChild(s);
+})();
+
+// tiny hook for automated tests; harmless in normal use
+window.__bbp = { state, getMap: () => map, getRect: () => rect, getHandles: () => handles };
+
+/* ---------------- theme toggle ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

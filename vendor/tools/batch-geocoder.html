@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Batch Geocoder</title>
+<meta name="description" content="Paste a list of addresses or place names — one per line — and get latitude/longitude for every entry, plotted on a map and exportable as CSV or GeoJSON. Geocoding by free OpenStreetMap Nominatim.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
+  .cap { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .caprow { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 999px; padding: 5px 12px; font-size: .8rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  textarea#input { width: 100%; min-height: 190px; resize: vertical; font-family: var(--mono); font-size: .88rem; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; }
+  textarea#input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  .inmeta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  #counter { color: var(--muted); font-size: .85rem; font-weight: 600; }
+  .hint { color: var(--muted); font-size: .78rem; }
+  .note.err { color: var(--danger); font-size: .82rem; margin: 8px 0 0; }
+
+  .runrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .prog { flex: 1 1 160px; min-width: 120px; height: 8px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 99px; overflow: hidden; }
+  .prog > i { display: block; height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width .25s; }
+  .progtext { font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .status { margin-top: 10px; color: var(--muted); font-size: .88rem; min-height: 1.2em; }
+  .status.err { color: var(--danger); }
+
+  .results { margin-top: 20px; }
+  .results-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .results-head h2 { font-size: 1.1rem; margin: 0; }
+  .results-head .row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .results .note.err { margin: 0 0 8px; text-align: right; }
+  .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; max-height: 60vh; overflow-y: auto; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: .84rem; }
+  th, td { border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { position: sticky; top: 0; background: var(--surface-2); z-index: 1; }
+  th.st, td.st { width: 58px; text-align: center; }
+  .ic { font-weight: 700; font-size: .95rem; }
+  .ic.ok { color: var(--ok); }
+  .ic.no { color: var(--muted); }
+  .ic.err { color: var(--danger); }
+  .ic.dim { color: var(--muted); }
+  td.name { max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  td.name.dim { color: var(--muted); font-style: italic; }
+  td.num { font-family: var(--mono); white-space: nowrap; }
+  .tag { font-size: .72rem; border: 1px solid var(--border); border-radius: 6px; padding: 1px 7px; background: var(--surface-2); white-space: nowrap; }
+  tbody tr.ok { cursor: pointer; }
+  tbody tr.ok:hover td { background: var(--surface-2); }
+  tbody tr:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  tr.empty td { color: var(--muted); text-align: center; padding: 20px 12px; font-size: .86rem; border-bottom: 0; }
+
+  .mappanel { margin-top: 20px; }
+  #map, .map-fallback { height: 380px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface-2); }
+  .map-fallback { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .9rem; text-align: center; padding: 24px; }
+  .leaflet-container { font-family: var(--sans); }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 18px 14px 40px; }
+    #map, .map-fallback { height: 280px; }
+    td.name { max-width: 180px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>📍 Batch Geocoder</h1>
+      <p>Paste addresses, cities or landmark names — one per line — and get coordinates for every entry, plotted on a map as they arrive and exportable as CSV or GeoJSON. Uses OpenStreetMap’s free Nominatim geocoder, politely: one lookup per second.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <section class="panel">
+    <div class="caprow">
+      <label class="cap" for="input">Places to geocode — one per line</label>
+      <button class="chip" id="exampleBtn" type="button">✨ Try an example</button>
+    </div>
+    <textarea id="input" spellcheck="false" placeholder="Tokyo&#10;1600 Pennsylvania Avenue NW, Washington, DC&#10;Eiffel Tower&#10;Machu Picchu"></textarea>
+    <div class="inmeta">
+      <span id="counter" aria-live="polite">0 places to geocode</span>
+      <span class="hint">Blank lines are skipped · duplicates are looked up once · one lookup per second, so 60 lines ≈ 1 minute</span>
+    </div>
+    <p class="note err" id="capNote" hidden></p>
+    <div class="runrow">
+      <button class="btn primary" id="runBtn" type="button" disabled>▶ Run</button>
+      <button class="btn" id="cancelBtn" type="button" hidden>✕ Cancel</button>
+      <button class="btn" id="retryBtn" type="button" hidden>↻ Retry failed</button>
+      <div class="prog" id="prog" role="progressbar" aria-label="Geocoding progress" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" hidden><i id="progFill"></i></div>
+      <span class="progtext" id="progText" hidden></span>
+    </div>
+    <div class="status" id="status" aria-live="polite"></div>
+  </section>
+
+  <section class="results">
+    <div class="results-head">
+      <h2>Results</h2>
+      <div class="row">
+        <button class="btn" id="copyCsvBtn" type="button">⧉ Copy CSV</button>
+        <button class="btn" id="dlCsvBtn" type="button">⬇ Download CSV</button>
+        <button class="btn" id="dlGeoBtn" type="button">⬇ Download GeoJSON</button>
+      </div>
+    </div>
+    <p class="note err" id="exportNote" hidden></p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th class="st">Status</th><th>Query</th><th>Matched name</th><th>Lat</th><th>Lng</th><th>Type</th></tr></thead>
+        <tbody id="rows"><tr class="empty"><td colspan="6">Nothing here yet — paste places above (or try the example), then press Run. Rows appear as each line resolves.</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel mappanel" id="mapPanel" hidden>
+    <div class="cap">Map preview — click a ✓ row to zoom to its pin</div>
+    <div id="map" aria-label="Map of geocoded places"></div>
+  </section>
+
+  <footer class="app">
+    Data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors, geocoding by <a href="https://nominatim.org" target="_blank" rel="noopener">Nominatim</a>. Results stay in your browser.<br>
+    Nominatim is a free community service — this tool paces requests to one per second and caps runs at 200 lines; please keep batches modest · a <strong>max</strong> tool
+  </footer>
+</div>
+
+<script type="module">
+/* ============================================================
+   Batch Geocoder — geocodes each line via OpenStreetMap Nominatim,
+   strictly sequentially with ≥1.1s between request STARTS (their
+   fair-use policy). The gap is measured start-to-start and survives
+   re-runs. Leaflet is background-loaded only when the first match
+   arrives, so nothing touches a CDN before you press Run.
+   ============================================================ */
+const $ = (s) => document.querySelector(s);
+
+const MIN_GAP = 1100;      // ms between request starts
+const MAX_LINES = 200;
+
+const input = $('#input'), counter = $('#counter'), capNote = $('#capNote');
+const runBtn = $('#runBtn'), cancelBtn = $('#cancelBtn'), retryBtn = $('#retryBtn');
+const prog = $('#prog'), progFill = $('#progFill'), progText = $('#progText');
+const statusEl = $('#status'), tbody = $('#rows'), mapPanel = $('#mapPanel');
+
+let rows = [];            // one entry per input line, in input order
+let trEls = [];           // row <tr> refs by index
+let shown = 0;            // rows[0..shown-1] are in the table
+let running = false;
+let runSeq = 0;           // generation counter: the newest run owns the UI/map
+let runCtrl = null;       // AbortController for the active run
+let lastReqStart = 0;     // persists across runs so politeness survives re-runs
+let reused = 0;
+const matchCache = new Map();   // query -> successful result, reused across runs
+
+const esc = (s) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escA = (s) => esc(s).replace(/"/g,'&quot;');
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+const setStatus = (msg, isErr) => { statusEl.textContent = msg || ''; statusEl.classList.toggle('err', !!isErr); };
+
+/* ---------------- input parsing + live counter ---------------- */
+const parseLines = (text) => String(text || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+
+function updateCounter(){
+  const lines = parseLines(input.value);
+  const n = lines.length, dup = n - new Set(lines).size;
+  counter.textContent = `${plural(n, 'place')} to geocode` + (dup ? ` · ${plural(dup, 'duplicate')} will reuse results` : '');
+  const over = n > MAX_LINES;
+  if (over) capNote.textContent = `Keeping it to ${MAX_LINES} per run — Nominatim is a free community service. Remove ${plural(n - MAX_LINES, 'line')} to enable Run.`;
+  capNote.hidden = !over;
+  runBtn.disabled = running || over || n === 0;
+}
+input.addEventListener('input', updateCounter);
+
+const EXAMPLE = [
+  'Tokyo',
+  'Eiffel Tower',
+  '1600 Pennsylvania Avenue NW, Washington, DC',
+  'Nairobi, Kenya',
+  'Machu Picchu',
+  'Reykjavík',
+  'Bondi Beach, Sydney',
+  'Xyzzyville Qq',
+];
+$('#exampleBtn').addEventListener('click', () => {
+  input.value = EXAMPLE.join('\n');
+  updateCounter();
+  setStatus('Example loaded — 8 mixed places; the last line is nonsense on purpose, so you can see a “no match”. Press Run.');
+  input.focus();
+});
+
+/* ---------------- progress ---------------- */
+function setProgress(done, total, netLeft){
+  prog.hidden = progText.hidden = false;
+  prog.setAttribute('aria-valuemax', total);
+  prog.setAttribute('aria-valuenow', done);
+  progFill.style.width = total ? (done / total * 100).toFixed(1) + '%' : '0%';
+  let eta = '';
+  if (netLeft > 0){
+    const s = Math.max(1, Math.round(netLeft * MIN_GAP / 1000));
+    eta = s < 90 ? ` · ~${s}s left` : ` · ~${Math.round(s / 60)}m left`;
+  }
+  progText.textContent = `${done} / ${total}${eta}`;
+}
+
+/* ---------------- results table ---------------- */
+function rowHtml(r){
+  const q = `<td>${esc(r.query)}</td>`;
+  if (r.status === 'ok') return `<td class="st"><span class="ic ok" title="Match">✓</span></td>${q}` +
+    `<td class="name" title="${escA(r.name)}">${esc(r.name)}</td>` +
+    `<td class="num">${r.lat.toFixed(5)}</td><td class="num">${r.lng.toFixed(5)}</td>` +
+    `<td>${r.type ? `<span class="tag">${esc(r.type)}</span>` : ''}</td>`;
+  if (r.status === 'nomatch') return `<td class="st"><span class="ic no" title="No match">✗</span></td>${q}<td class="name dim">no match found</td><td class="num"></td><td class="num"></td><td></td>`;
+  if (r.status === 'error') return `<td class="st"><span class="ic err" title="Error">⚠</span></td>${q}<td class="name dim">${esc(r.err || 'error')}</td><td class="num"></td><td class="num"></td><td></td>`;
+  return `<td class="st"><span class="ic dim" title="Waiting">…</span></td>${q}<td class="name dim">—</td><td class="num"></td><td class="num"></td><td></td>`;
+}
+function renderRow(i){
+  let tr = trEls[i];
+  if (!tr){ tr = document.createElement('tr'); tr.dataset.i = i; trEls[i] = tr; tbody.appendChild(tr); }
+  const r = rows[i];
+  tr.innerHTML = rowHtml(r);
+  if (r.status === 'ok'){ tr.className = 'ok'; tr.tabIndex = 0; tr.title = 'Show on map'; }
+  else { tr.className = ''; tr.removeAttribute('tabindex'); tr.removeAttribute('title'); }
+}
+// Rows appear in input order, each as soon as its result is known.
+function flushRows(){
+  while (shown < rows.length && rows[shown].status !== 'pending') renderRow(shown++);
+}
+// Fan one result out to every row with the same query (exact duplicates).
+function apply(query, r){
+  for (let i = 0; i < rows.length; i++){
+    const row = rows[i];
+    if (row.query !== query || row.status !== 'pending') continue;
+    row.status = r.status; row.lat = r.lat ?? null; row.lng = r.lng ?? null;
+    row.name = r.name || ''; row.type = r.type || ''; row.err = r.err || '';
+    delete row.prev;
+    if (i < shown) renderRow(i);   // retry updates rows already in the table
+  }
+  flushRows();
+}
+
+/* ---------------- geocoding (Nominatim, sequential + abortable) ---------------- */
+const sleep = (ms, signal) => new Promise((res) => {
+  if (signal.aborted) return res();
+  const onAbort = () => finish();
+  const t = setTimeout(finish, ms);
+  function finish(){ clearTimeout(t); signal.removeEventListener('abort', onAbort); res(); }
+  signal.addEventListener('abort', onAbort, { once: true });
+});
+
+async function requestOne(q, signal){
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(q)}`,
+    { headers: { 'Accept': 'application/json' }, signal });
+  if (!res.ok) return { status: 'error', err: 'HTTP ' + res.status };
+  let d;
+  try { d = await res.json(); } catch { return { status: 'error', err: 'bad response' }; }
+  if (!Array.isArray(d) || !d.length) return { status: 'nomatch' };
+  const m = d[0], lat = +m.lat, lng = +m.lon;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return { status: 'nomatch' };
+  return { status: 'ok', lat, lng, name: m.display_name || '', type: [m.category ?? m.class, m.type].filter(Boolean).join('/') };
+}
+
+async function execute(queue, my, signal){
+  const total = queue.length;
+  let done = 0;
+  let netLeft = queue.filter(q => !matchCache.has(q)).length;
+  setProgress(done, total, netLeft);
+  for (const q of queue){
+    if (signal.aborted || my !== runSeq) break;
+    let r;
+    if (matchCache.has(q)){
+      r = matchCache.get(q); reused++;
+    } else {
+      const wait = lastReqStart + MIN_GAP - Date.now();   // start-to-start pacing
+      if (wait > 0) await sleep(wait, signal);
+      if (signal.aborted || my !== runSeq) break;
+      lastReqStart = Date.now();
+      try { r = await requestOne(q, signal); }
+      catch { r = signal.aborted ? null : { status: 'error', err: 'network error' }; }
+      if (!r) break;                                       // aborted mid-flight
+      netLeft--;
+      if (r.status === 'ok') matchCache.set(q, r);
+    }
+    if (my !== runSeq) break;
+    apply(q, r);
+    done++;
+    setProgress(done, total, netLeft);
+    if (r.status === 'ok') syncMap(my);                    // map streams in behind the queue
+  }
+}
+
+function setRunning(b){
+  running = b;
+  cancelBtn.hidden = !b;
+  if (b) retryBtn.hidden = true;
+  updateCounter();                 // re-evaluates the Run button
+  if (!b) updateRetryBtn();
+}
+const failedRows = () => rows.filter(r => r.status === 'nomatch' || r.status === 'error');
+function updateRetryBtn(){
+  const n = failedRows().length;
+  retryBtn.textContent = `↻ Retry failed (${n})`;
+  retryBtn.hidden = running || n === 0;
+}
+
+async function startRun(queue, my, label){
+  reused = 0;
+  runCtrl = new AbortController();
+  setRunning(true);
+  setStatus(label);
+  const t0 = performance.now();
+  await execute(queue, my, runCtrl.signal);
+  if (my !== runSeq) return;               // a newer run took over the UI
+  const aborted = runCtrl.signal.aborted;
+  // a cancelled retry leaves rows mid-flight — restore their previous state
+  rows.forEach((r, i) => {
+    if (r.status === 'pending' && r.prev){ Object.assign(r, r.prev); delete r.prev; if (i < shown) renderRow(i); }
+  });
+  setRunning(false);
+  const resolved = rows.filter(r => r.status !== 'pending').length;
+  if (aborted){
+    setStatus(`Cancelled — kept ${resolved} of ${plural(rows.length, 'row')}.`);
+  } else {
+    const ok = rows.filter(r => r.status === 'ok').length;
+    const nm = rows.filter(r => r.status === 'nomatch').length;
+    const er = rows.filter(r => r.status === 'error').length;
+    const secs = ((performance.now() - t0) / 1000).toFixed(1);
+    setStatus(`Done in ${secs}s — ${ok} matched · ${nm} no match · ${er} error${er === 1 ? '' : 's'}` +
+      (reused ? ` · reused ${plural(reused, 'earlier result')}` : ''));
+  }
+}
+
+runBtn.addEventListener('click', () => {
+  if (running) return;
+  const lines = parseLines(input.value);
+  if (!lines.length || lines.length > MAX_LINES) return;
+  const my = ++runSeq;
+  rows = lines.map(q => ({ query: q, status: 'pending', lat: null, lng: null, name: '', type: '', err: '' }));
+  trEls = []; shown = 0;
+  tbody.innerHTML = '';                    // re-running clears previous results
+  markers.clear();
+  if (markerLayer) markerLayer.clearLayers();
+  mapPanel.hidden = true;                  // reappears at the first match
+  exportNote('');
+  startRun([...new Set(lines)], my, 'Geocoding…');
+});
+
+cancelBtn.addEventListener('click', () => {
+  if (running && runCtrl){ runCtrl.abort(); setStatus('Cancelling…'); }
+});
+
+retryBtn.addEventListener('click', () => {
+  if (running) return;
+  const failed = failedRows();
+  if (!failed.length) return;
+  const my = ++runSeq;
+  const queue = [];
+  for (const r of failed){
+    if (!queue.includes(r.query)) queue.push(r.query);
+    matchCache.delete(r.query);
+    r.prev = { status: r.status, err: r.err };
+    r.status = 'pending'; r.err = '';
+  }
+  rows.forEach((r, i) => { if (r.status === 'pending' && i < shown) renderRow(i); });
+  exportNote('');
+  startRun(queue, my, `Retrying ${plural(queue.length, 'failed lookup')}…`);
+});
+
+/* ---------------- map preview (Leaflet 1.9.4, fetched on demand) ----------------
+   Nothing Leaflet-related touches the network on page load: the library is
+   background-loaded only when the first match arrives, and the tool keeps
+   working (with a friendly note in the panel) if the CDN is blocked. */
+let leafletLoading = null, mapFailed = false;
+let map = null, markerLayer = null;
+const markers = new Map();     // query -> Leaflet marker
+
+function loadLeaflet(){
+  if (window.L) return Promise.resolve();
+  if (!leafletLoading){
+    leafletLoading = new Promise((resolve, reject) => {
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='; css.crossOrigin = '';
+      const js = document.createElement('script');
+      js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      js.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='; js.crossOrigin = '';
+      js.onload = () => window.L ? resolve() : reject(new Error('Leaflet did not initialize'));
+      js.onerror = () => reject(new Error('Leaflet failed to load'));
+      document.head.append(css, js);
+    });
+  }
+  return leafletLoading;
+}
+
+async function syncMap(my){
+  const pts = [], seen = new Set();
+  for (const r of rows){
+    if (r.status === 'ok' && !seen.has(r.query)){ seen.add(r.query); pts.push(r); }
+  }
+  if (!pts.length) return;
+  mapPanel.hidden = false;
+  if (mapFailed) return;
+  try { await loadLeaflet(); }
+  catch {
+    mapFailed = true;
+    const el = $('#map');
+    el.className = 'map-fallback';
+    el.textContent = 'Map preview unavailable — the Leaflet library didn’t load (offline or CDN blocked). The table and exports still work.';
+    return;
+  }
+  if (my !== runSeq) return;               // a newer run owns the map now
+  if (!map){
+    map = L.map('map', { worldCopyJump: true });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+    markerLayer = L.layerGroup().addTo(map);
+  }
+  for (const p of pts){
+    if (markers.has(p.query)) continue;
+    const mk = L.circleMarker([p.lat, p.lng], { radius: 7, weight: 2, color: '#2563eb', fillColor: '#3b82f6', fillOpacity: .5 })
+      .bindPopup(`<strong>${esc(p.query)}</strong><br>${esc(p.name)}`);
+    mk.addTo(markerLayer);
+    markers.set(p.query, mk);
+  }
+  map.invalidateSize();
+  map.fitBounds(pts.map(p => [p.lat, p.lng]), { padding: [30, 30], maxZoom: 10 });
+}
+
+function activateRow(i){
+  const r = rows[i];
+  if (!r || r.status !== 'ok' || !map) return;
+  const mk = markers.get(r.query);
+  if (!mk) return;
+  mapPanel.hidden = false;
+  map.invalidateSize();
+  map.setView(mk.getLatLng(), Math.max(map.getZoom() || 2, 11));
+  mk.openPopup();
+  mapPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+tbody.addEventListener('click', (e) => {
+  const tr = e.target.closest('tr[data-i]');
+  if (tr) activateRow(+tr.dataset.i);
+});
+tbody.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const tr = e.target.closest('tr[data-i]');
+  if (tr){ e.preventDefault(); activateRow(+tr.dataset.i); }
+});
+
+/* ---------------- export ---------------- */
+const exportRows = () => rows.filter(r => r.status !== 'pending');
+const STATUS_TEXT = { ok: 'match', nomatch: 'no_match', error: 'error' };
+const csvEsc = (v) => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+function toCSV(rs){
+  return ['query,status,lat,lng,matched_name,type',
+    ...rs.map(r => [r.query, STATUS_TEXT[r.status] || r.status, r.lat ?? '', r.lng ?? '', r.name, r.type].map(csvEsc).join(','))
+  ].join('\n');
+}
+// GeoJSON: one Point Feature per matched row; no-match/error rows are omitted.
+function toGeoJSON(rs){
+  const features = rs.filter(r => r.status === 'ok').map(r => ({
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: [r.lng, r.lat] },
+    properties: { query: r.query, matched: r.name, type: r.type },
+  }));
+  return JSON.stringify({ type: 'FeatureCollection', features }, null, 2);
+}
+const exportNote = (msg) => { const n = $('#exportNote'); n.textContent = msg || ''; n.hidden = !msg; };
+function download(name, content, mime){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+  a.download = name; a.click(); URL.revokeObjectURL(a.href);
+}
+$('#dlCsvBtn').addEventListener('click', () => {
+  const rs = exportRows();
+  if (!rs.length) return exportNote('Nothing to export yet — run the geocoder first.');
+  exportNote('');
+  download('geocoded-places.csv', toCSV(rs), 'text/csv');
+});
+$('#dlGeoBtn').addEventListener('click', () => {
+  const rs = exportRows();
+  if (!rs.length) return exportNote('Nothing to export yet — run the geocoder first.');
+  if (!rs.some(r => r.status === 'ok')) return exportNote('No matches yet — GeoJSON only includes rows with coordinates.');
+  exportNote('');
+  download('geocoded-places.geojson', toGeoJSON(rs), 'application/geo+json');
+});
+let copyTimer = 0;
+$('#copyCsvBtn').addEventListener('click', async () => {
+  const rs = exportRows();
+  if (!rs.length) return exportNote('Nothing to export yet — run the geocoder first.');
+  const b = $('#copyCsvBtn');
+  try {
+    await navigator.clipboard.writeText(toCSV(rs));
+    exportNote('');
+    clearTimeout(copyTimer);
+    b.classList.add('copied'); b.textContent = '✓ Copied';
+    copyTimer = setTimeout(() => { b.classList.remove('copied'); b.textContent = '⧉ Copy CSV'; }, 1200);
+  } catch {
+    exportNote('Copy blocked by the browser — use Download CSV instead.');
+  }
+});
+
+updateCounter();
+
+// exposed for automated tests
+window.__bg = {
+  parseLines,
+  csv: () => toCSV(exportRows()),
+  geojson: () => toGeoJSON(exportRows()),
+  rows: () => rows,
+  MIN_GAP,
+};
+
+/* ---------------- theme ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

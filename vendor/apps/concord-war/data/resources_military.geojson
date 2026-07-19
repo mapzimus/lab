@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "resources_military",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "name": "NH Army National Guard Armory", "category": "military", "side": "E", "actual_side": "E", "note": "the only true armory - week-one armor", "src": "census" }, "geometry": { "type": "Point", "coordinates": [ -71.513136712849999, 43.208428660914997 ] } },
+{ "type": "Feature", "properties": { "name": "NHARNG HQ / State Military Reservation", "category": "military", "side": "E", "actual_side": "E", "note": "AG HQ, Building C", "src": "fallback" }, "geometry": { "type": "Point", "coordinates": [ -71.5124, 43.2103 ] } }
+]
+}

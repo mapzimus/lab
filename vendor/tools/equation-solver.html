@@ -1,0 +1,978 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Step-by-Step Equation Solver</title>
+<meta name="description" content="Solve linear and quadratic equations one small move at a time, with a plain-English reason for every step. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --math: Georgia, "Times New Roman", "STIX Two Text", serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  footer.app { margin-top: 26px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+  /* math text */
+  .m { font-family: var(--math); }
+  .m var, var { font-style: italic; font-family: inherit; }
+  .m sup { font-size: .68em; line-height: 0; }
+  .rad { border-top: 1.5px solid currentColor; padding: 0 1px; }
+
+  /* input area */
+  .input-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 18px 14px; }
+  .input-row { display: flex; gap: 10px; }
+  .eq-input { flex: 1; min-width: 0; font-family: var(--math); font-size: 1.35rem; text-align: center; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); }
+  .eq-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .solve-btn { font-size: 1rem; padding: 10px 22px; }
+  .note { color: var(--muted); font-size: .85rem; }
+  .note.err { color: var(--danger); margin-top: 10px; }
+  .err-snippet { font-family: var(--mono); font-size: .95rem; margin-top: 4px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; display: inline-block; max-width: 100%; overflow-x: auto; white-space: pre; }
+  .err-snippet mark { background: color-mix(in srgb, var(--danger) 22%, transparent); color: var(--danger); font-weight: 700; border-radius: 3px; padding: 0 1px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
+  .chips-label { color: var(--muted); font-size: .82rem; margin-right: 2px; }
+  .chip { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 999px; padding: 6px 13px; cursor: pointer; font-family: var(--math); font-size: .92rem; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* results */
+  #results { margin-top: 20px; }
+  .results-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; max-width: 680px; margin: 0 auto 12px; }
+  .results-head h2 { font-size: 1.05rem; margin: 0; letter-spacing: -0.01em; }
+  .steps-col { max-width: 680px; margin: 0 auto; }
+  .step-card { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px 14px 54px; }
+  .step-n { position: absolute; left: 14px; top: 16px; width: 26px; height: 26px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); font-size: .8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .step-eq { font-size: 1.28rem; text-align: center; overflow-x: auto; padding-bottom: 2px; }
+  .step-why { color: var(--muted); font-size: .88rem; margin-top: 7px; text-align: center; max-width: 54ch; margin-left: auto; margin-right: auto; }
+  .connector { text-align: center; color: var(--muted); font-size: 1.05rem; padding: 4px 0; user-select: none; }
+  .answer-card { background: var(--surface); border: 2px solid var(--accent); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; text-align: center; }
+  .answer-label { color: var(--accent); font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+  .answer-eq { font-size: 1.5rem; overflow-x: auto; }
+  .check-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 18px 16px; margin-top: 14px; }
+  .check-card h3 { font-size: .95rem; margin: 0 0 8px; }
+  .check-line { font-size: .95rem; padding: 6px 0; border-top: 1px dashed var(--border); overflow-x: auto; }
+  .check-line:first-child { border-top: none; }
+  .ok-mark { color: var(--ok); font-weight: 700; }
+  .bad-mark { color: var(--danger); font-weight: 700; }
+
+  /* empty state */
+  .empty-card { margin-top: 20px; background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius); padding: 20px; text-align: center; color: var(--muted); font-size: .92rem; }
+  .empty-card .m { color: var(--text); font-size: 1.1rem; }
+
+  @media (max-width: 720px) {
+    .input-row { flex-direction: column; }
+    .eq-input { font-size: 1.15rem; }
+    .step-card { padding-left: 46px; }
+    .step-eq { font-size: 1.12rem; }
+    .answer-eq { font-size: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Step-by-Step Equation Solver</h1>
+      <p>Type a linear or quadratic equation and watch it get solved one small move at a time — with a plain-English reason for every step. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <section class="input-card">
+    <label class="visually-hidden" for="eqInput">Equation to solve</label>
+    <div class="input-row">
+      <input id="eqInput" class="eq-input" type="text" placeholder="3x + 2 = x − 8" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go">
+      <button class="btn primary solve-btn" id="solveBtn" type="button">Solve</button>
+    </div>
+    <div class="note err" id="errNote" hidden></div>
+    <div class="chips" id="chips" aria-label="Example equations">
+      <span class="chips-label">Try:</span>
+      <button class="chip" type="button" data-eq="3x + 2 = x − 8">3x + 2 = x − 8</button>
+      <button class="chip" type="button" data-eq="2(x − 3) = 10">2(x − 3) = 10</button>
+      <button class="chip" type="button" data-eq="x/4 + 2 = 7">x/4 + 2 = 7</button>
+      <button class="chip" type="button" data-eq="x² − 5x + 6 = 0">x² − 5x + 6 = 0</button>
+      <button class="chip" type="button" data-eq="2x² + 3x = 4">2x² + 3x = 4</button>
+      <button class="chip" type="button" data-eq="x² + x + 1 = 0">x² + x + 1 = 0</button>
+    </div>
+  </section>
+
+  <section id="results" hidden>
+    <div class="results-head">
+      <h2 id="resultsTitle">Solution, step by step</h2>
+      <button class="btn" id="copyBtn" type="button" title="Copy all steps as plain text">⧉ Copy steps</button>
+    </div>
+    <div class="steps-col">
+      <div id="steps" aria-live="polite"></div>
+      <div id="answer" class="answer-card"></div>
+      <section id="checkCard" class="check-card">
+        <h3 id="checkTitle">Check the answer</h3>
+        <div id="checkBody"></div>
+      </section>
+    </div>
+  </section>
+
+  <section id="empty" class="empty-card">
+    <p style="margin:0 0 6px"><span class="m">2<var>x</var> + 3 = 8&nbsp;&nbsp;→&nbsp;&nbsp;2<var>x</var> = 5&nbsp;&nbsp;→&nbsp;&nbsp;<var>x</var> = 5/2</span></p>
+    <p style="margin:0">Type an equation above (any single letter works as the variable) or tap an example — you'll get every step, why it's allowed, and a final check of the answer.</p>
+  </section>
+
+  <footer class="app">Nothing you type leaves this page · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+'use strict';
+/* ============================================================
+   Step-by-Step Equation Solver — standalone, client-side, no deps.
+   Exact rational arithmetic (BigInt fractions) throughout.
+   ============================================================ */
+const $ = (s) => document.querySelector(s);
+let VAR = 'x'; // auto-detected variable letter for the current solve
+
+class SolveErr extends Error {
+  constructor(msg, pos, len) { super(msg); this.pos = pos; this.len = (len == null ? 1 : len); }
+}
+
+/* ---------- Frac: exact rationals over BigInt ---------- */
+const gcdB = (a, b) => { a = a < 0n ? -a : a; b = b < 0n ? -b : b; while (b) { const t = a % b; a = b; b = t; } return a; };
+const lcmB = (a, b) => (a / (gcdB(a, b) || 1n)) * b;
+class F {
+  constructor(n, d = 1n) {
+    if (d === 0n) throw new SolveErr('That divides by zero, which isn’t allowed.');
+    if (d < 0n) { n = -n; d = -d; }
+    const g = gcdB(n, d) || 1n;
+    this.n = n / g; this.d = d / g;
+  }
+  add(o) { return new F(this.n * o.d + o.n * this.d, this.d * o.d); }
+  sub(o) { return new F(this.n * o.d - o.n * this.d, this.d * o.d); }
+  mul(o) { return new F(this.n * o.n, this.d * o.d); }
+  div(o) { if (o.n === 0n) throw new SolveErr('That divides by zero, which isn’t allowed.'); return new F(this.n * o.d, this.d * o.n); }
+  neg() { return new F(-this.n, this.d); }
+  abs() { return new F(this.n < 0n ? -this.n : this.n, this.d); }
+  powInt(k) { let n = 1n, d = 1n; for (let i = 0n; i < k; i++) { n *= this.n; d *= this.d; } return new F(n, d); }
+  isZero() { return this.n === 0n; }
+  isNeg() { return this.n < 0n; }
+  isInt() { return this.d === 1n; }
+  isOne() { return this.n === 1n && this.d === 1n; }
+  eq(o) { return this.n === o.n && this.d === o.d; }
+  cmp(o) { const l = this.n * o.d, r = o.n * this.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  num() { return Number(this.n) / Number(this.d); }
+}
+const ZERO = new F(0n), ONE = new F(1n);
+const fInt = (k) => new F(BigInt(k));
+function fracFromDec(s) {
+  const parts = s.split('.');
+  const ip = parts[0] || '0', fp = parts[1] || '';
+  return new F(BigInt(ip + fp), 10n ** BigInt(fp.length));
+}
+function isqrtB(v) { if (v < 2n) return v < 0n ? 0n : v; let x = v, y = (x + 1n) / 2n; while (y < x) { x = y; y = (x + v / x) / 2n; } return x; }
+
+/* ---------- tokenizer (positions refer to the raw input) ---------- */
+const SUPDIG = { '⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9' };
+const OPMAP = { '+':'+', '-':'-', '−':'-', '–':'-', '—':'-', '*':'*', '×':'*', '·':'*', '∙':'*', '⋅':'*', '/':'/', '÷':'/', '^':'^' };
+function tokenize(src) {
+  const toks = []; let i = 0;
+  while (i < src.length) {
+    const ch = src[i];
+    if (/\s/.test(ch)) { i++; continue; }
+    if (/[0-9.]/.test(ch)) {
+      let j = i, dot = false, digits = 0;
+      while (j < src.length && /[0-9.]/.test(src[j])) {
+        if (src[j] === '.') { if (dot) break; dot = true; } else digits++;
+        j++;
+      }
+      if (digits === 0) throw new SolveErr('I got stuck at “.” — a number needs digits around its decimal point.', i, 1);
+      toks.push({ t: 'num', v: fracFromDec(src.slice(i, j)), pos: i, len: j - i, raw: src.slice(i, j) });
+      i = j; continue;
+    }
+    if (/[a-zA-Z]/.test(ch)) { toks.push({ t: 'var', name: ch, pos: i, len: 1 }); i++; continue; }
+    if (SUPDIG[ch]) { // typed superscript like x² or x³ — same as ^2 / ^3
+      let j = i, s = '';
+      while (j < src.length && SUPDIG[src[j]]) { s += SUPDIG[src[j]]; j++; }
+      toks.push({ t: 'op', v: '^', pos: i, len: 1 });
+      toks.push({ t: 'num', v: new F(BigInt(s)), pos: i, len: j - i, raw: s });
+      i = j; continue;
+    }
+    if (OPMAP[ch]) { toks.push({ t: 'op', v: OPMAP[ch], pos: i, len: 1 }); i++; continue; }
+    if (ch === '(' || ch === '[') { toks.push({ t: 'lp', pos: i, len: 1 }); i++; continue; }
+    if (ch === ')' || ch === ']') { toks.push({ t: 'rp', pos: i, len: 1 }); i++; continue; }
+    if (ch === '=') { toks.push({ t: 'eq', pos: i, len: 1 }); i++; continue; }
+    throw new SolveErr(`I don’t recognize the character “${ch}” — stick to numbers, letters, + − × / ^ ( ) and =.`, i, 1);
+  }
+  return toks;
+}
+function tokStr(t) {
+  if (!t) return '';
+  if (t.t === 'num') return t.raw;
+  if (t.t === 'var') return t.name;
+  if (t.t === 'op') return t.v === '-' ? '−' : t.v;
+  if (t.t === 'lp') return '(';
+  if (t.t === 'rp') return ')';
+  return '=';
+}
+
+/* ---------- recursive-descent parser → AST ---------- */
+/* nodes: {k:'num',v,raw,pos} {k:'var',pos} {k:'grp',a,pos} {k:'neg',a,pos}
+          {k:'bin',op:'+','-','*','/','^',a,b,pos,implicit?} */
+function parseSide(toks, sideName, fallbackPos) {
+  let p = 0;
+  const peek = () => toks[p];
+  const bail = (msg, tok) => { throw new SolveErr(msg, tok ? tok.pos : fallbackPos, tok ? tok.len : 1); };
+  const endBail = () => {
+    const last = toks[toks.length - 1];
+    throw new SolveErr(`The ${sideName} side ends too soon — something is missing after “${tokStr(last)}”.`, last ? last.pos : fallbackPos, last ? last.len : 1);
+  };
+  let depth = 0;
+  function expr() {
+    let node = term();
+    while (peek() && peek().t === 'op' && (peek().v === '+' || peek().v === '-')) {
+      const op = toks[p++];
+      const rhs = term();
+      node = { k: 'bin', op: op.v, a: node, b: rhs, pos: op.pos };
+    }
+    return node;
+  }
+  function term() {
+    let node = unary();
+    for (;;) {
+      const t = peek();
+      if (!t) break;
+      if (t.t === 'op' && (t.v === '*' || t.v === '/')) {
+        p++;
+        const rhs = unary();
+        node = { k: 'bin', op: t.v, a: node, b: rhs, pos: t.pos };
+      } else if (t.t === 'var' || t.t === 'lp' || t.t === 'num') {
+        if (t.t === 'num') {
+          const prev = toks[p - 1];
+          if (prev && prev.t === 'num') bail(`Two numbers in a row (“${prev.raw}” then “${t.raw}”) — did you forget a + − × or / between them?`, t);
+        }
+        const rhs = unary();
+        node = { k: 'bin', op: '*', a: node, b: rhs, pos: t.pos, implicit: true };
+      } else break;
+    }
+    return node;
+  }
+  function unary() {
+    const t = peek();
+    if (!t) endBail();
+    if (t.t === 'op' && (t.v === '-' || t.v === '+')) {
+      p++;
+      const a = unary();
+      return t.v === '-' ? { k: 'neg', a, pos: t.pos } : a;
+    }
+    return power();
+  }
+  function power() {
+    const base = atom();
+    const t = peek();
+    if (t && t.t === 'op' && t.v === '^') {
+      p++;
+      const e = unary();
+      return { k: 'bin', op: '^', a: base, b: e, pos: t.pos };
+    }
+    return base;
+  }
+  function atom() {
+    const t = peek();
+    if (!t) endBail();
+    if (t.t === 'num') { p++; return { k: 'num', v: t.v, raw: t.raw, pos: t.pos }; }
+    if (t.t === 'var') { p++; return { k: 'var', pos: t.pos }; }
+    if (t.t === 'lp') {
+      if (++depth > 60) bail('That’s more nested parentheses than I can follow.', t);
+      p++;
+      const e = expr();
+      const c = peek();
+      if (!c || c.t !== 'rp') bail('This “(” is never closed — add a matching “)”.', t);
+      p++; depth--;
+      return { k: 'grp', a: e, pos: t.pos };
+    }
+    bail(`I got stuck at “${tokStr(t)}” — I expected a number, ${VAR}, or “(” there.`, t);
+  }
+  const root = expr();
+  if (p < toks.length) bail(`I got stuck at “${tokStr(peek())}” — I didn’t expect that there.`, peek());
+  return root;
+}
+/* ---------- formatting helpers ---------- */
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const vh = () => `<var>${esc(VAR)}</var>`;
+const bigH = (n) => (n < 0n ? '−' + (-n).toString() : n.toString());
+function fracHtml(f) { return (f.n < 0n ? '−' : '') + (f.n < 0n ? -f.n : f.n).toString() + (f.d > 1n ? '/' + f.d.toString() : ''); }
+function decStr(x) {
+  if (!isFinite(x)) return String(x);
+  if (Number.isInteger(x) && Math.abs(x) < 1e15) return String(x);
+  let s = x.toFixed(4);
+  if (s.indexOf('.') >= 0) s = s.replace(/0+$/, '').replace(/\.$/, '');
+  if ((s === '0' || s === '-0') && x !== 0) s = x.toPrecision(4);
+  return s;
+}
+const decHtml = (x) => esc(decStr(x)).replace(/-/g, '−');
+function sqrtHtml(v) { return `√<span class="rad">${v}</span>`; }
+
+/* one monomial, coefficient a (non-negative Frac), power p → HTML like 5, 3x, x², 3x/4 */
+function monoHtml(a, p) {
+  if (p === 0) return fracHtml(a);
+  const xs = p === 1 ? vh() : vh() + '<sup>2</sup>';
+  if (a.isOne()) return xs;
+  if (a.d === 1n) return a.n.toString() + xs;
+  return (a.n === 1n ? '' : a.n.toString()) + xs + '/' + a.d.toString();
+}
+/* ordered list of {c,p} monomials → HTML sum ("x² − 3x + x − 3"); empty/all shown as written */
+function rMonoList(list) {
+  if (!list.length) return '0';
+  let h = '';
+  list.forEach((m, i) => {
+    const neg = m.c.isNeg();
+    const piece = monoHtml(m.c.abs(), m.p);
+    if (i === 0) h += (neg ? '−' : '') + piece;
+    else h += neg ? ' − ' + piece : ' + ' + piece;
+  });
+  return h;
+}
+const eqHtml = (L, R) => rMonoList(L) + ' = ' + rMonoList(R);
+
+/* pretty-print the original AST (optionally substituting a value for the variable) */
+function rAst(node, sub) {
+  const valStr = sub ? ('f' in sub ? fracHtml(sub.f) : decHtml(sub.d)) : '';
+  function go(n, prec) {
+    switch (n.k) {
+      case 'num': return n.raw != null ? esc(n.raw) : fracHtml(n.v);
+      case 'var': return sub ? '(' + valStr + ')' : vh();
+      case 'grp': return '(' + go(n.a, 0) + ')';
+      case 'neg': { const s = '−' + go(n.a, 3); return prec >= 2 ? '(' + s + ')' : s; }
+      case 'bin': {
+        if (n.op === '+' || n.op === '-') {
+          const s = go(n.a, 1) + (n.op === '+' ? ' + ' : ' − ') + go(n.b, 2);
+          return prec >= 2 ? '(' + s + ')' : s;
+        }
+        if (n.op === '*') {
+          const a = go(n.a, 2), b = go(n.b, 2);
+          const implicit = n.implicit && n.b.k !== 'num';
+          return implicit ? a + b : a + ' · ' + b;
+        }
+        if (n.op === '/') return go(n.a, 2) + '/' + go(n.b, 3);
+        return go(n.a, 4) + '<sup>' + go(n.b, 0) + '</sup>'; // ^
+      }
+    }
+    return '';
+  }
+  return go(node, 0);
+}
+
+/* HTML → plain text (for the Copy-steps button) */
+const SUPU = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','−':'⁻' };
+function toText(h) {
+  return h
+    .replace(/<sup>(.*?)<\/sup>/g, (m, s) => s.replace(/<[^>]*>/g, '').split('').map(c => SUPU[c] || c).join(''))
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+}
+
+/* ---------- AST → expanded (uncombined) monomial list, recording what got distributed ---------- */
+function polyOf(list) { const arr = [ZERO, ZERO, ZERO]; for (const m of list) arr[m.p] = arr[m.p].add(m.c); return arr; }
+function degOf(arr) { return !arr[2].isZero() ? 2 : (!arr[1].isZero() ? 1 : 0); }
+function listFromPoly(arr) {
+  const l = [];
+  if (!arr[2].isZero()) l.push({ c: arr[2], p: 2 });
+  if (!arr[1].isZero()) l.push({ c: arr[1], p: 1 });
+  if (!arr[0].isZero()) l.push({ c: arr[0], p: 0 });
+  return l;
+}
+function degErr(node) {
+  throw new SolveErr(`I can solve linear and quadratic equations — up to ${VAR}². This one goes higher than that.`, node.pos, 1);
+}
+function expand(node, events) {
+  const inParens = (n) => n.k === 'grp' ? rAst(n, null) : '(' + rAst(n, null) + ')';
+  const inline = (n) => rAst(n, null);
+  function ev(n) {
+    switch (n.k) {
+      case 'num': return [{ c: n.v, p: 0 }];
+      case 'var': return [{ c: ONE, p: 1 }];
+      case 'grp': return ev(n.a);
+      case 'neg': return ev(n.a).map(m => ({ c: m.c.neg(), p: m.p }));
+      case 'bin': {
+        if (n.op === '+') return ev(n.a).concat(ev(n.b));
+        if (n.op === '-') return ev(n.a).concat(ev(n.b).map(m => ({ c: m.c.neg(), p: m.p })));
+        if (n.op === '*') {
+          const A = ev(n.a), B = ev(n.b);
+          if (A.length > 1 && B.length > 1) events.push(`multiply each term in ${inParens(n.a)} by each term in ${inParens(n.b)}`);
+          else if (B.length > 1) events.push(`multiply ${inline(n.a)} by each term inside ${inParens(n.b)}`);
+          else if (A.length > 1) events.push(`multiply each term inside ${inParens(n.a)} by ${inline(n.b)}`);
+          const out = [];
+          for (const a of A) for (const b of B) {
+            const p = a.p + b.p;
+            if (p > 2) degErr(n);
+            out.push({ c: a.c.mul(b.c), p });
+          }
+          return out;
+        }
+        if (n.op === '/') {
+          const B = ev(n.b), pb = polyOf(B);
+          if (degOf(pb) > 0) throw new SolveErr(`I can’t handle dividing by the variable yet — try rewriting it so ${VAR} isn’t underneath a division.`, n.pos, 1);
+          if (pb[0].isZero()) throw new SolveErr('That divides by zero, which isn’t allowed.', n.pos, 1);
+          const A = ev(n.a);
+          if (A.length > 1) events.push(`divide each term in ${inParens(n.a)} by ${fracHtml(pb[0])}`);
+          return A.map(m => ({ c: m.c.div(pb[0]), p: m.p }));
+        }
+        if (n.op === '^') {
+          const E = polyOf(ev(n.b));
+          if (degOf(E) > 0) throw new SolveErr(`I can’t solve equations where ${VAR} sits up in an exponent.`, n.pos, 1);
+          const e = E[0];
+          if (!e.isInt() || e.isNeg()) throw new SolveErr(`I can only handle whole-number powers (like ${VAR}²) — “^${toText(fracHtml(e))}” is beyond me.`, n.pos, 1);
+          const k = e.n;
+          if (k > 24n) throw new SolveErr(`That power (${k}) is bigger than I can usefully handle.`, n.pos, 1);
+          const A = ev(n.a), pa = polyOf(A), d = degOf(pa);
+          if (d > 0 && k * BigInt(d) > 2n) degErr(n);
+          if (k === 0n) return [{ c: ONE, p: 0 }];
+          if (A.length > 1 && k > 1n) events.push(`expand ${inParens(n.a)}<sup>${k}</sup> by multiplying it out`);
+          let out = A;
+          for (let i = 1n; i < k; i++) {
+            const nx = [];
+            for (const a of out) for (const b of A) {
+              const p = a.p + b.p;
+              if (p > 2) degErr(n);
+              nx.push({ c: a.c.mul(b.c), p });
+            }
+            out = nx;
+          }
+          return out;
+        }
+      }
+    }
+    return [];
+  }
+  return ev(node);
+}
+
+/* exact evaluation of the original AST at variable = x (Frac) — for the check step */
+function evalF(n, x) {
+  switch (n.k) {
+    case 'num': return n.v;
+    case 'var': return x;
+    case 'grp': return evalF(n.a, x);
+    case 'neg': return evalF(n.a, x).neg();
+    case 'bin': {
+      const a = evalF(n.a, x);
+      if (n.op === '^') { const e = evalF(n.b, x); return a.powInt(e.n); }
+      const b = evalF(n.b, x);
+      if (n.op === '+') return a.add(b);
+      if (n.op === '-') return a.sub(b);
+      if (n.op === '*') return a.mul(b);
+      return a.div(b);
+    }
+  }
+  return ZERO;
+}
+/* numeric evaluation (for irrational roots) */
+function evalN(n, x) {
+  switch (n.k) {
+    case 'num': return n.v.num();
+    case 'var': return x;
+    case 'grp': return evalN(n.a, x);
+    case 'neg': return -evalN(n.a, x);
+    case 'bin': {
+      const a = evalN(n.a, x), b = evalN(n.b, x);
+      if (n.op === '+') return a + b;
+      if (n.op === '-') return a - b;
+      if (n.op === '*') return a * b;
+      if (n.op === '/') return a / b;
+      return Math.pow(a, b);
+    }
+  }
+  return 0;
+}
+/* ---------- step-generation: shared phrasing ---------- */
+const signH = (v) => (typeof v === 'bigint')
+  ? (v < 0n ? `(−${(-v).toString()})` : v.toString())
+  : (v.isNeg() ? `(${fracHtml(v)})` : fracHtml(v));
+function addSubPhrase(c, p) { // phrase for removing the term c·x^p from a side
+  const m = monoHtml(c.abs(), p);
+  return c.isNeg() ? `Add ${m} to both sides` : `Subtract ${m} from both sides`;
+}
+function movePhrase(moved) {
+  const parts = moved.map(t => (t.c.isNeg() ? 'add ' : 'subtract ') + monoHtml(t.c.abs(), t.p));
+  let s;
+  if (parts.length === 1) s = parts[0] + (moved[0].c.isNeg() ? ' to both sides' : ' from both sides');
+  else s = parts.join(' and ') + ' on both sides';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+const zpWhy = () => 'If two things multiply to make 0, at least one of them must itself be 0 — that’s the zero-product property.';
+function binomHtml(k, m) { // k·x + m with k>0, integers (BigInt)
+  let h = (k === 1n ? '' : k.toString()) + vh();
+  if (m !== 0n) h += (m < 0n ? ' − ' : ' + ') + (m < 0n ? -m : m).toString();
+  return h;
+}
+function miniSolveWhy(k, m, r) { // solving kx + m = 0
+  if (k === 1n) return `${binomHtml(k, m)} = 0 gives ${vh()} = ${fracHtml(r)}`;
+  return `${binomHtml(k, m)} = 0 gives ${k.toString()}${vh()} = ${bigH(-m)}, so ${vh()} = ${fracHtml(r)}`;
+}
+
+/* ---------- linear path ---------- */
+function solveLinear(L, R, steps) {
+  if (!L[2].isZero() && L[2].eq(R[2])) {
+    const t = L[2];
+    L[2] = ZERO; R[2] = ZERO;
+    steps.push({ eq: eqHtml(listFromPoly(L), listFromPoly(R)),
+      why: `${addSubPhrase(t, 2)} — both sides have the exact same ${vh()}<sup>2</sup> term, so it cancels away and the equation is really linear.` });
+  }
+  const A = L[1], C = R[1];
+  if (A.eq(C)) {
+    if (!C.isZero()) {
+      L[1] = ZERO; R[1] = ZERO;
+      steps.push({ eq: eqHtml(listFromPoly(L), listFromPoly(R)),
+        why: `${addSubPhrase(C, 1)}. Both sides have the same amount of ${vh()}, so the ${vh()} terms wipe each other out completely.` });
+    }
+    if (L[0].eq(R[0])) return { kind: 'identity', value: L[0] };
+    return { kind: 'contradiction', left: L[0], right: R[0] };
+  }
+  const side = C.isZero() ? 'L' : (A.isZero() ? 'R' : (A.cmp(C) >= 0 ? 'L' : 'R'));
+  const mine = side === 'L' ? L : R, other = side === 'L' ? R : L;
+  const here = side === 'L' ? 'left' : 'right', there = side === 'L' ? 'right' : 'left';
+  const cv = other[1];
+  if (!cv.isZero()) {
+    mine[1] = mine[1].sub(cv); other[1] = ZERO;
+    steps.push({ eq: eqHtml(listFromPoly(L), listFromPoly(R)),
+      why: `${addSubPhrase(cv, 1)} so all the ${vh()} terms are together on the ${here}.` });
+  }
+  const bc = mine[0];
+  if (!bc.isZero()) {
+    mine[0] = ZERO; other[0] = other[0].sub(bc);
+    steps.push({ eq: eqHtml(listFromPoly(L), listFromPoly(R)),
+      why: `${addSubPhrase(bc, 0)} so the plain numbers gather on the ${there} and the ${vh()} term stands alone.` });
+  }
+  const E = mine[1];
+  let root = other[0];
+  if (!E.isOne()) {
+    root = other[0].div(E);
+    mine[1] = ONE; other[0] = root;
+    let why;
+    if (E.d === 1n) {
+      why = `Divide both sides by ${E.isNeg() ? signH(E) : fracHtml(E)} to get ${vh()} by itself` + (E.isNeg() ? ' — dividing by a negative flips the sign.' : '.');
+    } else if (E.n === 1n || E.n === -1n) {
+      const mult = new F(E.n < 0n ? -E.d : E.d);
+      why = `Multiply both sides by ${fracHtml(mult)} to undo dividing ${vh()} by ${fracHtml(mult.abs())}` + (E.isNeg() ? ' (multiplying by a negative flips the sign too).' : '.');
+    } else {
+      const rec = new F(E.n < 0n ? -E.d : E.d, E.n < 0n ? -E.n : E.n);
+      why = `Multiply both sides by ${fracHtml(rec)} — the reciprocal of ${fracHtml(E)} — so the fraction in front of ${vh()} cancels to 1.`;
+    }
+    steps.push({ eq: eqHtml(listFromPoly(L), listFromPoly(R)), why });
+  }
+  if (side === 'R') {
+    steps.push({ eq: eqHtml([{ c: ONE, p: 1 }], [{ c: root, p: 0 }]),
+      why: `Swap the two sides so ${vh()} sits on the left — they’re equal either way.` });
+  }
+  return { kind: 'one', root };
+}
+
+/* ---------- quadratic path ---------- */
+function solveQuad(L, R, steps) {
+  let a = L[2].sub(R[2]), b = L[1].sub(R[1]), c = L[0].sub(R[0]);
+  const moveLeft = a.cmp(ZERO) > 0;
+  if (!moveLeft) { a = a.neg(); b = b.neg(); c = c.neg(); }
+  const P = [c, b, a];
+  const stdEq = () => rMonoList(listFromPoly(P)) + ' = 0';
+  if (moveLeft) {
+    const moved = listFromPoly(R);
+    if (moved.length) {
+      steps.push({ eq: stdEq(),
+        why: `${movePhrase(moved)} — now everything is gathered on the left and the right side is 0, the standard setup for a quadratic.` });
+    }
+  } else {
+    const moved = listFromPoly(L);
+    if (moved.length) {
+      steps.push({ eq: '0 = ' + rMonoList(listFromPoly(P)),
+        why: `${movePhrase(moved)} — gathering everything on the right keeps the ${vh()}<sup>2</sup> term positive.` });
+    }
+    steps.push({ eq: stdEq(),
+      why: 'Swap the two sides so the expression sits on the left — an equation is true read in either direction.' });
+  }
+  const m = lcmB(lcmB(a.d, b.d), c.d);
+  if (m > 1n) {
+    const mf = new F(m);
+    a = a.mul(mf); b = b.mul(mf); c = c.mul(mf);
+    P[0] = c; P[1] = b; P[2] = a;
+    steps.push({ eq: stdEq(), why: `Multiply both sides by ${m.toString()} to clear the fractions (0 × ${m.toString()} is still 0).` });
+  }
+  let ai = a.n, bi = b.n, ci = c.n;
+  const g = gcdB(gcdB(ai, bi), ci);
+  if (g > 1n) {
+    ai /= g; bi /= g; ci /= g;
+    P[0] = new F(ci); P[1] = new F(bi); P[2] = new F(ai);
+    steps.push({ eq: stdEq(), why: `Every term is a multiple of ${g.toString()}, so divide both sides by ${g.toString()} to keep the numbers small (0 ÷ ${g.toString()} is still 0).` });
+  }
+
+  if (ci === 0n) {
+    if (bi === 0n) {
+      steps.push({ eq: `${vh()} = 0`,
+        why: `${vh()}<sup>2</sup> means ${vh()} × ${vh()}, and a product is 0 only when a factor is 0 — so ${vh()} must be 0. It happens “twice”, making this a double root.` });
+      return { kind: 'double', root: ZERO, ai, bi, ci };
+    }
+    const bin = binomHtml(ai, bi);
+    const r2 = new F(-bi, ai);
+    steps.push({ eq: `${vh()}(${bin}) = 0`, why: `Both terms contain ${vh()}, so factor ${vh()} out of each of them.` });
+    steps.push({ eq: `${vh()} = 0&nbsp;&nbsp;or&nbsp;&nbsp;${bin} = 0`, why: zpWhy() });
+    steps.push({ eq: `${vh()} = 0&nbsp;&nbsp;or&nbsp;&nbsp;${vh()} = ${fracHtml(r2)}`,
+      why: `The first factor already says ${vh()} = 0; ${miniSolveWhy(ai, bi, r2)}.` });
+    return { kind: 'two', roots: [ZERO, r2], ai, bi, ci };
+  }
+
+  const D = bi * bi - 4n * ai * ci;
+  const sD = D >= 0n ? isqrtB(D) : 0n;
+  const perfect = D >= 0n && sD * sD === D;
+  if (perfect) {
+    const p = (bi + sD) / 2n, q = (bi - sD) / 2n;
+    if (ai === 1n) {
+      const f1 = binomHtml(1n, p), f2 = binomHtml(1n, q);
+      steps.push({ eq: p === q ? `(${f1})<sup>2</sup> = 0` : `(${f1})(${f2}) = 0`,
+        why: `Factor: we need two numbers that multiply to ${signH(ci)} (the constant) and add up to ${signH(bi)} (the ${vh()} coefficient). ${signH(p)} and ${signH(q)} work: ${signH(p)} × ${signH(q)} = ${signH(ci)} and ${signH(p)} + ${signH(q)} = ${signH(bi)}.` });
+      if (p === q) {
+        const r = new F(-p);
+        steps.push({ eq: `${f1} = 0`,
+          why: 'The same factor appears twice — a square is 0 exactly when the thing being squared is 0.' });
+        steps.push({ eq: `${vh()} = ${fracHtml(r)}`, why: `${miniSolveWhy(1n, p, r)}.` });
+        return { kind: 'double', root: r, ai, bi, ci };
+      }
+      const r1 = new F(-p), r2 = new F(-q);
+      steps.push({ eq: `${f1} = 0&nbsp;&nbsp;or&nbsp;&nbsp;${f2} = 0`, why: zpWhy() });
+      steps.push({ eq: `${vh()} = ${fracHtml(r1)}&nbsp;&nbsp;or&nbsp;&nbsp;${vh()} = ${fracHtml(r2)}`,
+        why: `Solve each little equation by moving the number to the other side: ${miniSolveWhy(1n, p, r1)}, and ${miniSolveWhy(1n, q, r2)}.` });
+      return { kind: 'two', roots: [r1, r2], ai, bi, ci };
+    }
+    // a ≠ 1: split the middle term (ac method), then factor by grouping
+    const ac = ai * ci;
+    const splitList = [{ c: new F(ai), p: 2 }, { c: new F(p), p: 1 }, { c: new F(q), p: 1 }, { c: new F(ci), p: 0 }];
+    steps.push({ eq: rMonoList(splitList) + ' = 0',
+      why: `Factor by grouping: multiply a·c = ${signH(ai)} × ${signH(ci)} = ${signH(ac)}. We need two numbers that multiply to ${signH(ac)} and add up to ${signH(bi)} — that’s ${signH(p)} and ${signH(q)} — so split the middle term ${monoHtml(new F(bi < 0n ? -bi : bi), 1)} into ${monoHtml(new F(p < 0n ? -p : p), 1)} and ${monoHtml(new F(q < 0n ? -q : q), 1)} pieces.` });
+    const g1 = gcdB(ai, p) || 1n;
+    const u = ai / g1, v = p / g1;
+    const f2c = ci / v; // exact: v | c whenever p·q = a·c (see grouping identity)
+    const inner = binomHtml(u, v);
+    const lead1 = (g1 === 1n ? '' : g1.toString()) + vh();
+    steps.push({ eq: `${lead1}(${inner}) ${f2c < 0n ? '−' : '+'} ${(f2c < 0n ? -f2c : f2c).toString()}(${inner}) = 0`,
+      why: `Group into two pairs and factor each pair: the first pair shares ${lead1}, the second shares ${bigH(f2c < 0n ? -f2c : f2c)}. Both pairs now show the same bracket, (${inner}).` });
+    const outer = binomHtml(g1, f2c);
+    const r1 = new F(-v, u), r2 = new F(-f2c, g1);
+    if (r1.eq(r2)) {
+      steps.push({ eq: `(${inner})<sup>2</sup> = 0`, why: `Pull the shared bracket out front — both factors turn out identical, so the left side is a perfect square.` });
+      steps.push({ eq: `${vh()} = ${fracHtml(r1)}`, why: `A square is 0 only when the inside is 0: ${miniSolveWhy(u, v, r1)}.` });
+      return { kind: 'double', root: r1, ai, bi, ci };
+    }
+    steps.push({ eq: `(${inner})(${outer}) = 0`, why: `Pull the shared bracket (${inner}) out front — the leftovers form the second factor.` });
+    steps.push({ eq: `${inner} = 0&nbsp;&nbsp;or&nbsp;&nbsp;${outer} = 0`, why: zpWhy() });
+    steps.push({ eq: `${vh()} = ${fracHtml(r1)}&nbsp;&nbsp;or&nbsp;&nbsp;${vh()} = ${fracHtml(r2)}`,
+      why: `Solve each little equation: ${miniSolveWhy(u, v, r1)}, and ${miniSolveWhy(g1, f2c, r2)}.` });
+    return { kind: 'two', roots: [r1, r2], ai, bi, ci };
+  }
+  return quadFormula(ai, bi, ci, steps);
+}
+
+/* pieces of the quadratic-formula presentation */
+function pmRootHtml(nb, ns, mrad, nd, sign) {
+  const radH = (ns === 1n ? '' : ns.toString()) + sqrtHtml(mrad.toString());
+  const numer = nb === 0n ? `${sign === '±' ? '±' : (sign === '+' ? '' : '−')}${radH}`
+    : `${bigH(nb)} ${sign === '±' ? '±' : sign} ${radH}`;
+  if (nd === 1n) return numer;
+  return `(${numer}) / ${nd.toString()}`;
+}
+function quadFormula(ai, bi, ci, steps) {
+  const stdH = rMonoList(listFromPoly([new F(ci), new F(bi), new F(ai)])) + ' = 0';
+  steps.push({ eq: `${vh()} = (−<var>b</var> ± √(<var>b</var><sup>2</sup> − 4<var>a</var><var>c</var>)) / (2<var>a</var>)`,
+    why: `There’s no pair of whole numbers that multiplies to ${signH(ai * ci)} (that’s a·c) and adds up to ${signH(bi)}, so this doesn’t factor neatly. Time for the quadratic formula.` });
+  const aS = signH(ai), cS = signH(ci);
+  const negB = bi < 0n ? `−(${bigH(bi)})` : '−' + bi.toString();
+  const bSq = bi < 0n ? `(${bigH(bi)})<sup>2</sup>` : `${bi.toString()}<sup>2</sup>`;
+  steps.push({ eq: `${vh()} = (${negB} ± √(${bSq} − 4 · ${aS} · ${cS})) / (2 · ${aS})`,
+    why: `Plug in a = ${bigH(ai)}, b = ${bigH(bi)} and c = ${bigH(ci)}, read straight off ${stdH}.` });
+  const D = bi * bi - 4n * ai * ci;
+  const b2 = bi * bi, t = -4n * ai * ci;
+  let discWhy;
+  if (D > 0n) discWhy = `The number under the square root — the discriminant — comes out to ${bigH(D)}. It’s positive, so the square root is a real number and the ± gives two different real solutions.`;
+  else if (D === 0n) discWhy = 'The discriminant is 0, so the ± adds and subtracts nothing: there’s exactly one solution — a double root. The parabola just touches the x-axis at a single point.';
+  else discWhy = `The discriminant works out to ${bigH(D)} — negative. No real number squared gives a negative result, so this equation has no real solutions: the parabola never crosses the x-axis.`;
+  steps.push({ eq: `<var>b</var><sup>2</sup> − 4<var>a</var><var>c</var> = ${bSq} − 4 · ${aS} · ${cS} = ${bigH(b2)} ${t < 0n ? '−' : '+'} ${(t < 0n ? -t : t).toString()} = ${bigH(D)}`,
+    why: discWhy });
+  if (D < 0n) return { kind: 'none', ai, bi, ci, D };
+  if (D === 0n) {
+    const r = new F(-bi, 2n * ai);
+    steps.push({ eq: `${vh()} = ${negB} / (2 · ${aS}) = ${fracHtml(r)}`,
+      why: 'With √0 = 0, the formula collapses to a single value.' });
+    return { kind: 'double', root: r, ai, bi, ci };
+  }
+  // simplify √D and reduce the whole fraction
+  let s0 = 1n, mrad = D;
+  for (let i = 2n; i * i <= mrad && i < 65536n; i++) {
+    const sq = i * i;
+    while (mrad % sq === 0n) { s0 *= i; mrad /= sq; }
+  }
+  const g2 = gcdB(gcdB(bi < 0n ? -bi : bi, s0), 2n * ai) || 1n;
+  const nb = -bi / g2, ns = s0 / g2, nd = (2n * ai) / g2;
+  let simpWhy = '';
+  if (s0 > 1n) simpWhy += `Simplify the square root: ${bigH(D)} = ${bigH(s0 * s0)} × ${bigH(mrad)}, so √${bigH(D)} = ${bigH(s0)}√${bigH(mrad)}. `;
+  if (g2 > 1n) simpWhy += `Top and bottom are all divisible by ${bigH(g2)}, so divide it out. `;
+  if (!simpWhy) simpWhy = 'That’s already in simplest form. ';
+  steps.push({ eq: `${vh()} = ${pmRootHtml(nb, ns, mrad, nd, '±')}`,
+    why: simpWhy + 'The ± means one answer uses + and the other uses −.' });
+  const sq = Number(s0) * Math.sqrt(Number(mrad));
+  const decPlus = (Number(-bi) + sq) / (2 * Number(ai));
+  const decMinus = (Number(-bi) - sq) / (2 * Number(ai));
+  return {
+    kind: 'irr', ai, bi, ci, D,
+    exactPlus: pmRootHtml(nb, ns, mrad, nd, '+'),
+    exactMinus: pmRootHtml(nb, ns, mrad, nd, '−'),
+    decPlus, decMinus
+  };
+}
+/* ---------- combining like terms: describe what changed ---------- */
+function monoSignedHtml(f, p) { return (f.isNeg() ? '−' : '') + monoHtml(f.abs(), p); }
+function combineDesc(list, sideName) {
+  const notes = [];
+  for (const p of [2, 1, 0]) {
+    const grp = list.filter(m => m.p === p);
+    if (grp.length >= 2) {
+      const sum = grp.reduce((s, m) => s.add(m.c), ZERO);
+      const sumH = sum.isZero() ? '0 (they cancel out)' : monoSignedHtml(sum, p);
+      notes.push(`on the ${sideName}, ${rMonoList(grp)} = ${sumH}`);
+    } else if (grp.length === 1 && grp[0].c.isZero()) {
+      notes.push(`the 0 on the ${sideName} adds nothing, so it drops away`);
+    }
+  }
+  return notes;
+}
+
+/* ---------- answer + check ---------- */
+function answerFor(result) {
+  const dec = (r) => (!r.isInt() ? `&nbsp;&nbsp;(= ${decHtml(r.num())})` : '');
+  switch (result.kind) {
+    case 'one':
+      return { ansH: `${vh()} = ${fracHtml(result.root)}${dec(result.root)}`,
+        whyH: 'That’s the one value that makes both sides equal.' };
+    case 'two': {
+      const part = (r) => `${vh()} = ${fracHtml(r)}` + (!r.isInt() ? ` (= ${decHtml(r.num())})` : '');
+      return { ansH: `${part(result.roots[0])}&nbsp;&nbsp;or&nbsp;&nbsp;${part(result.roots[1])}`,
+        whyH: 'A quadratic can hit zero twice — both values work, as the check below shows.' };
+    }
+    case 'double':
+      return { ansH: `${vh()} = ${fracHtml(result.root)}${dec(result.root)}&nbsp;&nbsp;(a double root)`,
+        whyH: 'A double root: the parabola touches the x-axis at exactly this one point instead of crossing it.' };
+    case 'irr':
+      return { ansH: `${vh()} = ${result.exactPlus} ≈ ${decHtml(result.decPlus)}&nbsp;&nbsp;or&nbsp;&nbsp;${vh()} = ${result.exactMinus} ≈ ${decHtml(result.decMinus)}`,
+        whyH: 'Exact answers first — the decimals are rounded to 4 places.' };
+    case 'identity':
+      return { ansH: `Always true — any value of ${vh()} works (infinitely many solutions).`,
+        whyH: 'The two sides are the same expression in disguise, so every number satisfies the equation.' };
+    case 'contradiction':
+      return { ansH: 'No solution — the two sides can never be equal.',
+        whyH: `The ${vh()} parts match exactly but the plain numbers don’t, and no value of ${vh()} can fix that.` };
+    case 'none':
+      return { ansH: 'No real solutions.',
+        whyH: `The discriminant is negative (${bigH(result.D)}), so the parabola never crosses the x-axis. (Complex numbers could handle it, but that’s another lesson.)` };
+  }
+  return { ansH: '', whyH: '' };
+}
+function buildCheck(result, Last, Rast) {
+  const okM = ' <span class="ok-mark">✓</span>', badM = ' <span class="bad-mark">✗</span>';
+  const lines = [];
+  let title = 'Check the answer';
+  const rationalLine = (r) => {
+    const lv = evalF(Last, r), rv = evalF(Rast, r);
+    return `<span class="m">${vh()} = ${fracHtml(r)}</span>: &nbsp;Left side: <span class="m">${rAst(Last, { f: r })} = ${fracHtml(lv)}</span> &nbsp;·&nbsp; Right side: <span class="m">${rAst(Rast, { f: r })} = ${fracHtml(rv)}</span>${lv.eq(rv) ? okM : badM}`;
+  };
+  switch (result.kind) {
+    case 'one': lines.push(rationalLine(result.root)); break;
+    case 'double': lines.push(rationalLine(result.root)); break;
+    case 'two': lines.push(rationalLine(result.roots[0]), rationalLine(result.roots[1])); break;
+    case 'irr': {
+      for (const d of [result.decPlus, result.decMinus]) {
+        const lv = evalN(Last, d), rv = evalN(Rast, d);
+        const close = Math.abs(lv - rv) <= 1e-6 * Math.max(1, Math.abs(lv), Math.abs(rv));
+        lines.push(`Using <span class="m">${vh()} ≈ ${decHtml(d)}</span>: &nbsp;Left side: <span class="m">${rAst(Last, { d })} ≈ ${decHtml(lv)}</span> &nbsp;·&nbsp; Right side: <span class="m">${rAst(Rast, { d })} ≈ ${decHtml(rv)}</span>${close ? okM : badM}`);
+      }
+      lines.push('<span class="note">The decimals are rounded, so the sides may differ by a hair — the exact forms match perfectly.</span>');
+      break;
+    }
+    case 'identity': {
+      title = 'Check: any value works';
+      for (const k of [0n, 7n]) {
+        const r = new F(k);
+        lines.push(`Try <span class="m">${vh()} = ${fracHtml(r)}</span>: both sides come out to <span class="m">${fracHtml(evalF(Last, r))}</span>${okM}`);
+      }
+      break;
+    }
+    case 'contradiction': {
+      title = 'Why there’s no solution';
+      const gap = result.left.sub(result.right);
+      lines.push(`No matter what ${vh()} is, (left side) − (right side) always equals <span class="m">${fracHtml(gap)}</span> — never 0 — so the two sides can never match${okM}`);
+      break;
+    }
+    case 'none': {
+      title = 'Why there are no real solutions';
+      const aF = new F(result.ai), bF = new F(result.bi), cF = new F(result.ci);
+      const x0 = bF.neg().div(aF.mul(new F(2n)));
+      const vmin = cF.sub(bF.mul(bF).div(aF.mul(new F(4n))));
+      lines.push(`With everything on one side, <span class="m">${rMonoList(listFromPoly([cF, bF, aF]))}</span> bottoms out at <span class="m">${fracHtml(vmin)}</span> (when <span class="m">${vh()} = ${fracHtml(x0)}</span>) — still above 0, so it can never reach 0${okM}`);
+      break;
+    }
+  }
+  return { title, lines };
+}
+
+/* ---------- build the full walkthrough ---------- */
+function buildAndRender(Last, Rast) {
+  const steps = [];
+  const events = [];
+  const uL = expand(Last, events);
+  const uR = expand(Rast, events);
+  const origH = rAst(Last, null) + ' = ' + rAst(Rast, null);
+  steps.push({ eq: origH, why: `Our starting point. The goal: find every value of ${vh()} that makes the two sides equal.` });
+  const expH = eqHtml(uL, uR);
+  if (events.length) steps.push({ eq: expH, why: 'Expand: ' + events.join('; ') + '.' });
+  const Lp = polyOf(uL), Rp = polyOf(uR);
+  const combH = eqHtml(listFromPoly(Lp), listFromPoly(Rp));
+  const prevH = events.length ? expH : origH;
+  if (combH !== prevH) {
+    const notes = combineDesc(uL, 'left').concat(combineDesc(uR, 'right'));
+    if (notes.length) steps.push({ eq: combH, why: 'Combine like terms: ' + notes.join('; ') + '.' });
+    else steps.push({ eq: combH, why: 'Tidy up: write each side in its standard, simplest order.' });
+  }
+  const result = !Lp[2].sub(Rp[2]).isZero()
+    ? solveQuad(Lp, Rp, steps)
+    : solveLinear(Lp.slice(), Rp.slice(), steps);
+  const { ansH, whyH } = answerFor(result);
+  const check = buildCheck(result, Last, Rast);
+  showResults(steps, ansH, whyH, check);
+}
+
+/* ---------- rendering to the page ---------- */
+let copyText = '';
+function showResults(steps, ansH, whyH, check) {
+  $('#empty').hidden = true;
+  $('#steps').innerHTML = steps.map((s, i) =>
+    (i ? '<div class="connector" aria-hidden="true">↓</div>' : '') +
+    `<div class="step-card"><div class="step-n" aria-hidden="true">${i + 1}</div><div class="step-eq m">${s.eq}</div><div class="step-why">${s.why}</div></div>`
+  ).join('') + '<div class="connector" aria-hidden="true">↓</div>';
+  $('#answer').innerHTML = `<div class="answer-label">Answer</div><div class="answer-eq m">${ansH}</div>` +
+    (whyH ? `<div class="step-why">${whyH}</div>` : '');
+  $('#checkTitle').textContent = check.title;
+  $('#checkBody').innerHTML = check.lines.map(l => `<div class="check-line">${l}</div>`).join('');
+  $('#results').hidden = false;
+  const out = [];
+  steps.forEach((s, i) => out.push(`${i + 1}. ${toText(s.eq)} — ${toText(s.why)}`));
+  out.push(`Answer: ${toText(ansH)}`);
+  out.push(`${check.title}:`);
+  check.lines.forEach(l => out.push('  ' + toText(l)));
+  copyText = out.join('\n');
+}
+function showErr(msg, raw, pos, len) {
+  const el = $('#errNote');
+  let h = esc(msg);
+  if (raw != null && pos != null && pos >= 0 && pos < raw.length) {
+    const l = Math.max(1, Math.min(len || 1, raw.length - pos));
+    h += `<br><span class="err-snippet">${esc(raw.slice(0, pos))}<mark>${esc(raw.slice(pos, pos + l))}</mark>${esc(raw.slice(pos + l))}</span>`;
+  }
+  el.innerHTML = h;
+  el.hidden = false;
+  $('#results').hidden = true;
+}
+
+/* ---------- solve entry point ---------- */
+function solve() {
+  const raw = $('#eqInput').value;
+  const el = $('#errNote');
+  el.hidden = true; el.innerHTML = '';
+  if (!raw.trim()) { showErr('Type an equation first — or tap one of the examples below.'); return; }
+  if (raw.length > 400) { showErr('That’s longer than I can handle — try something under 400 characters.'); return; }
+  try {
+    const toks = tokenize(raw);
+    const letters = [];
+    for (const t of toks) if (t.t === 'var' && !letters.some(l => l.name === t.name)) letters.push(t);
+    if (letters.length > 1) throw new SolveErr(`I can only solve for one variable at a time, but I see both “${letters[0].name}” and “${letters[1].name}”.`, letters[1].pos, 1);
+    VAR = letters.length ? letters[0].name : 'x';
+    const eqToks = toks.filter(t => t.t === 'eq');
+    if (eqToks.length === 0) throw new SolveErr(`Every equation needs an “=” sign. Try something like 3${VAR} + 2 = 11.`);
+    if (eqToks.length > 1) throw new SolveErr('I see more than one “=” — an equation has exactly one, separating its two sides.', eqToks[1].pos, 1);
+    const idx = toks.indexOf(eqToks[0]);
+    const lt = toks.slice(0, idx), rt = toks.slice(idx + 1);
+    if (!lt.length) throw new SolveErr('The left side of “=” is empty — put something before it.', eqToks[0].pos, 1);
+    if (!rt.length) throw new SolveErr('The right side of “=” is empty — what should the left side equal?', eqToks[0].pos, 1);
+    const Last = parseSide(lt, 'left', eqToks[0].pos);
+    const Rast = parseSide(rt, 'right', eqToks[0].pos);
+    buildAndRender(Last, Rast);
+  } catch (e) {
+    if (e instanceof SolveErr) showErr(e.message, raw, e.pos, e.len);
+    else showErr('Something went wrong reading that equation — try writing it a little differently.');
+  }
+}
+
+/* ---------- wiring ---------- */
+$('#solveBtn').addEventListener('click', solve);
+$('#eqInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); solve(); } });
+$('#chips').addEventListener('click', (e) => {
+  const b = e.target.closest('button.chip');
+  if (!b) return;
+  $('#eqInput').value = b.dataset.eq;
+  solve();
+});
+$('#copyBtn').addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
+  const orig = btn.textContent;
+  try {
+    await navigator.clipboard.writeText(copyText);
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1200);
+  } catch (err) {
+    btn.textContent = 'Copy blocked by browser';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  }
+});
+
+/* ---------- theme ---------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>
