@@ -35,30 +35,36 @@ function decodeText(value) {
 const knownCategories = new Set(["maps", "data", "design", "teaching", "math", "fun", "play", "experiments"]);
 const requiredFields = ["slug", "title", "description", "category", "url"];
 
-/** First-party routes for projects that are snapshotted under vendor/apps/. */
+/** First-party routes for every non-external project. */
 const hostedProjectRoutes = {
   "geopuesto-playground": "/geopuesto/playground/",
   "us-fantasy-transit": "/transit/",
   "concord-civil-war": "/concord-war/",
   "bug-wars": "/bug-wars/",
   "flip-game": "/flip-game/",
+  "parrot-flip": "/parrot-flip/",
   "grog-flip": "/grog-flip/",
   "whydah-voyage": "/whydah-voyage/",
   "black-sam": "/black-sam/",
+  "whydah-unit": "/whydah/",
   "true-scale": "/true-scale/",
   "interstate-challenge": "/interstate-challenge/",
   "mapzimus-board": "/mapzimus-board/",
+  "tappymaps": "/tappymaps/",
+  "mcas-dashboard": "/mcas/",
+  "savvas-extraction": "/savvas/",
   "train-route-atlas": "/lab/train-routes/",
   "predicting-housing-crisis": "/lab/housing-crisis/",
 };
 
-/** vendor/apps/<dir> → public route */
+/** vendor/apps/<dir> → public route (copied into dist after src/). */
 const appRoutes = {
   geopuesto: "geopuesto",
   transit: "transit",
   "concord-war": "concord-war",
   "bug-wars": "bug-wars",
   "flip-game": "flip-game",
+  "parrot-flip": "parrot-flip",
   "grog-flip": "grog-flip",
   "whydah-voyage": "whydah-voyage",
   "black-sam": "black-sam",
@@ -70,18 +76,9 @@ const appRoutes = {
 const tools = loadCatalog("tools.json");
 const projects = loadCatalog("projects.json");
 const featuredSlugs = loadCatalog("featured.json");
-<<<<<<< HEAD
-const sourceCatalog = [...tools, ...projects];
-=======
 const fieldNotes = loadCatalog("field-notes.json");
 const linkGroups = loadCatalog("links.json");
-// Source drives the section split: single-page tools vs bigger projects.
-const catalog = [
-  ...tools.map((item) => ({ ...item, source: "tools" })),
-  ...projects.map((item) => ({ ...item, source: "projects" })),
-];
-
->>>>>>> origin/main
+const sourceCatalog = [...tools, ...projects];
 const problems = [];
 const seenSlugs = new Set();
 
@@ -94,18 +91,15 @@ for (const item of sourceCatalog) {
     if (seenSlugs.has(item.slug)) problems.push(`${label}: duplicate slug`);
     seenSlugs.add(item.slug);
   }
-<<<<<<< HEAD
   if (item.category && !knownCategories.has(item.category)) {
     problems.push(`${label}: unknown category "${item.category}"`);
   }
   if (item.url && !/^https:\/\//.test(item.url)) {
     problems.push(`${label}: source url is not https`);
   }
-=======
-  if (item.category && !knownCategories.has(item.category)) problems.push(`${label}: unknown category "${item.category}"`);
-  if (item.url && !/^https:\/\//.test(item.url)) problems.push(`${label}: url is not https`);
-  if (/&(amp|lt|gt|quot|#\d+);/.test(`${item.title} ${item.description}`)) problems.push(`${label}: title/description contains an HTML entity; store plain text`);
->>>>>>> origin/main
+  if (/&(amp|lt|gt|quot|#\d+);/.test(`${item.title} ${item.description}`)) {
+    problems.push(`${label}: title/description contains an HTML entity; store plain text`);
+  }
 }
 for (const slug of featuredSlugs) {
   if (!seenSlugs.has(slug)) problems.push(`featured.json: "${slug}" is not in the catalog`);
@@ -130,6 +124,7 @@ const publicTools = tools.map((item) => {
     url: `/${item.slug}/`,
     sourceUrl: item.url,
     collection: "tool",
+    source: "tools",
     status: hasSnapshot ? item.status || "live" : "in-progress",
     hosted: hasSnapshot,
   };
@@ -142,6 +137,7 @@ const publicProjects = projects.map((item) => ({
   url: item.external ? item.url : hostedProjectRoutes[item.slug],
   sourceUrl: item.url,
   collection: "project",
+  source: "projects",
 }));
 
 const catalog = [...publicTools, ...publicProjects];
@@ -154,9 +150,6 @@ const catalogRefresh = new Date(Date.UTC(refreshYear, refreshMonth - 1)).toLocal
   timeZone: "UTC",
 });
 
-// ---- Rendering helpers (card markup mirrors app.js, which re-renders the
-// same structures client-side for search/filter/favorites) ----
-
 const categoryLabels = {
   maps: "Maps & GIS",
   data: "Data",
@@ -167,8 +160,6 @@ const categoryLabels = {
   play: "Games",
   experiments: "Experiments",
 };
-// One home per item: map things → Maps, playable things → Games, utility
-// tools → Tools. Lab is source-based (all projects + anything unfinished).
 const viewCategories = {
   home: null,
   tools: ["data", "design", "teaching", "math", "fun"],
@@ -183,14 +174,17 @@ function escapeHtml(value) {
 function card(item, { featured = false, star = true } = {}) {
   const tags = (item.tags || []).slice(0, 3).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("");
   const status = item.status || "live";
+  const external = item.external || /^https?:\/\//i.test(item.url || "");
+  const targetAttrs = external ? ' target="_blank" rel="noopener"' : "";
+  const openCue = external ? "Open ↗" : "Open →";
   return `<article class="card${featured ? " featured" : ""}" data-slug="${escapeHtml(item.slug)}" data-category="${escapeHtml(item.category)}">
       ${star ? `<button class="star" type="button" aria-label="Add to favorites" aria-pressed="false">☆</button>` : ""}
-      <a class="card-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">
+      <a class="card-link" href="${escapeHtml(item.url)}"${targetAttrs}>
         <div class="card-meta"><span class="cat-tick" aria-hidden="true"></span><span class="card-type">${escapeHtml(categoryLabels[item.category] || item.category)}</span><span class="card-icon" aria-hidden="true">${escapeHtml(item.icon || "")}</span></div>
         <h3>${escapeHtml(item.title)}</h3>
         <p class="card-copy">${escapeHtml(item.description)}</p>
         ${featured ? "" : `<div class="card-tags">${tags}</div>`}
-        <div class="card-foot">${status === "live" ? "<span></span>" : `<span class="status">${escapeHtml(status)}</span>`}<span class="open-cue">Open ↗</span></div>
+        <div class="card-foot">${status === "live" ? "<span></span>" : `<span class="status">${escapeHtml(status)}</span>`}<span class="open-cue">${openCue}</span></div>
       </a>
     </article>`;
 }
@@ -216,14 +210,11 @@ function filtersHtml(view, activeCategory) {
     .join("");
 }
 
-// ---- Pages ----
-
 if (fs.existsSync(output)) fs.rmSync(assertInsideRoot(output), { recursive: true, force: true });
 fs.mkdirSync(output, { recursive: true });
 fs.cpSync(source, output, { recursive: true });
 fs.rmSync(path.join(output, "_template.html"));
 
-// Public catalog JSON uses first-party routes so the front door never deep-links off-site.
 fs.writeFileSync(path.join(output, "data", "catalog.json"), `${JSON.stringify(catalog, null, 2)}\n`, "utf8");
 fs.writeFileSync(
   path.join(output, "data", "tools.json"),
@@ -275,15 +266,10 @@ const pages = {
     title: "Browser tools · Mapzimus",
     description: `A searchable catalog of ${utilityCount} standalone browser tools for data, design, teaching, and math.`,
     canonical: "https://mapzimus.com/tools/",
-<<<<<<< HEAD
-    heading: "Tools that get out of the way.",
-    intro: "Every tool I have made, organized by type. Most run entirely in the browser — and every one is hosted here.",
-=======
     eyebrow: "The tool catalog",
     heading: "Every tool, one page each",
     intro: `${utilityCount} standalone browser tools for data, design, teaching, math, and fun. Each is a single page that loads fast and does one job. Map tools have their own shelf under Maps.`,
     catalogHeading: "All tools",
->>>>>>> origin/main
   },
   maps: {
     path: "maps/index.html",
@@ -298,17 +284,12 @@ const pages = {
   games: {
     path: "games/index.html",
     title: "Games · Mapzimus",
-    description: "Free browser games from Mapzimus — strategy and logic, no downloads.",
+    description: "Free browser games from Mapzimus — bottle flips, Whydah voyage games, strategy, and more.",
     canonical: "https://mapzimus.com/games/",
-<<<<<<< HEAD
-    heading: "Things made to be played.",
-    intro: "Strategy games, logic puzzles, bottle flips, and the Whydah voyage games — all running on this site.",
-=======
     eyebrow: "Playable",
     heading: "Games",
-    intro: "Actual games, made to be played — free in the browser, nothing to download.",
+    intro: "Actual games, made to be played — Flip Game, Parrot Flip, Whydah's Voyage, Bug Wars, and the rest. Free in the browser.",
     catalogHeading: "All games",
->>>>>>> origin/main
   },
 };
 
@@ -360,7 +341,6 @@ for (const [key, page] of Object.entries(pages)) {
   fs.writeFileSync(target, html, "utf8");
 }
 
-<<<<<<< HEAD
 requirePath(hostedToolSource, "vendor/tools");
 const placeholderTemplate = `<!doctype html>
 <html lang="en">
@@ -413,11 +393,10 @@ for (const [sourceName, route] of Object.entries(appRoutes)) {
   const appSource = requirePath(path.join(vendor, "apps", sourceName), `vendor/apps/${sourceName}`);
   fs.cpSync(appSource, path.join(output, route), { recursive: true });
 }
-=======
-// ---- Static pages that carry pre-rendered blocks ----
 
 function fillStatic(relPath, replacements) {
   const target = path.join(output, relPath);
+  if (!fs.existsSync(target)) return;
   let html = fs.readFileSync(target, "utf8");
   for (const [token, value] of Object.entries(replacements)) {
     html = html.replaceAll(`{{${token}}}`, value);
@@ -475,9 +454,6 @@ const skillCards = skills.map((skill) => `<article class="skill-card">
 </article>`).join("\n");
 fillStatic("skills/index.html", { SKILL_CARDS: skillCards });
 
-// ---- Sitemap ----
->>>>>>> origin/main
-
 const staticPages = ["field-notes", "radars", "radar", "geo-radar", "skills", "links", "about"];
 const sitemapUrls = [
   ...Object.values(pages).map((page) => page.canonical),
@@ -486,7 +462,6 @@ const sitemapUrls = [
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...new Set(sitemapUrls)].map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n`;
 fs.writeFileSync(path.join(output, "sitemap.xml"), sitemap, "utf8");
-<<<<<<< HEAD
 
 const missingTools = publicTools.filter((item) => !item.hosted).map((item) => item.slug);
 console.log(
@@ -494,6 +469,3 @@ console.log(
     (missingTools.length ? ` (${missingTools.length} placeholders: ${missingTools.join(", ")})` : "") +
     `, and ${Object.keys(appRoutes).length} hosted apps in dist/.`,
 );
-=======
-console.log(`Built ${Object.keys(pages).length + 3} Mapzimus pages in dist/ (${catalog.length} catalog items pre-rendered).`);
->>>>>>> origin/main

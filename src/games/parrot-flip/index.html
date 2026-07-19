@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Parrot Flip — WhydahStory</title>
+
+  <!-- PWA: installable, offline-capable app -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#142f4b">
+
+  <!-- iOS home-screen fallbacks (iOS ignores most manifest install behavior) -->
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Parrot Flip">
+
+  <link rel="stylesheet" href="css/style.css?v=1">
+</head>
+<body>
+  <a class="back-link" href="/games/">← WhydahStory Games</a>
+
+  <!-- ── Setup ───────────────────────────────────────── -->
+  <div id="setup-screen" class="screen hidden">
+    <div class="setup-card">
+      <h1><span class="emoji">🦜</span> Parrot Flip</h1>
+      <p class="tagline">Flick your pirate parrot sky-high — land it on its feet!</p>
+
+      <div>
+        <div class="section-label">Crew — pick your parrot (🧑 tap for CPU)</div>
+        <div id="player-inputs"><!-- rendered by main.js --></div>
+        <button id="add-player-btn">+ Add Player</button>
+      </div>
+
+      <div>
+        <div class="section-label">Pass around the table</div>
+        <div class="direction-options">
+          <label><input type="radio" name="direction" value="1" checked> ➡ Port → Starboard</label>
+          <label><input type="radio" name="direction" value="-1"> ⬅ Starboard → Port</label>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Rival difficulty</div>
+        <div class="direction-options">
+          <label><input type="radio" name="difficulty" value="easy"> 🟢 Calm seas</label>
+          <label><input type="radio" name="difficulty" value="medium" checked> 🟡 Rough seas</label>
+          <label><input type="radio" name="difficulty" value="hard"> 🔴 Gale</label>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Feel</div>
+        <div class="direction-options">
+          <label><input type="radio" name="feel" value="forgiving"> 🟢 Landlubber</label>
+          <label><input type="radio" name="feel" value="standard" checked> 🟡 Sailor</label>
+          <label><input type="radio" name="feel" value="pro"> 🔴 Pirate</label>
+        </div>
+        <label class="checkbox-row"><input type="checkbox" id="flick-feedback-toggle"> Show flick feedback</label>
+      </div>
+
+      <button id="start-btn">Cast Off</button>
+      <button id="practice-btn">🎯 Solo practice</button>
+    </div>
+  </div>
+
+  <!-- ── Game ────────────────────────────────────────── -->
+  <div id="game-screen" class="screen hidden">
+    <canvas id="game-canvas"></canvas>
+    <div id="hud">
+      <div id="top-bar">
+        <span id="turn-banner"></span>
+        <span id="top-right">
+          <button id="mute-btn" class="hud-btn" title="Mute / unmute">🔊</button>
+          <span id="point-count"></span>
+        </span>
+      </div>
+      <div id="streak-banner"></div>
+    </div>
+    <div id="flip-hint">Flick UP — harder = more spin. Land your parrot on its feet!</div>
+    <div id="practice-meter" class="hidden">
+      <div class="pm-track"><div class="pm-band"></div><div class="pm-marker"></div></div>
+      <div class="pm-label">flick strength — green zone ≈ one clean flip</div>
+    </div>
+    <div id="player-list"></div>
+    <div id="handoff-overlay" class="hidden">
+      <div class="handoff-card">
+        <div class="handoff-label">Pass the parrot to</div>
+        <div id="handoff-name" class="handoff-name"></div>
+        <div class="handoff-tap">Tap anywhere to flip</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── First-launch tutorial ────────────────────────── -->
+  <div id="tutorial-overlay" class="screen hidden">
+    <div class="setup-card tutorial-card">
+      <h2>How to flip your parrot</h2>
+      <ul class="tut-list">
+        <li><b>Flick up</b> from the parrot to launch it.</li>
+        <li><b>Harder flick = more spin.</b> Find the snap that lands one clean turn.</li>
+        <li><b>Lean left/right</b> to change which way it tumbles.</li>
+        <li>Land it <b>on its feet</b> for a MAKE.</li>
+      </ul>
+      <button id="tutorial-done-btn">Got it</button>
+    </div>
+  </div>
+
+  <!-- ── Game Over ────────────────────────────────────── -->
+  <div id="game-over" class="screen hidden">
+    <canvas id="confetti-canvas"></canvas>
+    <div class="game-over-card">
+      <div style="font-size:3rem">👑</div>
+      <h2>Captain</h2>
+      <div id="winner-name"></div>
+      <div id="match-summary"></div>
+      <button id="play-again-btn">Sail Again</button>
+    </div>
+  </div>
+
+  <script src="js/vendor/matter.min.js"></script>
+  <script src="js/game.js?v=1"></script>
+  <script src="js/physics.js?v=1"></script>
+  <script src="js/input.js?v=1"></script>
+  <script src="js/renderer.js?v=1"></script>
+  <script src="js/audio.js?v=1"></script>
+  <script src="js/main.js?v=1"></script>
+  <script>
+    window.onerror = (msg, src, line) => {
+      const el = document.getElementById('err-overlay') || (() => {
+        const d = document.createElement('div');
+        d.id = 'err-overlay';
+        d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);color:#ff5252;font:14px monospace;padding:20px;z-index:9999;white-space:pre-wrap;overflow:auto;';
+        document.body.appendChild(d); return d;
+      })();
+      el.textContent += `[${src?.split('/').pop()}:${line}] ${msg}\n`;
+    };
+
+    // Register the service worker for offline play — only on the deployed
+    // (non-localhost) HTTP(S) site. Skipped on localhost (dev) and file://
+    // (the bundled WebView APK, which is already fully offline).
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http') &&
+        location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('SW registered, scope:', reg.scope))
+          .catch(err => console.error('SW registration failed:', err));
+      });
+    }
+  </script>
+
+</body>
+</html>
