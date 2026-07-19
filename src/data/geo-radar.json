@@ -43,38 +43,7 @@
         "desc": "My house disappears under water at around 2 metres of sea level rise."
       }
     ],
-    "georealm": [
-      {
-        "title": "Geography Facts about the World’s Continents",
-        "url": "https://www.geographyrealm.com/continents/",
-        "desc": "How many continents are there?"
-      },
-      {
-        "title": "X is Longitude, Y is Latitude",
-        "url": "https://www.geographyrealm.com/x-longitude-y-latitude/",
-        "desc": "Why is X longitude and Y latitude in GIS?"
-      },
-      {
-        "title": "Unique Geography Facts About Every U.S.",
-        "url": "https://www.geographyrealm.com/only-state-geography-facts/",
-        "desc": "From Alaska's Arctic coastline to Delaware's colonial hundreds, discover the geographic features and characteristics that make every U.S."
-      },
-      {
-        "title": "Highest Point in Every U.S.",
-        "url": "https://www.geographyrealm.com/highest-point-in-every-u-s-state/",
-        "desc": "Every U.S. state's highest point, from Denali to Britton Hill, with elevations, maps, and geographic facts."
-      },
-      {
-        "title": "States in Order of Admission to the United States of America",
-        "url": "https://www.geographyrealm.com/states-in-order-of-admission-to-the-united-states-of-america/",
-        "desc": "From Delaware to Hawaii, discover when each state entered the Union and the geographic features that make every state unique."
-      },
-      {
-        "title": "How to Create a Radial Flow Map Using QGIS",
-        "url": "https://www.geographyrealm.com/radial-flow-map-qgis/",
-        "desc": "Learn how to create a radial flow map in QGIS using U.S."
-      }
-    ],
+    "georealm": [],
     "geoworld": [
       {
         "title": "HD Mapping and VPS: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence | GWF 2026",
@@ -142,39 +111,135 @@
       "url": "https://plugins.qgis.org/plugins/peruspatial_hub/"
     }
   ],
-  "releases": [],
-  "gisse": [],
+  "releases": [
+    {
+      "repo": "visgl/deck.gl",
+      "title": "deck.gl v9.3.7",
+      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.7",
+      "desc": "- fix(core): do not write View clearColor into the picking buffer (#10431) - fix(mapbox): avoid crash when MapboxOverlay beforeId layer is removed (#10425) -…",
+      "publishedAt": "2026-07-16",
+      "isFresh": true
+    },
+    {
+      "repo": "qgis/QGIS",
+      "title": "QGIS final-3_44_12",
+      "url": "https://github.com/qgis/QGIS/releases/tag/final-3_44_12",
+      "desc": "https://github.com/qgis/QGIS/compare/final-3_44_11%5E...final-3_44_12",
+      "publishedAt": "2026-07-03",
+      "isFresh": true
+    },
+    {
+      "repo": "duckdb/duckdb",
+      "title": "duckdb v1.5.4",
+      "url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.4",
+      "desc": "This is a bug fix release for various issues discovered after we released v1.5.3.",
+      "publishedAt": "2026-06-17",
+      "isFresh": false
+    },
+    {
+      "repo": "OSGeo/gdal",
+      "title": "gdal v3.13.1",
+      "url": "https://github.com/OSGeo/gdal/releases/tag/v3.13.1",
+      "desc": "Bug fix release. See release notes: https://github.com/OSGeo/gdal/blob/v3.13.1/NEWS.md",
+      "publishedAt": "2026-06-05",
+      "isFresh": false
+    },
+    {
+      "repo": "maplibre/maplibre-gl-js",
+      "title": "maplibre-gl-js v5.24.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v5.24.0",
+      "desc": "### ✨ Features and improvements - GPU performance optimization: Render halo and glyph in a single pass (-40% Time Reduction) ([#7436](https://github.com/mapl…",
+      "publishedAt": "2026-04-23",
+      "isFresh": false
+    },
+    {
+      "repo": "Turfjs/turf",
+      "title": "turf v7.3.5",
+      "url": "https://github.com/Turfjs/turf/releases/tag/v7.3.5",
+      "desc": "## What's Changed Main goal of this release was to revert a build breaking performance improvement introduced in v7.3.2 that was affecting CommonJS environme…",
+      "publishedAt": "2026-04-20",
+      "isFresh": false
+    },
+    {
+      "repo": "felt/tippecanoe",
+      "title": "tippecanoe 2.79.0",
+      "url": "https://github.com/felt/tippecanoe/releases/tag/2.79.0",
+      "desc": "# 2.79.0 * When deduplicating features by ID in tippecanoe-overzoom, be careful to track even features that have been clipped away.",
+      "publishedAt": "2025-07-24",
+      "isFresh": false
+    },
+    {
+      "repo": "Leaflet/Leaflet",
+      "title": "Leaflet v1.9.4",
+      "url": "https://github.com/Leaflet/Leaflet/releases/tag/v1.9.4",
+      "desc": "### 🐞 Bug fixes - Fix tile gaps in Chromium-based browsers ([#8891](https://github.com/Leaflet/Leaflet/pull/8891) by [@IvanSanchez](https://github.com/IvanS…",
+      "publishedAt": "2023-05-18",
+      "isFresh": false
+    }
+  ],
+  "gisse": [
+    {
+      "title": "Valid range of MODIS NDVI product",
+      "url": "https://gis.stackexchange.com/questions/501160/valid-range-of-modis-ndvi-product",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Convert AutoCAD (.dwg) file to GIS",
+      "url": "https://gis.stackexchange.com/questions/501148/convert-autocad-dwg-file-to-gis",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Display of OSM buildings when zoomed out at higher scale using an Esri vector tile service in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501142/display-of-osm-buildings-when-zoomed-out-at-higher-scale-using-an-esri-vector-ti",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Improving GPS accuracy and repeatability in European beech and broadleaved forest",
+      "url": "https://gis.stackexchange.com/questions/501152/improving-gps-accuracy-and-repeatability-in-european-beech-and-broadleaved-fores",
+      "score": 2,
+      "answers": 0
+    },
+    {
+      "title": "Simplest way to show an image and get the mouse click coordinates",
+      "url": "https://gis.stackexchange.com/questions/501143/simplest-way-to-show-an-image-and-get-the-mouse-click-coordinates",
+      "score": -3,
+      "answers": 1
+    },
+    {
+      "title": "How to create a layer filter based on value in different layer",
+      "url": "https://gis.stackexchange.com/questions/501146/how-to-create-a-layer-filter-based-on-value-in-different-layer",
+      "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "Shortcut commands in QGIS 4",
+      "url": "https://gis.stackexchange.com/questions/501140/shortcut-commands-in-qgis-4",
+      "score": 1,
+      "answers": 2
+    },
+    {
+      "title": "Add a Lat-Long trace in a CSV file to a Google Maps",
+      "url": "https://gis.stackexchange.com/questions/501137/add-a-lat-long-trace-in-a-csv-file-to-a-google-maps",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "How can I update an incorrect business address in OpenStreetMap?",
+      "url": "https://gis.stackexchange.com/questions/501134/how-can-i-update-an-incorrect-business-address-in-openstreetmap",
+      "score": 1,
+      "answers": 2
+    },
+    {
+      "title": "Scaling roads to adjust thickness on an ArcGIS basemap vector tile service using QGIS symbol layers",
+      "url": "https://gis.stackexchange.com/questions/501136/scaling-roads-to-adjust-thickness-on-an-arcgis-basemap-vector-tile-service-using",
+      "score": 0,
+      "answers": 0
+    }
+  ],
   "nasa": [
-    {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the quick look version of ATL13 and is based on the same algorithms that generate the ATL13 final data products.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
-      "desc": "ATL10QL is the quick look version of ATL10 and is based on the same algorithms that generate the ATL10 final data products.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
-      "desc": "ATL09QL is the quick look version of ATL09 and is based on the same algorithms that generate the ATL09 final data products.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the quick look version of ATL08 and is based on the same algorithms that generate the ATL08 final data products.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the quick look version of ATL07 and is based on the same algorithms that generate the ATL07 final data products.",
-      "org": "NSIDC_CPRD"
-    },
     {
       "title": "UAVSAR_POLSAR_STOKES",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
@@ -203,6 +268,36 @@
       "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
       "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
+      "desc": "UAVSAR PolSAR Scene Projected",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_METADATA",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
+      "desc": "UAVSAR PolSAR Scene Metadata",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_KMZ",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
+      "desc": "UAVSAR PolSAR Scene KMZ",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_INCIDENCE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
+      "desc": "UAVSAR PolSAR Scene Incidence Angle",
       "org": "ASF"
     }
   ],

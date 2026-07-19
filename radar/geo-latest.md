@@ -11,15 +11,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [The Entire History of Human Warfare](http://googlemapsmania.blogspot.com/2026/07/the-entire-history-of-human-warfare.html) — Launched in late 2025, Prakrit Ojha's War Atlas is an interactive map that visualizes more than 8,500 historical battles.
 - [Waterworld](http://googlemapsmania.blogspot.com/2026/07/waterworld.html) — My house disappears under water at around 2 metres of sea level rise.
 
-## Geography Realm
-
-- [Geography Facts about the World’s Continents](https://www.geographyrealm.com/continents/) — How many continents are there?
-- [X is Longitude, Y is Latitude](https://www.geographyrealm.com/x-longitude-y-latitude/) — Why is X longitude and Y latitude in GIS?
-- [Unique Geography Facts About Every U.S.](https://www.geographyrealm.com/only-state-geography-facts/) — From Alaska's Arctic coastline to Delaware's colonial hundreds, discover the geographic features and characteristics that make every U.S.
-- [Highest Point in Every U.S.](https://www.geographyrealm.com/highest-point-in-every-u-s-state/) — Every U.S. state's highest point, from Denali to Britton Hill, with elevations, maps, and geographic facts.
-- [States in Order of Admission to the United States of America](https://www.geographyrealm.com/states-in-order-of-admission-to-the-united-states-of-america/) — From Delaware to Hawaii, discover when each state entered the Union and the geographic features that make every state unique.
-- [How to Create a Radial Flow Map Using QGIS](https://www.geographyrealm.com/radial-flow-map-qgis/) — Learn how to create a radial flow map in QGIS using U.S.
-
 ## Geospatial World
 
 - [HD Mapping and VPS: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence | GWF 2026](https://geospatialworld.net/videos/hd-mapping-vps-geospatial-platforms-gwf-2026/) — Plenary Session 5: High-Definition Mapping and Visual Positioning Systems: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence |…
@@ -40,18 +31,42 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [GEAQUA Capture Zones](https://plugins.qgis.org/plugins/GEAQUA_Capture_Zones/)
 - [PeruSpatial Hub](https://plugins.qgis.org/plugins/peruspatial_hub/)
 
+## Library releases
+
+- [deck.gl v9.3.7](https://github.com/visgl/deck.gl/releases/tag/v9.3.7) (2026-07-16) — - fix(core): do not write View clearColor into the picking buffer (#10431) - fix(mapbox): avoid crash when MapboxOverlay beforeId layer is removed (#10425) -…
+- [QGIS final-3_44_12](https://github.com/qgis/QGIS/releases/tag/final-3_44_12) (2026-07-03) — https://github.com/qgis/QGIS/compare/final-3_44_11%5E...final-3_44_12
+- [duckdb v1.5.4](https://github.com/duckdb/duckdb/releases/tag/v1.5.4) (2026-06-17) — This is a bug fix release for various issues discovered after we released v1.5.3.
+- [gdal v3.13.1](https://github.com/OSGeo/gdal/releases/tag/v3.13.1) (2026-06-05) — Bug fix release. See release notes: https://github.com/OSGeo/gdal/blob/v3.13.1/NEWS.md
+- [maplibre-gl-js v5.24.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v5.24.0) (2026-04-23) — ### ✨ Features and improvements - GPU performance optimization: Render halo and glyph in a single pass (-40% Time Reduction) ([#7436](https://github.com/mapl…
+- [turf v7.3.5](https://github.com/Turfjs/turf/releases/tag/v7.3.5) (2026-04-20) — ## What's Changed Main goal of this release was to revert a build breaking performance improvement introduced in v7.3.2 that was affecting CommonJS environme…
+- [tippecanoe 2.79.0](https://github.com/felt/tippecanoe/releases/tag/2.79.0) (2025-07-24) — # 2.79.0 * When deduplicating features by ID in tippecanoe-overzoom, be careful to track even features that have been clipped away.
+- [Leaflet v1.9.4](https://github.com/Leaflet/Leaflet/releases/tag/v1.9.4) (2023-05-18) — ### 🐞 Bug fixes - Fix tile gaps in Chromium-based browsers ([#8891](https://github.com/Leaflet/Leaflet/pull/8891) by [@IvanSanchez](https://github.com/IvanS…
+
+## GIS Stack Exchange — hot questions
+
+- [Valid range of MODIS NDVI product](https://gis.stackexchange.com/questions/501160/valid-range-of-modis-ndvi-product) (▲ 0 · 0 answers)
+- [Convert AutoCAD (.dwg) file to GIS](https://gis.stackexchange.com/questions/501148/convert-autocad-dwg-file-to-gis) (▲ 0 · 1 answers)
+- [Display of OSM buildings when zoomed out at higher scale using an Esri vector tile service in QGIS](https://gis.stackexchange.com/questions/501142/display-of-osm-buildings-when-zoomed-out-at-higher-scale-using-an-esri-vector-ti) (▲ 0 · 0 answers)
+- [Improving GPS accuracy and repeatability in European beech and broadleaved forest](https://gis.stackexchange.com/questions/501152/improving-gps-accuracy-and-repeatability-in-european-beech-and-broadleaved-fores) (▲ 2 · 0 answers)
+- [Simplest way to show an image and get the mouse click coordinates](https://gis.stackexchange.com/questions/501143/simplest-way-to-show-an-image-and-get-the-mouse-click-coordinates) (▲ -3 · 1 answers)
+- [How to create a layer filter based on value in different layer](https://gis.stackexchange.com/questions/501146/how-to-create-a-layer-filter-based-on-value-in-different-layer) (▲ 1 · 1 answers)
+- [Shortcut commands in QGIS 4](https://gis.stackexchange.com/questions/501140/shortcut-commands-in-qgis-4) (▲ 1 · 2 answers)
+- [Add a Lat-Long trace in a CSV file to a Google Maps](https://gis.stackexchange.com/questions/501137/add-a-lat-long-trace-in-a-csv-file-to-a-google-maps) (▲ 0 · 1 answers)
+- [How can I update an incorrect business address in OpenStreetMap?](https://gis.stackexchange.com/questions/501134/how-can-i-update-an-incorrect-business-address-in-openstreetmap) (▲ 1 · 2 answers)
+- [Scaling roads to adjust thickness on an ArcGIS basemap vector tile service using QGIS symbol layers](https://gis.stackexchange.com/questions/501136/scaling-roads-to-adjust-thickness-on-an-arcgis-basemap-vector-tile-service-using) (▲ 0 · 0 answers)
+
 ## NASA Earthdata — recently updated collections
 
-- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the quick look version of ATL13 and is based on the same algorithms that generate the ATL13 final data products.
-- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the quick look version of ATL10 and is based on the same algorithms that generate the ATL10 final data products.
-- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the quick look version of ATL09 and is based on the same algorithms that generate the ATL09 final data products.
-- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the quick look version of ATL08 and is based on the same algorithms that generate the ATL08 final data products.
-- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the quick look version of ATL07 and is based on the same algorithms that generate the ATL07 final data products.
 - [UAVSAR_POLSAR_STOKES](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES) — UAVSAR PolSAR Scene Stokes
 - [UAVSAR_POLSAR_SLOPE](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE) — UAVSAR PolSAR Scene Slope
 - [UAVSAR_POLSAR_PAULI](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI) — UAVSAR PolSAR Scene Pauli Decomposition
 - [UAVSAR_POLSAR_ML_COMPLEX_SLANT](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT) — UAVSAR PolSAR Scene Complex
 - [UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5) — UAVSAR PolSAR Scene Projected Multilook 5x5
+- [UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3) — UAVSAR PolSAR Scene Projected Multilook 3x3
+- [UAVSAR_POLSAR_ML_COMPLEX_GRD](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD) — UAVSAR PolSAR Scene Projected
+- [UAVSAR_POLSAR_METADATA](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META) — UAVSAR PolSAR Scene Metadata
+- [UAVSAR_POLSAR_KMZ](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ) — UAVSAR PolSAR Scene KMZ
+- [UAVSAR_POLSAR_INCIDENCE](https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC) — UAVSAR PolSAR Scene Incidence Angle
 
 ## Data.gov — new geodata
 
