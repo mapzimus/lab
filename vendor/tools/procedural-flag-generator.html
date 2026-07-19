@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Procedural Flag Generator</title>
+<meta name="description" content="One glorious Randomize button that invents plausible new flags from real vexillological grammar — weighted layouts, tincture-aware palettes, classic charges — with a fictional country name, a NAVA critique, seeds and shareable links. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --warn:#b8860b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b; --warn:#e2b23a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b; --warn:#e2b23a;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 68ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); text-decoration: none; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.sm { padding: 5px 9px; font-size: .8rem; }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .layout { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,.9fr); gap: 18px; align-items: start; }
+  @media (max-width: 980px){ .layout { grid-template-columns: 1fr; } }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .card + .card { margin-top: 16px; }
+  .card h2 { font-size: 1rem; margin: 0 0 12px; letter-spacing: -0.01em; }
+  .card h2 .sub { font-weight: 400; color: var(--muted); font-size: .82rem; margin-left: 6px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; font-family: var(--sans); display: inline-flex; align-items: center; gap: 6px; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .chip .dot { width: 11px; height: 11px; border-radius: 50%; border: 1px solid rgba(0,0,0,.25); display: inline-block; }
+  .grouplbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 2px 0 0; align-self: center; }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .row + .row { margin-top: 10px; }
+  .spacer { flex: 1; }
+  .sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 2px; }
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+  .hint { font-size: .78rem; color: var(--muted); margin: 8px 0 0; }
+
+  /* big randomize row */
+  .bigbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .btn.huge { font-size: 1.05rem; padding: 13px 26px; font-weight: 700; border-radius: 12px; letter-spacing: .01em; }
+  .seedbox { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); }
+  .seedbox input { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 10px; font-size: .86rem; font-family: var(--mono); width: 130px; }
+  kbd { font-family: var(--mono); font-size: .74rem; background: var(--surface-2); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; }
+
+  /* stage */
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .flagbox { width: 100%; max-width: 560px; }
+  svg.flag { width: 100%; height: auto; display: block; }
+  .country { text-align: center; margin-top: 4px; }
+  .country .cname { font-size: 1.28rem; font-weight: 700; letter-spacing: -0.01em; }
+  .country .csub { color: var(--muted); font-size: .84rem; margin-top: 2px; }
+  label.fld { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); cursor: pointer; }
+  input[type=checkbox] { accent-color: var(--accent); }
+
+  /* nava */
+  .nava-overall { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; background: var(--surface-2); margin-bottom: 12px; font-weight: 600; font-size: .92rem; }
+  .nava-overall .big { font-size: 1.3rem; }
+  .nava-overall .score { margin-left: auto; font-family: var(--mono); font-size: .95rem; }
+  .principle { display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); }
+  .principle:first-of-type { border-top: none; }
+  .principle .badge { flex: none; width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: .95rem; font-weight: 700; }
+  .badge.ok { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .badge.warn { background: color-mix(in srgb, var(--warn) 22%, transparent); color: var(--warn); }
+  .badge.bad { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+  .badge.info { background: var(--surface-2); color: var(--muted); }
+  .principle .txt strong { display: block; font-size: .86rem; }
+  .principle .txt span { font-size: .8rem; color: var(--muted); }
+
+  /* history strip */
+  .histstrip { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 8px; }
+  .hitem { flex: none; position: relative; border: 1px solid var(--border); border-radius: 9px; background: var(--surface-2); padding: 6px 6px 3px; cursor: pointer; text-align: center; }
+  .hitem:hover { border-color: var(--accent); }
+  .hitem[aria-current="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent); }
+  .hitem svg { display: block; border-radius: 3px; }
+  .hitem .hname { font-size: .62rem; color: var(--muted); max-width: 84px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px; }
+  .hitem .pin, .hitem .rmv { position: absolute; top: -7px; width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: .62rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+  .hitem .pin { left: -6px; }
+  .hitem .rmv { right: -6px; }
+  .hitem .pin[aria-pressed="true"] { background: var(--warn); color: #fff; border-color: var(--warn); }
+  .hitem .rmv:hover { color: var(--danger); border-color: var(--danger); }
+  .exports { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+  @media (max-width: 480px){
+    .btn.huge { width: 100%; justify-content: center; }
+    .seedbox input { width: 100px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Procedural Flag Generator</h1>
+      <p>One glorious Randomize button. Every press invents a plausible new flag from real vexillological grammar — historically weighted layouts, tincture-aware colors, classic charges — plus a fictional country to fly it, and an instant NAVA critique. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="bigbar">
+    <button class="btn primary huge" id="randBtn" type="button">🎲 Randomize</button>
+    <span class="note">or press <kbd>Space</kbd></span>
+    <span class="spacer"></span>
+    <span class="seedbox">Seed
+      <input id="seedInput" spellcheck="false" autocomplete="off" aria-label="Seed — same seed reproduces the same flag">
+      <button class="btn sm" id="reseedBtn" type="button" title="Regenerate from this seed">↻</button>
+    </span>
+  </div>
+
+  <div class="layout">
+    <!-- LEFT: flag + history + export -->
+    <div>
+      <div class="card">
+        <div class="stage">
+          <div class="flagbox"><svg class="flag" id="flagSvg" role="img" aria-label="Generated flag"></svg></div>
+          <div class="country">
+            <div class="cname" id="countryName"></div>
+            <div class="csub" id="countrySub"></div>
+          </div>
+          <label class="fld"><input type="checkbox" id="clothChk" checked> Cloth shadow &amp; ripple</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>History <span class="sub">click to restore · 📌 to keep · newest first</span></h2>
+        <div class="histstrip" id="histStrip"></div>
+        <div class="row" style="margin-top:6px">
+          <span class="note" id="histNote"></span>
+          <span class="spacer"></span>
+          <button class="btn sm" id="clearHist" type="button">Clear history</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Export &amp; open elsewhere</h2>
+        <div class="exports">
+          <button class="btn primary" id="dlSvg" type="button">⬇ SVG</button>
+          <button class="btn" id="dlPng" type="button">⬇ PNG</button>
+          <button class="btn" id="copyLink" type="button">🔗 Copy seed link</button>
+          <span class="sep"></span>
+          <a class="btn" id="openDesigner" href="./flag-designer.html" target="_blank" rel="noopener" title="Deep-links this flag into Flag Designer Studio for editing (exotic charges become their closest built-in symbol)">✏ Open in Flag Designer</a>
+          <a class="btn" id="openLookalike" href="./flag-lookalike-finder.html" target="_blank" rel="noopener" title="Opens the Look-Alike Finder — it has no inbound link format, so re-describe the flag there">🔍 Find look-alikes</a>
+          <span class="note" id="exportNote"></span>
+        </div>
+        <p class="hint">The seed link reproduces this exact flag (seed + constraints in the URL). "Open in Flag Designer" hands the design over for editing; the Look-Alike Finder can't receive a design by link, so it opens fresh.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT: constraints + critique -->
+    <div>
+      <div class="card">
+        <h2>Constraints <span class="sub">optional — the dice respect them</span></h2>
+        <div class="row"><span class="grouplbl">Layout family</span></div>
+        <div class="chips" id="layoutChips" style="margin-top:6px"></div>
+        <div class="row" style="margin-top:12px"><span class="grouplbl">Must include color</span></div>
+        <div class="chips" id="colorChips" style="margin-top:6px"></div>
+        <div class="row" style="margin-top:12px"><span class="grouplbl">Aspect ratio</span></div>
+        <div class="chips" id="ratioChips" style="margin-top:6px"></div>
+        <div class="row" style="margin-top:12px"><span class="grouplbl">Style</span></div>
+        <div class="chips" style="margin-top:6px">
+          <button class="chip" id="chargeChk" type="button" aria-pressed="false">★ Must include charge</button>
+          <button class="chip" id="minimalChk" type="button" aria-pressed="false">◻ Minimalist (no charge, ≤3 colors)</button>
+        </div>
+        <p class="hint" id="consHint"></p>
+      </div>
+
+      <div class="card">
+        <h2>NAVA critique <span class="sub">Good Flag, Bad Flag — auto-scored</span></h2>
+        <div class="nava-overall" id="navaOverall"></div>
+        <div id="navaList"></div>
+        <p class="hint">Same five principles the <a href="./flag-designer.html">Flag Designer</a> judges by: simplicity, meaningful symbolism, 2–3 colors, no lettering or seals, distinctiveness. Symbolism is yours to invent; the rest is computed.</p>
+      </div>
+
+      <div class="card">
+        <h2>How it generates <span class="sub">not uniform noise</span></h2>
+        <p class="hint" style="margin-top:0">Layouts are weighted by real-world frequency (tricolors common, quartered fields rare). Colors come from the traditional vexillological palette with a rule-of-tincture-ish check — adjacent panels avoid color-on-color and metal-on-metal where possible. Charges (stars, crescents, suns, birds, laurel…) appear at the center, canton or hoist depending on the layout, and sometimes not at all — just like real flags. Aspect ratios draw from real standards: 2:3 mostly, then 3:5, 1:2, 5:8, and the rare square.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app">Nothing you generate leaves your browser · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+"use strict";
+const $ = (s)=>document.querySelector(s);
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const esc=(s)=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============ seeded PRNG (mulberry32, same scheme as data-generator) ============ */
+function hashSeed(str){ let h = 1779033703 ^ str.length; for (let i=0;i<str.length;i++){ h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h<<13 | h>>>19; } return (h>>>0); }
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a>>>15, 1 | a); t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t; return ((t ^ t>>>14) >>> 0) / 4294967296; }; }
+function newSeed(){ return Math.random().toString(36).slice(2,8); }
+function wpick(rng, pairs){ // pairs: [[value, weight], ...]
+  let total=0; for(const p of pairs) total+=p[1];
+  let r=rng()*total;
+  for(const p of pairs){ r-=p[1]; if(r<=0) return p[0]; }
+  return pairs[pairs.length-1][0];
+}
+function pickA(rng, arr){ return arr[Math.floor(rng()*arr.length)]; }
+
+/* ============ geometry helpers (shared vocabulary with flag-designer) ============ */
+const FW = 300; // flag-space width, matches flag-designer
+function ratioH(r){ const [a,b]=r.split(':').map(Number); return FW*(a/b); } // a:b = height:width
+function polyPath(pts){ return 'M'+pts.map(p=>p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' L ')+' Z'; }
+function starPath(spikes, ro, ri){
+  const pts=[]; const step=Math.PI/spikes; let a=-Math.PI/2;
+  for(let i=0;i<spikes*2;i++){ const r=(i%2)?ri:ro; pts.push([Math.cos(a)*r, Math.sin(a)*r]); a+=step; }
+  return polyPath(pts);
+}
+function plusPath(s,t){
+  return polyPath([[-t,-s],[t,-s],[t,-t],[s,-t],[s,t],[t,t],[t,s],[-t,s],[-t,t],[-s,t],[-s,-t],[-t,-t]]);
+}
+function crescentMarkup(s,color){
+  const sr=(s*0.82).toFixed(2), cx=(s*0.5).toFixed(2), ss=s.toFixed(2), ns=(-s).toFixed(2), nsr=(-s*0.82).toFixed(2);
+  return `<path fill-rule="evenodd" fill="${color}" d="M 0 ${ns} A ${ss} ${ss} 0 1 0 0 ${ss} A ${ss} ${ss} 0 1 0 0 ${ns} Z M ${cx} ${nsr} A ${sr} ${sr} 0 1 0 ${cx} ${sr} A ${sr} ${sr} 0 1 0 ${cx} ${nsr} Z"/>`;
+}
+function rect(x,y,w,h,c){ return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}" fill="${c}"/>`; }
+function rot2(p,deg){ const a=deg*Math.PI/180, c=Math.cos(a), s=Math.sin(a); return [p[0]*c-p[1]*s, p[0]*s+p[1]*c]; }
+
+/* ============ traditional vexillological palette ============ */
+/* metal=true → white/gold class ("metals"); false → colors. Rule-of-tincture-ish adjacency uses this. */
+const PALETTE = {
+  red:     { hex:'#CE1126', metal:false, w:19, label:'Red' },
+  white:   { hex:'#FFFFFF', metal:true,  w:20, label:'White' },
+  blue:    { hex:'#003DA5', metal:false, w:16, label:'Blue' },
+  green:   { hex:'#007A3D', metal:false, w:10, label:'Green' },
+  gold:    { hex:'#FCD116', metal:true,  w:13, label:'Gold' },
+  black:   { hex:'#000000', metal:false, w:8,  label:'Black' },
+  orange:  { hex:'#F77F00', metal:false, w:3,  label:'Orange' },
+  maroon:  { hex:'#800000', metal:false, w:3,  label:'Maroon' },
+  skyblue: { hex:'#75AADB', metal:false, w:4,  label:'Sky blue' },
+};
+const PAL_KEYS = Object.keys(PALETTE);
+/* low-contrast sibling pairs — avoided as neighbors even though same-class rules might allow them */
+const CLASH = new Set(['red|maroon','red|orange','orange|maroon','orange|gold','blue|skyblue','blue|black','maroon|black','green|black','blue|maroon','green|blue']);
+function clash(a,b){ return CLASH.has(a+'|'+b) || CLASH.has(b+'|'+a); }
+function badPair(a,b){ // true if pair should not touch
+  if(a===b) return true;
+  if(PALETTE[a].metal && PALETTE[b].metal) return true;   // metal on metal
+  return clash(a,b);
+}
+function tinctureViolation(a,b){ // softer: color-on-color (discouraged but sometimes fine)
+  return !PALETTE[a].metal && !PALETTE[b].metal;
+}
+function hexOf(k){ return PALETTE[k].hex; }
+
+/* ============ charge catalog (superset of flag-designer's; each maps to a designer type) ============ */
+function patteePath(s){
+  const t1=s*0.13, t2=s*0.42; let all=[];
+  const arm=[[-t1,-t1],[-t2,-s],[t2,-s],[t1,-t1]];
+  for(let q=0;q<4;q++){ all=all.concat(arm.map(p=>rot2(p,q*90))); }
+  return polyPath(all);
+}
+function molinePath(s){
+  const t=s*0.16, n=s*0.34; let all=[];
+  const arm=[[-t,-t],[-t,-s+n*0.2],[-t*2.1,-s],[0,-s+n],[t*2.1,-s],[t,-s+n*0.2],[t,-t]];
+  for(let q=0;q<4;q++){ all=all.concat(arm.map(p=>rot2(p,q*90))); }
+  return polyPath(all);
+}
+const BIRD_PTS=[[0,-0.92],[0.16,-0.6],[0.52,-0.7],[0.96,-0.52],[0.5,-0.28],[0.34,-0.06],[0.58,0.08],[0.24,0.18],[0.14,0.52],[0.34,0.8],[0.08,0.68],[0,0.9],[-0.08,0.68],[-0.34,0.8],[-0.14,0.52],[-0.24,0.18],[-0.58,0.08],[-0.34,-0.06],[-0.5,-0.28],[-0.96,-0.52],[-0.52,-0.7],[-0.16,-0.6]];
+function birdMarkup(s,c){ return `<path d="${polyPath(BIRD_PTS.map(p=>[p[0]*s,p[1]*s]))}" fill="${c}" transform="rotate(90)"/>`; }
+function laurelMarkup(s,c){
+  let out=`<g fill="${c}">`;
+  for(const side of [-1,1]){
+    out+=`<path d="M ${(side*s*0.16).toFixed(2)} ${(s*0.95).toFixed(2)} A ${(s*0.85).toFixed(2)} ${(s*0.85).toFixed(2)} 0 0 ${side>0?0:1} ${(side*s*0.82).toFixed(2)} ${(-s*0.55).toFixed(2)}" stroke="${c}" stroke-width="${(s*0.07).toFixed(2)}" fill="none"/>`;
+    for(let i=0;i<7;i++){
+      const a=(118-i*30)*Math.PI/180;                      // sweep up each side
+      const r=s*0.86, x=side*Math.cos(a)*r, y=Math.sin(a)*r*0.98;
+      const la=(side>0? -55+i*24 : 235-i*24);
+      out+=`<ellipse cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" rx="${(s*0.2).toFixed(2)}" ry="${(s*0.085).toFixed(2)}" transform="rotate(${la.toFixed(1)} ${x.toFixed(2)} ${y.toFixed(2)})"/>`;
+    }
+  }
+  return out+'</g>';
+}
+const CHARGES = {
+  star5:   { name:'Star',        designer:'star5',   draw:(s,c)=>`<path d="${starPath(5,s,s*0.382)}" fill="${c}"/>` },
+  crescent:{ name:'Crescent',    designer:'crescent',draw:(s,c)=>crescentMarkup(s,c) },
+  sun:     { name:'Sun',         designer:'sun',     draw:(s,c)=>`<g fill="${c}"><path d="${starPath(12,s,s*0.62)}"/><circle r="${(s*0.5).toFixed(2)}"/></g>` },
+  roundel: { name:'Roundel',     designer:'circle',  draw:(s,c)=>`<circle r="${s.toFixed(2)}" fill="${c}"/>` },
+  cross:   { name:'Cross',       designer:'cross',   draw:(s,c)=>`<path d="${plusPath(s,s*0.3)}" fill="${c}"/>` },
+  pattee:  { name:'Cross pattée',designer:'cross',   draw:(s,c)=>`<path d="${patteePath(s)}" fill="${c}"/>` },
+  moline:  { name:'Cross moline',designer:'cross',   draw:(s,c)=>`<path d="${molinePath(s)}" fill="${c}"/>` },
+  triangle:{ name:'Triangle',    designer:'triangle',draw:(s,c)=>`<path d="${polyPath([[0,-s],[s*0.866,s*0.5],[-s*0.866,s*0.5]])}" fill="${c}"/>` },
+  diamond: { name:'Diamond',     designer:'diamond', draw:(s,c)=>`<path d="${polyPath([[0,-s],[s*0.78,0],[0,s],[-s*0.78,0]])}" fill="${c}"/>` },
+  bird:    { name:'Bird',        designer:'triangle',draw:(s,c)=>birdMarkup(s,c) },
+  laurel:  { name:'Laurel',      designer:'leaf',    draw:(s,c)=>laurelMarkup(s,c) },
+  square:  { name:'Canton box',  designer:'square',  draw:(s,c)=>`<rect x="${(-s).toFixed(2)}" y="${(-s).toFixed(2)}" width="${(2*s).toFixed(2)}" height="${(2*s).toFixed(2)}" fill="${c}"/>` },
+};
+
+/* positions for arrangements — same vocabulary as flag-designer (single/row/ring/grid) */
+function positions(c){
+  const out=[];
+  if(c.arr==='single'){ out.push([0,0]); }
+  else if(c.arr==='row'){ const n=Math.max(1,c.count|0); for(let i=0;i<n;i++) out.push([(i-(n-1)/2)*c.gap,0]); }
+  else if(c.arr==='ring'){
+    const n=Math.max(1,c.count|0); const full=Math.abs(c.spread-360)<0.5;
+    for(let i=0;i<n;i++){ const deg = full ? (-90 + i*360/n) : (n<=1 ? -90 : (-90 - c.spread/2 + i*c.spread/(n-1)));
+      const a=deg*Math.PI/180; out.push([Math.cos(a)*c.arcR, Math.sin(a)*c.arcR]); }
+  } else if(c.arr==='grid'){
+    const rows=Math.max(1,c.rows|0), cols=Math.max(1,c.cols|0);
+    for(let r=0;r<rows;r++) for(let col=0;col<cols;col++) out.push([(col-(cols-1)/2)*c.gap,(r-(rows-1)/2)*c.gap]);
+  }
+  return out;
+}
+function chargeMarkup(c){
+  const inner = positions(c).map(([dx,dy])=>
+    `<g transform="translate(${dx.toFixed(2)} ${dy.toFixed(2)}) rotate(${c.rot||0})">${CHARGES[c.type].draw(c.size,c.color)}</g>`
+  ).join('');
+  return `<g transform="translate(${c.x.toFixed(2)} ${c.y.toFixed(2)})">${inner}</g>`;
+}
+
+/* ============ layout catalog — weighted by real-world frequency ============ */
+/* Each: key, family, weight, slots (# colors), adj (which slots touch), render(W,H,hexes,stripes),
+   zones(W,H) => list of {x,y,s(max charge size), bg(slot index under charge)}, chargeProb,
+   toDesigner(flag) => flag-designer state payload pieces. */
+const LAYOUTS = {
+  htricolor:{ family:'tricolor', w:16, slots:3, adj:[[0,1],[1,2]], chargeProb:0.32,
+    render:(W,H,c)=>rect(0,0,W,H/3,c[0])+rect(0,H/3,W,H/3,c[1])+rect(0,2*H/3,W,H/3,c[2]),
+    zones:(W,H)=>[{x:W/2,y:H/2,s:H*0.15,bg:1}],
+    toDesigner:f=>({d:'htricolor'}) },
+  vtricolor:{ family:'tricolor', w:12, slots:3, adj:[[0,1],[1,2]], chargeProb:0.3,
+    render:(W,H,c)=>rect(0,0,W/3,H,c[0])+rect(W/3,0,W/3,H,c[1])+rect(2*W/3,0,W/3,H,c[2]),
+    zones:(W,H)=>[{x:W/2,y:H/2,s:H*0.16,bg:1}],
+    toDesigner:f=>({d:'vtricolor'}) },
+  hbicolor:{ family:'bicolor', w:8, slots:2, adj:[[0,1]], chargeProb:0.42,
+    render:(W,H,c)=>rect(0,0,W,H/2,c[0])+rect(0,H/2,W,H/2,c[1]),
+    zones:(W,H)=>[{x:W/2,y:H/2,s:H*0.17,bg:0},{x:W*0.22,y:H*0.26,s:H*0.11,bg:0}],
+    toDesigner:f=>({d:'hbicolor'}) },
+  vbicolor:{ family:'bicolor', w:3, slots:2, adj:[[0,1]], chargeProb:0.5,
+    render:(W,H,c)=>rect(0,0,W/2,H,c[0])+rect(W/2,0,W/2,H,c[1]),
+    zones:(W,H)=>[{x:W*0.25,y:H/2,s:H*0.15,bg:0},{x:W/2,y:H/2,s:H*0.16,bg:0}],
+    toDesigner:f=>({d:'vbicolor'}) },
+  nordic:{ family:'cross', w:7, slots:2, adj:[[0,1]], chargeProb:0.06,
+    render:(W,H,c)=>{ const t=H*0.2, vx=W*0.34; return rect(0,0,W,H,c[0])+rect(0,(H-t)/2,W,t,c[1])+rect(vx-t/2,0,t,H,c[1]); },
+    zones:(W,H)=>[{x:W*0.34,y:H/2,s:H*0.085,bg:1}],
+    toDesigner:f=>({d:'nordic'}) },
+  greek:{ family:'cross', w:3, slots:2, adj:[[0,1]], chargeProb:0.05,
+    render:(W,H,c)=>{ const t=H*0.2; return rect(0,0,W,H,c[0])+rect(0,(H-t)/2,W,t,c[1])+rect((W-t)/2,0,t,H,c[1]); },
+    zones:(W,H)=>[{x:W/2,y:H/2,s:H*0.08,bg:1}],
+    toDesigner:f=>({d:'greek'}) },
+  saltire:{ family:'cross', w:4, slots:2, adj:[[0,1]], chargeProb:0.18,
+    render:(W,H,c)=>{ const t=H*0.18; return rect(0,0,W,H,c[0])+`<g stroke="${c[1]}" stroke-width="${t.toFixed(2)}"><line x1="0" y1="0" x2="${W}" y2="${H}"/><line x1="0" y1="${H}" x2="${W}" y2="0"/></g>`; },
+    zones:(W,H)=>[{x:W/2,y:H/2,s:H*0.1,bg:1}],
+    toDesigner:f=>({d:'saltire'}) },
+  canton:{ family:'canton', w:3, slots:2, adj:[[0,1]], chargeProb:0.96,
+    render:(W,H,c)=>rect(0,0,W,H,c[0])+rect(0,0,W*0.42,H*0.52,c[1]),
+    zones:(W,H)=>[{x:W*0.21,y:H*0.26,s:H*0.14,bg:1}],
+    toDesigner:f=>({d:'canton'}) },
+  cantonStripes:{ family:'canton', w:3, slots:3, adj:[[0,1],[0,2],[1,2]], chargeProb:0.97, stripes:true,
+    render:(W,H,c,n)=>{ let o=''; const h=H/n; for(let i=0;i<n;i++) o+=rect(0,i*h,W,h+0.5,c[i%2]); return o+rect(0,0,W*0.42,H*Math.ceil(n/2)/n+0.001*H,c[2]); },
+    zones:(W,H)=>[{x:W*0.21,y:H*0.27,s:H*0.13,bg:2}],
+    toDesigner:f=>{
+      const H=ratioH(f.ratio), cH=H*Math.ceil(f.stripes/2)/f.stripes;
+      return { d:'hstripes', extra:[{t:'square',x:Math.round(FW*0.21),y:Math.round(cH/2),z:Math.round(cH/2),o:0,k:f.hexes[2],a:'single',n:1,gp:40,ar:60,sp:360,rw:1,cl:1}] };
+    } },
+  hstripes:{ family:'stripes', w:4, slots:2, adj:[[0,1]], chargeProb:0.12, stripes:true,
+    render:(W,H,c,n)=>{ let o=''; const h=H/n; for(let i=0;i<n;i++) o+=rect(0,i*h,W,h+0.5,c[i%2]); return o; },
+    zones:(W,H)=>[{x:W/2,y:H/2,s:H*0.13,bg:0}],
+    toDesigner:f=>({d:'hstripes'}) },
+  pale:{ family:'band', w:3, slots:2, adj:[[0,1]], chargeProb:0.4,
+    render:(W,H,c)=>rect(0,0,W,H,c[0])+rect(W/3,0,W/3,H,c[1]),
+    zones:(W,H)=>[{x:W/2,y:H/2,s:H*0.15,bg:1}],
+    toDesigner:f=>({d:'pale'}) },
+  fess:{ family:'band', w:4, slots:2, adj:[[0,1]], chargeProb:0.4,
+    render:(W,H,c)=>rect(0,0,W,H,c[0])+rect(0,H/3,W,H/3,c[1]),
+    zones:(W,H)=>[{x:W/2,y:H/2,s:H*0.14,bg:1}],
+    toDesigner:f=>({d:'fess'}) },
+  bend:{ family:'band', w:4, slots:2, adj:[[0,1]], chargeProb:0.34,
+    render:(W,H,c)=>{ const t=Math.hypot(W,H)*0.18; return rect(0,0,W,H,c[0])+`<line x1="0" y1="0" x2="${W}" y2="${H}" stroke="${c[1]}" stroke-width="${t.toFixed(2)}"/>`; },
+    zones:(W,H)=>[{x:W*0.74,y:H*0.26,s:H*0.13,bg:0},{x:W*0.26,y:H*0.74,s:H*0.13,bg:0}],
+    toDesigner:f=>({d:'bend'}) },
+  chevron:{ family:'chevron', w:5, slots:3, adj:[[0,1],[0,2],[1,2]], chargeProb:0.4,
+    render:(W,H,c)=>rect(0,0,W,H/2,c[0])+rect(0,H/2,W,H/2,c[1])+`<path d="${polyPath([[0,0],[W*0.42,H/2],[0,H]])}" fill="${c[2]}"/>`,
+    zones:(W,H)=>[{x:W*0.13,y:H/2,s:H*0.11,bg:2},{x:W*0.68,y:H/2,s:H*0.13,bg:0}],
+    toDesigner:f=>{
+      const H=ratioH(f.ratio), s=H*0.5;
+      return { d:'hbicolor', extra:[{t:'triangle',x:Math.round(s*0.5),y:Math.round(H/2),z:Math.round(s),o:90,k:f.hexes[2],a:'single',n:1,gp:40,ar:60,sp:360,rw:1,cl:1}] };
+    } },
+  bordure:{ family:'bordure', w:2, slots:2, adj:[[0,1]], chargeProb:0.62,
+    render:(W,H,c)=>{ const t=H*0.1; return rect(0,0,W,H,c[1])+rect(t,t,W-2*t,H-2*t,c[0]); },
+    zones:(W,H)=>[{x:W/2,y:H/2,s:H*0.17,bg:0}],
+    toDesigner:f=>({d:'bordure'}) },
+  solid:{ family:'solid', w:9, slots:1, adj:[], chargeProb:1,
+    render:(W,H,c)=>rect(0,0,W,H,c[0]),
+    zones:(W,H)=>[{x:W/2,y:H/2,s:H*0.22,bg:0}],
+    toDesigner:f=>({d:'solid'}) },
+  quarterly:{ family:'quartered', w:1.5, slots:2, adj:[[0,1]], chargeProb:0.3,
+    render:(W,H,c)=>rect(0,0,W/2,H/2,c[0])+rect(W/2,0,W/2,H/2,c[1])+rect(0,H/2,W/2,H/2,c[1])+rect(W/2,H/2,W/2,H/2,c[0]),
+    zones:(W,H)=>[{x:W/2,y:H/2,s:H*0.14,bg:0}],
+    toDesigner:f=>({d:'quarterly', c4:true}) },
+};
+const LAYOUT_ORDER = Object.keys(LAYOUTS);
+const FAMILIES = [
+  ['tricolor','Tricolor'],['bicolor','Bicolor'],['cross','Cross / saltire'],['stripes','Many stripes'],
+  ['canton','Canton'],['band','Pale / fess / bend'],['chevron','Chevron'],['solid','Plain + charge'],
+  ['bordure','Bordure'],['quartered','Quartered'],
+];
+const RATIOS = [['2:3',46],['3:5',16],['1:2',14],['5:8',6],['1:1',3]];
+
+/* ============ color sequence picking (tincture-aware) ============ */
+function pickColors(rng, n, adjPairs, lockKey){
+  const weighted = PAL_KEYS.map(k=>[k, PALETTE[k].w]);
+  let best=null, bestScore=Infinity;
+  for(let attempt=0; attempt<60; attempt++){
+    const set=[];
+    if(lockKey) set.push(lockKey);
+    while(set.length<n){
+      const k=wpick(rng, weighted);
+      if(!set.includes(k)) set.push(k);
+    }
+    // shuffle placement (lock key can land anywhere)
+    for(let i=set.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); [set[i],set[j]]=[set[j],set[i]]; }
+    let hard=0, soft=0;
+    for(const [a,b] of adjPairs){
+      if(badPair(set[a],set[b])) hard++;
+      else if(tinctureViolation(set[a],set[b])) soft++;
+    }
+    const score=hard*10+soft;
+    if(score<bestScore){ bestScore=score; best=set.slice(); if(score===0) break; }
+  }
+  return best;
+}
+function chargeColor(rng, flag, bgKey, allowNew){
+  // prefer a color already in the flag whose class differs from the background
+  const inFlag = flag.colorKeys.filter(k=>k!==bgKey && !badPair(k,bgKey) && PALETTE[k].metal!==PALETTE[bgKey].metal);
+  if(inFlag.length && rng()<0.72) return pickA(rng,inFlag);
+  const okInFlag = flag.colorKeys.filter(k=>k!==bgKey && !badPair(k,bgKey));
+  if(!allowNew && okInFlag.length) return pickA(rng,okInFlag);
+  const fresh = PAL_KEYS.filter(k=>!flag.colorKeys.includes(k) && !badPair(k,bgKey) && PALETTE[k].metal!==PALETTE[bgKey].metal);
+  if(allowNew && fresh.length) return wpick(rng, fresh.map(k=>[k,PALETTE[k].w]));
+  if(okInFlag.length) return pickA(rng,okInFlag);
+  return PALETTE[bgKey].metal ? 'red' : 'white';
+}
+
+/* ============ the generator ============ */
+function generateFlag(seed, cons){
+  const rng = mulberry32(hashSeed(seed+'|'+consSig(cons)));
+  const ratio = cons.ratio || wpick(rng, RATIOS);
+  const H = ratioH(ratio);
+
+  // layout — weighted, filtered by family lock
+  let pool = LAYOUT_ORDER.filter(k=>!cons.layout || LAYOUTS[k].family===cons.layout);
+  if(cons.minimal) pool = pool.filter(k=>k!=='solid' && k!=='canton' && k!=='cantonStripes'); // these need charges
+  if(cons.charge) pool = pool.filter(k=>!(cons.minimal));
+  if(!pool.length) pool = LAYOUT_ORDER.slice();
+  const layoutKey = wpick(rng, pool.map(k=>[k, LAYOUTS[k].w]));
+  const L = LAYOUTS[layoutKey];
+
+  const stripes = L.stripes ? pickA(rng,[5,7,9,9,11,13]) : 0;
+  const colorKeys = pickColors(rng, L.slots, L.adj, cons.color);
+  const flag = { seed, ratio, layout:layoutKey, stripes, colorKeys, charges:[] };
+  flag.hexes = colorKeys.map(hexOf);
+
+  // charges
+  let wantCharge = rng() < L.chargeProb;
+  if(cons.charge) wantCharge = true;
+  if(cons.minimal) wantCharge = false;
+  if(layoutKey==='solid' || layoutKey==='canton' || layoutKey==='cantonStripes') wantCharge = true; // plain fields need a mark
+  if(wantCharge){
+    const zone = pickA(rng, L.zones(FW,H));
+    const bgKey = colorKeys[zone.bg];
+    const allowNew = !cons.minimal && (flag.colorKeys.length<3 ? rng()<0.5 : (flag.colorKeys.length===3 && rng()<0.09)); // 4th color: rare
+    const cKey = chargeColor(rng, flag, bgKey, allowNew);
+    if(!flag.colorKeys.includes(cKey)) flag.colorKeys=flag.colorKeys.concat([cKey]);
+    const col = hexOf(cKey);
+    const cantonish = (layoutKey==='canton'||layoutKey==='cantonStripes');
+    const kind = wpick(rng, cantonish
+      ? [['star1',34],['stargrid',26],['starring',12],['crescentstar',10],['sun',8],['pattee',5],['roundel',5]]
+      : [['star1',22],['stararc',8],['starring',7],['star3row',5],['crescent',8],['crescentstar',6],['sun',11],['roundel',9],['pattee',5],['moline',3],['triangle',4],['diamond',5],['bird',7],['laurelstar',6]]);
+    const base = { x:zone.x, y:zone.y, size:zone.s, rot:0, color:col, arr:'single', count:1, gap:0, arcR:0, spread:360, rows:1, cols:1 };
+    const add = (o)=>flag.charges.push(Object.assign({},base,o));
+    switch(kind){
+      case 'star1':       add({type:'star5', size:zone.s*(0.9+rng()*0.35)}); break;
+      case 'star3row':    add({type:'star5', size:zone.s*0.5, arr:'row', count:3, gap:zone.s*1.35}); break;
+      case 'stararc':     add({type:'star5', size:zone.s*0.42, arr:'ring', count:5, arcR:zone.s*1.25, spread:150}); break;
+      case 'starring':    add({type:'star5', size:zone.s*0.36, arr:'ring', count:pickA(rng,[5,6,8,10,12]), arcR:zone.s*1.35, spread:360}); break;
+      case 'stargrid': {  const rows=pickA(rng,[3,4,5]), cols=rows+pickA(rng,[0,1,1]);
+                          add({type:'star5', size:Math.min(zone.s*0.34, zone.s*1.7/Math.max(rows,cols)), arr:'grid', rows, cols, gap:zone.s*1.9/Math.max(rows,cols)}); break; }
+      case 'crescent':    add({type:'crescent', size:zone.s*1.05}); break;
+      case 'crescentstar':add({type:'crescent', size:zone.s*1.0});
+                          add({type:'star5', x:zone.x+zone.s*1.05, size:zone.s*0.4}); break;
+      case 'sun':         add({type:'sun', size:zone.s*(0.95+rng()*0.3)}); break;
+      case 'roundel':     add({type:'roundel', size:zone.s*(0.9+rng()*0.3)}); break;
+      case 'pattee':      add({type:'pattee', size:zone.s*1.05}); break;
+      case 'moline':      add({type:'moline', size:zone.s*1.05}); break;
+      case 'triangle':    add({type:'triangle', size:zone.s*1.0}); break;
+      case 'diamond':     add({type:'diamond', size:zone.s*1.1}); break;
+      case 'bird':        add({type:'bird', size:zone.s*1.15}); break;
+      case 'laurelstar':  add({type:'laurel', size:zone.s*1.25});
+                          add({type:'star5', size:zone.s*0.55}); break;
+    }
+    flag.hexes = flag.colorKeys.slice(0,L.slots).map(hexOf); // field hexes unchanged
+  }
+
+  flag.name = makeName(rng, flag);
+  return flag;
+}
+function consSig(c){ return [c.layout||'',c.color||'',c.ratio||'',c.charge?1:0,c.minimal?1:0].join('~'); }
+
+/* ============ country name generator ============ */
+const N_ON=['Vel','Kor','Al','Zan','Mar','Tal','Bel','Nor','Dra','Es','Or','Kal','Sel','Val','Ost','Ar','Lu','Gal','Ter','Mon','Sar','Hal','Ver','Ny','Qar','Bren','Cas','Del','Fen','Ist'];
+const N_MID=['do','ra','va','li','mo','na','se','ti','ga','ren','lan','vi','ko','da','me','be','du','sa'];
+const N_END=['ria','via','land','stan','nia','mark','dor','ia','ara','os','ova','ea','heim','wick','grad','a','ium','esse'];
+const FORMS=[['Republic of',30],['Kingdom of',11],['Federation of',6],['Free State of',5],['Commonwealth of',4],['Principality of',3],['United Republic of',3],['Grand Duchy of',2],['Confederation of',3],['Democratic Republic of',4],['Empire of',1],['Union of',3]];
+function makeName(rng, flag){
+  let core = pickA(rng,N_ON) + (rng()<0.62 ? pickA(rng,N_MID) : '') + pickA(rng,N_END);
+  core = core.replace(/(.)\1{2,}/g,'$1$1');
+  let form = wpick(rng, FORMS);
+  if(flag.charges.some(c=>c.type==='crescent') && rng()<0.4) form='Sultanate of';
+  if(flag.charges.some(c=>c.type==='bird') && rng()<0.25) form='Empire of';
+  // demonym adjective
+  let adj;
+  if(/ia$/.test(core)) adj=core.replace(/ia$/,'ian');
+  else if(/a$/.test(core)) adj=core.replace(/a$/,'an');
+  else if(/land$/.test(core)) adj=core.replace(/land$/,'landic');
+  else if(/os$/.test(core)) adj=core.replace(/os$/,'ian');
+  else if(/stan$/.test(core)) adj=core.replace(/stan$/,'stani');
+  else adj=core+(/[aeiou]$/i.test(core)?'n':'ese');
+  return { full:`${form} ${core}`, core, adj };
+}
+
+/* ============ NAVA critique ============ */
+const FAMOUS = [
+  ['vtricolor','blue,red,white','France'],['vtricolor','green,red,white','Italy or Mexico'],
+  ['vtricolor','green,gold,red','Guinea or Mali'],['htricolor','blue,red,white','the Netherlands or Russia'],
+  ['htricolor','black,gold,red','Germany or Belgium'],['htricolor','black,green,red','pan-African tricolors'],
+  ['htricolor','blue,gold,white','several La Plata flags'],['hbicolor','red,white','Indonesia, Monaco or Poland'],
+  ['nordic','blue,gold','Sweden'],['nordic','blue,white','Finland'],['nordic','red,white','Denmark'],
+  ['solid','green,white','Pakistan-adjacent crescent flags'],['bend','blue,red,white','several diagonal tricolors'],
+];
+function critique(flag){
+  const distinct = new Set(flag.colorKeys).size;
+  const L=LAYOUTS[flag.layout];
+  const elements = (flag.layout==='solid'?0:1) + flag.charges.length + (flag.stripes>9?1:0);
+  const P=[]; let score=0;
+  // 1 simplicity (0-4)
+  let s;
+  if(elements<=2){ s={b:'✓',cls:'ok',t:'A child could draw this from memory.'}; score+=4; }
+  else if(elements<=3){ s={b:'✓',cls:'ok',t:'Simple enough to draw from memory.'}; score+=3; }
+  else { s={b:'⚠',cls:'warn',t:`Getting busy (${elements} elements).`}; score+=2; }
+  P.push({title:'Keep it simple', ...s});
+  // 2 symbolism — flavor text from the generated country
+  P.push({title:'Use meaningful symbolism', b:'ℹ', cls:'info',
+    t:`Invent the story — what do these colors mean to the ${esc(flag.name.adj)} people?`});
+  score+=1;
+  // 3 colors (0-3)
+  let cc;
+  if(distinct<=3){ cc={b:'✓',cls:'ok',t:`${distinct} colors — within the 2–3 ideal.`}; score+=3; }
+  else if(distinct===4){ cc={b:'⚠',cls:'warn',t:'4 colors — one over the ideal.'}; score+=1; }
+  else { cc={b:'✗',cls:'bad',t:`${distinct} colors — too many.`}; }
+  P.push({title:'Use 2 or 3 colors', ...cc});
+  // 4 lettering
+  P.push({title:'No lettering or seals', b:'✓', cls:'ok', t:'The generator never draws text or seals — automatic pass.'});
+  score+=1;
+  // 5 distinctiveness (0-1): compare against famous layout+color signatures
+  const sig = flag.colorKeys.slice(0,L.slots).slice().sort().join(',');
+  const hit = FAMOUS.find(([lay,cols])=>lay===flag.layout && cols===sig);
+  let d;
+  if(hit && !flag.charges.length){ d={b:'⚠',cls:'warn',t:`Reads a lot like ${hit[2]} — check the Look-Alike Finder.`}; }
+  else if(hit){ d={b:'✓',cls:'ok',t:`Echoes ${hit[2]}, but the charge sets it apart.`}; score+=1; }
+  else { d={b:'✓',cls:'ok',t:'No famous flag shares this exact recipe.'}; score+=1; }
+  P.push({title:'Be distinctive or be related', ...d});
+  return { P, score, distinct, elements };
+}
+
+/* ============ rendering ============ */
+function fieldMarkup(flag,W,H){ return LAYOUTS[flag.layout].render(W,H,flag.hexes,flag.stripes); }
+function buildInner(flag,W,H){
+  return `<g>${fieldMarkup(flag,W,H)}</g><g>${flag.charges.map(chargeMarkup).join('')}</g>`;
+}
+function renderFlag(flag){
+  const H=ratioH(flag.ratio), svg=$('#flagSvg');
+  svg.setAttribute('viewBox',`0 0 ${FW} ${H.toFixed(2)}`);
+  const cloth=$('#clothChk').checked;
+  const defs = cloth
+    ? `<defs><filter id="pfgcloth" x="-12%" y="-12%" width="124%" height="130%">`+
+      `<feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="7" result="n"/>`+
+      `<feDisplacementMap in="SourceGraphic" in2="n" scale="${(H*0.022).toFixed(2)}" xChannelSelector="R" yChannelSelector="G" result="d"/>`+
+      `<feDropShadow dx="0" dy="${(H*0.018).toFixed(2)}" stdDeviation="${(H*0.02).toFixed(2)}" flood-color="#000" flood-opacity="0.3"/>`+
+      `</filter></defs>` : '';
+  svg.innerHTML = defs +
+    `<g ${cloth?'filter="url(#pfgcloth)"':''}>${buildInner(flag,FW,H)}</g>`+
+    `<rect x="0.5" y="0.5" width="${FW-1}" height="${(H-1).toFixed(2)}" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="1"/>`;
+  $('#countryName').textContent = flag.name.full;
+  $('#countrySub').textContent = `the ${flag.name.adj} flag · ${flag.ratio} · ${LAYOUTS[flag.layout].family} family · seed ${flag.seed}`;
+}
+function renderNava(flag){
+  const {P,score}=critique(flag);
+  $('#navaList').innerHTML = P.map(p=>
+    `<div class="principle"><div class="badge ${p.cls}">${p.b}</div><div class="txt"><strong>${esc(p.title)}</strong><span>${p.t}</span></div></div>`
+  ).join('');
+  const ov=$('#navaOverall');
+  let face, msg, col;
+  if(score>=9){ face='🏆'; msg='Textbook. NAVA would hang this in the lobby.'; col='var(--ok)'; }
+  else if(score>=7){ face='👍'; msg='A solid, flyable flag.'; col='var(--ok)'; }
+  else if(score>=5){ face='⚑'; msg='Serviceable, with caveats — see below.'; col='var(--warn)'; }
+  else { face='😬'; msg='The vexillologists have notes.'; col='var(--danger)'; }
+  ov.innerHTML = `<span class="big">${face}</span> ${msg}<span class="score">${score}/10</span>`;
+  ov.style.color = col;
+}
+function buildExportSVG(flag){
+  const H=ratioH(flag.ratio);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${FW}" height="${H.toFixed(2)}" viewBox="0 0 ${FW} ${H.toFixed(2)}">${buildInner(flag,FW,H)}</svg>`;
+}
+
+/* ============ deep link into Flag Designer (its encodeState format) ============ */
+function designerHash(flag){
+  const L=LAYOUTS[flag.layout], H=ratioH(flag.ratio);
+  const map=L.toDesigner(flag);
+  const c = map.c4
+    ? [flag.hexes[0],flag.hexes[1],flag.hexes[1],flag.hexes[0]]
+    : flag.hexes.concat(['#cccccc','#cccccc','#cccccc','#cccccc']).slice(0,4);
+  const g=(map.extra||[]).concat(flag.charges.map(ch=>({
+    t:CHARGES[ch.type].designer, x:Math.round(ch.x), y:Math.round(ch.y), z:Math.round(ch.size),
+    o:(ch.type==='bird'?90:ch.rot||0), k:ch.color,
+    a:ch.arr, n:ch.count, gp:Math.round(ch.gap||40), ar:Math.round(ch.arcR||60), sp:ch.spread||360, rw:ch.rows||1, cl:ch.cols||1
+  })));
+  const payload={ r:flag.ratio, d:map.d, c, s:flag.stripes||5,
+    p:[...new Set(flag.colorKeys.map(hexOf))], g };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+}
+
+/* ============ app state, hash, history ============ */
+const cons = { layout:null, color:null, ratio:null, charge:false, minimal:false };
+let current = null;
+let history_ = [];   // [{seed, cons, name, kept}]
+const HIST_MAX = 30;
+
+function encodeShare(){ return btoa(unescape(encodeURIComponent(JSON.stringify({ v:1, seed:current.seed, cons })))); }
+function decodeShare(h){
+  try{
+    const p=JSON.parse(decodeURIComponent(escape(atob(h))));
+    if(!p || typeof p.seed!=='string') return null;
+    return p;
+  }catch(_){ return null; }
+}
+function syncHash(){ try{ history.replaceState(null,'','#s='+encodeShare()); }catch(_){} }
+
+function loadHist(){
+  try{ const raw=localStorage.getItem('pfg-history'); if(raw){ const a=JSON.parse(raw); if(Array.isArray(a)) history_=a.filter(x=>x&&typeof x.seed==='string').slice(0,HIST_MAX+20); } }
+  catch(_){ history_=[]; }
+}
+function saveHist(){ try{ localStorage.setItem('pfg-history', JSON.stringify(history_)); }catch(_){} }
+function trimHist(){
+  // keep pinned always; trim unpinned beyond HIST_MAX total
+  while(history_.length>HIST_MAX){
+    let idx=-1;
+    for(let i=history_.length-1;i>=0;i--){ if(!history_[i].kept){ idx=i; break; } }
+    if(idx<0) break;
+    history_.splice(idx,1);
+  }
+}
+function pushHist(flag){
+  const sig=flag.seed+'|'+consSig(flag.cons);
+  if(history_.length && (history_[0].seed+'|'+consSig(history_[0].cons))===sig) return;
+  const dup=history_.findIndex(h=>(h.seed+'|'+consSig(h.cons))===sig);
+  if(dup>=0){ const [it]=history_.splice(dup,1); history_.unshift(it); }
+  else history_.unshift({ seed:flag.seed, cons:Object.assign({},flag.cons), name:flag.name.full, kept:false });
+  trimHist(); saveHist(); renderHist();
+}
+function thumbSVG(flag, w){
+  const H=ratioH(flag.ratio), h=Math.round(w*H/FW);
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${FW} ${H.toFixed(2)}" aria-hidden="true">${buildInner(flag,FW,H)}<rect x="1" y="1" width="${FW-2}" height="${(H-2).toFixed(2)}" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="2"/></svg>`;
+}
+function renderHist(){
+  const strip=$('#histStrip');
+  if(!history_.length){ strip.innerHTML='<span class="note">Nothing yet — smash that Randomize button.</span>'; }
+  else strip.innerHTML = history_.map((h,i)=>{
+    let fl;
+    try{ fl=generateFlag(h.seed, h.cons||{}); }catch(_){ return ''; }
+    const cur = current && current.seed===h.seed && consSig(current.cons)===consSig(h.cons||{});
+    return `<div class="hitem" data-hi="${i}" aria-current="${!!cur}" title="${esc(h.name||'')}">`+
+      `<button class="pin" data-pin="${i}" aria-pressed="${!!h.kept}" title="${h.kept?'Unpin':'Keep (pin)'}" aria-label="Keep">📌</button>`+
+      `<button class="rmv" data-rmv="${i}" title="Remove" aria-label="Remove">✕</button>`+
+      thumbSVG(fl,84)+`<div class="hname">${esc((h.name||'').replace(/^\w[\w ]* of /,''))}</div></div>`;
+  }).join('');
+  $('#histNote').textContent = `${history_.length}/${HIST_MAX} flags · ${history_.filter(h=>h.kept).length} pinned`;
+}
+
+/* ============ generate + full render ============ */
+function generate(seed){
+  const s = seed || newSeed();
+  $('#seedInput').value = s;
+  let flag;
+  try{ flag = generateFlag(s, cons); }
+  catch(err){ flash($('#exportNote'),'Generation hiccup — rerolled', true); flag = generateFlag(newSeed(), {layout:null,color:null,ratio:null,charge:false,minimal:false}); }
+  flag.cons = Object.assign({},cons);
+  current = flag;
+  renderFlag(flag); renderNava(flag);
+  $('#openDesigner').href = './flag-designer.html#' + designerHash(flag);
+  syncHash();
+  pushHist(flag);
+}
+function regenerate(){ generate($('#seedInput').value.trim() || null); }
+
+/* ============ constraint chips ============ */
+function renderConsChips(){
+  $('#layoutChips').innerHTML = FAMILIES.map(([k,l])=>
+    `<button class="chip" data-fam="${k}" aria-pressed="${cons.layout===k}">${l}</button>`).join('');
+  $('#colorChips').innerHTML = PAL_KEYS.map(k=>
+    `<button class="chip" data-col="${k}" aria-pressed="${cons.color===k}"><span class="dot" style="background:${PALETTE[k].hex}"></span>${PALETTE[k].label}</button>`).join('');
+  $('#ratioChips').innerHTML = RATIOS.map(([r])=>
+    `<button class="chip" data-ratio="${r}" aria-pressed="${cons.ratio===r}">${r}</button>`).join('');
+  $('#chargeChk').setAttribute('aria-pressed', String(cons.charge));
+  $('#minimalChk').setAttribute('aria-pressed', String(cons.minimal));
+  const parts=[];
+  if(cons.layout) parts.push(FAMILIES.find(f=>f[0]===cons.layout)[1]+' layouts only');
+  if(cons.color) parts.push('must use '+PALETTE[cons.color].label.toLowerCase());
+  if(cons.ratio) parts.push('ratio locked to '+cons.ratio);
+  if(cons.charge) parts.push('always a charge');
+  if(cons.minimal) parts.push('minimalist');
+  $('#consHint').textContent = parts.length ? 'Active: '+parts.join(' · ')+'.' : 'No constraints — pure weighted chance. Click chips to steer the dice; click again to release.';
+}
+$('#layoutChips').addEventListener('click',e=>{
+  const b=e.target.closest('[data-fam]'); if(!b) return;
+  cons.layout = cons.layout===b.dataset.fam ? null : b.dataset.fam;
+  renderConsChips(); regenerate();
+});
+$('#colorChips').addEventListener('click',e=>{
+  const b=e.target.closest('[data-col]'); if(!b) return;
+  cons.color = cons.color===b.dataset.col ? null : b.dataset.col;
+  renderConsChips(); regenerate();
+});
+$('#ratioChips').addEventListener('click',e=>{
+  const b=e.target.closest('[data-ratio]'); if(!b) return;
+  cons.ratio = cons.ratio===b.dataset.ratio ? null : b.dataset.ratio;
+  renderConsChips(); regenerate();
+});
+$('#chargeChk').addEventListener('click',()=>{
+  cons.charge=!cons.charge; if(cons.charge) cons.minimal=false;
+  renderConsChips(); regenerate();
+});
+$('#minimalChk').addEventListener('click',()=>{
+  cons.minimal=!cons.minimal; if(cons.minimal) cons.charge=false;
+  renderConsChips(); regenerate();
+});
+
+/* ============ main interactions ============ */
+$('#randBtn').addEventListener('click',()=>generate(null));
+$('#reseedBtn').addEventListener('click',regenerate);
+$('#seedInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); regenerate(); } });
+document.addEventListener('keydown',e=>{
+  if(e.code!=='Space' && e.key!==' ') return;
+  const t=e.target;
+  if(t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.tagName==='BUTTON'||t.isContentEditable)) return;
+  e.preventDefault(); generate(null);
+});
+$('#clothChk').addEventListener('change',()=>{ if(current) renderFlag(current); });
+
+$('#histStrip').addEventListener('click',e=>{
+  const pin=e.target.closest('[data-pin]');
+  if(pin){ e.stopPropagation(); const h=history_[+pin.dataset.pin]; if(h){ h.kept=!h.kept; saveHist(); renderHist(); } return; }
+  const rmv=e.target.closest('[data-rmv]');
+  if(rmv){ e.stopPropagation(); history_.splice(+rmv.dataset.rmv,1); saveHist(); renderHist(); return; }
+  const it=e.target.closest('[data-hi]'); if(!it) return;
+  const h=history_[+it.dataset.hi]; if(!h) return;
+  Object.assign(cons, {layout:null,color:null,ratio:null,charge:false,minimal:false}, h.cons||{});
+  renderConsChips();
+  generate(h.seed);
+});
+let clearArmed=false;
+$('#clearHist').addEventListener('click',e=>{
+  if(!clearArmed){ clearArmed=true; e.target.textContent='Sure? Click again'; setTimeout(()=>{ clearArmed=false; e.target.textContent='Clear history'; },2200); return; }
+  clearArmed=false; e.target.textContent='Clear history';
+  history_ = history_.filter(h=>h.kept);   // pinned flags survive a clear
+  saveHist(); renderHist();
+  flash($('#histNote'),'Cleared (pinned kept)');
+});
+
+/* ============ export ============ */
+function downloadBlob(blob,name){ const u=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),1500); }
+function flash(el,msg,err){ const keep=el.id==='histNote'?null:msg; el.textContent=msg; el.classList.toggle('err',!!err); setTimeout(()=>{ if(el.textContent===msg && keep!==null) el.textContent=''; else if(el.id==='histNote') renderHist(); },1900); }
+function fname(){ return (current?current.name.core:'flag').toLowerCase().replace(/[^a-z0-9]+/g,'-'); }
+$('#dlSvg').addEventListener('click',()=>{ if(!current) return; downloadBlob(new Blob([buildExportSVG(current)],{type:'image/svg+xml'}),fname()+'.svg'); flash($('#exportNote'),'SVG downloaded'); });
+$('#dlPng').addEventListener('click',()=>{
+  if(!current) return;
+  const H=ratioH(current.ratio);
+  const blob=new Blob([buildExportSVG(current)],{type:'image/svg+xml;charset=utf-8'});
+  const url=URL.createObjectURL(blob); const img=new Image();
+  img.onload=()=>{ const cw=1200, ch=Math.round(1200*H/FW); const cv=document.createElement('canvas'); cv.width=cw; cv.height=ch;
+    const ctx=cv.getContext('2d'); ctx.drawImage(img,0,0,cw,ch);
+    cv.toBlob(b=>{ if(b) downloadBlob(b,fname()+'.png'); URL.revokeObjectURL(url); flash($('#exportNote'),'PNG downloaded'); },'image/png'); };
+  img.onerror=()=>{ URL.revokeObjectURL(url); flash($('#exportNote'),'PNG export failed',true); };
+  img.src=url;
+});
+$('#copyLink').addEventListener('click',async e=>{
+  if(!current) return; syncHash();
+  try{ await navigator.clipboard.writeText(location.href); e.currentTarget.classList.add('copied'); setTimeout(()=>$('#copyLink').classList.remove('copied'),1100); flash($('#exportNote'),'Seed link copied'); }
+  catch(_){ flash($('#exportNote'),'Copy blocked — grab it from the address bar',true); }
+});
+
+/* ============ theme (same key as the other flag tools) ============ */
+const root=document.documentElement;
+const savedTheme=localStorage.getItem('max-theme');
+if(savedTheme) root.setAttribute('data-theme',savedTheme);
+$('#themeBtn').addEventListener('click',()=>{
+  const curT=root.getAttribute('data-theme');
+  const isDark=curT?curT==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next=isDark?'light':'dark';
+  root.setAttribute('data-theme',next); localStorage.setItem('max-theme',next);
+});
+
+/* ============ test hooks ============ */
+window.pfg = { get current(){return current;}, cons, generateFlag, critique, designerHash, hashSeed, mulberry32, PALETTE, LAYOUTS, CHARGES, encodeShare, history:()=>history_ };
+
+/* ============ boot — never open empty ============ */
+(function boot(){
+  loadHist();
+  renderConsChips();
+  const m=location.hash.match(/^#s=(.+)$/);
+  const p=m?decodeShare(m[1]):null;
+  if(p){
+    Object.assign(cons, {layout:null,color:null,ratio:null,charge:false,minimal:false}, p.cons||{});
+    renderConsChips();
+    generate(p.seed);
+  } else {
+    generate(null);
+  }
+  renderHist();
+})();
+</script>
+</body>
+</html>

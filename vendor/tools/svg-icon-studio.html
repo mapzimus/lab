@@ -1,0 +1,1613 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SVG Icon & Shape Studio</title>
+<meta name="description" content="A focused vector editor for simple icons and logos: shape library, layers, snap-to-grid, real boolean operations (unite / subtract / intersect), and optimized SVG + PNG export. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 12px; font-size: .84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.small { padding: 6px 10px; font-size: .8rem; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  select, input[type=text], input[type=number], textarea { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 7px 9px; font-size: .84rem; font-family: var(--sans); }
+  input[type=number] { width: 66px; }
+  textarea { font-family: var(--mono); font-size: .78rem; width: 100%; resize: vertical; }
+  label.fld { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); }
+  input[type=color] { width: 34px; height: 30px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 2px; cursor: pointer; }
+  input[type=checkbox] { accent-color: var(--accent); }
+  input[type=range] { accent-color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 12px; margin-bottom: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .row + .row { margin-top: 8px; }
+  .grouplbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 2px; align-self: center; }
+  .sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 2px; }
+  .spacer { flex: 1; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+  .chip { border: 1px dashed var(--border); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); border-style: solid; }
+  .chip svg { width: 15px; height: 15px; display: block; }
+  .chip svg path, .chip svg circle { fill: currentColor; }
+
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+
+  .layout { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,.9fr); gap: 16px; align-items: start; }
+  @media (max-width: 980px) { .layout { grid-template-columns: minmax(0,1fr); } }
+
+  .board-wrap { position: relative; width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; padding: 8px; }
+  svg.board { display: block; width: 100%; height: auto; touch-action: none; -webkit-user-select: none; user-select: none; cursor: default; }
+
+  .layers { max-height: 236px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
+  .lrow { display: flex; align-items: center; gap: 6px; padding: 5px 8px; border-bottom: 1px solid var(--border); font-size: .82rem; cursor: pointer; }
+  .lrow:last-child { border-bottom: none; }
+  .lrow:hover { background: var(--surface-2); }
+  .lrow.sel { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+  .lrow .lname { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lrow.locked .lname { color: var(--muted); font-style: italic; }
+  .lrow .sw { width: 13px; height: 13px; border-radius: 4px; border: 1px solid var(--border); flex: none; }
+  .lrow button { border: none; background: transparent; color: var(--muted); cursor: pointer; font-size: .82rem; padding: 1px 3px; border-radius: 5px; }
+  .lrow button:hover { color: var(--accent); background: var(--surface-2); }
+  .layers-empty { padding: 12px; color: var(--muted); font-size: .82rem; text-align: center; }
+
+  .previews { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+  .pv { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .pv .pvchips { display: flex; gap: 6px; }
+  .pv .pchip { border-radius: 8px; border: 1px solid var(--border); display: grid; place-items: center; }
+  .pv .pchip.light { background: #ffffff; }
+  .pv .pchip.dark { background: #14171c; }
+  .pv .lbl { font-size: .68rem; color: var(--muted); font-family: var(--mono); }
+
+  details.about { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 14px; margin-bottom: 12px; font-size: .86rem; }
+  details.about summary { cursor: pointer; font-weight: 600; }
+  details.about .body { margin-top: 8px; color: var(--muted); }
+  details.about code { font-family: var(--mono); font-size: .82em; background: var(--surface-2); padding: 1px 5px; border-radius: 5px; color: var(--text); }
+  details.about ul { margin: 6px 0; padding-left: 20px; }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  @media (max-width: 720px){
+    .grouplbl { width: 100%; margin-bottom: 2px; }
+    .sep { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>SVG Icon &amp; Shape Studio</h1>
+      <p>Build simple icons and logos from a shape library on a square grid — move, scale, rotate, snap, layer, and combine shapes with real boolean operations (unite / subtract / intersect), then export optimized SVG or PNG. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <details class="about">
+    <summary>How it works &amp; boolean-op limits (click to expand)</summary>
+    <div class="body">
+      <p>Every shape is stored parametrically but flattened to polygons (64 segments per full circle) for hit-testing, booleans, and export. Boolean operations use a <strong>Greiner–Hormann polygon clipper</strong> written inline — shapes are combined bottom-to-top in layer order, and results use <code>fill-rule="evenodd"</code> so holes (donuts, counters) work.</p>
+      <ul>
+        <li>Works well for the common icon cases: circle − circle (crescents, donuts), star ∪ circle (badges), overlapping rounded rects, chains of those.</li>
+        <li><strong>Limits:</strong> self-intersecting inputs are not supported, open shapes (line / polyline) can't participate, and heavily nested multi-hole chains can occasionally produce even-odd artifacts. Undo (<code>Ctrl+Z</code>) always gets you back.</li>
+        <li>Keyboard: <code>Ctrl+Z</code> / <code>Ctrl+Shift+Z</code> undo/redo, <code>Ctrl+D</code> duplicate, <code>Delete</code> remove, arrow keys nudge (with Shift ×5), <code>Esc</code> deselect. Shift-click for multi-select.</li>
+        <li>Share via URL hash when the project is small enough; otherwise save/load the project as JSON.</li>
+      </ul>
+    </div>
+  </details>
+
+  <div class="panel">
+    <div class="row">
+      <span class="grouplbl">Add shape</span>
+      <div class="chips" id="shapeChips"></div>
+    </div>
+    <div class="row">
+      <span class="grouplbl">Canvas</span>
+      <label class="fld">size <select id="canvasSize">
+        <option>16</option><option selected>24</option><option>32</option><option>48</option><option>64</option>
+      </select></label>
+      <label class="fld"><input type="checkbox" id="snapOn" checked> snap</label>
+      <label class="fld">step <select id="snapStep"><option value="1">1</option><option value="0.5" selected>0.5</option></select></label>
+      <span class="sep"></span>
+      <button class="btn small" id="undoBtn" title="Ctrl+Z">↩ Undo</button>
+      <button class="btn small" id="redoBtn" title="Ctrl+Shift+Z">↪ Redo</button>
+      <span class="sep"></span>
+      <button class="btn small" id="sampleBtn">✨ Load sample</button>
+      <button class="btn small" id="clearBtn">🗑 Clear all</button>
+      <span class="spacer"></span>
+      <span class="note" id="status">Add a shape from the library, or load the sample.</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="board-wrap"><svg class="board" id="board" aria-label="Icon editing canvas"></svg></div>
+      <div class="panel" style="margin-top:12px;">
+        <div class="row"><span class="grouplbl">Preview</span><div class="previews" id="previews"></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <div class="row">
+          <span class="grouplbl">Layers</span>
+          <span class="spacer"></span>
+          <button class="btn small" id="dupBtn" title="Ctrl+D">⧉ Duplicate</button>
+          <button class="btn small" id="delBtn" title="Delete">✕ Delete</button>
+        </div>
+        <div class="layers" id="layersList" style="margin-top:8px;"></div>
+      </div>
+
+      <div class="panel" id="inspector">
+        <div class="row">
+          <span class="grouplbl">Style</span>
+          <label class="fld">fill <input type="color" id="inFill" value="#2563eb"></label>
+          <label class="fld"><input type="checkbox" id="inNoFill"> none</label>
+          <span class="sep"></span>
+          <label class="fld">stroke <input type="color" id="inStroke" value="#1c2530"></label>
+          <label class="fld">w <input type="number" id="inSw" min="0" max="10" step="0.25" value="0"></label>
+          <label class="fld">cap <select id="inCap"><option>butt</option><option selected>round</option><option>square</option></select></label>
+          <label class="fld">join <select id="inJoin"><option>miter</option><option selected>round</option><option>bevel</option></select></label>
+        </div>
+        <div class="row">
+          <label class="fld">opacity <input type="range" id="inOpacity" min="0.05" max="1" step="0.05" value="1" style="width:90px"></label>
+          <span class="sep"></span>
+          <label class="fld">x <input type="number" id="inX" step="0.5"></label>
+          <label class="fld">y <input type="number" id="inY" step="0.5"></label>
+          <label class="fld">w <input type="number" id="inW" step="0.5" min="0.25"></label>
+          <label class="fld">h <input type="number" id="inH" step="0.5" min="0.25"></label>
+          <label class="fld">rot <input type="number" id="inRot" step="5"></label>
+        </div>
+        <div class="row" id="paramRow" style="display:none;">
+          <span class="grouplbl">Shape</span>
+          <label class="fld" id="fRadius" style="display:none;">corner r <input type="number" id="inRadius" min="0" step="0.25" value="0"></label>
+          <label class="fld" id="fSides" style="display:none;">sides <input type="number" id="inSides" min="3" max="24" step="1" value="6"></label>
+          <label class="fld" id="fPoints" style="display:none;">points <input type="number" id="inPoints" min="3" max="20" step="1" value="5"></label>
+          <label class="fld" id="fInner" style="display:none;">inner <input type="range" id="inInner" min="0.15" max="0.9" step="0.05" value="0.45" style="width:80px"></label>
+          <label class="fld" id="fThick" style="display:none;">thickness <input type="range" id="inThick" min="0.15" max="0.9" step="0.05" value="0.34" style="width:80px"></label>
+        </div>
+        <div class="row">
+          <span class="grouplbl">Arrange</span>
+          <button class="btn small" data-align="left" title="Align left">⇤</button>
+          <button class="btn small" data-align="hcenter" title="Align horizontal center">⇹</button>
+          <button class="btn small" data-align="right" title="Align right">⇥</button>
+          <button class="btn small" data-align="top" title="Align top">⤒</button>
+          <button class="btn small" data-align="vmiddle" title="Align vertical middle">⇳</button>
+          <button class="btn small" data-align="bottom" title="Align bottom">⤓</button>
+          <button class="btn small" id="centerCanvasBtn" title="Center selection on canvas">◎ Center</button>
+        </div>
+        <div class="row">
+          <span class="grouplbl">Boolean</span>
+          <button class="btn small" id="boolUnite">⊕ Unite</button>
+          <button class="btn small" id="boolSubtract">⊖ Subtract</button>
+          <button class="btn small" id="boolIntersect">⊗ Intersect</button>
+          <span class="note" id="boolNote">select 2+ closed shapes</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="row">
+          <span class="grouplbl">Export</span>
+          <button class="btn primary small" id="dlSvgBtn">⬇ SVG</button>
+          <button class="btn small" id="copySvgBtn">⧉ Copy SVG</button>
+          <span class="sep"></span>
+          <label class="fld">PNG <select id="pngScale"><option value="1">1×</option><option value="2" selected>2×</option><option value="4">4×</option><option value="8">8×</option></select></label>
+          <button class="btn small" id="dlPngBtn">⬇ PNG</button>
+        </div>
+        <div class="row">
+          <span class="grouplbl">Project</span>
+          <button class="btn small" id="shareBtn">🔗 Share link</button>
+          <button class="btn small" id="saveJsonBtn">⬇ JSON</button>
+          <button class="btn small" id="loadJsonBtn">⬆ Load JSON</button>
+          <input type="file" id="jsonFile" accept=".json,application/json" style="display:none;">
+        </div>
+        <details style="margin-top:8px;">
+          <summary style="cursor:pointer;font-size:.82rem;color:var(--muted);">Import an SVG path <code>d</code> string</summary>
+          <div class="row" style="margin-top:6px;">
+            <textarea id="pathD" rows="3" placeholder="e.g. M12 2 L22 22 L2 22 Z"></textarea>
+          </div>
+          <div class="row">
+            <button class="btn small" id="importDBtn">＋ Add as shape</button>
+            <span class="note">M/L/H/V/C/S/Q/T/A/Z supported; curves &amp; arcs flattened to segments.</span>
+          </div>
+        </details>
+        <div class="note" id="exportNote" style="margin-top:6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app">Part of the <a href="./index.html">mapzimus/max</a> toolbox · fully client-side, nothing uploaded.</footer>
+</div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const fmt = v => { const r = Math.round(v * 100) / 100; return Object.is(r, -0) ? '0' : String(r); };
+const deg2rad = d => d * Math.PI / 180;
+
+/* =====================================================================
+   Polygon boolean engine — Greiner–Hormann, multi-ring, even-odd fill.
+   Tested standalone (circle−circle, donut hole, star∪circle, rects,
+   disjoint, corner-touch degeneracy) before being inlined here.
+===================================================================== */
+function ringArea(ring){
+  let a = 0;
+  for (let i = 0, n = ring.length; i < n; i++){
+    const p = ring[i], q = ring[(i + 1) % n];
+    a += p[0] * q[1] - q[0] * p[1];
+  }
+  return a / 2;
+}
+function pointInRing(pt, ring){
+  let inside = false;
+  const x = pt[0], y = pt[1];
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++){
+    const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside;
+  }
+  return inside;
+}
+function pointInPoly(pt, rings){
+  let c = 0;
+  for (const r of rings) if (pointInRing(pt, r)) c++;
+  return (c % 2) === 1;
+}
+function ghNode(x, y){
+  return { x, y, next: null, prev: null, inter: false, neighbor: null, alpha: 0, entry: false, processed: false };
+}
+function buildList(ring){
+  let first = null, last = null;
+  for (const p of ring){
+    const n = ghNode(p[0], p[1]);
+    if (!first){ first = n; n.next = n; n.prev = n; }
+    else { n.prev = last; n.next = first; last.next = n; first.prev = n; }
+    last = n;
+  }
+  return first;
+}
+function insertInter(node, start, end){
+  let ref = start;
+  let c = start.next;
+  while (c !== end && c.inter && c.alpha <= node.alpha){ ref = c; c = c.next; }
+  node.next = ref.next; node.prev = ref;
+  ref.next.prev = node; ref.next = node;
+}
+function segInt(a1, a2, b1, b2){
+  const dax = a2.x - a1.x, day = a2.y - a1.y;
+  const dbx = b2.x - b1.x, dby = b2.y - b1.y;
+  const den = dax * dby - day * dbx;
+  if (Math.abs(den) < 1e-12) return null;
+  const t = ((b1.x - a1.x) * dby - (b1.y - a1.y) * dbx) / den;
+  const u = ((b1.x - a1.x) * day - (b1.y - a1.y) * dax) / den;
+  if (t <= 1e-9 || t >= 1 - 1e-9 || u <= 1e-9 || u >= 1 - 1e-9) return null;
+  return { x: a1.x + t * dax, y: a1.y + t * day, t, u };
+}
+function realNext(n){ let c = n.next; while (c.inter) c = c.next; return c; }
+function perturbRing(ring, eps){
+  return ring.map((p, i) => [p[0] + eps * Math.sin(i * 2.7 + 0.61), p[1] + eps * Math.cos(i * 1.9 + 1.13)]);
+}
+function cleanRing(ring){
+  const out = [];
+  for (const p of ring){
+    const q = out[out.length - 1];
+    if (!q || Math.abs(p[0] - q[0]) > 1e-7 || Math.abs(p[1] - q[1]) > 1e-7) out.push(p);
+  }
+  while (out.length > 1){
+    const a = out[0], b = out[out.length - 1];
+    if (Math.abs(a[0] - b[0]) < 1e-7 && Math.abs(a[1] - b[1]) < 1e-7) out.pop(); else break;
+  }
+  return out;
+}
+function polyBoolean(polyA, polyB, op){
+  const A = polyA.map(cleanRing).filter(r => r.length >= 3);
+  let B = polyB.map(cleanRing).filter(r => r.length >= 3);
+  if (!A.length) return op === 'union' ? B.slice() : [];
+  if (!B.length) return op === 'intersect' ? [] : A.slice();
+  B = B.map(r => perturbRing(r, 1e-7));
+
+  const subjLists = A.map(buildList);
+  const clipLists = B.map(buildList);
+
+  let anyInter = false;
+  for (const sFirst of subjLists){
+    let s = sFirst;
+    do {
+      if (!s.inter){
+        const sNext = realNext(s);
+        for (const cFirst of clipLists){
+          let c = cFirst;
+          do {
+            if (!c.inter){
+              const cNext = realNext(c);
+              const hit = segInt(s, sNext, c, cNext);
+              if (hit){
+                anyInter = true;
+                const ns = ghNode(hit.x, hit.y); ns.inter = true; ns.alpha = hit.t;
+                const nc = ghNode(hit.x, hit.y); nc.inter = true; nc.alpha = hit.u;
+                ns.neighbor = nc; nc.neighbor = ns;
+                insertInter(ns, s, sNext);
+                insertInter(nc, c, cNext);
+              }
+            }
+            c = c.next;
+          } while (c !== cFirst);
+        }
+      }
+      s = s.next;
+    } while (s !== sFirst);
+  }
+
+  if (!anyInter){
+    const out = [];
+    for (const r of A){
+      const inB = pointInPoly(r[0], B);
+      if (op === 'intersect' && inB) out.push(r);
+      if (op === 'union' && !inB) out.push(r);
+      if (op === 'subtract' && !inB) out.push(r);
+    }
+    for (const r of B){
+      const inA = pointInPoly(r[0], A);
+      if (op === 'intersect' && inA) out.push(r);
+      if (op === 'union' && !inA) out.push(r);
+      if (op === 'subtract' && inA) out.push(r); // hole via even-odd
+    }
+    return out;
+  }
+
+  const fwd = { intersect: [true, true], union: [false, false], subtract: [false, true] }[op];
+  for (const sFirst of subjLists){
+    let entry = (!pointInPoly([sFirst.x, sFirst.y], B)) === fwd[0];
+    let s = sFirst;
+    do { if (s.inter){ s.entry = entry; entry = !entry; } s = s.next; } while (s !== sFirst);
+  }
+  for (const cFirst of clipLists){
+    let entry = (!pointInPoly([cFirst.x, cFirst.y], A)) === fwd[1];
+    let c = cFirst;
+    do { if (c.inter){ c.entry = entry; entry = !entry; } c = c.next; } while (c !== cFirst);
+  }
+
+  const result = [];
+  const allInters = [];
+  for (const sFirst of subjLists){
+    let s = sFirst;
+    do { if (s.inter) allInters.push(s); s = s.next; } while (s !== sFirst);
+  }
+  for (const start of allInters){
+    if (start.processed) continue;
+    const ring = [];
+    let cur = start;
+    let guard = 0;
+    do {
+      cur.processed = true;
+      if (cur.neighbor) cur.neighbor.processed = true;
+      if (cur.entry){
+        do { cur = cur.next; ring.push([cur.x, cur.y]); cur.processed = true; if (++guard > 100000) return result; } while (!cur.inter);
+      } else {
+        do { cur = cur.prev; ring.push([cur.x, cur.y]); cur.processed = true; if (++guard > 100000) return result; } while (!cur.inter);
+      }
+      cur = cur.neighbor;
+    } while (cur !== start && !cur.processed);
+    const cr = cleanRing(ring);
+    if (cr.length >= 3) result.push(cr);
+  }
+
+  const ringHasInter = (first) => { let n = first; do { if (n.inter) return true; n = n.next; } while (n !== first); return false; };
+  A.forEach((r, i) => {
+    if (!ringHasInter(subjLists[i])){
+      const inB = pointInPoly(r[0], B);
+      if (op === 'intersect' && inB) result.push(r);
+      if (op === 'union' && !inB) result.push(r);
+      if (op === 'subtract' && !inB) result.push(r);
+    }
+  });
+  B.forEach((r, i) => {
+    if (!ringHasInter(clipLists[i])){
+      const inA = pointInPoly(r[0], A);
+      if (op === 'intersect' && inA) result.push(r);
+      if (op === 'union' && !inA) result.push(r);
+      if (op === 'subtract' && inA) result.push(r);
+    }
+  });
+  return result;
+}
+
+/* ================= shape generators (local coords, centered) ================= */
+const SEG = 64; // segments per full circle at export resolution
+function ellipseRing(rx, ry, seg = SEG){
+  const r = [];
+  for (let i = 0; i < seg; i++){
+    const a = (i / seg) * Math.PI * 2 - Math.PI / 2;
+    r.push([rx * Math.cos(a), ry * Math.sin(a)]);
+  }
+  return r;
+}
+function arcPts(cx, cy, r, a0, a1, seg){
+  const out = [];
+  for (let i = 0; i <= seg; i++){
+    const a = a0 + (a1 - a0) * (i / seg);
+    out.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]);
+  }
+  return out;
+}
+function roundedRectRing(w, h, rad){
+  const r = clamp(rad, 0, Math.min(w, h) / 2);
+  const x = w / 2, y = h / 2;
+  if (r < 0.01) return [[-x, -y], [x, -y], [x, y], [-x, y]];
+  const seg = 12;
+  return [].concat(
+    arcPts(x - r, -y + r, r, -Math.PI / 2, 0, seg),
+    arcPts(x - r, y - r, r, 0, Math.PI / 2, seg),
+    arcPts(-x + r, y - r, r, Math.PI / 2, Math.PI, seg),
+    arcPts(-x + r, -y + r, r, Math.PI, Math.PI * 1.5, seg)
+  );
+}
+function starRing(points, inner, w, h){
+  const r = [];
+  for (let i = 0; i < points * 2; i++){
+    const rad = i % 2 === 0 ? 1 : inner;
+    const a = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
+    r.push([rad * (w / 2) * Math.cos(a), rad * (h / 2) * Math.sin(a)]);
+  }
+  return r;
+}
+function ngonRing(sides, w, h){
+  const r = [];
+  for (let i = 0; i < sides; i++){
+    const a = (i / sides) * Math.PI * 2 - Math.PI / 2;
+    r.push([(w / 2) * Math.cos(a), (h / 2) * Math.sin(a)]);
+  }
+  return r;
+}
+function heartRing(w, h){
+  const pts = [];
+  for (let i = 0; i < SEG; i++){
+    const t = (i / SEG) * Math.PI * 2;
+    const x = 16 * Math.pow(Math.sin(t), 3);
+    const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+    pts.push([x, y]);
+  }
+  let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+  for (const p of pts){ minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]); minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]); }
+  const sx = w / (maxX - minX), sy = h / (maxY - minY);
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  return pts.map(p => [(p[0] - cx) * sx, (p[1] - cy) * sy]);
+}
+function shieldRing(w, h){
+  const x = w / 2, y = h / 2;
+  const top = [[-x, -y], [-x * 0.32, -y * 0.82], [0, -y * 0.94], [x * 0.32, -y * 0.82], [x, -y]];
+  const side = [];
+  const seg = 22;
+  for (let i = 1; i <= seg; i++){
+    const t = i / seg;
+    const yy = -y + t * (2 * y);
+    const shrink = Math.pow(t, 1.8);
+    side.push([x * (1 - shrink), yy]);
+  }
+  const left = side.slice(0, -1).map(p => [-p[0], p[1]]).reverse();
+  return top.concat(side, [[0, y]], left);
+}
+function bubbleRing(w, h, rad){
+  const bodyH = h * 0.74;
+  const body = roundedRectRing(w, bodyH, clamp(rad, 0, Math.min(w, bodyH) / 2)).map(p => [p[0], p[1] - (h - bodyH) / 2]);
+  const tailTopY = bodyH / 2 - (h - bodyH) / 2 - 0.02;
+  const tail = [[-w * 0.05, tailTopY], [-w * 0.12, h / 2], [w * 0.22, tailTopY]];
+  const out = [];
+  for (const p of body){
+    out.push(p);
+    // splice the tail into the bottom edge (bottom edge runs right→left in our ring order)
+  }
+  // easier: boolean-union body with tail triangle
+  return polyBoolean([out], [tail], 'union')[0] || out;
+}
+function crossRing(t, w, h){
+  const ax = w / 2, ay = h / 2, tx = (w * t) / 2, ty = (h * t) / 2;
+  return [
+    [-tx, -ay], [tx, -ay], [tx, -ty], [ax, -ty], [ax, ty], [tx, ty],
+    [tx, ay], [-tx, ay], [-tx, ty], [-ax, ty], [-ax, -ty], [-tx, -ty]
+  ];
+}
+function crescentRings(w, h){
+  const outer = ellipseRing(w / 2, h / 2);
+  const bite = ellipseRing(w / 2 * 0.92, h / 2 * 0.92).map(p => [p[0] + w * 0.22, p[1] - h * 0.1]);
+  const res = polyBoolean([outer], [bite], 'subtract');
+  return res.length ? res : [outer];
+}
+function arrowRing(w, h){
+  const x = w / 2, y = h / 2, shaft = h * 0.19, headW = w * 0.42;
+  return [
+    [-x, -shaft], [x - headW, -shaft], [x - headW, -y], [x, 0],
+    [x - headW, y], [x - headW, shaft], [-x, shaft]
+  ];
+}
+
+const SHAPE_DEFS = [
+  { type: 'rect',     label: 'Rectangle',    p: { r: 1 } },
+  { type: 'circle',   label: 'Circle',       p: {} },
+  { type: 'ellipse',  label: 'Ellipse',      p: {} },
+  { type: 'line',     label: 'Line',         p: {}, open: true },
+  { type: 'polyline', label: 'Polyline',     p: {}, open: true },
+  { type: 'polygon',  label: 'Polygon',      p: { sides: 6 } },
+  { type: 'star',     label: 'Star',         p: { points: 5, inner: 0.45 } },
+  { type: 'arrow',    label: 'Arrow',        p: {} },
+  { type: 'heart',    label: 'Heart',        p: {} },
+  { type: 'shield',   label: 'Badge',        p: {} },
+  { type: 'bubble',   label: 'Speech',       p: { r: 1.2 } },
+  { type: 'cross',    label: 'Cross',        p: { t: 0.34 } },
+  { type: 'crescent', label: 'Crescent',     p: {} },
+];
+
+function localGeom(sh){
+  const w = sh.w, h = sh.h, p = sh.p || {};
+  switch (sh.type){
+    case 'rect':     return { rings: [roundedRectRing(w, h, p.r || 0)] };
+    case 'circle':
+    case 'ellipse':  return { rings: [ellipseRing(w / 2, h / 2)] };
+    case 'line':     return { open: true, pts: [[-w / 2, h / 2], [w / 2, -h / 2]] };
+    case 'polyline': return { open: true, pts: [[-w / 2, h / 2], [-w / 6, -h / 2], [w / 6, h / 2], [w / 2, -h / 2]] };
+    case 'polygon':  return { rings: [ngonRing(clamp(Math.round(p.sides || 6), 3, 24), w, h)] };
+    case 'star':     return { rings: [starRing(clamp(Math.round(p.points || 5), 3, 20), clamp(p.inner || 0.45, 0.1, 0.95), w, h)] };
+    case 'arrow':    return { rings: [arrowRing(w, h)] };
+    case 'heart':    return { rings: [heartRing(w, h)] };
+    case 'shield':   return { rings: [shieldRing(w, h)] };
+    case 'bubble':   return { rings: [bubbleRing(w, h, p.r || 0)] };
+    case 'cross':    return { rings: [crossRing(clamp(p.t || 0.34, 0.1, 0.95), w, h)] };
+    case 'crescent': return { rings: crescentRings(w, h) };
+    case 'path':     return sh.open
+      ? { open: true, pts: (sh.rings[0] || []).map(q => [q[0] * w, q[1] * h]) }
+      : { rings: sh.rings.map(r => r.map(q => [q[0] * w, q[1] * h])) };
+    default:         return { rings: [roundedRectRing(w, h, 0)] };
+  }
+}
+function xform(pts, sh){
+  const a = deg2rad(sh.rot || 0), c = Math.cos(a), s = Math.sin(a);
+  return pts.map(p => [sh.cx + p[0] * c - p[1] * s, sh.cy + p[0] * s + p[1] * c]);
+}
+function worldGeom(sh){
+  const g = localGeom(sh);
+  if (g.open) return { open: true, pts: xform(g.pts, sh) };
+  return { rings: g.rings.map(r => xform(r, sh)) };
+}
+function shapeBBox(sh){
+  const g = worldGeom(sh);
+  const pts = g.open ? g.pts : g.rings.flat();
+  let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+  for (const p of pts){ minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]); minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]); }
+  return { minX, maxX, minY, maxY, w: maxX - minX, h: maxY - minY, cx: (minX + maxX) / 2, cy: (minY + maxY) / 2 };
+}
+
+/* ================= state ================= */
+const state = {
+  n: 24,
+  shapes: [],   // bottom → top
+  sel: [],      // ids
+  nextId: 1,
+  counter: {},
+};
+const history = [], redoStack = [];
+const HIST_MAX = 120;
+function serialize(){ return JSON.stringify({ n: state.n, shapes: state.shapes, nextId: state.nextId, counter: state.counter }); }
+function restore(json){
+  const d = JSON.parse(json);
+  state.n = d.n; state.shapes = d.shapes; state.nextId = d.nextId || 1; state.counter = d.counter || {};
+  state.sel = state.sel.filter(id => state.shapes.some(s => s.id === id));
+  $('#canvasSize').value = String(state.n);
+}
+function pushUndo(){
+  history.push(serialize());
+  if (history.length > HIST_MAX) history.shift();
+  redoStack.length = 0;
+  updateUndoBtns();
+}
+function undo(){
+  if (!history.length) return;
+  redoStack.push(serialize());
+  restore(history.pop());
+  renderAll(); flash('Undone.');
+}
+function redo(){
+  if (!redoStack.length) return;
+  history.push(serialize());
+  restore(redoStack.pop());
+  renderAll(); flash('Redone.');
+}
+function updateUndoBtns(){
+  $('#undoBtn').disabled = !history.length;
+  $('#redoBtn').disabled = !redoStack.length;
+}
+const byId = id => state.shapes.find(s => s.id === id);
+const selShapes = () => state.sel.map(byId).filter(Boolean);
+const snapEnabled = () => $('#snapOn').checked;
+const snapStep = () => parseFloat($('#snapStep').value);
+const snapV = v => snapEnabled() ? Math.round(v / snapStep()) * snapStep() : v;
+
+const PALETTE = ['#2563eb', '#e0483e', '#1a9d5c', '#e8a13a', '#7c4fd0', '#12a5b8', '#d0489b'];
+function addShape(type, opts = {}){
+  const def = SHAPE_DEFS.find(d => d.type === type) || { label: type, p: {} };
+  pushUndo();
+  state.counter[type] = (state.counter[type] || 0) + 1;
+  const n = state.n;
+  const sh = Object.assign({
+    id: state.nextId++,
+    type,
+    name: `${def.label} ${state.counter[type]}`,
+    cx: snapV(n / 2), cy: snapV(n / 2),
+    w: Math.max(2, Math.round(n * 0.5)), h: Math.max(2, Math.round(n * 0.5)),
+    rot: 0,
+    fill: PALETTE[(state.shapes.length) % PALETTE.length],
+    stroke: '#1c2530', sw: 0, cap: 'round', join: 'round',
+    opacity: 1, locked: false,
+    open: !!def.open,
+    p: JSON.parse(JSON.stringify(def.p || {})),
+  }, opts);
+  if (sh.open){ sh.fill = 'none'; sh.sw = sh.sw || Math.max(0.5, n / 16); sh.stroke = PALETTE[(state.shapes.length) % PALETTE.length]; }
+  state.shapes.push(sh);
+  state.sel = [sh.id];
+  renderAll();
+  flash(`Added ${sh.name}.`, 'ok');
+  return sh;
+}
+
+/* ================= board rendering ================= */
+const board = $('#board');
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+function ringsToD(rings){
+  return rings.map(r => 'M' + r.map(p => fmt(p[0]) + ' ' + fmt(p[1])).join(' L') + ' Z').join(' ');
+}
+function openToD(pts){
+  return 'M' + pts.map(p => fmt(p[0]) + ' ' + fmt(p[1])).join(' L');
+}
+function shapeToPathEl(sh, extraAttrs){
+  const g = worldGeom(sh);
+  const d = g.open ? openToD(g.pts) : ringsToD(g.rings);
+  const attrs = {
+    d,
+    fill: g.open ? 'none' : (sh.fill === 'none' ? 'none' : sh.fill),
+    'fill-rule': 'evenodd',
+    stroke: sh.sw > 0 ? sh.stroke : 'none',
+    'stroke-width': sh.sw > 0 ? fmt(sh.sw) : null,
+    'stroke-linecap': sh.cap, 'stroke-linejoin': sh.join,
+    opacity: sh.opacity < 1 ? fmt(sh.opacity) : null,
+  };
+  const e = el('path', {});
+  for (const k in attrs) if (attrs[k] != null) e.setAttribute(k, attrs[k]);
+  if (extraAttrs) for (const k in extraAttrs) e.setAttribute(k, extraAttrs[k]);
+  return e;
+}
+function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+function renderBoard(){
+  const n = state.n, M = n * 0.09 + 1;
+  board.setAttribute('viewBox', `${fmt(-M)} ${fmt(-M)} ${fmt(n + 2 * M)} ${fmt(n + 2 * M)}`);
+  board.innerHTML = '';
+  const accent = cssVar('--accent') || '#2563eb';
+  const borderC = cssVar('--border') || '#d9dee5';
+  const mutedC = cssVar('--muted') || '#61707f';
+
+  // canvas backing + grid
+  board.appendChild(el('rect', { x: 0, y: 0, width: n, height: n, fill: cssVar('--surface-2') || '#f0f2f5', stroke: borderC, 'stroke-width': n / 300, rx: n / 60 }));
+  const grid = el('g', { stroke: borderC, 'stroke-width': n / 600, opacity: 0.7 });
+  for (let i = 1; i < n; i++){
+    grid.appendChild(el('line', { x1: i, y1: 0, x2: i, y2: n }));
+    grid.appendChild(el('line', { x1: 0, y1: i, x2: n, y2: i }));
+  }
+  grid.appendChild(el('line', { x1: n / 2, y1: 0, x2: n / 2, y2: n, stroke: mutedC, 'stroke-width': n / 450, opacity: 0.7 }));
+  grid.appendChild(el('line', { x1: 0, y1: n / 2, x2: n, y2: n / 2, stroke: mutedC, 'stroke-width': n / 450, opacity: 0.7 }));
+  board.appendChild(grid);
+
+  // shapes
+  for (const sh of state.shapes){
+    const pe = shapeToPathEl(sh, { 'data-id': sh.id });
+    if (!sh.open && sh.fill === 'none' && sh.sw === 0) pe.setAttribute('fill', 'rgba(127,127,127,.15)');
+    pe.style.cursor = sh.locked ? 'not-allowed' : 'move';
+    board.appendChild(pe);
+    if (sh.open && sh.sw > 0){
+      // widen hit area for thin lines
+      const hit = el('path', { d: openToD(worldGeom(sh).pts), fill: 'none', stroke: 'rgba(0,0,0,0)', 'stroke-width': Math.max(sh.sw * 2, n / 18), 'data-id': sh.id });
+      hit.style.cursor = sh.locked ? 'not-allowed' : 'move';
+      board.appendChild(hit);
+    }
+  }
+
+  // selection overlays
+  const sel = selShapes();
+  const hs = n / 42 + 0.22; // handle radius
+  for (const sh of sel){
+    const a = deg2rad(sh.rot || 0), c = Math.cos(a), s = Math.sin(a);
+    const corners = [[-sh.w / 2, -sh.h / 2], [sh.w / 2, -sh.h / 2], [sh.w / 2, sh.h / 2], [-sh.w / 2, sh.h / 2]]
+      .map(p => [sh.cx + p[0] * c - p[1] * s, sh.cy + p[0] * s + p[1] * c]);
+    board.appendChild(el('polygon', {
+      points: corners.map(p => fmt(p[0]) + ',' + fmt(p[1])).join(' '),
+      fill: 'none', stroke: accent, 'stroke-width': n / 350, 'stroke-dasharray': `${n / 90} ${n / 140}`,
+    }));
+    if (sel.length === 1 && !sh.locked){
+      corners.forEach((p, i) => {
+        const h = el('rect', {
+          x: p[0] - hs, y: p[1] - hs, width: hs * 2, height: hs * 2, rx: hs / 2.5,
+          fill: cssVar('--surface') || '#fff', stroke: accent, 'stroke-width': n / 320,
+          'data-handle': 'scale', 'data-corner': i,
+        });
+        h.style.cursor = (i % 2 === 0) ? 'nwse-resize' : 'nesw-resize';
+        board.appendChild(h);
+      });
+      // rotation handle: above rotated top edge
+      const topMid = [sh.cx + (0) * c - (-sh.h / 2) * s, sh.cy + (0) * s + (-sh.h / 2) * c];
+      const rOff = n / 14 + 0.6;
+      const rp = [sh.cx + (0) * c - (-sh.h / 2 - rOff) * s, sh.cy + (0) * s + (-sh.h / 2 - rOff) * c];
+      board.appendChild(el('line', { x1: topMid[0], y1: topMid[1], x2: rp[0], y2: rp[1], stroke: accent, 'stroke-width': n / 400 }));
+      const rh = el('circle', { cx: rp[0], cy: rp[1], r: hs * 0.95, fill: accent, stroke: cssVar('--surface') || '#fff', 'stroke-width': n / 380, 'data-handle': 'rotate' });
+      rh.style.cursor = 'grab';
+      board.appendChild(rh);
+    }
+  }
+}
+
+/* ================= layers panel ================= */
+function renderLayers(){
+  const box = $('#layersList');
+  box.innerHTML = '';
+  if (!state.shapes.length){
+    box.innerHTML = '<div class="layers-empty">No shapes yet — add one above.</div>';
+    return;
+  }
+  const top = state.shapes.slice().reverse();
+  for (const sh of top){
+    const row = document.createElement('div');
+    row.className = 'lrow' + (state.sel.includes(sh.id) ? ' sel' : '') + (sh.locked ? ' locked' : '');
+    const swColor = sh.open || sh.fill === 'none' ? sh.stroke : sh.fill;
+    row.innerHTML = `<span class="sw" style="background:${swColor}"></span><span class="lname">${sh.name}</span>`;
+    row.addEventListener('click', ev => {
+      if (ev.target.tagName === 'BUTTON') return;
+      if (ev.shiftKey){
+        state.sel = state.sel.includes(sh.id) ? state.sel.filter(i => i !== sh.id) : state.sel.concat(sh.id);
+      } else state.sel = [sh.id];
+      renderAll();
+    });
+    const mkBtn = (txt, title, fn) => {
+      const b = document.createElement('button');
+      b.textContent = txt; b.title = title; b.type = 'button';
+      b.addEventListener('click', ev => { ev.stopPropagation(); fn(); });
+      row.appendChild(b);
+    };
+    const idx = state.shapes.indexOf(sh);
+    mkBtn('▲', 'Raise (toward front)', () => {
+      if (idx >= state.shapes.length - 1) return;
+      pushUndo();
+      state.shapes.splice(idx, 1); state.shapes.splice(idx + 1, 0, sh); renderAll();
+    });
+    mkBtn('▼', 'Lower (toward back)', () => {
+      if (idx <= 0) return;
+      pushUndo();
+      state.shapes.splice(idx, 1); state.shapes.splice(idx - 1, 0, sh); renderAll();
+    });
+    mkBtn(sh.locked ? '🔒' : '🔓', sh.locked ? 'Unlock' : 'Lock', () => {
+      pushUndo(); sh.locked = !sh.locked;
+      if (sh.locked) state.sel = state.sel.filter(i => i !== sh.id);
+      renderAll();
+    });
+    box.appendChild(row);
+  }
+}
+
+/* ================= inspector ================= */
+let suppressInspector = false;
+function renderInspector(){
+  const sel = selShapes();
+  suppressInspector = true;
+  const one = sel.length === 1 ? sel[0] : null;
+  const ref = sel[0];
+  if (ref){
+    $('#inFill').value = /^#/.test(ref.fill) ? ref.fill : '#2563eb';
+    $('#inNoFill').checked = ref.fill === 'none';
+    $('#inStroke').value = /^#/.test(ref.stroke) ? ref.stroke : '#1c2530';
+    $('#inSw').value = ref.sw;
+    $('#inCap').value = ref.cap; $('#inJoin').value = ref.join;
+    $('#inOpacity').value = ref.opacity;
+  }
+  if (one){
+    $('#inX').value = fmt(one.cx); $('#inY').value = fmt(one.cy);
+    $('#inW').value = fmt(one.w); $('#inH').value = fmt(one.h);
+    $('#inRot').value = fmt(one.rot || 0);
+  } else { ['#inX', '#inY', '#inW', '#inH', '#inRot'].forEach(s => $(s).value = ''); }
+  // shape-specific params
+  const show = (id, on) => { $(id).style.display = on ? '' : 'none'; };
+  const hasR = one && (one.type === 'rect' || one.type === 'bubble');
+  const hasSides = one && one.type === 'polygon';
+  const hasStar = one && one.type === 'star';
+  const hasT = one && one.type === 'cross';
+  show('#fRadius', hasR); show('#fSides', hasSides); show('#fPoints', hasStar); show('#fInner', hasStar); show('#fThick', hasT);
+  $('#paramRow').style.display = (hasR || hasSides || hasStar || hasT) ? '' : 'none';
+  if (hasR) $('#inRadius').value = one.p.r || 0;
+  if (hasSides) $('#inSides').value = one.p.sides || 6;
+  if (hasStar){ $('#inPoints').value = one.p.points || 5; $('#inInner').value = one.p.inner || 0.45; }
+  if (hasT) $('#inThick').value = one.p.t || 0.34;
+  suppressInspector = false;
+}
+let gestureOpen = false;
+function inspectorEdit(fn){
+  if (suppressInspector) return;
+  const sel = selShapes().filter(s => !s.locked);
+  if (!sel.length) return;
+  if (!gestureOpen){ pushUndo(); gestureOpen = true; }
+  sel.forEach(fn);
+  renderAll();
+}
+function closeGesture(){ gestureOpen = false; }
+function wireInspector(){
+  const on = (sel, ev, fn) => $(sel).addEventListener(ev, fn);
+  on('#inFill', 'input', () => inspectorEdit(s => { if (!s.open){ s.fill = $('#inFill').value; $('#inNoFill').checked = false; } }));
+  on('#inNoFill', 'change', () => { inspectorEdit(s => { if (!s.open) s.fill = $('#inNoFill').checked ? 'none' : $('#inFill').value; }); closeGesture(); });
+  on('#inStroke', 'input', () => inspectorEdit(s => { s.stroke = $('#inStroke').value; if (s.sw === 0 && !s.open) s.sw = 0.5; }));
+  on('#inSw', 'input', () => inspectorEdit(s => { s.sw = clamp(parseFloat($('#inSw').value) || 0, 0, 20); }));
+  on('#inCap', 'change', () => { inspectorEdit(s => { s.cap = $('#inCap').value; }); closeGesture(); });
+  on('#inJoin', 'change', () => { inspectorEdit(s => { s.join = $('#inJoin').value; }); closeGesture(); });
+  on('#inOpacity', 'input', () => inspectorEdit(s => { s.opacity = parseFloat($('#inOpacity').value); }));
+  on('#inX', 'input', () => inspectorEdit(s => { const v = parseFloat($('#inX').value); if (isFinite(v)) s.cx = v; }));
+  on('#inY', 'input', () => inspectorEdit(s => { const v = parseFloat($('#inY').value); if (isFinite(v)) s.cy = v; }));
+  on('#inW', 'input', () => inspectorEdit(s => { const v = parseFloat($('#inW').value); if (isFinite(v) && v > 0.1) s.w = v; }));
+  on('#inH', 'input', () => inspectorEdit(s => { const v = parseFloat($('#inH').value); if (isFinite(v) && v > 0.1) s.h = v; }));
+  on('#inRot', 'input', () => inspectorEdit(s => { const v = parseFloat($('#inRot').value); if (isFinite(v)) s.rot = v; }));
+  on('#inRadius', 'input', () => inspectorEdit(s => { if (s.type === 'rect' || s.type === 'bubble') s.p.r = Math.max(0, parseFloat($('#inRadius').value) || 0); }));
+  on('#inSides', 'input', () => inspectorEdit(s => { if (s.type === 'polygon') s.p.sides = clamp(Math.round(parseFloat($('#inSides').value) || 6), 3, 24); }));
+  on('#inPoints', 'input', () => inspectorEdit(s => { if (s.type === 'star') s.p.points = clamp(Math.round(parseFloat($('#inPoints').value) || 5), 3, 20); }));
+  on('#inInner', 'input', () => inspectorEdit(s => { if (s.type === 'star') s.p.inner = parseFloat($('#inInner').value); }));
+  on('#inThick', 'input', () => inspectorEdit(s => { if (s.type === 'cross') s.p.t = parseFloat($('#inThick').value); }));
+  ['#inFill', '#inStroke', '#inSw', '#inOpacity', '#inX', '#inY', '#inW', '#inH', '#inRot', '#inRadius', '#inSides', '#inPoints', '#inInner', '#inThick']
+    .forEach(s => $(s).addEventListener('change', closeGesture));
+}
+
+/* ================= pointer interaction ================= */
+function svgPoint(ev){
+  const pt = new DOMPoint(ev.clientX, ev.clientY);
+  const m = board.getScreenCTM();
+  if (!m) return [0, 0];
+  const p = pt.matrixTransform(m.inverse());
+  return [p.x, p.y];
+}
+function distToSeg(p, a, b){
+  const dx = b[0] - a[0], dy = b[1] - a[1];
+  const len2 = dx * dx + dy * dy;
+  const t = len2 ? clamp(((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / len2, 0, 1) : 0;
+  const qx = a[0] + t * dx, qy = a[1] + t * dy;
+  return Math.hypot(p[0] - qx, p[1] - qy);
+}
+function hitShape(pt){
+  for (let i = state.shapes.length - 1; i >= 0; i--){
+    const sh = state.shapes[i];
+    const g = worldGeom(sh);
+    if (g.open){
+      const tol = Math.max(sh.sw, state.n / 24);
+      for (let k = 0; k < g.pts.length - 1; k++)
+        if (distToSeg(pt, g.pts[k], g.pts[k + 1]) < tol) return sh;
+    } else {
+      if (pointInPoly(pt, g.rings)) return sh;
+      if (sh.sw > 0){
+        const tol = sh.sw;
+        for (const r of g.rings)
+          for (let k = 0; k < r.length; k++)
+            if (distToSeg(pt, r[k], r[(k + 1) % r.length]) < tol) return sh;
+      }
+    }
+  }
+  return null;
+}
+let drag = null; // { mode, start:[x,y], orig: [{id,cx,cy,w,h,rot}], corner, moved }
+board.addEventListener('pointerdown', ev => {
+  const pt = svgPoint(ev);
+  const t = ev.target;
+  const handle = t.getAttribute && t.getAttribute('data-handle');
+  if (handle && state.sel.length === 1){
+    const sh = byId(state.sel[0]);
+    if (sh && !sh.locked){
+      drag = { mode: handle, start: pt, corner: parseInt(t.getAttribute('data-corner') || '0', 10),
+               orig: [{ id: sh.id, cx: sh.cx, cy: sh.cy, w: sh.w, h: sh.h, rot: sh.rot || 0 }], moved: false };
+      board.setPointerCapture(ev.pointerId);
+      ev.preventDefault();
+      return;
+    }
+  }
+  const sh = hitShape(pt);
+  if (sh && !sh.locked){
+    if (ev.shiftKey){
+      state.sel = state.sel.includes(sh.id) ? state.sel.filter(i => i !== sh.id) : state.sel.concat(sh.id);
+      renderAll();
+      return;
+    }
+    if (!state.sel.includes(sh.id)) state.sel = [sh.id];
+    drag = { mode: 'move', start: pt,
+             orig: selShapes().filter(s => !s.locked).map(s => ({ id: s.id, cx: s.cx, cy: s.cy, w: s.w, h: s.h, rot: s.rot || 0 })),
+             moved: false };
+    board.setPointerCapture(ev.pointerId);
+    renderAll();
+    ev.preventDefault();
+  } else if (!ev.shiftKey){
+    if (state.sel.length){ state.sel = []; renderAll(); }
+  }
+});
+board.addEventListener('pointermove', ev => {
+  if (!drag) return;
+  const pt = svgPoint(ev);
+  const dx = pt[0] - drag.start[0], dy = pt[1] - drag.start[1];
+  if (!drag.moved && Math.hypot(dx, dy) < state.n / 200) return;
+  if (!drag.moved){ pushUndo(); drag.moved = true; }
+  if (drag.mode === 'move'){
+    const sx = snapV(dx), sy = snapV(dy);
+    for (const o of drag.orig){
+      const sh = byId(o.id); if (!sh) continue;
+      sh.cx = o.cx + (snapEnabled() ? sx : dx);
+      sh.cy = o.cy + (snapEnabled() ? sy : dy);
+    }
+  } else if (drag.mode === 'scale'){
+    const o = drag.orig[0], sh = byId(o.id); if (!sh) return;
+    const a = deg2rad(o.rot), c = Math.cos(a), s = Math.sin(a);
+    // pointer in shape-local (unrotated) coords relative to original center
+    const lx = (pt[0] - o.cx) * c + (pt[1] - o.cy) * s;
+    const ly = -(pt[0] - o.cx) * s + (pt[1] - o.cy) * c;
+    const signs = [[-1, -1], [1, -1], [1, 1], [-1, 1]][drag.corner];
+    const ax = -signs[0] * o.w / 2, ay = -signs[1] * o.h / 2; // anchor = opposite corner (local)
+    let nw = Math.abs(lx - ax), nh = Math.abs(ly - ay);
+    if (ev.shiftKey){ const k = Math.max(nw / o.w, nh / o.h); nw = o.w * k; nh = o.h * k; }
+    nw = Math.max(0.25, snapEnabled() ? Math.max(snapStep(), snapV(nw)) : nw);
+    nh = Math.max(0.25, snapEnabled() ? Math.max(snapStep(), snapV(nh)) : nh);
+    const ncxL = ax + signs[0] * nw / 2, ncyL = ay + signs[1] * nh / 2;
+    sh.w = nw; sh.h = nh;
+    sh.cx = o.cx + ncxL * c - ncyL * s;
+    sh.cy = o.cy + ncxL * s + ncyL * c;
+  } else if (drag.mode === 'rotate'){
+    const o = drag.orig[0], sh = byId(o.id); if (!sh) return;
+    let ang = Math.atan2(pt[1] - o.cy, pt[0] - o.cx) * 180 / Math.PI + 90;
+    if (snapEnabled() || ev.shiftKey) ang = Math.round(ang / 15) * 15;
+    sh.rot = ((ang % 360) + 360) % 360;
+  }
+  renderBoard(); renderInspector();
+});
+function endDrag(){
+  if (drag && drag.moved){ renderAll(); }
+  drag = null;
+}
+board.addEventListener('pointerup', endDrag);
+board.addEventListener('pointercancel', endDrag);
+
+/* ================= align / arrange ================= */
+function alignSel(mode){
+  const sel = selShapes().filter(s => !s.locked);
+  if (!sel.length) return;
+  pushUndo();
+  const boxes = sel.map(s => ({ s, b: shapeBBox(s) }));
+  let target;
+  if (sel.length === 1) target = { minX: 0, maxX: state.n, minY: 0, maxY: state.n };
+  else {
+    target = {
+      minX: Math.min(...boxes.map(x => x.b.minX)), maxX: Math.max(...boxes.map(x => x.b.maxX)),
+      minY: Math.min(...boxes.map(x => x.b.minY)), maxY: Math.max(...boxes.map(x => x.b.maxY)),
+    };
+  }
+  const tcx = (target.minX + target.maxX) / 2, tcy = (target.minY + target.maxY) / 2;
+  for (const { s, b } of boxes){
+    if (mode === 'left') s.cx += target.minX - b.minX;
+    if (mode === 'right') s.cx += target.maxX - b.maxX;
+    if (mode === 'hcenter') s.cx += tcx - b.cx;
+    if (mode === 'top') s.cy += target.minY - b.minY;
+    if (mode === 'bottom') s.cy += target.maxY - b.maxY;
+    if (mode === 'vmiddle') s.cy += tcy - b.cy;
+  }
+  renderAll();
+}
+function centerOnCanvas(){
+  const sel = selShapes().filter(s => !s.locked);
+  if (!sel.length) return;
+  pushUndo();
+  const boxes = sel.map(s => shapeBBox(s));
+  const minX = Math.min(...boxes.map(b => b.minX)), maxX = Math.max(...boxes.map(b => b.maxX));
+  const minY = Math.min(...boxes.map(b => b.minY)), maxY = Math.max(...boxes.map(b => b.maxY));
+  const dx = state.n / 2 - (minX + maxX) / 2, dy = state.n / 2 - (minY + maxY) / 2;
+  sel.forEach(s => { s.cx += dx; s.cy += dy; });
+  renderAll();
+}
+
+/* ================= boolean ops ================= */
+function booleanOp(op){
+  const sel = selShapes().filter(s => !s.locked);
+  if (sel.length < 2){ flash('Select at least 2 shapes for boolean ops.', 'err'); return; }
+  if (sel.some(s => s.open)){ flash('Open shapes (line / polyline) can\'t be used in booleans.', 'err'); return; }
+  const ordered = state.shapes.filter(s => sel.includes(s)); // bottom → top
+  try {
+    let rings = worldGeom(ordered[0]).rings;
+    for (let i = 1; i < ordered.length; i++){
+      rings = polyBoolean(rings, worldGeom(ordered[i]).rings, op);
+    }
+    rings = rings.map(cleanRing).filter(r => r.length >= 3);
+    if (!rings.length){ flash('Result is empty — shapes don\'t overlap that way. Nothing changed.', 'err'); return; }
+    pushUndo();
+    let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+    for (const r of rings) for (const p of r){
+      minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]);
+      minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]);
+    }
+    const w = Math.max(0.25, maxX - minX), h = Math.max(0.25, maxY - minY);
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    const base = ordered[0];
+    state.counter.path = (state.counter.path || 0) + 1;
+    const label = { union: 'Union', subtract: 'Cutout', intersect: 'Intersect' }[op] || 'Path';
+    const merged = {
+      id: state.nextId++, type: 'path', name: `${label} ${state.counter.path}`,
+      cx, cy, w, h, rot: 0,
+      fill: base.fill === 'none' ? PALETTE[0] : base.fill,
+      stroke: base.stroke, sw: base.sw, cap: base.cap, join: base.join,
+      opacity: base.opacity, locked: false, open: false, p: {},
+      rings: rings.map(r => r.map(p => [Math.round((p[0] - cx) / w * 1e4) / 1e4, Math.round((p[1] - cy) / h * 1e4) / 1e4])),
+    };
+    const insertAt = state.shapes.indexOf(ordered[0]);
+    state.shapes = state.shapes.filter(s => !sel.includes(s));
+    state.shapes.splice(Math.min(insertAt, state.shapes.length), 0, merged);
+    state.sel = [merged.id];
+    renderAll();
+    flash(`${label} created (${rings.length} ring${rings.length > 1 ? 's' : ''}).`, 'ok');
+  } catch (e){
+    flash('Boolean op failed on this geometry — try nudging a shape slightly.', 'err');
+  }
+}
+
+/* ================= duplicate / delete ================= */
+function duplicateSel(){
+  const sel = selShapes();
+  if (!sel.length) return;
+  pushUndo();
+  const clones = sel.map(s => {
+    const c = JSON.parse(JSON.stringify(s));
+    c.id = state.nextId++;
+    c.name = s.name + ' copy';
+    c.cx += snapEnabled() ? snapStep() * 2 : 1;
+    c.cy += snapEnabled() ? snapStep() * 2 : 1;
+    c.locked = false;
+    return c;
+  });
+  state.shapes.push(...clones);
+  state.sel = clones.map(c => c.id);
+  renderAll();
+  flash(`Duplicated ${clones.length} shape${clones.length > 1 ? 's' : ''}.`, 'ok');
+}
+function deleteSel(){
+  const sel = selShapes().filter(s => !s.locked);
+  if (!sel.length) return;
+  pushUndo();
+  state.shapes = state.shapes.filter(s => !sel.includes(s));
+  state.sel = [];
+  renderAll();
+  flash('Deleted.', 'ok');
+}
+
+/* ================= export ================= */
+function styleKey(sh){
+  return [sh.open ? 'none' : sh.fill, sh.stroke, sh.sw, sh.cap, sh.join, sh.opacity].join('|');
+}
+function buildSVG(){
+  const n = state.n;
+  const groups = []; // merge consecutive same-style, non-overlapping shapes into one path
+  for (const sh of state.shapes){
+    const g = worldGeom(sh);
+    const d = g.open ? openToD(g.pts) : ringsToD(g.rings);
+    const multiRing = !g.open && g.rings.length > 1;
+    const bb = shapeBBox(sh);
+    const last = groups[groups.length - 1];
+    const overlaps = last && last.bbs.some(o => !(bb.maxX < o.minX || bb.minX > o.maxX || bb.maxY < o.minY || bb.minY > o.maxY));
+    // only merge when neither piece has holes and bboxes are disjoint — merging
+    // overlapping subpaths under evenodd would punch unintended holes
+    if (last && last.key === styleKey(sh) && !last.open && !g.open && !last.multiRing && !multiRing && !overlaps){
+      last.d += ' ' + d;
+      last.bbs.push(bb);
+    } else {
+      groups.push({ key: styleKey(sh), d, sh, open: !!g.open, multiRing, bbs: [bb] });
+    }
+  }
+  const paths = groups.map(gr => {
+    const sh = gr.sh;
+    const at = [`d="${gr.d}"`];
+    at.push(`fill="${gr.open ? 'none' : sh.fill}"`);
+    if (gr.multiRing) at.push('fill-rule="evenodd"');
+    if (sh.sw > 0){
+      at.push(`stroke="${sh.stroke}"`, `stroke-width="${fmt(sh.sw)}"`);
+      if (sh.cap !== 'butt') at.push(`stroke-linecap="${sh.cap}"`);
+      if (sh.join !== 'miter') at.push(`stroke-linejoin="${sh.join}"`);
+    }
+    if (sh.opacity < 1) at.push(`opacity="${fmt(sh.opacity)}"`);
+    return `  <path ${at.join(' ')}/>`;
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n} ${n}" width="${n}" height="${n}">\n${paths.join('\n')}\n</svg>`;
+}
+function download(name, blob){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+function exportSVGFile(){
+  if (!state.shapes.length){ flash('Nothing to export yet.', 'err'); return; }
+  const svg = buildSVG();
+  download('icon.svg', new Blob([svg], { type: 'image/svg+xml' }));
+  $('#exportNote').textContent = `SVG exported — ${(svg.length / 1024).toFixed(1)} KB, ${state.shapes.length} shape(s).`;
+}
+async function copySVG(btn){
+  if (!state.shapes.length){ flash('Nothing to copy yet.', 'err'); return; }
+  try {
+    await navigator.clipboard.writeText(buildSVG());
+    btn.classList.add('copied'); setTimeout(() => btn.classList.remove('copied'), 1200);
+    flash('SVG copied to clipboard.', 'ok');
+  } catch (e){ flash('Clipboard blocked — use the download button instead.', 'err'); }
+}
+function exportPNG(){
+  if (!state.shapes.length){ flash('Nothing to export yet.', 'err'); return; }
+  const mult = parseInt($('#pngScale').value, 10) || 2;
+  const px = state.n * mult;
+  const svg = buildSVG().replace(`width="${state.n}" height="${state.n}"`, `width="${px}" height="${px}"`);
+  const blob = new Blob([svg], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    const cv = document.createElement('canvas');
+    cv.width = px; cv.height = px;
+    cv.getContext('2d').drawImage(img, 0, 0, px, px);
+    URL.revokeObjectURL(url);
+    cv.toBlob(b => {
+      if (b){ download(`icon-${px}px.png`, b); $('#exportNote').textContent = `PNG exported at ${px}×${px}px (${mult}×).`; }
+      else flash('PNG export failed in this browser.', 'err');
+    }, 'image/png');
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); flash('PNG render failed.', 'err'); };
+  img.src = url;
+}
+
+/* ================= share / save / load ================= */
+function encodeState(){
+  const json = JSON.stringify({ v: 1, n: state.n, shapes: state.shapes });
+  return btoa(unescape(encodeURIComponent(json))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodeState(b64){
+  const s = b64.replace(/-/g, '+').replace(/_/g, '/');
+  const d = JSON.parse(decodeURIComponent(escape(atob(s))));
+  if (!d || d.v !== 1 || !Array.isArray(d.shapes)) return false;
+  state.n = [16, 24, 32, 48, 64].includes(d.n) ? d.n : 24;
+  state.shapes = d.shapes;
+  state.nextId = Math.max(0, ...d.shapes.map(x => x.id || 0)) + 1;
+  state.sel = [];
+  $('#canvasSize').value = String(state.n);
+  return true;
+}
+async function shareLink(btn){
+  if (!state.shapes.length){ flash('Nothing to share yet.', 'err'); return; }
+  const enc = encodeState();
+  if (enc.length > 6000){
+    flash('Project too big for a URL — use ⬇ JSON to save it instead.', 'err');
+    return;
+  }
+  const url = location.origin + location.pathname + '#s=' + enc;
+  try {
+    await navigator.clipboard.writeText(url);
+    location.hash = 's=' + enc;
+    btn.classList.add('copied'); setTimeout(() => btn.classList.remove('copied'), 1200);
+    flash('Share link copied to clipboard.', 'ok');
+  } catch (e){
+    location.hash = 's=' + enc;
+    flash('Link is in the address bar (clipboard blocked).', 'ok');
+  }
+}
+function saveJSON(){
+  const json = JSON.stringify({ v: 1, n: state.n, shapes: state.shapes }, null, 1);
+  download('icon-project.json', new Blob([json], { type: 'application/json' }));
+}
+function loadJSONFile(file){
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const d = JSON.parse(rd.result);
+      if (!d || !Array.isArray(d.shapes)) throw new Error('bad');
+      pushUndo();
+      state.n = [16, 24, 32, 48, 64].includes(d.n) ? d.n : 24;
+      state.shapes = d.shapes;
+      state.nextId = Math.max(0, ...d.shapes.map(x => x.id || 0)) + 1;
+      state.sel = [];
+      $('#canvasSize').value = String(state.n);
+      renderAll();
+      flash(`Loaded project (${d.shapes.length} shapes).`, 'ok');
+    } catch (e){ flash('That file isn\'t a valid icon project JSON.', 'err'); }
+  };
+  rd.onerror = () => flash('Could not read that file.', 'err');
+  rd.readAsText(file);
+}
+
+/* ================= path d import ================= */
+function parsePathD(d){
+  const tokens = d.match(/[a-zA-Z]|-?\d*\.?\d+(?:e[-+]?\d+)?/gi);
+  if (!tokens || !tokens.length) throw new Error('empty');
+  let i = 0;
+  const num = () => { const v = parseFloat(tokens[i++]); if (!isFinite(v)) throw new Error('number expected'); return v; };
+  const rings = []; let cur = [];
+  let x = 0, y = 0, sx = 0, sy = 0, cmd = '', prevCtrl = null, prevQCtrl = null, closedAny = false;
+  const push = (px, py) => cur.push([px, py]);
+  const flattenCubic = (x0, y0, x1, y1, x2, y2, x3, y3) => {
+    for (let k = 1; k <= 16; k++){
+      const t = k / 16, u = 1 - t;
+      push(u * u * u * x0 + 3 * u * u * t * x1 + 3 * u * t * t * x2 + t * t * t * x3,
+           u * u * u * y0 + 3 * u * u * t * y1 + 3 * u * t * t * y2 + t * t * t * y3);
+    }
+  };
+  const flattenQuad = (x0, y0, x1, y1, x2, y2) => {
+    for (let k = 1; k <= 12; k++){
+      const t = k / 12, u = 1 - t;
+      push(u * u * x0 + 2 * u * t * x1 + t * t * x2, u * u * y0 + 2 * u * t * y1 + t * t * y2);
+    }
+  };
+  const flattenArc = (x0, y0, rx, ry, phi, laf, sf, x1, y1) => {
+    rx = Math.abs(rx); ry = Math.abs(ry);
+    if (rx < 1e-9 || ry < 1e-9){ push(x1, y1); return; }
+    const rad = deg2rad(phi), cp = Math.cos(rad), sp = Math.sin(rad);
+    const dx = (x0 - x1) / 2, dy = (y0 - y1) / 2;
+    const x1p = cp * dx + sp * dy, y1p = -sp * dx + cp * dy;
+    let lam = (x1p * x1p) / (rx * rx) + (y1p * y1p) / (ry * ry);
+    if (lam > 1){ const s = Math.sqrt(lam); rx *= s; ry *= s; }
+    const sign = laf !== sf ? 1 : -1;
+    const numer = rx * rx * ry * ry - rx * rx * y1p * y1p - ry * ry * x1p * x1p;
+    const denom = rx * rx * y1p * y1p + ry * ry * x1p * x1p;
+    const co = sign * Math.sqrt(Math.max(0, numer / denom));
+    const cxp = co * rx * y1p / ry, cyp = -co * ry * x1p / rx;
+    const cx = cp * cxp - sp * cyp + (x0 + x1) / 2;
+    const cy = sp * cxp + cp * cyp + (y0 + y1) / 2;
+    const ang = (ux, uy, vx, vy) => {
+      const dot = ux * vx + uy * vy, len = Math.hypot(ux, uy) * Math.hypot(vx, vy);
+      let a = Math.acos(clamp(dot / len, -1, 1));
+      if (ux * vy - uy * vx < 0) a = -a;
+      return a;
+    };
+    const th0 = ang(1, 0, (x1p - cxp) / rx, (y1p - cyp) / ry);
+    let dth = ang((x1p - cxp) / rx, (y1p - cyp) / ry, (-x1p - cxp) / rx, (-y1p - cyp) / ry);
+    if (!sf && dth > 0) dth -= 2 * Math.PI;
+    if (sf && dth < 0) dth += 2 * Math.PI;
+    const steps = Math.max(2, Math.ceil(Math.abs(dth) / (Math.PI / 30)));
+    for (let k = 1; k <= steps; k++){
+      const th = th0 + dth * (k / steps);
+      push(cp * rx * Math.cos(th) - sp * ry * Math.sin(th) + cx,
+           sp * rx * Math.cos(th) + cp * ry * Math.sin(th) + cy);
+    }
+  };
+  const closeRing = () => { if (cur.length >= 2){ rings.push(cur); } cur = []; };
+  while (i < tokens.length){
+    const t = tokens[i];
+    if (/[a-zA-Z]/.test(t)){ cmd = t; i++; }
+    const rel = cmd === cmd.toLowerCase();
+    const C = cmd.toUpperCase();
+    if (C === 'Z'){ closedAny = true; closeRing(); x = sx; y = sy; prevCtrl = prevQCtrl = null; continue; }
+    switch (C){
+      case 'M': {
+        const nx = num() + (rel ? x : 0), ny = num() + (rel ? y : 0);
+        if (cur.length >= 2) closeRing(); else cur = [];
+        x = sx = nx; y = sy = ny; push(x, y);
+        cmd = rel ? 'l' : 'L';
+        prevCtrl = prevQCtrl = null;
+        break;
+      }
+      case 'L': { x = num() + (rel ? x : 0); y = num() + (rel ? y : 0); push(x, y); prevCtrl = prevQCtrl = null; break; }
+      case 'H': { x = num() + (rel ? x : 0); push(x, y); prevCtrl = prevQCtrl = null; break; }
+      case 'V': { y = num() + (rel ? y : 0); push(x, y); prevCtrl = prevQCtrl = null; break; }
+      case 'C': {
+        const x1 = num() + (rel ? x : 0), y1 = num() + (rel ? y : 0);
+        const x2 = num() + (rel ? x : 0), y2 = num() + (rel ? y : 0);
+        const x3 = num() + (rel ? x : 0), y3 = num() + (rel ? y : 0);
+        flattenCubic(x, y, x1, y1, x2, y2, x3, y3);
+        prevCtrl = [x2, y2]; prevQCtrl = null; x = x3; y = y3;
+        break;
+      }
+      case 'S': {
+        const x1 = prevCtrl ? 2 * x - prevCtrl[0] : x, y1 = prevCtrl ? 2 * y - prevCtrl[1] : y;
+        const x2 = num() + (rel ? x : 0), y2 = num() + (rel ? y : 0);
+        const x3 = num() + (rel ? x : 0), y3 = num() + (rel ? y : 0);
+        flattenCubic(x, y, x1, y1, x2, y2, x3, y3);
+        prevCtrl = [x2, y2]; prevQCtrl = null; x = x3; y = y3;
+        break;
+      }
+      case 'Q': {
+        const x1 = num() + (rel ? x : 0), y1 = num() + (rel ? y : 0);
+        const x2 = num() + (rel ? x : 0), y2 = num() + (rel ? y : 0);
+        flattenQuad(x, y, x1, y1, x2, y2);
+        prevQCtrl = [x1, y1]; prevCtrl = null; x = x2; y = y2;
+        break;
+      }
+      case 'T': {
+        const x1 = prevQCtrl ? 2 * x - prevQCtrl[0] : x, y1 = prevQCtrl ? 2 * y - prevQCtrl[1] : y;
+        const x2 = num() + (rel ? x : 0), y2 = num() + (rel ? y : 0);
+        flattenQuad(x, y, x1, y1, x2, y2);
+        prevQCtrl = [x1, y1]; prevCtrl = null; x = x2; y = y2;
+        break;
+      }
+      case 'A': {
+        const rx = num(), ry = num(), phi = num(), laf = num() ? 1 : 0, sf = num() ? 1 : 0;
+        const x1 = num() + (rel ? x : 0), y1 = num() + (rel ? y : 0);
+        flattenArc(x, y, rx, ry, phi, laf, sf, x1, y1);
+        prevCtrl = prevQCtrl = null; x = x1; y = y1;
+        break;
+      }
+      default: throw new Error(`unsupported command "${cmd}"`);
+    }
+  }
+  if (cur.length >= 2) rings.push(cur);
+  return { rings: rings.map(cleanRing).filter(r => r.length >= 2), closed: closedAny || rings.every(r => r.length >= 3) };
+}
+function importPathD(){
+  const d = $('#pathD').value.trim();
+  if (!d){ flash('Paste a path d string first.', 'err'); return; }
+  let parsed;
+  try { parsed = parsePathD(d); } catch (e){ flash(`Couldn't parse that path: ${e.message}.`, 'err'); return; }
+  if (!parsed.rings.length){ flash('That path produced no usable geometry.', 'err'); return; }
+  const pts = parsed.rings.flat();
+  let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+  for (const p of pts){ minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]); minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]); }
+  const w = Math.max(0.25, maxX - minX), h = Math.max(0.25, maxY - minY);
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  const open = parsed.rings.length === 1 && parsed.rings[0].length === 2 ? true : !parsed.closed;
+  pushUndo();
+  state.counter.path = (state.counter.path || 0) + 1;
+  const fits = maxX <= state.n * 1.5 && maxY <= state.n * 1.5 && minX >= -state.n * 0.5 && minY >= -state.n * 0.5;
+  const scale = fits ? 1 : Math.min((state.n * 0.8) / w, (state.n * 0.8) / h);
+  const sh = {
+    id: state.nextId++, type: 'path', name: `Imported ${state.counter.path}`,
+    cx: fits ? cx : state.n / 2, cy: fits ? cy : state.n / 2,
+    w: w * scale, h: h * scale, rot: 0,
+    fill: open ? 'none' : PALETTE[state.shapes.length % PALETTE.length],
+    stroke: '#1c2530', sw: open ? 1 : 0, cap: 'round', join: 'round',
+    opacity: 1, locked: false, open, p: {},
+    rings: parsed.rings.map(r => r.map(p => [(p[0] - cx) / w, (p[1] - cy) / h])),
+  };
+  state.shapes.push(sh);
+  state.sel = [sh.id];
+  renderAll();
+  flash(`Imported path (${parsed.rings.length} subpath${parsed.rings.length > 1 ? 's' : ''}${fits ? '' : ', scaled to fit'}).`, 'ok');
+}
+
+/* ================= previews ================= */
+function renderPreviews(){
+  const box = $('#previews');
+  box.innerHTML = '';
+  if (!state.shapes.length){ box.innerHTML = '<span class="note">Previews appear once you add shapes.</span>'; return; }
+  const svg = buildSVG();
+  for (const size of [16, 24, 32, 64]){
+    const pv = document.createElement('div');
+    pv.className = 'pv';
+    const chips = document.createElement('div');
+    chips.className = 'pvchips';
+    for (const mode of ['light', 'dark']){
+      const chip = document.createElement('div');
+      chip.className = 'pchip ' + mode;
+      const pad = Math.max(4, Math.round(size * 0.22));
+      chip.style.width = chip.style.height = (size + pad * 2) + 'px';
+      chip.innerHTML = svg.replace(/width="\d+" height="\d+"/, `width="${size}" height="${size}"`);
+      chips.appendChild(chip);
+    }
+    const lbl = document.createElement('span');
+    lbl.className = 'lbl'; lbl.textContent = size + 'px';
+    pv.appendChild(chips); pv.appendChild(lbl);
+    box.appendChild(pv);
+  }
+}
+
+/* ================= shape library chips ================= */
+const CHIP_ICONS = {
+  rect: '<svg viewBox="0 0 16 16"><path d="M2 3h12v10H2z"/></svg>',
+  circle: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/></svg>',
+  ellipse: '<svg viewBox="0 0 16 16"><path d="M8 3.5c3.6 0 6.5 2 6.5 4.5S11.6 12.5 8 12.5 1.5 10.5 1.5 8 4.4 3.5 8 3.5z"/></svg>',
+  line: '<svg viewBox="0 0 16 16"><path d="M2 13 13 2l1 1L3 14z"/></svg>',
+  polyline: '<svg viewBox="0 0 16 16"><path d="M1 13 5 4l3 6 3-8 3 4-1 .8-2-2.6-3 8-3-6-3 7z"/></svg>',
+  polygon: '<svg viewBox="0 0 16 16"><path d="M8 1.5 13.6 4.8v6.4L8 14.5 2.4 11.2V4.8z"/></svg>',
+  star: '<svg viewBox="0 0 16 16"><path d="m8 1 1.9 4.6 5 .3-3.9 3.2 1.3 4.9L8 11.3 3.7 14l1.3-4.9L1.1 5.9l5-.3z"/></svg>',
+  arrow: '<svg viewBox="0 0 16 16"><path d="M1 6.5h8v-3L15 8l-6 4.5v-3H1z"/></svg>',
+  heart: '<svg viewBox="0 0 16 16"><path d="M8 14 2.6 8.6a3.4 3.4 0 0 1 4.8-4.8L8 4.4l.6-.6a3.4 3.4 0 0 1 4.8 4.8z"/></svg>',
+  shield: '<svg viewBox="0 0 16 16"><path d="M8 1.2 14 3v5c0 3.4-2.5 5.8-6 7-3.5-1.2-6-3.6-6-7V3z"/></svg>',
+  bubble: '<svg viewBox="0 0 16 16"><path d="M2 2h12v8H6l-3 3v-3H2z"/></svg>',
+  cross: '<svg viewBox="0 0 16 16"><path d="M6 1h4v5h5v4h-5v5H6v-5H1V6h5z"/></svg>',
+  crescent: '<svg viewBox="0 0 16 16"><path d="M9 1a7 7 0 1 0 6 10.5A6 6 0 0 1 9 1z"/></svg>',
+};
+function buildChips(){
+  const box = $('#shapeChips');
+  for (const def of SHAPE_DEFS){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip';
+    b.innerHTML = (CHIP_ICONS[def.type] || '') + def.label;
+    b.title = 'Add ' + def.label.toLowerCase();
+    b.addEventListener('click', () => addShape(def.type));
+    box.appendChild(b);
+  }
+}
+
+/* ================= sample ================= */
+function loadSample(){
+  pushUndo();
+  state.n = 24;
+  $('#canvasSize').value = '24';
+  state.counter = { circle: 2, polygon: 1, path: 0 };
+  state.nextId = 1;
+  const mk = o => Object.assign({
+    id: state.nextId++, rot: 0, stroke: '#1c2530', sw: 0, cap: 'round', join: 'round',
+    opacity: 1, locked: false, open: false, p: {},
+  }, o);
+  state.shapes = [
+    mk({ type: 'polygon', name: 'Pin tip', cx: 12, cy: 16, w: 11, h: 12, rot: 180, fill: '#e0483e', p: { sides: 3 } }),
+    mk({ type: 'circle', name: 'Pin head', cx: 12, cy: 9.5, w: 13, h: 13, fill: '#e0483e' }),
+    mk({ type: 'circle', name: 'Pin hole', cx: 12, cy: 9.5, w: 5.5, h: 5.5, fill: '#ffffff' }),
+  ];
+  state.sel = [];
+  renderAll();
+  flash('Sample loaded — try selecting all 3 layers (shift-click) and hitting Subtract, or the first two and Unite.', 'ok');
+}
+
+/* ================= status flash ================= */
+let flashTimer = null;
+function flash(msg, kind){
+  const s = $('#status');
+  s.textContent = msg;
+  s.className = 'note' + (kind ? ' ' + kind : '');
+  clearTimeout(flashTimer);
+  if (msg) flashTimer = setTimeout(() => { s.textContent = ''; s.className = 'note'; }, 3400);
+}
+
+/* ================= render all ================= */
+function renderAll(){
+  renderBoard();
+  renderLayers();
+  renderInspector();
+  renderPreviews();
+  updateUndoBtns();
+  const closed = selShapes().filter(s => !s.open && !s.locked).length;
+  $('#boolNote').textContent = closed >= 2 ? `${closed} shapes ready` : 'select 2+ closed shapes';
+}
+
+/* ================= wiring ================= */
+buildChips();
+wireInspector();
+$('#canvasSize').addEventListener('change', () => {
+  const nn = parseInt($('#canvasSize').value, 10);
+  if (nn === state.n) return;
+  pushUndo();
+  const k = nn / state.n;
+  state.shapes.forEach(s => { s.cx *= k; s.cy *= k; s.w *= k; s.h *= k; s.sw = Math.round(s.sw * k * 100) / 100; if (s.p && s.p.r) s.p.r *= k; });
+  state.n = nn;
+  renderAll();
+  flash(`Canvas now ${nn}×${nn} (shapes scaled to match).`, 'ok');
+});
+$('#snapOn').addEventListener('change', () => flash($('#snapOn').checked ? 'Snap on.' : 'Snap off.'));
+$('#undoBtn').addEventListener('click', undo);
+$('#redoBtn').addEventListener('click', redo);
+$('#sampleBtn').addEventListener('click', loadSample);
+$('#clearBtn').addEventListener('click', () => {
+  if (!state.shapes.length) return;
+  pushUndo();
+  state.shapes = []; state.sel = [];
+  renderAll();
+  flash('Cleared (Ctrl+Z to undo).', 'ok');
+});
+$('#dupBtn').addEventListener('click', duplicateSel);
+$('#delBtn').addEventListener('click', deleteSel);
+$$('#inspector [data-align]').forEach(b => b.addEventListener('click', () => alignSel(b.getAttribute('data-align'))));
+$('#centerCanvasBtn').addEventListener('click', centerOnCanvas);
+$('#boolUnite').addEventListener('click', () => booleanOp('union'));
+$('#boolSubtract').addEventListener('click', () => booleanOp('subtract'));
+$('#boolIntersect').addEventListener('click', () => booleanOp('intersect'));
+$('#dlSvgBtn').addEventListener('click', exportSVGFile);
+$('#copySvgBtn').addEventListener('click', ev => copySVG(ev.currentTarget));
+$('#dlPngBtn').addEventListener('click', exportPNG);
+$('#shareBtn').addEventListener('click', ev => shareLink(ev.currentTarget));
+$('#saveJsonBtn').addEventListener('click', saveJSON);
+$('#loadJsonBtn').addEventListener('click', () => $('#jsonFile').click());
+$('#jsonFile').addEventListener('change', ev => {
+  const f = ev.target.files && ev.target.files[0];
+  if (f) loadJSONFile(f);
+  ev.target.value = '';
+});
+$('#importDBtn').addEventListener('click', importPathD);
+
+document.addEventListener('keydown', ev => {
+  const tag = (document.activeElement && document.activeElement.tagName) || '';
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  const mod = ev.ctrlKey || ev.metaKey;
+  if (mod && ev.key.toLowerCase() === 'z' && !ev.shiftKey){ ev.preventDefault(); undo(); return; }
+  if ((mod && ev.key.toLowerCase() === 'z' && ev.shiftKey) || (mod && ev.key.toLowerCase() === 'y')){ ev.preventDefault(); redo(); return; }
+  if (mod && ev.key.toLowerCase() === 'd'){ ev.preventDefault(); duplicateSel(); return; }
+  if (ev.key === 'Delete' || ev.key === 'Backspace'){ ev.preventDefault(); deleteSel(); return; }
+  if (ev.key === 'Escape'){ state.sel = []; renderAll(); return; }
+  const nudge = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[ev.key];
+  if (nudge){
+    const sel = selShapes().filter(s => !s.locked);
+    if (!sel.length) return;
+    ev.preventDefault();
+    pushUndo();
+    const step = (snapEnabled() ? snapStep() : 0.25) * (ev.shiftKey ? 5 : 1);
+    sel.forEach(s => { s.cx += nudge[0] * step; s.cy += nudge[1] * step; });
+    renderAll();
+  }
+});
+
+/* ================= theme ================= */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+  renderAll();
+});
+
+/* ================= boot ================= */
+function boot(){
+  let loaded = false;
+  if (location.hash.startsWith('#s=')){
+    try { loaded = decodeState(location.hash.slice(3)); } catch (e){ loaded = false; }
+    if (loaded) flash('Project restored from share link.', 'ok');
+  }
+  if (!loaded) loadSample();
+  else renderAll();
+  history.length = 0; redoStack.length = 0;
+  updateUndoBtns();
+}
+boot();
+
+// test / automation hooks
+window.sis = {
+  state, addShape, byId, selShapes,
+  polyBoolean, booleanOp, worldGeom, shapeBBox, parsePathD,
+  buildSVG, encodeState, decodeState,
+  undo, redo, loadSample, alignSel, duplicateSel, deleteSel,
+  renderAll,
+};
+</script>
+</body>
+</html>
