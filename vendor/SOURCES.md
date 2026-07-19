@@ -8,7 +8,8 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/geopuesto/` and `/geopuesto/playground/` | `mapzimus/geopuesto` | |
 | `/bug-wars/` | `mapzimus/bug-wars` | |
 | `/flip-game/` | `mapzimus/flipgame` | Bottle-flip party game (PWA). |
-| `/grog-flip/` | `mapzimus/flipgame` (`grog-flip/`) | Pirate reskin for the Whydah classroom. |
+| `/grog-flip/` | `mapzimus/flipgame` (`grog-flip/`) | Pirate bottle reskin for the Whydah classroom. |
+| `/parrot-flip/` | `mapzimus/Whydah-Unit` (`parrot-flip/`) | Pirate-parrot flick party game (added 2026-07-18). Also mirrored under `src/games/parrot-flip/` and `src/whydah/parrot-flip/`. |
 | `/whydah-voyage/` | `mapzimus/Whydah-Unit` (`navigator/`) | Whydah's Voyage / First Sail. Host-bounce redirect to whydahstory.com removed so the game stays on mapzimus.com. |
 | `/black-sam/` | `mapzimus/Whydah-Unit` (`black-sam/`) | |
 | `/true-scale/` | `mapzimus/true-scale` | |
