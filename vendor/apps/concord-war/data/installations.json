@@ -1,0 +1,675 @@
+{
+  "installations": [
+    {
+      "name": "NHARNG State Military Reservation (HIMARS HQ)",
+      "category": "military",
+      "side": "East",
+      "blurb": "Battalion headquarters of the 3rd Battalion, 197th Field Artillery (M142 HIMARS) plus Joint Force HQ-NH and the 12th Civil Support Team \u2014 the command brain of the East. The launchers home-station out of town, but the order to fire originates here, giving the East the longest reach on the map.",
+      "stats": [
+        {
+          "label": "Lead unit",
+          "value": "HHB, 3-197th FA (M142 HIMARS)"
+        },
+        {
+          "label": "GMLRS / ATACMS reach",
+          "value": "70 km / 300+ km class"
+        },
+        {
+          "label": "HQ staff (est.)",
+          "value": "~100-200 + 22 CBRNE"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://currentops.com/unit/us/army/197-fa/3-bn"
+    },
+    {
+      "name": "Army Aviation Support Facility (Black Hawks)",
+      "category": "military_air",
+      "side": "East",
+      "blurb": "The AASF at Concord Municipal Airport bases both the 1-169th Aviation lift Black Hawks (UH-60L) and the C/3-238th MEDEVAC fleet (HH-60M). This rotary-wing lift is the East's single best-supported advantage \u2014 it lets the East bypass every contested river bridge entirely.",
+      "stats": [
+        {
+          "label": "Airframes",
+          "value": "UH-60L lift + HH-60M MEDEVAC"
+        },
+        {
+          "label": "Est. fleet",
+          "value": "~8-12 (OPSEC, not public)"
+        },
+        {
+          "label": "Aircrew / maint.",
+          "value": "~120-190 across two companies"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://currentops.com/installations/us/nh/nh-arng-aasf"
+    },
+    {
+      "name": "Concord Municipal Airport",
+      "category": "transport",
+      "side": "East",
+      "blurb": "The only hard-surface runway in the city and the physical home of the East's air mobility. Fuel, hangars, and a 6,000-ft runway make it the staging point for both Guard aviation and any resupply that arrives by air rather than over the bridges.",
+      "stats": [
+        {
+          "label": "Runway",
+          "value": "17/35, ~6,005 ft paved"
+        },
+        {
+          "label": "Role",
+          "value": "Airfield, fuel, air mobility hub"
+        },
+        {
+          "label": "Co-located",
+          "value": "NH Army Aviation Support Facility"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.concordnh.gov/206/Airport"
+    },
+    {
+      "name": "NH Supreme Court / State Office Park East",
+      "category": "command",
+      "side": "East",
+      "blurb": "The judicial and executive nerve center sitting on the East side of the line: the NH Supreme Court, the Department of Safety HQ (parent of State Police), and the high ground of State Office Park East. Holding it gives the East legal legitimacy plus a fortified administrative complex.",
+      "stats": [
+        {
+          "label": "Tenants",
+          "value": "Supreme Court, DOS HQ, state offices"
+        },
+        {
+          "label": "Address",
+          "value": "1 Eagle Sq / Hazen Dr complex"
+        },
+        {
+          "label": "Significance",
+          "value": "Seat of state judiciary"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.courts.nh.gov/our-courts/supreme-court"
+    },
+    {
+      "name": "NH State Data Center / Dept. of Safety HQ (33 Hazen Dr)",
+      "category": "command",
+      "side": "Contested",
+      "blurb": "The state's primary data center (Dept. of Information Technology) and State Police HQ dispatch sit on the I-93/State Office Park seam \u2014 physically straddling the front line. Whoever holds it controls statewide communications, dispatch, and the E911 backbone.",
+      "stats": [
+        {
+          "label": "Address",
+          "value": "27 & 33 Hazen Drive"
+        },
+        {
+          "label": "Function",
+          "value": "State data center + SP dispatch"
+        },
+        {
+          "label": "E911 PSAPs",
+          "value": "Concord + Laconia (2 statewide)"
+        },
+        {
+          "label": "Confidence",
+          "value": "Medium"
+        }
+      ],
+      "source_url": "https://www.doit.nh.gov/contact-us"
+    },
+    {
+      "name": "Steeplegate Mall (staging fortress)",
+      "category": "fortress",
+      "side": "East",
+      "blurb": "A dead megastructure on the Heights with acres of roofed floor and parking. In the war it converts into the East's barracks, motor pool, and forward staging area \u2014 a ready-made fortified node behind the I-93 line.",
+      "stats": [
+        {
+          "label": "Footprint",
+          "value": "~480,000 sq ft enclosed"
+        },
+        {
+          "label": "War role",
+          "value": "Barracks / staging / motor pool"
+        },
+        {
+          "label": "Location",
+          "value": "The Heights, East Concord"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.concordmonitor.com/Steeplegate-Mall-Concord-redevelopment"
+    },
+    {
+      "name": "Loudon Road logistics belt",
+      "category": "logistics",
+      "side": "East",
+      "blurb": "The Loudon Rd big-box corridor \u2014 Walmart, Sam's Club, Target, Market Basket \u2014 is the East's quartermaster. Warehouse-scale food, fuel, and dry goods sit pre-stocked east of the river, feeding a siege from the inside.",
+      "stats": [
+        {
+          "label": "Anchors",
+          "value": "Walmart, Sam's, Target, Market Basket"
+        },
+        {
+          "label": "War role",
+          "value": "Bulk food / supply depot"
+        },
+        {
+          "label": "Corridor",
+          "value": "Loudon Rd / NH 9, East bank"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.concordnh.gov/business"
+    },
+    {
+      "name": "Rymes Propane & Oil bulk plant",
+      "category": "fuel",
+      "side": "East",
+      "blurb": "A regional propane and heating-oil bulk depot at 257 Sheep Davis Rd, well east of I-93. It is the East's on-side fuel reserve \u2014 bulk heating and vehicle fuel that the West cannot reach without crossing the line.",
+      "stats": [
+        {
+          "label": "Operator",
+          "value": "Rymes (Superior Plus)"
+        },
+        {
+          "label": "Stock",
+          "value": "Bulk propane + heating oil"
+        },
+        {
+          "label": "Address",
+          "value": "257 Sheep Davis Rd (Rte 9)"
+        },
+        {
+          "label": "Confidence",
+          "value": "Medium"
+        }
+      ],
+      "source_url": "https://www.concordmonitor.com/2022/10/06/rymes-oil-new-hampshire-propane-48297740/"
+    },
+    {
+      "name": "Old Turnpike Rd landfill solar (6.7 MW)",
+      "category": "power_gen",
+      "side": "Contested",
+      "blurb": "A 6.7 MW DC array of ~11,000 panels atop the capped city landfill \u2014 local generation independent of the grid. The site geocodes near the I-93 seam, so it is flagged contested rather than safely East; verify the array footprint before claiming it.",
+      "stats": [
+        {
+          "label": "Capacity",
+          "value": "6.7 MW DC (~11,000 panels)"
+        },
+        {
+          "label": "Land",
+          "value": "17 leased acres, capped landfill"
+        },
+        {
+          "label": "Output buyer",
+          "value": "City of Concord"
+        },
+        {
+          "label": "Confidence",
+          "value": "Medium"
+        }
+      ],
+      "source_url": "https://www.concordmonitor.com/2025/04/28/concord-new-hampshire-solar-landfill-sheep-60809362/"
+    },
+    {
+      "name": "Oak Hill (eastern high ground)",
+      "category": "contested",
+      "side": "East",
+      "blurb": "The dominant terrain northeast of the city. Whoever holds Oak Hill owns the viewshed: its line of sight reaches deep across the west bank, turning East observation into East fire on roughly a third of West Concord's ground.",
+      "stats": [
+        {
+          "label": "Elevation",
+          "value": "~990 ft (city high point)"
+        },
+        {
+          "label": "West bank under fire",
+          "value": "~36.4% (beaten zone)"
+        },
+        {
+          "label": "War role",
+          "value": "Observation + fire control"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.usgs.gov/3d-elevation-program"
+    },
+    {
+      "name": "NH State House",
+      "category": "govt",
+      "side": "West",
+      "blurb": "The oldest state capitol in the U.S. still seating its legislature in its original chambers \u2014 the symbolic seat of New Hampshire. The West holds the legitimacy of government even as the East holds the guns.",
+      "stats": [
+        {
+          "label": "Built",
+          "value": "1819 (oldest in original use)"
+        },
+        {
+          "label": "Role",
+          "value": "Seat of NH government"
+        },
+        {
+          "label": "Location",
+          "value": "107 N Main St, downtown West"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.gencourt.state.nh.us/nh_visitorcenter/"
+    },
+    {
+      "name": "Concord Hospital",
+      "category": "medical",
+      "side": "West",
+      "blurb": "The region's only Level II trauma center, with a rooftop helipad and ~295 beds. In a siege the West controls casualty care for both banks \u2014 the body that can heal itself while the East must fly its wounded out.",
+      "stats": [
+        {
+          "label": "Beds",
+          "value": "~295"
+        },
+        {
+          "label": "Trauma level",
+          "value": "Level II + helipad"
+        },
+        {
+          "label": "Role",
+          "value": "Regional acute / surgical care"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.concordhospital.org/"
+    },
+    {
+      "name": "NH Hospital (state psychiatric)",
+      "category": "medical",
+      "side": "West",
+      "blurb": "The state psychiatric hospital, ~168 locked beds, on the West bank. A secondary medical and secure-facility asset that adds to the West's care capacity and population responsibilities under siege.",
+      "stats": [
+        {
+          "label": "Beds",
+          "value": "~168 locked psychiatric"
+        },
+        {
+          "label": "Operator",
+          "value": "NH Dept. of Health & Human Services"
+        },
+        {
+          "label": "Location",
+          "value": "36 Clinton St, West Concord"
+        },
+        {
+          "label": "Confidence",
+          "value": "Medium"
+        }
+      ],
+      "source_url": "https://www.dhhs.nh.gov/programs-services/adult-care/new-hampshire-hospital"
+    },
+    {
+      "name": "NH State Prison for Men",
+      "category": "manpower",
+      "side": "West",
+      "blurb": "The West's 'dungeon' \u2014 a max/medium/minimum prison with operational capacity near 1,408. It is a huge confined population guarded by a chronically understaffed force (roughly half of corrections posts vacant), making it the war's best siege plot hook.",
+      "stats": [
+        {
+          "label": "Capacity",
+          "value": "~1,408-1,461 inmates"
+        },
+        {
+          "label": "Staffing",
+          "value": "~50% vacancy (chronic)"
+        },
+        {
+          "label": "Address",
+          "value": "281 N State St, West"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.corrections.nh.gov/locations/nhsp-m"
+    },
+    {
+      "name": "NH Correctional Facility for Women",
+      "category": "manpower",
+      "side": "West",
+      "blurb": "The state women's prison, part of the West-bank DOC complex. Like the men's facility it concentrates a large confined population behind thin guard numbers \u2014 manpower the West must feed and contain throughout any siege.",
+      "stats": [
+        {
+          "label": "Type",
+          "value": "State women's correctional facility"
+        },
+        {
+          "label": "Operator",
+          "value": "NH Dept. of Corrections"
+        },
+        {
+          "label": "Location",
+          "value": "DOC complex, West Concord"
+        },
+        {
+          "label": "Confidence",
+          "value": "Medium"
+        }
+      ],
+      "source_url": "https://www.corrections.nh.gov/locations/ncf-w"
+    },
+    {
+      "name": "Concord Police HQ + Lenco BearCat",
+      "category": "police",
+      "side": "West",
+      "blurb": "City PD downtown, home to the Central NH Special Operations Unit's Lenco BearCat armored vehicle \u2014 the only armored asset in Concord and it is West. It is the West's single counter to an armored blitz across the bridges.",
+      "stats": [
+        {
+          "label": "Sworn officers",
+          "value": "~120"
+        },
+        {
+          "label": "Armor",
+          "value": "1 Lenco BearCat (thermal, off-road)"
+        },
+        {
+          "label": "SWAT",
+          "value": "Central NH Special Ops Unit"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://patch.com/new-hampshire/concord-nh/concord-city-council-approves-bearcat-grant"
+    },
+    {
+      "name": "Penacook Lake + Hutchins WTP (drinking water)",
+      "category": "water",
+      "side": "West",
+      "blurb": "The city's drinking-water source (Penacook Lake, ~1.5 billion gallons) and the Hutchins St treatment plant (10 MGD design) \u2014 the 'water in' for the whole city, and both sit West. The West controls who drinks.",
+      "stats": [
+        {
+          "label": "Source volume",
+          "value": "~1.5 billion gal accessible"
+        },
+        {
+          "label": "WTP capacity",
+          "value": "10 MGD design (~4 MGD avg)"
+        },
+        {
+          "label": "Served",
+          "value": "~12,000 connections / 172 mi main"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.concordnh.gov/1396/Water-Source"
+    },
+    {
+      "name": "Hall Street Wastewater Treatment Plant",
+      "category": "water",
+      "side": "West",
+      "blurb": "The main wastewater plant (125 Hall St, ~10.1 MGD design) \u2014 the city's 'water out,' discharging to the Merrimack. With both the source and the sewer on the West bank, the East depends on West-controlled water infrastructure.",
+      "stats": [
+        {
+          "label": "Design flow",
+          "value": "~10.1 MGD (~25 MGD peak)"
+        },
+        {
+          "label": "Built",
+          "value": "1979; serves Concord + Bow"
+        },
+        {
+          "label": "Discharge",
+          "value": "Merrimack River"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.concordnh.gov/1353/Wastewater-Treatment"
+    },
+    {
+      "name": "Garvins Falls Hydroelectric Station",
+      "category": "power_gen",
+      "side": "Contested",
+      "blurb": "A 12.4 MW four-unit hydro dam sitting mid-river on the Bow/Concord line \u2014 the contested generator that neither bank can fully claim because it is the river itself. The southern river gate's power prize.",
+      "stats": [
+        {
+          "label": "Capacity",
+          "value": "12.4 MW (4 units)"
+        },
+        {
+          "label": "Annual output",
+          "value": "~31 GWh/yr"
+        },
+        {
+          "label": "Operator",
+          "value": "Central Rivers Power NH"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.gridinfo.com/plant/garvins-falls/2357"
+    },
+    {
+      "name": "Unitil substations (Bridge St + McGuire St)",
+      "category": "power",
+      "side": "West",
+      "blurb": "Power distribution control sits West: the 60-year-old Bridge St downtown switching hub plus the McGuire St substation (being rebuilt to absorb its load) and Unitil's Capital Region operations HQ. The East has generation; the West has the grid's control room.",
+      "stats": [
+        {
+          "label": "Bridge St hub",
+          "value": ">60 yrs old; steps to 4.16 kV"
+        },
+        {
+          "label": "McGuire St",
+          "value": "Substation rebuild 2025-26 + region HQ"
+        },
+        {
+          "label": "Customers (NH)",
+          "value": "~78,900 Unitil electric"
+        },
+        {
+          "label": "Confidence",
+          "value": "Medium"
+        }
+      ],
+      "source_url": "https://www.concordmonitor.com/2025/11/08/concord-nh-bridge-street-substation-electric/"
+    },
+    {
+      "name": "Liberty Utilities / EnergyNorth gas HQ",
+      "category": "fuel",
+      "side": "West",
+      "blurb": "The Concord gas-distribution office (116 N Main St) for Liberty/EnergyNorth, serving ~98,000 customers up the I-93 corridor. Note: gas is a chokepoint, not a local resource \u2014 Concord is fed entirely by the Concord Lateral pipeline from Dracut MA.",
+      "stats": [
+        {
+          "label": "Customers",
+          "value": "~98,000 across 30 towns"
+        },
+        {
+          "label": "Supply",
+          "value": "Concord Lateral pipeline (single feed)"
+        },
+        {
+          "label": "Office",
+          "value": "116 N Main St, West"
+        },
+        {
+          "label": "Confidence",
+          "value": "Medium"
+        }
+      ],
+      "source_url": "https://new-hampshire.libertyutilities.com/bath/residential/contact/general-inquiries.html"
+    },
+    {
+      "name": "NHTI + McAuliffe-Shepard Discovery Center",
+      "category": "contested",
+      "side": "Contested",
+      "blurb": "The community college campus and planetarium on Institute Dr \u2014 an institutional strongpoint in the contested strip between the river and I-93. Open ground, dormitories, and buildings make it a natural foothold for either bank.",
+      "stats": [
+        {
+          "label": "Campus",
+          "value": "NHTI community college + dorms"
+        },
+        {
+          "label": "Landmark",
+          "value": "McAuliffe-Shepard Discovery Center"
+        },
+        {
+          "label": "Zone",
+          "value": "Contested strip, Institute Dr"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.nhti.edu/"
+    },
+    {
+      "name": "Everett Arena / Fort Eddy Rd plaza",
+      "category": "contested",
+      "side": "Contested",
+      "blurb": "The Everett Arena and Fort Eddy Rd commercial seam sit on the east-bank edge of the contested zone, opposite downtown. It is a river-assault crossing point and a strongpoint commanding the approach off Main Street.",
+      "stats": [
+        {
+          "label": "Anchor",
+          "value": "Douglas N. Everett Arena"
+        },
+        {
+          "label": "War role",
+          "value": "River-assault foothold / strongpoint"
+        },
+        {
+          "label": "Zone",
+          "value": "Contested east-bank seam"
+        },
+        {
+          "label": "Confidence",
+          "value": "Medium"
+        }
+      ],
+      "source_url": "https://www.concordnh.gov/1175/Everett-Arena"
+    },
+    {
+      "name": "The Six Merrimack River Crossings",
+      "category": "contested",
+      "side": "Contested",
+      "blurb": "Six spans tie the two banks together \u2014 and every one is a contested choke point. The 1915 Sewalls Falls Bridge is structurally deficient and weight-limited, the fragile northern flank; the four central spans (twin I-93, I-393/US-4, Loudon Rd, Manchester St) are the high-traffic gates the whole war is fought over.",
+      "stats": [
+        {
+          "label": "Crossings",
+          "value": "6 (Sewalls Falls, 2x I-93, I-393, Loudon Rd, Manchester St)"
+        },
+        {
+          "label": "Weakest link",
+          "value": "Sewalls Falls (1915, redlist, 14-ton limit)"
+        },
+        {
+          "label": "Busiest",
+          "value": "I-393/US-4 ~39,000 AADT"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://gis.concordnh.gov/arc1061/rest/services/CityGeneral/WaterSystemGIS/MapServer/44"
+    },
+    {
+      "name": "The I-93 Interchanges (the front line)",
+      "category": "contested",
+      "side": "Contested",
+      "blurb": "Interstate 93 IS the front line, and its interchanges are the gateways through it. Exit 17 (Penacook, the northern supply prize), Exit 16 (the northern breakthrough point), and the Bow Junction I-93/I-89 hinge to the south are the contested doors in the wall.",
+      "stats": [
+        {
+          "label": "Key exits",
+          "value": "17 (Penacook), 16 (north), Bow Jct (south)"
+        },
+        {
+          "label": "Role",
+          "value": "Front-line gateways / breakthrough points"
+        },
+        {
+          "label": "South hinge",
+          "value": "I-93 / I-89 interchange, Bow"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.openstreetmap.org/relation/61307"
+    },
+    {
+      "name": "Merrimack County Superior Court / Sheriff",
+      "category": "govt",
+      "side": "West",
+      "blurb": "The county court and the Merrimack County Sheriff's Office downtown (163 N Main St) \u2014 civil process, transports, warrants, and court security on the West bank. A secondary West-side law-and-order node alongside the State House.",
+      "stats": [
+        {
+          "label": "Sworn deputies (est.)",
+          "value": "~30-60 + civilian staff"
+        },
+        {
+          "label": "Functions",
+          "value": "Civil process, transport, court security"
+        },
+        {
+          "label": "Address",
+          "value": "163 N Main St, West"
+        },
+        {
+          "label": "Confidence",
+          "value": "High"
+        }
+      ],
+      "source_url": "https://www.merrimackcounty.net/departments/sheriff/index.php"
+    },
+    {
+      "name": "Tanks / tracked armor",
+      "category": "armor",
+      "side": "East",
+      "blurb": "Tracked armor at the NH National Guard State Military Reservation (reported on-site) - the heaviest direct-fire ground assets in the city, and East's armored fist.",
+      "stats": [
+        {
+          "label": "Side",
+          "value": "East"
+        },
+        {
+          "label": "Type",
+          "value": "Tracked armor"
+        },
+        {
+          "label": "Sourcing",
+          "value": "On-site report"
+        }
+      ],
+      "source_url": "NH National Guard State Military Reservation, 1 Minuteman Way, Concord"
+    }
+  ]
+}

@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seating Chart Generator</title>
+<meta name="description" content="Paste a roster, set constraints (keep apart, keep together, lock seats), and generate classroom seating charts — rows, pods or U-shape. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --warn:#9a6700; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --desk:#eef2f8; --desk-border:#c6d0dd; --desk-empty:#f4f6f9;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b; --warn:#e3b341;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --desk:#1f2733; --desk-border:#3a4553; --desk-empty:#191f28;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b; --warn:#e3b341;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --desk:#1f2733; --desk-border:#3a4553; --desk-empty:#191f28;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.small { padding: 5px 10px; font-size: .78rem; border-radius: 7px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .layout { display: grid; grid-template-columns: minmax(280px, 350px) 1fr; gap: 18px; align-items: start; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .panel h2 { font-size: .95rem; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .panel + .panel { margin-top: 14px; }
+  label.field { display: block; font-size: .82rem; color: var(--muted); margin-bottom: 6px; }
+  textarea#rosterBox { width: 100%; min-height: 150px; resize: vertical; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 9px; padding: 10px 12px; font-family: var(--sans); font-size: .9rem; line-height: 1.55; }
+  textarea#rosterBox:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .note { color: var(--muted); font-size: .8rem; min-height: 1.2em; margin: 7px 0 0; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+  .note.warn { color: var(--warn); }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; align-items: center; }
+  select, input[type="number"], input[type="text"] {
+    border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    border-radius: 8px; padding: 7px 9px; font-size: .86rem; font-family: var(--sans);
+  }
+  select:focus, input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  input[type="number"] { width: 62px; }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .seg button { border: 0; background: var(--surface); color: var(--muted); padding: 7px 12px; font-size: .82rem; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button.on { background: var(--accent); color: var(--accent-ink); }
+  .check { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: .84rem; cursor: pointer; }
+  .check input { accent-color: var(--accent); width: 15px; height: 15px; }
+
+  /* constraints */
+  .cgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; }
+  .cgrid select { width: 100%; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 3px 6px 3px 11px; font-size: .78rem; }
+  .chip.apart { border-color: var(--danger); }
+  .chip.together { border-color: var(--ok); }
+  .chip.violated { background: color-mix(in srgb, var(--danger) 14%, var(--surface-2)); font-weight: 600; }
+  .chip button { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: .85rem; padding: 0 4px; border-radius: 50%; }
+  .chip button:hover { color: var(--danger); }
+  .chip .sym { font-weight: 700; }
+  .chip.apart .sym { color: var(--danger); }
+  .chip.together .sym { color: var(--ok); }
+
+  /* room */
+  .roomwrap { position: relative; }
+  .frontbar { text-align: center; font-size: .74rem; letter-spacing: .22em; text-transform: uppercase; color: var(--muted);
+    border: 1px dashed var(--border); border-radius: 8px; padding: 5px 0; margin-bottom: 10px; background: var(--surface-2); }
+  #room { position: relative; width: 100%; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface);
+    box-shadow: var(--shadow); overflow: hidden; touch-action: none; }
+  .desk { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+    background: var(--desk); border: 2px solid var(--desk-border); border-radius: 9px; cursor: grab; user-select: none;
+    font-size: .78rem; text-align: center; padding: 2px 4px; overflow: hidden; transition: border-color .12s ease, box-shadow .12s ease; }
+  .desk .nm { font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
+  .desk .seatno { font-size: .62rem; color: var(--muted); line-height: 1; }
+  .desk.empty { background: var(--desk-empty); border-style: dashed; color: var(--muted); cursor: default; }
+  .desk.empty .nm { font-weight: 400; font-style: italic; }
+  .desk.locked { border-color: var(--warn); }
+  .desk.violated { border-color: var(--danger); box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 30%, transparent); }
+  .desk.selected { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+  .desk.dragover { border-color: var(--accent); border-style: solid; }
+  .desk .lockbtn { position: absolute; top: 1px; right: 2px; border: 0; background: transparent; cursor: pointer; font-size: .68rem; opacity: .35; padding: 1px 2px; }
+  .desk .lockbtn:hover { opacity: 1; }
+  .desk.locked .lockbtn { opacity: .95; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; color: var(--muted); font-size: .76rem; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; border: 2px solid var(--desk-border); background: var(--desk); }
+  .swatch.lk { border-color: var(--warn); }
+  .swatch.vi { border-color: var(--danger); }
+
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  /* ---- print ---- */
+  @media print {
+    body { background: #fff; color: #000; }
+    .panelcol, header.app .theme-toggle, header.app p, .backlink, footer.app, .roomactions, .legend, .note { display: none !important; }
+    .wrap { max-width: none; padding: 0; }
+    .layout { display: block; }
+    header.app h1 { font-size: 1.1rem; margin-bottom: 8px; }
+    #room { box-shadow: none; border-color: #999; }
+    .frontbar { border-color: #999; background: #fff; color: #333; }
+    .desk { background: #fff; border-color: #888; color: #000; }
+    .desk.locked { border-color: #444; }
+    .desk .lockbtn { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Seating Chart Generator</h1>
+      <p>Paste your roster, pick a room layout, add constraints — keep these two apart, keep those together, lock someone to the front — then shuffle until it works. Rosters stay in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="layout">
+    <div class="panelcol">
+      <div class="panel">
+        <h2>1 · Roster</h2>
+        <label class="field" for="rosterBox">One student per line (a pasted CSV column works too)</label>
+        <textarea id="rosterBox" spellcheck="false" placeholder="Ada Lovelace&#10;Alan Turing&#10;Grace Hopper&#10;…"></textarea>
+        <div class="row">
+          <button class="btn small" id="sampleBtn" type="button">Sample class</button>
+          <button class="btn small" id="clearBtn" type="button">Clear</button>
+        </div>
+        <p class="note" id="rosterNote"></p>
+      </div>
+
+      <div class="panel">
+        <h2>2 · Room layout</h2>
+        <div class="seg" id="layoutSeg" role="tablist">
+          <button type="button" data-mode="rows" class="on">Rows</button>
+          <button type="button" data-mode="pods">Pods</button>
+          <button type="button" data-mode="ushape">U-shape</button>
+        </div>
+        <div class="row" id="rowsOpts">
+          <label class="field" style="margin:0">Columns <input type="number" id="colsIn" min="2" max="12" value="6"></label>
+          <label class="field" style="margin:0">Rows <input type="number" id="rowsIn" min="1" max="10" value="5"></label>
+        </div>
+        <div class="row" id="podsOpts" hidden>
+          <label class="field" style="margin:0">Pods <input type="number" id="podsIn" min="2" max="12" value="6"></label>
+          <label class="field" style="margin:0">Seats each <input type="number" id="podSizeIn" min="2" max="8" value="4"></label>
+        </div>
+        <div class="row" id="ushapeOpts" hidden>
+          <label class="field" style="margin:0">Seats <input type="number" id="uSeatsIn" min="6" max="40" value="24"></label>
+        </div>
+        <label class="check"><input type="checkbox" id="fbAdj"> Front/back neighbors count as “next to” (rows)</label>
+        <p class="note" id="layoutNote"></p>
+      </div>
+
+      <div class="panel">
+        <h2>3 · Constraints</h2>
+        <div class="cgrid">
+          <select id="stuA" aria-label="First student"></select>
+          <select id="stuB" aria-label="Second student"></select>
+        </div>
+        <div class="row">
+          <select id="cType" aria-label="Constraint type">
+            <option value="apart">must sit apart</option>
+            <option value="together">must sit together</option>
+          </select>
+          <button class="btn small" id="addC" type="button">Add</button>
+        </div>
+        <div class="chips" id="cChips"></div>
+        <p class="note" id="cNote">Tip: click 📌 on a desk to lock that student in place.</p>
+      </div>
+
+      <div class="panel">
+        <h2>4 · Save / load</h2>
+        <div class="row">
+          <input type="text" id="saveName" placeholder="e.g. Period 3" style="flex:1; min-width: 0;">
+          <button class="btn small" id="saveBtn" type="button">Save</button>
+        </div>
+        <div class="row">
+          <select id="loadSel" style="flex:1; min-width:0;"><option value="">— saved classes —</option></select>
+          <button class="btn small" id="loadBtn" type="button">Load</button>
+          <button class="btn small" id="delBtn" type="button" title="Delete selected save">🗑</button>
+        </div>
+        <p class="note" id="saveNote"></p>
+      </div>
+    </div>
+
+    <div class="roomwrap">
+      <div class="row roomactions" style="margin: 0 0 10px;">
+        <button class="btn primary" id="shuffleBtn" type="button">🎲 Shuffle seats</button>
+        <button class="btn" id="printBtn" type="button">🖨 Print</button>
+        <button class="btn" id="pngBtn" type="button">⬇ PNG</button>
+        <span class="note" id="statusNote" style="margin:0"></span>
+      </div>
+      <div class="frontbar">Front of room · whiteboard</div>
+      <div id="room" aria-label="Seating chart"></div>
+      <div class="legend">
+        <span><span class="swatch"></span> desk</span>
+        <span><span class="swatch lk"></span> locked</span>
+        <span><span class="swatch vi"></span> constraint broken</span>
+        <span>drag a name onto another desk to swap · tap two desks to swap on touch</span>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app">Rosters never leave your browser — everything is stored locally · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+// ---------- state ----------
+const state = {
+  roster: [],            // array of names (strings, unique)
+  mode: 'rows',          // rows | pods | ushape
+  opts: { cols: 6, rows: 5, pods: 6, podSize: 4, uSeats: 24 },
+  fbAdj: false,          // front/back adjacency in rows mode
+  seats: [],             // [{x,y,w,h}] in abstract 1000-unit-wide space
+  assign: [],            // seatIndex -> name | null
+  locks: {},             // name -> seatIndex
+  constraints: [],       // [{a,b,type:'apart'|'together'}]
+};
+let selectedDesk = null; // for tap-to-swap
+
+const $ = id => document.getElementById(id);
+const els = {
+  roster: $('rosterBox'), rosterNote: $('rosterNote'), layoutNote: $('layoutNote'),
+  room: $('room'), stuA: $('stuA'), stuB: $('stuB'), cType: $('cType'),
+  cChips: $('cChips'), cNote: $('cNote'), statusNote: $('statusNote'),
+  saveNote: $('saveNote'),
+};
+
+const SAMPLE = ['Ava Martin','Ben Okafor','Carmen Diaz','Derek Chen','Elena Petrov','Felix Wagner','Gina Rossi','Hank Miller','Isla Fraser','Jamal Wright','Kara Nguyen','Liam Doyle','Maya Patel','Noah Kim','Olivia Santos','Pete Novak','Quinn Adler','Rosa Ibarra','Sam Fuller','Tara Singh','Umar Aziz','Vera Kovacs','Will Turner','Ximena Cruz'];
+
+// ---------- roster parsing ----------
+function parseRoster() {
+  const seen = new Set(); const names = [];
+  els.roster.value.split(/\r?\n/).forEach(line => {
+    // Accept CSV-ish lines: take the first non-empty cell
+    let name = line.split(/[,\t;]/)[0].trim().replace(/^"|"$/g, '');
+    if (!name) return;
+    if (seen.has(name.toLowerCase())) return;
+    seen.add(name.toLowerCase());
+    names.push(name);
+  });
+  state.roster = names.slice(0, 60);
+  // Drop constraints/locks that reference removed students
+  const have = new Set(state.roster);
+  state.constraints = state.constraints.filter(c => have.has(c.a) && have.has(c.b));
+  for (const n of Object.keys(state.locks)) if (!have.has(n)) delete state.locks[n];
+  els.rosterNote.textContent = names.length ? `${names.length} student${names.length===1?'':'s'}` +
+    (els.roster.value.split(/\r?\n/).filter(l=>l.trim()).length > names.length ? ' (duplicates ignored)' : '') : '';
+  refreshStudentSelects();
+}
+
+function refreshStudentSelects() {
+  for (const sel of [els.stuA, els.stuB]) {
+    const cur = sel.value;
+    sel.innerHTML = '';
+    state.roster.forEach(n => { const o = document.createElement('option'); o.value = o.textContent = n; sel.appendChild(o); });
+    if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
+  }
+  if (els.stuB.options.length > 1 && els.stuA.value === els.stuB.value) els.stuB.selectedIndex = 1;
+}
+
+// ---------- seat layout generators (abstract 1000-wide space) ----------
+const DESK = { w: 118, h: 64 };
+
+function genSeats() {
+  const seats = [];
+  const o = state.opts;
+  if (state.mode === 'rows') {
+    const cols = clamp(o.cols, 2, 12), rows = clamp(o.rows, 1, 10);
+    const gapX = 26, gapY = 34;
+    const totW = cols * DESK.w + (cols - 1) * gapX;
+    const x0 = (1000 - totW) / 2;
+    for (let r = 0; r < rows; r++)
+      for (let c = 0; c < cols; c++)
+        seats.push({ x: x0 + c * (DESK.w + gapX), y: 24 + r * (DESK.h + gapY), row: r, col: c });
+  } else if (state.mode === 'pods') {
+    const pods = clamp(o.pods, 2, 12), size = clamp(o.podSize, 2, 8);
+    const podCols = Math.ceil(Math.sqrt(pods * 1.4));
+    const podRows = Math.ceil(pods / podCols);
+    const cellW = 1000 / podCols;
+    let p = 0;
+    for (let pr = 0; pr < podRows && p < pods; pr++) {
+      for (let pc = 0; pc < podCols && p < pods; pc++, p++) {
+        // seats inside a pod: 2 columns, tight spacing
+        const inCols = 2, inRows = Math.ceil(size / inCols);
+        const podW = inCols * DESK.w + 10, podH = inRows * DESK.h + 10 * (inRows - 1);
+        const cx = pc * cellW + cellW / 2, cy = 40 + pr * (podH + 70) + podH / 2;
+        for (let s = 0; s < size; s++) {
+          const ic = s % inCols, ir = Math.floor(s / inCols);
+          seats.push({ x: cx - podW / 2 + ic * (DESK.w + 10), y: cy - podH / 2 + ir * (DESK.h + 10), pod: p });
+        }
+      }
+    }
+  } else { // ushape — open toward the front (top)
+    const n = clamp(o.uSeats, 6, 40);
+    const sideN = Math.floor(n / 4);
+    const backN = n - sideN * 2;
+    const gap = 14;
+    const backW = backN * (DESK.w + gap) - gap;
+    const x0 = Math.max(10, (1000 - backW) / 2);
+    const sideTop = 30, sideStep = DESK.h + 26;
+    const backY = sideTop + sideN * sideStep + 30;
+    for (let i = 0; i < sideN; i++) seats.push({ x: 16, y: sideTop + i * sideStep });                 // left column
+    for (let i = 0; i < backN; i++) seats.push({ x: x0 + i * (DESK.w + gap), y: backY });            // back row
+    for (let i = 0; i < sideN; i++) seats.push({ x: 1000 - DESK.w - 16, y: sideTop + i * sideStep }); // right column
+  }
+  return seats;
+}
+
+function clamp(v, lo, hi) { v = Number(v) || lo; return Math.max(lo, Math.min(hi, v)); }
+
+function roomHeight() {
+  return state.seats.length ? Math.max(...state.seats.map(s => s.y + DESK.h)) + 24 : 220;
+}
+
+// ---------- adjacency (geometric, works for every layout) ----------
+function adjacentSeats(i, j) {
+  const a = state.seats[i], b = state.seats[j];
+  if (a.pod !== undefined && b.pod !== undefined) return a.pod === b.pod;
+  if (state.mode === 'rows' && !state.fbAdj) {
+    // same row, neighboring column only
+    return a.row === b.row && Math.abs(a.col - b.col) === 1;
+  }
+  const dx = (a.x + DESK.w/2) - (b.x + DESK.w/2), dy = (a.y + DESK.h/2) - (b.y + DESK.h/2);
+  const thresh = (DESK.w + 26) * 1.25; // one desk-pitch + slack: catches side and front/back neighbors
+  return Math.hypot(dx, dy) < thresh;
+}
+
+// ---------- constraint checking ----------
+function seatOf(name) { return state.assign.indexOf(name); }
+
+function violations(assign = state.assign) {
+  const out = [];
+  const idx = {}; assign.forEach((n, i) => { if (n) idx[n] = i; });
+  state.constraints.forEach((c, k) => {
+    const ia = idx[c.a], ib = idx[c.b];
+    if (ia === undefined || ib === undefined) return;
+    const adj = adjacentSeats(ia, ib);
+    if (c.type === 'apart' && adj) out.push(k);
+    if (c.type === 'together' && !adj) out.push(k);
+  });
+  return out;
+}
+
+// ---------- solver: random assignment + swap repair + restarts ----------
+function shuffle() {
+  if (!state.roster.length) { setStatus('Add a roster first.', 'err'); return; }
+  if (state.roster.length > state.seats.length) {
+    setStatus(`Not enough desks: ${state.roster.length} students, ${state.seats.length} seats.`, 'err'); return;
+  }
+  const nSeats = state.seats.length;
+  const lockedSeats = new Set(Object.values(state.locks));
+  const freeStudents = state.roster.filter(n => !(n in state.locks));
+  const freeSeats = []; for (let i = 0; i < nSeats; i++) if (!lockedSeats.has(i)) freeSeats.push(i);
+
+  let best = null, bestV = Infinity;
+  const RESTARTS = 60, PASSES = 250;
+  for (let r = 0; r < RESTARTS && bestV > 0; r++) {
+    const assign = new Array(nSeats).fill(null);
+    for (const [n, s] of Object.entries(state.locks)) assign[s] = n;
+    const pool = freeStudents.slice();
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    freeSeats.forEach((s, i) => { assign[s] = pool[i] ?? null; });
+
+    let v = violations(assign).length;
+    for (let p = 0; p < PASSES && v > 0; p++) {
+      // try a random swap between two free seats; keep if it doesn't get worse
+      const i = freeSeats[Math.floor(Math.random() * freeSeats.length)];
+      const j = freeSeats[Math.floor(Math.random() * freeSeats.length)];
+      if (i === j) continue;
+      [assign[i], assign[j]] = [assign[j], assign[i]];
+      const v2 = violations(assign).length;
+      if (v2 <= v) v = v2; else [assign[i], assign[j]] = [assign[j], assign[i]];
+    }
+    if (v < bestV) { bestV = v; best = assign.slice(); }
+  }
+  state.assign = best;
+  render();
+  if (bestV === 0) setStatus(`Solved — all ${state.constraints.length} constraint${state.constraints.length===1?'':'s'} satisfied.`, 'ok');
+  else setStatus(`Best found: ${bestV} constraint${bestV===1?'':'s'} still broken (highlighted). Try again or loosen constraints.`, 'warn');
+  autosave();
+}
+
+function setStatus(msg, cls) { els.statusNote.textContent = msg; els.statusNote.className = 'note ' + (cls || ''); }
+
+// ---------- rendering ----------
+function render() {
+  const room = els.room;
+  const W = room.clientWidth || 800;
+  const scale = W / 1000;
+  room.style.height = Math.round(roomHeight() * scale) + 'px';
+  room.innerHTML = '';
+  const brokenSeats = new Set();
+  violations().forEach(k => {
+    const c = state.constraints[k];
+    const ia = seatOf(c.a), ib = seatOf(c.b);
+    if (ia >= 0) brokenSeats.add(ia); if (ib >= 0) brokenSeats.add(ib);
+  });
+
+  state.seats.forEach((s, i) => {
+    const name = state.assign[i] || null;
+    const d = document.createElement('div');
+    d.className = 'desk' + (name ? '' : ' empty') + (name && state.locks[name] === i ? ' locked' : '') +
+      (brokenSeats.has(i) ? ' violated' : '') + (selectedDesk === i ? ' selected' : '');
+    d.style.left = Math.round(s.x * scale) + 'px';
+    d.style.top = Math.round(s.y * scale) + 'px';
+    d.style.width = Math.round(DESK.w * scale) + 'px';
+    d.style.height = Math.round(DESK.h * scale) + 'px';
+    d.dataset.seat = i;
+    const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = name || 'empty';
+    const no = document.createElement('span'); no.className = 'seatno'; no.textContent = '#' + (i + 1);
+    d.append(nm, no);
+    if (name) {
+      d.draggable = true;
+      const lk = document.createElement('button');
+      lk.className = 'lockbtn'; lk.type = 'button'; lk.textContent = '📌';
+      lk.title = state.locks[name] === i ? 'Unlock seat' : 'Lock to this seat';
+      lk.setAttribute('aria-label', lk.title);
+      lk.addEventListener('click', e => { e.stopPropagation(); toggleLock(name, i); });
+      d.appendChild(lk);
+    }
+    room.appendChild(d);
+  });
+  renderChips();
+}
+
+function toggleLock(name, seat) {
+  if (state.locks[name] === seat) delete state.locks[name];
+  else state.locks[name] = seat;
+  render(); autosave();
+}
+
+// ---------- swap interactions (drag on desktop, tap-tap on touch) ----------
+els.room.addEventListener('dragstart', e => {
+  const d = e.target.closest('.desk'); if (!d || d.classList.contains('empty')) return;
+  e.dataTransfer.setData('text/plain', d.dataset.seat);
+  e.dataTransfer.effectAllowed = 'move';
+});
+els.room.addEventListener('dragover', e => {
+  const d = e.target.closest('.desk'); if (!d) return;
+  e.preventDefault(); d.classList.add('dragover');
+});
+els.room.addEventListener('dragleave', e => {
+  const d = e.target.closest('.desk'); if (d) d.classList.remove('dragover');
+});
+els.room.addEventListener('drop', e => {
+  const d = e.target.closest('.desk'); if (!d) return;
+  e.preventDefault();
+  const from = Number(e.dataTransfer.getData('text/plain'));
+  swapSeats(from, Number(d.dataset.seat));
+});
+els.room.addEventListener('click', e => {
+  if (e.target.closest('.lockbtn')) return;
+  const d = e.target.closest('.desk'); if (!d) { selectedDesk = null; render(); return; }
+  const i = Number(d.dataset.seat);
+  if (selectedDesk === null) {
+    if (!state.assign[i]) return;
+    selectedDesk = i; render();
+  } else if (selectedDesk === i) {
+    selectedDesk = null; render();
+  } else {
+    const from = selectedDesk; selectedDesk = null;
+    swapSeats(from, i);
+  }
+});
+
+function swapSeats(i, j) {
+  if (i === j || i < 0 || j < 0) return;
+  const a = state.assign[i], b = state.assign[j];
+  state.assign[i] = b; state.assign[j] = a;
+  // moving a locked student re-locks them to the new seat (manual moves win)
+  if (a && state.locks[a] !== undefined) state.locks[a] = j;
+  if (b && state.locks[b] !== undefined) state.locks[b] = i;
+  render(); autosave();
+  const v = violations().length;
+  setStatus(v ? `${v} constraint${v===1?'':'s'} broken (highlighted).` : 'All constraints satisfied.', v ? 'warn' : 'ok');
+}
+
+// ---------- constraints UI ----------
+$('addC').addEventListener('click', () => {
+  const a = els.stuA.value, b = els.stuB.value, type = els.cType.value;
+  if (!a || !b) return;
+  if (a === b) { els.cNote.textContent = 'Pick two different students.'; els.cNote.className = 'note err'; return; }
+  const key = [a, b].sort().join('|') ;
+  if (state.constraints.some(c => [c.a, c.b].sort().join('|') === key)) {
+    els.cNote.textContent = 'That pair already has a constraint.'; els.cNote.className = 'note err'; return;
+  }
+  state.constraints.push({ a, b, type });
+  els.cNote.textContent = ''; els.cNote.className = 'note';
+  render(); autosave();
+});
+
+function renderChips() {
+  els.cChips.innerHTML = '';
+  const broken = new Set(violations());
+  state.constraints.forEach((c, k) => {
+    const chip = document.createElement('span');
+    chip.className = 'chip ' + c.type + (broken.has(k) ? ' violated' : '');
+    const sym = c.type === 'apart' ? '⇄' : '⊕';
+    chip.innerHTML = `${escapeHtml(c.a)} <span class="sym">${sym}</span> ${escapeHtml(c.b)}`;
+    const x = document.createElement('button');
+    x.type = 'button'; x.textContent = '×'; x.setAttribute('aria-label', 'Remove constraint');
+    x.addEventListener('click', () => { state.constraints.splice(k, 1); render(); autosave(); });
+    chip.appendChild(x);
+    els.cChips.appendChild(chip);
+  });
+}
+
+function escapeHtml(s) { const d = document.createElement('span'); d.textContent = s; return d.innerHTML; }
+
+// ---------- layout controls ----------
+document.querySelectorAll('#layoutSeg button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#layoutSeg button').forEach(x => x.classList.toggle('on', x === b));
+    state.mode = b.dataset.mode;
+    $('rowsOpts').hidden = state.mode !== 'rows';
+    $('podsOpts').hidden = state.mode !== 'pods';
+    $('ushapeOpts').hidden = state.mode !== 'ushape';
+    rebuildSeats();
+  });
+});
+for (const [id, key] of [['colsIn','cols'],['rowsIn','rows'],['podsIn','pods'],['podSizeIn','podSize'],['uSeatsIn','uSeats']]) {
+  $(id).addEventListener('change', () => { state.opts[key] = Number($(id).value); rebuildSeats(); });
+}
+$('fbAdj').addEventListener('change', () => { state.fbAdj = $('fbAdj').checked; render(); autosave(); });
+
+function rebuildSeats() {
+  state.seats = genSeats();
+  // keep assignments where possible: reflow existing names into new seat list
+  const names = state.assign.filter(Boolean);
+  state.assign = new Array(state.seats.length).fill(null);
+  state.locks = {};   // locks reference old seat indices — reset on layout change
+  names.slice(0, state.seats.length).forEach((n, i) => state.assign[i] = n);
+  const cap = state.seats.length, n = state.roster.length;
+  els.layoutNote.textContent = `${cap} desks`;
+  els.layoutNote.className = 'note' + (n > cap ? ' err' : '');
+  if (n > cap) els.layoutNote.textContent += ` — not enough for ${n} students`;
+  render(); autosave();
+}
+
+// ---------- roster events ----------
+let rosterTimer;
+els.roster.addEventListener('input', () => {
+  clearTimeout(rosterTimer);
+  rosterTimer = setTimeout(() => {
+    parseRoster();
+    // place any new students into empty seats
+    const seated = new Set(state.assign.filter(Boolean));
+    const unseated = state.roster.filter(n => !seated.has(n));
+    for (let i = 0; i < state.assign.length && unseated.length; i++)
+      if (!state.assign[i]) state.assign[i] = unseated.shift();
+    // remove names no longer on roster
+    const have = new Set(state.roster);
+    state.assign = state.assign.map(n => (n && have.has(n)) ? n : null);
+    render(); autosave();
+  }, 250);
+});
+$('sampleBtn').addEventListener('click', () => { els.roster.value = SAMPLE.join('\n'); els.roster.dispatchEvent(new Event('input')); });
+$('clearBtn').addEventListener('click', () => { els.roster.value = ''; els.roster.dispatchEvent(new Event('input')); });
+
+// ---------- save / load (localStorage) ----------
+const STORE = 'max-seating-saves', AUTO = 'max-seating-auto';
+function snapshot() {
+  return { roster: els.roster.value, mode: state.mode, opts: state.opts, fbAdj: state.fbAdj,
+           assign: state.assign, locks: state.locks, constraints: state.constraints };
+}
+function restore(s) {
+  try {
+    els.roster.value = s.roster || '';
+    state.mode = s.mode || 'rows';
+    Object.assign(state.opts, s.opts || {});
+    state.fbAdj = !!s.fbAdj;
+    $('fbAdj').checked = state.fbAdj;
+    $('colsIn').value = state.opts.cols; $('rowsIn').value = state.opts.rows;
+    $('podsIn').value = state.opts.pods; $('podSizeIn').value = state.opts.podSize;
+    $('uSeatsIn').value = state.opts.uSeats;
+    document.querySelectorAll('#layoutSeg button').forEach(x => x.classList.toggle('on', x.dataset.mode === state.mode));
+    $('rowsOpts').hidden = state.mode !== 'rows';
+    $('podsOpts').hidden = state.mode !== 'pods';
+    $('ushapeOpts').hidden = state.mode !== 'ushape';
+    parseRoster();
+    state.seats = genSeats();
+    state.constraints = Array.isArray(s.constraints) ? s.constraints : [];
+    state.assign = Array.isArray(s.assign) ? s.assign.slice(0, state.seats.length) : [];
+    while (state.assign.length < state.seats.length) state.assign.push(null);
+    state.locks = s.locks && typeof s.locks === 'object' ? s.locks : {};
+    const have = new Set(state.roster);
+    state.constraints = state.constraints.filter(c => have.has(c.a) && have.has(c.b));
+    state.assign = state.assign.map(n => (n && have.has(n)) ? n : null);
+    render();
+  } catch (e) { /* corrupted save — start fresh */ }
+}
+function autosave() { try { localStorage.setItem(AUTO, JSON.stringify(snapshot())); } catch (e) {} }
+function savesMap() { try { return JSON.parse(localStorage.getItem(STORE) || '{}'); } catch (e) { return {}; } }
+function refreshLoadSel() {
+  const sel = $('loadSel'); const cur = sel.value;
+  sel.innerHTML = '<option value="">— saved classes —</option>';
+  Object.keys(savesMap()).sort().forEach(k => { const o = document.createElement('option'); o.value = o.textContent = k; sel.appendChild(o); });
+  if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
+}
+$('saveBtn').addEventListener('click', () => {
+  const name = $('saveName').value.trim();
+  if (!name) { $('saveNote').textContent = 'Give the class a name first.'; $('saveNote').className = 'note err'; return; }
+  const m = savesMap(); m[name] = snapshot();
+  try { localStorage.setItem(STORE, JSON.stringify(m)); $('saveNote').textContent = `Saved “${name}”.`; $('saveNote').className = 'note ok'; }
+  catch (e) { $('saveNote').textContent = 'Could not save (storage full?).'; $('saveNote').className = 'note err'; }
+  refreshLoadSel();
+});
+$('loadBtn').addEventListener('click', () => {
+  const k = $('loadSel').value; if (!k) return;
+  const m = savesMap(); if (m[k]) { restore(m[k]); $('saveName').value = k; $('saveNote').textContent = `Loaded “${k}”.`; $('saveNote').className = 'note ok'; autosave(); }
+});
+$('delBtn').addEventListener('click', () => {
+  const k = $('loadSel').value; if (!k) return;
+  const m = savesMap(); delete m[k];
+  try { localStorage.setItem(STORE, JSON.stringify(m)); } catch (e) {}
+  refreshLoadSel(); $('saveNote').textContent = `Deleted “${k}”.`; $('saveNote').className = 'note';
+});
+
+// ---------- export ----------
+$('printBtn').addEventListener('click', () => window.print());
+$('pngBtn').addEventListener('click', () => {
+  // draw the chart from the data model at 2× for crispness
+  const H = roomHeight();
+  const pad = 30, scale = 2;
+  const cv = document.createElement('canvas');
+  cv.width = (1000 + pad * 2) * scale; cv.height = (H + pad * 2 + 60) * scale;
+  const ctx = cv.getContext('2d');
+  const cs = getComputedStyle(document.documentElement);
+  const col = v => cs.getPropertyValue(v).trim();
+  ctx.scale(scale, scale);
+  ctx.fillStyle = col('--bg'); ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.fillStyle = col('--muted');
+  ctx.font = '600 13px ' + col('--sans');
+  ctx.textAlign = 'center';
+  ctx.fillText('FRONT OF ROOM · WHITEBOARD', pad + 500, 26);
+  ctx.strokeStyle = col('--border'); ctx.setLineDash([6, 5]);
+  ctx.strokeRect(pad, 10, 1000, 24); ctx.setLineDash([]);
+  state.seats.forEach((s, i) => {
+    const x = pad + s.x, y = 50 + s.y;
+    const name = state.assign[i];
+    ctx.fillStyle = name ? col('--desk') : col('--desk-empty');
+    ctx.strokeStyle = name && state.locks[name] === i ? col('--warn') : col('--desk-border');
+    ctx.lineWidth = 2;
+    roundRect(ctx, x, y, DESK.w, DESK.h, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = name ? col('--text') : col('--muted');
+    ctx.font = (name ? '600 ' : 'italic 400 ') + '13px ' + col('--sans');
+    ctx.fillText(fitText(ctx, name || 'empty', DESK.w - 12), x + DESK.w / 2, y + DESK.h / 2 + 1);
+    ctx.fillStyle = col('--muted'); ctx.font = '400 9px ' + col('--sans');
+    ctx.fillText('#' + (i + 1), x + DESK.w / 2, y + DESK.h - 8);
+  });
+  const a = document.createElement('a');
+  a.download = 'seating-chart.png';
+  a.href = cv.toDataURL('image/png');
+  a.click();
+});
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function fitText(ctx, s, maxW) {
+  if (ctx.measureText(s).width <= maxW) return s;
+  while (s.length > 1 && ctx.measureText(s + '…').width > maxW) s = s.slice(0, -1);
+  return s + '…';
+}
+
+// ---------- responsive re-render ----------
+if ('ResizeObserver' in window) new ResizeObserver(() => render()).observe(els.room);
+else window.addEventListener('resize', render);
+
+// ---------- theme toggle (shared convention) ----------
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+
+// ---------- shuffle button ----------
+$('shuffleBtn').addEventListener('click', shuffle);
+
+// ---------- test hook ----------
+window.__seatTest = {
+  setRoster(names) { els.roster.value = names.join('\n'); parseRoster();
+    state.assign = new Array(state.seats.length).fill(null);
+    state.roster.forEach((n, i) => { if (i < state.assign.length) state.assign[i] = n; });
+    render(); },
+  addConstraint(a, b, type) { state.constraints.push({ a, b, type }); render(); },
+  clearConstraints() { state.constraints = []; render(); },
+  shuffle,
+  violations: () => violations().length,
+  adjacent: (a, b) => { const ia = seatOf(a), ib = seatOf(b); return ia >= 0 && ib >= 0 && adjacentSeats(ia, ib); },
+  get assignments() { return state.assign.slice(); },
+  get seatCount() { return state.seats.length; },
+  get roster() { return state.roster.slice(); },
+  setLayout(mode, opts) {
+    state.mode = mode; Object.assign(state.opts, opts || {});
+    document.querySelectorAll('#layoutSeg button').forEach(x => x.classList.toggle('on', x.dataset.mode === mode));
+    rebuildSeats();
+  },
+  lock(name, seat) { state.locks[name] = seat; render(); },
+  get locks() { return { ...state.locks }; },
+};
+
+// ---------- boot ----------
+state.seats = genSeats();
+state.assign = new Array(state.seats.length).fill(null);
+const auto = (() => { try { return JSON.parse(localStorage.getItem(AUTO) || 'null'); } catch (e) { return null; } })();
+if (auto && auto.roster) restore(auto);
+else { els.roster.value = SAMPLE.slice(0, 18).join('\n'); parseRoster(); state.roster.forEach((n, i) => { if (i < state.assign.length) state.assign[i] = n; }); render(); }
+refreshLoadSel();
+els.layoutNote.textContent = `${state.seats.length} desks`;
+})();
+</script>
+</body>
+</html>

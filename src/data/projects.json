@@ -19,11 +19,15 @@
     "title": "Geopuesto Playground",
     "description": "Spherical-geometry experiments for great circles, equidistant points, polyhedra, and curve analysis on a globe.",
     "category": "experiments",
+<<<<<<< HEAD
+    "tags": ["geometry", "Leaflet", "research sandbox"],
+=======
     "tags": [
       "geometry",
       "Leaflet",
       "research sandbox"
     ],
+>>>>>>> origin/main
     "url": "https://mapzimus.com/geopuesto/playground/",
     "status": "live",
     "updated": "2026-07"
@@ -33,11 +37,15 @@
     "title": "U.S. Fantasy Transit Network",
     "description": "A generated four-tier North American transit network connecting Census places at continental, regional, metro, and commuter scales.",
     "category": "maps",
+<<<<<<< HEAD
+    "tags": ["Python", "Leaflet", "fantasy transit"],
+=======
     "tags": [
       "Python",
       "Leaflet",
       "fantasy transit"
     ],
+>>>>>>> origin/main
     "url": "https://mapzimus.com/transit/",
     "status": "live",
     "updated": "2026-07"
@@ -47,11 +55,15 @@
     "title": "Concord Civil War",
     "description": "An alternate-history scrollytelling map that divides Concord, New Hampshire along the Merrimack River.",
     "category": "experiments",
+<<<<<<< HEAD
+    "tags": ["MapLibre", "scrollytelling", "alternate history"],
+=======
     "tags": [
       "MapLibre",
       "scrollytelling",
       "alternate history"
     ],
+>>>>>>> origin/main
     "url": "https://mapzimus.com/concord-war/",
     "status": "live",
     "updated": "2026-07"
@@ -61,17 +73,28 @@
     "title": "Bug Wars",
     "description": "A compact browser strategy game about building an insect colony and surviving rival swarms.",
     "category": "play",
+<<<<<<< HEAD
+    "tags": ["strategy", "browser game"],
+    "url": "https://mapzimus.com/bug-wars/",
+=======
     "tags": [
       "strategy",
       "browser game"
     ],
     "url": "https://mapzimus.com/games/bugwars/",
+>>>>>>> origin/main
     "status": "live",
     "updated": "2026-07"
   },
   {
     "slug": "flip-game",
     "title": "Flip Game",
+<<<<<<< HEAD
+    "description": "A bottle-flip party game — flick for a clean 360°, land upright, and steal lives. Installable PWA with Matter.js physics.",
+    "category": "play",
+    "tags": ["physics", "party game", "PWA"],
+    "url": "https://mapzimus.com/flip-game/",
+=======
     "description": "A bottle-flip physics game — time your flick, land the bottle, chain streaks across increasingly absurd targets.",
     "category": "play",
     "tags": [
@@ -80,12 +103,39 @@
       "PWA"
     ],
     "url": "https://mapzimus.com/games/flip/",
+>>>>>>> origin/main
     "status": "live",
     "updated": "2026-07"
   },
   {
     "slug": "grog-flip",
     "title": "Grog Flip",
+<<<<<<< HEAD
+    "description": "The pirate-themed bottle-flip reskin for the Whydah classroom — amber grog bottle, ship-deck table, crew colors.",
+    "category": "play",
+    "tags": ["physics", "Whydah", "party game"],
+    "url": "https://mapzimus.com/grog-flip/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "whydah-voyage",
+    "title": "Whydah's Voyage",
+    "description": "Steer Black Sam Bellamy's 1717 voyage from the Caribbean to Maine — ten missions, ship battles, and the nor'easter the real crew never beat.",
+    "category": "play",
+    "tags": ["Whydah", "voyage", "canvas game"],
+    "url": "https://mapzimus.com/whydah-voyage/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "black-sam",
+    "title": "Black Sam",
+    "description": "A branching choose-your-own-destiny game about Samuel Bellamy and the Whydah — fifty-plus scenes, mini-games, and ten endings.",
+    "category": "play",
+    "tags": ["Whydah", "narrative", "mini-games"],
+    "url": "https://mapzimus.com/black-sam/",
+=======
     "description": "The pirate-parrot cousin of Flip Game, built for the Whydah unit — flip Grog's tankard and stick the landing.",
     "category": "play",
     "tags": [
@@ -94,6 +144,7 @@
       "Whydah"
     ],
     "url": "https://mapzimus.com/games/grog-flip/",
+>>>>>>> origin/main
     "status": "live",
     "updated": "2026-07"
   },
@@ -102,16 +153,39 @@
     "title": "True Scale",
     "description": "A map experiment for comparing the apparent and actual size of places across latitudes.",
     "category": "maps",
+<<<<<<< HEAD
+    "tags": ["projection", "MapLibre", "scale"],
+    "url": "https://mapzimus.com/true-scale/",
+=======
     "tags": [
       "projection",
       "MapLibre",
       "scale"
     ],
     "url": "https://mapzimus.com/truescale/",
+>>>>>>> origin/main
     "status": "live",
     "updated": "2026-07"
   },
   {
+<<<<<<< HEAD
+    "slug": "interstate-challenge",
+    "title": "Sequential Interstate Challenge",
+    "description": "Drive every two-digit Interstate end to end — an optimized order and orientation cuts connector drive time 86% versus strict numerical order.",
+    "category": "maps",
+    "tags": ["route optimization", "MapLibre", "OSRM"],
+    "url": "https://mapzimus.com/interstate-challenge/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "mapzimus-board",
+    "title": "Mapzimus Board",
+    "description": "The lab's idea engine — a live board that scores roughly 20,000 candidate map ideas by predicted virality with a weighted seven-dimension V-Score.",
+    "category": "experiments",
+    "tags": ["idea scoring", "vanilla JS", "Python"],
+    "url": "https://mapzimus.com/mapzimus-board/",
+=======
     "slug": "whydah-voyage",
     "title": "Whydah Voyage",
     "description": "A project-based learning dashboard for a 5-week middle-school unit on the Whydah Gally — the 1717 pirate ship wrecked off Cape Cod — with maps, a navigator, handouts, and daily pages.",
@@ -123,11 +197,21 @@
       "curriculum"
     ],
     "url": "https://mapzimus.com/whydah/",
+>>>>>>> origin/main
     "status": "live",
     "updated": "2026-07"
   },
   {
     "slug": "tappymaps",
+<<<<<<< HEAD
+    "title": "TappyMaps",
+    "description": "Tap. Color. Share. A browser map maker for colored U.S. state and county maps, plus a growing arcade of geography games.",
+    "category": "play",
+    "tags": ["map design", "geography games"],
+    "url": "https://tappymaps.com",
+    "status": "live",
+    "external": true,
+=======
     "title": "Tappymaps Arcade",
     "description": "Tap-to-color US state and county maps plus a shelf of geography arcade games — locate, recall, duel, and daily draft modes.",
     "category": "play",
@@ -167,6 +251,7 @@
     ],
     "url": "https://mapzimus.com/savvas/",
     "status": "in-progress",
+>>>>>>> origin/main
     "updated": "2026-07"
   },
   {

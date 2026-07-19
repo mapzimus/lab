@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quadratic Explorer</title>
+<meta name="description" content="Drag sliders for a, b, and c and watch the parabola, vertex, roots, and standard/vertex/factored forms update live. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --math: Georgia, "Times New Roman", "STIX Two Text", serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+  .m { font-family: var(--math); }
+  .m var, var { font-style: italic; font-family: inherit; }
+  .m sup { font-size: .7em; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
+  .card h2 { font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 12px; }
+
+  canvas { display: block; width: 100%; height: auto; border-radius: 10px; touch-action: none; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+  .chips-label { color: var(--muted); font-size: .82rem; margin-right: 2px; }
+  .chip { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 999px; padding: 6px 13px; cursor: pointer; font-family: var(--math); font-size: .9rem; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .ctrl { display: grid; grid-template-columns: auto 1fr auto; gap: 10px 14px; align-items: center; }
+  .ctrl label { font-weight: 700; color: var(--accent); font-size: 1.05rem; font-family: var(--math); }
+  .ctrl input[type=range] { width: 100%; accent-color: var(--accent); }
+  .ctrl input[type=number] { width: 84px; padding: 7px 8px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; text-align: center; background: var(--bg); color: var(--text); }
+  .ctrl input[type=number]:focus, .ctrl input[type=range]:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .row-actions { display: flex; justify-content: flex-end; margin-top: 12px; gap: 8px; }
+
+  .forms { display: grid; gap: 10px; }
+  .form-row { background: var(--surface-2); border-radius: 12px; padding: 12px 16px; }
+  .form-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; margin-bottom: 5px; }
+  .form-val { font-size: 1.15rem; }
+  .disc-box { border-radius: 12px; padding: 12px 16px; font-size: .95rem; font-weight: 600; margin-top: 4px; }
+  .disc-box.two { background: color-mix(in srgb, var(--ok) 16%, var(--surface)); color: var(--ok); }
+  .disc-box.one { background: color-mix(in srgb, #d9a520 22%, var(--surface)); color: #92600e; }
+  :root[data-theme="dark"] .disc-box.one { color: #f0c04a; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .disc-box.one { color: #f0c04a; } }
+  .disc-box.none { background: color-mix(in srgb, var(--danger) 16%, var(--surface)); color: var(--danger); }
+
+  @media (max-width: 640px) {
+    .ctrl { grid-template-columns: auto 1fr; }
+    .ctrl input[type=number] { grid-column: 2; justify-self: start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← max</a>
+      <h1>Quadratic Explorer</h1>
+      <p>Drag the sliders for a, b, and c and watch the parabola, vertex, roots, and the standard/vertex/factored forms update live.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="card">
+    <canvas id="plot" width="640" height="420" aria-label="Graph of the quadratic function"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>Try an example</h2>
+    <div class="chips" id="chips" aria-label="Example quadratics">
+      <span class="chips-label">Load:</span>
+      <button class="chip" type="button" data-abc="1,-2,-3">x² − 2x − 3</button>
+      <button class="chip" type="button" data-abc="1,-4,3">x² − 4x + 3</button>
+      <button class="chip" type="button" data-abc="1,2,1">x² + 2x + 1</button>
+      <button class="chip" type="button" data-abc="1,1,1">x² + x + 1</button>
+      <button class="chip" type="button" data-abc="-1,0,4">−x² + 4</button>
+      <button class="chip" type="button" data-abc="0.5,-1,-2">0.5x² − x − 2</button>
+    </div>
+    <div class="ctrl" id="controls"></div>
+    <div class="row-actions">
+      <button class="btn" id="resetBtn" type="button">↺ Reset</button>
+      <button class="btn" id="copyBtn" type="button">⧉ Copy forms</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Forms &amp; discriminant</h2>
+    <div class="forms" id="forms"></div>
+  </div>
+
+  <footer class="app">Everything runs locally in your browser · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PKEY = "max-quadratic-explorer-prefs";
+  var DEFAULTS = { a: 1, b: -2, c: -3 };
+  var prefs = { a: DEFAULTS.a, b: DEFAULTS.b, c: DEFAULTS.c };
+  try {
+    var s = JSON.parse(localStorage.getItem(PKEY));
+    if (s) prefs = Object.assign(prefs, s);
+  } catch (e) {}
+  function save() { try { localStorage.setItem(PKEY, JSON.stringify(prefs)); } catch (e) {} }
+
+  var canvas = document.getElementById("plot"), ctx = canvas.getContext("2d");
+  var VMIN = -10, VMAX = 10;
+
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#000";
+  }
+
+  /* ---------- math helpers (ported from the original tool, unchanged logic) ---------- */
+  function fmt(n) {
+    if (!isFinite(n)) return "?";
+    var r = Math.round(n * 100) / 100;
+    return (Object.is(r, -0) ? 0 : r).toString();
+  }
+  function fmtCoefHtml(n, varHtml, first) {
+    n = Math.round(n * 100) / 100;
+    if (Object.is(n, -0)) n = 0;
+    if (n === 0) return "";
+    var sign = first ? (n < 0 ? "−" : "") : (n < 0 ? " − " : " + ");
+    var abs = Math.abs(n);
+    if (varHtml === "") return sign + abs;
+    if (abs === 1) return sign + varHtml;
+    return sign + abs + varHtml;
+  }
+  var X2 = "<var>x</var><sup>2</sup>", XV = "<var>x</var>";
+
+  function buildStdHtml(a, b, c) {
+    var s = fmtCoefHtml(a, X2, true) + fmtCoefHtml(b, XV, !a) + fmtCoefHtml(c, "", !(a || b));
+    return s || "0";
+  }
+  function buildVertexHtml(a, b, c) {
+    var h = -b / (2 * a), k = c - (b * b) / (4 * a);
+    var hfmt = Math.round(h * 100) / 100, kfmt = Math.round(k * 100) / 100;
+    if (Object.is(hfmt, -0)) hfmt = 0;
+    if (Object.is(kfmt, -0)) kfmt = 0;
+    var af = fmtCoefHtml(a, "", true);
+    if (af === "1") af = "";
+    if (af === "−1") af = "−";
+    var inner = hfmt === 0 ? XV : (hfmt < 0 ? "(" + XV + " + " + Math.abs(hfmt) + ")" : "(" + XV + " − " + hfmt + ")");
+    var kpart = kfmt === 0 ? "" : (kfmt > 0 ? " + " + kfmt : " − " + Math.abs(kfmt));
+    return af + inner + "<sup>2</sup>" + kpart;
+  }
+  function buildFactoredHtml(a, b, c) {
+    var disc = b * b - 4 * a * c;
+    if (disc < 0) return "Not factorable over the real numbers";
+    if (a === 0) return buildStdHtml(a, b, c);
+    var r1 = (-b - Math.sqrt(disc)) / (2 * a), r2 = (-b + Math.sqrt(disc)) / (2 * a);
+    r1 = Math.round(r1 * 1000) / 1000;
+    r2 = Math.round(r2 * 1000) / 1000;
+    var af = Math.abs(a) === 1 ? "" : Math.abs(a).toString();
+    var sign = a < 0 ? "−" : "";
+    function factorHtml(r) {
+      if (r === 0) return XV;
+      return r < 0 ? "(" + XV + " + " + Math.abs(r) + ")" : "(" + XV + " − " + r + ")";
+    }
+    if (Math.abs(disc) < 1e-9) {
+      var r = Math.round(r1 * 100) / 100;
+      return sign + af + factorHtml(r) + "<sup>2</sup>";
+    }
+    return sign + af + factorHtml(r1) + factorHtml(r2);
+  }
+
+  /* ---------- controls ---------- */
+  var CTRLS = [
+    { k: "a", min: -4, max: 4, step: 0.25 },
+    { k: "b", min: -10, max: 10, step: 0.5 },
+    { k: "c", min: -10, max: 10, step: 0.5 }
+  ];
+  function buildControls() {
+    var host = document.getElementById("controls");
+    host.innerHTML = "";
+    CTRLS.forEach(function (cfg) {
+      var lab = document.createElement("label");
+      lab.textContent = cfg.k + " =";
+      lab.setAttribute("for", "r_" + cfg.k);
+      var range = document.createElement("input");
+      range.type = "range"; range.id = "r_" + cfg.k;
+      range.min = cfg.min; range.max = cfg.max; range.step = cfg.step; range.value = prefs[cfg.k];
+      var num = document.createElement("input");
+      num.type = "number"; num.step = cfg.step; num.value = prefs[cfg.k];
+      num.setAttribute("aria-label", "Coefficient " + cfg.k);
+      range.addEventListener("input", function () {
+        prefs[cfg.k] = parseFloat(range.value); num.value = range.value; save(); draw();
+      });
+      num.addEventListener("input", function () {
+        var v = parseFloat(num.value);
+        if (isNaN(v)) return;
+        v = Math.max(cfg.min, Math.min(cfg.max, v));
+        prefs[cfg.k] = v; range.value = v; save(); draw();
+      });
+      host.appendChild(lab); host.appendChild(range); host.appendChild(num);
+    });
+  }
+  function syncControls() {
+    CTRLS.forEach(function (cfg) {
+      var range = document.getElementById("r_" + cfg.k);
+      var num = range ? range.nextElementSibling : null;
+      if (range) range.value = prefs[cfg.k];
+      if (num) num.value = prefs[cfg.k];
+    });
+  }
+
+  /* ---------- graph ---------- */
+  function resize() {
+    var dpr = window.devicePixelRatio || 1, W = canvas.clientWidth || 640, H = Math.round(W * 0.65);
+    canvas.width = W * dpr; canvas.height = H * dpr; canvas.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  function toScreen(mx, my, W, H) {
+    return { x: (mx - VMIN) / (VMAX - VMIN) * W, y: H - (my - VMIN) / (VMAX - VMIN) * H };
+  }
+  function fOf(x) { return prefs.a * x * x + prefs.b * x + prefs.c; }
+
+  function draw() {
+    var dpr = window.devicePixelRatio || 1, W = canvas.width / dpr, H = canvas.height / dpr;
+    var colSurface = cssVar("--surface"), colBorder = cssVar("--border"), colMuted = cssVar("--muted"),
+        colText = cssVar("--text"), colAccent = cssVar("--accent");
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = colSurface; ctx.fillRect(0, 0, W, H);
+
+    ctx.lineWidth = 1; ctx.font = "11px " + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    var o = toScreen(0, 0, W, H);
+    for (var g = VMIN; g <= VMAX; g++) {
+      var v = toScreen(g, g, W, H);
+      ctx.strokeStyle = g === 0 ? colMuted : colBorder;
+      ctx.beginPath(); ctx.moveTo(v.x, 0); ctx.lineTo(v.x, H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, v.y); ctx.lineTo(W, v.y); ctx.stroke();
+    }
+    ctx.fillStyle = colMuted;
+    for (var t = VMIN; t <= VMAX; t += 2) {
+      if (t === 0) continue;
+      var px = toScreen(t, 0, W, H), py = toScreen(0, t, W, H);
+      ctx.textAlign = "center"; ctx.fillText(t, px.x, o.y + 10);
+      ctx.textAlign = "right"; ctx.fillText(t, o.x - 5, py.y);
+    }
+    ctx.strokeStyle = colMuted; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(o.x, 0); ctx.lineTo(o.x, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, o.y); ctx.lineTo(W, o.y); ctx.stroke();
+
+    var a = prefs.a, b = prefs.b, c = prefs.c;
+
+    if (a !== 0) {
+      var axSym = -b / (2 * a);
+      var axPx = toScreen(axSym, 0, W, H);
+      ctx.strokeStyle = colBorder; ctx.lineWidth = 1.5; ctx.setLineDash([6, 4]);
+      ctx.beginPath(); ctx.moveTo(axPx.x, 0); ctx.lineTo(axPx.x, H); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    ctx.strokeStyle = colAccent; ctx.lineWidth = 2.5; ctx.beginPath();
+    var started = false;
+    for (var sx = 0; sx <= W; sx++) {
+      var mx = VMIN + (sx / W) * (VMAX - VMIN), my = fOf(mx);
+      var p = toScreen(mx, my, W, H);
+      if (p.y < -300 || p.y > H + 300) { started = false; continue; }
+      if (!started) { ctx.moveTo(p.x, p.y); started = true; } else ctx.lineTo(p.x, p.y);
+    }
+    ctx.stroke();
+
+    function dot(mx, my, label, offset) {
+      if (!isFinite(my) || my < VMIN - 1 || my > VMAX + 1) return;
+      var p = toScreen(mx, my, W, H);
+      ctx.fillStyle = colAccent; ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, 2 * Math.PI); ctx.fill();
+      ctx.fillStyle = colText; ctx.font = "11px " + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = offset.ta || "center"; ctx.textBaseline = "middle";
+      ctx.fillText(label, p.x + (offset.dx || 0), p.y + (offset.dy || 0));
+    }
+
+    if (a !== 0) {
+      var vx = -b / (2 * a), vy = fOf(vx);
+      dot(vx, vy, "V (" + fmt(vx) + ", " + fmt(vy) + ")", { dx: 0, dy: -16, ta: "center" });
+      var disc = b * b - 4 * a * c;
+      if (disc >= 0) {
+        var r1 = (-b - Math.sqrt(disc)) / (2 * a), r2 = (-b + Math.sqrt(disc)) / (2 * a);
+        if (Math.abs(disc) < 1e-9) {
+          dot(r1, 0, "(" + fmt(r1) + ",0)", { dx: 0, dy: -14, ta: "center" });
+        } else {
+          dot(r1, 0, "(" + fmt(r1) + ",0)", { dx: -4, dy: -14, ta: "right" });
+          dot(r2, 0, "(" + fmt(r2) + ",0)", { dx: 4, dy: -14, ta: "left" });
+        }
+      }
+    }
+    dot(0, c, "(0," + fmt(c) + ")", { dx: 10, dy: -14, ta: "left" });
+
+    updateForms();
+  }
+
+  /* ---------- forms panel ---------- */
+  var lastCopyText = "";
+  function plain(html) {
+    return html.replace(/<var>x<\/var>/g, "x").replace(/<sup>(.*?)<\/sup>/g, "^$1").replace(/−/g, "-");
+  }
+  function updateForms() {
+    var a = prefs.a, b = prefs.b, c = prefs.c;
+    var disc = b * b - 4 * a * c;
+    var discRounded = Math.round(disc * 100) / 100;
+    var discClass = disc > 1e-9 ? "two" : (Math.abs(disc) < 1e-9 ? "one" : "none");
+    var discMsg = disc > 1e-9 ? "2 real roots" : (Math.abs(disc) < 1e-9 ? "1 real root (repeated)" : "no real roots");
+
+    var stdHtml = buildStdHtml(a, b, c);
+    var vertexHtml = a !== 0 ? buildVertexHtml(a, b, c) : null;
+    var factoredHtml = a !== 0 ? buildFactoredHtml(a, b, c) : null;
+
+    document.getElementById("forms").innerHTML =
+      '<div class="form-row"><div class="form-label">Standard form</div><div class="form-val m">y = ' + stdHtml + '</div></div>' +
+      (vertexHtml ? '<div class="form-row"><div class="form-label">Vertex form</div><div class="form-val m">y = ' + vertexHtml + '</div></div>' : '') +
+      (factoredHtml ? '<div class="form-row"><div class="form-label">Factored form</div><div class="form-val m">y = ' + factoredHtml + '</div></div>' : '') +
+      (a !== 0 ? '<div class="disc-box ' + discClass + '">Discriminant: b² − 4ac = ' + discRounded + ' → ' + discMsg + '</div>' : '');
+
+    var lines = ["y = " + plain(stdHtml)];
+    if (vertexHtml) lines.push("y = " + plain(vertexHtml));
+    if (factoredHtml) lines.push("y = " + plain(factoredHtml));
+    if (a !== 0) lines.push("Discriminant: b^2 - 4ac = " + discRounded + " -> " + discMsg);
+    lastCopyText = lines.join("\n");
+  }
+
+  /* ---------- wiring ---------- */
+  document.getElementById("chips").addEventListener("click", function (e) {
+    var b = e.target.closest("button.chip");
+    if (!b) return;
+    var parts = b.dataset.abc.split(",").map(Number);
+    prefs.a = parts[0]; prefs.b = parts[1]; prefs.c = parts[2];
+    save(); syncControls(); draw();
+  });
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    prefs.a = DEFAULTS.a; prefs.b = DEFAULTS.b; prefs.c = DEFAULTS.c;
+    save(); syncControls(); draw();
+  });
+  document.getElementById("copyBtn").addEventListener("click", function (e) {
+    var btn = e.currentTarget, orig = btn.textContent;
+    navigator.clipboard.writeText(lastCopyText).then(function () {
+      btn.textContent = "✓ Copied"; btn.classList.add("copied");
+      setTimeout(function () { btn.textContent = orig; btn.classList.remove("copied"); }, 1200);
+    }).catch(function () {
+      btn.textContent = "Copy blocked"; setTimeout(function () { btn.textContent = orig; }, 1200);
+    });
+  });
+
+  buildControls();
+  window.addEventListener("resize", resize);
+  resize();
+})();
+
+/* ---------- theme toggle ---------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+  document.dispatchEvent(new Event('max-theme-changed'));
+});
+document.addEventListener('max-theme-changed', () => { window.dispatchEvent(new Event('resize')); });
+</script>
+</body>
+</html>

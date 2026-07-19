@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR Code Generator</title>
+<meta name="description" content="Create QR codes for links, Wi-Fi networks, email, phone numbers, SMS and plain text. Pick colors and size, then download as PNG or SVG. What you type never leaves your browser.">
+<style>
+  /* ---- Theme tokens: swap these to rebrand per site ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --warn:#8a5a00; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b; --warn:#e6b455;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b; --warn:#e6b455;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .grid { display: grid; grid-template-columns: minmax(0,1.08fr) minmax(0,1fr); gap: 20px; align-items: start; }
+  @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+  /* ---- content type tabs ---- */
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 14px 16px 0; }
+  .tab {
+    border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+    border-radius: 999px; padding: 7px 13px; font-size: .84rem; cursor: pointer;
+  }
+  .tab:hover { border-color: var(--accent); color: var(--accent); }
+  .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+  /* ---- forms ---- */
+  .forms { padding: 16px 16px 0; }
+  .form { display: flex; flex-direction: column; gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field > label { font-size: .8rem; color: var(--muted); }
+  input[type="text"], input[type="tel"], textarea, select {
+    width: 100%; font-family: var(--mono); font-size: .92rem;
+    background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 9px 10px;
+  }
+  select { font-family: var(--sans); }
+  textarea { resize: vertical; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  .hint { color: var(--muted); font-size: .78rem; margin: 0; }
+  .checkline { display: flex; align-items: center; gap: 8px; font-size: .84rem; cursor: pointer; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .two-col { grid-template-columns: 1fr; } }
+
+  .note { font-size: .8rem; color: var(--muted); }
+  .note.err { color: var(--danger); }
+  .note.warn { color: var(--warn); }
+  #contentErr { margin: 10px 16px 0; min-height: 0; }
+
+  /* ---- encoded payload peek ---- */
+  .payload { margin: 14px 16px 0; border-top: 1px solid var(--border); padding-top: 10px; }
+  .payload summary { cursor: pointer; color: var(--muted); font-size: .8rem; user-select: none; }
+  .payload summary:hover { color: var(--accent); }
+  .payload-row { display: flex; gap: 8px; align-items: stretch; margin-top: 8px; }
+  .payload-row code {
+    flex: 1; font-family: var(--mono); font-size: .78rem; background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+    word-break: break-all; white-space: pre-wrap; min-width: 0;
+  }
+  .copy {
+    flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+    border-radius: 8px; width: 38px; cursor: pointer; font-size: 1rem;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .copy:hover { color: var(--accent); border-color: var(--accent); }
+  .copy.copied { color: var(--ok); border-color: var(--ok); }
+
+  /* ---- options ---- */
+  .options { border: none; border-top: 1px solid var(--border); margin: 16px 16px 0; padding: 12px 0 18px; }
+  .options legend { padding: 0; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; margin-top: 8px; }
+  @media (max-width: 480px) { .opt-grid { grid-template-columns: 1fr; } }
+  .opt > label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: .8rem; color: var(--muted); }
+  .opt output { font-family: var(--mono); font-size: .78rem; color: var(--text); }
+  input[type="range"] { width: 100%; accent-color: var(--accent); margin: 10px 0 0; }
+  input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; flex: none; }
+  .colors-row { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+  .color-chip { display: inline-flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--muted); cursor: pointer; }
+  input[type="color"] { width: 42px; height: 30px; padding: 2px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+  .options .note { margin: 10px 0 0; }
+
+  /* ---- preview ---- */
+  .preview-panel { padding: 16px; position: sticky; top: 16px; }
+  @media (max-width: 820px) { .preview-panel { position: static; } }
+  .stage {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    min-height: 352px; display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  #qrCanvas { display: block; max-width: 100%; }
+  #qrCanvas.checker { background: repeating-conic-gradient(rgba(128,128,128,.28) 0% 25%, rgba(128,128,128,0) 0% 50%) 0 0 / 18px 18px; }
+  .ph { color: var(--muted); font-size: .9rem; text-align: center; max-width: 36ch; }
+  .ph.err { color: var(--danger); }
+  .qr-meta { text-align: center; color: var(--muted); font-family: var(--mono); font-size: .8rem; margin: 12px 0 0; min-height: 1.2em; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 12px; }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover:not(:disabled) { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  #exportNote { text-align: center; margin: 10px 0 0; min-height: 1.1em; }
+
+  .hide { display: none !important; }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>QR Code Generator</h1>
+      <p>Make a QR code that opens a link, joins a Wi-Fi network, starts an email, call or text — or just shows some text. Style it, then download it as a PNG or SVG. Everything happens in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="grid">
+    <!-- ---- content + options ---- -->
+    <section class="panel" id="controls" style="padding-bottom:2px">
+      <div class="tabs" role="tablist" aria-label="What should the code contain?">
+        <button class="tab" role="tab" id="tab-url"   aria-selected="true"  aria-controls="panel-url"   data-type="url"   type="button">🔗 URL</button>
+        <button class="tab" role="tab" id="tab-text"  aria-selected="false" aria-controls="panel-text"  data-type="text"  type="button" tabindex="-1">📝 Text</button>
+        <button class="tab" role="tab" id="tab-wifi"  aria-selected="false" aria-controls="panel-wifi"  data-type="wifi"  type="button" tabindex="-1">📶 Wi‑Fi</button>
+        <button class="tab" role="tab" id="tab-email" aria-selected="false" aria-controls="panel-email" data-type="email" type="button" tabindex="-1">✉️ Email</button>
+        <button class="tab" role="tab" id="tab-phone" aria-selected="false" aria-controls="panel-phone" data-type="phone" type="button" tabindex="-1">📞 Phone</button>
+        <button class="tab" role="tab" id="tab-sms"   aria-selected="false" aria-controls="panel-sms"   data-type="sms"   type="button" tabindex="-1">💬 SMS</button>
+      </div>
+
+      <div class="forms">
+        <div class="form" id="panel-url" role="tabpanel" aria-labelledby="tab-url">
+          <div class="field">
+            <label for="urlInput">Web address</label>
+            <input type="text" id="urlInput" value="https://example.com" placeholder="example.com/page" spellcheck="false" autocapitalize="off" autocomplete="off">
+          </div>
+          <p class="hint">No need to type <strong>https://</strong> — it's added automatically if you leave it off.</p>
+        </div>
+
+        <div class="form hide" id="panel-text" role="tabpanel" aria-labelledby="tab-text">
+          <div class="field">
+            <label for="textInput">Text</label>
+            <textarea id="textInput" rows="4" placeholder="Anything you want the code to say…"></textarea>
+          </div>
+        </div>
+
+        <div class="form hide" id="panel-wifi" role="tabpanel" aria-labelledby="tab-wifi">
+          <div class="two-col">
+            <div class="field">
+              <label for="wifiSsid">Network name (SSID)</label>
+              <input type="text" id="wifiSsid" placeholder="MyHomeWiFi" spellcheck="false" autocapitalize="off" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="wifiSec">Security</label>
+              <select id="wifiSec" aria-label="Wi-Fi security type">
+                <option value="WPA" selected>WPA / WPA2 / WPA3</option>
+                <option value="WEP">WEP</option>
+                <option value="nopass">None (open network)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" id="wifiPassRow">
+            <label for="wifiPass">Password</label>
+            <input type="text" id="wifiPass" placeholder="Network password" spellcheck="false" autocapitalize="off" autocomplete="off">
+          </div>
+          <label class="checkline" for="wifiHidden"><input type="checkbox" id="wifiHidden"> Hidden network (doesn't broadcast its name)</label>
+          <p class="hint">Scanning the code offers to join the network. The password is stored in the code as plain text.</p>
+        </div>
+
+        <div class="form hide" id="panel-email" role="tabpanel" aria-labelledby="tab-email">
+          <div class="field">
+            <label for="emailTo">To (email address)</label>
+            <input type="text" id="emailTo" placeholder="someone@example.com" spellcheck="false" autocapitalize="off" autocomplete="off" inputmode="email">
+          </div>
+          <div class="field">
+            <label for="emailSubj">Subject <span style="opacity:.7">(optional)</span></label>
+            <input type="text" id="emailSubj" placeholder="Hello!" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="emailBody">Message <span style="opacity:.7">(optional)</span></label>
+            <textarea id="emailBody" rows="3" placeholder="Pre-filled message body…"></textarea>
+          </div>
+          <p class="hint">Scanning opens the person's mail app with everything filled in.</p>
+        </div>
+
+        <div class="form hide" id="panel-phone" role="tabpanel" aria-labelledby="tab-phone">
+          <div class="field">
+            <label for="phoneNum">Phone number</label>
+            <input type="tel" id="phoneNum" placeholder="+1 555 123 4567" autocomplete="off">
+          </div>
+          <p class="hint">Scanning offers to call this number. Include the country code (like +1) so it works abroad.</p>
+        </div>
+
+        <div class="form hide" id="panel-sms" role="tabpanel" aria-labelledby="tab-sms">
+          <div class="field">
+            <label for="smsNum">Phone number</label>
+            <input type="tel" id="smsNum" placeholder="+1 555 123 4567" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="smsMsg">Message <span style="opacity:.7">(optional)</span></label>
+            <textarea id="smsMsg" rows="2" placeholder="Pre-filled text message…"></textarea>
+          </div>
+          <p class="hint">Scanning opens a new text message to this number.</p>
+        </div>
+      </div>
+
+      <p class="note err" id="contentErr" role="alert"></p>
+
+      <details class="payload">
+        <summary>What gets encoded</summary>
+        <div class="payload-row">
+          <code id="payloadText">(nothing yet)</code>
+          <button class="copy" id="copyPayload" type="button" title="Copy the encoded text">⧉</button>
+        </div>
+      </details>
+
+      <fieldset class="options">
+        <legend>Style &amp; size</legend>
+        <div class="opt-grid">
+          <div class="opt">
+            <label for="sizeRange">Image size <output id="sizeOut" for="sizeRange">320 px</output></label>
+            <input type="range" id="sizeRange" min="128" max="1024" step="32" value="320">
+          </div>
+          <div class="opt">
+            <label for="marginRange" title="The blank border around the code. Scanners need some quiet space — 4 is the standard.">Margin <output id="marginOut" for="marginRange">4 modules</output></label>
+            <input type="range" id="marginRange" min="0" max="8" step="1" value="4">
+          </div>
+          <div class="opt">
+            <label for="ecSelect" title="Higher = survives more damage (dirt, tears, a logo on top), but makes a denser code.">Error correction</label>
+            <select id="ecSelect" title="Higher = survives more damage (dirt, tears, a logo on top), but makes a denser code." style="margin-top:6px">
+              <option value="L">L — low (≈7% recoverable)</option>
+              <option value="M" selected>M — medium (≈15%)</option>
+              <option value="Q">Q — quartile (≈25%)</option>
+              <option value="H">H — high (≈30%)</option>
+            </select>
+          </div>
+          <div class="colors-row">
+            <label class="color-chip" for="fgColor"><input type="color" id="fgColor" value="#000000"> Code color</label>
+            <label class="color-chip" for="bgColor"><input type="color" id="bgColor" value="#ffffff"> Background</label>
+            <label class="checkline" for="transparentBg" title="The PNG and SVG keep a see-through background"><input type="checkbox" id="transparentBg"> Transparent background</label>
+          </div>
+        </div>
+        <p class="note warn" id="warnLow" hidden>⚠ Low contrast — many scanners will fail to read this.</p>
+        <p class="note warn" id="warnInvert" hidden>⚠ QR codes should be dark-on-light for best compatibility — consider swapping the colors.</p>
+        <p class="note" id="transNote" hidden>Transparent background: whether it scans depends on what ends up behind the code — keep that light.</p>
+      </fieldset>
+    </section>
+
+    <!-- ---- preview + export ---- -->
+    <section class="panel preview-panel">
+      <div class="stage" id="stage">
+        <canvas id="qrCanvas" class="hide" role="img" aria-label="Generated QR code"></canvas>
+        <div class="ph" id="phMsg" role="status">Loading QR engine…</div>
+      </div>
+      <p class="qr-meta" id="qrMeta" aria-live="polite"></p>
+      <div class="actions">
+        <button class="btn primary" id="dlPng" type="button" disabled>⬇ Download PNG</button>
+        <button class="btn" id="dlSvg" type="button" disabled title="Vector file — stays sharp at any size">⬇ Download SVG</button>
+        <button class="btn" id="copyImg" type="button" disabled title="Copy the code as an image to paste elsewhere">⧉ Copy image</button>
+      </div>
+      <p class="note" id="exportNote"></p>
+    </section>
+  </div>
+
+  <footer class="app">Codes are generated locally — what you type never leaves this page. Only the tiny QR engine loads once from unpkg.com. · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+/* ============================================================
+   QR Code Generator — standalone, client-side.
+   Dep: qrcode-generator 1.4.4 (global `qrcode`), loaded in the
+   BACKGROUND from unpkg so a slow/blocked CDN never freezes the
+   page. Rendering to canvas/SVG is done here, module by module.
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+
+/* ---------------- QR engine background load ---------------- */
+let engine = null;         // the `qrcode` global once the script lands
+let engineFailed = false;
+
+function loadEngine() {
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/qrcode-generator@1.4.4/qrcode.js';
+  s.async = true;
+  s.onload = () => {
+    engine = window.qrcode || null;
+    if (engine && engine.stringToBytesFuncs && engine.stringToBytesFuncs['UTF-8']) {
+      engine.stringToBytes = engine.stringToBytesFuncs['UTF-8']; // accents & emoji encode correctly
+    }
+    if (!engine) engineFailed = true;
+    update(true);
+  };
+  s.onerror = () => { engineFailed = true; update(true); };
+  document.head.appendChild(s);
+}
+
+/* ---------------- payload builders ---------------- */
+// Wi-Fi spec: backslash-escape \ ; , : " inside SSID and password
+const wifiEsc = (s) => s.replace(/[\\;,:"]/g, (m) => '\\' + m);
+const cleanPhone = (s) => s.replace(/[\s().-]/g, '');
+
+function buildPayload(type) {
+  switch (type) {
+    case 'text':
+      return $('textInput').value;
+    case 'url': {
+      let v = $('urlInput').value.trim();
+      if (!v) return '';
+      if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(v)) v = 'https://' + v;
+      return v;
+    }
+    case 'wifi': {
+      const ssid = $('wifiSsid').value;
+      if (!ssid) return '';
+      const sec = $('wifiSec').value;              // WPA | WEP | nopass
+      let p = 'WIFI:T:' + sec + ';S:' + wifiEsc(ssid) + ';';
+      if (sec !== 'nopass' && $('wifiPass').value) p += 'P:' + wifiEsc($('wifiPass').value) + ';';
+      if ($('wifiHidden').checked) p += 'H:true;';
+      return p + ';';
+    }
+    case 'email': {
+      const to = $('emailTo').value.trim();
+      if (!to) return '';
+      const params = [];
+      if ($('emailSubj').value) params.push('subject=' + encodeURIComponent($('emailSubj').value));
+      if ($('emailBody').value) params.push('body=' + encodeURIComponent($('emailBody').value));
+      return 'mailto:' + to + (params.length ? '?' + params.join('&') : '');
+    }
+    case 'phone': {
+      const n = cleanPhone($('phoneNum').value);
+      return n ? 'tel:' + n : '';
+    }
+    case 'sms': {
+      const n = cleanPhone($('smsNum').value);
+      if (!n) return '';
+      const msg = $('smsMsg').value;
+      return 'smsto:' + n + (msg ? ':' + msg : '');
+    }
+  }
+  return '';
+}
+
+const EMPTY_HINTS = {
+  url:   'Enter a web address on the left and your QR code appears here.',
+  text:  'Type some text on the left and your QR code appears here.',
+  wifi:  'Enter the network name (SSID) on the left and your QR code appears here.',
+  email: 'Enter a recipient email address on the left and your QR code appears here.',
+  phone: 'Enter a phone number on the left and your QR code appears here.',
+  sms:   'Enter a phone number on the left and your QR code appears here.',
+};
+const TOO_LONG_MSG = 'Too much data for a QR code at this error-correction level — shorten the content or lower the level.';
+
+/* ---------------- color math (for the contrast guard) ---------------- */
+function hexToRgb(hex) {
+  let h = String(hex).replace('#', '').trim();
+  if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+  if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
+  const n = parseInt(h, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+function relLum({ r, g, b }) {
+  const f = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+  return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+}
+function contrast(a, b) {
+  const l1 = relLum(a), l2 = relLum(b);
+  return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+}
+
+/* ---------------- module rendering (canvas + SVG) ---------------- */
+// Draw the QR into a 2d context at px×px total pixels. bg === null → transparent.
+// Cell edges are rounded per-boundary so modules stay seamless at any scale.
+function drawModules(ctx, qr, px, margin, fg, bg) {
+  ctx.clearRect(0, 0, px, px);
+  if (bg) { ctx.fillStyle = bg; ctx.fillRect(0, 0, px, px); }
+  const n = qr.getModuleCount();
+  const cell = px / (n + margin * 2);
+  ctx.fillStyle = fg;
+  for (let r = 0; r < n; r++) {
+    const y0 = Math.round((margin + r) * cell), y1 = Math.round((margin + r + 1) * cell);
+    for (let c = 0; c < n; c++) {
+      if (!qr.isDark(r, c)) continue;
+      const x0 = Math.round((margin + c) * cell), x1 = Math.round((margin + c + 1) * cell);
+      ctx.fillRect(x0, y0, x1 - x0, y1 - y0);
+    }
+  }
+}
+
+// Vector version: one <rect> background (unless transparent) + one <path> of modules.
+function buildSVG(qr, sizePx, margin, fg, bg) {
+  const n = qr.getModuleCount();
+  const total = n + margin * 2;
+  let d = '';
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      if (qr.isDark(r, c)) d += 'M' + (c + margin) + ' ' + (r + margin) + 'h1v1h-1z';
+    }
+  }
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="' + sizePx + '" height="' + sizePx +
+    '" viewBox="0 0 ' + total + ' ' + total + '" shape-rendering="crispEdges">' +
+    (bg ? '<rect width="' + total + '" height="' + total + '" fill="' + bg + '"/>' : '') +
+    '<path d="' + d + '" fill="' + fg + '"/></svg>';
+}
+
+/* ---------------- app state & rendering ---------------- */
+const state = { type: 'url', qr: null, payload: '' };
+
+function readOptions() {
+  return {
+    size: parseInt($('sizeRange').value, 10) || 320,
+    margin: parseInt($('marginRange').value, 10) || 0,
+    ec: $('ecSelect').value,
+    fg: $('fgColor').value,
+    bg: $('bgColor').value,
+    transparent: $('transparentBg').checked,
+  };
+}
+
+function syncOptions() {
+  const o = readOptions();
+  $('sizeOut').textContent = o.size + ' px';
+  $('marginOut').textContent = o.margin + (o.margin === 1 ? ' module' : ' modules');
+  $('wifiPassRow').classList.toggle('hide', $('wifiSec').value === 'nopass');
+  $('bgColor').disabled = o.transparent;
+  $('bgColor').style.opacity = o.transparent ? .4 : 1;
+}
+
+function renderWarnings() {
+  const o = readOptions();
+  const fg = hexToRgb(o.fg) || { r: 0, g: 0, b: 0 };
+  // with a transparent background, judge against the white most codes end up on
+  const bg = hexToRgb(o.transparent ? '#ffffff' : o.bg) || { r: 255, g: 255, b: 255 };
+  $('warnLow').hidden = contrast(fg, bg) >= 4;
+  $('warnInvert').hidden = relLum(fg) <= relLum(bg);
+  $('transNote').hidden = !o.transparent;
+}
+
+function setExports(enabled) {
+  $('dlPng').disabled = !enabled;
+  $('dlSvg').disabled = !enabled;
+  $('copyImg').disabled = !enabled;
+}
+
+function showPlaceholder(msg, isErr) {
+  state.qr = null; state.payload = '';
+  $('qrCanvas').classList.add('hide');
+  const ph = $('phMsg');
+  ph.textContent = msg;
+  ph.classList.toggle('err', !!isErr);
+  ph.classList.remove('hide');
+  $('qrMeta').textContent = '';
+  $('exportNote').textContent = '';
+  setExports(false);
+}
+
+function drawPreview(qr, o) {
+  const canvas = $('qrCanvas');
+  const avail = Math.max(120, $('stage').clientWidth - 34);
+  const cssSize = Math.max(96, Math.min(o.size, avail));
+  const dpr = window.devicePixelRatio || 1;
+  canvas.style.width = canvas.style.height = cssSize + 'px';
+  canvas.width = canvas.height = Math.max(21, Math.round(cssSize * dpr));
+  drawModules(canvas.getContext('2d'), qr, canvas.width, o.margin, o.fg, o.transparent ? null : o.bg);
+  canvas.classList.toggle('checker', o.transparent);
+  canvas.classList.remove('hide');
+  $('phMsg').classList.add('hide');
+}
+
+function render() {
+  syncOptions();
+  renderWarnings();
+  $('contentErr').textContent = '';
+
+  const payload = buildPayload(state.type);
+  $('payloadText').textContent = payload || '(nothing yet)';
+
+  if (!engine) {
+    showPlaceholder(engineFailed
+      ? 'QR engine unavailable — the qrcode-generator library didn\'t load (it comes from unpkg.com). Check your connection and reload the page; nothing you typed is lost.'
+      : 'Loading QR engine…', engineFailed);
+    return;
+  }
+  if (!payload) { showPlaceholder(EMPTY_HINTS[state.type]); return; }
+
+  const o = readOptions();
+  let qr;
+  try {
+    qr = engine(0, o.ec);          // type 0 = pick the smallest version that fits
+    qr.addData(payload, 'Byte');
+    qr.make();
+  } catch (e) {
+    $('contentErr').textContent = TOO_LONG_MSG;
+    showPlaceholder(TOO_LONG_MSG, true);
+    return;
+  }
+
+  state.qr = qr; state.payload = payload;
+  drawPreview(qr, o);
+  const n = qr.getModuleCount();
+  $('qrMeta').textContent = 'Version ' + ((n - 17) / 4) + ' · ' + n + '×' + n + ' modules · ' + payload.length + ' chars';
+  setExports(true);
+  const note = $('exportNote');
+  note.classList.remove('err');
+  note.textContent = (o.size / (n + o.margin * 2) < 2)
+    ? 'Dense code: each square is under 2 px at this image size — increase the size for reliable scanning.'
+    : '';
+}
+
+/* debounced regeneration */
+let timer = null;
+function update(now) {
+  clearTimeout(timer);
+  if (now) render();
+  else timer = setTimeout(render, 250);
+}
+
+/* ---------------- tabs ---------------- */
+const tablist = document.querySelector('.tabs');
+function setType(type) {
+  state.type = type;
+  tablist.querySelectorAll('.tab').forEach((t) => {
+    const on = t.dataset.type === type;
+    t.setAttribute('aria-selected', on ? 'true' : 'false');
+    t.tabIndex = on ? 0 : -1;
+  });
+  ['url', 'text', 'wifi', 'email', 'phone', 'sms'].forEach((k) => {
+    $('panel-' + k).classList.toggle('hide', k !== type);
+  });
+  update(true);
+}
+tablist.addEventListener('click', (e) => {
+  const t = e.target.closest('.tab');
+  if (t) setType(t.dataset.type);
+});
+tablist.addEventListener('keydown', (e) => {
+  if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  const tabs = [...tablist.querySelectorAll('.tab')];
+  const i = tabs.indexOf(document.activeElement);
+  if (i < 0) return;
+  e.preventDefault();
+  const j = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+  tabs[j].focus();
+  setType(tabs[j].dataset.type);
+});
+
+/* any input inside the left panel regenerates (debounced) */
+$('controls').addEventListener('input', () => { syncOptions(); renderWarnings(); update(); });
+
+/* re-fit the preview when the window size changes */
+let rz = null;
+window.addEventListener('resize', () => {
+  clearTimeout(rz);
+  rz = setTimeout(() => { if (state.qr) render(); }, 200);
+});
+
+/* ---------------- exports ---------------- */
+function downloadBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+function renderExportCanvas() {
+  const o = readOptions();
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = o.size;
+  drawModules(cv.getContext('2d'), state.qr, o.size, o.margin, o.fg, o.transparent ? null : o.bg);
+  return cv;
+}
+
+$('dlPng').addEventListener('click', () => {
+  if (!state.qr) return;
+  renderExportCanvas().toBlob((b) => {
+    if (b) downloadBlob(b, 'qr-' + state.type + '.png');
+  }, 'image/png');
+});
+
+$('dlSvg').addEventListener('click', () => {
+  if (!state.qr) return;
+  const o = readOptions();
+  const svg = buildSVG(state.qr, o.size, o.margin, o.fg, o.transparent ? null : o.bg);
+  downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), 'qr-' + state.type + '.svg');
+});
+
+function flashBtn(btn, label) {
+  const old = btn.textContent;
+  btn.classList.add('copied');
+  btn.textContent = label || '✓ Copied';
+  setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1200);
+}
+
+$('copyImg').addEventListener('click', async () => {
+  if (!state.qr) return;
+  try {
+    const blob = await new Promise((res) => renderExportCanvas().toBlob(res, 'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    flashBtn($('copyImg'));
+  } catch (e) {
+    const note = $('exportNote');
+    note.classList.add('err');
+    note.textContent = 'Copy was blocked by the browser — download the PNG instead.';
+  }
+});
+
+$('copyPayload').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(state.payload || $('payloadText').textContent);
+    flashBtn($('copyPayload'), '✓');
+  } catch (e) { /* clipboard blocked; ignore */ }
+});
+
+/* ---------------- theme toggle ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+
+/* ---------------- boot ---------------- */
+(function boot() {
+  if (!(navigator.clipboard && navigator.clipboard.write && window.ClipboardItem)) {
+    $('copyImg').classList.add('hide'); // Copy image not supported here
+  }
+  render(); // shows "Loading QR engine…" with the default URL ready to encode
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', loadEngine);
+  else loadEngine();
+})();
+</script>
+</body>
+</html>

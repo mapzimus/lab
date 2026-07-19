@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Systems of Equations Explorer</title>
+<meta name="description" content="Drag two lines on a coordinate plane, edit their slope and intercept, or type an equation, and see their intersection and solution type live. Fully client-side.">
+<style>
+  /* ---- Theme tokens: swap these to rebrand per site ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --line1:#2f6fed; --line2:#e2661f; --sol:#c98a00;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --line1:#6d99ff; --line2:#ff9d54; --sol:#ffd23f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --line1:#6d99ff; --line2:#ff9d54; --sol:#ffd23f;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
+  canvas { display: block; width: 100%; height: auto; border-radius: 10px; touch-action: none; background: var(--surface); }
+  .hint { text-align: center; color: var(--muted); font-size: .82rem; margin: 6px 0 0; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 22px; justify-content: center; margin-top: 12px; font-size: .85rem; font-weight: 600; }
+  .leg-item { display: flex; align-items: center; gap: 7px; }
+  .swatch { width: 14px; height: 14px; border-radius: 4px; display: inline-block; flex: none; }
+  .swatch.l1 { background: var(--line1); }
+  .swatch.l2 { background: var(--line2); }
+
+  .solution { font-size: 1.15rem; font-weight: 800; text-align: center; padding: 14px 10px; border-radius: 12px; background: var(--surface-2); color: var(--accent); transition: background .15s, color .15s; }
+  .solution.none { background: color-mix(in srgb, var(--danger) 16%, var(--surface)); color: var(--danger); }
+  .solution.infinite { background: color-mix(in srgb, var(--ok) 16%, var(--surface)); color: var(--ok); }
+
+  .row-actions { display: flex; justify-content: center; margin-top: 10px; }
+
+  .line-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 480px) { .line-inputs { grid-template-columns: 1fr; } }
+  fieldset.line-fs { border: 2px solid var(--border); border-radius: 12px; padding: 6px 14px 14px; margin: 0; }
+  .line-fs.line1 { border-color: var(--line1); }
+  .line-fs.line1 legend { color: var(--line1); }
+  .line-fs.line2 { border-color: var(--line2); }
+  .line-fs.line2 legend { color: var(--line2); }
+  .line-fs legend { font-weight: 800; padding: 0 6px; font-size: .95rem; }
+  .line-fs label { display: block; font-size: .78rem; color: var(--muted); margin: 10px 0 4px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+  .line-fs input { width: 100%; padding: 9px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; font-family: inherit; background: var(--surface); color: var(--text); }
+  .line-fs input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .line-fs input:disabled { background: var(--surface-2); color: var(--muted); }
+  .line-fs .eq-error { min-height: 1.1em; font-size: .76rem; font-weight: 700; color: var(--danger); margin-top: 4px; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← max</a>
+      <h1>Systems of Equations Explorer</h1>
+      <p>Drag a line's handles, edit slope and intercept, or type an equation — watch the intersection and solution update live.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="card">
+    <canvas id="plot" width="640" height="480" aria-label="Coordinate plane showing two lines and, when it exists, their intersection point"></canvas>
+    <div class="legend" id="legend">
+      <div class="leg-item"><span class="swatch l1"></span><span id="eq1">y = —</span></div>
+      <div class="leg-item"><span class="swatch l2"></span><span id="eq2">y = —</span></div>
+    </div>
+    <div class="hint">Drag a line's handles, edit m and b, or type an equation below</div>
+  </div>
+
+  <div class="card">
+    <div class="solution" id="solution" role="status">Solution: —</div>
+    <div class="sr-only" id="sr-announce" aria-live="polite"></div>
+    <div class="row-actions">
+      <button class="btn" id="resetBtn" type="button">↺ Reset to example</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="line-inputs">
+      <fieldset class="line-fs line1">
+        <legend>Line 1</legend>
+        <label for="m1">Slope (m₁)</label>
+        <input type="number" id="m1" step="0.25" inputmode="decimal">
+        <label for="b1">Y-intercept (b₁)</label>
+        <input type="number" id="b1" step="0.5" inputmode="decimal">
+        <label for="eq1text">Or type an equation</label>
+        <input type="text" id="eq1text" inputmode="text" placeholder="e.g. y = 2x + 1" autocomplete="off" spellcheck="false">
+        <div class="eq-error" id="eq1err" aria-live="polite"></div>
+      </fieldset>
+      <fieldset class="line-fs line2">
+        <legend>Line 2</legend>
+        <label for="m2">Slope (m₂)</label>
+        <input type="number" id="m2" step="0.25" inputmode="decimal">
+        <label for="b2">Y-intercept (b₂)</label>
+        <input type="number" id="b2" step="0.5" inputmode="decimal">
+        <label for="eq2text">Or type an equation</label>
+        <input type="text" id="eq2text" inputmode="text" placeholder="e.g. x = 3" autocomplete="off" spellcheck="false">
+        <div class="eq-error" id="eq2err" aria-live="polite"></div>
+      </fieldset>
+    </div>
+  </div>
+
+  <footer class="app">Nothing you enter leaves your browser · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+  const root = document.documentElement;
+  const savedTheme = localStorage.getItem('max-theme');
+  if (savedTheme) root.setAttribute('data-theme', savedTheme);
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const cur = root.getAttribute('data-theme');
+    const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const next = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('max-theme', next);
+  });
+</script>
+<script>
+(function(){
+  "use strict";
+  var PKEY="max-systems-explorer-lines";
+
+  function defaultLines(){
+    return [{vertical:false,m:2,b:1,hx:3},{vertical:false,m:-1,b:4,hx:3}];
+  }
+  function isValidLine(ln){
+    if(!ln||typeof ln!=="object") return false;
+    if(ln.vertical) return isFinite(ln.x);
+    return isFinite(ln.m)&&isFinite(ln.b);
+  }
+  var lines=defaultLines();
+  try{
+    var raw=JSON.parse(localStorage.getItem(PKEY));
+    if(raw&&Array.isArray(raw.lines)&&raw.lines.length===2&&isValidLine(raw.lines[0])&&isValidLine(raw.lines[1])){
+      lines=raw.lines.map(function(ln){
+        return ln.vertical?{vertical:true,x:ln.x}:{vertical:false,m:ln.m,b:ln.b,hx:isFinite(ln.hx)?ln.hx:3};
+      });
+    }
+  }catch(e){}
+
+  var DEFAULT_HX=3;
+  var MIN_HANDLE_X=0.3; // ignore m-handle drags too close to the y-axis (avoid divide-by-zero)
+
+  var canvas=document.getElementById("plot"), ctx=canvas.getContext("2d");
+  var VMIN=-10,VMAX=10;
+  var DRAG=null, HANDLE_R=10;
+
+  function cssVar(name){
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function save(){try{localStorage.setItem(PKEY,JSON.stringify({lines:lines}));}catch(e){}}
+
+  function r2(n){var v=Math.round(n*100)/100; return Object.is(v,-0)?0:v;}
+  function fmt(n){
+    if(!isFinite(n)) return "undefined";
+    var r=r2(n);
+    return r.toString();
+  }
+  // ascii:true => plain "-" (for the editable text inputs); otherwise unicode "−" (for the legend)
+  function formatEq(ln,ascii){
+    if(ln.vertical){
+      var xr=r2(ln.x);
+      return ascii?("x = "+xr):("x = "+(xr<0?"−"+Math.abs(xr):String(xr)));
+    }
+    var mr=r2(ln.m), br=r2(ln.b);
+    var minus=ascii?"-":"−";
+    var parts=[];
+    if(mr===1) parts.push("x");
+    else if(mr===-1) parts.push(minus+"x");
+    else if(mr!==0) parts.push(mr+"x");
+    if(parts.length===0){
+      parts.push(br<0?minus+Math.abs(br):String(br));
+    } else if(br!==0){
+      parts.push(br>=0?" + "+br:" "+minus+" "+Math.abs(br));
+    }
+    return "y = "+parts.join("");
+  }
+
+  // ---------- text-equation parser: accepts slope-intercept, standard form, and vertical (x = k) ----------
+  // Strategy: parse each side of "=" into (coeffX, coeffY, constant), then combine into
+  // A*x + B*y = C. B===0 => vertical line; otherwise m=-A/B, b=C/B.
+  function tokenizeTerms(s){
+    var terms=[]; var i=0, n=s.length;
+    while(i<n){
+      var sign=1;
+      if(s[i]==="+"){i++;} else if(s[i]==="-"){sign=-1;i++;}
+      var start=i;
+      while(i<n && /[0-9.]/.test(s[i])) i++;
+      var numStr=s.slice(start,i);
+      var varc="";
+      if(i<n && (s[i]==="x"||s[i]==="y")){ varc=s[i]; i++; }
+      if(numStr===""&&varc==="") return null; // empty term: bad input like "++" or a trailing operator
+      var num = numStr===""?1:parseFloat(numStr);
+      if(isNaN(num)) return null;
+      terms.push({sign:sign,num:num,varc:varc});
+    }
+    return terms;
+  }
+  function parseSide(str){
+    if(str==="") return null;
+    if(!/^[0-9xy+\-.]+$/.test(str)) return null;
+    var terms=tokenizeTerms(str);
+    if(!terms) return null;
+    var res={x:0,y:0,c:0};
+    for(var i=0;i<terms.length;i++){
+      var t=terms[i];
+      if(t.varc==="x") res.x+=t.sign*t.num;
+      else if(t.varc==="y") res.y+=t.sign*t.num;
+      else res.c+=t.sign*t.num;
+    }
+    return res;
+  }
+  function parseLineText(rawInput){
+    if(typeof rawInput!=="string" || rawInput.trim()==="") return {ok:false,error:"Enter an equation"};
+    var s=rawInput.trim().toLowerCase().replace(/−/g,"-").replace(/\*/g,"").replace(/\s+/g,"");
+    var eqIdx=s.indexOf("=");
+    if(eqIdx===-1||s.indexOf("=",eqIdx+1)!==-1){
+      return {ok:false,error:"Use the form y = 2x + 1"};
+    }
+    var left=parseSide(s.slice(0,eqIdx)), right=parseSide(s.slice(eqIdx+1));
+    if(!left||!right) return {ok:false,error:"Couldn't parse that equation"};
+    var A=left.x-right.x, B=left.y-right.y, C=right.c-left.c;
+    if(Math.abs(A)<1e-9 && Math.abs(B)<1e-9){
+      return {ok:false,error:Math.abs(C)<1e-9?"That's true for every point":"That equation has no solutions"};
+    }
+    if(Math.abs(B)<1e-9){
+      return {ok:true,line:{vertical:true,x:C/A}};
+    }
+    return {ok:true,line:{vertical:false,m:-A/B,b:C/B,hx:DEFAULT_HX}};
+  }
+
+  function resize(){
+    var dpr=window.devicePixelRatio||1, W=canvas.clientWidth||640, H=Math.round(W*0.75);
+    canvas.width=W*dpr; canvas.height=H*dpr; canvas.style.height=H+"px";
+    ctx.setTransform(dpr,0,0,dpr,0,0); draw();
+  }
+  function toScreen(mx,my,W,H){
+    return{x:(mx-VMIN)/(VMAX-VMIN)*W, y:H-(my-VMIN)/(VMAX-VMIN)*H};
+  }
+  function toMathF(sx,sy,W,H){
+    return{x:sx/W*(VMAX-VMIN)+VMIN, y:(1-sy/H)*(VMAX-VMIN)+VMIN};
+  }
+
+  function lineToABC(ln){
+    if(ln.vertical) return {a:1,b:0,c:ln.x};
+    return {a:-ln.m,b:1,c:ln.b};
+  }
+
+  function solve(){
+    var L1=lineToABC(lines[0]), L2=lineToABC(lines[1]);
+    var a1=L1.a,b1=L1.b,c1=L1.c, a2=L2.a,b2=L2.b,c2=L2.c;
+    var det=a1*b2-a2*b1;
+    if(Math.abs(det)<1e-9){
+      var cross1=a1*c2-a2*c1, cross2=b1*c2-b2*c1;
+      if(Math.abs(cross1)<1e-9 && Math.abs(cross2)<1e-9) return {type:"infinite"};
+      return {type:"none"};
+    }
+    var x=(c1*b2-c2*b1)/det;
+    var y=(a1*c2-a2*c1)/det;
+    return {type:"one", x:x, y:y};
+  }
+
+  function getHandles(){
+    var h=[];
+    lines.forEach(function(ln,i){
+      if(ln.vertical){
+        h.push({line:i,kind:"x",mx:ln.x,my:0});
+      } else {
+        var hx=isFinite(ln.hx)?ln.hx:DEFAULT_HX;
+        h.push({line:i,kind:"b",mx:0,my:ln.b});
+        h.push({line:i,kind:"m",mx:hx,my:ln.m*hx+ln.b});
+      }
+    });
+    return h;
+  }
+  function handleOnPlane(h){
+    return h.mx>=VMIN&&h.mx<=VMAX&&h.my>=VMIN&&h.my<=VMAX;
+  }
+
+  function draw(){
+    var dpr=window.devicePixelRatio||1, W=canvas.width/dpr, H=canvas.height/dpr;
+    var lineColors=[cssVar("--line1"),cssVar("--line2")];
+    var solColor=cssVar("--sol");
+    var bgColor=cssVar("--surface");
+    var gridColor=cssVar("--border");
+    var axisColor=cssVar("--muted");
+    var textColor=cssVar("--text");
+
+    ctx.clearRect(0,0,W,H); ctx.fillStyle=bgColor; ctx.fillRect(0,0,W,H);
+    // grid
+    ctx.lineWidth=1; ctx.font="11px -apple-system,Arial,sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    var o=toScreen(0,0,W,H);
+    for(var g=VMIN;g<=VMAX;g++){
+      var v=toScreen(g,g,W,H);
+      ctx.strokeStyle=g===0?axisColor:gridColor;
+      ctx.beginPath();ctx.moveTo(v.x,0);ctx.lineTo(v.x,H);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(0,v.y);ctx.lineTo(W,v.y);ctx.stroke();
+    }
+    // axis labels
+    ctx.fillStyle=axisColor;
+    for(var t=VMIN;t<=VMAX;t+=2){if(t===0)continue;
+      var px=toScreen(t,0,W,H),py=toScreen(0,t,W,H);
+      ctx.textAlign="center"; ctx.fillText(t,px.x,o.y+10);
+      ctx.textAlign="right"; ctx.fillText(t,o.x-5,py.y);
+    }
+    // bold axes
+    ctx.strokeStyle=axisColor; ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(o.x,0);ctx.lineTo(o.x,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,o.y);ctx.lineTo(W,o.y);ctx.stroke();
+
+    // the two lines, drawn full width (or full height, for verticals) edge-to-edge
+    lines.forEach(function(ln,i){
+      ctx.strokeStyle=lineColors[i]; ctx.lineWidth=2.5;
+      if(ln.vertical){
+        var sTop=toScreen(ln.x,VMAX,W,H), sBot=toScreen(ln.x,VMIN,W,H);
+        ctx.beginPath(); ctx.moveTo(sTop.x,sTop.y); ctx.lineTo(sBot.x,sBot.y); ctx.stroke();
+      } else {
+        var yL=ln.m*VMIN+ln.b, yR=ln.m*VMAX+ln.b;
+        var sL=toScreen(VMIN,yL,W,H), sR=toScreen(VMAX,yR,W,H);
+        ctx.beginPath(); ctx.moveTo(sL.x,sL.y); ctx.lineTo(sR.x,sR.y); ctx.stroke();
+      }
+    });
+
+    // draggable handles (intercept + slope, or single position handle for vertical lines)
+    getHandles().forEach(function(h){
+      if(!handleOnPlane(h)) return; // off-plane, skip drawing/hit-testing
+      var p=toScreen(h.mx,h.my,W,H);
+      ctx.fillStyle=lineColors[h.line]; ctx.beginPath(); ctx.arc(p.x,p.y,HANDLE_R,0,2*Math.PI); ctx.fill();
+      ctx.fillStyle=cssVar("--accent-ink"); ctx.font="bold 11px -apple-system,Arial,sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText(h.kind==="b"?"b":(h.kind==="m"?"m":"x"),p.x,p.y);
+    });
+
+    // intersection point
+    var sol=solve();
+    if(sol.type==="one" && sol.x>=VMIN && sol.x<=VMAX && sol.y>=VMIN && sol.y<=VMAX){
+      var sp=toScreen(sol.x,sol.y,W,H);
+      ctx.fillStyle=solColor; ctx.strokeStyle=textColor; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(sp.x,sp.y,7,0,2*Math.PI); ctx.fill(); ctx.stroke();
+      ctx.fillStyle=textColor; ctx.font="bold 12px -apple-system,Arial,sans-serif";
+      ctx.textAlign=sp.x>W-70?"right":"left"; ctx.textBaseline="bottom";
+      ctx.fillText("("+sol.x.toFixed(2)+", "+sol.y.toFixed(2)+")", sp.x+(sp.x>W-70?-10:10), sp.y-8);
+    }
+
+    updateReadouts(sol);
+  }
+
+  function updateReadouts(sol){
+    document.getElementById("eq1").textContent="Line 1: "+formatEq(lines[0],false);
+    document.getElementById("eq2").textContent="Line 2: "+formatEq(lines[1],false);
+
+    var solEl=document.getElementById("solution");
+    var sr=document.getElementById("sr-announce");
+    var text;
+    if(sol.type==="one"){
+      text="Solution: ("+sol.x.toFixed(2)+", "+sol.y.toFixed(2)+")";
+      solEl.className="solution one";
+    } else if(sol.type==="infinite"){
+      text="Infinitely many solutions (same line)";
+      solEl.className="solution infinite";
+    } else {
+      text="No solution (parallel lines)";
+      solEl.className="solution none";
+    }
+    solEl.textContent=text;
+    sr.textContent=text;
+  }
+
+  function syncInputs(){
+    [0,1].forEach(function(i){
+      var ln=lines[i];
+      var mEl=document.getElementById("m"+(i+1));
+      var bEl=document.getElementById("b"+(i+1));
+      var txtEl=document.getElementById("eq"+(i+1)+"text");
+      if(ln.vertical){
+        mEl.value=""; mEl.disabled=true;
+        bEl.value=""; bEl.disabled=true;
+      } else {
+        mEl.disabled=false; bEl.disabled=false;
+        mEl.value=fmt(ln.m); bEl.value=fmt(ln.b);
+      }
+      if(document.activeElement!==txtEl){
+        txtEl.value=formatEq(ln,true);
+      }
+    });
+  }
+
+  function bindInput(id,lineIdx,key){
+    var el=document.getElementById(id);
+    el.addEventListener("input",function(){
+      if(el.disabled||lines[lineIdx].vertical) return;
+      var v=parseFloat(el.value);
+      if(isFinite(v)){ lines[lineIdx][key]=v; save(); syncInputs(); draw(); }
+    });
+  }
+  bindInput("m1",0,"m"); bindInput("b1",0,"b");
+  bindInput("m2",1,"m"); bindInput("b2",1,"b");
+
+  // text-equation inputs
+  function bindEqText(id,lineIdx,errId){
+    var el=document.getElementById(id), errEl=document.getElementById(errId);
+    function apply(){
+      var res=parseLineText(el.value);
+      if(!res.ok){
+        errEl.textContent=res.error;
+        return;
+      }
+      errEl.textContent="";
+      lines[lineIdx]=res.line;
+      save(); syncInputs(); draw();
+    }
+    el.addEventListener("change",apply);
+    el.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); apply(); el.blur(); } });
+    el.addEventListener("input",function(){ if(errEl.textContent) errEl.textContent=""; });
+  }
+  bindEqText("eq1text",0,"eq1err");
+  bindEqText("eq2text",1,"eq2err");
+
+  // reset to the example lines
+  document.getElementById("resetBtn").addEventListener("click",function(){
+    lines=defaultLines();
+    document.getElementById("eq1err").textContent="";
+    document.getElementById("eq2err").textContent="";
+    save(); syncInputs(); draw();
+  });
+
+  // drag handling (unified mouse + touch)
+  function hitPoint(sx,sy,W,H){
+    var handles=getHandles();
+    for(var i=0;i<handles.length;i++){
+      var h=handles[i];
+      if(!handleOnPlane(h)) continue;
+      var p=toScreen(h.mx,h.my,W,H);
+      if(Math.hypot(sx-p.x,sy-p.y)<HANDLE_R*1.8) return i;
+    }
+    return -1;
+  }
+  function eventPos(e){
+    var r=canvas.getBoundingClientRect();
+    var src=e.touches?e.touches[0]:e;
+    return{sx:src.clientX-r.left, sy:src.clientY-r.top};
+  }
+  function onDown(e){
+    var dpr=window.devicePixelRatio||1;
+    var W=canvas.width/dpr, H=canvas.height/dpr;
+    var pos=eventPos(e); DRAG=hitPoint(pos.sx,pos.sy,W,H);
+    if(DRAG>=0) e.preventDefault();
+  }
+  function onMove(e){
+    if(DRAG===null||DRAG<0) return; e.preventDefault();
+    var dpr=window.devicePixelRatio||1;
+    var W=canvas.width/dpr, H=canvas.height/dpr;
+    var pos=eventPos(e);
+    var m=toMathF(pos.sx,pos.sy,W,H);
+    m.x=Math.max(VMIN,Math.min(VMAX,m.x));
+    m.y=Math.max(VMIN,Math.min(VMAX,m.y));
+    var h=getHandles()[DRAG];
+    var ln=lines[h.line];
+    if(h.kind==="b"){
+      ln.b=Math.round(m.y*2)/2; // snap intercept to nearest 0.5, x pinned to the y-axis
+    } else if(h.kind==="x"){
+      ln.x=Math.round(m.x*2)/2; // vertical line: slide left/right, snap to nearest 0.5
+    } else { // "m" handle: free to move anywhere on the plane
+      if(Math.abs(m.x)<MIN_HANDLE_X) return; // too close to the y-axis: would divide by ~0, ignore this move
+      ln.m=Math.round(((m.y-ln.b)/m.x)*4)/4; // snap slope to nearest 0.25
+      ln.hx=m.x;
+    }
+    save(); syncInputs(); draw();
+  }
+  function onUp(){DRAG=-1;}
+
+  canvas.addEventListener("mousedown",onDown);
+  canvas.addEventListener("mousemove",onMove);
+  canvas.addEventListener("mouseup",onUp);
+  canvas.addEventListener("touchstart",onDown,{passive:false});
+  canvas.addEventListener("touchmove",onMove,{passive:false});
+  canvas.addEventListener("touchend",onUp);
+  window.addEventListener("resize",resize);
+
+  syncInputs();
+  resize();
+
+  // keep canvas colors correct when the theme toggle changes CSS custom properties
+  // (registered after the theme-toggle script below, so it redraws with the new theme already applied)
+  document.getElementById("themeBtn").addEventListener("click",function(){ draw(); });
+})();
+</script>
+</body>
+</html>

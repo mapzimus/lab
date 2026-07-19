@@ -1,8 +1,37 @@
 https://www.mapzimus.com/* https://mapzimus.com/:splat 301
+<<<<<<< HEAD
+
+# Legacy GitHub Pages /max shelf → first-party tool routes
+/max/:slug.html /:slug/ 301
+/max/:slug /:slug/ 301
+/max/ /tools/ 301
+/tool/:slug /:slug/ 301
+/tools/:slug.html /:slug/ 301
+
+# Alternate / legacy game paths
+/flipgame /flip-game/ 301
+/flipgame/* /flip-game/:splat 301
+/bugwars /bug-wars/ 301
+/bugwars/* /bug-wars/:splat 301
+/truescale /true-scale/ 301
+/truescale/* /true-scale/:splat 301
+/whydah/navigator /whydah-voyage/ 301
+/whydah/navigator/ /whydah-voyage/ 301
+/whydah/navigator/* /whydah-voyage/:splat 301
+/navigator /whydah-voyage/ 301
+/navigator/ /whydah-voyage/ 301
+/parrot-flip /grog-flip/ 301
+/parrot-flip/ /grog-flip/ 301
+/bottle-flip /flip-game/ 301
+/bottle-flip/ /flip-game/ 301
+
+# Section aliases
+=======
 /max/* https://mapzimus.github.io/max/:splat 302
 /tool/:slug https://mapzimus.github.io/max/:slug.html 302
 /tools/maps/ /maps/ 301
 /tools/maps /maps 301
+>>>>>>> origin/main
 /play/ /games/ 301
 /play /games 301
 /experiments/ /lab/ 301

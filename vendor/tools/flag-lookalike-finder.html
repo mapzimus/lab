@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flag Look-Alike Finder</title>
+<meta name="description" content="Describe a flag design (or drop in an image) and see which real national and regional flags it most resembles, with a warning when it's an uncomfortably close match. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --warn:#b8860b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b; --warn:#e2b23a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b; --warn:#e2b23a;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 68ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); text-decoration: none; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.sm { padding: 5px 9px; font-size: .8rem; }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.2fr); gap: 18px; align-items: start; }
+  @media (max-width: 900px){ .layout { grid-template-columns: 1fr; } }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .card + .card { margin-top: 16px; }
+  .card h2 { font-size: 1rem; margin: 0 0 12px; letter-spacing: -0.01em; }
+  .card h2 .sub { font-weight: 400; color: var(--muted); font-size: .82rem; margin-left: 6px; }
+
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  .field > label, .lbl { display: block; font-size: .78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 0 0 6px; }
+  select, input[type="number"] { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 10px; font-size: .86rem; font-family: var(--sans); max-width: 100%; }
+  select { width: 100%; }
+  input[type="range"] { accent-color: var(--accent); width: 100%; }
+  input[type="color"] { inline-size: 40px; block-size: 34px; padding: 2px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .val { font-family: var(--mono); font-size: .78rem; color: var(--muted); min-width: 20px; text-align: right; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; font-family: var(--sans); }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .chip.sm { padding: 5px 10px; font-size: .78rem; }
+
+  .colorpicks { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+  .colorslot { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .colorslot span { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .colorslot .hexlabel { font-family: var(--mono); font-size: .7rem; color: var(--text); }
+  .colorcount { display: flex; gap: 6px; }
+
+  /* dropzone */
+  .drop { border: 2px dashed var(--border); border-radius: var(--radius); background: var(--surface); padding: 20px 14px; text-align: center; transition: border-color .15s, background .15s; }
+  .drop.drag { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+  .drop .big { font-size: 1.35rem; }
+  .drop p { margin: 6px 0 10px; color: var(--muted); font-size: .85rem; }
+  .drop .controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+  .imgpreview { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .imgpreview img { width: 64px; height: 42px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+  .imgpreview .meta { font-size: .78rem; color: var(--muted); }
+
+  /* results */
+  .callout { border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; display: flex; gap: 12px; align-items: flex-start; }
+  .callout.warn { background: color-mix(in srgb, var(--warn) 14%, var(--surface)); border: 1px solid color-mix(in srgb, var(--warn) 45%, var(--border)); }
+  .callout .icon { font-size: 1.4rem; flex: none; }
+  .callout strong { display: block; margin-bottom: 2px; font-size: .92rem; }
+  .callout span { font-size: .84rem; color: var(--text); }
+
+  .resultlist { display: flex; flex-direction: column; gap: 8px; }
+  .resultrow { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  .resultrow .rank { font-family: var(--mono); font-size: .78rem; color: var(--muted); width: 20px; flex: none; text-align: right; }
+  .resultrow .swatch { flex: none; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .resultrow .swatch svg { display: block; width: 72px; height: auto; }
+  .resultrow .info { flex: 1; min-width: 0; }
+  .resultrow .info .top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .resultrow .info .name { font-weight: 700; font-size: .92rem; }
+  .resultrow .info .region { font-size: .74rem; color: var(--muted); font-weight: 400; margin-left: 6px; }
+  .resultrow .info .pct { font-family: var(--mono); font-weight: 700; font-size: .88rem; }
+  .resultrow .info .why { font-size: .78rem; color: var(--muted); margin-top: 3px; }
+  .resultrow .bar { height: 5px; border-radius: 4px; background: var(--surface-2); margin-top: 6px; overflow: hidden; }
+  .resultrow .bar > span { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+  .resultrow.top1 { border-color: var(--accent); }
+
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .hint { font-size: .78rem; color: var(--muted); margin: 8px 0 0; }
+  .crosslinks { display: flex; flex-wrap: wrap; gap: 8px; }
+  .empty { text-align: center; padding: 30px 12px; color: var(--muted); font-size: .88rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Flag Look-Alike Finder</h1>
+      <p>Describe a flag design — or drop in an image — and see which real national and regional flags it resembles most, with a heads-up if it lands uncomfortably close to an existing one. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="layout">
+    <!-- LEFT: query builder -->
+    <div>
+      <div class="card">
+        <h2>1. Build a quick description</h2>
+        <div class="field">
+          <span class="lbl">How many main colors?</span>
+          <div class="colorcount chips" id="colorCountChips"></div>
+        </div>
+        <div class="field">
+          <span class="lbl">Colors <span style="text-transform:none;font-weight:400">(most dominant first)</span></span>
+          <div class="colorpicks" id="colorPicks"></div>
+        </div>
+        <div class="field">
+          <label for="layoutSel">Field layout</label>
+          <select id="layoutSel"></select>
+        </div>
+        <div class="field" id="stripeField" hidden>
+          <div class="row" style="justify-content:space-between">
+            <span class="lbl" style="margin:0">Stripes: <span class="val" id="stripeVal"></span></span>
+            <div class="chips" id="stripeDirChips"></div>
+          </div>
+          <input type="range" id="stripeCount" min="3" max="15" step="1" value="5">
+        </div>
+        <div class="field">
+          <span class="lbl">Aspect ratio</span>
+          <div class="chips" id="ratioChips"></div>
+        </div>
+        <div class="field">
+          <span class="lbl">Symbols on it? <span style="text-transform:none;font-weight:400">(optional)</span></span>
+          <div class="chips" id="chargeChips"></div>
+        </div>
+        <p class="hint" id="queryHint"></p>
+      </div>
+
+      <div class="card">
+        <h2>2. Or analyze an image</h2>
+        <div class="drop" id="drop">
+          <div class="big" aria-hidden="true">🏳️</div>
+          <p>Drag &amp; drop a flag image, paste one, or</p>
+          <div class="controls">
+            <button class="btn" id="pickBtn" type="button">🖼 Choose image…</button>
+            <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/*" class="visually-hidden">
+          </div>
+          <div class="note" id="dropNote" style="margin-top:8px"></div>
+          <div class="imgpreview" id="imgPreview" hidden>
+            <img id="previewImg" alt="Uploaded flag preview">
+            <div class="meta" id="previewMeta"></div>
+          </div>
+        </div>
+        <p class="hint">We'll pull the dominant colors and aspect ratio straight from the pixels and fill them in above — layout and symbols aren't reliably auto-detectable, so pick those yourself.</p>
+      </div>
+
+      <div class="card">
+        <h2>Try an example</h2>
+        <div class="chips" id="exampleChips"></div>
+      </div>
+
+      <div class="card">
+        <h2>Related tools</h2>
+        <div class="crosslinks">
+          <a class="btn primary" href="./flag-designer.html">🛠 Design in Flag Designer</a>
+          <a class="btn" href="./flag-analyzer.html">🔍 Analyze an image in Flag Analyzer</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: results -->
+    <div>
+      <div class="card">
+        <h2>Closest real-world matches <span class="sub" id="resultSub"></span></h2>
+        <div id="callout"></div>
+        <div id="resultList" class="resultlist"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app">Approximate similarity based on a curated reference set of ~200 flags with hand-estimated colors — not an authoritative vexillological database. Nothing you enter or upload leaves your browser · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+"use strict";
+const $ = (s)=>document.querySelector(s);
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const esc=(s)=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ================================================================
+   CORE START — flag dataset + similarity scoring
+   (validated separately against edge cases: same-orientation tricolor
+   vs bicolor partial credit, cross-orientation heavy penalty, an
+   unrelated/off-palette query staying under the "too similar" bar, a
+   near-exact query clearing it, all in well under 50ms for 200+ flags)
+   ================================================================ */
+const LAYOUT_KEYS = ['solid','horizontal-tricolor','vertical-tricolor','horizontal-bicolor',
+  'vertical-bicolor','nordic-cross','saltire','canton','stripes','quarterly','bend','other'];
+const CHARGE_KEYS = ['star','stars-grid','crescent','sun','eagle','lion','maple-leaf','circle','cross','other'];
+
+function F(name, region, ratio, colors, layout, charges, stripes, stripeDir){
+  return {
+    name, region, ratio,
+    colors: colors.map(([hex,pct])=>({hex:hex.toUpperCase(), pct})),
+    layout, charges: charges||[],
+    stripes: stripes||null, stripeDir: stripeDir||'horizontal',
+  };
+}
+
+/* ~210 real flags: all UN member states plus a curated set of well-known
+   regional / historic / constituent flags. Colors are approximate (hex +
+   rough coverage %) — a similarity tool, not a vexillological register. */
+const FLAGS = [
+// ---- Europe ----
+F('Albania','Europe','5:7',[['#E41E20',95],['#000000',5]],'solid',['eagle']),
+F('Andorra','Europe','7:10',[['#0018A8',33],['#FEDD00',34],['#D50032',33]],'vertical-tricolor',['other']),
+F('Armenia','Europe/Asia','1:2',[['#D90012',34],['#0033A0',33],['#F2A800',33]],'horizontal-tricolor',[]),
+F('Austria','Europe','2:3',[['#ED2939',67],['#FFFFFF',33]],'horizontal-tricolor',[]),
+F('Azerbaijan','Europe/Asia','1:2',[['#00B9E4',33],['#EF3340',34],['#509E2F',33],['#FFFFFF',3]],'horizontal-tricolor',['crescent','star']),
+F('Belarus','Europe','1:2',[['#D22730',67],['#4AA657',30],['#FFFFFF',3]],'horizontal-bicolor',['other']),
+F('Belgium','Europe','13:15',[['#000000',33],['#FAE042',34],['#ED2939',33]],'vertical-tricolor',[]),
+F('Bosnia and Herzegovina','Europe','1:2',[['#002395',60],['#FECB00',30],['#FFFFFF',10]],'bend',['star']),
+F('Bulgaria','Europe','3:5',[['#FFFFFF',33],['#00966E',34],['#D62612',33]],'horizontal-tricolor',[]),
+F('Croatia','Europe','1:2',[['#FF0000',33],['#FFFFFF',34],['#171796',33]],'horizontal-tricolor',['other']),
+F('Cyprus','Europe/Asia','3:5',[['#FFFFFF',80],['#D57800',15],['#4E7A33',5]],'solid',['other']),
+F('Czechia','Europe','2:3',[['#FFFFFF',45],['#D7141A',45],['#11457E',10]],'other',[]),
+F('Denmark','Europe','28:37',[['#C8102E',65],['#FFFFFF',35]],'nordic-cross',[]),
+F('Estonia','Europe','7:11',[['#0072CE',33],['#000000',34],['#FFFFFF',33]],'horizontal-tricolor',[]),
+F('Finland','Europe','11:18',[['#FFFFFF',75],['#003580',25]],'nordic-cross',[]),
+F('France','Europe','2:3',[['#0055A4',33],['#FFFFFF',34],['#EF4135',33]],'vertical-tricolor',[]),
+F('Georgia','Europe/Asia','2:3',[['#FFFFFF',80],['#FF0000',20]],'other',['cross']),
+F('Germany','Europe','3:5',[['#000000',33],['#DD0000',34],['#FFCE00',33]],'horizontal-tricolor',[]),
+F('Greece','Europe','2:3',[['#0D5EAF',56],['#FFFFFF',44]],'stripes',['cross'],9,'horizontal'),
+F('Hungary','Europe','2:3',[['#CE2939',33],['#FFFFFF',34],['#477050',33]],'horizontal-tricolor',[]),
+F('Iceland','Europe','18:25',[['#003897',55],['#FFFFFF',30],['#D72828',15]],'nordic-cross',[]),
+F('Ireland','Europe','1:2',[['#169B62',33],['#FFFFFF',34],['#FF883E',33]],'vertical-tricolor',[]),
+F('Italy','Europe','2:3',[['#009246',33],['#FFFFFF',34],['#CE2B37',33]],'vertical-tricolor',[]),
+F('Kosovo','Europe','5:7',[['#244AA5',80],['#FFCD00',15],['#FFFFFF',5]],'solid',['star','other']),
+F('Latvia','Europe','1:2',[['#9E3039',44],['#FFFFFF',12],['#9E3039',44]],'horizontal-tricolor',[]),
+F('Liechtenstein','Europe','3:5',[['#002B7F',48],['#CE1126',47],['#FFD83D',5]],'horizontal-bicolor',['other']),
+F('Lithuania','Europe','3:5',[['#FDB913',33],['#006A44',34],['#C1272D',33]],'horizontal-tricolor',[]),
+F('Luxembourg','Europe','1:2',[['#ED2939',33],['#FFFFFF',34],['#00A1DE',33]],'horizontal-tricolor',[]),
+F('Malta','Europe','2:3',[['#FFFFFF',50],['#CF142B',50]],'vertical-bicolor',['cross']),
+F('Moldova','Europe','1:2',[['#003DA5',33],['#FFD200',34],['#CC092F',33]],'vertical-tricolor',['eagle']),
+F('Monaco','Europe','4:5',[['#CE1126',50],['#FFFFFF',50]],'horizontal-bicolor',[]),
+F('Montenegro','Europe','1:2',[['#C40308',85],['#D4AF37',15]],'solid',['eagle']),
+F('Netherlands','Europe','2:3',[['#AE1C28',33],['#FFFFFF',34],['#21468B',33]],'horizontal-tricolor',[]),
+F('North Macedonia','Europe','1:2',[['#D20000',80],['#FFE600',20]],'solid',['sun']),
+F('Norway','Europe','8:11',[['#EF2B2D',60],['#FFFFFF',25],['#002868',15]],'nordic-cross',[]),
+F('Poland','Europe','5:8',[['#FFFFFF',50],['#DC143C',50]],'horizontal-bicolor',[]),
+F('Portugal','Europe','2:3',[['#046A38',40],['#FF0000',55],['#FFCC00',5]],'vertical-bicolor',['other']),
+F('Romania','Europe','2:3',[['#002B7F',33],['#FCD116',34],['#CE1126',33]],'vertical-tricolor',[]),
+F('Russia','Europe/Asia','2:3',[['#FFFFFF',33],['#0039A6',34],['#D52B1E',33]],'horizontal-tricolor',[]),
+F('San Marino','Europe','3:4',[['#FFFFFF',50],['#5EB6E4',50]],'horizontal-bicolor',['other']),
+F('Serbia','Europe','2:3',[['#C6363C',33],['#0C4076',34],['#FFFFFF',33]],'horizontal-tricolor',['other']),
+F('Slovakia','Europe','2:3',[['#FFFFFF',33],['#0B4EA2',34],['#EE1C25',33]],'horizontal-tricolor',['other']),
+F('Slovenia','Europe','1:2',[['#FFFFFF',33],['#005CE6',34],['#ED1C24',33]],'horizontal-tricolor',['star','other']),
+F('Spain','Europe','2:3',[['#FFC400',50],['#AD1519',50]],'horizontal-tricolor',['other']),
+F('Sweden','Europe','5:8',[['#005293',65],['#FECC02',35]],'nordic-cross',[]),
+F('Switzerland','Europe','1:1',[['#D52B1E',85],['#FFFFFF',15]],'other',['cross']),
+F('Ukraine','Europe','2:3',[['#0057B7',50],['#FFD700',50]],'horizontal-bicolor',[]),
+F('United Kingdom','Europe','1:2',[['#FFFFFF',45],['#C8102E',40],['#00247D',15]],'saltire',['cross']),
+F('Vatican City','Europe','1:1',[['#FFE000',50],['#FFFFFF',50]],'vertical-bicolor',['other']),
+F('England','Europe','3:5',[['#FFFFFF',80],['#CE1124',20]],'other',['cross']),
+F('Scotland','Europe','3:5',[['#0065BD',70],['#FFFFFF',30]],'saltire',[]),
+F('Wales','Europe','3:5',[['#FFFFFF',50],['#00B140',50]],'horizontal-bicolor',['other']),
+F('Northern Ireland','Europe','1:2',[['#FFFFFF',70],['#CE1124',25],['#003087',5]],'other',['cross','star']),
+F('European Union','Europe','2:3',[['#003399',90],['#FFCC00',10]],'solid',['star']),
+// ---- Americas ----
+F('United States','Americas','10:19',[['#B31942',40],['#FFFFFF',30],['#0A3161',30]],'stripes',['stars-grid'],13,'horizontal'),
+F('Canada','Americas','1:2',[['#FF0000',50],['#FFFFFF',50]],'vertical-tricolor',['maple-leaf']),
+F('Mexico','Americas','4:7',[['#006847',33],['#FFFFFF',34],['#CE1126',33]],'vertical-tricolor',['eagle']),
+F('Brazil','Americas','7:10',[['#009739',65],['#FEDD00',25],['#012169',10]],'other',['star','other']),
+F('Argentina','Americas','2:3',[['#74ACDF',67],['#FFFFFF',33]],'horizontal-tricolor',['sun']),
+F('Chile','Americas','2:3',[['#FFFFFF',45],['#D52B1E',45],['#0033A0',10]],'canton',['star']),
+F('Texas','Americas','2:3',[['#002868',34],['#FFFFFF',33],['#BF0A30',33]],'canton',['star']),
+F('Peru','Americas','2:3',[['#D91023',67],['#FFFFFF',33]],'vertical-tricolor',[]),
+F('Bolivia','Americas','2:3',[['#D52B1E',33],['#F9E300',34],['#007934',33]],'horizontal-tricolor',[]),
+F('Ecuador','Americas','1:2',[['#FFDD00',50],['#0072CE',25],['#EF3340',25]],'horizontal-tricolor',['sun','other']),
+F('Colombia','Americas','2:3',[['#FCD116',50],['#003893',25],['#CE1126',25]],'horizontal-tricolor',[]),
+F('Venezuela','Americas','2:3',[['#FCD116',33],['#003DA5',34],['#CF142B',33]],'horizontal-tricolor',['star']),
+F('Guyana','Americas','3:5',[['#009E49',60],['#FCD116',20],['#CE1126',10],['#000000',10]],'other',['other']),
+F('Suriname','Americas','2:3',[['#377E3F',40],['#FFFFFF',20],['#B40A2D',20],['#ECC81D',20]],'stripes',['star'],5,'horizontal'),
+F('Uruguay','Americas','2:3',[['#FFFFFF',60],['#0038A8',30],['#FCD116',10]],'stripes',['sun'],9,'horizontal'),
+F('Paraguay','Americas','3:5',[['#D52B1E',33],['#FFFFFF',34],['#0038A8',33]],'horizontal-tricolor',['other']),
+F('Panama','Americas','2:3',[['#FFFFFF',50],['#D21034',25],['#072357',25]],'quarterly',['star']),
+F('Costa Rica','Americas','3:5',[['#002B7F',20],['#FFFFFF',20],['#CE1126',60]],'stripes',[],5,'horizontal'),
+F('Nicaragua','Americas','3:5',[['#0067C6',67],['#FFFFFF',33]],'horizontal-tricolor',['other']),
+F('Honduras','Americas','1:2',[['#0073CF',67],['#FFFFFF',33]],'horizontal-tricolor',['star']),
+F('El Salvador','Americas','3:5',[['#0047AB',67],['#FFFFFF',33]],'horizontal-tricolor',['other']),
+F('Guatemala','Americas','5:8',[['#4997D0',67],['#FFFFFF',33]],'vertical-tricolor',['other']),
+F('Belize','Americas','3:5',[['#002868',85],['#CE1126',10],['#FFFFFF',5]],'other',['other']),
+F('Cuba','Americas','1:2',[['#002A8F',60],['#FFFFFF',30],['#CF142B',10]],'stripes',['star'],5,'horizontal'),
+F('Dominican Republic','Americas','5:8',[['#002D62',45],['#CE1126',45],['#FFFFFF',10]],'other',['cross','other']),
+F('Haiti','Americas','3:5',[['#00209F',50],['#D21034',50]],'horizontal-bicolor',['other']),
+F('Jamaica','Americas','1:2',[['#000000',25],['#009B3A',50],['#FED100',25]],'saltire',[]),
+F('Trinidad and Tobago','Americas','3:5',[['#CE1126',70],['#000000',20],['#FFFFFF',10]],'bend',[]),
+F('Bahamas','Americas','1:2',[['#00778B',33],['#FFC72C',34],['#00778B',33]],'horizontal-tricolor',['other']),
+F('Barbados','Americas','2:3',[['#00267F',33],['#FFC726',34],['#00267F',33]],'vertical-tricolor',['other']),
+F('Dominica','Americas','1:2',[['#496A2E',65],['#FCD116',12],['#000000',8],['#CE1126',15]],'other',['star','cross']),
+F('Grenada','Americas','3:5',[['#CE1126',20],['#FCD116',40],['#007A5E',40]],'saltire',['star']),
+F('Saint Lucia','Americas','1:2',[['#66CCFF',70],['#000000',15],['#FFFFFF',10],['#FCD116',5]],'other',['other']),
+F('Saint Vincent and the Grenadines','Americas','2:3',[['#0038A8',33],['#FCD116',34],['#009E60',33]],'vertical-tricolor',['other']),
+F('Antigua and Barbuda','Americas','2:3',[['#CE1126',45],['#000000',15],['#003DA5',15],['#FFFFFF',10],['#FCD116',15]],'other',['sun']),
+F('Saint Kitts and Nevis','Americas','2:3',[['#009E49',30],['#FCD116',10],['#000000',30],['#CE1126',30]],'bend',['star']),
+// ---- Africa ----
+F('Algeria','Africa','2:3',[['#FFFFFF',50],['#006233',50]],'vertical-bicolor',['star','crescent']),
+F('Angola','Africa','2:3',[['#CC092F',50],['#000000',50]],'horizontal-bicolor',['star','other']),
+F('Benin','Africa','2:3',[['#008751',40],['#FCD116',30],['#E8112D',30]],'other',[]),
+F('Botswana','Africa','2:3',[['#75AADB',76],['#FFFFFF',12],['#000000',12]],'stripes',[],5,'horizontal'),
+F('Burkina Faso','Africa','2:3',[['#EF2B2D',50],['#009E49',50]],'horizontal-bicolor',['star']),
+F('Burundi','Africa','3:5',[['#CE1126',50],['#1EB53A',50]],'saltire',['star']),
+F('Cabo Verde','Africa','10:17',[['#003893',80],['#FFFFFF',10],['#CF142B',10]],'horizontal-tricolor',['star']),
+F('Cameroon','Africa','2:3',[['#007A5E',33],['#CE1126',34],['#FCD116',33]],'vertical-tricolor',['star']),
+F('Central African Republic','Africa','2:3',[['#003082',20],['#FFFFFF',20],['#289728',20],['#FCD116',20],['#D21034',20]],'other',['star']),
+F('Chad','Africa','2:3',[['#002664',33],['#FECB00',34],['#C60C30',33]],'vertical-tricolor',[]),
+F('Comoros','Africa','2:3',[['#FFD700',25],['#FFFFFF',25],['#CE1126',25],['#3A75C4',25]],'other',['crescent','star']),
+F('Congo (DR)','Africa','2:3',[['#007FFF',60],['#F7D618',20],['#CE1021',20]],'bend',['star']),
+F('Congo (Republic)','Africa','2:3',[['#009543',34],['#FBDE4A',33],['#DC241F',33]],'bend',[]),
+F('Cote d’Ivoire','Africa','2:3',[['#F77F00',33],['#FFFFFF',34],['#009E60',33]],'vertical-tricolor',[]),
+F('Djibouti','Africa','2:3',[['#6AB2E7',45],['#12AD2B',45],['#FFFFFF',5],['#D7141A',5]],'horizontal-bicolor',['star']),
+F('Egypt','Africa','2:3',[['#CE1126',33],['#FFFFFF',34],['#000000',33]],'horizontal-tricolor',['eagle']),
+F('Equatorial Guinea','Africa','2:3',[['#3E9A00',32],['#FFFFFF',33],['#E32118',32],['#0073CE',3]],'horizontal-tricolor',['star','other']),
+F('Eritrea','Africa','1:2',[['#EA0437',35],['#12AD2B',33],['#1A6DBA',32]],'other',['other']),
+F('Eswatini','Africa','2:3',[['#3A75C4',30],['#FFD900',10],['#B10C0C',40],['#000000',10],['#FFFFFF',10]],'stripes',['other'],5,'horizontal'),
+F('Ethiopia','Africa','1:2',[['#078930',32],['#FCDD09',33],['#DA121A',32],['#0F47AF',3]],'horizontal-tricolor',['star']),
+F('Gabon','Africa','3:4',[['#009E60',33],['#FCD116',34],['#3A75C2',33]],'horizontal-tricolor',[]),
+F('Gambia','Africa','2:3',[['#CE1126',33],['#0C1C8C',34],['#3A7728',33]],'horizontal-tricolor',[]),
+F('Ghana','Africa','2:3',[['#CE1126',33],['#FCD116',34],['#006B3F',33]],'horizontal-tricolor',['star']),
+F('Guinea','Africa','2:3',[['#CE1126',33],['#FCD116',34],['#009460',33]],'vertical-tricolor',[]),
+F('Guinea-Bissau','Africa','1:2',[['#CE1126',33],['#FCD116',34],['#009E49',33]],'other',['star']),
+F('Kenya','Africa','2:3',[['#000000',30],['#FFFFFF',10],['#BB0000',30],['#006600',30]],'stripes',['other'],5,'horizontal'),
+F('Lesotho','Africa','2:3',[['#00209F',40],['#FFFFFF',30],['#009543',30]],'stripes',['other'],3,'horizontal'),
+F('Liberia','Africa','10:19',[['#BF0A30',55],['#FFFFFF',35],['#002868',10]],'stripes',['star'],11,'horizontal'),
+F('Libya','Africa','1:2',[['#E70013',20],['#000000',60],['#239E46',20]],'horizontal-tricolor',['crescent','star']),
+F('Madagascar','Africa','2:3',[['#FFFFFF',50],['#FC3D32',25],['#007E3A',25]],'other',[]),
+F('Malawi','Africa','2:3',[['#000000',33],['#CE1126',34],['#21A130',33]],'stripes',['sun'],3,'horizontal'),
+F('Mali','Africa','2:3',[['#14B53A',33],['#FCD116',34],['#CE1126',33]],'vertical-tricolor',[]),
+F('Mauritania','Africa','2:3',[['#00A651',80],['#FFD400',15],['#CE1126',5]],'other',['crescent','star']),
+F('Mauritius','Africa','2:3',[['#EA2839',25],['#1A206D',25],['#FFD500',25],['#00A551',25]],'stripes',[],4,'horizontal'),
+F('Morocco','Africa','2:3',[['#C1272D',90],['#006233',10]],'solid',['star']),
+F('Mozambique','Africa','2:3',[['#009739',25],['#000000',30],['#FCD116',5],['#CE1126',30],['#FFFFFF',10]],'other',['star','other']),
+F('Namibia','Africa','2:3',[['#003580',35],['#009543',35],['#D21034',15],['#FFFFFF',10],['#FFCE00',5]],'bend',['sun']),
+F('Niger','Africa','6:7',[['#E05206',33],['#FFFFFF',34],['#0DB02B',33]],'horizontal-tricolor',['sun']),
+F('Nigeria','Africa','1:2',[['#008751',67],['#FFFFFF',33]],'vertical-tricolor',[]),
+F('Rwanda','Africa','2:3',[['#20603D',50],['#FAD201',20],['#00A1DE',30]],'stripes',['sun'],3,'horizontal'),
+F('Sao Tome and Principe','Africa','1:2',[['#12AD2B',40],['#FFCE00',40],['#D21034',20]],'other',['star']),
+F('Senegal','Africa','2:3',[['#00853F',33],['#FDEF42',34],['#E31B23',33]],'vertical-tricolor',['star']),
+F('Seychelles','Africa','1:2',[['#003F87',20],['#FCD856',20],['#D62828',20],['#FFFFFF',20],['#007A3D',20]],'bend',[]),
+F('Sierra Leone','Africa','2:3',[['#1EB53A',33],['#FFFFFF',34],['#0072C6',33]],'horizontal-tricolor',[]),
+F('Somalia','Africa','2:3',[['#4189DD',90],['#FFFFFF',10]],'solid',['star']),
+F('South Africa','Africa','2:3',[['#000000',10],['#FFB612',10],['#007A4D',20],['#FFFFFF',15],['#DE3831',22],['#002395',23]],'other',['other']),
+F('South Sudan','Africa','1:2',[['#000000',20],['#CE1126',30],['#078930',20],['#FFFFFF',10],['#0F47AF',15],['#FCDD09',5]],'stripes',['star','other'],3,'horizontal'),
+F('Sudan','Africa','1:2',[['#D21034',33],['#FFFFFF',34],['#000000',33]],'horizontal-tricolor',['other']),
+F('Tanzania','Africa','2:3',[['#1EB53A',40],['#FCD116',10],['#000000',10],['#00A3DD',40]],'bend',[]),
+F('Togo','Africa','2:3',[['#006A4E',40],['#FFCE00',40],['#D21034',15],['#FFFFFF',5]],'stripes',['star'],5,'horizontal'),
+F('Tunisia','Africa','2:3',[['#E70013',90],['#FFFFFF',10]],'solid',['crescent','star']),
+F('Uganda','Africa','2:3',[['#000000',33],['#FCDC04',34],['#D90000',33]],'stripes',['other'],6,'horizontal'),
+F('Zambia','Africa','2:3',[['#198A00',70],['#DE2010',10],['#000000',10],['#EF7D00',10]],'other',['eagle']),
+F('Zimbabwe','Africa','1:2',[['#006400',28],['#FFD200',14],['#D40000',14],['#000000',14],['#FFFFFF',10],['#D40000',14],['#FFD200',6]],'stripes',['star','other'],7,'horizontal'),
+// ---- Asia ----
+F('Afghanistan','Asia','2:3',[['#FFFFFF',95],['#000000',5]],'solid',['other']),
+F('Bahrain','Asia','3:5',[['#FFFFFF',30],['#CE1126',70]],'vertical-bicolor',['other']),
+F('Bangladesh','Asia','3:5',[['#006A4E',88],['#F42A41',12]],'solid',['circle']),
+F('Bhutan','Asia','2:3',[['#FFCE00',50],['#FF4E12',50]],'bend',['other']),
+F('Brunei','Asia','1:2',[['#FDDA24',70],['#FFFFFF',15],['#000000',10],['#CE1126',5]],'bend',['other']),
+F('Cambodia','Asia','2:3',[['#032EA1',40],['#E00025',40],['#FFFFFF',20]],'horizontal-tricolor',['other']),
+F('China','Asia','2:3',[['#EE1C25',95],['#FFDE00',5]],'solid',['star']),
+F('India','Asia','2:3',[['#FF9933',33],['#FFFFFF',34],['#138808',33]],'horizontal-tricolor',['circle','other']),
+F('Indonesia','Asia','2:3',[['#CE1126',50],['#FFFFFF',50]],'horizontal-bicolor',[]),
+F('Iran','Asia','4:7',[['#239F40',33],['#FFFFFF',34],['#DA0000',33]],'horizontal-tricolor',['other']),
+F('Iraq','Asia','2:3',[['#CE1126',33],['#FFFFFF',34],['#000000',33]],'horizontal-tricolor',['other']),
+F('Israel','Asia','8:11',[['#FFFFFF',80],['#0038B8',20]],'other',['star']),
+F('Japan','Asia','2:3',[['#FFFFFF',85],['#BC002D',15]],'solid',['circle']),
+F('Jordan','Asia','1:2',[['#000000',30],['#FFFFFF',30],['#007A3D',30],['#CE1126',10]],'horizontal-tricolor',['star','other']),
+F('Kazakhstan','Asia','1:2',[['#00AFCA',92],['#FEC50C',8]],'solid',['sun','eagle']),
+F('Kuwait','Asia','1:2',[['#007A3D',30],['#FFFFFF',30],['#CE1126',30],['#000000',10]],'horizontal-tricolor',['other']),
+F('Kyrgyzstan','Asia','3:5',[['#E8112D',90],['#FFD700',10]],'solid',['sun']),
+F('Laos','Asia','2:3',[['#CE1126',50],['#002868',40],['#FFFFFF',10]],'horizontal-tricolor',['circle']),
+F('Lebanon','Asia','2:3',[['#EE161F',50],['#FFFFFF',40],['#00A651',10]],'horizontal-tricolor',['other']),
+F('Malaysia','Asia','1:2',[['#CC0001',50],['#FFFFFF',43],['#010066',7]],'stripes',['crescent','star'],14,'horizontal'),
+F('Maldives','Asia','2:3',[['#D21034',20],['#007E3A',70],['#FFFFFF',10]],'other',['crescent']),
+F('Mongolia','Asia','1:2',[['#C4272F',33],['#015197',34],['#C4272F',33]],'vertical-tricolor',['sun','other']),
+F('Myanmar','Asia','5:9',[['#FECB00',33],['#34B233',34],['#EA2839',33]],'horizontal-tricolor',['star']),
+F('Nepal','Asia','4:3',[['#DC143C',85],['#003893',15]],'other',['crescent','sun']),
+F('North Korea','Asia','1:2',[['#024FA2',20],['#FFFFFF',10],['#ED1C27',40],['#FFFFFF',10],['#024FA2',20]],'stripes',['star','circle'],5,'horizontal'),
+F('Oman','Asia','2:3',[['#FFFFFF',34],['#DB161B',33],['#008000',33]],'other',['other']),
+F('Pakistan','Asia','2:3',[['#01411C',75],['#FFFFFF',25]],'vertical-bicolor',['crescent','star']),
+F('Palestine','Asia','1:2',[['#000000',25],['#FFFFFF',25],['#007A3D',25],['#CE1126',25]],'horizontal-tricolor',['other']),
+F('Philippines','Asia','1:2',[['#0038A8',48],['#CE1126',47],['#FCD116',5]],'horizontal-bicolor',['sun','star']),
+F('Qatar','Asia','11:28',[['#FFFFFF',30],['#8D1B3D',70]],'vertical-bicolor',['other']),
+F('Saudi Arabia','Asia','2:3',[['#006C35',95],['#FFFFFF',5]],'solid',['other']),
+F('Singapore','Asia','2:3',[['#EF3340',50],['#FFFFFF',50]],'horizontal-bicolor',['crescent','star']),
+F('South Korea','Asia','2:3',[['#FFFFFF',85],['#CD2E3A',8],['#0047A0',7]],'solid',['circle','other']),
+F('Sri Lanka','Asia','1:2',[['#8D153A',60],['#FFB700',25],['#00534E',10],['#FF7A00',5]],'other',['lion','other']),
+F('Syria','Asia','2:3',[['#CE1126',33],['#FFFFFF',34],['#000000',33]],'horizontal-tricolor',['star']),
+F('Tajikistan','Asia','1:2',[['#CC0000',30],['#FFFFFF',40],['#006600',30]],'horizontal-tricolor',['star','other']),
+F('Thailand','Asia','2:3',[['#A51931',36],['#FFFFFF',24],['#2D2A4A',40]],'stripes',[],5,'horizontal'),
+F('Timor-Leste','Asia','1:2',[['#DC241F',50],['#FFC726',30],['#000000',15],['#FFFFFF',5]],'other',['star']),
+F('Turkey','Asia','2:3',[['#E30A17',95],['#FFFFFF',5]],'solid',['crescent','star']),
+F('Turkmenistan','Asia','2:3',[['#00843D',80],['#D22630',15],['#FFFFFF',5]],'other',['crescent','star']),
+F('United Arab Emirates','Asia','1:2',[['#00732F',20],['#FFFFFF',20],['#000000',20],['#FF0000',40]],'other',[]),
+F('Uzbekistan','Asia','1:2',[['#0099B5',40],['#FFFFFF',10],['#1EB53A',40],['#CE1126',10]],'stripes',['crescent','star'],3,'horizontal'),
+F('Vietnam','Asia','2:3',[['#DA251D',90],['#FFCD00',10]],'solid',['star']),
+F('Yemen','Asia','2:3',[['#CE1126',33],['#FFFFFF',34],['#000000',33]],'horizontal-tricolor',[]),
+// ---- Oceania ----
+F('Australia','Oceania','1:2',[['#00247D',80],['#FFFFFF',15],['#CE1124',5]],'canton',['star']),
+F('New Zealand','Oceania','1:2',[['#00247D',80],['#CC142B',15],['#FFFFFF',5]],'canton',['star']),
+F('Fiji','Oceania','1:2',[['#68BFE5',75],['#FFFFFF',15],['#CE1124',10]],'canton',['other']),
+F('Papua New Guinea','Oceania','3:4',[['#000000',45],['#CE1126',45],['#FCD116',10]],'bend',['star','other']),
+F('Solomon Islands','Oceania','1:2',[['#0051BA',40],['#009A44',40],['#FCD116',15],['#FFFFFF',5]],'bend',['star']),
+F('Vanuatu','Oceania','3:5',[['#D21034',45],['#009543',35],['#000000',10],['#FCD116',10]],'other',['other']),
+F('Samoa','Oceania','1:2',[['#CE1126',80],['#002B7F',15],['#FFFFFF',5]],'canton',['star']),
+F('Tonga','Oceania','1:2',[['#C10000',80],['#FFFFFF',15],['#C10000',5]],'canton',['cross']),
+F('Kiribati','Oceania','1:2',[['#CE1126',50],['#FCD116',15],['#003F87',25],['#FFFFFF',10]],'other',['sun','other']),
+F('Tuvalu','Oceania','1:2',[['#68BFE5',80],['#FFFFFF',10],['#FCD116',10]],'canton',['star']),
+F('Marshall Islands','Oceania','10:19',[['#003893',75],['#FF6720',15],['#FFFFFF',10]],'bend',['star']),
+F('Micronesia','Oceania','10:19',[['#75B2DD',88],['#FFFFFF',12]],'solid',['star']),
+F('Palau','Oceania','10:19',[['#4AADD6',80],['#FFDE00',20]],'solid',['circle']),
+F('Nauru','Oceania','1:2',[['#002B7F',80],['#FFC61E',10],['#FFFFFF',10]],'other',['star']),
+// ---- Historic / regional bonus ----
+F('Yugoslavia (SFRY)','Historic','1:2',[['#0033A0',33],['#FFFFFF',34],['#DA020E',33]],'horizontal-tricolor',['star']),
+F('Confederate States (1st national)','Historic','2:3',[['#B22234',33],['#FFFFFF',34],['#B22234',33]],'stripes',['star'],3,'horizontal'),
+F('Quebec','Historic','2:3',[['#003DA5',80],['#FFFFFF',20]],'other',['cross','other']),
+F('Catalonia','Historic','2:3',[['#FCDD09',56],['#DA121A',44]],'stripes',[],9,'horizontal'),
+F('Basque Country','Historic','2:3',[['#D52B1E',60],['#009B48',25],['#FFFFFF',15]],'saltire',['cross']),
+F('Tibet','Historic','2:3',[['#C8102E',30],['#FFFFFF',30],['#00539C',25],['#FFD100',15]],'other',['sun','lion','other']),
+F('Kurdistan','Historic','2:3',[['#ED1C24',32],['#FFFFFF',33],['#007A3D',32],['#FFCD00',3]],'horizontal-tricolor',['sun']),
+F('Somaliland','Historic','2:3',[['#009A44',33],['#FFFFFF',34],['#CE1126',33]],'horizontal-tricolor',['star','other']),
+F('Hong Kong','Historic','2:3',[['#DE2910',90],['#FFFFFF',10]],'solid',['star','other']),
+F('Taiwan','Historic','2:3',[['#FE0000',80],['#000091',15],['#FFFFFF',5]],'canton',['sun']),
+F('Puerto Rico','Historic','2:3',[['#ED1C24',60],['#FFFFFF',30],['#0050A0',10]],'stripes',['star'],5,'horizontal'),
+];
+
+/* ---- color math (perceptual-ish, same spirit as flag-analyzer.html) ---- */
+function hexToRgb(hex){
+  hex = hex.replace('#','');
+  if (hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+  const n = parseInt(hex,16);
+  return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+}
+function rgbDist(a,b){ return Math.sqrt((a.r-b.r)**2+(a.g-b.g)**2+(a.b-b.b)**2); }
+function rgbToHsl(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s; const l=(max+min)/2;
+  if (max===min){ h=0; s=0; }
+  else {
+    const d = max-min;
+    s = l>0.5 ? d/(2-max-min) : d/(max+min);
+    switch(max){
+      case r: h=(g-b)/d + (g<b?6:0); break;
+      case g: h=(b-r)/d + 2; break;
+      default: h=(r-g)/d + 4;
+    }
+    h/=6;
+  }
+  return { h:h*360, s, l };
+}
+function colorFamily(hex){
+  const {r,g,b} = hexToRgb(hex);
+  const {h,s,l} = rgbToHsl(r,g,b);
+  if (l>0.90) return 'white';
+  if (l<0.13) return 'black';
+  if (s<0.18) return 'gray';
+  if (h<15||h>=345) return 'red';
+  if (h<40) return 'orange';
+  if (h<65) return 'yellow';
+  if (h<170) return 'green';
+  if (h<200) return 'cyan';
+  if (h<255) return 'blue';
+  if (h<290) return 'purple';
+  return 'pink';
+}
+/* pairwise color match 0..1 — mostly raw perceptual distance (so navy ~
+   blue, maroon ~ red) with a small same-family bump; unrelated hues (e.g.
+   hot pink vs national red) fall off fast and stay low, by design. */
+const DIST_FALLOFF = 165; // rgb distance at which match score hits 0
+function colorMatchScore(hexA, hexB){
+  const dist = rgbDist(hexToRgb(hexA), hexToRgb(hexB));
+  let score = Math.max(0, 1 - dist/DIST_FALLOFF);
+  if (colorFamily(hexA) === colorFamily(hexB)) score = Math.min(1, score + 0.15);
+  return score;
+}
+/* bidirectional, coverage-weighted color-set similarity, 0..1 */
+function colorSetScore(qColors, fColors){
+  if (!qColors.length || !fColors.length) return 0;
+  const dir = (A,B)=>{
+    let totalW=0, matched=0;
+    A.forEach(a=>{
+      let best=0;
+      B.forEach(b=>{ const s=colorMatchScore(a.hex,b.hex); if (s>best) best=s; });
+      totalW += a.pct; matched += best*a.pct;
+    });
+    return totalW ? matched/totalW : 0;
+  };
+  const qToF = dir(qColors, fColors); // how well the flag covers what the query asked for
+  const fToQ = dir(fColors, qColors); // how much of the flag is "extra" / unaccounted for
+  return qToF*0.65 + fToQ*0.35;
+}
+
+/* ---- layout compatibility ---- */
+const LAYOUT_RELATED = {
+  'horizontal-tricolor|horizontal-bicolor': 0.55,
+  'vertical-tricolor|vertical-bicolor': 0.55,
+  'horizontal-tricolor|stripes': 0.42,
+  'vertical-tricolor|stripes': 0.30,
+  'horizontal-bicolor|stripes': 0.32,
+  'vertical-bicolor|stripes': 0.22,
+  'nordic-cross|saltire': 0.30,
+  'nordic-cross|other': 0.15,
+  'saltire|other': 0.20,
+  'saltire|bend': 0.22,
+  'canton|quarterly': 0.28,
+  'canton|stripes': 0.22,
+  'canton|solid': 0.18,
+  'quarterly|other': 0.15,
+  'bend|other': 0.20,
+  'bend|saltire': 0.22,
+  'solid|other': 0.20,
+  'horizontal-tricolor|vertical-tricolor': 0.12,
+  'horizontal-bicolor|vertical-bicolor': 0.12,
+  'horizontal-tricolor|other': 0.15,
+  'vertical-tricolor|other': 0.15,
+};
+function layoutScore(a,b){
+  if (a===b) return 1;
+  return LAYOUT_RELATED[a+'|'+b] ?? LAYOUT_RELATED[b+'|'+a] ?? 0.08;
+}
+
+/* ---- aspect ratio ---- */
+function ratioDecimal(str){ // "h:w" -> width/height decimal
+  const [h,w] = String(str).split(':').map(Number);
+  if (!h || !w) return 1.5;
+  return w/h;
+}
+function ratioScore(qDec, fDec){
+  if (qDec==null || fDec==null) return 0.5;
+  const diff = Math.abs(qDec-fDec);
+  return Math.max(0, 1 - diff/0.6);
+}
+
+/* ---- charges ---- */
+function chargeMatchScore(qCharges, fCharges){
+  if (!qCharges || !qCharges.length) return 0.4; // neutral-low: user didn't say, don't reward or punish much
+  const qs = new Set(qCharges), fs = new Set(fCharges||[]);
+  if (!fs.size) return qs.size ? 0.1 : 0.4;
+  let inter=0; qs.forEach(c=>{ if (fs.has(c)) inter++; });
+  const union = new Set([...qs,...fs]).size;
+  return union ? inter/union : 0.4;
+}
+
+/* ---- overall weighted score ----
+   Fixed weights, always sum to 1 (documented here rather than tuned
+   per-query so results stay deterministic and easy to reason about):
+     color similarity   0.62  — dominant signal: matched hues weighted by
+                                 coverage, perceptual-ish distance so navy
+                                 reads close to blue, hot pink reads far
+                                 from national red, etc.
+     layout match       0.18  — exact division match scores 1.0; related
+                                 layouts (e.g. tricolor vs bicolor of the
+                                 same orientation) score partial credit,
+                                 cross-orientation (horizontal vs vertical)
+                                 or unrelated layouts score low.
+     aspect ratio        0.08 — closeness of width:height decimal.
+     charge keywords     0.12 — Jaccard overlap of charge keywords; if the
+                                 query specifies none, a flat low-neutral
+                                 0.4 is used so this dimension can't be
+                                 gamed but also can't tank a match. */
+const WEIGHTS = { color:0.62, layout:0.18, ratio:0.08, charge:0.12 };
+function scoreFlag(query, flag){
+  const cs = colorSetScore(query.colors, flag.colors);
+  const ls = layoutScore(query.layout, flag.layout);
+  const rs = ratioScore(query.ratioDec, ratioDecimal(flag.ratio));
+  const chs = chargeMatchScore(query.charges, flag.charges);
+  const w = WEIGHTS;
+  const total = cs*w.color + ls*w.layout + rs*w.ratio + chs*w.charge;
+  return { total, colorScore:cs, layoutScore:ls, ratioScoreV:rs, chargeScoreV:chs };
+}
+function rankFlags(query, flags){
+  flags = flags || FLAGS;
+  return flags.map(f=>({ flag:f, ...scoreFlag(query,f) })).sort((a,b)=> b.total - a.total);
+}
+const TOO_SIMILAR_THRESHOLD = 0.80;
+/* ================================================================
+   CORE END
+   ================================================================ */
+
+/* ============ human-readable labels ============ */
+const LAYOUT_LABEL = {
+  'solid':'solid field', 'horizontal-tricolor':'horizontal tricolor', 'vertical-tricolor':'vertical tricolor',
+  'horizontal-bicolor':'horizontal bicolor', 'vertical-bicolor':'vertical bicolor', 'nordic-cross':'Nordic (offset) cross',
+  'saltire':'saltire (diagonal cross)', 'canton':'canton (corner box)', 'stripes':'multiple stripes',
+  'quarterly':'quartered', 'bend':'diagonal band', 'other':'irregular / mixed layout',
+};
+function layoutLabel(flag){
+  if (flag.layout==='stripes') return `${flag.stripes||''}-stripe ${flag.stripeDir||'horizontal'} bands`.trim();
+  return LAYOUT_LABEL[flag.layout] || flag.layout;
+}
+const CHARGE_LABEL = { 'star':'a star', 'stars-grid':'a grid of stars', 'crescent':'a crescent', 'sun':'a sun',
+  'eagle':'an eagle', 'lion':'a lion', 'maple-leaf':'a maple leaf', 'circle':'a disc', 'cross':'a cross', 'other':'an emblem' };
+
+/* ============ "why it matched" ============ */
+function whyMatched(query, flag){
+  const reasons = [];
+  const qFams = [...new Set(query.colors.map(c=>colorFamily(c.hex)))];
+  const fFams = new Set(flag.colors.map(c=>colorFamily(c.hex)));
+  const shared = qFams.filter(f=>fFams.has(f));
+  if (shared.length >= 2) reasons.push(`same colors (${shared.join(', ')})`);
+  else if (shared.length === 1) reasons.push(`shares a ${shared[0]} tone`);
+  if (query.layout === flag.layout) reasons.push(`same ${layoutLabel(flag)} layout`);
+  else if (layoutScore(query.layout, flag.layout) >= 0.3) reasons.push(`related layout (${layoutLabel(flag)})`);
+  if (query.charges && query.charges.length){
+    const sharedCh = query.charges.filter(c=>flag.charges.includes(c));
+    if (sharedCh.length) reasons.push(`both have ${sharedCh.map(c=>CHARGE_LABEL[c]||c).join(' and ')}`);
+  }
+  if (!reasons.length) reasons.push('loosely similar palette and proportions');
+  return reasons.slice(0,3).join('; ');
+}
+
+/* ============ SVG swatch rendering (same division-drawing spirit as flag-designer.html) ============ */
+function rect(x,y,w,h,c){ return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${c}"/>`; }
+function fitColors(colors, n){
+  const hexes = colors.map(c=>c.hex);
+  if (!hexes.length) return Array(n).fill('#888888');
+  const out=[]; for (let i=0;i<n;i++) out.push(hexes[i%hexes.length]);
+  return out;
+}
+function polyPath(pts){ return 'M'+pts.map(p=>p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' L ')+' Z'; }
+function starPath(spikes, ro, ri){
+  const pts=[]; const step=Math.PI/spikes; let a=-Math.PI/2;
+  for (let i=0;i<spikes*2;i++){ const r=(i%2)?ri:ro; pts.push([Math.cos(a)*r, Math.sin(a)*r]); a+=step; }
+  return polyPath(pts);
+}
+function plusPath(s,t){ return polyPath([[-t,-s],[t,-s],[t,-t],[s,-t],[s,t],[t,t],[t,s],[-t,s],[-t,t],[-s,t],[-s,-t],[-t,-t]]); }
+function crescentMarkup(s,color){
+  const sr=(s*0.82).toFixed(2), cx=(s*0.45).toFixed(2), ss=s.toFixed(2), ns=(-s).toFixed(2), nsr=(-s*0.82).toFixed(2);
+  return `<path fill-rule="evenodd" fill="${color}" d="M 0 ${ns} A ${ss} ${ss} 0 1 0 0 ${ss} A ${ss} ${ss} 0 1 0 0 ${ns} Z M ${cx} ${nsr} A ${sr} ${sr} 0 1 0 ${cx} ${sr} A ${sr} ${sr} 0 1 0 ${cx} ${nsr} Z"/>`;
+}
+const SWATCH_LAYOUT = {
+  'solid': (W,H,c)=> rect(0,0,W,H,c[0]),
+  'horizontal-bicolor': (W,H,c)=> rect(0,0,W,H/2,c[0])+rect(0,H/2,W,H/2,c[1]),
+  'horizontal-tricolor': (W,H,c)=> rect(0,0,W,H/3,c[0])+rect(0,H/3,W,H/3,c[1])+rect(0,2*H/3,W,H/3,c[2]),
+  'vertical-bicolor': (W,H,c)=> rect(0,0,W/2,H,c[0])+rect(W/2,0,W/2,H,c[1]),
+  'vertical-tricolor': (W,H,c)=> rect(0,0,W/3,H,c[0])+rect(W/3,0,W/3,H,c[1])+rect(2*W/3,0,W/3,H,c[2]),
+  'nordic-cross': (W,H,c)=>{ const t=H*0.22, vx=W*0.34; return rect(0,0,W,H,c[0])+rect(0,(H-t)/2,W,t,c[1])+rect(vx-t/2,0,t,H,c[1]); },
+  'saltire': (W,H,c)=>{ const t=H*0.2; return rect(0,0,W,H,c[0])+`<g stroke="${c[1]}" stroke-width="${t.toFixed(1)}"><line x1="0" y1="0" x2="${W}" y2="${H}"/><line x1="0" y1="${H}" x2="${W}" y2="0"/></g>`; },
+  'canton': (W,H,c)=> rect(0,0,W,H,c[0])+rect(0,0,W*0.42,H*0.54,c[1]),
+  'quarterly': (W,H,c)=> rect(0,0,W/2,H/2,c[0])+rect(W/2,0,W/2,H/2,c[1])+rect(0,H/2,W/2,H/2,c[2])+rect(W/2,H/2,W/2,H/2,c[3]),
+  'bend': (W,H,c)=>{ const t=Math.hypot(W,H)*0.22; return rect(0,0,W,H,c[0])+`<line x1="0" y1="0" x2="${W}" y2="${H}" stroke="${c[1]}" stroke-width="${t.toFixed(1)}"/>`; },
+  'other': (W,H,c)=> rect(0,0,W,H,c[0]) + `<path d="M0 0 L${(W*0.55).toFixed(1)} 0 L0 ${H.toFixed(1)} Z" fill="${c[1]}"/>`,
+};
+function stripesMarkup(W,H,c,flag){
+  const n = flag.stripes||5, dir = flag.stripeDir||'horizontal';
+  let o='';
+  if (dir==='vertical'){ const w=W/n; for (let i=0;i<n;i++) o+=rect(i*w,0,w+0.6,H,c[i%c.length]); }
+  else { const h=H/n; for (let i=0;i<n;i++) o+=rect(0,i*h,W,h+0.6,c[i%c.length]); }
+  return o;
+}
+function chargeGlyph(type, cx, cy, s, color){
+  const t = `translate(${cx.toFixed(1)} ${cy.toFixed(1)})`;
+  switch(type){
+    case 'star': return `<path transform="${t}" d="${starPath(5,s,s*0.4)}" fill="${color}"/>`;
+    case 'stars-grid': {
+      let o=''; const rows=2, cols=3;
+      for (let r=0;r<rows;r++) for (let cIdx=0;cIdx<cols;cIdx++){
+        const dx=(cIdx-(cols-1)/2)*s*0.85, dy=(r-(rows-1)/2)*s*0.85;
+        o += `<path transform="translate(${(cx+dx).toFixed(1)} ${(cy+dy).toFixed(1)})" d="${starPath(5,s*0.32,s*0.32*0.4)}" fill="${color}"/>`;
+      }
+      return o;
+    }
+    case 'crescent': return `<g transform="${t}">${crescentMarkup(s,color)}</g>`;
+    case 'sun': return `<g transform="${t}" fill="${color}"><path d="${starPath(12,s,s*0.62)}"/><circle r="${(s*0.42).toFixed(1)}"/></g>`;
+    case 'cross': return `<path transform="${t}" d="${plusPath(s*0.85,s*0.3)}" fill="${color}"/>`;
+    case 'circle': return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(s*0.8).toFixed(1)}" fill="${color}"/>`;
+    case 'maple-leaf': return `<g transform="${t}" fill="${color}"><path d="${starPath(11,s,s*0.45)}"/></g>`;
+    default: return `<g transform="${t}" fill="${color}"><path d="${starPath(6,s*0.75,s*0.75*0.55)}"/></g>`; // eagle / lion / other stand-in
+  }
+}
+const SWATCH_SLOTS = { 'solid':1,'horizontal-bicolor':2,'vertical-bicolor':2,'horizontal-tricolor':3,'vertical-tricolor':3,
+  'nordic-cross':2,'saltire':2,'canton':2,'quarterly':4,'bend':2,'other':2 };
+function buildSwatchSVG(flag, W){
+  W = W||120;
+  const H = Math.max(20, Math.round(W/ratioDecimal(flag.ratio)));
+  const nSlots = flag.layout==='stripes' ? Math.max(2, Math.min(flag.colors.length,4)) : (SWATCH_SLOTS[flag.layout]||2);
+  const cols = fitColors(flag.colors, nSlots);
+  const field = flag.layout==='stripes' ? stripesMarkup(W,H,cols,flag) : (SWATCH_LAYOUT[flag.layout]||SWATCH_LAYOUT.other)(W,H,cols);
+  let charges = '';
+  const chargeColor = flag.colors.length>1 ? flag.colors[flag.colors.length-1].hex : '#FFD700';
+  (flag.charges||[]).slice(0,2).forEach((ch,i)=>{
+    const s = H*0.2;
+    const cx = W/2 + (i===0 ? 0 : W*0.24);
+    const cy = H/2;
+    charges += chargeGlyph(ch, cx, cy, s, chargeColor);
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(flag.name)} stylized swatch">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="#999"/>
+    ${field}
+    ${charges}
+    <rect x="0.5" y="0.5" width="${W-1}" height="${H-1}" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1"/>
+  </svg>`;
+}
+
+/* ============ query state ============ */
+const RATIO_OPTS = ['1:1','1:2','2:3','3:4','3:5','5:8','10:19'];
+const COLOR_WEIGHTS = { 1:[100], 2:[58,42], 3:[42,33,25] };
+const DEFAULT_PALETTE = ['#D52B1E','#FFFFFF','#0039A6'];
+const qstate = {
+  colors: DEFAULT_PALETTE.slice(0,3).map((hex,i)=>({hex, pct: COLOR_WEIGHTS[3][i]})),
+  layout: 'horizontal-tricolor',
+  stripes: 5, stripeDir: 'horizontal',
+  ratio: '2:3',
+  charges: [],
+};
+
+function setColorCount(n){
+  const weights = COLOR_WEIGHTS[n];
+  const cur = qstate.colors.map(c=>c.hex);
+  const next = [];
+  for (let i=0;i<n;i++) next.push({ hex: cur[i] || DEFAULT_PALETTE[i] || '#888888', pct: weights[i] });
+  qstate.colors = next;
+}
+
+function buildQuery(){
+  return {
+    colors: qstate.colors.map(c=>({hex:c.hex, pct:c.pct})),
+    layout: qstate.layout,
+    ratioDec: ratioDecimal(qstate.ratio),
+    charges: qstate.charges.slice(),
+  };
+}
+
+/* ============ render: query builder controls ============ */
+function renderColorCountChips(){
+  $('#colorCountChips').innerHTML = [1,2,3].map(n=>
+    `<button class="chip sm" data-count="${n}" aria-pressed="${qstate.colors.length===n}">${n} color${n>1?'s':''}</button>`
+  ).join('');
+}
+function renderColorPicks(){
+  $('#colorPicks').innerHTML = qstate.colors.map((c,i)=>
+    `<label class="colorslot"><span>${i===0?'Dominant':i===1?'Secondary':'Third'}</span>
+      <input type="color" data-colorslot="${i}" value="${c.hex}" aria-label="Color ${i+1}">
+      <span class="hexlabel">${esc(c.hex.toUpperCase())}</span>
+    </label>`
+  ).join('');
+}
+function renderLayoutSel(){
+  const sel = $('#layoutSel');
+  if (!sel.options.length) sel.innerHTML = LAYOUT_KEYS.map(k=>`<option value="${k}">${esc(LAYOUT_LABEL[k])}</option>`).join('');
+  sel.value = qstate.layout;
+  $('#stripeField').hidden = qstate.layout !== 'stripes';
+  $('#stripeVal').textContent = qstate.stripes;
+  $('#stripeCount').value = qstate.stripes;
+  $('#stripeDirChips').innerHTML = ['horizontal','vertical'].map(d=>
+    `<button class="chip sm" data-dir="${d}" aria-pressed="${qstate.stripeDir===d}">${d}</button>`).join('');
+}
+function renderRatioChips(){
+  $('#ratioChips').innerHTML = RATIO_OPTS.map(r=>
+    `<button class="chip sm" data-ratio="${r}" aria-pressed="${qstate.ratio===r}">${r}</button>`).join('');
+}
+function renderChargeChips(){
+  $('#chargeChips').innerHTML = CHARGE_KEYS.map(c=>
+    `<button class="chip sm" data-charge="${c}" aria-pressed="${qstate.charges.includes(c)}">${esc(CHARGE_LABEL[c])}</button>`).join('');
+}
+function renderQueryHint(){
+  const c = qstate.colors.map(x=>colorFamily(x.hex)).join(', ');
+  $('#queryHint').textContent = `Describing: ${c} · ${layoutLabel({layout:qstate.layout, stripes:qstate.stripes, stripeDir:qstate.stripeDir})} · ${qstate.ratio}${qstate.charges.length? ' · '+qstate.charges.map(c=>CHARGE_LABEL[c]).join(', ') : ''}`;
+}
+function renderQueryBuilder(){
+  renderColorCountChips(); renderColorPicks(); renderLayoutSel(); renderRatioChips(); renderChargeChips(); renderQueryHint();
+}
+
+/* ============ render: results ============ */
+function renderResults(){
+  const query = buildQuery();
+  const ranked = rankFlags(query, FLAGS).slice(0,15);
+  $('#resultSub').textContent = `top ${ranked.length} of ${FLAGS.length}`;
+
+  const top = ranked[0];
+  const calloutEl = $('#callout');
+  if (top && top.total >= TOO_SIMILAR_THRESHOLD){
+    calloutEl.innerHTML = `<div class="callout warn">
+      <div class="icon" aria-hidden="true">⚠️</div>
+      <div><strong>This closely resembles the flag of ${esc(top.flag.name)} (${Math.round(top.total*100)}% match)</strong>
+      <span>Consider more distinctive colors, symbolism, or layout before finalizing this design — it may read as a copy rather than something new.</span></div>
+    </div>`;
+  } else {
+    calloutEl.innerHTML = '';
+  }
+
+  if (!ranked.length){
+    $('#resultList').innerHTML = `<div class="empty">No matches to show yet.</div>`;
+    return;
+  }
+
+  $('#resultList').innerHTML = ranked.map((r,i)=>`
+    <div class="resultrow ${i===0?'top1':''}">
+      <div class="rank">${i+1}</div>
+      <div class="swatch">${buildSwatchSVG(r.flag,72)}</div>
+      <div class="info">
+        <div class="top">
+          <span class="name">${esc(r.flag.name)}<span class="region">${esc(r.flag.region)}</span></span>
+          <span class="pct">${Math.round(r.total*100)}%</span>
+        </div>
+        <div class="bar"><span style="width:${Math.max(2,r.total*100).toFixed(1)}%"></span></div>
+        <div class="why">${esc(whyMatched(query, r.flag))}</div>
+      </div>
+    </div>`).join('');
+}
+
+function runQuery(){ renderQueryHint(); renderResults(); }
+
+/* ============ interactions: query builder ============ */
+$('#colorCountChips').addEventListener('click', e=>{
+  const b = e.target.closest('[data-count]'); if (!b) return;
+  setColorCount(+b.dataset.count);
+  renderColorCountChips(); renderColorPicks(); runQuery();
+});
+$('#colorPicks').addEventListener('input', e=>{
+  const i = e.target.dataset.colorslot; if (i==null) return;
+  qstate.colors[+i].hex = e.target.value;
+  renderColorPicks(); runQuery();
+});
+$('#layoutSel').addEventListener('change', e=>{ qstate.layout = e.target.value; renderLayoutSel(); runQuery(); });
+$('#stripeCount').addEventListener('input', e=>{ qstate.stripes = +e.target.value; $('#stripeVal').textContent = qstate.stripes; runQuery(); });
+$('#stripeDirChips').addEventListener('click', e=>{
+  const b = e.target.closest('[data-dir]'); if (!b) return;
+  qstate.stripeDir = b.dataset.dir; renderLayoutSel(); runQuery();
+});
+$('#ratioChips').addEventListener('click', e=>{
+  const b = e.target.closest('[data-ratio]'); if (!b) return;
+  qstate.ratio = b.dataset.ratio; renderRatioChips(); runQuery();
+});
+$('#chargeChips').addEventListener('click', e=>{
+  const b = e.target.closest('[data-charge]'); if (!b) return;
+  const c = b.dataset.charge;
+  const idx = qstate.charges.indexOf(c);
+  if (idx>=0) qstate.charges.splice(idx,1); else if (qstate.charges.length<4) qstate.charges.push(c);
+  renderChargeChips(); runQuery();
+});
+
+/* ============ examples ============ */
+const EXAMPLES = {
+  'Red / white / blue horizontal tricolor': ()=>{
+    qstate.colors = [{hex:'#D52B1E',pct:42},{hex:'#FFFFFF',pct:33},{hex:'#0039A6',pct:25}];
+    qstate.layout='horizontal-tricolor'; qstate.ratio='2:3'; qstate.charges=[];
+  },
+  'Green / white / orange vertical tricolor': ()=>{
+    qstate.colors = [{hex:'#009A44',pct:42},{hex:'#FFFFFF',pct:33},{hex:'#FF8200',pct:25}];
+    qstate.layout='vertical-tricolor'; qstate.ratio='2:3'; qstate.charges=[];
+  },
+  'Blue + yellow bicolor (spot the copy)': ()=>{
+    qstate.colors = [{hex:'#0057B7',pct:58},{hex:'#FFD700',pct:42}];
+    qstate.layout='horizontal-bicolor'; qstate.ratio='2:3'; qstate.charges=[];
+  },
+  'Nordic cross, blue + gold': ()=>{
+    qstate.colors = [{hex:'#005293',pct:65},{hex:'#FECC02',pct:35}];
+    qstate.layout='nordic-cross'; qstate.ratio='5:8'; qstate.charges=[];
+  },
+  'Wildly unusual: neon pink solid': ()=>{
+    qstate.colors = [{hex:'#FF00CC',pct:100}];
+    qstate.layout='solid'; qstate.ratio='2:3'; qstate.charges=[];
+  },
+};
+function renderExamples(){
+  $('#exampleChips').innerHTML = Object.keys(EXAMPLES).map(k=>`<button class="chip" data-ex="${esc(k)}" type="button">${esc(k)}</button>`).join('');
+}
+$('#exampleChips').addEventListener('click', e=>{
+  const b = e.target.closest('[data-ex]'); if (!b) return;
+  EXAMPLES[b.dataset.ex]();
+  renderQueryBuilder(); runQuery();
+});
+
+/* ============ image analysis (ported from flag-analyzer.html) ============ */
+const MAX_DIM = 220, MERGE_DIST = 40, SIGNIFICANT_PCT = 2;
+function makeBuffer(drawable, natW, natH){
+  const scale = Math.min(1, MAX_DIM/Math.max(natW,natH));
+  const w = Math.max(1, Math.round(natW*scale)), h = Math.max(1, Math.round(natH*scale));
+  const cv = document.createElement('canvas'); cv.width=w; cv.height=h;
+  const ctx = cv.getContext('2d', { willReadFrequently:true });
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(drawable, 0, 0, w, h);
+  try { return { w, h, data: ctx.getImageData(0,0,w,h).data, tainted:false }; }
+  catch(e){ return { w, h, data:null, tainted:true }; }
+}
+function computeColorsFromPixels(data){
+  const buckets = new Map(); let total = 0;
+  for (let i=0;i<data.length;i+=4){
+    if (data[i+3] < 128) continue;
+    const r=data[i], g=data[i+1], b=data[i+2];
+    const key = ((r>>3)<<10) | ((g>>3)<<5) | (b>>3);
+    let e = buckets.get(key);
+    if (!e){ e={n:0,r:0,g:0,b:0}; buckets.set(key,e); }
+    e.n++; e.r+=r; e.g+=g; e.b+=b; total++;
+  }
+  const arr = [...buckets.values()].map(e=>({n:e.n,r:e.r/e.n,g:e.g/e.n,b:e.b/e.n}))
+    .sort((a,b)=> b.n-a.n || (b.r+b.g+b.b)-(a.r+a.g+a.b));
+  const clusters = [];
+  for (const c of arr){
+    let best=null, bd=Infinity;
+    for (const cl of clusters){ const d=rgbDist(cl,c); if (d<bd){ bd=d; best=cl; } }
+    if (best && bd < MERGE_DIST){
+      const t = best.n+c.n;
+      best.r=(best.r*best.n+c.r*c.n)/t; best.g=(best.g*best.n+c.g*c.n)/t; best.b=(best.b*best.n+c.b*c.n)/t; best.n=t;
+    } else clusters.push({n:c.n,r:c.r,g:c.g,b:c.b});
+  }
+  clusters.sort((a,b)=> b.n-a.n);
+  const colors = clusters.map(c=>({
+    hex: '#'+[c.r,c.g,c.b].map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''),
+    n:c.n, pct: total? c.n/total*100 : 0,
+  }));
+  return colors.filter(c=>c.pct>=SIGNIFICANT_PCT);
+}
+function closestRatioLabel(decimal){
+  const table = RATIO_OPTS.map(r=>({r, d:ratioDecimal(r)}));
+  return table.reduce((p,c)=> Math.abs(c.d-decimal)<Math.abs(p.d-decimal)?c:p).r;
+}
+function applyImageAnalysis(drawable, natW, natH){
+  const buf = makeBuffer(drawable, natW, natH);
+  if (buf.tainted){ flash($('#dropNote'), 'This image is cross-origin — the browser blocked pixel access. Download it and drop the local file instead.', true); return; }
+  let colors = computeColorsFromPixels(buf.data).slice(0,3);
+  if (!colors.length) colors = [{hex:'#888888',pct:100}];
+  const total = colors.reduce((s,c)=>s+c.pct,0) || 100;
+  colors = colors.map(c=>({ hex:c.hex, pct: Math.round(c.pct/total*100) }));
+  qstate.colors = colors;
+  qstate.ratio = closestRatioLabel(natW/natH);
+  renderQueryBuilder();
+  runQuery();
+  flash($('#dropNote'), `Extracted ${colors.length} color${colors.length>1?'s':''} and ratio ${qstate.ratio} — pick a layout & symbols below.`);
+}
+function loadImageFile(file){
+  const note = $('#dropNote');
+  if (!file || !file.type.startsWith('image/')){ flash(note, "That doesn't look like an image file.", true); return; }
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = ()=>{
+    let w = img.naturalWidth||img.width, h = img.naturalHeight||img.height;
+    if (!w || !h){ w=300; h=200; }
+    $('#imgPreview').hidden = false;
+    $('#previewImg').src = url;
+    $('#previewMeta').textContent = `${file.name||'pasted image'} · ${w}×${h}px`;
+    applyImageAnalysis(img, w, h);
+  };
+  img.onerror = ()=>{ URL.revokeObjectURL(url); flash(note, 'Could not read that image.', true); };
+  img.src = url;
+}
+function flash(el, msg, err){ if (!el) return; el.textContent = msg; el.classList.toggle('err', !!err); if (msg) setTimeout(()=>{ if (el.textContent===msg){ el.textContent=''; el.classList.remove('err'); } },2600); }
+
+$('#pickBtn').addEventListener('click', ()=>$('#fileInput').click());
+$('#fileInput').addEventListener('change', e=>{ if (e.target.files[0]) loadImageFile(e.target.files[0]); e.target.value=''; });
+const dropEl = $('#drop');
+['dragenter','dragover'].forEach(ev=>dropEl.addEventListener(ev, e=>{ e.preventDefault(); dropEl.classList.add('drag'); }));
+['dragleave','dragend'].forEach(ev=>dropEl.addEventListener(ev, e=>{ if (e.target===dropEl) dropEl.classList.remove('drag'); }));
+dropEl.addEventListener('drop', e=>{ e.preventDefault(); dropEl.classList.remove('drag'); if (e.dataTransfer.files[0]) loadImageFile(e.dataTransfer.files[0]); });
+document.addEventListener('dragover', e=>e.preventDefault());
+document.addEventListener('drop', e=>{ e.preventDefault(); if (!dropEl.contains(e.target) && e.dataTransfer.files[0]) loadImageFile(e.dataTransfer.files[0]); });
+document.addEventListener('paste', e=>{
+  const items = (e.clipboardData||{}).items || [];
+  for (const item of items){
+    if (item.type && item.type.startsWith('image/')){ const file = item.getAsFile(); if (file){ loadImageFile(file); break; } }
+  }
+});
+
+/* ============ theme ============ */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('#themeBtn').addEventListener('click', ()=>{
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next); localStorage.setItem('max-theme', next);
+});
+
+/* ============ debug hook (for tests) ============ */
+window.lookalikeDebug = { FLAGS, rankFlags, buildQuery, qstate, scoreFlag, colorFamily, ratioDecimal,
+  TOO_SIMILAR_THRESHOLD, EXAMPLE_KEYS: Object.keys(EXAMPLES), applyImageAnalysis, buildSwatchSVG };
+
+/* ============ boot ============ */
+setColorCount(3);
+qstate.colors = [{hex:'#D52B1E',pct:42},{hex:'#FFFFFF',pct:33},{hex:'#0039A6',pct:25}];
+renderQueryBuilder(); renderExamples(); runQuery();
+</script>
+</body>
+</html>

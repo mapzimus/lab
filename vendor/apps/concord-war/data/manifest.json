@@ -1,0 +1,574 @@
+{
+  "version": 1,
+  "layers": [
+    {
+      "id": "city",
+      "group": "Territory",
+      "label": "City of Concord boundary",
+      "geojson": "city.geojson",
+      "source_url": "https://gis.concordnh.gov/arc1061/rest/services/CityGeneral/WaterSystemGIS/MapServer/63",
+      "style": {
+        "line": "#3a2f1d",
+        "lineWidth": 2
+      },
+      "visible_default": true,
+      "note": ""
+    },
+    {
+      "id": "river",
+      "group": "Territory",
+      "label": "Merrimack River (NHD flowlines)",
+      "geojson": "river.geojson",
+      "source_url": "https://hydro.nationalmap.gov/arcgis/rest/services/nhd/MapServer/6",
+      "style": {
+        "line": "#26527a",
+        "lineWidth": 2
+      },
+      "visible_default": true,
+      "note": ""
+    },
+    {
+      "id": "front_line",
+      "group": "Territory",
+      "label": "I-93 corridor (front line)",
+      "geojson": "front_line.geojson",
+      "source_url": "OpenStreetMap: way[ref=\"I 93\"] within Concord bbox (recut_on_i93.py)",
+      "style": {
+        "line": "#463722",
+        "lineWidth": 3
+      },
+      "visible_default": true,
+      "note": ""
+    },
+    {
+      "id": "territory_east",
+      "group": "Territory",
+      "label": "East Concord",
+      "geojson": "territory_east.geojson",
+      "source_url": "derived: city polygon cut on the I-93 corridor",
+      "style": {
+        "fill": "#bcc6a8",
+        "fillOpacity": 0.55
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "territory_west",
+      "group": "Territory",
+      "label": "West Concord",
+      "geojson": "territory_west.geojson",
+      "source_url": "derived: city polygon cut on the I-93 corridor",
+      "style": {
+        "fill": "#d7c597",
+        "fillOpacity": 0.55
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "territory_contested",
+      "group": "Territory",
+      "label": "Contested zone (river \u2194 I-93)",
+      "geojson": "territory_contested.geojson",
+      "source_url": "derived: city pieces between the Merrimack and I-93",
+      "style": {
+        "fill": "#c4825a",
+        "fillOpacity": 0.55,
+        "line": "#6e2c00",
+        "lineWidth": 1.5
+      },
+      "visible_default": true,
+      "note": ""
+    },
+    {
+      "id": "territory_contested_stripes",
+      "group": "Territory",
+      "label": "Contested zone (hatch)",
+      "geojson": "territory_contested_stripes.geojson",
+      "source_url": "derived: 150 m / 45\u00b0 diagonal hatch over the contested zone",
+      "style": {
+        "line": "#9e3b2e",
+        "lineWidth": 1.2
+      },
+      "visible_default": true,
+      "note": "visual hatching for the contested zone \u2014 1860s campaign-map look"
+    },
+    {
+      "id": "crossings",
+      "group": "Transport",
+      "label": "Merrimack River crossings",
+      "geojson": "crossings.geojson",
+      "source_url": "https://gis.concordnh.gov/arc1061/rest/services/CityGeneral/WaterSystemGIS/MapServer/44",
+      "style": {
+        "point": "#b22222",
+        "pointRadius": 6
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "viewshed_east",
+      "group": "Tactical",
+      "label": "East viewshed (3DEP DEM)",
+      "geojson": "viewshed_east.geojson",
+      "source_url": "USGS 3DEP DEM + gdal.ViewshedGenerate from airport / armory / Oak Hill",
+      "style": {
+        "fill": "#7d6608",
+        "fillOpacity": 0.2,
+        "line": "#7d6608",
+        "lineWidth": 0.5
+      },
+      "visible_default": false,
+      "note": "Everything East's batteries can SEE \u2014 i.e. can shell"
+    },
+    {
+      "id": "exposed_west",
+      "group": "Tactical",
+      "label": "Beaten zone (West under fire)",
+      "geojson": "exposed_west.geojson",
+      "source_url": "viewshed_east \u2229 territory_west \u2014 36.4% of the west bank",
+      "style": {
+        "fill": "#9e3b2e",
+        "fillOpacity": 0.35,
+        "line": "#9e3b2e",
+        "lineWidth": 0.5
+      },
+      "visible_default": false,
+      "note": "The west-bank ground actually exposed to East fire"
+    },
+    {
+      "id": "flashpoints",
+      "group": "Tactical",
+      "label": "Contested flashpoints",
+      "geojson": "flashpoints.geojson",
+      "source_url": "curated points: Hannah Dustin, Exit 17, Sewalls Falls, Exit 16, Fort Eddy plaza, NHTI, Bow Jct",
+      "style": {
+        "point": "#7b241c",
+        "pointRadius": 9,
+        "line": "#3a2f1d",
+        "lineWidth": 1.5
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "himars",
+      "group": "Military",
+      "label": "HIMARS launchers (3-197 FA)",
+      "geojson": "himars.geojson",
+      "source_url": "NH Army National Guard, 3rd Battalion 197th Field Artillery (M142 HIMARS)",
+      "style": {
+        "point": "#c0392b",
+        "pointRadius": 11,
+        "line": "#3a2f1d",
+        "lineWidth": 1.5
+      },
+      "visible_default": false,
+      "note": "Strategic rocket artillery \u2014 East's range advantage"
+    },
+    {
+      "id": "blackhawks",
+      "group": "Military",
+      "label": "Black Hawks (AASF / 151st Aviation)",
+      "geojson": "blackhawks.geojson",
+      "source_url": "Army Aviation Support Facility, Concord Municipal Airport",
+      "style": {
+        "point": "#1a5276",
+        "pointRadius": 11,
+        "line": "#3a2f1d",
+        "lineWidth": 1.5
+      },
+      "visible_default": false,
+      "note": "UH-60 air mobility \u2014 East can bypass the bridges"
+    },
+    {
+      "id": "tanks",
+      "group": "Military",
+      "label": "Tanks / tracked armor",
+      "geojson": "tanks.geojson",
+      "source_url": "NH National Guard State Military Reservation (reported on-site)",
+      "style": {
+        "point": "#4a1c1c",
+        "pointRadius": 12,
+        "line": "#1a0e0e",
+        "lineWidth": 2
+      },
+      "visible_default": false,
+      "note": "East's heaviest ground armor \u2014 flips the armor advantage East"
+    },
+    {
+      "id": "resources_military",
+      "group": "Military",
+      "label": "NHARNG sites",
+      "geojson": "resources_military.geojson",
+      "source_url": "poster: 07_resources.py (Census geocoded + bank-validated)",
+      "style": {
+        "point": "#7b241c",
+        "pointRadius": 8,
+        "line": "#3a2f1d",
+        "lineWidth": 1.2
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "resources_police",
+      "group": "Forces",
+      "label": "Police HQ + BearCat (West)",
+      "geojson": "resources_police.geojson",
+      "source_url": "poster: 07_resources.py",
+      "style": {
+        "point": "#1a5276",
+        "pointRadius": 8,
+        "line": "#3a2f1d",
+        "lineWidth": 1.2
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "resources_manpower",
+      "group": "Forces",
+      "label": "State prisons (1,408+ inmates)",
+      "geojson": "resources_manpower.geojson",
+      "source_url": "poster: 07_resources.py",
+      "style": {
+        "point": "#4a3520",
+        "pointRadius": 8,
+        "line": "#3a2f1d",
+        "lineWidth": 1.2
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "resources_medical",
+      "group": "Medical",
+      "label": "Hospitals (Level II + psych)",
+      "geojson": "resources_medical.geojson",
+      "source_url": "poster: 07_resources.py",
+      "style": {
+        "point": "#922b21",
+        "pointRadius": 9,
+        "line": "#3a2f1d",
+        "lineWidth": 1.2
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "resources_govt",
+      "group": "Government",
+      "label": "State House",
+      "geojson": "resources_govt.geojson",
+      "source_url": "poster: 07_resources.py",
+      "style": {
+        "point": "#5b3a1a",
+        "pointRadius": 10,
+        "line": "#3a2f1d",
+        "lineWidth": 1.5
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "resources_command",
+      "group": "Government",
+      "label": "Supreme Court / DOS HQ / data ctr",
+      "geojson": "resources_command.geojson",
+      "source_url": "poster: 07_resources.py",
+      "style": {
+        "point": "#7d6608",
+        "pointRadius": 8,
+        "line": "#3a2f1d",
+        "lineWidth": 1.2
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "resources_water",
+      "group": "Water",
+      "label": "Drinking water + WWTPs",
+      "geojson": "resources_water.geojson",
+      "source_url": "poster: 07_resources.py (Hutchins WTP, Hall St WWTP, Penacook Lake)",
+      "style": {
+        "point": "#1f618d",
+        "pointRadius": 9,
+        "line": "#3a2f1d",
+        "lineWidth": 1.2
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "garvins_falls",
+      "group": "Power",
+      "label": "Garvins Falls hydro (12.4 MW)",
+      "geojson": "garvins_falls.geojson",
+      "source_url": "Hull Street Energy / FERC; mid-river on the Bow line",
+      "style": {
+        "point": "#f1c40f",
+        "pointRadius": 11,
+        "line": "#3a2f1d",
+        "lineWidth": 1.5
+      },
+      "visible_default": false,
+      "note": "The contested generator \u2014 neither bank can claim it"
+    },
+    {
+      "id": "resources_energy",
+      "group": "Power",
+      "label": "Solar + propane + transfer station",
+      "geojson": "resources_energy.geojson",
+      "source_url": "poster: 07_resources.py (Rymes Propane, Old Turnpike solar 6.7 MW)",
+      "style": {
+        "point": "#9c640c",
+        "pointRadius": 8,
+        "line": "#3a2f1d",
+        "lineWidth": 1.2
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "resources_logistics",
+      "group": "Logistics",
+      "label": "Loudon Rd big-box belt",
+      "geojson": "resources_logistics.geojson",
+      "source_url": "poster: 07_resources.py (Walmart/Sam's/Target/Market Basket)",
+      "style": {
+        "point": "#7d6608",
+        "pointRadius": 8,
+        "line": "#3a2f1d",
+        "lineWidth": 1.2
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "resources_fortress",
+      "group": "Logistics",
+      "label": "Steeplegate Mall (staging)",
+      "geojson": "resources_fortress.geojson",
+      "source_url": "poster: 07_resources.py",
+      "style": {
+        "point": "#6e2c00",
+        "pointRadius": 9,
+        "line": "#3a2f1d",
+        "lineWidth": 1.2
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "resources_transport",
+      "group": "Logistics",
+      "label": "Concord Municipal Airport",
+      "geojson": "resources_transport.geojson",
+      "source_url": "poster: 07_resources.py",
+      "style": {
+        "point": "#196f3d",
+        "pointRadius": 9,
+        "line": "#3a2f1d",
+        "lineWidth": 1.2
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "lifelines_power",
+      "group": "Power",
+      "label": "Power & utility network",
+      "geojson": "lifelines_power.geojson",
+      "source_url": "workflow research: substations, Garvins Falls, solar, gas, comms (cited per point)",
+      "style": {
+        "point": "#9c640c",
+        "pointRadius": 7,
+        "line": "#3a2f1d",
+        "lineWidth": 1.0
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "lifelines_water",
+      "group": "Water",
+      "label": "Water & wastewater network",
+      "geojson": "lifelines_water.geojson",
+      "source_url": "workflow research: Penacook Lake, Hutchins WTP, Hall St + Penacook WWTP (cited per point)",
+      "style": {
+        "point": "#1f618d",
+        "pointRadius": 7,
+        "line": "#3a2f1d",
+        "lineWidth": 1.0
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "i93_exits",
+      "group": "Transport",
+      "label": "I-93 interchanges",
+      "geojson": "i93_exits.geojson",
+      "source_url": "City of Concord interstate-exit layer (Exits 12-17 = I-93)",
+      "style": {
+        "point": "#6e2c00",
+        "pointRadius": 6,
+        "line": "#3a2f1d",
+        "lineWidth": 1.0
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "blitz_arcs",
+      "group": "Tactical",
+      "label": "Blitz \u2014 offensive arcs",
+      "geojson": "blitz_arcs.geojson",
+      "source_url": "authored from the blitz scenario (HIMARS / air assault / armor)",
+      "style": {
+        "arc": true,
+        "line": "#c0392b",
+        "lineWidth": 3
+      },
+      "visible_default": false,
+      "note": "East's week-one offensive: bombardment, air assault, armor thrusts"
+    },
+    {
+      "id": "terrain_3d",
+      "group": "Terrain",
+      "label": "3D terrain (the Heights)",
+      "geojson": "",
+      "source_url": "Mapzen / AWS Terrain Tiles (terrarium raster-DEM)",
+      "style": {
+        "terrain": true
+      },
+      "visible_default": false,
+      "note": "Toggles real 3D relief + hillshade; best with a tilted camera"
+    },
+    {
+      "id": "siege_overlay",
+      "group": "Tactical",
+      "label": "Siege \u2014 held/blown crossings",
+      "geojson": "siege_overlay.geojson",
+      "source_url": "derived: the crossings as chokepoints West holds or blows",
+      "style": {
+        "point": "#7b241c",
+        "pointRadius": 8,
+        "line": "#3a2f1d",
+        "lineWidth": 1.5
+      },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "city_pois",
+      "group": "Landmarks",
+      "label": "City landmarks (187, by category)",
+      "geojson": "city_pois.geojson",
+      "source_url": "OpenStreetMap contributors (ODbL) \u2014 strategic named features citywide",
+      "style": {
+        "point": "#3a2f1d",
+        "pointRadius": 4,
+        "categoryColors": true
+      },
+      "visible_default": false,
+      "note": "187 real named POIs (medical, education, government, power, water, transport, logistics, public safety, worship, comms, fuel, military), banked West/East/Contested."
+    },
+    {
+      "id": "buildings_3d",
+      "group": "Terrain",
+      "label": "Downtown buildings (3D, lidar height)",
+      "geojson": "downtown_bldgs_h.geojson",
+      "source_url": "USGS 3DEP lidar (NH_Coastal_2019); nDSM = DSM \u2212 ground DTM per OSM footprint",
+      "style": {
+        "extrude": true,
+        "fill": "#bf9b6a"
+      },
+      "visible_default": false,
+      "note": "1,273 downtown footprints extruded to their real lidar-derived height \u2014 tilt with the 3D button to see the city rise."
+    },
+    {
+      "id": "forest",
+      "group": "Land cover",
+      "label": "Forest / woodland",
+      "geojson": "forest.geojson",
+      "source_url": "OpenStreetMap natural=wood / landuse=forest",
+      "style": { "fill": "#5f7350", "fillOpacity": 0.4, "line": "#4f6044", "lineWidth": 0.3 },
+      "visible_default": false,
+      "note": "Tree cover \u2014 concealment and cover that shapes movement and observation."
+    },
+    {
+      "id": "water_bodies",
+      "group": "Land cover",
+      "label": "Lakes, ponds & reservoirs",
+      "geojson": "water_bodies.geojson",
+      "source_url": "City of Concord GIS / USGS NHD",
+      "style": { "fill": "#3f6f8c", "fillOpacity": 0.75, "line": "#2c5066", "lineWidth": 0.4 },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "streams",
+      "group": "Land cover",
+      "label": "Streams & brooks",
+      "geojson": "streams.geojson",
+      "source_url": "USGS NHD flowlines",
+      "style": { "line": "#4a7e96", "lineWidth": 0.6 },
+      "visible_default": false,
+      "note": ""
+    },
+    {
+      "id": "roads_major",
+      "group": "Transport",
+      "label": "Major roads (arterials)",
+      "geojson": "roads_major.geojson",
+      "source_url": "OpenStreetMap (motorway/trunk/primary/secondary)",
+      "style": { "line": "#6e5a38", "lineWidth": 1.2 },
+      "visible_default": false,
+      "note": "The arterial network \u2014 how force and supply actually move."
+    },
+    {
+      "id": "roads_minor",
+      "group": "Transport",
+      "label": "Local road network",
+      "geojson": "roads_minor.geojson",
+      "source_url": "OpenStreetMap (tertiary/residential/unclassified)",
+      "style": { "line": "#998663", "lineWidth": 0.4 },
+      "visible_default": false,
+      "note": "1,845 local streets \u2014 the urban fabric of both banks."
+    },
+    {
+      "id": "allied_towns",
+      "group": "Strategic",
+      "label": "Allied towns (by bank)",
+      "geojson": "allied_towns.geojson",
+      "source_url": "derived: longest shared border with West vs East (proximity tiebreak)",
+      "style": { "colorBy": "side", "fillOpacity": 0.3, "line": "#3a2f1d", "lineWidth": 1 },
+      "visible_default": false,
+      "note": "Each bordering town allies with the bank it shares the most boundary with: West = Bow, Hopkinton, Webster, Boscawen, Dunbarton; East = Pembroke, Chichester, Loudon, Canterbury, Epsom, Allenstown."
+    },
+    {
+      "id": "neighborhoods",
+      "group": "Tactical",
+      "label": "Neighborhoods under fire",
+      "geojson": "neighborhoods.geojson",
+      "source_url": "derived: Voronoi neighborhoods \u00d7 East viewshed exposure",
+      "style": { "colorBy": "exposure", "fillOpacity": 0.5, "line": "#3a2f1d", "lineWidth": 0.6 },
+      "visible_default": false,
+      "note": "Named neighborhoods shaded by how much of each lies inside the East's line-of-sight fire: heavy / partial / sheltered."
+    },
+    {
+      "id": "artillery_rings",
+      "group": "Tactical",
+      "label": "Artillery range rings (East battery)",
+      "geojson": "artillery_rings.geojson",
+      "source_url": "derived: 2/4/6/8 km from the NHARNG armory firing position",
+      "style": { "line": "#7a1f14", "lineWidth": 1.1 },
+      "visible_default": false,
+      "note": "Concentric range bands from the East's gun line."
+    }
+  ]
+}

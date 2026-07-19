@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "resources_medical",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "name": "Concord Hospital", "category": "medical", "side": "W", "actual_side": "W", "note": "Level II trauma + helipad, 295 beds", "src": "census" }, "geometry": { "type": "Point", "coordinates": [ -71.559752431833004, 43.196056513232001 ] } },
+{ "type": "Feature", "properties": { "name": "NH Hospital (psychiatric)", "category": "medical", "side": "W", "actual_side": "W", "note": "~168 locked beds", "src": "fallback" }, "geometry": { "type": "Point", "coordinates": [ -71.5447, 43.1928 ] } }
+]
+}

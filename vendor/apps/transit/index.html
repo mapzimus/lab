@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>US Fantasy Transit Network — Viewer</title>
+<meta name="description" content="Interactive viewer for a four-tier fantasy transit network across North America — an HSR spine, regional hubs, metro systems, and every Census town plotted as a node. Toggle tiers; search flies to any town." />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg:#0a0e17; --panel:rgba(22,29,47,0.94); --panel-2:rgba(15,21,35,0.95);
+    --border:#2a3550; --ink:#e8ecf4; --muted:#9aa3b7;
+    --amber:#fbbf24; --indigo:#a5b4fc;
+    --t1:#fbbf24; /* HSR hub          */
+    --t2:#a5b4fc; /* regional hub     */
+    --t3:#34d399; /* metro / subway   */
+    --t4:#38bdf8; /* commuter rail    */
+    --shadow:0 6px 28px rgba(0,0,0,0.45);
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; height:100%; font-family:"Inter",system-ui,sans-serif; color:var(--ink); background:var(--bg); overflow:hidden; }
+  #map { position:absolute; inset:0; background:#0a0e17; }
+  button, input, select { font-family:inherit; }
+  button { cursor:pointer; }
+  .panel { background:var(--panel); border:1px solid var(--border); border-radius:13px; box-shadow:var(--shadow); backdrop-filter:blur(8px); }
+  .leaflet-container { background:#0a0e17; }
+  .leaflet-control-attribution { font-size:10px; background:rgba(10,14,23,0.7)!important; color:var(--muted)!important; }
+  .leaflet-control-attribution a { color:var(--indigo)!important; }
+
+  /* Title card */
+  .title-card { position:absolute; top:14px; left:14px; z-index:600; padding:13px 15px; max-width:320px; }
+  .title-card .label { font-family:"JetBrains Mono",monospace; font-size:10.5px; letter-spacing:0.18em; text-transform:uppercase; color:var(--amber); }
+  .title-card h1 { margin:5px 0 0; font-size:17px; font-weight:700; letter-spacing:-0.01em; line-height:1.15; }
+  .title-card .sub { margin:7px 0 0; font-size:11.5px; color:var(--muted); line-height:1.5; }
+
+  /* Toolbar (top-center) */
+  .toolbar { position:absolute; top:14px; left:50%; transform:translateX(-50%); z-index:650; display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center; max-width:calc(100vw - 28px); }
+  .seg { display:flex; padding:4px; gap:3px; }
+  .seg button { background:transparent; border:1px solid transparent; color:var(--muted); font-size:12px; font-weight:600; padding:7px 11px; border-radius:8px; display:flex; align-items:center; gap:6px; white-space:nowrap; }
+  .seg button:hover { color:var(--ink); }
+  .seg button.on { color:var(--ink); background:rgba(255,255,255,0.07); border-color:var(--border); }
+  .seg .dot { width:10px; height:10px; border-radius:50%; flex:none; box-shadow:0 0 0 2px rgba(0,0,0,0.35); }
+  .seg button:not(.on) .dot { opacity:.35; }
+  .nodes-glyph { width:11px; height:11px; flex:none; border-radius:2px;
+    background:radial-gradient(currentColor 1.4px, transparent 1.6px) 0 0 / 5px 5px; opacity:.85; }
+
+  /* Sidebar */
+  .sidebar { position:absolute; top:14px; right:14px; bottom:14px; z-index:640; width:300px; max-width:calc(100vw - 28px); display:flex; flex-direction:column; overflow:hidden; }
+  .sidebar .shead { padding:13px 15px 11px; border-bottom:1px solid var(--border); }
+  .sidebar .shead h2 { margin:0; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:space-between; }
+  .sidebar .shead .counts { margin-top:9px; display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+  .cbadge { text-align:center; border:1px solid var(--border); border-radius:8px; padding:6px 2px; }
+  .cbadge .n { font-family:"JetBrains Mono",monospace; font-size:16px; font-weight:600; line-height:1; }
+  .cbadge .t { font-size:8.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); margin-top:3px; }
+  .towns-bar { margin-top:10px; display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--ink); cursor:pointer; user-select:none; }
+  .towns-bar input { accent-color:var(--t4); margin:0; cursor:pointer; }
+  .towns-bar .dot { width:8px; height:8px; border-radius:50%; flex:none; }
+  .towns-bar b { margin-left:auto; font-family:"JetBrains Mono",monospace; font-weight:500; color:var(--muted); font-size:10.5px; }
+  .mileage { margin-top:8px; font-family:"JetBrains Mono",monospace; font-size:10px; color:var(--muted); display:flex; flex-wrap:wrap; gap:3px 6px; align-items:center; }
+  .srch { margin-top:9px; position:relative; }
+  .srch input { width:100%; background:var(--panel-2); border:1px solid var(--border); border-radius:8px; color:var(--ink); font-size:12px; padding:7px 9px; outline:none; }
+  .srch input:focus { border-color:var(--indigo); }
+  .srch input::placeholder { color:var(--muted); opacity:0.7; }
+  .srch-results { position:absolute; top:calc(100% + 4px); left:0; right:0; z-index:30; background:var(--panel-2); border:1px solid var(--border); border-radius:9px; overflow:hidden; display:none; box-shadow:var(--shadow); }
+  .srch-results.show { display:block; }
+  .srch-row { display:flex; align-items:center; gap:7px; padding:7px 9px; font-size:12px; cursor:pointer; }
+  .srch-row:hover, .srch-row.top { background:rgba(255,255,255,0.06); }
+  .srch-row .snm { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .srch-row .sst { color:var(--muted); font-size:10.5px; flex:none; }
+  .srch-row .spop { margin-left:auto; font-family:"JetBrains Mono",monospace; font-size:10px; color:var(--muted); flex:none; }
+  .node-list { overflow-y:auto; flex:1; padding:8px 8px 4px; }
+  .grp-head { font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); padding:10px 8px 5px; display:flex; align-items:center; gap:7px; }
+  .grp-head .dot { width:9px; height:9px; border-radius:50%; flex:none; }
+  .nrow { display:grid; grid-template-columns:1fr auto; gap:8px; padding:7px 8px; border-radius:8px; font-size:12.5px; align-items:center; cursor:pointer; }
+  .nrow:hover { background:rgba(255,255,255,0.05); }
+  .nrow .nm { font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .nrow .co { font-family:"JetBrains Mono",monospace; font-size:9.5px; color:var(--muted); }
+  .empty { color:var(--muted); font-size:12px; text-align:center; padding:26px 16px; line-height:1.6; }
+
+  /* Sidebar footer actions */
+  .sfoot { border-top:1px solid var(--border); padding:11px; display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+  .sfoot button { background:var(--panel-2); border:1px solid var(--border); color:var(--ink); font-size:12px; font-weight:600; padding:9px 8px; border-radius:8px; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .sfoot button:hover { border-color:var(--indigo); }
+  .sfoot button.wide { grid-column:1 / -1; }
+
+  /* Toast */
+  .toast { position:absolute; bottom:18px; left:50%; transform:translateX(-50%) translateY(20px); z-index:800; background:var(--panel); border:1px solid var(--border); color:var(--ink); padding:10px 16px; border-radius:10px; font-size:12.5px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:all .22s; max-width:calc(100vw - 40px); }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* Marker labels */
+  .node-tip { font-family:"Inter",sans-serif !important; font-size:11px; font-weight:600; }
+
+  /* Bottom-sheet handle (mobile only) */
+  .sheet-handle { display:none; align-items:center; justify-content:center; gap:9px; width:100%;
+    min-height:54px; background:transparent; border:none; color:var(--ink); font-size:13px;
+    font-weight:600; border-bottom:1px solid var(--border); }
+  .sheet-handle .chev { transition:transform .28s; font-size:15px; color:var(--muted); }
+  .sheet-handle .hsum { font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--muted); font-weight:500; }
+
+  @media (max-width:720px){
+    .title-card { display:none; }                 /* map first on phones */
+    .toolbar { top:10px; }
+    .seg button { padding:11px 12px; font-size:13px; }
+    .seg .tname { display:none; }                 /* short tier labels on phones */
+    .leaflet-control-zoom { display:none; }       /* pinch-zoom is native */
+
+    /* sidebar becomes a collapsible bottom sheet, collapsed by default */
+    .sidebar { top:auto; bottom:0; left:0; right:0; width:auto; max-width:none; height:60vh;
+      border-radius:16px 16px 0 0; border-bottom:none;
+      transform:translateY(0); transition:transform .28s cubic-bezier(.4,0,.2,1); }
+    .sidebar.collapsed { transform:translateY(calc(100% - 55px)); }
+    .sheet-handle { display:flex; }
+    .sidebar.collapsed .sheet-handle .chev { transform:rotate(180deg); }
+
+    /* comfortable touch targets */
+    .sfoot button { min-height:44px; }
+    .nrow { padding:11px 8px; }
+    .srch input { padding:11px 10px; font-size:13px; }
+    .towns-bar { min-height:32px; }
+
+    .toast { bottom:auto; top:74px; }
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<div class="title-card panel">
+  <div class="label">Fantasy Transit · Network Map</div>
+  <h1>US Network — Viewer</h1>
+  <div class="sub">The auto-generated four-tier network: an HSR spine, regional hubs (plus lighter <b>2b</b> promoted cities), gap-driven metro systems, and a commuter web linking every town to at least two neighbors. Click <b>T1–T4</b> to show or hide a tier; search flies to any town.</div>
+</div>
+
+<div class="toolbar">
+  <div class="seg panel" id="tierSeg">
+    <button data-tier="1" class="on" aria-pressed="true" aria-label="Toggle tier 1 · HSR" title="Show / hide HSR"><span class="dot" style="background:var(--t1)"></span>T1<span class="tname"> · HSR</span></button>
+    <button data-tier="2" class="on" aria-pressed="true" aria-label="Toggle tier 2 · Regional (includes 2b promoted cities)" title="Show / hide regional — includes the lighter 2b promoted cities"><span class="dot" style="background:var(--t2)"></span><span class="dot" style="background:#cdd6fe;width:7px;height:7px;margin-left:-3px"></span>T2<span class="tname"> · Regional</span></button>
+    <button data-tier="3" class="on" aria-pressed="true" aria-label="Toggle tier 3 · Metro" title="Show / hide metro"><span class="dot" style="background:var(--t3)"></span>T3<span class="tname"> · Metro</span></button>
+    <button data-tier="4" class="on" aria-pressed="true" aria-label="Toggle tier 4 · Commuter layers" title="Show / hide the commuter towns + lines"><span class="dot" style="background:var(--t4)"></span>T4<span class="tname"> · Commuter</span></button>
+  </div>
+  <div class="seg panel" id="viewSeg">
+    <button id="nodesOnlyBtn" aria-pressed="false" aria-label="Nodes-only view — hide every line" title="Hide all lines (across every tier) to study just the node placement"><span class="nodes-glyph"></span>Nodes<span class="tname"> only</span></button>
+  </div>
+</div>
+
+<div class="sidebar panel" id="sidebar">
+  <button class="sheet-handle" id="sheetHandle" aria-label="Expand or collapse the network panel">
+    <span class="chev">▾</span><span>Network</span><span class="hsum" id="handleSum"></span>
+  </button>
+  <div class="shead">
+    <h2>Network <span style="font-weight:500;color:var(--muted);font-size:11px;" id="totalCount"></span></h2>
+    <div class="counts">
+      <div class="cbadge"><div class="n" style="color:var(--t1)" id="c1">0</div><div class="t">HSR</div></div>
+      <div class="cbadge"><div class="n" style="color:var(--t2)" id="c2">0</div><div class="t">Regional</div></div>
+      <div class="cbadge"><div class="n" style="color:var(--t3)" id="c3">0</div><div class="t">Metro</div></div>
+      <div class="cbadge" title="Tier-4 town nodes (see the Tier-4 towns layer)"><div class="n" style="color:var(--t4)" id="c4">…</div><div class="t">Towns</div></div>
+    </div>
+    <div class="mileage" id="mileage" style="display:none"></div>
+    <label class="towns-bar" title="Every US Census place — incorporated towns and CDPs, plus New England MCD towns. Dot size scales with population.">
+      <input type="checkbox" id="townsChk" checked />
+      <span class="dot" style="background:var(--t4)"></span>
+      <span>Tier-4 towns</span>
+      <b id="townsCount">…</b>
+    </label>
+    <label class="towns-bar" title="The tier-4 commuter web — every town connects to at least 2 neighbors (islands and edges excepted).">
+      <input type="checkbox" id="linesChk" checked />
+      <span class="dot" style="background:var(--t4)"></span>
+      <span>Tier-4 lines</span>
+      <b id="linesCount">…</b>
+    </label>
+    <div class="srch">
+      <input id="townSearch" type="search" placeholder="Find a town… (Enter flies to top hit)" autocomplete="off" spellcheck="false" />
+      <div class="srch-results" id="srchResults"></div>
+    </div>
+  </div>
+  <div class="node-list" id="nodeList"></div>
+  <div class="sfoot">
+    <button class="wide" id="btnFit">⤢ Fit view</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+/* ------------------------------------------------------------------ *
+ * US Fantasy Transit Network — read-only viewer.
+ * Renders data/network.json (generated by scripts/build_network.py):
+ * the four-tier network plus the towns and commuter-web layers.
+ * ------------------------------------------------------------------ */
+
+const STORE_KEY = 'fantasy-transit-network-v1';
+
+const TIERS = {
+  1: { name:'HSR Hub',       color:'#fbbf24', radius:9 },
+  2: { name:'Regional Hub',  color:'#a5b4fc', radius:7 },
+  3: { name:'Metro / Subway',color:'#34d399', radius:5 },
+  4: { name:'Commuter Rail', color:'#38bdf8', radius:4 },
+};
+/* tier 2b: important cities promoted into tier 2 by the generator (sub='2b')
+   — same family as T2 but lighter and smaller so the two waves read apart */
+const T2B = { name:'Regional Hub · 2b', color:'#cdd6fe', radius:5 };
+
+/* ---- state ---- */
+let state = { name:'US Fantasy Transit Network', nodes:[], edges:[] };
+const tierVisible = { 1:true, 2:true, 3:true, 4:true };   // legend toggles
+
+/* ---- map ---- */
+const map = L.map('map', { zoomControl:true, attributionControl:true, worldCopyJump:true, preferCanvas:true })
+  .setView([39.5, -98.35], 4);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  subdomains:'abcd', maxZoom:19,
+  attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a> &middot; towns: US Census'
+}).addTo(map);
+
+/* dedicated panes: tier-4 renders under the tier 1-3 network — the commuter
+   web lines sit below the town dots */
+map.createPane('towns'); map.getPane('towns').style.zIndex = 250;
+map.createPane('t4lines'); map.getPane('t4lines').style.zIndex = 240;
+let townsGeo = null, townCount = 0, townsLoadStarted = false;
+let townsShown = localStorage.getItem(STORE_KEY + ':towns') !== '0';
+let linesGeo = null, lineCount = 0, linesLoadStarted = false;
+let linesShown = localStorage.getItem(STORE_KEY + ':t4lines') !== '0';
+let nodesOnly = localStorage.getItem(STORE_KEY + ':nodesonly') === '1';   // hide ALL lines, every tier
+
+/* Bulk canvas layer: draws tens of thousands of static features in a single
+   pass per view change, instead of one Leaflet layer object per feature
+   (which takes ~20s to construct for the 37k reference features). */
+const BulkCanvas = L.Layer.extend({
+  initialize(pane, draw){ this._paneName = pane; this._drawFn = draw; },
+  onAdd(map){
+    this._map = map;
+    const c = this._canvas = L.DomUtil.create('canvas', 'leaflet-layer');
+    c.style.position = 'absolute';
+    map.getPane(this._paneName).appendChild(c);
+    map.on('moveend zoomend viewreset resize', this._redraw, this);
+    map.on('zoomanim', this._animateZoom, this);
+    this._redraw();
+    return this;
+  },
+  onRemove(map){
+    map.getPane(this._paneName).removeChild(this._canvas);
+    map.off('moveend zoomend viewreset resize', this._redraw, this);
+    map.off('zoomanim', this._animateZoom, this);
+  },
+  _redraw(){
+    const map = this._map, size = map.getSize(), c = this._canvas;
+    const dpr = window.devicePixelRatio || 1;
+    c.width = size.x * dpr; c.height = size.y * dpr;
+    c.style.width = size.x + 'px'; c.style.height = size.y + 'px';
+    L.DomUtil.setPosition(c, map.containerPointToLayerPoint([0, 0]));
+    const ctx = c.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, size.x, size.y);
+    this._drawFn(ctx, map, size);
+  },
+  _animateZoom(e){
+    const scale = this._map.getZoomScale(e.zoom);
+    const offset = this._map._latLngBoundsToNewLayerBounds(this._map.getBounds(), e.zoom, e.center).min;
+    L.DomUtil.setTransform(this._canvas, offset, scale);
+  },
+});
+
+const edgeLayer = L.layerGroup().addTo(map);
+const nodeLayer = L.layerGroup().addTo(map);
+const markers = {};   // id -> L.circleMarker
+
+/* ------------------------------------------------------------------ *
+ *  tier-4 "every town" base layer — every US Census town (~33k; see
+ *  data/towns.geojson, built by scripts/build_towns.py). Reference
+ *  context only: canvas-rendered and non-interactive — the search box
+ *  flies to towns; they are not part of the network graph itself.
+ * ------------------------------------------------------------------ */
+let townsData = [];   // flat {name, st, pop, geoid, lat, lng} for search
+
+function townRadius(pop){
+  if (!pop) return 1.6;
+  if (pop >= 500000) return 4.4;
+  if (pop >= 100000) return 3.6;
+  if (pop >= 25000)  return 2.8;
+  if (pop >= 5000)   return 2.2;
+  return 1.7;
+}
+
+async function loadTowns(){
+  if (townsLoadStarted) return;   // already fetched (or in flight) — cached, never refetch
+  townsLoadStarted = true;
+  toast('Loading towns…');
+  try {
+    const r = await fetch('data/towns.geojson');
+    if (!r.ok) throw new Error('http ' + r.status);
+    const gj = await r.json();
+    townCount = gj.features.length;
+    townsData = gj.features.map(f => ({
+      name:f.properties.name, st:f.properties.st, pop:f.properties.pop || 0,
+      geoid:f.properties.geoid, lng:f.geometry.coordinates[0], lat:f.geometry.coordinates[1]
+    }));
+    // three opacity buckets so each draw pass sets style once
+    const buckets = [
+      { alpha:0.9,  pts: townsData.filter(t => t.pop >= 100000) },
+      { alpha:0.75, pts: townsData.filter(t => t.pop >= 25000 && t.pop < 100000) },
+      { alpha:0.6,  pts: townsData.filter(t => t.pop < 25000) },
+    ];
+    // Guam / far-Aleutian towns (lng > 0) also draw on the Americas world
+    // copy, matching the network layer's dateline ghosting
+    buckets.forEach(b => {
+      b.pts = b.pts.concat(b.pts.filter(t => t.lng > 0).map(t => ({ ...t, lng: t.lng - 360 })));
+    });
+    townsGeo = new BulkCanvas('towns', (ctx, m, size) => {
+      ctx.fillStyle = TIERS[4].color;
+      for (const b of buckets){
+        ctx.globalAlpha = b.alpha;
+        ctx.beginPath();
+        for (const t of b.pts){
+          const p = m.latLngToContainerPoint([t.lat, t.lng]);
+          if (p.x < -8 || p.y < -8 || p.x > size.x + 8 || p.y > size.y + 8) continue;
+          const rad = townRadius(t.pop);
+          ctx.moveTo(p.x + rad, p.y);
+          ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
+        }
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    });
+    if (townsShown) townsGeo.addTo(map);
+    updateTownsUI();
+    toast(`Loaded ${townCount.toLocaleString()} town nodes`);
+  } catch(e){
+    townsLoadStarted = false;   // allow a retry on the next toggle/search
+    toast('Could not load towns');
+  }
+}
+function updateTownsUI(){
+  const chk = $('#townsChk'), lbl = $('#townsCount');
+  if (chk) chk.checked = townsShown;
+  if (lbl) lbl.textContent = townCount ? townCount.toLocaleString() + ' towns' : '—';
+  const c4 = $('#c4');
+  if (c4) c4.textContent = townCount ? townCount.toLocaleString() : '…';
+  syncT4Button();
+}
+/* the T4 legend button mirrors + drives the two tier-4 layers */
+function syncT4Button(){
+  const b = $('#tierSeg [data-tier="4"]'), on = townsShown || linesShown;
+  if (b){ b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }
+}
+function toggleTowns(on){
+  townsShown = on;
+  localStorage.setItem(STORE_KEY + ':towns', on ? '1' : '0');
+  if (on){ if (townsGeo) townsGeo.addTo(map); else loadTowns(); }   // first enable → fetch; later enables reuse the cached layer
+  else if (townsGeo) map.removeLayer(townsGeo);
+  syncT4Button();
+}
+
+/* ------------------------------------------------------------------ *
+ *  tier-4 commuter web — the connecting lines between town nodes
+ *  (data/tier4_links.geojson, generated by scripts/build_network.py:
+ *  a relative neighborhood graph where every town links to >= 2
+ *  neighbors except islands/edges). Canvas-drawn, non-interactive.
+ * ------------------------------------------------------------------ */
+let lineSegs = null;   // Float64Array [lat1,lng1,lat2,lng2, …]
+
+async function loadT4Lines(){
+  if (linesLoadStarted) return;   // already fetched (or in flight) — cached, never refetch
+  linesLoadStarted = true;
+  try {
+    const r = await fetch('data/tier4_links.geojson');
+    if (!r.ok) throw new Error('http ' + r.status);
+    const gj = await r.json();
+    lineCount = gj.features.length;
+    const segs = [];
+    gj.features.forEach(f => {
+      const [a, b] = f.geometry.coordinates;
+      segs.push(a[1], a[0], b[1], b[0]);
+      if (a[0] > 0 || b[0] > 0)                       // dateline ghost (Guam web)
+        segs.push(a[1], a[0] - 360, b[1], b[0] - 360);
+    });
+    lineSegs = Float64Array.from(segs);
+    const drawCount = lineSegs.length / 4;
+    linesGeo = new BulkCanvas('t4lines', (ctx, m, size) => {
+      ctx.strokeStyle = TIERS[4].color;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.32;
+      ctx.beginPath();
+      for (let i = 0; i < drawCount; i++){
+        const p = m.latLngToContainerPoint([lineSegs[i*4], lineSegs[i*4+1]]);
+        const q = m.latLngToContainerPoint([lineSegs[i*4+2], lineSegs[i*4+3]]);
+        if ((p.x < -40 && q.x < -40) || (p.y < -40 && q.y < -40) ||
+            (p.x > size.x + 40 && q.x > size.x + 40) ||
+            (p.y > size.y + 40 && q.y > size.y + 40)) continue;   // both ends off-screen
+        ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+      }
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    });
+    if (linesShown) linesGeo.addTo(map);
+    updateLinesUI();
+  } catch(e){
+    linesLoadStarted = false;   // allow a retry on the next toggle
+    toast('Could not load commuter lines');
+  }
+}
+function updateLinesUI(){
+  const chk = $('#linesChk'), lbl = $('#linesCount');
+  if (chk) chk.checked = linesShown;
+  if (lbl) lbl.textContent = lineCount ? lineCount.toLocaleString() + ' links' : '—';
+  syncT4Button();
+}
+function toggleLines(on){
+  linesShown = on;
+  localStorage.setItem(STORE_KEY + ':t4lines', on ? '1' : '0');
+  // in nodes-only view the commuter web stays off the map; we still remember
+  // the preference and restore it when nodes-only is turned back off
+  if (on){ if (nodesOnly){ /* deferred */ } else if (linesGeo) linesGeo.addTo(map); else loadT4Lines(); }
+  else if (linesGeo) map.removeLayer(linesGeo);
+  syncT4Button();
+}
+
+/* nodes-only view: hide every line (tier 1-3 edges + the tier-4 commuter web)
+   while keeping all node dots, so the node placement can be judged without
+   line clutter — the fix for "hard to pick nodes when the lines are drawn" */
+function applyNodesOnly(){
+  const btn = $('#nodesOnlyBtn');
+  if (btn){ btn.classList.toggle('on', nodesOnly); btn.setAttribute('aria-pressed', String(nodesOnly)); }
+  if (nodesOnly){
+    map.removeLayer(edgeLayer);
+    if (linesGeo) map.removeLayer(linesGeo);
+  } else {
+    edgeLayer.addTo(map);
+    if (linesShown){ if (linesGeo) linesGeo.addTo(map); else if (!linesLoadStarted) loadT4Lines(); }
+  }
+}
+function toggleNodesOnly(){
+  nodesOnly = !nodesOnly;
+  localStorage.setItem(STORE_KEY + ':nodesonly', nodesOnly ? '1' : '0');
+  applyNodesOnly();
+  toast(nodesOnly ? 'Nodes-only view — all lines hidden' : 'Lines shown');
+}
+
+
+/* ---- helpers ---- */
+const $ = s => document.querySelector(s);
+const byId = id => state.nodes.find(n => n.id === id);
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200); }
+function fmt(n){ return Number(n).toFixed(4); }
+
+function havMi(a, b){
+  const R = 3958.761, d = Math.PI/180;
+  const s = Math.sin((b.lat-a.lat)*d/2)**2
+          + Math.cos(a.lat*d)*Math.cos(b.lat*d)*Math.sin((b.lng-a.lng)*d/2)**2;
+  return 2*R*Math.asin(Math.sqrt(s));
+}
+
+/* ------------------------------------------------------------------ *
+ *  render
+ * ------------------------------------------------------------------ */
+function nodeMarker(n){
+  const t = TIERS[n.tier];
+  const is2b = n.sub === '2b';
+  const radius = is2b ? T2B.radius : t.radius;
+  const m = L.circleMarker([n.lat, n.lng], {
+    radius, color:'#0a0e17', weight:2,
+    fillColor: is2b ? T2B.color : t.color, fillOpacity:0.95
+  });
+  m.bindTooltip(is2b ? `${n.name} · 2b` : n.name,
+    { direction:'top', offset:[0,-radius-2], className:'node-tip', opacity:0.95 });
+  m.on('click', (ev) => { L.DomEvent.stop(ev); map.flyTo([n.lat, n.lng], Math.max(map.getZoom(), 6)); });
+  return m;
+}
+
+function edgeLine(e, shift = 0){
+  const a = byId(e.from), b = byId(e.to);
+  if (!a || !b) return null;
+  const t = TIERS[e.tier];
+  const dashed = e.tier >= 3;
+  // antimeridian: draw Pacific crossings the short way (Guam–Honolulu,
+  // Attu–Adak), not the long way around through Europe. shift=0 draws on
+  // the Americas world copy; shift=360 duplicates it on the eastern copy.
+  let aLng = a.lng, bLng = b.lng;
+  if (Math.abs(aLng - bLng) > 180){
+    if (aLng > bLng) aLng -= 360; else bLng -= 360;
+  }
+  const is2b = e.sub === '2b' && e.tier === 2;
+  return L.polyline([[a.lat,aLng+shift],[b.lat,bLng+shift]], {
+    color: is2b ? T2B.color : t.color,
+    weight: e.tier===1?3.5 : e.tier===2?(is2b?1.6:2.5) : 1.8,
+    opacity: is2b ? 0.6 : 0.7, dashArray: dashed ? '4 5' : null
+  });
+}
+
+function renderAll(){
+  edgeLayer.clearLayers(); nodeLayer.clearLayers();
+  for (const k in markers) delete markers[k];
+
+  const tierOf = {};
+  state.nodes.forEach(n => tierOf[n.id] = n.tier);
+  state.edges.forEach(e => {
+    // an edge needs its own tier AND both endpoint tiers visible — a T1↔T2
+    // link is tier 2, so hiding T1 would otherwise leave it dangling at an
+    // invisible hub marker
+    if (!tierVisible[e.tier] || !tierVisible[tierOf[e.from]] || !tierVisible[tierOf[e.to]]) return;
+    const l = edgeLine(e); if (l) l.addTo(edgeLayer);
+    const a = byId(e.from), b = byId(e.to);
+    if (a && b && Math.abs(a.lng - b.lng) > 180){   // dateline crossers exist on both copies
+      const twin = edgeLine(e, 360); if (twin) twin.addTo(edgeLayer);
+    }
+  });
+  state.nodes.forEach(n => {
+    if (!tierVisible[n.tier]) return;
+    const m = nodeMarker(n); m.addTo(nodeLayer); markers[n.id]=m;
+    if (n.lng > 0){                                  // Guam / far Aleutians: ghost on the Americas copy
+      nodeMarker({ ...n, lng: n.lng - 360 }).addTo(nodeLayer);
+    }
+  });
+
+  renderSidebar();
+}
+
+function renderSidebar(){
+  const counts = {1:0,2:0,3:0,4:0};
+  state.nodes.forEach(n => counts[n.tier]++);
+  [1,2,3].forEach(t => $('#c'+t).textContent = counts[t]);   // #c4 shows town-node count (updateTownsUI)
+  $('#totalCount').textContent = `· ${state.nodes.length} nodes · ${state.edges.length} links`;
+  $('#handleSum').textContent = `${state.nodes.length.toLocaleString()} nodes`;
+
+  const miles = {1:0,2:0,3:0,4:0};
+  state.edges.forEach(e => {
+    const a = byId(e.from), b = byId(e.to);
+    if (a && b) miles[e.tier] += havMi(a, b);
+  });
+  const mi = $('#mileage');
+  const parts = [1,2,3,4].filter(t => miles[t] >= 0.5)
+    .map(t => `<span style="color:${TIERS[t].color}">T${t}</span> ${Math.round(miles[t]).toLocaleString()} mi`);
+  mi.innerHTML = parts.join(' <span style="opacity:.4">·</span> ');
+  mi.style.display = parts.length ? 'flex' : 'none';
+
+  const list = $('#nodeList');
+  if (!state.nodes.length){
+    list.innerHTML = '<div class="empty">Network data unavailable.<br>Could not load data/network.json.</div>';
+    return;
+  }
+  let html = '';
+  for (const tier of [1,2,3,4]){
+    if (!tierVisible[tier]) continue;
+    const t = TIERS[tier];
+    const groups = tier === 2
+      ? [[t.name, t.color, state.nodes.filter(n => n.tier === 2 && n.sub !== '2b')],
+         [T2B.name, T2B.color, state.nodes.filter(n => n.tier === 2 && n.sub === '2b')]]
+      : [[t.name, t.color, state.nodes.filter(n => n.tier === +tier)]];
+    for (const [gname, gcolor, group] of groups){
+      if (!group.length) continue;
+      html += `<div class="grp-head"><span class="dot" style="background:${gcolor}"></span>${gname} · ${group.length}</div>`;
+      group.forEach(n => {
+        html += `<div class="nrow" data-id="${n.id}" role="button" tabindex="0">
+          <div style="overflow:hidden">
+            <div class="nm">${escapeHtml(n.name)}</div>
+            <div class="co">${fmt(n.lat)}, ${fmt(n.lng)}</div>
+          </div>
+        </div>`;
+      });
+    }
+  }
+  list.innerHTML = html;
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* keyboard: Enter/Space activates the focused list or search row */
+for (const sel of ['#nodeList', '#srchResults']){
+  $(sel).addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const row = e.target.closest('[role="button"]'); if (!row) return;
+    e.preventDefault(); row.click();
+  });
+}
+
+/* sidebar row events (delegated): tap a row to fly there */
+$('#nodeList').addEventListener('click', (ev) => {
+  const row = ev.target.closest('.nrow'); if (!row) return;
+  const id = row.dataset.id;
+  const n = byId(id); if (n){ map.flyTo([n.lat,n.lng], Math.max(map.getZoom(),6)); markers[id]&&markers[id].openTooltip(); collapseSheetOnMobile(); }
+});
+
+function fromGeoJSON(gj){
+  if (!gj || gj.type !== 'FeatureCollection' || !Array.isArray(gj.features)) throw new Error('Not a FeatureCollection');
+  const nodes = [], edges = [];
+  gj.features.forEach(f => {
+    const p = f.properties || {}, g = f.geometry || {};
+    if (g.type === 'Point' && p.kind !== 'edge'){
+      const [lng,lat] = g.coordinates;
+      nodes.push({ id:p.id||('n'+(nodes.length+1)), name:p.name||'Node', tier:+p.tier||1, lat, lng, parent:p.parent||null, sub:p.sub||null,
+                   geoid:p.geoid||null, pop:(p.pop != null ? +p.pop : null) });
+    } else if (g.type === 'LineString' && p.kind !== 'node'){
+      if (p.from && p.to) edges.push({ id:p.id||('e'+(edges.length+1)), from:p.from, to:p.to, tier:+p.tier||1, sub:p.sub||null });
+    }
+  });
+  return { name:gj.name || 'US Fantasy Transit Network', nodes, edges };
+}
+
+$('#townsChk').addEventListener('change', e => toggleTowns(e.target.checked));
+$('#linesChk').addEventListener('change', e => toggleLines(e.target.checked));
+$('#nodesOnlyBtn').addEventListener('click', toggleNodesOnly);
+
+/* mobile bottom sheet: collapsed by default so the map owns the screen */
+const sheetMq = window.matchMedia('(max-width:720px)');
+if (sheetMq.matches) $('#sidebar').classList.add('collapsed');
+$('#sheetHandle').addEventListener('click', () => $('#sidebar').classList.toggle('collapsed'));
+/* tapping a list row or search result should reveal the map again */
+function collapseSheetOnMobile(){ if (sheetMq.matches) $('#sidebar').classList.add('collapsed'); }
+
+/* ------------------------------------------------------------------ *
+ *  town search — fly to any of the ~33k towns
+ * ------------------------------------------------------------------ */
+let srchHits = [];
+
+function fmtPop(p){
+  if (!p) return '';
+  return p >= 1e6 ? (p/1e6).toFixed(1)+'M' : p >= 1e3 ? Math.round(p/1e3)+'k' : String(p);
+}
+
+function closeSearch(){
+  $('#townSearch').value = ''; $('#townSearch').blur(); srchHits = [];
+  $('#srchResults').classList.remove('show'); $('#srchResults').innerHTML = '';
+}
+
+function runSearch(){
+  const box = $('#srchResults');
+  const q = $('#townSearch').value.trim().toLowerCase();
+  if (q.length < 2){ box.classList.remove('show'); box.innerHTML = ''; srchHits = []; return; }
+  if (!townsData.length){
+    box.innerHTML = '<div class="srch-row"><span class="sst">town data still loading…</span></div>';
+    box.classList.add('show'); return;
+  }
+  const starts = [], contains = [];
+  for (const t of townsData){
+    const n = t.name.toLowerCase();
+    if (n.startsWith(q)) starts.push(t);
+    else if (n.includes(q)) contains.push(t);
+  }
+  const byPop = (a, b) => b.pop - a.pop;
+  srchHits = starts.sort(byPop).concat(contains.sort(byPop)).slice(0, 8);
+  if (!srchHits.length){
+    box.innerHTML = '<div class="srch-row"><span class="sst">no towns match</span></div>';
+    box.classList.add('show'); return;
+  }
+  box.innerHTML = srchHits.map((t, i) => `
+    <div class="srch-row${i===0?' top':''}" data-i="${i}" role="button" tabindex="0" title="Click to fly there">
+      <span class="snm">${escapeHtml(t.name)}</span><span class="sst">${t.st}</span>
+      <span class="spop">${fmtPop(t.pop)}</span>
+    </div>`).join('');
+  box.classList.add('show');
+}
+
+const debounce=(fn,ms)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};};
+// search works even with the towns layer toggled off — kick off the (cached)
+// fetch as soon as the user shows intent to search, not just on layer-enable
+$('#townSearch').addEventListener('focus', () => { if (!townsData.length) loadTowns(); });
+$('#townSearch').addEventListener('input', debounce(runSearch, 120));
+$('#townSearch').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && srchHits.length){ const t = srchHits[0]; map.flyTo([t.lat, t.lng], Math.max(map.getZoom(), 9)); closeSearch(); collapseSheetOnMobile(); }
+  else if (e.key === 'Escape'){ closeSearch(); e.target.blur(); e.stopPropagation(); }
+});
+$('#srchResults').addEventListener('click', e => {
+  const row = e.target.closest('.srch-row'); if (!row || row.dataset.i == null) return;
+  const t = srchHits[+row.dataset.i]; if (!t) return;
+  map.flyTo([t.lat, t.lng], Math.max(map.getZoom(), 9));
+  collapseSheetOnMobile();
+});
+
+/* ---- footer ---- */
+function fitView(){
+  if (!state.nodes.length){ map.setView([39.5,-98.35],4); return; }
+  // fit the lower 48 when possible — Alaska/Aleutian hubs would zoom us out to half the Pacific
+  const conus = state.nodes.filter(n => n.lat > 24 && n.lat < 50 && n.lng > -125 && n.lng < -66);
+  const use = conus.length >= 10 ? conus : state.nodes;
+  const b = L.latLngBounds(use.map(n => [n.lat,n.lng]));
+  map.fitBounds(b.pad(0.15));
+}
+$('#btnFit').onclick = fitView;
+
+/* ------------------------------------------------------------------ *
+ *  tier legend: click T1–T4 to show / hide that tier's nodes and lines
+ * ------------------------------------------------------------------ */
+$('#tierSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const t = +b.dataset.tier;
+  if (t === 4){
+    // the network graph has no tier-4 nodes — this button shows/hides the
+    // tier-4 LAYERS (town nodes + commuter web) and mirrors their checkboxes
+    const on = !(townsShown || linesShown);
+    toggleTowns(on); toggleLines(on);
+    updateTownsUI(); updateLinesUI();
+    return;
+  }
+  tierVisible[t] = !tierVisible[t];
+  b.classList.toggle('on', tierVisible[t]);
+  b.setAttribute('aria-pressed', String(tierVisible[t]));
+  renderAll();
+});
+
+/* ------------------------------------------------------------------ *
+ *  boot — viewer: load the committed network (data/network.json,
+ *  generated by scripts/build_network.py), render it, fit the view.
+ *  No local state; only the layer-toggle prefs persist.
+ * ------------------------------------------------------------------ */
+async function boot(){
+  try {
+    const r = await fetch('data/network.json');
+    if (!r.ok) throw new Error('http ' + r.status);
+    state = fromGeoJSON(await r.json());
+  } catch(e){
+    toast('Could not load network data');
+  }
+  renderAll(); fitView();
+  // reference layers: fetch only if their toggle is on (default or restored pref)
+  updateTownsUI(); updateLinesUI();
+  if (townsShown) loadTowns();
+  if (linesShown && !nodesOnly) loadT4Lines();
+  applyNodesOnly();   // enforce nodes-only view if it was left on
+}
+boot();
+</script>
+</body>
+</html>
