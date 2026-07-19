@@ -4,15 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Predicting Tomorrow's Housing Crisis · Mapzimus Lab</title>
-  <meta name="description" content="An interactive tract explorer for a Massachusetts housing-stress, homelessness-pressure, and supportive-housing-suitability screening model — 1,613 census tracts, all client-side.">
+  <meta name="description" content="An interactive screening-model explorer for Massachusetts housing: six tract surfaces (stress, pressure, suitability, development, trend, 2030), transit and siting overlays, and live re-weighting of the suitability index — all client-side.">
   <link rel="canonical" href="https://mapzimus.com/lab/housing-crisis/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Predicting Tomorrow's Housing Crisis · Mapzimus Lab">
-  <meta property="og:description" content="An interactive tract explorer for a Massachusetts housing-stress, homelessness-pressure, and supportive-housing-suitability screening model — 1,613 census tracts, all client-side.">
+  <meta property="og:description" content="Six switchable model surfaces over 1,613 Massachusetts census tracts, with transit and siting overlays and live suitability re-weighting.">
   <meta property="og:url" content="https://mapzimus.com/lab/housing-crisis/">
   <meta name="twitter:card" content="summary">
-  <meta name="theme-color" content="#14161c">
+  <meta name="theme-color" content="#121721">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script src="/theme.js"></script>
   <link rel="stylesheet" href="/lab/housing-crisis/vendor/maplibre-gl.css">
   <link rel="stylesheet" href="/lab/housing-crisis/housing-crisis.css">
   <script src="/lab/housing-crisis/vendor/maplibre-gl.js" defer></script>
@@ -21,31 +22,60 @@
 <body>
   <div class="top">
     <a class="back" href="/lab/">← Lab</a>
-    <div>
+    <div class="top-title">
       <span class="eyebrow">Mapzimus Lab experiment</span>
       <h1>Predicting Tomorrow's Housing Crisis</h1>
     </div>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle light/dark theme">◐</button>
   </div>
 
   <div class="wrap">
     <aside class="panel">
-      <h2>Three screening surfaces</h2>
-      <p class="hint">1,613 Massachusetts census tracts, scored 0–100 statewide.
-        Pick a surface, hover to read a tract, click to pin its details.</p>
+      <h2>Model surfaces</h2>
+      <p class="hint">1,613 Massachusetts census tracts. Pick a surface, hover to read,
+        click to pin. Drag the weights to rebuild the suitability surface live.</p>
 
-      <div class="filters" role="group" aria-label="Index layer picker">
-        <button type="button" data-metric="HSI" aria-pressed="true">housing stress</button>
-        <button type="button" data-metric="HPP" aria-pressed="false">pressure proxy</button>
+      <div class="filters" role="group" aria-label="Surface picker">
+        <button type="button" data-metric="HSI" aria-pressed="true">stress</button>
+        <button type="button" data-metric="HPP" aria-pressed="false">pressure*</button>
         <button type="button" data-metric="SUIT" aria-pressed="false">suitability</button>
+        <button type="button" data-metric="DPI" aria-pressed="false">development</button>
+        <button type="button" data-metric="TREND" aria-pressed="false">trend Δ</button>
+        <button type="button" data-metric="PROJ" aria-pressed="false">2030</button>
       </div>
 
-      <div class="legend" id="legend" aria-label="Map legend"></div>
+      <div class="legend-block">
+        <div class="legend-title" id="legendTitle"></div>
+        <div class="legend" id="legend" aria-label="Map legend"></div>
+      </div>
+
+      <fieldset class="overlays">
+        <legend>Overlays</legend>
+        <label><input type="checkbox" id="ovTransit"> MBTA rail network</label>
+        <label><input type="checkbox" id="ovSites"> Optimized sites (p=25)</label>
+        <label><input type="checkbox" id="ovTop"> Top-decile suitability</label>
+      </fieldset>
+
+      <fieldset class="weights" id="weightsBox">
+        <legend>Suitability weights <span id="customBadge" class="badge" hidden>custom</span></legend>
+        <div class="w-row"><span class="w-label">need</span>
+          <input type="range" id="wNeed" min="0" max="100" value="45" step="5">
+          <span class="w-val" id="wNeedVal">45%</span></div>
+        <div class="w-row"><span class="w-label">access</span>
+          <input type="range" id="wAccess" min="0" max="100" value="35" step="5">
+          <span class="w-val" id="wAccessVal">35%</span></div>
+        <div class="w-row"><span class="w-label">vulnerability</span>
+          <input type="range" id="wVuln" min="0" max="100" value="20" step="5">
+          <span class="w-val" id="wVulnVal">20%</span></div>
+        <button type="button" id="wReset" class="w-reset">reset to 45 / 35 / 20</button>
+      </fieldset>
 
       <dl class="readout" id="readout">
         <dt>Tract</dt><dd id="roName">hover the map</dd>
-        <dt>Housing stress</dt><dd id="roHSI">–</dd>
-        <dt>Pressure proxy</dt><dd id="roHPP">–</dd>
+        <dt>Stress</dt><dd id="roHSI">–</dd>
+        <dt>Pressure*</dt><dd id="roHPP">–</dd>
         <dt>Suitability</dt><dd id="roSUIT">–</dd>
+        <dt>Development</dt><dd id="roDPI">–</dd>
       </dl>
 
       <p class="note" id="metricNote"></p>
@@ -56,17 +86,19 @@
       </p>
     </aside>
 
-    <div class="map-frame"><div id="map" aria-label="Interactive map of Massachusetts tract indices"></div></div>
+    <div class="map-frame"><div id="map" aria-label="Interactive map of Massachusetts tract model surfaces"></div></div>
   </div>
 
   <footer>
     <p><strong>Screening model, honestly labeled:</strong> every value is an aggregate
-      tract-level indicator — never a prediction about individuals. The pressure surface is a
-      <em>proxy composite</em> of literature-based correlates (severe rent burden, poverty,
-      overcrowding, rent growth, vulnerability); observed homelessness counts exist only at
-      Continuum-of-Care level. Indices computed from ACS 2019–2023 &amp; 2009–2013, CDC/ATSDR SVI 2022,
-      MassGIS (MBTA, trains, EJ&nbsp;2020), and HUD PIT validation by the open pipeline in the
-      <a href="https://github.com/mapzimus/predicting-housing-crisis">predicting-housing-crisis</a> repo.
+      tract-level indicator — never a prediction about individuals. *The pressure surface is a
+      <em>proxy composite</em> of literature-based correlates; observed homelessness counts exist
+      only at Continuum-of-Care level. The 2030 surface is a labeled persistence extrapolation,
+      not a forecast; development probability broadcasts county permits to tracts (stated in the
+      methodology). Indices computed from ACS 2019–2023 &amp; 2009–2013, LEHD LODES 2013–2022,
+      Census BPS permits, CDC/ATSDR SVI 2022, MassGIS (MBTA, trains, EJ&nbsp;2020), and HUD PIT
+      validation by the open pipeline in
+      <a href="https://github.com/mapzimus/predicting-housing-crisis">predicting-housing-crisis</a>.
       Rendering by <a href="https://maplibre.org/">MapLibre GL JS</a> (5.6.1, self-hosted),
       tiles © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.</p>
   </footer>
