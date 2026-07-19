@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Responsive Breakpoint Previewer</title>
+<meta name="description" content="Preview a page side-by-side at multiple device widths — paste HTML or load a URL, toggle devices, rotate, zoom, and scroll all frames in sync. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 12px; font-size: .84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.small { padding: 6px 10px; font-size: .8rem; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  select, input[type=text], input[type=url], input[type=number] { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 7px 9px; font-size: .84rem; font-family: var(--sans); }
+  label.fld { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); cursor: pointer; }
+  input[type=checkbox] { accent-color: var(--accent); }
+  input[type=range] { accent-color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 12px; margin-bottom: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .row + .row { margin-top: 8px; }
+  .grouplbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 2px; align-self: center; }
+  .sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 2px; }
+  .spacer { flex: 1; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .chip { border: 1px dashed var(--border); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); border-style: solid; }
+
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+
+  /* ---- input-mode tabs ---- */
+  .tabs { display: inline-flex; border: 1px solid var(--border); border-radius: 999px; padding: 3px; background: var(--surface); gap: 4px; }
+  .tabs .tab { border: none; background: transparent; color: var(--muted); border-radius: 999px; padding: 6px 16px; font-size: .84rem; cursor: pointer; }
+  .tabs .tab[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .tabs .tab:not([aria-pressed="true"]):hover { color: var(--accent); }
+
+  textarea#htmlSrc { width: 100%; min-height: 180px; resize: vertical; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 10px 12px; font-family: var(--mono); font-size: .8rem; line-height: 1.5; tab-size: 2; }
+  textarea#htmlSrc:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .draft-note { color: var(--ok); font-size: .8rem; margin: 4px 0 0; }
+  .draft-note[hidden] { display: none; }
+
+  .url-row input[type=url] { flex: 1 1 260px; min-width: 0; }
+
+  /* ---- device picker ---- */
+  .device-picks { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+  .device-picks label.fld { border: 1px solid var(--border); border-radius: 999px; padding: 5px 11px; background: var(--surface); }
+  .device-picks label.fld.on { border-color: var(--accent); color: var(--text); }
+  .device-picks .dw { font-family: var(--mono); font-size: .76rem; color: var(--muted); }
+  .device-picks .rmcustom { border: none; background: transparent; color: var(--muted); cursor: pointer; font-size: .95rem; padding: 0 0 0 2px; line-height: 1; }
+  .device-picks .rmcustom:hover { color: var(--danger); }
+  .addw input[type=number] { width: 84px; }
+
+  .zoomval { font-family: var(--mono); font-size: .8rem; color: var(--muted); min-width: 4ch; text-align: right; }
+
+  /* ---- rack ---- */
+  .rack-outer { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .rack { display: flex; gap: 18px; align-items: flex-start; min-height: 120px; }
+  .rack .empty { color: var(--muted); font-size: .86rem; padding: 24px 8px; }
+
+  .frame { flex: none; }
+  .flabel { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; font-size: .78rem; color: var(--muted); white-space: nowrap; }
+  .flabel b { color: var(--text); font-weight: 600; }
+  .flabel .dims { font-family: var(--mono); font-size: .74rem; }
+  .flabel .scale { font-family: var(--mono); font-size: .72rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; }
+  .flabel button { border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 6px; cursor: pointer; font-size: .78rem; padding: 2px 6px; line-height: 1.3; }
+  .flabel button:hover { color: var(--accent); border-color: var(--accent); }
+  .bezel { background: #20242b; border-radius: 14px; padding: 7px; box-shadow: var(--shadow); }
+  :root[data-theme="dark"] .bezel { background: #343b46; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .bezel { background: #343b46; } }
+  .viewport { overflow: hidden; border-radius: 8px; background: #fff; }
+  .viewport iframe { display: block; border: 0; background: #fff; transform-origin: 0 0; }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  @media (max-width: 980px) {
+    textarea#htmlSrc { min-height: 140px; }
+  }
+  @media (max-width: 720px) {
+    .grouplbl { width: 100%; margin-bottom: 2px; }
+    .sep { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="backlink" href="./index.html">← All tools</a>
+  <header class="app">
+    <div>
+      <h1>Responsive Breakpoint Previewer</h1>
+      <p>See the same page side-by-side at phone, tablet, and desktop widths — paste your HTML (or point at a URL), toggle devices, rotate them, and scroll every frame in sync. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="chips">
+    <button class="chip" id="sampleBtn" type="button" title="Load a small responsive landing page with a hamburger-menu breakpoint">Load sample</button>
+    <button class="chip" id="shareBtn" type="button" title="Copy a link that restores your device/zoom settings (not the pasted HTML)">Copy settings link</button>
+    <button class="chip" id="clearBtn" type="button" title="Empty the editor and delete the autosaved draft">Clear HTML</button>
+  </div>
+
+  <!-- ============ input panel ============ -->
+  <div class="panel">
+    <div class="row">
+      <div class="tabs" role="tablist" aria-label="Input mode">
+        <button class="tab" id="tabPaste" type="button" role="tab" aria-pressed="true">Paste HTML</button>
+        <button class="tab" id="tabUrl" type="button" role="tab" aria-pressed="false">URL</button>
+      </div>
+      <span class="spacer"></span>
+      <span class="note" id="modeNote"></span>
+    </div>
+
+    <div id="pastePane">
+      <div class="row" style="margin-top:10px">
+        <textarea id="htmlSrc" spellcheck="false" aria-label="HTML source to preview" placeholder="Paste a full HTML document here (or a fragment — it still renders). Edits re-render every frame automatically."></textarea>
+      </div>
+      <p class="draft-note" id="draftNote" hidden>Draft restored from this browser — “Clear HTML” to start over.</p>
+      <div class="row">
+        <label class="fld" title="Injects a color-scheme:dark style into the previewed page. This flips browser default colors (canvas, form controls, scrollbars) for pages that don't set their own — it can NOT fake the prefers-color-scheme media query, so @media (prefers-color-scheme: dark) rules in your CSS won't trigger. That's a browser limitation with no client-side workaround.">
+          <input type="checkbox" id="darkEmu"> Dark color-scheme hint
+        </label>
+        <label class="fld" title="Scrolling one frame scrolls the others to the same relative position (works because we inject a tiny messenger script into your pasted HTML)">
+          <input type="checkbox" id="syncScroll" checked> Sync scrolling
+        </label>
+      </div>
+    </div>
+
+    <div id="urlPane" hidden>
+      <div class="row url-row" style="margin-top:10px">
+        <input type="url" id="urlInput" placeholder="https://example.com" aria-label="URL to preview" inputmode="url">
+        <button class="btn primary" id="loadUrlBtn" type="button">Load into frames</button>
+      </div>
+      <div class="row">
+        <p class="note" style="max-width:78ch">Heads-up: many sites (Google, GitHub, most apps with logins) send <code style="font-family:var(--mono)">X-Frame-Options</code> / CSP headers that tell the browser to refuse embedding, and there is no client-side workaround. Cross-origin frames are also sealed off from this page, so I can't reliably tell "loaded fine" from "blocked" — if the frames stay blank or show an error, the site is refusing to be framed. For those pages, save the HTML and use the <strong>Paste HTML</strong> tab instead. Sync scrolling and the dark hint are also unavailable cross-origin.</p>
+      </div>
+      <div class="row"><span class="note err" id="urlNote"></span></div>
+    </div>
+  </div>
+
+  <!-- ============ device panel ============ -->
+  <div class="panel">
+    <div class="row">
+      <span class="grouplbl">Devices</span>
+      <div class="device-picks" id="devicePicks"></div>
+    </div>
+    <div class="row">
+      <span class="grouplbl">Custom</span>
+      <span class="addw row" style="gap:6px">
+        <input type="number" id="customW" min="240" max="3840" step="1" placeholder="Width px" aria-label="Custom device width in pixels">
+        <button class="btn small" id="addCustomBtn" type="button">+ Add width</button>
+      </span>
+      <span class="sep"></span>
+      <span class="grouplbl">Zoom</span>
+      <input type="range" id="zoom" min="25" max="100" value="45" step="1" aria-label="Rack zoom percentage">
+      <span class="zoomval" id="zoomVal">45%</span>
+      <span class="sep"></span>
+      <button class="btn small" id="rotateAllBtn" type="button" title="Swap portrait/landscape on every rotatable device">⟳ Rotate all</button>
+      <button class="btn small" id="reloadAllBtn" type="button" title="Reload every frame">↻ Reload all</button>
+      <span class="spacer"></span>
+      <span class="note" id="rackNote"></span>
+    </div>
+  </div>
+
+  <!-- ============ rack ============ -->
+  <div class="rack-outer">
+    <div class="rack" id="rack"></div>
+  </div>
+
+  <footer class="app">Nothing is uploaded — pasted HTML renders in sandboxed frames and autosaves in this browser only. Frame screenshots aren't offered because browsers can't capture cross-origin/sandboxed iframe pixels. · a <strong>max</strong> tool</footer>
+</div>
+
+<!-- Sample: small responsive landing page, CSS-only hamburger below 720px -->
+<script type="text/plain" id="sampleSrc">
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trailhead Coffee — sample</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, sans-serif; line-height: 1.5; color: #22303c; background: #fdfbf7; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; background: #14532d; color: #fff; position: sticky; top: 0; }
+  .logo { font-weight: 800; letter-spacing: .02em; }
+  nav ul { display: flex; gap: 20px; list-style: none; margin: 0; padding: 0; }
+  nav a { color: #d1fae5; text-decoration: none; font-size: .95rem; }
+  nav a:hover { color: #fff; text-decoration: underline; }
+  #menu-toggle, .burger { display: none; }
+  .hero { padding: 56px 22px; text-align: center; background: linear-gradient(160deg, #14532d, #166534 60%, #4d7c0f); color: #fff; }
+  .hero h1 { font-size: clamp(1.6rem, 5vw, 2.8rem); margin: 0 0 10px; }
+  .hero p { max-width: 46ch; margin: 0 auto 22px; color: #d9f99d; }
+  .cta { display: inline-block; background: #facc15; color: #1c1917; font-weight: 700; padding: 12px 26px; border-radius: 999px; text-decoration: none; }
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 40px 22px; max-width: 960px; margin: 0 auto; }
+  .card { background: #fff; border: 1px solid #e7e5e4; border-radius: 12px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+  .card h2 { font-size: 1.05rem; margin: 0 0 6px; color: #14532d; }
+  .card p { margin: 0; font-size: .9rem; color: #57534e; }
+  .strip { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; padding: 0 22px 46px; font-size: .85rem; color: #78716c; }
+  footer { background: #1c1917; color: #a8a29e; text-align: center; padding: 22px; font-size: .85rem; }
+
+  /* ---- hamburger breakpoint ---- */
+  @media (max-width: 719px) {
+    .burger { display: block; font-size: 1.5rem; cursor: pointer; user-select: none; }
+    nav { position: absolute; top: 100%; left: 0; right: 0; background: #14532d; display: none; }
+    nav ul { flex-direction: column; gap: 0; padding: 8px 0; }
+    nav a { display: block; padding: 12px 22px; }
+    #menu-toggle:checked ~ nav { display: block; }
+    .features { grid-template-columns: 1fr; }
+  }
+  @media (min-width: 720px) and (max-width: 999px) {
+    .features { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">☕ Trailhead Coffee</span>
+  <input type="checkbox" id="menu-toggle" aria-label="Open menu">
+  <label class="burger" for="menu-toggle">☰</label>
+  <nav>
+    <ul>
+      <li><a href="#roasts">Roasts</a></li>
+      <li><a href="#visit">Visit</a></li>
+      <li><a href="#wholesale">Wholesale</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+  </nav>
+</header>
+<section class="hero">
+  <h1>Small-batch roasts for long walks</h1>
+  <p>Beans roasted every Tuesday in a converted trailside barn. Resize this page — the nav collapses to a hamburger under 720px and the cards restack.</p>
+  <a class="cta" href="#roasts">Browse roasts</a>
+</section>
+<section class="features" id="roasts">
+  <div class="card"><h2>Switchback Espresso</h2><p>Chocolate, cherry, and a finish that lingers like the last mile of a good hike.</p></div>
+  <div class="card"><h2>Fire Tower Filter</h2><p>Bright and floral. Best enjoyed somewhere with a view and no cell service.</p></div>
+  <div class="card"><h2>Basecamp Decaf</h2><p>Swiss-water process, all of the comfort, none of the 2 a.m. ceiling-staring.</p></div>
+</section>
+<div class="strip">
+  <span>★ Roasted weekly</span><span>★ Free pickup</span><span>★ Compostable bags</span><span>★ Dog-friendly patio</span>
+</div>
+<footer id="about">Trailhead Coffee Co. — a fictional sample page for breakpoint testing. Scroll me in one frame and watch the others follow.</footer>
+</body>
+</html>
+</script>
+
+<script>
+(function () {
+'use strict';
+
+var $ = function (id) { return document.getElementById(id); };
+
+/* =============== state =============== */
+var DEFAULT_DEVICES = [
+  { id: 'ms',  name: 'Mobile S', w: 320,  h: 568,  rot: true,  on: true,  landscape: false },
+  { id: 'm',   name: 'Mobile',   w: 375,  h: 812,  rot: true,  on: true,  landscape: false },
+  { id: 'ml',  name: 'Mobile L', w: 428,  h: 926,  rot: true,  on: false, landscape: false },
+  { id: 't',   name: 'Tablet',   w: 768,  h: 1024, rot: true,  on: true,  landscape: false },
+  { id: 'l',   name: 'Laptop',   w: 1024, h: 700,  rot: false, on: true,  landscape: false },
+  { id: 'd',   name: 'Desktop',  w: 1280, h: 800,  rot: false, on: false, landscape: false },
+  { id: 'w',   name: 'Wide',     w: 1536, h: 864,  rot: false, on: false, landscape: false }
+];
+
+var state = {
+  mode: 'paste',            // 'paste' | 'url'
+  html: '',
+  url: '',
+  zoom: 45,                 // percent
+  sync: true,
+  dark: false,
+  devices: DEFAULT_DEVICES.map(function (d) { return Object.assign({}, d); }),
+  customSeq: 0
+};
+
+var DRAFT_KEY = 'max-bp-html';
+var THEME_KEY = 'max-theme';
+
+var rack = $('rack');
+var htmlSrc = $('htmlSrc'), draftNote = $('draftNote');
+var urlInput = $('urlInput'), urlNote = $('urlNote');
+var modeNote = $('modeNote'), rackNote = $('rackNote');
+var frameEls = {};            // device id -> { root, iframe, viewport, scaleEl, dimsEl }
+var renderTimer = null, saveTimer = null, hashTimer = null;
+var urlTimeouts = {};
+var suppressHash = false;
+
+/* =============== helpers =============== */
+function debounceRender() {
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(refreshFrames, 400);
+}
+function customHeightFor(w) {
+  if (w <= 500) return Math.round(w * 2.16);       // phone-ish
+  if (w <= 900) return Math.round(w * 1.33);       // tablet-ish
+  return Math.round(w * 0.625);                    // desktop-ish 16:10
+}
+function dims(d) {
+  return d.landscape ? { w: d.h, h: d.w } : { w: d.w, h: d.h };
+}
+function setNote(el, msg, cls) {
+  el.textContent = msg || '';
+  el.className = 'note' + (cls ? ' ' + cls : '');
+}
+
+/* =============== srcdoc build (injection) =============== */
+var SYNC_SCRIPT =
+  '<script>(function(){' +
+  'var applying=false;' +
+  'function root(){var d=document.scrollingElement||document.documentElement;return d;}' +
+  'addEventListener("scroll",function(){' +
+  'if(applying)return;' +
+  'var d=root(),max=d.scrollHeight-d.clientHeight;' +
+  'var f=max>0?d.scrollTop/max:0;' +
+  'try{parent.postMessage({type:"bp-scroll",frac:f},"*");}catch(e){}' +
+  '},{passive:true});' +
+  'addEventListener("message",function(e){' +
+  'if(!e.data||e.data.type!=="bp-set")return;' +
+  'applying=true;' +
+  'var d=root(),max=d.scrollHeight-d.clientHeight;' +
+  'd.scrollTop=e.data.frac*max;' +
+  'setTimeout(function(){applying=false;},90);' +
+  '});' +
+  '})();<\/script>';
+
+var DARK_STYLE = '<style>:root{color-scheme:dark}</style>';
+
+function buildSrcdoc() {
+  var out = state.html || '';
+  if (!out.trim()) return '';
+  if (state.dark) {
+    if (/<head[^>]*>/i.test(out)) out = out.replace(/<head[^>]*>/i, function (m) { return m + DARK_STYLE; });
+    else out = DARK_STYLE + out;
+  }
+  var inject = state.sync ? SYNC_SCRIPT : '';
+  if (inject) {
+    if (/<\/body>/i.test(out)) out = out.replace(/<\/body>/i, inject + '</body>');
+    else out += inject;
+  }
+  return out;
+}
+
+/* =============== rack build / refresh =============== */
+function activeDevices() {
+  return state.devices.filter(function (d) { return d.on; });
+}
+
+function buildRack() {
+  rack.textContent = '';
+  frameEls = {};
+  var act = activeDevices();
+  if (!act.length) {
+    var p = document.createElement('div');
+    p.className = 'empty';
+    p.textContent = 'No devices selected — tick at least one above.';
+    rack.appendChild(p);
+    return;
+  }
+  act.forEach(function (d) {
+    var frame = document.createElement('div');
+    frame.className = 'frame';
+
+    var label = document.createElement('div');
+    label.className = 'flabel';
+    var nameB = document.createElement('b'); nameB.textContent = d.name;
+    var dimsEl = document.createElement('span'); dimsEl.className = 'dims';
+    var scaleEl = document.createElement('span'); scaleEl.className = 'scale';
+    label.appendChild(nameB); label.appendChild(dimsEl); label.appendChild(scaleEl);
+
+    if (d.rot) {
+      var rotBtn = document.createElement('button');
+      rotBtn.type = 'button'; rotBtn.textContent = '⤾'; rotBtn.title = 'Swap portrait / landscape';
+      rotBtn.addEventListener('click', function () { d.landscape = !d.landscape; layoutFrames(); scheduleHash(); });
+      label.appendChild(rotBtn);
+    }
+    var relBtn = document.createElement('button');
+    relBtn.type = 'button'; relBtn.textContent = '↻'; relBtn.title = 'Reload this frame';
+    relBtn.addEventListener('click', function () { loadFrame(d, true); });
+    label.appendChild(relBtn);
+
+    var bezel = document.createElement('div'); bezel.className = 'bezel';
+    var viewport = document.createElement('div'); viewport.className = 'viewport';
+    var iframe = document.createElement('iframe');
+    iframe.setAttribute('title', d.name + ' preview at ' + d.w + 'px');
+    iframe.setAttribute('loading', 'lazy');
+    viewport.appendChild(iframe);
+    bezel.appendChild(viewport);
+
+    frame.appendChild(label);
+    frame.appendChild(bezel);
+    rack.appendChild(frame);
+
+    frameEls[d.id] = { root: frame, iframe: iframe, viewport: viewport, scaleEl: scaleEl, dimsEl: dimsEl };
+  });
+  layoutFrames();
+  refreshFrames();
+}
+
+function layoutFrames() {
+  var s = state.zoom / 100;
+  activeDevices().forEach(function (d) {
+    var f = frameEls[d.id];
+    if (!f) return;
+    var dm = dims(d);
+    f.iframe.style.width = dm.w + 'px';
+    f.iframe.style.height = dm.h + 'px';
+    f.iframe.style.transform = 'scale(' + s + ')';
+    f.viewport.style.width = Math.round(dm.w * s) + 'px';
+    f.viewport.style.height = Math.round(dm.h * s) + 'px';
+    f.dimsEl.textContent = dm.w + '×' + dm.h;
+    f.scaleEl.textContent = '×' + s.toFixed(2);
+  });
+  $('zoomVal').textContent = state.zoom + '%';
+}
+
+function loadFrame(d, force) {
+  var f = frameEls[d.id];
+  if (!f) return;
+  if (state.mode === 'paste') {
+    f.iframe.removeAttribute('src');
+    f.iframe.setAttribute('sandbox', 'allow-scripts'); // never combined with allow-same-origin
+    var doc = buildSrcdoc();
+    if (force && f.iframe.srcdoc === doc) f.iframe.srcdoc = ''; // force a reload of identical content
+    f.iframe.srcdoc = doc;
+  } else {
+    f.iframe.removeAttribute('srcdoc');
+    f.iframe.removeAttribute('sandbox'); // remote origin is already isolated cross-origin
+    if (!state.url) return;
+    clearTimeout(urlTimeouts[d.id]);
+    f.iframe.onload = function () { clearTimeout(urlTimeouts[d.id]); };
+    urlTimeouts[d.id] = setTimeout(function () {
+      setNote(urlNote, 'At least one frame never finished loading after 10s — the site is probably refusing to be embedded (or is just slow). Try the Paste HTML tab.', 'err');
+    }, 10000);
+    // cache-buster on forced reload so the browser actually refetches
+    f.iframe.src = force ? state.url : state.url;
+    if (force) { try { f.iframe.contentWindow.location.reload(); } catch (e) { f.iframe.src = state.url; } }
+  }
+}
+
+function refreshFrames() {
+  activeDevices().forEach(function (d) { loadFrame(d, false); });
+}
+
+/* =============== sync scroll (paste mode only) =============== */
+window.addEventListener('message', function (e) {
+  if (!e.data || e.data.type !== 'bp-scroll') return;
+  if (!state.sync || state.mode !== 'paste') return;
+  var frac = Number(e.data.frac);
+  if (!isFinite(frac)) return;
+  frac = Math.max(0, Math.min(1, frac));
+  Object.keys(frameEls).forEach(function (id) {
+    var w = frameEls[id].iframe.contentWindow;
+    if (w && w !== e.source) {
+      try { w.postMessage({ type: 'bp-set', frac: frac }, '*'); } catch (err) { /* frame not ready */ }
+    }
+  });
+});
+
+/* =============== device picker UI =============== */
+function buildDevicePicks() {
+  var box = $('devicePicks');
+  box.textContent = '';
+  state.devices.forEach(function (d) {
+    var lab = document.createElement('label');
+    lab.className = 'fld' + (d.on ? ' on' : '');
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = d.on;
+    cb.addEventListener('change', function () {
+      d.on = cb.checked;
+      lab.classList.toggle('on', d.on);
+      buildRack(); scheduleHash();
+    });
+    lab.appendChild(cb);
+    lab.appendChild(document.createTextNode(' ' + d.name + ' '));
+    var w = document.createElement('span'); w.className = 'dw'; w.textContent = String(d.w);
+    lab.appendChild(w);
+    if (d.custom) {
+      var rm = document.createElement('button');
+      rm.type = 'button'; rm.className = 'rmcustom'; rm.textContent = '×';
+      rm.title = 'Remove this custom width';
+      rm.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        state.devices = state.devices.filter(function (x) { return x.id !== d.id; });
+        buildDevicePicks(); buildRack(); scheduleHash();
+      });
+      lab.appendChild(rm);
+    }
+    box.appendChild(lab);
+  });
+}
+
+function addCustomWidth(w) {
+  w = Math.round(Number(w));
+  if (!isFinite(w) || w < 240 || w > 3840) {
+    setNote(rackNote, 'Custom width must be between 240 and 3840 px.', 'err');
+    return false;
+  }
+  if (state.devices.some(function (d) { return dims(d).w === w; })) {
+    setNote(rackNote, 'A ' + w + 'px device is already in the rack.', 'err');
+    return false;
+  }
+  state.customSeq += 1;
+  state.devices.push({
+    id: 'c' + state.customSeq, name: 'Custom', w: w, h: customHeightFor(w),
+    rot: w <= 900, on: true, landscape: false, custom: true
+  });
+  setNote(rackNote, '');
+  buildDevicePicks(); buildRack(); scheduleHash();
+  return true;
+}
+
+/* =============== tabs =============== */
+function setMode(mode) {
+  state.mode = mode;
+  var paste = mode === 'paste';
+  $('tabPaste').setAttribute('aria-pressed', String(paste));
+  $('tabUrl').setAttribute('aria-pressed', String(!paste));
+  $('pastePane').hidden = !paste;
+  $('urlPane').hidden = paste;
+  setNote(modeNote, paste
+    ? 'Sandboxed srcdoc frames — scripts allowed, no same-origin access.'
+    : 'Sync scroll and dark hint are off: cross-origin frames can\'t be reached from this page.');
+  if (paste) setNote(urlNote, '');
+  refreshFrames();
+  scheduleHash();
+}
+
+/* =============== autosave draft =============== */
+function saveDraftNow() {
+  clearTimeout(saveTimer);
+  try { localStorage.setItem(DRAFT_KEY, htmlSrc.value); } catch (e) { /* storage blocked/full */ }
+}
+
+/* =============== shareable settings hash =============== */
+function serializeState() {
+  return {
+    v: 1,
+    mode: state.mode,
+    url: state.url,
+    zoom: state.zoom,
+    sync: state.sync ? 1 : 0,
+    dark: state.dark ? 1 : 0,
+    on: state.devices.filter(function (d) { return d.on && !d.custom; }).map(function (d) { return d.id; }),
+    land: state.devices.filter(function (d) { return d.landscape && !d.custom; }).map(function (d) { return d.id; }),
+    custom: state.devices.filter(function (d) { return d.custom; }).map(function (d) {
+      return { w: d.w, h: d.h, on: d.on ? 1 : 0, land: d.landscape ? 1 : 0 };
+    })
+  };
+}
+function writeHash() {
+  if (suppressHash) return;
+  try {
+    var enc = btoa(unescape(encodeURIComponent(JSON.stringify(serializeState()))));
+    history.replaceState(null, '', '#s=' + enc);
+  } catch (e) { /* ignore */ }
+}
+function scheduleHash() {
+  clearTimeout(hashTimer);
+  hashTimer = setTimeout(writeHash, 300);
+}
+function readHash() {
+  var m = location.hash.match(/^#s=(.+)$/);
+  if (!m) return false;
+  var obj;
+  try { obj = JSON.parse(decodeURIComponent(escape(atob(m[1])))); } catch (e) { return false; }
+  if (!obj || obj.v !== 1) return false;
+  if (obj.mode === 'url' || obj.mode === 'paste') state.mode = obj.mode;
+  if (typeof obj.url === 'string' && /^https?:\/\//i.test(obj.url)) state.url = obj.url;
+  var z = Number(obj.zoom);
+  if (isFinite(z)) state.zoom = Math.max(25, Math.min(100, Math.round(z)));
+  state.sync = obj.sync !== 0;
+  state.dark = obj.dark === 1;
+  if (Array.isArray(obj.on)) {
+    state.devices.forEach(function (d) { d.on = obj.on.indexOf(d.id) !== -1; });
+  }
+  if (Array.isArray(obj.land)) {
+    state.devices.forEach(function (d) { if (d.rot) d.landscape = obj.land.indexOf(d.id) !== -1; });
+  }
+  if (Array.isArray(obj.custom)) {
+    obj.custom.slice(0, 12).forEach(function (c) {
+      var w = Math.round(Number(c && c.w));
+      if (!isFinite(w) || w < 240 || w > 3840) return;
+      var h = Math.round(Number(c.h));
+      if (!isFinite(h) || h < 200 || h > 3000) h = customHeightFor(w);
+      state.customSeq += 1;
+      state.devices.push({
+        id: 'c' + state.customSeq, name: 'Custom', w: w, h: h,
+        rot: w <= 900, on: c.on !== 0, landscape: c.land === 1 && w <= 900, custom: true
+      });
+    });
+  }
+  return true;
+}
+
+/* =============== wire up =============== */
+$('tabPaste').addEventListener('click', function () { setMode('paste'); });
+$('tabUrl').addEventListener('click', function () { setMode('url'); });
+
+htmlSrc.addEventListener('input', function () {
+  state.html = htmlSrc.value;
+  draftNote.hidden = true;
+  debounceRender();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveDraftNow, 600);
+});
+
+$('sampleBtn').addEventListener('click', function () {
+  var sample = $('sampleSrc').textContent.replace(/^\n+/, '').replace(/\s+$/, '\n');
+  if (htmlSrc.value.trim() && htmlSrc.value !== sample &&
+      !window.confirm('Replace the current HTML with the sample? Your draft will be overwritten.')) return;
+  htmlSrc.value = sample;
+  state.html = sample;
+  draftNote.hidden = true;
+  saveDraftNow();
+  if (state.mode !== 'paste') setMode('paste'); else refreshFrames();
+});
+
+$('clearBtn').addEventListener('click', function () {
+  if (htmlSrc.value.trim() && !window.confirm('Clear the editor and delete the autosaved draft?')) return;
+  clearTimeout(saveTimer);
+  htmlSrc.value = '';
+  state.html = '';
+  try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
+  draftNote.hidden = true;
+  refreshFrames();
+});
+
+$('shareBtn').addEventListener('click', function () {
+  writeHash();
+  var link = location.href;
+  var done = function (ok) {
+    setNote(rackNote, ok ? 'Settings link copied (devices, zoom, mode — not the pasted HTML).' : 'Copy failed — grab the URL from the address bar.', ok ? 'ok' : 'err');
+    setTimeout(function () { setNote(rackNote, ''); }, 4000);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(function () { done(true); }, function () { done(false); });
+  } else { done(false); }
+});
+
+$('darkEmu').addEventListener('change', function () {
+  state.dark = this.checked;
+  refreshFrames(); scheduleHash();
+});
+$('syncScroll').addEventListener('change', function () {
+  state.sync = this.checked;
+  refreshFrames(); scheduleHash(); // re-render so the messenger script is added/removed
+});
+
+$('loadUrlBtn').addEventListener('click', function () {
+  var u = urlInput.value.trim();
+  if (!u) { setNote(urlNote, 'Enter a URL first.', 'err'); return; }
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  try { new URL(u); } catch (e) { setNote(urlNote, 'That doesn\'t look like a valid URL.', 'err'); return; }
+  state.url = u;
+  urlInput.value = u;
+  setNote(urlNote, '');
+  refreshFrames(); scheduleHash();
+});
+urlInput.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') $('loadUrlBtn').click();
+});
+
+$('addCustomBtn').addEventListener('click', function () {
+  if (addCustomWidth($('customW').value)) $('customW').value = '';
+});
+$('customW').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') $('addCustomBtn').click();
+});
+
+$('zoom').addEventListener('input', function () {
+  state.zoom = Number(this.value);
+  layoutFrames();
+});
+$('zoom').addEventListener('change', scheduleHash);
+
+$('rotateAllBtn').addEventListener('click', function () {
+  var rotatables = activeDevices().filter(function (d) { return d.rot; });
+  if (!rotatables.length) { setNote(rackNote, 'No rotatable devices in the rack (phones/tablets only).', 'err'); return; }
+  var anyPortrait = rotatables.some(function (d) { return !d.landscape; });
+  state.devices.forEach(function (d) { if (d.rot) d.landscape = anyPortrait; });
+  layoutFrames(); scheduleHash();
+  setNote(rackNote, '');
+});
+
+$('reloadAllBtn').addEventListener('click', function () {
+  activeDevices().forEach(function (d) { loadFrame(d, true); });
+});
+
+/* =============== boot =============== */
+var hadHash = false;
+try { hadHash = readHash(); } catch (e) { hadHash = false; }
+
+var restored = null;
+try { restored = localStorage.getItem(DRAFT_KEY); } catch (e) { /* ignore */ }
+if (restored) {
+  htmlSrc.value = restored;
+  state.html = restored;
+  draftNote.hidden = false;
+} else if (!hadHash || state.mode === 'paste') {
+  // first visit: preload the sample so the tool demos itself
+  var sample0 = $('sampleSrc').textContent.replace(/^\n+/, '').replace(/\s+$/, '\n');
+  htmlSrc.value = sample0;
+  state.html = sample0;
+}
+
+suppressHash = true;
+$('zoom').value = String(state.zoom);
+$('darkEmu').checked = state.dark;
+$('syncScroll').checked = state.sync;
+if (state.url) urlInput.value = state.url;
+buildDevicePicks();
+setMode(state.mode);   // also calls refreshFrames + updates panes
+buildRack();
+suppressHash = false;
+if (hadHash) writeHash();
+
+/* =============== theme toggle =============== */
+var root = document.documentElement;
+var savedTheme = null;
+try { savedTheme = localStorage.getItem(THEME_KEY); } catch (e) { /* ignore */ }
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('themeBtn').addEventListener('click', function () {
+  var cur = root.getAttribute('data-theme');
+  var isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* ignore */ }
+});
+
+/* =============== test hooks =============== */
+window.bpv = {
+  state: state,
+  buildSrcdoc: buildSrcdoc,
+  addCustomWidth: addCustomWidth,
+  setMode: setMode,
+  refreshFrames: refreshFrames,
+  layoutFrames: layoutFrames,
+  serializeState: serializeState,
+  readHash: readHash,
+  frames: function () { return frameEls; }
+};
+
+})();
+</script>
+</body>
+</html>

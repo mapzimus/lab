@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 2: What Is a Map? · Navigating Piracy</title>
+<meta name="description" content="Day 2 student missions: What Is a Map? Whydah unit, LEAP4Ed Summer 2026.">
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<script src="day-config.js" defer></script>
+<style>
+  :root{
+    --ink:#12222B; --ink2:#1C3743; --parch:#F3E8CE; --parch2:#EAD9B4;
+    --brass:#A9781F; --brassl:#D8B25A; --ox:#8C2C1E; --inktx:#2B2114; --muted:#6E5B3C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--parch); color:var(--inktx); font-family:"Segoe UI",system-ui,-apple-system,sans-serif; line-height:1.5;}
+  .hero{background:var(--ink); color:var(--parch); padding:2.2em 1em 1.8em; text-align:center;}
+  .hero .kicker{color:var(--brassl); font-weight:700; letter-spacing:.25em; font-size:.85em; text-transform:uppercase;}
+  .hero h1{font-family:Georgia,"Times New Roman",serif; font-size:clamp(1.9em,5vw,3em); margin:.25em 0 .2em;}
+  .hero .sub{color:#C7BCA0; font-style:italic; font-size:1.05em;}
+  .wrap{max-width:880px; margin:0 auto; padding:1.2em 1em 3em;}
+  .mission{background:var(--parch2); border:1.5px solid var(--brass); border-radius:10px; padding:1.2em 1.3em 1.3em; margin:1.3em 0; box-shadow:2px 3px 10px rgba(42,29,15,.14);}
+  .mission-top{display:flex; align-items:baseline; gap:.7em; flex-wrap:wrap;}
+  .mnum{background:var(--ox); color:var(--parch); font-family:Georgia,serif; font-weight:700; font-size:1.25em; border-radius:50%; width:1.9em; height:1.9em; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .mission h2{font-family:Georgia,serif; font-size:1.45em; color:var(--inktx);}
+  .meta{color:var(--ox); font-weight:700; font-size:.92em; margin:.15em 0 .6em;}
+  .mission p{margin:.5em 0;}
+  .btn{display:inline-block; background:var(--brass); color:#FBF4E2; font-weight:700; font-size:1.06em; text-decoration:none; padding:.85em 1.25em; border-radius:8px; margin:.45em .45em .2em 0; border:2px solid #8a6119;}
+  .btn:hover,.btn:focus{background:#8a6119; outline:3px solid var(--ox);}
+  .btn.alt{background:var(--ink2); border-color:var(--ink);}
+  .btn.alt:hover,.btn.alt:focus{background:var(--ink);}
+  .log{background:#FBF4E2; border:1.5px dashed var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .log b{color:var(--ox);}
+  .hunt{margin:.5em 0 .3em 1.2em;}
+  .hunt li{margin:.35em 0;}
+  .bonus{font-style:italic; color:var(--muted); margin-top:.6em;}
+  .vocab{display:flex; gap:.6em; justify-content:center; flex-wrap:wrap; margin:1em 0;}
+  .chip{background:var(--ink); color:var(--brassl); font-family:Georgia,serif; font-weight:700; padding:.45em 1.1em; border-radius:999px; letter-spacing:.06em;}
+  .foot{background:var(--ink); color:#C7BCA0; text-align:center; padding:1.6em 1em 2em; font-size:.95em;}
+  .foot a{color:var(--brassl);}
+  .divider{text-align:center; color:var(--ox); font-size:1.3em; margin:1.6em 0 .2em; font-family:Georgia,serif; font-weight:700;}
+  img.chart{width:100%; height:auto; border:1.5px solid var(--brass); border-radius:6px; margin:.6em 0;}
+  .note{font-size:.9em; color:var(--muted); font-style:italic;}
+  @media (max-width:520px){ .mission{padding:1em .9em;} .btn{display:block; text-align:center; margin-right:0;} }
+</style>
+</head>
+<body>
+<div id="today-banner"></div>
+
+<header class="hero">
+  <div class="kicker">Day 2 · Week 1: Setting Sail</div>
+  <h1>What Is a Map?</h1>
+  <div class="sub">Every map is a set of choices. Today you catch the maps choosing.</div>
+</header>
+
+<main class="wrap">
+
+  <section class="mission" id="m0">
+    <div class="mission-top"><span class="mnum">0</span><h2>Rig your Logbook sheet</h2></div>
+    <div class="meta">2 minutes · solo · paper + pencil</div>
+    <p>One sheet of blank paper. Fold it in half like a book. On the cover: <b>your name, "Day 2," today's date.</b></p>
+    <p>Open it. Across the top of the inside, make <b>three columns</b>:</p>
+    <p style="text-align:center; font-weight:700; color:var(--ox);">WHAT IT SHOWS &nbsp;·&nbsp; WHAT IT LEAVES OUT &nbsp;·&nbsp; WHO IT'S FOR</p>
+    <p class="note">This sheet goes in your Voyage Journal. Everything you discover today gets logged here.</p>
+  </section>
+
+  <section class="mission" id="m1">
+    <div class="mission-top"><span class="mnum">1</span><h2>The Size Lie</h2></div>
+    <div class="meta">~12 minutes · with your first mate (pairs)</div>
+    <p>The world map you've seen your whole life has been lying to you about <b>size</b>. Time to catch it. With a tool <b>built by your captain</b>.</p>
+    <a class="btn" href="https://maxwellhowegis.com/truescale/" target="_blank" rel="noopener">Open TrueScale →</a>
+    <ol class="hunt">
+      <li>In the search box, type <b>Greenland</b>. Drag it down onto <b>Africa</b>. What happens?</li>
+      <li>Now try your own: drag any <b>2 more countries</b> toward the equator or the poles. Watch them change.</li>
+      <li>Why it happens: flat maps must <b>stretch</b> the round Earth somewhere. The usual map (called <b>Mercator</b>, invented in 1569) stretches everything near the poles.</li>
+      <li>So why do we still use it? Mercator has a superpower: a <b>straight line</b> on his map is one steady compass course at sea, a <b>rhumb line</b>. Sailors loved that. And your phone's map app still runs on its cousin, <b>Web Mercator</b>.</li>
+    </ol>
+    <a class="btn alt" href="whydah-dashboard.html#projections" target="_blank" rel="noopener">See the proof: Projections tab →</a>
+    <div class="log"><b>LOG IT:</b> Write down <b>two size-lies</b> you caught (example: "Greenland looks as big as Africa but really fits inside it ~14 times").</div>
+  </section>
+
+  <section class="mission" id="m2">
+    <div class="mission-top"><span class="mnum">2</span><h2>Chart Detective: 1717</h2></div>
+    <div class="meta">~13 minutes · pairs</div>
+    <p>This is the <b>real chart</b> drawn by Cyprian Southack, the mapmaker sent to salvage our wreck. Open it full size and investigate.</p>
+    <p class="note">Heads-up: <b>Salem isn't on this sheet</b>. This chart covers <b>Cape Cod</b>, where our ship went down. A map only shows what its maker chose to cover. Salem gets its turn in Mission 3.</p>
+    <img class="chart" src="pics/southack-1717-chart-clean.jpg" alt="Cyprian Southack's chart of Cape Cod with his note about the Whydah wreck.">
+    <a class="btn" href="pics/southack-1717-chart-clean.jpg" target="_blank" rel="noopener">Open the FULL chart →</a>
+    <p class="note">Zoom: <b>Ctrl</b> + scroll (or pinch the trackpad). Bonus for the curious: the <a href="https://www.digitalcommonwealth.org/book_viewer/commonwealth:kk91fq614" target="_blank" rel="noopener">library's giant scan</a> (can be slow to load).</p>
+    <p style="margin-top:.7em; font-weight:700;">Detective hunt. Find:</p>
+    <ol class="hunt">
+      <li>Little <b>numbers sprinkled all over the water</b>. What do you think they mean? (Hint: what would a sailor be terrified of?)</li>
+      <li>The spot where Southack wrote about <b>OUR ship</b>. It's there, in his own words, right on the chart. First pair to find it, write what he wrote on the board!</li>
+      <li>A <b>place name you've heard of</b>. Maybe from a Cape Cod trip.</li>
+      <li>Long <b>straight lines</b> criss-crossing the whole chart. Those are <b>rhumb lines</b>, compass courses a captain could steer without turning. This chart is a tool, not a picture.</li>
+      <li>Something Google Maps has <b>everywhere</b> that this chart barely shows at all.</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> Fill the 1717 chart's row: what it shows · what it leaves out · who it's for. (Think: who would <i>pay</i> for this map in 1717?)</div>
+    <p class="bonus">Think deeper: why might a 1700s mapmaker leave something off <b>on purpose</b>?</p>
+  </section>
+
+  <section class="mission" id="m3">
+    <div class="mission-top"><span class="mnum">3</span><h2>Salem, Two Ways</h2></div>
+    <div class="meta">~12 minutes · pairs</div>
+    <p>Now <b>our town</b>: Salem, 300 years apart. Open both maps, then fill your columns.</p>
+    <a class="btn" href="https://www.salemhistorical.org/maps-of-salem" target="_blank" rel="noopener">Open the historic Salem maps →</a>
+    <a class="btn alt" href="https://www.google.com/maps/place/Salem,+MA" target="_blank" rel="noopener">Open Salem on Google Maps →</a>
+    <ol class="hunt">
+      <li>On the historic-maps page, pick a map of Salem from the <b>1700s</b>. Find the <b>harbor</b>. What did the mapmaker fill in? What's barely there?</li>
+      <li>Now Google: <b>map view</b>, then <b>satellite</b> (Layers button, bottom-left). Find <b>our school</b>. Find something that was NOT here in the 1700s.</li>
+      <li>Compare: what did the old mapmaker care about? What does Google care about?</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> Add TWO rows to your columns: the <b>old Salem map</b> and <b>Google</b>. Fill all three columns for each. Then answer beneath: <b>who is each map FOR?</b></div>
+    <p class="bonus">Talk with your first mate: your two maps of Salem disagree about almost everything. Is one of them <b>wrong</b>?</p>
+  </section>
+
+  <section class="mission" id="m4">
+    <div class="mission-top"><span class="mnum">4</span><h2>Find the Wreck</h2></div>
+    <div class="meta">~8 minutes · pairs · the payoff</div>
+    <p>In 1717, Southack could only mark the wreck by drawing it on his chart. Today, two little numbers can take you straight there. Try it:</p>
+    <p style="text-align:center; font-family:Georgia,serif; font-size:1.35em; font-weight:700; color:var(--ox);">41.891, -69.957</p>
+    <ol class="hunt">
+      <li>Copy those numbers into the Google Maps <b>search box</b> (or tap the button below).</li>
+      <li>Switch to <b>satellite</b>. Zoom out slowly. Where on Cape Cod are you?</li>
+      <li>That water is where the <b>Whydah</b> has rested since April 26, 1717.</li>
+    </ol>
+    <a class="btn" href="https://www.google.com/maps?q=41.891,-69.957" target="_blank" rel="noopener">Jump to the coordinates →</a>
+    <a class="btn alt" href="https://masswebcams.com/marconi-beach-webcam/" target="_blank" rel="noopener">See that beach LIVE right now →</a>
+    <div class="log"><b>LOG IT:</b> You just did in ten seconds something no sailor in 1717 could do. <b>What was it?</b> (Hint: it's the two numbers.)</div>
+    <p class="bonus">Bonus: those numbers are called <b>coordinates</b>: latitude and longitude. Thursday, you learn why sailors in 1717 could figure out one of them but not the other… and how that killed people.</p>
+  </section>
+
+  <div class="divider">✦</div>
+
+  <section class="mission" id="m5">
+    <div class="mission-top"><span class="mnum">5</span><h2>Quiet Water: the reflection</h2></div>
+    <div class="meta">~7 minutes · solo · no screens, lids down</div>
+    <p>On the back page of your Logbook sheet, write (or draw) your answer:</p>
+    <p style="font-family:Georgia,serif; font-size:1.2em; font-weight:700; text-align:center; padding:.4em 0; color:var(--ink2);">"What would a map of YOUR life include<br>that a stranger's map of you would leave out?"</p>
+    <p class="note">There are no wrong answers. This one's yours.</p>
+  </section>
+
+  <div class="vocab">
+    <span class="chip">cartography</span><span class="chip">projection</span><span class="chip">legend</span><span class="chip">rhumb line</span>
+  </div>
+  <p style="text-align:center; font-size:.92em; color:var(--muted); max-width:640px; margin:0 auto;">
+    <b>cartography</b> = map-making (literally "map writing") · <b>projection</b> = how you flatten a round world ·
+    <b>legend</b> = the map's key to its symbols · <b>rhumb line</b> = a straight-line compass course ·
+    <b>scale</b> = how much smaller the map is than the world
+  </p>
+
+</main>
+
+<footer class="foot">
+  <p><b>Tomorrow:</b> the London mapmaker who drank with pirates. And your first <b>cipher</b>.</p>
+  <p style="margin-top:.6em;"><a href="whydah-dashboard.html#overview">⚓ Back to the ship's logbook (dashboard)</a></p>
+</footer>
+
+</body>
+</html>

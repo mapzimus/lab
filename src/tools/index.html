@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>max · web tools</title>
+<meta name="description" content="A collection of 65 standalone, client-side web tools for maps, data, design, teaching, math and more.">
+<style>
+  /* ---- Theme tokens: shared with the tools ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --shadow-lg:0 2px 6px rgba(16,24,40,.08), 0 12px 32px rgba(16,24,40,.10);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --shadow-lg:0 2px 8px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --shadow-lg:0 2px 8px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 20px 64px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 6px; }
+  .brand { display: flex; align-items: baseline; gap: 12px; }
+  .brand h1 { font-size: 2rem; margin: 0; letter-spacing: -0.02em; }
+  .brand .dot { color: var(--accent); }
+  .tagline { color: var(--muted); margin: 8px 0 10px; font-size: 1rem; max-width: 60ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+
+  nav.jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 26px; }
+  nav.jump a { font-size: .8rem; color: var(--muted); text-decoration: none; border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 5px 12px; }
+  nav.jump a:hover { color: var(--accent); border-color: var(--accent); }
+
+  section.cat { margin: 0 0 34px; }
+  section.cat h2 { font-size: 1.15rem; margin: 0 0 2px; letter-spacing: -0.01em; scroll-margin-top: 16px; }
+  section.cat .cap { color: var(--muted); font-size: .85rem; margin: 0 0 14px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
+  .card {
+    display: flex; flex-direction: column; text-decoration: none; color: inherit;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 20px; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+  .card .icon { font-size: 1.8rem; line-height: 1; margin-bottom: 12px; }
+  .card h3 { font-size: 1.12rem; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .card p { margin: 0 0 14px; color: var(--muted); font-size: .9rem; flex: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .tag { font-size: .7rem; color: var(--muted); background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 2px 9px; }
+  .open { font-size: .88rem; font-weight: 600; color: var(--accent); display: inline-flex; align-items: center; gap: 6px; }
+  .card:hover .open .arrow { transform: translateX(3px); }
+  .open .arrow { transition: transform .12s ease; }
+
+  footer.app { margin-top: 40px; color: var(--muted); font-size: .82rem; text-align: center; }
+  footer.app code { font-family: var(--mono); background: var(--surface-2); border: 1px solid var(--border); padding: 1px 6px; border-radius: 5px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div class="brand"><h1>max<span class="dot">.</span></h1></div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+  <p class="tagline">65 standalone, client-side web tools. Each one is a single file that runs entirely in your browser — nothing is uploaded.</p>
+
+  <nav class="jump" aria-label="Categories">
+    <a href="#maps">🧭 Maps &amp; GIS</a>
+    <a href="#data">📊 Data</a>
+    <a href="#design">🎨 Design &amp; Media</a>
+    <a href="#teaching">🍎 Teaching</a>
+    <a href="#math">🧮 Math</a>
+    <a href="#fun">🎡 Fun &amp; Learning</a>
+  </nav>
+
+  <section class="cat">
+    <h2 id="maps">Maps &amp; GIS</h2>
+    <p class="cap">Coordinates, GeoJSON, geocoding and other spatial odds and ends.</p>
+    <div class="cards">
+      <a class="card" href="./coordinate-converter.html">
+        <div class="icon">🧭</div>
+        <h3>Coordinate Converter</h3>
+        <p>Convert live between Decimal Degrees, DMS, UTM, MGRS and Geohash, with an interactive map. Click or drag the marker to set a location.</p>
+        <div class="tags"><span class="tag">maps</span><span class="tag">GIS</span><span class="tag">Leaflet</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./geojson-viewer.html">
+        <div class="icon">🗾</div>
+        <h3>GeoJSON Viewer &amp; Editor</h3>
+        <p>Paste, drop or load GeoJSON, see it on a map, click features to edit their properties, validate, and re-export.</p>
+        <div class="tags"><span class="tag">GIS</span><span class="tag">GeoJSON</span><span class="tag">Leaflet</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./bounding-box-picker.html">
+        <div class="icon">🔲</div>
+        <h3>Bounding Box Picker</h3>
+        <p>Draw or type a geographic bounding box and copy it in the five formats APIs want — CSV, WKT, GeoJSON, Leaflet and Overpass.</p>
+        <div class="tags"><span class="tag">GIS</span><span class="tag">bbox</span><span class="tag">Leaflet</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./static-map-generator.html">
+        <div class="icon">🖼️</div>
+        <h3>Static Map Generator</h3>
+        <p>Compose a map view with pins, then export a ready-to-use PNG image or an OpenStreetMap embed snippet. No API keys.</p>
+        <div class="tags"><span class="tag">maps</span><span class="tag">PNG</span><span class="tag">embed</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./batch-geocoder.html">
+        <div class="icon">📍</div>
+        <h3>Batch Geocoder</h3>
+        <p>Paste a list of addresses or place names and get coordinates for all of them — on a map and as CSV or GeoJSON.</p>
+        <div class="tags"><span class="tag">geocoding</span><span class="tag">OSM</span><span class="tag">CSV</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./spatial-data-scraper.html">
+        <div class="icon">🗺️</div>
+        <h3>Spatial Data Scraper</h3>
+        <p>Extract locations from a URL or pasted page text — addresses, cities, landmarks — geocode them, preview on a map, and export JSON, CSV or GeoJSON.</p>
+        <div class="tags"><span class="tag">GIS</span><span class="tag">scraping</span><span class="tag">NER</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./sun-calculator.html">
+        <div class="icon">☀️</div>
+        <h3>Sun Calculator</h3>
+        <p>Sunrise, sunset, twilight and golden hour for any place and date, with a sun-path chart. NOAA-accurate math, no libraries.</p>
+        <div class="tags"><span class="tag">solar</span><span class="tag">outdoors</span><span class="tag">photography</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./weather.html">
+        <div class="icon">⛅</div>
+        <h3>Weather</h3>
+        <p>Current conditions, a 24-hour strip with sparkline, a 7-day forecast and a live precipitation radar for any place — offline caching, °C/°F toggle.</p>
+        <div class="tags"><span class="tag">weather</span><span class="tag">radar</span><span class="tag">no key</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./moon-calculator.html">
+        <div class="icon">🌙</div>
+        <h3>Moon Calculator</h3>
+        <p>Moonrise, moonset, phase and illumination for any place and date, with a live moon disc and a month of phases at a glance.</p>
+        <div class="tags"><span class="tag">astronomy</span><span class="tag">outdoors</span><span class="tag">photography</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./elevation-profiler.html">
+        <div class="icon">⛰️</div>
+        <h3>Elevation Profiler</h3>
+        <p>Draw a route on the map and see the terrain profile under it — distance, climb, descent and steepest grade.</p>
+        <div class="tags"><span class="tag">GIS</span><span class="tag">hiking</span><span class="tag">Open-Meteo</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./radius-buffer-tool.html">
+        <div class="icon">⭕</div>
+        <h3>Radius &amp; Buffer Tool</h3>
+        <p>Drop a pin and draw accurate distance rings around it — true geodesic circles, not flat-map approximations — then export GeoJSON.</p>
+        <div class="tags"><span class="tag">GIS</span><span class="tag">buffers</span><span class="tag">Leaflet</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./flight-plotter.html">
+        <div class="icon">✈️</div>
+        <h3>Flight Route Plotter</h3>
+        <p>Build a multi-leg route between airports and cities, see true great-circle paths with distances and flight times.</p>
+        <div class="tags"><span class="tag">travel</span><span class="tag">great circle</span><span class="tag">Leaflet</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./photo-location-viewer.html">
+        <div class="icon">📷</div>
+        <h3>Photo Location Viewer</h3>
+        <p>See where your photos were taken from their hidden EXIF GPS data, map them, and save clean copies with the metadata stripped.</p>
+        <div class="tags"><span class="tag">privacy</span><span class="tag">EXIF</span><span class="tag">maps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./map-projection-explorer.html">
+        <div class="icon">🌐</div>
+        <h3>Map Projection Explorer</h3>
+        <p>See the world in 19 map projections, visualize distortion with Tissot's indicatrix, and compare Mercator vs Gall-Peters side by side.</p>
+        <div class="tags"><span class="tag">GIS</span><span class="tag">projections</span><span class="tag">D3</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./geojson-diff-viewer.html">
+        <div class="icon">🆚</div>
+        <h3>GeoJSON Diff Viewer</h3>
+        <p>Compare two GeoJSON files — added, removed and changed features matched by ID or geometry, shown on a map and in a detail list.</p>
+        <div class="tags"><span class="tag">GIS</span><span class="tag">GeoJSON</span><span class="tag">diff</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./choropleth-map-builder.html">
+        <div class="icon">🗺️</div>
+        <h3>Choropleth Map Builder</h3>
+        <p>Paste CSV data keyed by US state or country, fuzzy-match it to real geography, and get a colored choropleth map with a legend — export SVG or PNG.</p>
+        <div class="tags"><span class="tag">GIS</span><span class="tag">choropleth</span><span class="tag">D3</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./coordinate-grid-generator.html">
+        <div class="icon">🌐</div>
+        <h3>Coordinate Grid Generator</h3>
+        <p>Draw lat/long graticules, UTM and MGRS grids over a real map — styled, labeled, and exportable as GeoJSON or a standalone SVG.</p>
+        <div class="tags"><span class="tag">GIS</span><span class="tag">UTM/MGRS</span><span class="tag">Leaflet</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./map-style-builder.html">
+        <div class="icon">🎛️</div>
+        <h3>Map Style Builder</h3>
+        <p>Design a map color theme on a live sample city — water, roads, parks, labels — and export a real MapLibre style JSON or theme tokens.</p>
+        <div class="tags"><span class="tag">GIS</span><span class="tag">design</span><span class="tag">MapLibre</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="cat">
+    <h2 id="data">Data</h2>
+    <p class="cap">Explore, convert, chart and fake your data — no spreadsheet required.</p>
+    <div class="cards">
+      <a class="card" href="./quick-chart-maker.html">
+        <div class="icon">📊</div>
+        <h3>Quick Chart Maker</h3>
+        <p>Type or paste data and export a chart — bar, line, pie, doughnut or scatter. Edit as a table or raw CSV/TSV, then download a PNG.</p>
+        <div class="tags"><span class="tag">data</span><span class="tag">charts</span><span class="tag">PNG export</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./csv-explorer.html">
+        <div class="icon">🔎</div>
+        <h3>CSV Explorer</h3>
+        <p>Open a CSV without a spreadsheet: sort, filter, per-column stats and histograms — then clean it up and re-export.</p>
+        <div class="tags"><span class="tag">data</span><span class="tag">CSV</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./csv-json-converter.html">
+        <div class="icon">🔁</div>
+        <h3>CSV ↔ JSON Converter</h3>
+        <p>Convert between CSV and JSON in either direction with live preview, delimiter auto-detect, type detection and nested-JSON flattening.</p>
+        <div class="tags"><span class="tag">data</span><span class="tag">CSV</span><span class="tag">JSON</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./data-generator.html">
+        <div class="icon">🧪</div>
+        <h3>Data Generator</h3>
+        <p>Set up your columns and generate realistic fake data — names, emails, dates, prices and more — then export as CSV or JSON. Same seed = same data every time.</p>
+        <div class="tags"><span class="tag">data</span><span class="tag">testing</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./regex-tester.html">
+        <div class="icon">🔤</div>
+        <h3>Regex Tester &amp; Extractor</h3>
+        <p>Write a regex, see live match highlighting and a capture-group table, then replace or extract — with a built-in cheatsheet and example patterns.</p>
+        <div class="tags"><span class="tag">data</span><span class="tag">regex</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./json-tree-explorer.html">
+        <div class="icon">🌳</div>
+        <h3>JSON Tree Explorer</h3>
+        <p>Paste JSON and explore it as a collapsible tree — search keys and values, copy any path, and pluck values out of arrays of objects.</p>
+        <div class="tags"><span class="tag">data</span><span class="tag">JSON</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./pivot-table-explorer.html">
+        <div class="icon">🧾</div>
+        <h3>Pivot Table Explorer</h3>
+        <p>Load a CSV and drag or click fields into Rows, Columns, Values and Filters for a live pivot table — nested groups, subtotals, a quick chart.</p>
+        <div class="tags"><span class="tag">data</span><span class="tag">CSV</span><span class="tag">pivot</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./data-anonymizer.html">
+        <div class="icon">🕶️</div>
+        <h3>Data Anonymizer</h3>
+        <p>Mask or fake-replace sensitive CSV columns — shuffle, hash, redact, add noise — with reproducible seeding and a k-anonymity check.</p>
+        <div class="tags"><span class="tag">data</span><span class="tag">privacy</span><span class="tag">CSV</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./data-cleaning-workbench.html">
+        <div class="icon">🧼</div>
+        <h3>Data Cleaning Workbench</h3>
+        <p>Stack cleaning steps into a reusable recipe — trim, split, merge, dedupe, normalize — with live before/after preview and an exportable change log.</p>
+        <div class="tags"><span class="tag">data</span><span class="tag">CSV</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="cat">
+    <h2 id="design">Design &amp; Media</h2>
+    <p class="cap">Colors, CSS, images and words — polished output, zero uploads.</p>
+    <div class="cards">
+      <a class="card" href="./color-palette-generator.html">
+        <div class="icon">🎨</div>
+        <h3>Color Palette Generator</h3>
+        <p>Generate palettes with harmony rules, lock and edit swatches, extract colors from an image, check WCAG contrast and color-blind safety.</p>
+        <div class="tags"><span class="tag">design</span><span class="tag">color</span><span class="tag">a11y</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./css-playground.html">
+        <div class="icon">✨</div>
+        <h3>CSS Playground</h3>
+        <p>Visually build gradients, layered shadows and border-radius blobs, then copy production-ready CSS.</p>
+        <div class="tags"><span class="tag">design</span><span class="tag">CSS</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./image-converter.html">
+        <div class="icon">🎞️</div>
+        <h3>Image Converter &amp; Resizer</h3>
+        <p>Convert, resize and compress images right in your browser — nothing is uploaded, and private EXIF data is stripped along the way.</p>
+        <div class="tags"><span class="tag">images</span><span class="tag">privacy</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./qr-code-generator.html">
+        <div class="icon">🔳</div>
+        <h3>QR Code Generator</h3>
+        <p>Make QR codes for links, Wi-Fi, email, phone or text with custom colors and sizes; download as PNG or SVG.</p>
+        <div class="tags"><span class="tag">QR</span><span class="tag">PNG/SVG</span><span class="tag">sharing</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./markdown-previewer.html">
+        <div class="icon">📝</div>
+        <h3>Markdown Previewer</h3>
+        <p>Write Markdown with a live side-by-side preview and export clean HTML — drafts autosave as you type.</p>
+        <div class="tags"><span class="tag">writing</span><span class="tag">markdown</span><span class="tag">export</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./favicon-generator.html">
+        <div class="icon">🔖</div>
+        <h3>Favicon Generator</h3>
+        <p>Make a complete favicon set from an emoji, letters or an image — real multi-size .ico, all the PNGs, manifest and HTML tags.</p>
+        <div class="tags"><span class="tag">web dev</span><span class="tag">icons</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./flag-designer.html">
+        <div class="icon">🚩</div>
+        <h3>Flag Designer Studio</h3>
+        <p>Design a flag from real vexillological building blocks and get live feedback against NAVA's "good flag" principles. Export SVG or PNG.</p>
+        <div class="tags"><span class="tag">design</span><span class="tag">flags</span><span class="tag">SVG</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./pixel-sprite-studio.html">
+        <div class="icon">👾</div>
+        <h3>Pixel Sprite Studio</h3>
+        <p>Draw pixel art with retro palettes (Game Boy, NES, PICO-8), animate across frames, and export PNG, sprite sheets or animated GIF.</p>
+        <div class="tags"><span class="tag">pixel art</span><span class="tag">retro</span><span class="tag">GIF</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./flag-analyzer.html">
+        <div class="icon">🔍</div>
+        <h3>Flag Analyzer</h3>
+        <p>Drop in any flag image and get its dominant colors and percentages, aspect ratio, symmetry scores and a NAVA critique — companion to the Flag Designer.</p>
+        <div class="tags"><span class="tag">flags</span><span class="tag">color</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./svg-pattern-generator.html">
+        <div class="icon">🔷</div>
+        <h3>SVG Pattern Generator</h3>
+        <p>Design a seamless tileable pattern — dots, stripes, hexagons, waves and more — preview it tiled, then export SVG, CSS or PNG.</p>
+        <div class="tags"><span class="tag">design</span><span class="tag">SVG</span><span class="tag">patterns</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./crt-effect-lab.html">
+        <div class="icon">📺</div>
+        <h3>CRT Effect Lab</h3>
+        <p>Apply retro CRT effects — scanlines, curvature, phosphor glow, chromatic aberration — to text or an image, then copy the CSS or export a PNG.</p>
+        <div class="tags"><span class="tag">retro</span><span class="tag">CSS</span><span class="tag">effects</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./chiptune-sfx-lab.html">
+        <div class="icon">🎮</div>
+        <h3>Chiptune SFX Lab</h3>
+        <p>Design retro 8-bit sound effects — sfxr-style presets, waveform, envelope, slides and bit-crushing — and export a WAV.</p>
+        <div class="tags"><span class="tag">audio</span><span class="tag">retro</span><span class="tag">WAV</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./flag-lookalike-finder.html">
+        <div class="icon">🏳️</div>
+        <h3>Flag Look-Alike Finder</h3>
+        <p>Design or pick a flag and find its closest real-world matches by color, layout and charges — a similarity score flags "too close" designs.</p>
+        <div class="tags"><span class="tag">flags</span><span class="tag">design</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./design-token-previewer.html">
+        <div class="icon">🎫</div>
+        <h3>Design Token &amp; Component Previewer</h3>
+        <p>Turn 1–3 brand colors into full OKLCH tonal scales, semantic colors and WCAG-checked text pairings — rendered live on real buttons, cards and forms.</p>
+        <div class="tags"><span class="tag">design</span><span class="tag">tokens</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./svg-icon-studio.html">
+        <div class="icon">💠</div>
+        <h3>SVG Icon &amp; Shape Studio</h3>
+        <p>Build icons and logos from a shape library with real boolean operations — unite, subtract, intersect — then export optimized SVG or PNG.</p>
+        <div class="tags"><span class="tag">design</span><span class="tag">SVG</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./breakpoint-previewer.html">
+        <div class="icon">📱</div>
+        <h3>Responsive Breakpoint Previewer</h3>
+        <p>Paste HTML or a URL and see it at seven device widths side by side, with synchronized scrolling and live editing.</p>
+        <div class="tags"><span class="tag">web dev</span><span class="tag">responsive</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./procedural-flag-generator.html">
+        <div class="icon">🎏</div>
+        <h3>Procedural Flag Generator</h3>
+        <p>Generate plausible new flags from real vexillological grammar — seeded, constrainable, NAVA-scored — and open any result in the Flag Designer.</p>
+        <div class="tags"><span class="tag">flags</span><span class="tag">generative</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="cat">
+    <h2 id="teaching">Teaching</h2>
+    <p class="cap">Classroom workflow tools — rosters and student work never leave the browser.</p>
+    <div class="cards">
+      <a class="card" href="./seating-chart-generator.html">
+        <div class="icon">🪑</div>
+        <h3>Seating Chart Generator</h3>
+        <p>Paste a roster, pick rows, pods or a U-shape, add constraints — keep these two apart, lock her to the front row — and shuffle until the chart works.</p>
+        <div class="tags"><span class="tag">teaching</span><span class="tag">constraints</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./probability-lab.html">
+        <div class="icon">🎲</div>
+        <h3>Probability Lab</h3>
+        <p>Run coins, dice, spinners, cards, urns and the birthday paradox — and watch empirical results converge to the exact theory in live charts.</p>
+        <div class="tags"><span class="tag">teaching</span><span class="tag">statistics</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./class-timer.html">
+        <div class="icon">⏱️</div>
+        <h3>Class Timer</h3>
+        <p>A big, projector-friendly countdown and stopwatch for timing class activities and transitions.</p>
+        <div class="tags"><span class="tag">teaching</span><span class="tag">timer</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./group-maker.html">
+        <div class="icon">👥</div>
+        <h3>Group Maker</h3>
+        <p>Paste a roster and shuffle it into random, balanced groups — by group count or by group size.</p>
+        <div class="tags"><span class="tag">teaching</span><span class="tag">random</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="cat">
+    <h2 id="math">Math</h2>
+    <p class="cap">Interactive explorers, drills and reference tools for high-school math class.</p>
+    <div class="cards">
+      <a class="card" href="./function-grapher.html">
+        <div class="icon">📈</div>
+        <h3>Function Grapher</h3>
+        <p>Plot lines and parabolas and see the slope, intercepts and vertex computed live as you adjust them.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">graphing</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./slope-explorer.html">
+        <div class="icon">📐</div>
+        <h3>Slope Explorer</h3>
+        <p>Drag two points on a grid and watch the slope and line equation — slope-intercept and point-slope — update live.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">algebra</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./quadratic-explorer.html">
+        <div class="icon">🎢</div>
+        <h3>Quadratic Explorer</h3>
+        <p>See a parabola in standard, vertex and factored form at once, with a live graph and roots/vertex readouts.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">algebra</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./systems-explorer.html">
+        <div class="icon">🔀</div>
+        <h3>Systems Explorer</h3>
+        <p>Two lines on a graph — see their intersection and the solved system live, including parallel and identical cases.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">algebra</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./exponential-explorer.html">
+        <div class="icon">🚀</div>
+        <h3>Exponential Explorer</h3>
+        <p>y = a·bˣ with live sliders — see growth vs. decay, a table of values, and an optional linear comparison.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">algebra</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./inequality-grapher.html">
+        <div class="icon">🔶</div>
+        <h3>Inequality Grapher</h3>
+        <p>Shade a linear inequality or a system of them and see the solution region update as you edit the inequalities.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">algebra</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./stats-explorer.html">
+        <div class="icon">📊</div>
+        <h3>Stats Explorer</h3>
+        <p>Enter a dataset and get mean, median, mode, quartiles, a histogram and a box plot, all computed live.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">statistics</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./scatter-plot-explorer.html">
+        <div class="icon">🔵</div>
+        <h3>Scatter Plot &amp; Best Fit</h3>
+        <p>Plot (x, y) data, fit a least-squares trend line, and read off the correlation coefficient live.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">statistics</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./transformations-explorer.html">
+        <div class="icon">🔄</div>
+        <h3>Transformations</h3>
+        <p>Translate, reflect, rotate and dilate a shape on the coordinate grid and see the transformed vertices live.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">geometry</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./right-triangle-explorer.html">
+        <div class="icon">🔺</div>
+        <h3>Right Triangle Explorer</h3>
+        <p>Drag the legs of a right triangle and watch a² + b² = c² prove itself with squares drawn on each side.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">geometry</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./formula-sheet.html">
+        <div class="icon">📖</div>
+        <h3>Formula Sheet</h3>
+        <p>A searchable high-school math reference — area, volume, coordinate geometry, algebra and finance formulas with worked examples.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">reference</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./number-converter.html">
+        <div class="icon">🔢</div>
+        <h3>Number Converter</h3>
+        <p>Convert between fractions, decimals and percents in either direction, with automatic simplification.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">arithmetic</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./geometry-toolbox.html">
+        <div class="icon">📏</div>
+        <h3>Geometry Toolbox</h3>
+        <p>Pick a 2D or 3D shape, enter its dimensions, and get area, perimeter, volume and surface area instantly.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">geometry</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./scientific-calculator.html">
+        <div class="icon">🖩</div>
+        <h3>Scientific Calculator</h3>
+        <p>A full scientific calculator with correct operator precedence, trig/log functions, memory and history.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">calculator</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./math-vocab-flashcards.html">
+        <div class="icon">🗂️</div>
+        <h3>Math Vocab Flashcards</h3>
+        <p>Flip through academic math-vocabulary flashcard decks, term to definition and back, shuffle included.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">vocabulary</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./practice-problems.html">
+        <div class="icon">✏️</div>
+        <h3>Practice Problems</h3>
+        <p>Auto-generated arithmetic, integer and equation drills across difficulty levels, with instant answer checking.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">practice</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./core-skills-builder.html">
+        <div class="icon">🧩</div>
+        <h3>Core Skills Builder</h3>
+        <p>Drill foundational number skills — fraction operations, simplifying, GCF, LCM, order of operations and more.</p>
+        <div class="tags"><span class="tag">math</span><span class="tag">practice</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="cat">
+    <h2 id="fun">Fun &amp; Learning</h2>
+    <p class="cap">Teaching helpers and things to argue with your friends about.</p>
+    <div class="cards">
+      <a class="card" href="./equation-solver.html">
+        <div class="icon">🧮</div>
+        <h3>Equation Solver</h3>
+        <p>Solve linear and quadratic equations step by step, with every move explained like a patient teacher — and the answer checked at the end.</p>
+        <div class="tags"><span class="tag">teaching</span><span class="tag">math</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./unit-converter.html">
+        <div class="icon">📏</div>
+        <h3>Unit Converter</h3>
+        <p>Convert length, area, temperature, running pace and more across 12 categories — including the GIS units nobody remembers.</p>
+        <div class="tags"><span class="tag">units</span><span class="tag">GIS</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./vacation-selector.html">
+        <div class="icon">🏝️</div>
+        <h3>Vacation Selector</h3>
+        <p>A short, adaptive survey — each page tailored to your last answers — matches you to travel destinations from a curated set of ~85 places worldwide, with shareable results.</p>
+        <div class="tags"><span class="tag">travel</span><span class="tag">quiz</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./decision-wheel.html">
+        <div class="icon">🎡</div>
+        <h3>Decision Wheel</h3>
+        <p>Can't decide? Type your options and spin the wheel — confetti included. Share a link so the group can't blame you.</p>
+        <div class="tags"><span class="tag">fun</span><span class="tag">random</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./soccer-tactics-board.html">
+        <div class="icon">⚽</div>
+        <h3>Soccer Tactics Board</h3>
+        <p>Set up formations on a scale pitch, drag players, draw movement and passing runs, animate a move across frames, then export or share.</p>
+        <div class="tags"><span class="tag">soccer</span><span class="tag">tactics</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./bracket-builder.html">
+        <div class="icon">🏆</div>
+        <h3>Tournament Bracket Builder</h3>
+        <p>Build single- or double-elimination brackets or a round-robin league, enter results, and watch standings and the champion emerge. Works for any contest.</p>
+        <div class="tags"><span class="tag">tournaments</span><span class="tag">sports</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./shot-map-xg.html">
+        <div class="icon">⚽</div>
+        <h3>Shot Map &amp; xG Visualizer</h3>
+        <p>Click a pitch to log shots and watch Expected Goals compute live from distance and angle — a shot map plus a cumulative xG race chart.</p>
+        <div class="tags"><span class="tag">soccer</span><span class="tag">xG</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./match-timeline-creator.html">
+        <div class="icon">📋</div>
+        <h3>Match Timeline Creator</h3>
+        <p>Log goals, cards, subs and VAR drama minute by minute and get a clean match-timeline infographic — export PNG, SVG or a text report.</p>
+        <div class="tags"><span class="tag">soccer</span><span class="tag">infographic</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./training-session-planner.html">
+        <div class="icon">🎯</div>
+        <h3>Training Session Planner</h3>
+        <p>Drag cones, goals, players and coaching arrows onto a pitch to build multi-drill practice sessions — print clean coaching sheets.</p>
+        <div class="tags"><span class="tag">soccer</span><span class="tag">coaching</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./league-whatif-calculator.html">
+        <div class="icon">🧮</div>
+        <h3>League Table What-If Calculator</h3>
+        <p>Click W/D/L on remaining fixtures and watch the standings reshuffle live — with every possible finish enumerated for any team.</p>
+        <div class="tags"><span class="tag">soccer</span><span class="tag">standings</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+      <a class="card" href="./lineup-card-generator.html">
+        <div class="icon">📇</div>
+        <h3>Match Lineup Card Generator</h3>
+        <p>Type in your Starting XI and get a shareable lineup graphic in Pitch, List or Broadcast style — sized for social, exported as PNG.</p>
+        <div class="tags"><span class="tag">soccer</span><span class="tag">graphics</span><span class="tag">no deps</span></div>
+        <span class="open">Open<span class="arrow">→</span></span>
+      </a>
+    </div>
+  </section>
+
+  <footer class="app">76 tools and counting. Source in <code>mapzimus/max</code>.</footer>
+</div>
+
+<script>
+  const root = document.documentElement;
+  const saved = localStorage.getItem('max-theme');
+  if (saved) root.setAttribute('data-theme', saved);
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const cur = root.getAttribute('data-theme');
+    const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const next = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('max-theme', next);
+  });
+</script>
+</body>
+</html>

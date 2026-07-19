@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flight Route Plotter</title>
+<meta name="description" content="Build a multi-leg flight route between cities and airports, see true great-circle paths, distances and estimated flight times, and export GeoJSON.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { border-color: var(--ok); color: var(--ok); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+  .examples button { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; }
+  .examples button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; }
+  .panel h2 { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+  .panel + .panel { margin-top: 16px; }
+
+  .add-row { display: flex; gap: 8px; }
+  .add-row input { flex: 1; min-width: 0; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 9px 10px; font-size: .9rem; font-family: var(--sans); }
+  .add-row input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  .add-row .btn { flex: none; }
+  .hint { color: var(--muted); font-size: .78rem; margin: 6px 0 0; }
+  .note.err { color: var(--danger); font-size: .8rem; min-height: 1.1em; margin: 6px 0 0; }
+
+  .search-results { list-style: none; margin: 8px 0 0; padding: 0; }
+  .search-results li { padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 4px; cursor: pointer; font-size: .86rem; background: var(--surface); }
+  .search-results li:hover { border-color: var(--accent); color: var(--accent); }
+  .hide { display: none !important; }
+
+  /* waypoint list */
+  .wp-list { list-style: none; margin: 0; padding: 0; }
+  .wp-list li { display: flex; align-items: center; gap: 10px; padding: 8px 6px; border-top: 1px solid var(--border); }
+  .wp-list li:first-child { border-top: none; }
+  .wp-num { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: .75rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+  .wp-info { flex: 1; min-width: 0; }
+  .wp-info .wp-name { font-size: .88rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+  .wp-info .wp-ll { font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+  .wp-btns { flex: none; display: flex; gap: 4px; }
+  .wp-btns button { border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 7px; width: 28px; height: 28px; cursor: pointer; font-size: .78rem; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+  .wp-btns button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .wp-btns button.wp-del:hover { border-color: var(--danger); color: var(--danger); }
+  .wp-btns button:disabled { opacity: .35; cursor: default; }
+
+  .empty { color: var(--muted); font-size: .86rem; padding: 8px 2px; }
+  .empty ul { margin: 8px 0 0; padding-left: 20px; }
+  .empty li { margin: 3px 0; }
+
+  /* legs table */
+  .legs-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .legs-head h2 { margin: 0; }
+  .legs-head select { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 5px 8px; font-size: .82rem; font-family: var(--sans); }
+  table.legs { width: 100%; border-collapse: collapse; font-size: .86rem; }
+  table.legs th { text-align: left; font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 4px 8px; border-bottom: 1px solid var(--border); }
+  table.legs td { padding: 7px 8px; border-bottom: 1px solid var(--border); }
+  table.legs th:nth-child(2), table.legs td:nth-child(2),
+  table.legs th:nth-child(3), table.legs td:nth-child(3) { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  table.legs tbody tr { cursor: pointer; }
+  table.legs tbody tr:hover { background: var(--surface-2); }
+  table.legs tbody tr.sel { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
+  table.legs tfoot td { font-weight: 700; border-bottom: none; }
+  .legs-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+  /* map */
+  #map { height: 560px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
+  @media (max-width: 860px){ #map { height: 380px; } }
+  .leaflet-container { font-family: var(--sans); background: var(--surface-2); }
+  .map-fallback { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); height: 560px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .92rem; text-align: center; padding: 24px; }
+  @media (max-width: 860px){ .map-fallback { height: 380px; } }
+  .wp-marker span { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); border: 2px solid var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.35); font: 700 .72rem/1 var(--sans); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Flight Route Plotter</h1>
+      <p>Build a multi-leg route between cities or airports and see the true great-circle path each flight follows, with distances and rough flight times. Runs in your browser; only the optional place search calls the internet.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="examples" aria-label="Examples">
+    <button type="button" id="exampleBtn">✈️ Try an example: World tour (JFK → LHR → DXB → SIN → SYD → LAX → JFK)</button>
+  </div>
+
+  <div class="grid">
+    <div>
+      <!-- add waypoints -->
+      <section class="panel">
+        <h2>Add a stop</h2>
+        <div class="add-row">
+          <input id="airportPick" list="airportList" placeholder="Pick a major airport — type a city or code (e.g. JFK)…" autocomplete="off" aria-label="Pick a major airport by code or city">
+          <button class="btn" id="airportAddBtn" type="button">＋ Add</button>
+        </div>
+        <datalist id="airportList"></datalist>
+        <div class="add-row" style="margin-top:8px">
+          <input id="placeSearch" type="text" placeholder="…or search any place name (uses OpenStreetMap)" aria-label="Search any place name">
+          <button class="btn" id="placeSearchBtn" type="button">🔍 Search</button>
+        </div>
+        <ul class="search-results hide" id="searchResults"></ul>
+        <p class="hint">You can also click anywhere on the map to drop the next stop.</p>
+        <p class="note err" id="addErr"></p>
+      </section>
+
+      <!-- route list -->
+      <section class="panel">
+        <h2>Route</h2>
+        <ul class="wp-list" id="wpList"></ul>
+        <div class="empty" id="emptyState">
+          No stops yet. Add them three ways:
+          <ul>
+            <li><strong>Quick-pick</strong> a major airport above (type a code like <code>JFK</code> or a city),</li>
+            <li><strong>Search</strong> any place name, or</li>
+            <li><strong>Click the map</strong> where you want the next stop.</li>
+          </ul>
+          Add two or more stops to see the great-circle legs.
+        </div>
+      </section>
+
+      <!-- legs -->
+      <section class="panel" id="legsPanel">
+        <div class="legs-head">
+          <h2>Legs</h2>
+          <label style="font-size:.78rem;color:var(--muted)">Units
+            <select id="unitSel" aria-label="Distance units">
+              <option value="km">km</option>
+              <option value="mi">mi</option>
+              <option value="nmi">nmi</option>
+            </select>
+          </label>
+        </div>
+        <table class="legs" id="legTable">
+          <thead><tr><th scope="col">Leg</th><th scope="col">Distance</th><th scope="col">Est. time</th></tr></thead>
+          <tbody id="legBody"></tbody>
+          <tfoot><tr><td>Total</td><td id="totDist">—</td><td id="totTime">—</td></tr></tfoot>
+        </table>
+        <p class="hint">Time estimate: distance ÷ 850 km/h cruise + 45 min per leg for climb, descent and taxi. Click a leg to zoom to it.</p>
+        <div class="legs-actions">
+          <button class="btn primary" id="fitBtn" type="button">🗺 Fit route</button>
+          <button class="btn" id="dlBtn" type="button">⬇ Download GeoJSON</button>
+          <button class="btn" id="copyBtn" type="button">⧉ Copy GeoJSON</button>
+          <button class="btn" id="clearBtn" type="button">✕ Clear route</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- map -->
+    <section>
+      <div id="map" aria-label="Map. Click to add the next stop of the route."></div>
+    </section>
+  </div>
+
+  <footer class="app">
+    Great-circle paths are the shortest routes over the globe — that's why long flights bend toward the poles on flat maps. Share your route with the URL: it's stored in the <code>#hash</code>. · a <strong>max</strong> tool
+  </footer>
+</div>
+
+<script>
+'use strict';
+/* ============================================================
+   Flight Route Plotter — standalone, client-side.
+   Only dependency: Leaflet 1.9.4 (background-loaded below).
+   Great-circle math (slerp + haversine) implemented inline.
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+
+/* ---------------- ~40 major airports for quick-pick ---------------- */
+const AIRPORTS = [
+  ['JFK','New York',40.6413,-73.7781], ['LAX','Los Angeles',33.9416,-118.4085],
+  ['ORD','Chicago',41.9742,-87.9073],  ['DEN','Denver',39.8561,-104.6737],
+  ['ATL','Atlanta',33.6407,-84.4277],  ['SFO','San Francisco',37.6213,-122.3790],
+  ['SEA','Seattle',47.4502,-122.3088], ['MIA','Miami',25.7959,-80.2870],
+  ['BOS','Boston',42.3656,-71.0096],   ['LHR','London',51.4700,-0.4543],
+  ['CDG','Paris',49.0097,2.5479],      ['FRA','Frankfurt',50.0379,8.5622],
+  ['AMS','Amsterdam',52.3105,4.7683],  ['MAD','Madrid',40.4983,-3.5676],
+  ['FCO','Rome',41.8003,12.2389],      ['IST','Istanbul',41.2753,28.7519],
+  ['DXB','Dubai',25.2532,55.3657],     ['DOH','Doha',25.2731,51.6081],
+  ['JNB','Johannesburg',-26.1367,28.2411], ['CAI','Cairo',30.1219,31.4056],
+  ['LOS','Lagos',6.5774,3.3212],       ['NRT','Tokyo Narita',35.7720,140.3929],
+  ['HND','Tokyo Haneda',35.5494,139.7798], ['ICN','Seoul',37.4602,126.4407],
+  ['PEK','Beijing',40.0799,116.6031],  ['PVG','Shanghai',31.1443,121.8083],
+  ['HKG','Hong Kong',22.3080,113.9185],['SIN','Singapore',1.3644,103.9915],
+  ['BKK','Bangkok',13.6900,100.7501],  ['DEL','Delhi',28.5562,77.1000],
+  ['BOM','Mumbai',19.0896,72.8656],    ['SYD','Sydney',-33.9399,151.1753],
+  ['MEL','Melbourne',-37.6690,144.8410],['AKL','Auckland',-37.0082,174.7850],
+  ['GRU','São Paulo',-23.4356,-46.4731],['EZE','Buenos Aires',-34.8222,-58.5358],
+  ['SCL','Santiago',-33.3930,-70.7858],['LIM','Lima',-12.0219,-77.1143],
+  ['MEX','Mexico City',19.4363,-99.0721],['YYZ','Toronto',43.6777,-79.6248],
+  ['YVR','Vancouver',49.1947,-123.1839],
+];
+
+/* ---------------- great-circle math ---------------- */
+const R_EARTH = 6371.0088;                 // mean Earth radius, km
+const RAD = Math.PI / 180, DEG = 180 / Math.PI;
+const ARC_SEGS = 64;                       // interpolated points per leg
+
+function haversineKm(a, b) {               // a,b = [lat,lng] degrees
+  const p1 = a[0] * RAD, p2 = b[0] * RAD;
+  const dp = (b[0] - a[0]) * RAD, dl = (b[1] - a[1]) * RAD;
+  const h = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
+  return 2 * R_EARTH * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+function toVec(lat, lng) {
+  const p = lat * RAD, l = lng * RAD;
+  return [Math.cos(p) * Math.cos(l), Math.cos(p) * Math.sin(l), Math.sin(p)];
+}
+function vecToLL(v) {
+  return [Math.asin(Math.max(-1, Math.min(1, v[2]))) * DEG, Math.atan2(v[1], v[0]) * DEG];
+}
+// Spherical linear interpolation between two points; returns ARC_SEGS+1 [lat,lng] points.
+function slerpArc(a, b) {
+  const va = toVec(a[0], a[1]), vb = toVec(b[0], b[1]);
+  const dot = Math.max(-1, Math.min(1, va[0] * vb[0] + va[1] * vb[1] + va[2] * vb[2]));
+  const w = Math.acos(dot), sinW = Math.sin(w);
+  const pts = [];
+  if (w < 1e-9 || sinW < 1e-9) {
+    // coincident (or antipodal — path undefined; fall back to straight interpolation)
+    for (let i = 0; i <= ARC_SEGS; i++) {
+      const t = i / ARC_SEGS;
+      pts.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+    }
+    return pts;
+  }
+  for (let i = 0; i <= ARC_SEGS; i++) {
+    const t = i / ARC_SEGS;
+    const k1 = Math.sin((1 - t) * w) / sinW, k2 = Math.sin(t * w) / sinW;
+    pts.push(vecToLL([k1 * va[0] + k2 * vb[0], k1 * va[1] + k2 * vb[1], k1 * va[2] + k2 * vb[2]]));
+  }
+  pts[0] = [a[0], a[1]]; pts[ARC_SEGS] = [b[0], b[1]];  // exact endpoints
+  return pts;
+}
+// Split an arc at the antimeridian: whenever consecutive lngs jump > 180°,
+// insert crossing points at ±180 (linear lat interpolation on the unwrapped
+// segment) and start a new part, so no polyline streaks across the map.
+function splitAntimeridian(pts) {
+  const parts = [];
+  let cur = [pts[0]];
+  for (let i = 1; i < pts.length; i++) {
+    const [lat0, ln0] = pts[i - 1], [lat1, ln1] = pts[i];
+    const d = ln1 - ln0;
+    if (Math.abs(d) > 180) {
+      const edge = d < 0 ? 180 : -180;                 // boundary on the outgoing side
+      const ln1u = ln1 - Math.sign(d) * 360;           // unwrap so segment is continuous
+      const t = (edge - ln0) / (ln1u - ln0);
+      const latX = lat0 + (lat1 - lat0) * t;
+      cur.push([latX, edge]);
+      parts.push(cur);
+      cur = [[latX, -edge], [lat1, ln1]];
+    } else {
+      cur.push([lat1, ln1]);
+    }
+  }
+  parts.push(cur);
+  return parts;
+}
+// Unwrap longitudes into a continuous sequence (for nice fitBounds).
+function unwrapPts(pts) {
+  const out = [pts[0].slice()];
+  for (let i = 1; i < pts.length; i++) {
+    let ln = pts[i][1];
+    const prev = out[i - 1][1];
+    while (ln - prev > 180) ln -= 360;
+    while (ln - prev < -180) ln += 360;
+    out.push([pts[i][0], ln]);
+  }
+  return out;
+}
+
+/* ---------------- units & time ---------------- */
+const UNITS = { km: { f: 1, lbl: 'km' }, mi: { f: 1 / 1.609344, lbl: 'mi' }, nmi: { f: 1 / 1.852, lbl: 'nmi' } };
+let unit = 'km';
+try { const u = localStorage.getItem('max-flight-units'); if (u && UNITS[u]) unit = u; } catch (e) { /* storage blocked */ }
+
+function fmtDist(km) {
+  const v = km * UNITS[unit].f;
+  const s = v.toLocaleString('en-US', { maximumFractionDigits: v < 100 ? 1 : 0 });
+  return `${s} ${UNITS[unit].lbl}`;
+}
+function legHours(km) { return km / 850 + 0.75; }      // cruise 850 km/h + 45 min overhead
+function fmtTime(hours) {
+  const m = Math.round(hours * 60);
+  return `~${Math.floor(m / 60)}h ${m % 60}m`;
+}
+
+/* ---------------- state ---------------- */
+let waypoints = [];        // {name, lat, lng}
+let legs = [];             // {from, to, distKm, pts, parts, unwrapped}
+let selectedLeg = -1;
+let map = null, markerLayer = null, arcLayer = null, mapReady = false;
+let legLines = [];         // per-leg array of L.polyline
+
+function shortName(wp) {
+  const m = wp.name.match(/^[A-Z]{3}\b/);
+  if (m) return m[0];
+  return wp.name.length > 14 ? wp.name.slice(0, 13) + '…' : wp.name;
+}
+
+function recompute() {
+  legs = [];
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const a = waypoints[i], b = waypoints[i + 1];
+    const pts = slerpArc([a.lat, a.lng], [b.lat, b.lng]);
+    legs.push({
+      from: a, to: b,
+      distKm: haversineKm([a.lat, a.lng], [b.lat, b.lng]),
+      pts,
+      parts: splitAntimeridian(pts),
+      unwrapped: unwrapPts(pts),
+    });
+  }
+  if (selectedLeg >= legs.length) selectedLeg = -1;
+  renderList();
+  renderTable();
+  renderMapLayers();
+  syncHash();
+}
+
+/* ---------------- waypoint list ---------------- */
+function renderList() {
+  const ul = $('wpList');
+  ul.innerHTML = '';
+  $('emptyState').classList.toggle('hide', waypoints.length > 0);
+  waypoints.forEach((wp, i) => {
+    const li = document.createElement('li');
+    const num = document.createElement('span');
+    num.className = 'wp-num'; num.textContent = i + 1;
+    const info = document.createElement('div');
+    info.className = 'wp-info';
+    const nm = document.createElement('span'); nm.className = 'wp-name'; nm.textContent = wp.name; nm.title = wp.name;
+    const ll = document.createElement('span'); ll.className = 'wp-ll';
+    ll.textContent = `${wp.lat.toFixed(4)}, ${wp.lng.toFixed(4)}`;
+    info.append(nm, ll);
+    const btns = document.createElement('div');
+    btns.className = 'wp-btns';
+    const up = document.createElement('button');
+    up.type = 'button'; up.textContent = '▲'; up.disabled = i === 0;
+    up.setAttribute('aria-label', `Move ${wp.name} up`);
+    up.addEventListener('click', () => moveWp(i, -1));
+    const dn = document.createElement('button');
+    dn.type = 'button'; dn.textContent = '▼'; dn.disabled = i === waypoints.length - 1;
+    dn.setAttribute('aria-label', `Move ${wp.name} down`);
+    dn.addEventListener('click', () => moveWp(i, 1));
+    const del = document.createElement('button');
+    del.type = 'button'; del.textContent = '✕'; del.className = 'wp-del';
+    del.setAttribute('aria-label', `Remove ${wp.name}`);
+    del.addEventListener('click', () => { waypoints.splice(i, 1); selectedLeg = -1; recompute(); });
+    btns.append(up, dn, del);
+    li.append(num, info, btns);
+    ul.appendChild(li);
+  });
+}
+function moveWp(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= waypoints.length) return;
+  [waypoints[i], waypoints[j]] = [waypoints[j], waypoints[i]];
+  selectedLeg = -1;
+  recompute();
+}
+function addWaypoint(name, lat, lng, opts) {
+  $('addErr').textContent = '';
+  if (!isFinite(lat) || !isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    $('addErr').textContent = 'That point is out of range.'; return;
+  }
+  waypoints.push({ name: String(name || `Point ${waypoints.length + 1}`).slice(0, 80), lat, lng });
+  recompute();
+  if (!opts || !opts.noFit) fitRoute();
+}
+
+/* ---------------- legs table ---------------- */
+function renderTable() {
+  const tb = $('legBody');
+  tb.innerHTML = '';
+  let totKm = 0, totH = 0;
+  legs.forEach((leg, i) => {
+    totKm += leg.distKm; totH += legHours(leg.distKm);
+    const tr = document.createElement('tr');
+    tr.dataset.leg = i;
+    if (i === selectedLeg) tr.classList.add('sel');
+    const c1 = document.createElement('td');
+    c1.textContent = `${shortName(leg.from)} → ${shortName(leg.to)}`;
+    const c2 = document.createElement('td'); c2.textContent = fmtDist(leg.distKm);
+    const c3 = document.createElement('td'); c3.textContent = fmtTime(legHours(leg.distKm));
+    tr.append(c1, c2, c3);
+    tr.addEventListener('click', () => selectLeg(i));
+    tb.appendChild(tr);
+  });
+  $('totDist').textContent = legs.length ? fmtDist(totKm) : '—';
+  $('totTime').textContent = legs.length ? fmtTime(totH) : '—';
+}
+function selectLeg(i) {
+  selectedLeg = i;
+  renderTable();
+  styleArcs();
+  if (mapReady && legs[i]) {
+    map.fitBounds(L.latLngBounds(legs[i].unwrapped), { padding: [40, 40] });
+  }
+}
+
+/* ---------------- map ---------------- */
+function renderMapLayers() {
+  if (!mapReady) return;
+  markerLayer.clearLayers();
+  arcLayer.clearLayers();
+  legLines = [];
+  waypoints.forEach((wp, i) => {
+    L.marker([wp.lat, wp.lng], {
+      icon: L.divIcon({ className: 'wp-marker', html: `<span>${i + 1}</span>`, iconSize: [24, 24], iconAnchor: [12, 12] }),
+      keyboard: false,
+    }).bindTooltip(wp.name).addTo(markerLayer);
+  });
+  legs.forEach((leg, i) => {
+    const lines = leg.parts.map(part => L.polyline(part, { color: accentColor() }).addTo(arcLayer));
+    lines.forEach(pl => pl.on('click', () => selectLeg(i)));
+    legLines.push(lines);
+  });
+  styleArcs();
+}
+function accentColor() {
+  return getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#2563eb';
+}
+function styleArcs() {
+  if (!mapReady) return;
+  const acc = accentColor();
+  legLines.forEach((lines, i) => {
+    const sel = i === selectedLeg;
+    lines.forEach(pl => pl.setStyle({
+      color: acc, weight: sel ? 5 : 2.5, opacity: sel ? 1 : .8,
+      dashArray: sel ? null : '1 7', lineCap: 'round',
+    }));
+  });
+}
+function fitRoute() {
+  if (!mapReady) return;
+  if (!waypoints.length) return;
+  if (legs.length) {
+    let all = [];
+    let prevEnd = null;
+    legs.forEach(leg => {
+      let u = leg.unwrapped;
+      if (prevEnd !== null) {                 // keep the whole route continuous
+        let shift = 0;
+        while (u[0][1] + shift - prevEnd > 180) shift -= 360;
+        while (u[0][1] + shift - prevEnd < -180) shift += 360;
+        if (shift) u = u.map(p => [p[0], p[1] + shift]);
+      }
+      prevEnd = u[u.length - 1][1];
+      all = all.concat(u);
+    });
+    map.fitBounds(L.latLngBounds(all), { padding: [40, 40] });
+  } else {
+    map.setView([waypoints[0].lat, waypoints[0].lng], 5);
+  }
+}
+
+/* ---------------- Leaflet background load (never blocks the UI) ---------------- */
+(function loadLeaflet() {
+  const fail = () => {
+    const el = document.createElement('div');
+    el.className = 'map-fallback';
+    el.innerHTML = 'Map unavailable — the Leaflet library didn\'t load (offline or CDN blocked).<br>The route list, distances and GeoJSON export still work.';
+    $('map').replaceWith(el);
+  };
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='; css.crossOrigin = '';
+  const js = document.createElement('script');
+  js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  js.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='; js.crossOrigin = '';
+  js.onload = () => {
+    if (!window.L) { fail(); return; }
+    map = L.map('map', { worldCopyJump: true }).setView([25, 10], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+    markerLayer = L.layerGroup().addTo(map);
+    arcLayer = L.layerGroup().addTo(map);
+    map.on('click', (e) => {
+      const lat = e.latlng.lat, lng = ((e.latlng.lng + 540) % 360) - 180;
+      addWaypoint(`Point ${waypoints.length + 1} (${lat.toFixed(2)}, ${lng.toFixed(2)})`, lat, lng, { noFit: true });
+    });
+    mapReady = true;
+    renderMapLayers();
+    if (waypoints.length) fitRoute();
+  };
+  js.onerror = fail;
+  document.head.append(css, js);
+})();
+
+/* ---------------- airport quick-pick ---------------- */
+(function initAirports() {
+  const dl = $('airportList');
+  AIRPORTS.forEach(([code, city]) => {
+    const o = document.createElement('option');
+    o.value = `${code} · ${city}`;
+    dl.appendChild(o);
+  });
+})();
+function tryAddAirport() {
+  const raw = $('airportPick').value.trim();
+  if (!raw) return;
+  const q = raw.toUpperCase();
+  const ap = AIRPORTS.find(([code, city]) =>
+    code === q || `${code} · ${city}`.toUpperCase() === q || city.toUpperCase() === q.replace(/^.*·\s*/, ''));
+  if (!ap) { $('addErr').textContent = `No quick-pick airport matches “${raw}” — try a 3-letter code like JFK, or use the place search.`; return; }
+  $('airportPick').value = '';
+  $('addErr').textContent = '';
+  addWaypoint(`${ap[0]} · ${ap[1]}`, ap[2], ap[3]);
+}
+$('airportAddBtn').addEventListener('click', tryAddAirport);
+$('airportPick').addEventListener('keydown', (e) => { if (e.key === 'Enter') tryAddAirport(); });
+$('airportPick').addEventListener('change', tryAddAirport);
+
+/* ---------------- Nominatim place search ---------------- */
+async function searchPlace() {
+  const q = $('placeSearch').value.trim();
+  if (!q) return;
+  $('addErr').textContent = '';
+  const btn = $('placeSearchBtn');
+  btn.textContent = '⏳'; btn.disabled = true;
+  try {
+    const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(q)}`);
+    const data = await resp.json();
+    const ul = $('searchResults');
+    ul.innerHTML = ''; ul.classList.remove('hide');
+    if (!data.length) { ul.innerHTML = '<li style="cursor:default;color:var(--muted)">No results found</li>'; }
+    else data.forEach(r => {
+      const li = document.createElement('li');
+      li.textContent = r.display_name;
+      li.addEventListener('click', () => {
+        const name = r.display_name.split(',').slice(0, 2).join(',').trim() || r.display_name;
+        addWaypoint(name, parseFloat(r.lat), parseFloat(r.lon));
+        ul.classList.add('hide');
+        $('placeSearch').value = '';
+      });
+      ul.appendChild(li);
+    });
+  } catch (e) {
+    $('addErr').textContent = 'Place search failed — check your connection. Quick-picks and map clicks still work.';
+  }
+  btn.textContent = '🔍 Search'; btn.disabled = false;
+}
+$('placeSearchBtn').addEventListener('click', searchPlace);
+$('placeSearch').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchPlace(); });
+
+/* ---------------- units ---------------- */
+$('unitSel').value = unit;
+$('unitSel').addEventListener('change', () => {
+  unit = $('unitSel').value;
+  try { localStorage.setItem('max-flight-units', unit); } catch (e) { /* ignore */ }
+  renderTable();
+});
+
+/* ---------------- buttons ---------------- */
+$('fitBtn').addEventListener('click', () => { selectedLeg = -1; renderTable(); styleArcs(); fitRoute(); });
+$('clearBtn').addEventListener('click', () => { waypoints = []; selectedLeg = -1; recompute(); });
+$('exampleBtn').addEventListener('click', () => {
+  const codes = ['JFK', 'LHR', 'DXB', 'SIN', 'SYD', 'LAX', 'JFK'];
+  waypoints = codes.map(c => {
+    const a = AIRPORTS.find(x => x[0] === c);
+    return { name: `${a[0]} · ${a[1]}`, lat: a[2], lng: a[3] };
+  });
+  selectedLeg = -1;
+  recompute();
+  fitRoute();
+});
+
+/* ---------------- GeoJSON export ---------------- */
+function buildGeoJSON() {
+  const features = waypoints.map((wp, i) => ({
+    type: 'Feature',
+    properties: { name: wp.name, order: i + 1 },
+    geometry: { type: 'Point', coordinates: [+wp.lng.toFixed(6), +wp.lat.toFixed(6)] },
+  }));
+  legs.forEach((leg, i) => {
+    const rings = leg.parts.map(part => part.map(p => [+p[1].toFixed(5), +p[0].toFixed(5)]));
+    features.push({
+      type: 'Feature',
+      properties: {
+        leg: i + 1, from: leg.from.name, to: leg.to.name,
+        distance_km: +leg.distKm.toFixed(1),
+        est_time: fmtTime(legHours(leg.distKm)),
+      },
+      geometry: rings.length === 1
+        ? { type: 'LineString', coordinates: rings[0] }
+        : { type: 'MultiLineString', coordinates: rings },
+    });
+  });
+  return { type: 'FeatureCollection', features };
+}
+$('dlBtn').addEventListener('click', () => {
+  if (!waypoints.length) { $('addErr').textContent = 'Add at least one stop first.'; return; }
+  const blob = new Blob([JSON.stringify(buildGeoJSON(), null, 2)], { type: 'application/geo+json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'flight-route.geojson';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+$('copyBtn').addEventListener('click', async () => {
+  if (!waypoints.length) { $('addErr').textContent = 'Add at least one stop first.'; return; }
+  const btn = $('copyBtn');
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(buildGeoJSON(), null, 2));
+    const old = btn.textContent;
+    btn.classList.add('copied'); btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1200);
+  } catch (e) { $('addErr').textContent = 'Clipboard blocked by the browser — use Download instead.'; }
+});
+
+/* ---------------- shareable URL hash ---------------- */
+// #lat,lng,name;lat,lng,name;…  (4 decimals, names URI-encoded)
+function syncHash() {
+  const h = waypoints.map(w => `${w.lat.toFixed(4)},${w.lng.toFixed(4)},${encodeURIComponent(w.name)}`).join(';');
+  history.replaceState(null, '', h ? '#' + h : location.pathname + location.search);
+}
+function restoreFromHash() {
+  const h = location.hash.replace(/^#/, '');
+  if (!h) return false;
+  const wps = [];
+  for (const seg of h.split(';')) {
+    const m = seg.match(/^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),(.*)$/);
+    if (!m) return false;
+    const lat = parseFloat(m[1]), lng = parseFloat(m[2]);
+    if (!isFinite(lat) || !isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return false;
+    let name = '';
+    try { name = decodeURIComponent(m[3]); } catch (e) { name = m[3]; }
+    wps.push({ name: name || `Point ${wps.length + 1}`, lat, lng });
+  }
+  if (!wps.length) return false;
+  waypoints = wps;
+  return true;
+}
+
+/* ---------------- theme toggle ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+  styleArcs();   // marker/arc accent color follows the theme
+});
+
+/* ---------------- boot ---------------- */
+restoreFromHash();
+recompute();
+
+// tiny debug/testing handle (not part of the UI)
+window.__fp = {
+  get waypoints() { return waypoints; },
+  get legs() { return legs; },
+  get unit() { return unit; },
+  get map() { return map; },
+  slerpArc, splitAntimeridian, haversineKm,
+};
+</script>
+</body>
+</html>

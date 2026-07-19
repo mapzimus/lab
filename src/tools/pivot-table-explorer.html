@@ -1,0 +1,1281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pivot Table Explorer</title>
+<meta name="description" content="Load a CSV, drag or click fields into Rows, Columns, Values and Filters, and get a live pivot table — nested groups, subtotals, sorting, and a quick chart. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.sm { padding: 4px 10px; font-size: .78rem; }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
+  .note { color: var(--muted); font-size: .8rem; }
+  .note.err { color: var(--danger); }
+  .note.okc { color: var(--ok); }
+  .hide { display: none !important; }
+  body:not(.loaded) .needs-data { display: none; }
+  .spacer { flex: 1 1 auto; }
+  .cap { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+
+  input[type="text"], input[type="search"], input[type="number"], input[type="date"], textarea, select { font-family: var(--sans); font-size: .88rem; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; }
+
+  /* ---- input card ---- */
+  #fileInput { display: none; }
+  #dropzone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 26px 16px; text-align: center; cursor: pointer; background: var(--surface-2); transition: border-color .15s, background .15s; }
+  #dropzone:hover, #dropzone:focus-visible, #dropzone.drag { border-color: var(--accent); }
+  #dropzone.drag { background: var(--surface); }
+  #dropzone .dz-icon { font-size: 1.6rem; line-height: 1; margin-bottom: 8px; color: var(--muted); }
+  #dropzone .dz-main { font-size: .95rem; }
+  #dropzone .dz-main .linky { color: var(--accent); text-decoration: underline; }
+  #dropzone .dz-sub { color: var(--muted); font-size: .8rem; margin-top: 4px; }
+  body.loaded #dropzone { padding: 10px 16px; }
+  body.loaded #dropzone .dz-icon, body.loaded #dropzone .dz-sub { display: none; }
+  .input-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 12px; }
+  .inline-lbl { display: inline-flex; align-items: center; gap: 7px; font-size: .84rem; color: var(--muted); white-space: nowrap; }
+  #pasteBox { margin-top: 12px; }
+  #pasteBox summary { cursor: pointer; font-size: .86rem; color: var(--muted); }
+  #pasteBox summary:hover { color: var(--accent); }
+  #pasteBox textarea { width: 100%; min-height: 130px; margin-top: 10px; font-family: var(--mono); font-size: .8rem; white-space: pre; }
+
+  .strip { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .pill { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 5px 13px; font-size: .82rem; color: var(--muted); }
+  .pill strong { color: var(--text); font-weight: 600; }
+
+  .badge { font-size: .6rem; letter-spacing: .05em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-weight: 600; flex: none; }
+  .b-number { color: var(--accent); }
+  .b-date { color: var(--ok); }
+  .b-text { color: var(--muted); }
+
+  /* ---- layout: sidebar + main ---- */
+  .pv-layout { display: grid; grid-template-columns: 240px 1fr; gap: 16px; align-items: start; }
+  .pv-layout > * { min-width: 0; }
+  @media (max-width: 900px) { .pv-layout { grid-template-columns: minmax(0,1fr); } }
+
+  #fieldList { display: flex; flex-direction: column; }
+  .field-row { display: block; padding: 7px 2px; border-bottom: 1px solid var(--border); font-size: .82rem; cursor: grab; }
+  .field-row:last-child { border-bottom: none; }
+  .frow-top { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+  .fname { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  .fadds { display: flex; gap: 4px; }
+  .fadd { flex: 1 1 0; height: 22px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: .68rem; font-weight: 700; cursor: pointer; line-height: 1; padding: 0; }
+  .fadd:hover { border-color: var(--accent); color: var(--accent); }
+  .fadd.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+  /* ---- zones ---- */
+  .zones { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+  @media (max-width: 720px) { .zones { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  .zone { border: 1.5px dashed var(--border); border-radius: 10px; padding: 8px; min-height: 64px; background: var(--surface-2); transition: border-color .15s, background .15s; min-width: 0; }
+  .zone.drag { border-color: var(--accent); background: var(--surface); }
+  .zone-title { font-size: .68rem; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+  .zone-empty { font-size: .76rem; color: var(--muted); }
+  .chip-list { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip { display: inline-flex; align-items: center; gap: 3px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 3px 6px; font-size: .78rem; }
+  .chip select.chip-agg { font-size: .72rem; padding: 2px 4px; border-radius: 6px; max-width: 96px; }
+  .chip button { border: none; background: none; color: var(--muted); cursor: pointer; font-size: .78rem; padding: 1px 3px; line-height: 1; border-radius: 4px; }
+  .chip button:hover { color: var(--accent); background: var(--surface-2); }
+  .chip button.chip-x:hover { color: var(--danger); }
+  .chip button:disabled { opacity: .3; cursor: not-allowed; }
+
+  /* ---- filters ---- */
+  #filtersPanel { display: flex; flex-direction: column; gap: 10px; }
+  .fpanel { border: 1px solid var(--border); border-radius: 10px; padding: 10px; background: var(--surface-2); }
+  .fhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+  .fset { display: flex; flex-wrap: wrap; gap: 5px 14px; max-height: 140px; overflow: auto; padding: 2px; }
+  .chk { display: inline-flex; align-items: center; gap: 5px; font-size: .82rem; white-space: nowrap; }
+  .frow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 6px; }
+  .frow label { font-size: .8rem; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; }
+  .frow input { width: 130px; }
+
+  /* ---- toolbar / cap note ---- */
+  .pv-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px; }
+  #capNote { flex: 1 1 220px; min-height: 1.1em; }
+
+  /* ---- pivot table ---- */
+  .pv-wrap { max-height: 60vh; overflow: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  table.pvtable { border-collapse: separate; border-spacing: 0; width: 100%; font-size: .82rem; font-variant-numeric: tabular-nums; }
+  .pvtable th, .pvtable td { padding: 5px 9px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); white-space: nowrap; text-align: left; }
+  .pvtable th:last-child, .pvtable td:last-child { border-right: none; }
+  .pvtable thead th { position: sticky; top: 0; z-index: 3; background: var(--surface-2); font-weight: 600; }
+  .pvtable td.pv-val, .pvtable th.pv-valh { text-align: right; font-variant-numeric: tabular-nums; }
+  .pvtable td.pv-label.pv-lvl0, .pvtable th.pv-cornerh:first-child { position: sticky; left: 0; z-index: 1; background: var(--surface); }
+  .pvtable thead th.pv-cornerh:first-child { z-index: 4; background: var(--surface-2); }
+  .pv-sortlbl, .pv-sortval { border: none; background: none; color: var(--text); font: inherit; font-weight: 600; cursor: pointer; padding: 1px 2px; }
+  .pv-sortlbl:hover, .pv-sortval:hover { color: var(--accent); }
+  .pv-toggle { border: none; background: none; color: var(--muted); cursor: pointer; font-size: .8rem; padding: 0 3px 0 0; }
+  .pv-toggle:hover { color: var(--accent); }
+  tr.pv-subtotal td { background: var(--surface-2); font-weight: 600; }
+  tr.pv-grand td { background: var(--surface-2); font-weight: 700; border-top: 2px solid var(--border); }
+  tr.pv-leaf:hover td, tr.pv-group:hover td { background: var(--surface-2); }
+  td.pv-empty { text-align: center; color: var(--muted); padding: 22px; white-space: normal; }
+
+  /* ---- chart ---- */
+  #chartPanel { margin-top: 14px; }
+  #chartCanvas { display: block; width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 16px 12px 40px; }
+    #dropzone { padding: 18px 12px; }
+    .pv-wrap { max-height: 52vh; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Pivot Table Explorer</h1>
+      <p>Load a spreadsheet, click fields into Rows / Columns / Values / Filters, and watch a live pivot table build itself — nested subtotals, sorting, collapsible groups, CSV export and a quick chart.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <!-- ============ input ============ -->
+  <section class="panel" id="inputCard" aria-label="Load data">
+    <div id="dropzone" tabindex="0" role="button" aria-label="Drop a CSV or TSV file here, or press Enter to choose a file">
+      <div class="dz-icon" aria-hidden="true">⇪</div>
+      <div class="dz-main">Drop a <strong>.csv</strong> or <strong>.tsv</strong> file here — or <span class="linky">choose a file</span></div>
+      <div class="dz-sub">Everything runs in your browser. Your data never leaves this page.</div>
+    </div>
+    <input type="file" id="fileInput" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain" aria-hidden="true" tabindex="-1">
+    <div class="input-row">
+      <button class="btn" id="exampleBtn" type="button">Try an example</button>
+      <label class="inline-lbl">Delimiter
+        <select id="delimSel">
+          <option value="auto" selected>Auto-detect</option>
+          <option value="comma">Comma ,</option>
+          <option value="semicolon">Semicolon ;</option>
+          <option value="tab">Tab</option>
+          <option value="pipe">Pipe |</option>
+        </select>
+      </label>
+      <span class="note" id="inputNote" role="status"></span>
+    </div>
+    <details id="pasteBox">
+      <summary>Or paste data as text</summary>
+      <textarea id="pasteArea" spellcheck="false" aria-label="Paste CSV or TSV text here" placeholder="region,product,revenue&#10;APAC,Widget,120&#10;EMEA,Gizmo,80"></textarea>
+      <div style="margin-top:8px"><button class="btn primary" id="loadPasteBtn" type="button">Load pasted text</button></div>
+    </details>
+  </section>
+
+  <!-- ============ stats strip ============ -->
+  <section class="strip needs-data" id="statsStrip" aria-label="Dataset summary">
+    <span class="pill" id="stName"></span>
+    <span class="pill"><strong id="stShape"></strong></span>
+    <span class="pill" id="stSize"></span>
+  </section>
+
+  <!-- ============ main layout ============ -->
+  <div class="needs-data pv-layout">
+    <!-- ---- sidebar: field list ---- -->
+    <section class="panel" aria-label="Fields">
+      <div class="cap">Fields</div>
+      <div id="fieldList"></div>
+      <p class="note" style="margin-top:10px">Click <strong>R</strong>/<strong>C</strong>/<strong>V</strong>/<strong>F</strong> to add a field to Rows, Columns, Values or Filters. You can also drag a field into a zone.</p>
+    </section>
+
+    <!-- ---- right column ---- -->
+    <div>
+      <!-- zones -->
+      <section class="panel" id="zonesPanel" aria-label="Pivot layout">
+        <div class="cap">Pivot layout</div>
+        <div class="zones">
+          <div class="zone" id="zoneRows" data-zone="rows">
+            <div class="zone-title">Rows</div>
+            <div class="chip-list" id="chipsRows"></div>
+          </div>
+          <div class="zone" id="zoneCols" data-zone="cols">
+            <div class="zone-title">Columns</div>
+            <div class="chip-list" id="chipsCols"></div>
+          </div>
+          <div class="zone" id="zoneValues" data-zone="values">
+            <div class="zone-title">Values</div>
+            <div class="chip-list" id="chipsValues"></div>
+          </div>
+          <div class="zone" id="zoneFilters" data-zone="filters">
+            <div class="zone-title">Filters</div>
+            <div class="chip-list" id="chipsFilters"></div>
+          </div>
+        </div>
+        <div class="input-row">
+          <button class="btn" id="clearLayoutBtn" type="button">↺ Reset layout</button>
+          <span class="note">Layout is remembered for the next time you load data with the same columns (saved to your browser only).</span>
+        </div>
+      </section>
+
+      <!-- filter value pickers -->
+      <section class="panel hide" id="filtersPanel" aria-label="Filter values"></section>
+
+      <!-- pivot table -->
+      <section class="panel" aria-label="Pivot table">
+        <div class="pv-toolbar">
+          <button class="btn primary" id="dlCsv" type="button">⬇ Download CSV</button>
+          <button class="btn" id="copyCsv" type="button">⧉ Copy CSV</button>
+          <button class="btn" id="quickChartBtn" type="button" disabled>📊 Quick chart</button>
+          <span class="spacer"></span>
+          <span class="note" id="capNote" role="status"></span>
+        </div>
+        <div class="pv-wrap" tabindex="0" aria-label="Pivot table (scrollable)">
+          <table class="pvtable" id="pvTable">
+            <thead id="pvHead"></thead>
+            <tbody id="pvBody"></tbody>
+          </table>
+        </div>
+        <div class="note" style="margin-top:8px">Click a row-field header (in the left columns) or a value column header to sort. Click ▾/▸ next to a row group to collapse or expand it.</div>
+
+        <div class="panel hide" id="chartPanel" style="margin-top:14px; box-shadow:none;">
+          <div class="pv-toolbar">
+            <strong>Quick chart — row totals</strong>
+            <span class="spacer"></span>
+            <span class="note" id="chartNote"></span>
+            <button class="btn sm" id="closeChartBtn" type="button">× Close</button>
+          </div>
+          <canvas id="chartCanvas" width="600" height="200" aria-label="Bar chart of row totals"></canvas>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer class="app">Your file is processed entirely in your browser — nothing is uploaded. · a <strong>max</strong> tool</footer>
+</div>
+
+<script type="module">
+/* ============================================================
+   Pivot Table Explorer — standalone, fully client-side, zero deps.
+   ============================================================ */
+window.__PV_READY__ = false;
+const $ = (s) => document.querySelector(s);
+const DELIM_CHARS = { comma: ',', semicolon: ';', tab: '\t', pipe: '|' };
+
+// ---------- tiny helpers ----------
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const escAttr = (s) => esc(s).replace(/"/g, '&quot;');
+const fmtInt = (n) => Math.round(n).toLocaleString();
+const fmtNum = (n) => (typeof n === 'number' ? n.toLocaleString(undefined, { maximumFractionDigits: 2 }) : String(n));
+const plural = (n, word) => fmtInt(n) + ' ' + word + (n === 1 ? '' : 's');
+function fmtBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+  return (n / 1048576).toFixed(1) + ' MB';
+}
+function parseNum(v) {
+  const s = String(v).trim();
+  if (s === '') return null;
+  const n = Number(s.replace(/,/g, ''));
+  return Number.isFinite(n) ? n : null;
+}
+const DATE_RE_ISO = /^\d{4}-\d{1,2}-\d{1,2}([T ]\d{1,2}:\d{2}(:\d{2}(\.\d+)?)?\s*(Z|[+-]\d{2}:?\d{2})?)?$/;
+const DATE_RE_SLASH = /^\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4}$/;
+const DATE_RE_YMD = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
+const isDateStr = (s) => DATE_RE_ISO.test(s) || DATE_RE_SLASH.test(s) || DATE_RE_YMD.test(s);
+
+// ---------- quote-aware delimited-text parser (reused from csv-explorer.html) ----------
+function parseRows(text, delim) {
+  const rows = [];
+  let row = [], field = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; } else q = false;
+      } else field += ch;
+    } else if (ch === '"' && field === '') {
+      q = true;
+    } else if (ch === delim) {
+      row.push(field); field = '';
+    } else if (ch === '\n') {
+      row.push(field); rows.push(row); row = []; field = '';
+    } else if (ch === '\r') {
+      if (text[i + 1] === '\n') i++;
+      row.push(field); rows.push(row); row = []; field = '';
+    } else field += ch;
+  }
+  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+function buildModel(text, delim) {
+  const raw = parseRows(text, delim);
+  if (!raw.length) return { headers: [], rows: [] };
+  let width = 0;
+  for (const r of raw) if (r.length > width) width = r.length;
+  const headers = raw[0].slice();
+  while (headers.length < width) headers.push('');
+  const named = headers.map((h, i) => h.trim() === '' ? 'Column ' + (i + 1) : h);
+  const rows = raw.slice(1).map(r => {
+    if (r.length === width) return r;
+    const c = r.slice();
+    while (c.length < width) c.push('');
+    return c;
+  });
+  return { headers: named, rows };
+}
+function detectDelimiter(text) {
+  const sample = text.slice(0, 65536);
+  let best = ',', bestScore = 0;
+  for (const d of [',', '\t', ';', '|']) {
+    const rs = parseRows(sample, d).slice(0, 30);
+    if (!rs.length) continue;
+    const first = rs[0].length;
+    if (first < 2) continue;
+    let consistent = 0;
+    for (const r of rs) if (r.length === first) consistent++;
+    const score = first * (consistent / rs.length);
+    if (score > bestScore) { bestScore = score; best = d; }
+  }
+  return best;
+}
+
+// ---------- app state ----------
+const S = {
+  loaded: false,
+  headers: [], rows: [], types: [], fields: [],
+  srcText: '', srcName: '', srcSize: 0, delim: ',',
+  zones: { rows: [], cols: [], values: [], filters: [] },
+  filterState: new Map(),
+  collapsed: new Set(),
+  sortState: { type: 'label', dir: 'asc' },
+  valUidSeq: 1,
+  cube: null, colSlots: [], colTrunc: false,
+  _lastLines: [],
+};
+const AGG_LABELS = { sum: 'Sum', count: 'Count', avg: 'Average', min: 'Min', max: 'Max', countDistinct: 'Count Distinct' };
+function aggOptionsFor(ftype) {
+  if (ftype === 'number') return ['sum', 'count', 'avg', 'min', 'max', 'countDistinct'];
+  if (ftype === 'date') return ['count', 'countDistinct', 'min', 'max'];
+  return ['count', 'countDistinct'];
+}
+function aggLabel(vf) { return AGG_LABELS[vf.agg] + ' of ' + S.fields[vf.field].name; }
+
+// ---------- type sniffing ----------
+function sniffTypesAndBuildFields() {
+  S.types = S.headers.map((_, c) => {
+    let samples = 0, nums = 0, dates = 0;
+    for (let i = 0; i < S.rows.length; i++) {
+      const s = S.rows[i][c].trim();
+      if (s === '') continue;
+      samples++;
+      if (parseNum(s) != null) nums++;
+      else if (isDateStr(s)) dates++;
+      if (samples >= 2500) break;
+    }
+    if (!samples) return 'text';
+    if (nums / samples >= 0.8) return 'number';
+    if (dates / samples >= 0.8) return 'date';
+    return 'text';
+  });
+  S.fields = S.headers.map((h, i) => ({ id: i, name: h, type: S.types[i] }));
+}
+
+// ---------- example dataset (deterministic, ~260 rows) ----------
+function buildExampleCSV() {
+  const regions = ['North America', 'EMEA', 'APAC', 'Latin America'];
+  const products = ['Widget Pro', 'Gizmo Max', 'Sprocket', 'Doohickey', 'Flux Capacitor', 'Cable Pack'];
+  const salespeople = ['Dana Kim', 'Marcus Lee', 'Priya Singh', 'Jon Alvarez', 'Ela Novak', 'Tom Baxter', 'Sofia Rossi', 'Ken Osei'];
+  const prices = { 'Widget Pro': 49.99, 'Gizmo Max': 129.5, 'Sprocket': 15, 'Doohickey': 7.25, 'Flux Capacitor': 88.8, 'Cable Pack': 12.99 };
+  let seed = 42;
+  function rnd() { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+  const lines = ['region,product,salesperson,date,quantity,revenue'];
+  const start = new Date('2025-01-01T00:00:00Z').getTime();
+  const dayMs = 86400000;
+  const n = 260;
+  for (let i = 0; i < n; i++) {
+    const region = regions[Math.floor(rnd() * regions.length)];
+    const product = products[Math.floor(rnd() * products.length)];
+    const person = salespeople[Math.floor(rnd() * salespeople.length)];
+    const day = Math.floor(rnd() * 180);
+    const date = new Date(start + day * dayMs).toISOString().slice(0, 10);
+    const qty = 1 + Math.floor(rnd() * 40);
+    const revenue = +(qty * prices[product] * (0.9 + rnd() * 0.3)).toFixed(2);
+    lines.push([region, product, person, date, qty, revenue].join(','));
+  }
+  return lines.join('\n');
+}
+
+// ---------- filters ----------
+function initFilterState(fieldId) {
+  const f = S.fields[fieldId];
+  if (f.type === 'number') {
+    let mn = Infinity, mx = -Infinity;
+    for (const row of S.rows) { const v = parseNum(row[fieldId]); if (v != null) { if (v < mn) mn = v; if (v > mx) mx = v; } }
+    if (mn === Infinity) { mn = 0; mx = 0; }
+    S.filterState.set(fieldId, { kind: 'range', type: 'number', min: mn, max: mx, cur: [mn, mx] });
+  } else if (f.type === 'date') {
+    let mn = Infinity, mx = -Infinity;
+    for (const row of S.rows) { const t = Date.parse(row[fieldId].trim()); if (!Number.isNaN(t)) { if (t < mn) mn = t; if (t > mx) mx = t; } }
+    if (mn === Infinity) { mn = 0; mx = 0; }
+    S.filterState.set(fieldId, { kind: 'range', type: 'date', min: mn, max: mx, cur: [mn, mx] });
+  } else {
+    const vals = new Set();
+    for (const row of S.rows) { const v = row[fieldId].trim(); vals.add(v === '' ? '(blank)' : v); }
+    const all = [...vals].sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
+    S.filterState.set(fieldId, { kind: 'set', all, selected: new Set(all) });
+  }
+}
+function applyFilters() {
+  const filters = S.zones.filters;
+  const idx = [];
+  if (!filters.length) {
+    for (let i = 0; i < S.rows.length; i++) idx.push(i);
+    return idx;
+  }
+  outer:
+  for (let i = 0; i < S.rows.length; i++) {
+    const row = S.rows[i];
+    for (const fid of filters) {
+      const fs = S.filterState.get(fid);
+      if (!fs) continue;
+      const raw = row[fid].trim();
+      if (fs.kind === 'set') {
+        const key = raw === '' ? '(blank)' : raw;
+        if (!fs.selected.has(key)) continue outer;
+      } else {
+        if (raw === '') continue outer;
+        const v = fs.type === 'number' ? parseNum(raw) : Date.parse(raw);
+        if (v == null || Number.isNaN(v)) continue outer;
+        if (v < fs.cur[0] || v > fs.cur[1]) continue outer;
+      }
+    }
+    idx.push(i);
+  }
+  return idx;
+}
+
+// ---------- cube engine ----------
+// Every data row is inserted at EVERY level of both the row axis and the
+// column axis (root..leaf), so every intermediate node's accumulator is
+// already the correct subtotal/grand-total for its subtree — no separate
+// rollup pass needed.
+function newColNode() { return { children: new Map(), values: new Map() }; }
+function newRowNode() { return { children: new Map(), colRoot: newColNode() }; }
+function getAcc(valuesMap, uid) {
+  let a = valuesMap.get(uid);
+  if (!a) { a = { sum: 0, count: 0, min: Infinity, max: -Infinity, minRaw: null, maxRaw: null, distinct: new Set() }; valuesMap.set(uid, a); }
+  return a;
+}
+function accumulateRow(colNode, row, valueFields) {
+  for (const vf of valueFields) {
+    const raw = row[vf.field];
+    const t = raw.trim();
+    if (t === '') continue;
+    const acc = getAcc(colNode.values, vf.uid);
+    acc.count++;
+    acc.distinct.add(t);
+    const ftype = S.fields[vf.field].type;
+    let num = null;
+    if (ftype === 'number') num = parseNum(t);
+    else if (ftype === 'date') { const ts = Date.parse(t); num = Number.isNaN(ts) ? null : ts; }
+    if (num != null) {
+      acc.sum += num;
+      if (num < acc.min) { acc.min = num; acc.minRaw = t; }
+      if (num > acc.max) { acc.max = num; acc.maxRaw = t; }
+    }
+  }
+}
+function insertColPath(colNode, colPath, lvl, row, valueFields) {
+  accumulateRow(colNode, row, valueFields);
+  if (lvl < colPath.length) {
+    const key = colPath[lvl];
+    let child = colNode.children.get(key);
+    if (!child) { child = newColNode(); colNode.children.set(key, child); }
+    insertColPath(child, colPath, lvl + 1, row, valueFields);
+  }
+}
+function groupKey(row, fieldId) { const v = row[fieldId].trim(); return v === '' ? '(blank)' : v; }
+function buildCube(rowIdx) {
+  const rowFields = S.zones.rows, colFields = S.zones.cols, valueFields = S.zones.values;
+  const root = newRowNode();
+  for (const i of rowIdx) {
+    const row = S.rows[i];
+    const rowPath = rowFields.map(fid => groupKey(row, fid));
+    const colPath = colFields.map(fid => groupKey(row, fid));
+    let node = root;
+    insertColPath(node.colRoot, colPath, 0, row, valueFields);
+    for (let lvl = 0; lvl < rowPath.length; lvl++) {
+      const key = rowPath[lvl];
+      let child = node.children.get(key);
+      if (!child) { child = newRowNode(); node.children.set(key, child); }
+      node = child;
+      insertColPath(node.colRoot, colPath, 0, row, valueFields);
+    }
+  }
+  return root;
+}
+function navigateColNode(colRoot, path) {
+  let n = colRoot;
+  for (const k of path) { n = n && n.children.get(k); if (!n) return null; }
+  return n;
+}
+function getAggValue(colNode, vfUid, agg, fieldType) {
+  const acc = colNode ? colNode.values.get(vfUid) : null;
+  if (!acc) return (agg === 'count' || agg === 'countDistinct') ? 0 : null;
+  switch (agg) {
+    case 'sum': return acc.count ? acc.sum : null;
+    case 'count': return acc.count;
+    case 'avg': return acc.count ? acc.sum / acc.count : null;
+    case 'min': return fieldType === 'date' ? acc.minRaw : (acc.min === Infinity ? null : acc.min);
+    case 'max': return fieldType === 'date' ? acc.maxRaw : (acc.max === -Infinity ? null : acc.max);
+    case 'countDistinct': return acc.distinct.size;
+    default: return null;
+  }
+}
+function fmtCell(val, vf) {
+  if (vf.agg === 'count' || vf.agg === 'countDistinct') return fmtInt(val);
+  if (typeof val === 'string') return esc(val);
+  return esc(fmtNum(val));
+}
+
+// ---------- ordering ----------
+function cmpKeys(a, b, ftype) {
+  if (a === '(blank)' && b === '(blank)') return 0;
+  if (a === '(blank)') return 1;
+  if (b === '(blank)') return -1;
+  if (ftype === 'number') { const na = parseNum(a), nb = parseNum(b); if (na != null && nb != null) return na - nb; }
+  if (ftype === 'date') { const da = Date.parse(a), db = Date.parse(b); if (!Number.isNaN(da) && !Number.isNaN(db)) return da - db; }
+  return String(a).localeCompare(String(b), undefined, { numeric: true });
+}
+function sortedEntries(map, level, isColAxis) {
+  const fields = isColAxis ? S.zones.cols : S.zones.rows;
+  const fid = fields[level];
+  const ftype = S.fields[fid].type;
+  const entries = [...map.entries()];
+  let dir = 1;
+  if (!isColAxis && S.sortState.type === 'label') dir = S.sortState.dir === 'desc' ? -1 : 1;
+  entries.sort((a, b) => cmpKeys(a[0], b[0], ftype) * dir);
+  if (!isColAxis && S.sortState.type === 'value') {
+    const { path, vfUid, dir: vdirRaw } = S.sortState;
+    const vf = S.zones.values.find(v => v.uid === vfUid);
+    if (vf) {
+      const vd = vdirRaw === 'asc' ? 1 : -1;
+      const ftype2 = S.fields[vf.field].type;
+      entries.sort((a, b) => {
+        const na = navigateColNode(a[1].colRoot, path);
+        const nb = navigateColNode(b[1].colRoot, path);
+        const va = getAggValue(na, vf.uid, vf.agg, ftype2);
+        const vb = getAggValue(nb, vf.uid, vf.agg, ftype2);
+        if (va == null && vb == null) return 0;
+        if (va == null) return 1;
+        if (vb == null) return -1;
+        if (va < vb) return -vd;
+        if (va > vb) return vd;
+        return 0;
+      });
+    }
+  }
+  return entries;
+}
+
+// ---------- column slot list (flat, with subtotal + grand-total slots) ----------
+function buildColSlots(node, path, level, isRoot) {
+  const colFields = S.zones.cols;
+  if (level === colFields.length) return [{ path, type: 'leaf' }];
+  const entries = sortedEntries(node.children, level, true);
+  let out = [];
+  for (const [key, child] of entries) out.push(...buildColSlots(child, path.concat([key]), level + 1, false));
+  if (!isRoot && entries.length > 1) out.push({ path, type: 'subtotal' });
+  return out;
+}
+
+// ---------- row line list (flat, respects collapse + sort) ----------
+function buildRowLines(node, path, out, cap) {
+  const R = S.zones.rows.length;
+  const level = path.length;
+  if (level === R) { out.push({ type: 'leaf', path, node, level }); return; }
+  const entries = sortedEntries(node.children, level, false);
+  for (const [key, child] of entries) {
+    if (out.length >= cap) { out.__truncated = true; return; }
+    const childPath = path.concat([key]);
+    const childKeyStr = childPath.join('\u0001');
+    const isGroup = (level + 1) < R;
+    if (isGroup) {
+      const collapsed = S.collapsed.has(childKeyStr);
+      out.push({ type: 'group', path: childPath, node: child, level: level + 1, collapsed });
+      if (!collapsed) buildRowLines(child, childPath, out, cap);
+      if (out.length >= cap) { out.__truncated = true; return; }
+      out.push({ type: 'subtotal', path: childPath, node: child, level: level + 1 });
+    } else {
+      buildRowLines(child, childPath, out, cap);
+    }
+  }
+}
+
+// ---------- compute + render pipeline ----------
+function computeAndRender() {
+  const rowIdx = applyFilters();
+  S.cube = buildCube(rowIdx);
+  const C = S.zones.cols.length;
+  let colSlots = C ? buildColSlots(S.cube.colRoot, [], 0, true) : [];
+  colSlots.push({ path: [], type: 'grand' });
+  let colTrunc = false;
+  if (colSlots.length > 61) { colSlots = colSlots.slice(0, 60); colSlots.push({ path: [], type: 'grand' }); colTrunc = true; }
+  S.colSlots = colSlots;
+  S.colTrunc = colTrunc;
+  renderAll();
+}
+function quickRerender() { if (S.cube) renderAll(); }
+function renderAll() {
+  const V = S.zones.values.length;
+  if (!S.cube || !V) {
+    $('#pvHead').innerHTML = '';
+    $('#pvBody').innerHTML = '<tr><td class="pv-empty">' + (V ? 'Add a Rows, Columns or Values field to see your pivot.' : 'Add at least one field to <strong>Values</strong> to compute numbers — click the “V” button next to a numeric field.') + '</td></tr>';
+    renderCapNote(false, S.colTrunc, 0, S.colSlots.length);
+    updateQuickChartAvailability([]);
+    persistLayout();
+    return;
+  }
+  const R = S.zones.rows.length;
+  const lines = [];
+  if (R === 0) lines.push({ type: 'grand', path: [], node: S.cube });
+  else { buildRowLines(S.cube, [], lines, 500); lines.push({ type: 'grand', path: [], node: S.cube }); }
+  const rowTrunc = !!lines.__truncated;
+  S._lastLines = lines;
+  renderHeader(S.colSlots);
+  renderBody(lines, S.colSlots);
+  renderCapNote(rowTrunc, S.colTrunc, lines.length, S.colSlots.length);
+  updateQuickChartAvailability(lines);
+  persistLayout();
+}
+function labelSortArrow() {
+  if (S.sortState.type !== 'label') return '';
+  return S.sortState.dir === 'desc' ? ' ▼' : ' ▲';
+}
+function pathEq(a, b) { return a.length === b.length && a.every((v, i) => v === b[i]); }
+
+function renderHeader(colSlots) {
+  const rowFields = S.zones.rows, valueFields = S.zones.values;
+  const R = rowFields.length, C = S.zones.cols.length, V = valueFields.length;
+  const rowsHtml = [];
+  for (let lvl = 0; lvl < C; lvl++) {
+    let cells = '';
+    if (lvl === 0) {
+      for (let r = 0; r < R; r++) {
+        const fid = rowFields[r];
+        cells += '<th class="pv-cornerh" rowspan="' + (C + 1) + '"><button type="button" class="pv-sortlbl" data-rowsort="1">' + esc(S.fields[fid].name) + labelSortArrow() + '</button></th>';
+      }
+      if (R === 0) cells += '<th class="pv-cornerh" rowspan="' + (C + 1) + '"></th>';
+    }
+    let i = 0;
+    while (i < colSlots.length) {
+      const slot = colSlots[i];
+      if (slot.type === 'grand') {
+        if (lvl === 0) cells += '<th class="pv-grandh" rowspan="' + (C + 1) + '">Grand Total</th>';
+        i++; continue;
+      }
+      const prefix = slot.path.slice(0, lvl + 1).join('\u0001');
+      let j = i + 1;
+      while (j < colSlots.length && colSlots[j].type !== 'grand' && colSlots[j].path.slice(0, lvl + 1).join('\u0001') === prefix) j++;
+      let label = '';
+      if (slot.path.length > lvl) {
+        label = String(slot.path[lvl]);
+      } else if (slot.type === 'subtotal' && lvl === C - 1) {
+        label = 'Subtotal';
+      }
+      const span = (j - i) * Math.max(V, 1);
+      cells += '<th class="pv-colh" colspan="' + span + '">' + esc(label) + '</th>';
+      i = j;
+    }
+    rowsHtml.push('<tr>' + cells + '</tr>');
+  }
+  {
+    let cells = '';
+    if (C === 0) {
+      for (let r = 0; r < R; r++) {
+        const fid = rowFields[r];
+        cells += '<th class="pv-cornerh"><button type="button" class="pv-sortlbl" data-rowsort="1">' + esc(S.fields[fid].name) + labelSortArrow() + '</button></th>';
+      }
+      if (R === 0) cells += '<th class="pv-cornerh"></th>';
+    }
+    for (const slot of colSlots) {
+      for (const vf of valueFields) {
+        const active = S.sortState.type === 'value' && S.sortState.vfUid === vf.uid && pathEq(S.sortState.path, slot.path);
+        const arrow = active ? (S.sortState.dir === 'desc' ? ' ▼' : ' ▲') : '';
+        cells += '<th class="pv-valh' + (active ? ' active' : '') + '"><button type="button" class="pv-sortval" data-path="' + escAttr(JSON.stringify(slot.path)) + '" data-vf="' + vf.uid + '">' + esc(aggLabel(vf)) + arrow + '</button></th>';
+      }
+    }
+    rowsHtml.push('<tr>' + cells + '</tr>');
+  }
+  $('#pvHead').innerHTML = rowsHtml.join('');
+}
+
+function renderBody(lines, colSlots) {
+  const rowFields = S.zones.rows, valueFields = S.zones.values;
+  const R = rowFields.length;
+  if (!lines.length) { $('#pvBody').innerHTML = '<tr><td class="pv-empty">No data to show.</td></tr>'; return; }
+  let html = '';
+  for (const line of lines) {
+    const rowClass = line.type === 'grand' ? 'pv-grand' : line.type === 'subtotal' ? 'pv-subtotal' : line.type === 'group' ? 'pv-group' : 'pv-leaf';
+    let cells = '';
+    if (line.type === 'grand') {
+      cells += '<td class="pv-label pv-lvl0" colspan="' + Math.max(R, 1) + '"><strong>Grand Total</strong></td>';
+    } else {
+      for (let lvl = 0; lvl < R; lvl++) {
+        if (lvl < line.path.length) {
+          const val = line.path[lvl];
+          let txt;
+          if (line.type === 'subtotal' && lvl === line.path.length - 1) txt = esc(val) + ' — Subtotal';
+          else if (line.type === 'group' && lvl === line.path.length - 1) {
+            const toggleChar = line.collapsed ? '▸' : '▾';
+            txt = '<button type="button" class="pv-toggle" data-key="' + escAttr(line.path.join('\u0001')) + '" aria-label="Toggle group">' + toggleChar + '</button> ' + esc(val);
+          } else txt = esc(val);
+          cells += '<td class="pv-label pv-lvl' + lvl + '" style="padding-left:' + (9 + lvl * 14) + 'px">' + txt + '</td>';
+        } else {
+          cells += '<td class="pv-label pv-lvl' + lvl + '"></td>';
+        }
+      }
+      if (R === 0) cells += '<td class="pv-label pv-lvl0">All rows</td>';
+    }
+    for (const slot of colSlots) {
+      const colNode = navigateColNode(line.node.colRoot, slot.path);
+      for (const vf of valueFields) {
+        const val = getAggValue(colNode, vf.uid, vf.agg, S.fields[vf.field].type);
+        cells += '<td class="pv-val">' + (val == null ? '' : fmtCell(val, vf)) + '</td>';
+      }
+    }
+    html += '<tr class="' + rowClass + '">' + cells + '</tr>';
+  }
+  $('#pvBody').innerHTML = html;
+}
+
+function renderCapNote(rowTrunc, colTrunc, lineCount, colCount) {
+  const el = $('#capNote');
+  if (rowTrunc || colTrunc) {
+    el.textContent = 'Showing a capped view (' + fmtInt(lineCount) + ' row lines' + (colTrunc ? ', ' + fmtInt(colCount) + ' columns' : '') + ') — this pivot has more combinations than can render smoothly. Add a filter or simplify Rows/Columns to see everything.';
+    el.classList.add('err');
+  } else {
+    el.textContent = '';
+    el.classList.remove('err');
+  }
+}
+function updateQuickChartAvailability() {
+  const btn = $('#quickChartBtn');
+  const ok = S.zones.rows.length === 1 && S.zones.values.length === 1;
+  btn.disabled = !ok;
+  btn.title = ok ? 'Draw a bar chart of row totals' : 'Quick chart needs exactly one Rows field and one Values field';
+}
+
+// ---------- sidebar / zones / filters UI ----------
+function renderSidebar() {
+  const html = S.fields.map(f => {
+    const inRows = S.zones.rows.includes(f.id);
+    const inCols = S.zones.cols.includes(f.id);
+    const inFilters = S.zones.filters.includes(f.id);
+    return '<div class="field-row" draggable="true" data-field="' + f.id + '">'
+      + '<div class="frow-top"><span class="badge b-' + f.type + '">' + f.type + '</span>'
+      + '<span class="fname" title="' + escAttr(f.name) + '">' + esc(f.name) + '</span></div>'
+      + '<div class="fadds">'
+      + '<button type="button" class="fadd' + (inRows ? ' on' : '') + '" data-add="rows" data-field="' + f.id + '" title="Add ' + escAttr(f.name) + ' to Rows">R</button>'
+      + '<button type="button" class="fadd' + (inCols ? ' on' : '') + '" data-add="cols" data-field="' + f.id + '" title="Add ' + escAttr(f.name) + ' to Columns">C</button>'
+      + '<button type="button" class="fadd" data-add="values" data-field="' + f.id + '" title="Add ' + escAttr(f.name) + ' to Values">V</button>'
+      + '<button type="button" class="fadd' + (inFilters ? ' on' : '') + '" data-add="filters" data-field="' + f.id + '" title="Add ' + escAttr(f.name) + ' to Filters">F</button>'
+      + '</div></div>';
+  }).join('');
+  $('#fieldList').innerHTML = html || '<p class="note">No fields detected.</p>';
+}
+function zoneChipsSimple(zone) {
+  const arr = S.zones[zone];
+  if (!arr.length) return '<span class="zone-empty">Click a letter next to a field to add it here.</span>';
+  return arr.map((fid, i) => '<span class="chip">'
+    + '<button type="button" class="chip-move" data-zone="' + zone + '" data-idx="' + i + '" data-dir="-1" ' + (i === 0 ? 'disabled' : '') + ' title="Move earlier">‹</button>'
+    + esc(S.fields[fid].name)
+    + '<button type="button" class="chip-move" data-zone="' + zone + '" data-idx="' + i + '" data-dir="1" ' + (i === arr.length - 1 ? 'disabled' : '') + ' title="Move later">›</button>'
+    + '<button type="button" class="chip-x" data-zone="' + zone + '" data-idx="' + i + '" title="Remove">×</button>'
+    + '</span>').join('');
+}
+function zoneChipsValues() {
+  const arr = S.zones.values;
+  if (!arr.length) return '<span class="zone-empty">Click “V” next to a field to add it here.</span>';
+  return arr.map((v, i) => {
+    const f = S.fields[v.field];
+    const opts = aggOptionsFor(f.type).map(a => '<option value="' + a + '"' + (a === v.agg ? ' selected' : '') + '>' + AGG_LABELS[a] + '</option>').join('');
+    return '<span class="chip chip-val">'
+      + '<button type="button" class="chip-move" data-zone="values" data-idx="' + i + '" data-dir="-1" ' + (i === 0 ? 'disabled' : '') + ' title="Move earlier">‹</button>'
+      + esc(f.name)
+      + '<select class="chip-agg" data-uid="' + v.uid + '" aria-label="Aggregation for ' + escAttr(f.name) + '">' + opts + '</select>'
+      + '<button type="button" class="chip-move" data-zone="values" data-idx="' + i + '" data-dir="1" ' + (i === arr.length - 1 ? 'disabled' : '') + ' title="Move later">›</button>'
+      + '<button type="button" class="chip-x" data-zone="values" data-idx="' + i + '" title="Remove">×</button>'
+      + '</span>';
+  }).join('');
+}
+function renderZones() {
+  $('#chipsRows').innerHTML = zoneChipsSimple('rows');
+  $('#chipsCols').innerHTML = zoneChipsSimple('cols');
+  $('#chipsValues').innerHTML = zoneChipsValues();
+  $('#chipsFilters').innerHTML = zoneChipsSimple('filters');
+}
+function tsToDateInput(ts) {
+  if (!Number.isFinite(ts)) return '';
+  const d = new Date(ts);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toISOString().slice(0, 10);
+}
+function renderFilterPanels() {
+  const panel = $('#filtersPanel');
+  if (!S.zones.filters.length) { panel.innerHTML = ''; panel.classList.add('hide'); return; }
+  panel.classList.remove('hide');
+  panel.innerHTML = '<div class="cap">Filters</div>' + S.zones.filters.map((fid, idx) => {
+    const f = S.fields[fid];
+    const fs = S.filterState.get(fid);
+    let body = '';
+    if (!fs) return '';
+    if (fs.kind === 'set') {
+      const shown = fs.all.slice(0, 300);
+      body = '<div class="fset">' + shown.map(v => '<label class="chk"><input type="checkbox" data-fset="' + fid + '" value="' + escAttr(v) + '" ' + (fs.selected.has(v) ? 'checked' : '') + '> ' + esc(v) + '</label>').join('')
+        + '</div><div class="frow"><button type="button" class="btn sm" data-fall="' + fid + '">Select all</button><button type="button" class="btn sm" data-fnone="' + fid + '">Select none</button>'
+        + '<span class="note">' + fmtInt(fs.selected.size) + ' of ' + fmtInt(fs.all.length) + ' selected</span></div>';
+    } else if (fs.type === 'number') {
+      body = '<div class="frow">'
+        + '<label>Min <input type="number" step="any" data-frange="' + fid + '" data-b="0" value="' + fs.cur[0] + '"></label>'
+        + '<label>Max <input type="number" step="any" data-frange="' + fid + '" data-b="1" value="' + fs.cur[1] + '"></label>'
+        + '<span class="note">Full range: ' + fmtNum(fs.min) + ' – ' + fmtNum(fs.max) + '</span></div>';
+    } else {
+      body = '<div class="frow">'
+        + '<label>From <input type="date" data-frange-d="' + fid + '" data-b="0" value="' + tsToDateInput(fs.cur[0]) + '"></label>'
+        + '<label>To <input type="date" data-frange-d="' + fid + '" data-b="1" value="' + tsToDateInput(fs.cur[1]) + '"></label></div>';
+    }
+    return '<div class="fpanel"><div class="fhead"><strong>' + esc(f.name) + '</strong><button type="button" class="chip-x" data-zone="filters" data-idx="' + idx + '" title="Remove filter">× Remove</button></div>' + body + '</div>';
+  }).join('');
+}
+
+// ---------- add / remove / move field ----------
+function refreshAll() {
+  renderSidebar();
+  renderZones();
+  renderFilterPanels();
+  computeAndRender();
+}
+function addField(zone, fieldId) {
+  if (fieldId == null || Number.isNaN(fieldId) || !S.fields[fieldId]) return;
+  if (zone === 'rows') { if (!S.zones.rows.includes(fieldId)) S.zones.rows.push(fieldId); }
+  else if (zone === 'cols') { if (!S.zones.cols.includes(fieldId)) S.zones.cols.push(fieldId); }
+  else if (zone === 'values') {
+    const f = S.fields[fieldId];
+    const agg = f.type === 'number' ? 'sum' : 'count';
+    S.zones.values.push({ uid: S.valUidSeq++, field: fieldId, agg });
+  } else if (zone === 'filters') {
+    if (!S.zones.filters.includes(fieldId)) { S.zones.filters.push(fieldId); initFilterState(fieldId); }
+  }
+  refreshAll();
+}
+function removeChip(zone, idx) {
+  if (zone === 'rows') S.zones.rows.splice(idx, 1);
+  else if (zone === 'cols') S.zones.cols.splice(idx, 1);
+  else if (zone === 'values') S.zones.values.splice(idx, 1);
+  else if (zone === 'filters') { const fid = S.zones.filters[idx]; S.zones.filters.splice(idx, 1); S.filterState.delete(fid); }
+  refreshAll();
+}
+function moveChip(zone, idx, dir) {
+  const arr = S.zones[zone];
+  const j = idx + dir;
+  if (j < 0 || j >= arr.length) return;
+  const tmp = arr[idx]; arr[idx] = arr[j]; arr[j] = tmp;
+  refreshAll();
+}
+
+// ---------- event wiring: sidebar add + drag ----------
+$('#fieldList').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-add]');
+  if (!b) return;
+  addField(b.dataset.add, +b.dataset.field);
+});
+$('#fieldList').addEventListener('dragstart', (e) => {
+  const row = e.target.closest('.field-row');
+  if (row) e.dataTransfer.setData('text/plain', row.dataset.field);
+});
+for (const zoneEl of document.querySelectorAll('.zone')) {
+  zoneEl.addEventListener('dragover', (e) => { e.preventDefault(); zoneEl.classList.add('drag'); });
+  zoneEl.addEventListener('dragleave', () => zoneEl.classList.remove('drag'));
+  zoneEl.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zoneEl.classList.remove('drag');
+    const fid = +e.dataTransfer.getData('text/plain');
+    if (!Number.isNaN(fid)) addField(zoneEl.dataset.zone, fid);
+  });
+}
+
+// ---------- event wiring: zone chips (move / remove / agg change) ----------
+function handleZoneClick(e) {
+  const xBtn = e.target.closest('.chip-x');
+  if (xBtn) { removeChip(xBtn.dataset.zone, +xBtn.dataset.idx); return; }
+  const mBtn = e.target.closest('.chip-move');
+  if (mBtn) { moveChip(mBtn.dataset.zone, +mBtn.dataset.idx, +mBtn.dataset.dir); return; }
+}
+$('#zonesPanel').addEventListener('click', handleZoneClick);
+$('#filtersPanel').addEventListener('click', handleZoneClick);
+$('#zonesPanel').addEventListener('change', (e) => {
+  const sel = e.target.closest('.chip-agg');
+  if (!sel) return;
+  const uid = +sel.dataset.uid;
+  const v = S.zones.values.find(x => x.uid === uid);
+  if (v) { v.agg = sel.value; computeAndRender(); }
+});
+$('#clearLayoutBtn').addEventListener('click', () => {
+  S.zones = { rows: [], cols: [], values: [], filters: [] };
+  S.filterState = new Map();
+  S.collapsed = new Set();
+  S.sortState = { type: 'label', dir: 'asc' };
+  refreshAll();
+});
+
+// ---------- event wiring: filter panels ----------
+$('#filtersPanel').addEventListener('change', (e) => {
+  const cb = e.target.closest('input[data-fset]');
+  if (cb) {
+    const fid = +cb.dataset.fset;
+    const fs = S.filterState.get(fid);
+    if (fs) { if (cb.checked) fs.selected.add(cb.value); else fs.selected.delete(cb.value); computeAndRender(); renderFilterPanels(); }
+    return;
+  }
+  const rn = e.target.closest('input[data-frange]');
+  if (rn) {
+    const fid = +rn.dataset.frange, b = +rn.dataset.b;
+    const fs = S.filterState.get(fid);
+    if (fs) { const v = parseNum(rn.value); fs.cur[b] = v == null ? (b === 0 ? fs.min : fs.max) : v; computeAndRender(); }
+    return;
+  }
+  const rd = e.target.closest('input[data-frange-d]');
+  if (rd) {
+    const fid = +rd.dataset.frangeD, b = +rd.dataset.b;
+    const fs = S.filterState.get(fid);
+    if (fs) {
+      let t = Date.parse(rd.value);
+      if (Number.isNaN(t)) t = b === 0 ? fs.min : fs.max;
+      else if (b === 1) t += 86399999;
+      fs.cur[b] = t;
+      computeAndRender();
+    }
+  }
+});
+$('#filtersPanel').addEventListener('click', (e) => {
+  const allBtn = e.target.closest('button[data-fall]');
+  if (allBtn) { const fs = S.filterState.get(+allBtn.dataset.fall); if (fs) { fs.selected = new Set(fs.all); computeAndRender(); renderFilterPanels(); } return; }
+  const noneBtn = e.target.closest('button[data-fnone]');
+  if (noneBtn) { const fs = S.filterState.get(+noneBtn.dataset.fnone); if (fs) { fs.selected = new Set(); computeAndRender(); renderFilterPanels(); } }
+});
+
+// ---------- event wiring: sort + collapse ----------
+$('#pvHead').addEventListener('click', (e) => {
+  const vbtn = e.target.closest('.pv-sortval');
+  if (vbtn) {
+    const path = JSON.parse(vbtn.dataset.path);
+    const uid = +vbtn.dataset.vf;
+    if (S.sortState.type === 'value' && S.sortState.vfUid === uid && pathEq(S.sortState.path, path)) {
+      S.sortState.dir = S.sortState.dir === 'desc' ? 'asc' : 'desc';
+    } else {
+      S.sortState = { type: 'value', path, vfUid: uid, dir: 'desc' };
+    }
+    quickRerender();
+    return;
+  }
+  const lbtn = e.target.closest('.pv-sortlbl');
+  if (lbtn) {
+    if (S.sortState.type === 'label') S.sortState.dir = S.sortState.dir === 'asc' ? 'desc' : 'asc';
+    else S.sortState = { type: 'label', dir: 'asc' };
+    quickRerender();
+  }
+});
+$('#pvBody').addEventListener('click', (e) => {
+  const t = e.target.closest('.pv-toggle');
+  if (!t) return;
+  const key = t.dataset.key;
+  if (S.collapsed.has(key)) S.collapsed.delete(key); else S.collapsed.add(key);
+  quickRerender();
+});
+
+// ---------- localStorage layout persistence ----------
+const LS_KEY = 'max-pivot-layout';
+function persistLayout() {
+  try {
+    const cfg = {
+      cols: S.headers,
+      rows: S.zones.rows.map(i => S.fields[i].name),
+      colsZone: S.zones.cols.map(i => S.fields[i].name),
+      values: S.zones.values.map(v => ({ name: S.fields[v.field].name, agg: v.agg })),
+      filters: S.zones.filters.map(i => S.fields[i].name),
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(cfg));
+  } catch (e) { /* ignore quota/privacy errors */ }
+}
+function tryRestoreLayout() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return false;
+    const cfg = JSON.parse(raw);
+    if (!cfg.cols || cfg.cols.length !== S.headers.length) return false;
+    for (let i = 0; i < cfg.cols.length; i++) if (cfg.cols[i] !== S.headers[i]) return false;
+    const nameToId = new Map(S.fields.map(f => [f.name, f.id]));
+    S.zones.rows = (cfg.rows || []).map(n => nameToId.get(n)).filter(x => x != null);
+    S.zones.cols = (cfg.colsZone || []).map(n => nameToId.get(n)).filter(x => x != null);
+    S.zones.values = (cfg.values || []).filter(v => nameToId.has(v.name)).map(v => ({ uid: S.valUidSeq++, field: nameToId.get(v.name), agg: v.agg }));
+    S.zones.filters = (cfg.filters || []).map(n => nameToId.get(n)).filter(x => x != null);
+    for (const fid of S.zones.filters) initFilterState(fid);
+    return true;
+  } catch (e) { return false; }
+}
+
+// ---------- loading ----------
+function inputNote(msg, isErr) {
+  const el = $('#inputNote');
+  el.textContent = msg;
+  el.className = 'note' + (isErr ? ' err' : '');
+}
+function renderStrip() {
+  $('#stName').textContent = S.srcName || 'pasted data';
+  $('#stShape').textContent = plural(S.rows.length, 'row') + ' × ' + plural(S.headers.length, 'column');
+  $('#stSize').textContent = fmtBytes(S.srcSize);
+}
+function loadText(text, name, size) {
+  text = String(text).replace(/^\uFEFF/, '');
+  if (!text.trim()) { inputNote('That looks empty — nothing to load.', true); return; }
+  const sel = $('#delimSel').value;
+  const delim = sel === 'auto' ? detectDelimiter(text) : DELIM_CHARS[sel];
+  const m = buildModel(text, delim);
+  if (!m.headers.length) { inputNote('Could not find any data in there.', true); return; }
+  S.srcText = text;
+  S.srcName = name || '';
+  S.srcSize = size != null ? size : new Blob([text]).size;
+  S.delim = delim;
+  S.headers = m.headers;
+  S.rows = m.rows;
+  sniffTypesAndBuildFields();
+  S.zones = { rows: [], cols: [], values: [], filters: [] };
+  S.filterState = new Map();
+  S.collapsed = new Set();
+  S.sortState = { type: 'label', dir: 'asc' };
+  S.valUidSeq = 1;
+  S.cube = null;
+  tryRestoreLayout();
+  S.loaded = true;
+  document.body.classList.add('loaded');
+  inputNote('');
+  renderStrip();
+  refreshAll();
+  $('#chartPanel').classList.add('hide');
+}
+async function readFile(f) {
+  if (!f) return;
+  if (f.size > 50 * 1024 * 1024) { inputNote('That file is over 50 MB — too big for this in-browser tool.', true); return; }
+  try {
+    const text = await f.text();
+    loadText(text, f.name, f.size);
+  } catch (err) {
+    inputNote('Could not read that file: ' + err.message, true);
+  }
+}
+
+const dz = $('#dropzone'), fi = $('#fileInput');
+dz.addEventListener('click', () => fi.click());
+dz.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fi.click(); } });
+['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add('drag'); }));
+['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove('drag'); }));
+dz.addEventListener('drop', (e) => { readFile(e.dataTransfer.files && e.dataTransfer.files[0]); });
+fi.addEventListener('change', () => { readFile(fi.files[0]); fi.value = ''; });
+window.addEventListener('dragover', (e) => { if (!e.target.closest('.field-row') && !e.target.closest('.zone')) e.preventDefault(); });
+window.addEventListener('drop', (e) => { if (!e.target.closest('.zone')) e.preventDefault(); });
+
+$('#loadPasteBtn').addEventListener('click', () => {
+  if (S.loaded && !confirm('Replace your current data with the pasted text? The pivot layout will reset (unless a saved layout matches the new columns).')) return;
+  loadText($('#pasteArea').value, '');
+});
+$('#exampleBtn').addEventListener('click', () => {
+  if (S.loaded && !confirm('Replace your current data with the example dataset?')) return;
+  $('#delimSel').value = 'auto';
+  loadText(buildExampleCSV(), 'sales-example.csv');
+});
+$('#delimSel').addEventListener('change', () => {
+  if (!S.loaded || !S.srcText) return;
+  loadText(S.srcText, S.srcName, S.srcSize);
+});
+
+// ---------- export ----------
+function colSlotExportLabel(slot) {
+  if (slot.type === 'grand') return 'Grand Total';
+  if (!slot.path.length) return '';
+  let l = slot.path.join(' / ');
+  if (slot.type === 'subtotal') l += ' Subtotal';
+  return l;
+}
+function exportRows() {
+  const R = S.zones.rows.length, valueFields = S.zones.values;
+  const lines = [];
+  if (R === 0) lines.push({ type: 'grand', path: [], node: S.cube });
+  else { buildRowLines(S.cube, [], lines, 5000); lines.push({ type: 'grand', path: [], node: S.cube }); }
+  const header = [];
+  for (let i = 0; i < Math.max(R, 1); i++) header.push(R ? S.fields[S.zones.rows[i]].name : 'Row');
+  for (const slot of S.colSlots) {
+    const label = colSlotExportLabel(slot);
+    for (const vf of valueFields) header.push((label ? label + ' — ' : '') + aggLabel(vf));
+  }
+  const out = [header];
+  for (const line of lines) {
+    const row = [];
+    if (line.type === 'grand') {
+      row.push('Grand Total');
+      for (let i = 1; i < Math.max(R, 1); i++) row.push('');
+    } else {
+      for (let lvl = 0; lvl < R; lvl++) {
+        if (lvl < line.path.length) {
+          let v = String(line.path[lvl]);
+          if (line.type === 'subtotal' && lvl === line.path.length - 1) v += ' Subtotal';
+          row.push(v);
+        } else row.push('');
+      }
+      if (R === 0) row.push('All rows');
+    }
+    for (const slot of S.colSlots) {
+      const colNode = navigateColNode(line.node.colRoot, slot.path);
+      for (const vf of valueFields) {
+        const val = getAggValue(colNode, vf.uid, vf.agg, S.fields[vf.field].type);
+        row.push(val == null ? '' : val);
+      }
+    }
+    out.push(row);
+  }
+  return out;
+}
+function toCsvText(rows) {
+  const escF = (v) => { const s = String(v); return /["\n,]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  return rows.map(r => r.map(escF).join(',')).join('\n');
+}
+function download(name, text, mime) {
+  const blob = new Blob([text], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+$('#dlCsv').addEventListener('click', () => {
+  if (!S.cube || !S.zones.values.length) { return; }
+  download('pivot.csv', toCsvText(exportRows()), 'text/csv;charset=utf-8');
+});
+$('#copyCsv').addEventListener('click', async () => {
+  const btn = $('#copyCsv');
+  if (!S.cube || !S.zones.values.length) { return; }
+  try {
+    await navigator.clipboard.writeText(toCsvText(exportRows()));
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1200);
+  } catch (err) {
+    inputNote('Copy failed — your browser blocked clipboard access. Use Download instead.', true);
+  }
+});
+
+// ---------- quick chart ----------
+function renderBarChart(bars) {
+  const cv = $('#chartCanvas');
+  const dpr = window.devicePixelRatio || 1;
+  const rowH = 24;
+  const W = cv.clientWidth || 600;
+  const H = Math.max(90, bars.length * rowH + 24);
+  cv.width = Math.max(1, W * dpr); cv.height = Math.max(1, H * dpr);
+  cv.style.height = H + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const cs = getComputedStyle(document.documentElement);
+  const accent = cs.getPropertyValue('--accent').trim() || '#2563eb';
+  const text = cs.getPropertyValue('--text').trim() || '#000';
+  const maxV = Math.max(1e-9, ...bars.map(b => Math.abs(b.value)));
+  const labelW = 130, rightPad = 70;
+  const barAreaW = Math.max(10, W - labelW - rightPad);
+  ctx.font = '12px ' + (cs.getPropertyValue('--sans').trim() || 'sans-serif');
+  ctx.textBaseline = 'middle';
+  bars.forEach((b, i) => {
+    const y = i * rowH + rowH / 2 + 12;
+    ctx.fillStyle = text;
+    ctx.textAlign = 'right';
+    let lbl = String(b.label);
+    if (lbl.length > 18) lbl = lbl.slice(0, 17) + '…';
+    ctx.fillText(lbl, labelW - 8, y);
+    const w = Math.max(2, (Math.abs(b.value) / maxV) * barAreaW);
+    ctx.fillStyle = accent;
+    ctx.fillRect(labelW, y - 8, w, 16);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = text;
+    ctx.fillText(fmtNum(b.value), labelW + w + 6, y);
+  });
+}
+function drawQuickChart() {
+  if (S.zones.rows.length !== 1 || S.zones.values.length !== 1 || !S.cube) return;
+  const vf = S.zones.values[0];
+  const ftype = S.fields[vf.field].type;
+  const leaves = (S._lastLines || []).filter(l => l.type === 'leaf');
+  let bars = leaves.map(l => ({ label: l.path[0], value: getAggValue(l.node.colRoot, vf.uid, vf.agg, ftype) })).filter(b => typeof b.value === 'number');
+  bars.sort((a, b) => (b.value || 0) - (a.value || 0));
+  const fullLen = bars.length;
+  const capped = bars.length > 20;
+  if (capped) bars = bars.slice(0, 20);
+  renderBarChart(bars);
+  $('#chartPanel').classList.remove('hide');
+  $('#chartNote').textContent = capped ? ('Showing top 20 of ' + fmtInt(fullLen) + ' groups by ' + aggLabel(vf) + '.') : ('By ' + aggLabel(vf) + '.');
+  $('#chartPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+$('#quickChartBtn').addEventListener('click', drawQuickChart);
+$('#closeChartBtn').addEventListener('click', () => $('#chartPanel').classList.add('hide'));
+
+// ---------- theme ----------
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+  if (!$('#chartPanel').classList.contains('hide')) requestAnimationFrame(() => drawQuickChart());
+});
+
+window.__PV_READY__ = true;
+</script>
+</body>
+</html>

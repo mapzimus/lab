@@ -1,0 +1,909 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Match Lineup Card Generator</title>
+<meta name="description" content="Build the clean, shareable Starting XI graphic teams post before kickoff — pitch, list or broadcast layouts, team colors, crest, subs and coach — then export PNG/SVG or copy to clipboard. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 12px; font-size: .84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.small { padding: 6px 10px; font-size: .8rem; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  select, input[type=text], input[type=number], input[type=date] { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 7px 9px; font-size: .84rem; font-family: var(--sans); }
+  label.fld { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); }
+  input[type=color] { width: 34px; height: 30px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 2px; cursor: pointer; }
+  input[type=checkbox] { accent-color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 12px; margin-bottom: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .row + .row { margin-top: 8px; }
+  .grouplbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 2px; align-self: center; }
+  .sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 2px; }
+  .spacer { flex: 1; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .chip { border: 1px dashed var(--border); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); border-style: solid; }
+  .chip.active { border-style: solid; border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+
+  .layout { display: grid; grid-template-columns: minmax(0,.95fr) minmax(0,1.05fr); gap: 16px; align-items: start; }
+  @media (max-width: 980px) { .layout { grid-template-columns: minmax(0,1fr); } }
+
+  .roster { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  .roster td { padding: 2px 3px; }
+  .roster input[type=number] { width: 58px; }
+  .roster input.nm { width: 100%; min-width: 110px; }
+  .roster input.ps { width: 62px; font-family: var(--mono); font-size: .78rem; text-transform: uppercase; }
+  .roster .idx { color: var(--muted); font-size: .72rem; width: 20px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  .crest-preview { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface-2); display: inline-flex; align-items: center; justify-content: center; font-size: 20px; overflow: hidden; flex: none; }
+  .crest-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+  .preview-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 12px; }
+  .preview-holder { display: flex; justify-content: center; }
+  .preview-holder svg { max-width: 100%; height: auto; max-height: 78vh; border-radius: 8px; box-shadow: var(--shadow); }
+
+  .colgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; }
+  @media (max-width: 560px) { .colgrid { grid-template-columns: 1fr; } }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  @media (max-width: 720px){
+    .grouplbl { width: 100%; margin-bottom: 2px; }
+    .sep { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Match Lineup Card Generator</h1>
+      <p>Build the clean "Starting XI" graphic teams post before kickoff: pick a formation, type your eleven, choose a layout style and team colors, then export a social-ready PNG or SVG. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="chips">
+    <button class="chip" id="sampleBtn" type="button">⚽ Load sample</button>
+    <button class="chip" id="clearBtn" type="button">✨ Clear roster</button>
+    <button class="chip" id="undoBtn" type="button" disabled>↩ Undo clear</button>
+  </div>
+
+  <div class="layout">
+    <div><!-- left column: inputs -->
+      <div class="panel">
+        <div class="row">
+          <span class="grouplbl">Team</span>
+          <input type="text" id="teamName" placeholder="Team name" style="flex:1;min-width:150px" maxlength="40">
+          <span class="crest-preview" id="crestPreview" title="Crest preview">⚽</span>
+        </div>
+        <div class="row">
+          <label class="fld">Crest emoji <input type="text" id="crestEmoji" placeholder="🦈" maxlength="8" style="width:64px;text-align:center;font-size:1rem"></label>
+          <label class="fld btn small" style="cursor:pointer">🖼 Upload crest<input type="file" id="crestFile" accept="image/*" hidden></label>
+          <button class="btn small" id="crestClear" type="button" title="Remove uploaded crest">✕ Image</button>
+        </div>
+        <div class="row">
+          <input type="text" id="competition" placeholder="Competition (optional)" style="flex:1;min-width:120px" maxlength="48">
+        </div>
+        <div class="row">
+          <input type="text" id="opponent" placeholder="vs Opponent (optional)" style="flex:1;min-width:110px" maxlength="40">
+          <input type="text" id="dateLine" placeholder="Date / kickoff (optional)" style="flex:1;min-width:110px" maxlength="32">
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="row">
+          <span class="grouplbl">Formation</span>
+          <select id="formation" aria-label="Formation">
+            <option>4-4-2</option><option>4-3-3</option><option>4-2-3-1</option><option>3-5-2</option>
+            <option>3-4-3</option><option>5-3-2</option><option>4-1-4-1</option><option>4-5-1</option>
+            <option value="custom">Custom…</option>
+          </select>
+          <input type="text" id="customFormation" placeholder="e.g. 4-2-2-2" style="width:110px;display:none" maxlength="11">
+          <button class="btn small" id="relabelBtn" type="button" title="Re-assign position labels from the formation">↺ Re-assign positions</button>
+          <div class="spacer"></div>
+          <span class="note" id="formationNote"></span>
+        </div>
+        <div class="row"><span class="grouplbl" style="width:100%">Starting XI (number · name · position)</span></div>
+        <table class="roster"><tbody id="startersBody"></tbody></table>
+        <div class="row" style="margin-top:10px"><span class="grouplbl" style="width:100%">Substitutes (up to 9)</span></div>
+        <table class="roster"><tbody id="subsBody"></tbody></table>
+        <div class="row" style="margin-top:8px">
+          <label class="fld" style="flex:1">Coach <input type="text" id="coach" placeholder="Coach name" style="flex:1;min-width:120px" maxlength="40"></label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="row">
+          <span class="grouplbl">Layout</span>
+          <button class="chip lstyle active" data-style="pitch" type="button">🟩 Pitch</button>
+          <button class="chip lstyle" data-style="list" type="button">📜 List</button>
+          <button class="chip lstyle" data-style="broadcast" type="button">📺 Broadcast</button>
+        </div>
+        <div class="row">
+          <span class="grouplbl">Colors</span>
+          <label class="fld">Primary <input type="color" id="primary" value="#0b3d2e" aria-label="Primary team color"></label>
+          <label class="fld">Secondary <input type="color" id="secondary" value="#e8c547" aria-label="Secondary team color"></label>
+          <div class="sep"></div>
+          <label class="fld">Background
+            <select id="bgStyle" aria-label="Background style">
+              <option value="solid">Solid</option>
+              <option value="gradient" selected>Subtle gradient</option>
+              <option value="split">Diagonal split</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label class="fld">Font
+            <select id="fontKind" aria-label="Accent font">
+              <option value="condensed" selected>Condensed</option>
+              <option value="wide">Wide / heavy</option>
+              <option value="serif">Serif</option>
+            </select>
+          </label>
+          <label class="fld"><input type="checkbox" id="allCaps" checked> ALL-CAPS names</label>
+          <label class="fld"><input type="checkbox" id="showBadge" checked> Formation badge</label>
+          <div class="sep"></div>
+          <label class="fld">Size
+            <select id="canvasSize" aria-label="Canvas size">
+              <option value="1080x1350" selected>1080 × 1350 (4:5 social)</option>
+              <option value="1080x1080">1080 × 1080 (square)</option>
+              <option value="1920x1080">1920 × 1080 (widescreen)</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="row">
+          <span class="grouplbl">Export</span>
+          <button class="btn primary" id="pngBtn" type="button">⬇ PNG (2×)</button>
+          <button class="btn" id="svgBtn" type="button">⬇ SVG</button>
+          <button class="btn" id="copyBtn" type="button">📋 Copy image</button>
+          <div class="sep"></div>
+          <button class="btn small" id="saveJsonBtn" type="button" title="Save team + settings as JSON">💾 Save team</button>
+          <label class="fld btn small" style="cursor:pointer">📂 Load team<input type="file" id="loadJson" accept=".json,application/json" hidden></label>
+          <button class="btn small" id="shareBtn" type="button" title="Copy a link that restores this card">🔗 Share link</button>
+        </div>
+        <div class="note" id="status">Autosaves locally as you type — your last card is restored next visit.</div>
+      </div>
+    </div>
+
+    <div><!-- right column: preview -->
+      <div class="preview-box">
+        <div class="preview-holder" id="previewHolder" aria-label="Lineup card preview"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app">Everything stays on your device — nothing is uploaded anywhere.</footer>
+</div>
+
+<script>
+'use strict';
+const $ = (s, el) => (el || document).querySelector(s);
+const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ---------- formations & position labels ----------
+const FORMATIONS = {
+  '4-4-2':[4,4,2], '4-3-3':[4,3,3], '4-2-3-1':[4,2,3,1], '3-5-2':[3,5,2],
+  '3-4-3':[3,4,3], '5-3-2':[5,3,2], '4-1-4-1':[4,1,4,1], '4-5-1':[4,5,1]
+};
+const DEF_LABELS = {1:['CB'],2:['CB','CB'],3:['LCB','CB','RCB'],4:['LB','CB','CB','RB'],5:['LWB','CB','CB','CB','RWB']};
+const MID_LABELS = {1:['CDM'],2:['CDM','CDM'],3:['LM','CM','RM'],4:['LM','CM','CM','RM'],5:['LM','CM','CDM','CM','RM']};
+const AM_LABELS  = {1:['CAM'],2:['CAM','CAM'],3:['LW','CAM','RW'],4:['LM','CAM','CAM','RM'],5:['LW','CAM','CAM','CAM','RW']};
+const ATT_LABELS = {1:['ST'],2:['ST','ST'],3:['LW','ST','RW'],4:['LW','ST','ST','RW'],5:['LW','ST','ST','ST','RW']};
+
+function parseCustom(str){
+  const parts = String(str || '').split(/[-\s,]+/).map(n => parseInt(n, 10)).filter(n => Number.isFinite(n));
+  if (!parts.length || parts.length > 5) return null;
+  if (parts.some(n => n < 1 || n > 5)) return null;
+  if (parts.reduce((a,b) => a + b, 0) !== 10) return null;
+  return parts;
+}
+function currentLines(){
+  if (state.formation === 'custom'){ return parseCustom(state.customFormation) || [4,4,2]; }
+  return FORMATIONS[state.formation] || [4,4,2];
+}
+function formationString(){
+  return currentLines().join('-');
+}
+function labelsForLines(lines){
+  const out = ['GK'];
+  lines.forEach((n, i) => {
+    let set;
+    if (i === 0) set = DEF_LABELS;
+    else if (i === lines.length - 1) set = ATT_LABELS;
+    else if (lines.length >= 4 && i === lines.length - 2) set = AM_LABELS;
+    else set = MID_LABELS;
+    out.push(...(set[n] || Array(n).fill('CM')));
+  });
+  return out;
+}
+
+// ---------- state ----------
+const blankStarters = () => Array.from({length:11}, () => ({num:'', name:'', pos:''}));
+const blankSubs = () => Array.from({length:9}, () => ({num:'', name:''}));
+const state = {
+  teamName:'', crestEmoji:'', crestImg:'', competition:'', opponent:'', dateLine:'',
+  formation:'4-3-3', customFormation:'',
+  starters: blankStarters(), subs: blankSubs(), coach:'',
+  layoutStyle:'pitch', primary:'#0b3d2e', secondary:'#e8c547', bgStyle:'gradient',
+  fontKind:'condensed', allCaps:true, showBadge:true, canvasSize:'1080x1350'
+};
+let undoSnapshot = null;
+
+// ---------- color helpers ----------
+function hexRgb(hex){
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+  if (!m) return {r:0,g:0,b:0};
+  const n = parseInt(m[1], 16);
+  return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+}
+function luminance(hex){
+  const {r,g,b} = hexRgb(hex);
+  const f = v => { v /= 255; return v <= .03928 ? v/12.92 : Math.pow((v+.055)/1.055, 2.4); };
+  return .2126*f(r) + .7152*f(g) + .0722*f(b);
+}
+function inkFor(hex){ return luminance(hex) > .35 ? '#14181d' : '#ffffff'; }
+function shade(hex, amt){ // amt -1..1
+  const {r,g,b} = hexRgb(hex);
+  const t = amt < 0 ? 0 : 255, p = Math.abs(amt);
+  const c = v => Math.round(v + (t - v) * p);
+  return '#' + [c(r),c(g),c(b)].map(v => v.toString(16).padStart(2,'0')).join('');
+}
+
+// ---------- fonts ----------
+const FONTS = {
+  condensed: { stack:`"Arial Narrow","Helvetica Neue Condensed","Roboto Condensed","Segoe UI",Arial,sans-serif`, factor:.5,  spacing:'.04em', weight:700 },
+  wide:      { stack:`"Arial Black","Segoe UI Black",Impact,"Helvetica Neue",Arial,sans-serif`,                factor:.72, spacing:'.06em', weight:800 },
+  serif:     { stack:`Georgia,"Times New Roman","Palatino Linotype",serif`,                                    factor:.56, spacing:'.02em', weight:700 }
+};
+function font(){ return FONTS[state.fontKind] || FONTS.condensed; }
+function fitSize(text, maxW, base){
+  const len = Math.max(1, String(text || '').length);
+  return Math.min(base, maxW / (len * font().factor));
+}
+function displayName(n){ const s = String(n || '').trim(); return state.allCaps ? s.toUpperCase() : s; }
+
+// ---------- SVG building ----------
+function svgText(x, y, txt, size, fill, opts){
+  opts = opts || {};
+  return `<text x="${x}" y="${y}" font-family='${font().stack}' font-size="${size.toFixed(1)}" font-weight="${opts.weight || font().weight}" fill="${fill}" text-anchor="${opts.anchor || 'middle'}" letter-spacing="${opts.spacing || font().spacing}"${opts.opacity ? ` opacity="${opts.opacity}"` : ''}>${esc(txt)}</text>`;
+}
+function crestSVG(cx, cy, r, ink){
+  const parts = [];
+  if (state.crestImg){
+    parts.push(`<clipPath id="crestClip"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath>`);
+    parts.push(`<circle cx="${cx}" cy="${cy}" r="${r+3}" fill="none" stroke="${ink}" stroke-opacity=".55" stroke-width="3"/>`);
+    parts.push(`<image href="${state.crestImg}" x="${cx-r}" y="${cy-r}" width="${r*2}" height="${r*2}" clip-path="url(#crestClip)" preserveAspectRatio="xMidYMid slice"/>`);
+  } else if (state.crestEmoji.trim()){
+    parts.push(`<circle cx="${cx}" cy="${cy}" r="${r+3}" fill="${ink}" fill-opacity=".12" stroke="${ink}" stroke-opacity=".45" stroke-width="2.5"/>`);
+    parts.push(`<text x="${cx}" y="${cy}" font-size="${(r*1.3).toFixed(0)}" text-anchor="middle" dominant-baseline="central">${esc(state.crestEmoji.trim())}</text>`);
+  }
+  return parts.join('');
+}
+function backgroundSVG(W, H){
+  const p = state.primary, s = state.secondary;
+  let out = '';
+  if (state.bgStyle === 'gradient'){
+    out += `<defs><linearGradient id="bgGrad" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="${shade(p,.10)}"/><stop offset="1" stop-color="${shade(p,-.28)}"/></linearGradient></defs>`;
+    out += `<rect width="${W}" height="${H}" fill="url(#bgGrad)"/>`;
+  } else {
+    out += `<rect width="${W}" height="${H}" fill="${p}"/>`;
+  }
+  if (state.bgStyle === 'split'){
+    out += `<polygon points="${W},0 ${W},${H} ${W*.42},${H}" fill="${s}" opacity=".16"/>`;
+    out += `<polygon points="${W},0 ${W},${H*.55} ${W*.7},${H}" fill="${s}" opacity=".10"/>`;
+  }
+  return out;
+}
+function headerSVG(W, ink, isWide){
+  const s = state.secondary;
+  const parts = [];
+  const cx = isWide ? 90 : 96, cy = isWide ? 92 : 100, r = isWide ? 44 : 50;
+  const hasCrest = !!(state.crestImg || state.crestEmoji.trim());
+  parts.push(crestSVG(cx, cy, r, ink));
+  const tx = hasCrest ? cx + r + 28 : 60;
+  const anchor = 'start';
+  const maxW = W - tx - 200;
+  const name = displayName(state.teamName || 'Your Team');
+  parts.push(svgText(tx, cy - 4, name, fitSize(name, maxW, isWide ? 60 : 66), ink, {anchor}));
+  const sub = [state.competition, state.opponent && ('vs ' + state.opponent), state.dateLine].filter(Boolean).join('  ·  ');
+  if (sub) parts.push(svgText(tx, cy + 34, state.allCaps ? sub.toUpperCase() : sub, fitSize(sub, maxW, 26), ink, {anchor, weight:500, opacity:.82}));
+  parts.push(svgText(tx, cy + (sub ? 66 : 40), 'STARTING XI', 22, s, {anchor, weight:800, spacing:'.28em'}));
+  if (state.showBadge){
+    const f = formationString();
+    const bw = Math.max(110, f.length * 26 + 30);
+    parts.push(`<rect x="${W - bw - 44}" y="${cy - 26}" width="${bw}" height="52" rx="12" fill="${s}"/>`);
+    parts.push(svgText(W - 44 - bw/2, cy + 10, f, 30, inkFor(s), {weight:800, spacing:'.1em'}));
+  }
+  return parts.join('');
+}
+function pitchLinesSVG(x, y, w, h, ink){
+  const st = `fill="none" stroke="${ink}" stroke-opacity=".45" stroke-width="3"`;
+  const cw = w * .44, ch = h * .13, gw = w * .2, gh = h * .05;
+  return [
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" ${st}/>`,
+    `<line x1="${x}" y1="${y + h/2}" x2="${x + w}" y2="${y + h/2}" stroke="${ink}" stroke-opacity=".45" stroke-width="3"/>`,
+    `<circle cx="${x + w/2}" cy="${y + h/2}" r="${w*.115}" ${st}/>`,
+    `<circle cx="${x + w/2}" cy="${y + h/2}" r="4" fill="${ink}" fill-opacity=".45"/>`,
+    `<rect x="${x + (w-cw)/2}" y="${y}" width="${cw}" height="${ch}" ${st}/>`,
+    `<rect x="${x + (w-gw)/2}" y="${y}" width="${gw}" height="${gh}" ${st}/>`,
+    `<rect x="${x + (w-cw)/2}" y="${y + h - ch}" width="${cw}" height="${ch}" ${st}/>`,
+    `<rect x="${x + (w-gw)/2}" y="${y + h - gh}" width="${gw}" height="${gh}" ${st}/>`
+  ].join('');
+}
+function tokenSVG(cx, cy, r, p){
+  const s = state.secondary, tIn = inkFor(s);
+  const num = String(p.num || '').trim() || '·';
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${s}" stroke="${shade(s,-.35)}" stroke-width="3"/>` +
+    svgText(cx, cy + r*.32, num, fitSize(num, r*1.5, r*.95), tIn, {weight:800, spacing:'0'});
+}
+function subsFooterSVG(x, y, w, ink, cols){
+  const subs = state.subs.filter(p => (p.name || '').trim() || String(p.num || '').trim());
+  const parts = [];
+  let yy = y;
+  if (subs.length){
+    parts.push(svgText(x, yy, 'SUBSTITUTES', 20, state.secondary, {anchor:'start', weight:800, spacing:'.24em'}));
+    yy += 34;
+    const colW = w / cols, rows = Math.ceil(subs.length / cols);
+    subs.forEach((p, i) => {
+      const c = i % cols, r = Math.floor(i / cols);
+      const sx = x + c * colW, sy = yy + r * 32;
+      const txt = (String(p.num||'').trim() ? String(p.num).trim() + '  ' : '') + displayName(p.name || '—');
+      parts.push(svgText(sx, sy, txt, fitSize(txt, colW - 24, 23), ink, {anchor:'start', weight:500, opacity:.92}));
+    });
+    yy += rows * 32 + 6;
+  }
+  if ((state.coach || '').trim()){
+    parts.push(svgText(x, yy + 6, 'COACH  ' + displayName(state.coach), 22, ink, {anchor:'start', weight:700, spacing:'.08em', opacity:.95}));
+  }
+  return parts.join('');
+}
+
+// --- layout: Pitch ---
+function buildPitchLayout(W, H, ink){
+  const isWide = W > H;
+  const parts = [headerSVG(W, ink, isWide)];
+  let px, py, pw, ph, fx, fw;
+  if (isWide){
+    px = 70; py = 190; pw = W * .36; ph = H - py - 50;
+    fx = px + pw + 80; fw = W - fx - 60;
+  } else {
+    px = W * .13; py = 210; pw = W * .74;
+    const footH = H === 1080 ? 190 : 250;
+    ph = H - py - footH - 30;
+    fx = 60; fw = W - 120;
+  }
+  parts.push(pitchLinesSVG(px, py, pw, ph, ink));
+  const lines = currentLines();
+  const rowsY = [];
+  const nRows = lines.length + 1;
+  for (let i = 0; i < nRows; i++){
+    // GK near bottom, attack near top
+    rowsY.push(py + ph - ph * (0.085 + (i * (0.86 / Math.max(1, nRows - 1)))));
+  }
+  const tokR = clamp(Math.min(pw, ph) * .052, 22, isWide ? 30 : 38);
+  let idx = 0;
+  const rows = [[1]].concat(lines.map(n => Array(n).fill(0)));
+  rows.forEach((row, ri) => {
+    const n = row.length, y = rowsY[ri];
+    for (let i = 0; i < n; i++){
+      const x = px + pw * ((i + 1) / (n + 1));
+      const p = state.starters[idx] || {};
+      parts.push(tokenSVG(x, y, tokR, p));
+      const nm = displayName(p.name || '—');
+      parts.push(svgText(x, y + tokR + 26, nm, fitSize(nm, pw / n - 12, tokR * .78), ink, {weight:700}));
+      idx++;
+    }
+  });
+  if (isWide){
+    parts.push(subsFooterSVG(fx, 250, fw, ink, 1));
+  } else {
+    parts.push(subsFooterSVG(fx, py + ph + 52, fw, ink, H === 1080 ? 3 : 2));
+  }
+  return parts.join('');
+}
+
+// --- layout: List ---
+function groupNames(lines){
+  return ['GOALKEEPER'].concat(lines.map((n, i) => {
+    if (i === 0) return 'DEFENDERS';
+    if (i === lines.length - 1) return 'FORWARDS';
+    return 'MIDFIELDERS';
+  }));
+}
+function buildListLayout(W, H, ink){
+  const isWide = W > H;
+  const parts = [headerSVG(W, ink, isWide)];
+  const lines = currentLines();
+  const groups = groupNames(lines);
+  const counts = [1].concat(lines);
+  // merge consecutive duplicate group names (e.g. two midfield lines)
+  const rows = []; let idx = 0;
+  counts.forEach((n, gi) => {
+    for (let i = 0; i < n; i++){ rows.push({p: state.starters[idx] || {}, group: (i === 0 && (gi === 0 || groups[gi] !== groups[gi-1] || true)) && i === 0 ? groups[gi] : null, gi}); idx++; }
+  });
+  // collapse repeated group headers
+  let lastGroup = null;
+  rows.forEach(r => { if (r.group === lastGroup) r.group = null; else if (r.group) lastGroup = r.group; });
+
+  const topY = isWide ? 200 : 236;
+  const cols = isWide ? 2 : 1;
+  const colW = isWide ? (W - 160) / 2 : W - 150;
+  const x0 = isWide ? 80 : 84;
+  const availH = H - topY - (isWide ? 60 : 260);
+  const headerCount = rows.filter(r => r.group).length;
+  const rowH = Math.min(isWide ? 66 : 78, availH / (rows.length / cols + (headerCount * .55) / cols + 1));
+  const gH = rowH * .62;
+  let colHeights = [];
+  { // pre-split rows into columns evenly by height
+    let acc = 0; const heights = rows.map(r => (r.group ? gH : 0) + rowH);
+    const total = heights.reduce((a,b)=>a+b,0);
+    let cut = rows.length; let run = 0;
+    if (cols === 2){ for (let i = 0; i < rows.length; i++){ run += heights[i]; if (run >= total/2){ cut = i + 1; break; } } }
+    colHeights = [cut];
+  }
+  let y = topY, col = 0;
+  rows.forEach((r, i) => {
+    if (cols === 2 && i === colHeights[0]){ col = 1; y = topY; }
+    const x = x0 + col * (colW + 90);
+    if (r.group){
+      y += gH;
+      parts.push(svgText(x, y - gH*.28, r.group, 19, state.secondary, {anchor:'start', weight:800, spacing:'.26em'}));
+      parts.push(`<line x1="${x}" y1="${y - gH*.12}" x2="${x + colW}" y2="${y - gH*.12}" stroke="${ink}" stroke-opacity=".22" stroke-width="2"/>`);
+    }
+    y += rowH;
+    const numTxt = String(r.p.num || '').trim() || '–';
+    parts.push(svgText(x + 8, y - rowH*.28, numTxt, rowH*.62, state.secondary, {anchor:'start', weight:800, spacing:'0'}));
+    const nm = displayName(r.p.name || '—');
+    parts.push(svgText(x + rowH*1.35, y - rowH*.28, nm, Math.min(rowH*.5, fitSize(nm, colW - rowH*1.35 - 80, rowH*.5)), ink, {anchor:'start', weight:700}));
+    const pos = String(r.p.pos || '').trim().toUpperCase();
+    if (pos) parts.push(svgText(x + colW, y - rowH*.28, pos, rowH*.34, ink, {anchor:'end', weight:500, opacity:.6, spacing:'.1em'}));
+  });
+  if (!isWide) parts.push(subsFooterSVG(x0 - 20, H - 210, W - 130, ink, H === 1080 ? 3 : 2));
+  else parts.push(subsFooterSVG(x0, H - 130, W - 160, ink, 4));
+  return parts.join('');
+}
+
+// --- layout: Broadcast ---
+function buildBroadcastLayout(W, H, ink){
+  const isWide = W > H;
+  const s = state.secondary, sInk = inkFor(s);
+  const parts = [headerSVG(W, ink, isWide)];
+  const cols = isWide ? 2 : (H === 1080 ? 2 : 1);
+  const x0 = 64, gap = 22;
+  const colW = (W - x0*2 - gap*(cols-1)) / cols;
+  const topY = isWide ? 200 : 240;
+  const footH = isWide ? 120 : (H === 1080 ? 150 : 230);
+  const availH = H - topY - footH;
+  const perCol = Math.ceil(11 / cols);
+  const barH = Math.min(isWide ? 62 : 76, (availH - (perCol-1)*12) / perCol);
+  for (let i = 0; i < 11; i++){
+    const p = state.starters[i] || {};
+    const c = Math.floor(i / perCol), r = i % perCol;
+    const x = x0 + c * (colW + gap), y = topY + r * (barH + 12);
+    const numW = barH * 1.15;
+    // bar: dark translucent body + secondary number block, TV lower-third style with a skewed edge
+    parts.push(`<g>`);
+    parts.push(`<path d="M ${x} ${y} h ${colW - 14} l 14 ${barH} H ${x} Z" fill="${ink}" opacity=".12"/>`);
+    parts.push(`<path d="M ${x} ${y} h ${numW} l 10 ${barH} H ${x} Z" fill="${s}"/>`);
+    const num = String(p.num || '').trim() || '·';
+    parts.push(svgText(x + numW*.52, y + barH*.68, num, fitSize(num, numW*.9, barH*.58), sInk, {weight:800, spacing:'0'}));
+    const nm = displayName(p.name || '—');
+    parts.push(svgText(x + numW + 26, y + barH*.66, nm, Math.min(barH*.46, fitSize(nm, colW - numW - 120, barH*.46)), ink, {anchor:'start', weight:700}));
+    const pos = String(p.pos || '').trim().toUpperCase();
+    if (pos) parts.push(svgText(x + colW - 18, y + barH*.64, pos, barH*.3, ink, {anchor:'end', weight:600, opacity:.65, spacing:'.12em'}));
+    parts.push(`</g>`);
+  }
+  parts.push(subsFooterSVG(x0, H - footH + 42, W - x0*2, ink, isWide ? 4 : (H === 1080 ? 3 : 2)));
+  return parts.join('');
+}
+
+function buildSVG(){
+  const [W, H] = state.canvasSize.split('x').map(Number);
+  const ink = inkFor(state.primary);
+  let body;
+  if (state.layoutStyle === 'list') body = buildListLayout(W, H, ink);
+  else if (state.layoutStyle === 'broadcast') body = buildBroadcastLayout(W, H, ink);
+  else body = buildPitchLayout(W, H, ink);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">` +
+    backgroundSVG(W, H) + body + `</svg>`;
+}
+
+// ---------- preview ----------
+function renderPreview(){
+  $('#previewHolder').innerHTML = buildSVG();
+  const svg = $('#previewHolder svg');
+  if (svg){ svg.removeAttribute('width'); svg.removeAttribute('height'); svg.style.width = '100%'; }
+}
+
+// ---------- roster UI ----------
+function buildRosterRows(){
+  const sb = $('#startersBody');
+  sb.innerHTML = state.starters.map((p, i) =>
+    `<tr><td class="idx">${i+1}</td>
+      <td><input type="number" min="1" max="99" data-k="num" data-i="${i}" data-set="starters" value="${esc(p.num)}" aria-label="Shirt number ${i+1}"></td>
+      <td><input type="text" class="nm" maxlength="30" data-k="name" data-i="${i}" data-set="starters" value="${esc(p.name)}" placeholder="Player name" aria-label="Player name ${i+1}"></td>
+      <td><input type="text" class="ps" maxlength="4" data-k="pos" data-i="${i}" data-set="starters" value="${esc(p.pos)}" aria-label="Position ${i+1}"></td></tr>`).join('');
+  const ub = $('#subsBody');
+  ub.innerHTML = state.subs.map((p, i) =>
+    `<tr><td class="idx">S${i+1}</td>
+      <td><input type="number" min="1" max="99" data-k="num" data-i="${i}" data-set="subs" value="${esc(p.num)}" aria-label="Sub number ${i+1}"></td>
+      <td colspan="2"><input type="text" class="nm" maxlength="30" data-k="name" data-i="${i}" data-set="subs" value="${esc(p.name)}" placeholder="Substitute name" aria-label="Substitute name ${i+1}"></td></tr>`).join('');
+}
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset && t.dataset.set){
+    const arr = state[t.dataset.set];
+    const i = +t.dataset.i;
+    if (arr && arr[i]){
+      let v = t.value;
+      if (t.dataset.k === 'num' && v !== '') v = String(clamp(parseInt(v,10) || 0, 1, 99));
+      arr[i][t.dataset.k] = v;
+      changed();
+    }
+  }
+});
+
+function applyFormationLabels(force){
+  const labels = labelsForLines(currentLines());
+  state.starters.forEach((p, i) => { if (force || !(p.pos || '').trim()) p.pos = labels[i] || ''; });
+  buildRosterRows();
+}
+
+// ---------- crest ----------
+function updateCrestPreview(){
+  const el = $('#crestPreview');
+  if (state.crestImg) el.innerHTML = `<img src="${state.crestImg}" alt="crest">`;
+  else el.textContent = state.crestEmoji.trim() || '⚽';
+}
+$('#crestFile').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  if (!/^image\//.test(f.type)){ flash('That file is not an image.', 'err'); return; }
+  const img = new Image();
+  const url = URL.createObjectURL(f);
+  img.onload = () => {
+    URL.revokeObjectURL(url);
+    const size = 256, c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    const s = Math.max(size / img.width, size / img.height);
+    ctx.drawImage(img, (size - img.width*s)/2, (size - img.height*s)/2, img.width*s, img.height*s);
+    state.crestImg = c.toDataURL('image/png');
+    updateCrestPreview(); changed();
+    flash('Crest image loaded (scaled to a 256px circle).', 'ok');
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); flash('Could not read that image file.', 'err'); };
+  img.src = url;
+});
+$('#crestClear').addEventListener('click', () => { state.crestImg = ''; updateCrestPreview(); changed(); });
+
+// ---------- controls wiring ----------
+const FIELD_IDS = ['teamName','crestEmoji','competition','opponent','dateLine','coach','customFormation'];
+FIELD_IDS.forEach(id => $('#' + id).addEventListener('input', () => {
+  state[id] = $('#' + id).value;
+  if (id === 'crestEmoji') updateCrestPreview();
+  if (id === 'customFormation') validateCustom();
+  changed();
+}));
+$('#formation').addEventListener('change', () => {
+  state.formation = $('#formation').value;
+  $('#customFormation').style.display = state.formation === 'custom' ? '' : 'none';
+  validateCustom();
+  applyFormationLabels(true);
+  changed();
+});
+function validateCustom(){
+  const note = $('#formationNote');
+  if (state.formation !== 'custom'){ note.textContent = ''; note.className = 'note'; return; }
+  const p = parseCustom(state.customFormation);
+  if (p){ note.textContent = 'Custom ' + p.join('-'); note.className = 'note ok'; applyFormationLabels(true); }
+  else { note.textContent = 'Lines must sum to 10 outfielders (e.g. 4-2-2-2).'; note.className = 'note err'; }
+}
+$('#relabelBtn').addEventListener('click', () => { applyFormationLabels(true); changed(); flash('Position labels re-assigned from the formation.', 'ok'); });
+
+$$('.lstyle').forEach(b => b.addEventListener('click', () => {
+  state.layoutStyle = b.dataset.style;
+  $$('.lstyle').forEach(x => x.classList.toggle('active', x === b));
+  changed();
+}));
+['primary','secondary','bgStyle','fontKind','canvasSize'].forEach(id =>
+  $('#' + id).addEventListener('input', () => { state[id] = $('#' + id).value; changed(); }));
+['allCaps','showBadge'].forEach(id =>
+  $('#' + id).addEventListener('change', () => { state[id] = $('#' + id).checked; changed(); }));
+
+function syncControls(){
+  FIELD_IDS.forEach(id => { $('#' + id).value = state[id] || ''; });
+  $('#formation').value = FORMATIONS[state.formation] || state.formation === 'custom' ? state.formation : '4-3-3';
+  $('#customFormation').style.display = state.formation === 'custom' ? '' : 'none';
+  $('#primary').value = state.primary; $('#secondary').value = state.secondary;
+  $('#bgStyle').value = state.bgStyle; $('#fontKind').value = state.fontKind; $('#canvasSize').value = state.canvasSize;
+  $('#allCaps').checked = !!state.allCaps; $('#showBadge').checked = !!state.showBadge;
+  $$('.lstyle').forEach(x => x.classList.toggle('active', x.dataset.style === state.layoutStyle));
+  updateCrestPreview(); validateCustom();
+}
+
+// ---------- change / autosave ----------
+let saveTimer = null;
+function changed(){
+  renderPreview();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try { localStorage.setItem('lineup-card-state', JSON.stringify(state)); } catch (e) { /* storage full/blocked — ignore */ }
+  }, 350);
+}
+
+// ---------- status flash ----------
+let flashTimer = null;
+function flash(msg, kind){
+  const s = $('#status');
+  s.textContent = msg; s.className = 'note' + (kind ? ' ' + kind : '');
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => { s.textContent = 'Autosaves locally as you type — your last card is restored next visit.'; s.className = 'note'; }, 3200);
+}
+function flashBtn(btn){ btn.classList.add('copied'); setTimeout(() => btn.classList.remove('copied'), 1200); }
+
+// ---------- exports ----------
+function downloadBlob(blob, name){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function slug(){
+  return ((state.teamName || 'lineup').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'lineup') + '-xi';
+}
+function svgToCanvas(scale){
+  return new Promise((resolve, reject) => {
+    const [W, H] = state.canvasSize.split('x').map(Number);
+    const svg = buildSVG();
+    const blob = new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const c = document.createElement('canvas');
+      c.width = W * scale; c.height = H * scale;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      resolve(c);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('SVG rasterization failed')); };
+    img.src = url;
+  });
+}
+$('#pngBtn').addEventListener('click', async () => {
+  try {
+    const c = await svgToCanvas(2);
+    c.toBlob(b => {
+      if (!b){ flash('PNG encoding failed in this browser.', 'err'); return; }
+      downloadBlob(b, slug() + '.png');
+      flash('PNG downloaded at 2× resolution.', 'ok'); flashBtn($('#pngBtn'));
+    }, 'image/png');
+  } catch (e){ flash('PNG export failed: ' + e.message, 'err'); }
+});
+$('#svgBtn').addEventListener('click', () => {
+  downloadBlob(new Blob([buildSVG()], {type:'image/svg+xml;charset=utf-8'}), slug() + '.svg');
+  flash('SVG downloaded.', 'ok'); flashBtn($('#svgBtn'));
+});
+$('#copyBtn').addEventListener('click', async () => {
+  if (!navigator.clipboard || typeof ClipboardItem === 'undefined'){
+    flash('Clipboard images are not supported in this browser — use the PNG download instead.', 'err');
+    return;
+  }
+  try {
+    const c = await svgToCanvas(1);
+    const blob = await new Promise(res => c.toBlob(res, 'image/png'));
+    if (!blob) throw new Error('encode failed');
+    await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+    flash('Image copied to clipboard.', 'ok'); flashBtn($('#copyBtn'));
+  } catch (e){
+    flash('Copy failed (' + e.message + ') — use the PNG download instead.', 'err');
+  }
+});
+
+// ---------- save / load JSON ----------
+$('#saveJsonBtn').addEventListener('click', () => {
+  downloadBlob(new Blob([JSON.stringify(state, null, 2)], {type:'application/json'}), slug() + '.json');
+  flash('Team saved as JSON — load it back next week.', 'ok'); flashBtn($('#saveJsonBtn'));
+});
+$('#loadJson').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const obj = JSON.parse(rd.result);
+      applyState(obj);
+      flash('Team loaded.', 'ok');
+    } catch (err){ flash('Could not read that file as a lineup JSON.', 'err'); }
+  };
+  rd.onerror = () => flash('Could not read that file.', 'err');
+  rd.readAsText(f);
+});
+function applyState(obj){
+  if (!obj || typeof obj !== 'object') throw new Error('bad state');
+  const keys = ['teamName','crestEmoji','crestImg','competition','opponent','dateLine','formation','customFormation','coach','layoutStyle','primary','secondary','bgStyle','fontKind','canvasSize'];
+  keys.forEach(k => { if (typeof obj[k] === 'string') state[k] = obj[k]; });
+  ['allCaps','showBadge'].forEach(k => { if (typeof obj[k] === 'boolean') state[k] = obj[k]; });
+  if (!/^#[0-9a-f]{6}$/i.test(state.primary)) state.primary = '#0b3d2e';
+  if (!/^#[0-9a-f]{6}$/i.test(state.secondary)) state.secondary = '#e8c547';
+  if (!['pitch','list','broadcast'].includes(state.layoutStyle)) state.layoutStyle = 'pitch';
+  if (!['1080x1350','1080x1080','1920x1080'].includes(state.canvasSize)) state.canvasSize = '1080x1350';
+  if (!FONTS[state.fontKind]) state.fontKind = 'condensed';
+  if (!['solid','gradient','split'].includes(state.bgStyle)) state.bgStyle = 'gradient';
+  if (state.formation !== 'custom' && !FORMATIONS[state.formation]) state.formation = '4-3-3';
+  if (state.crestImg && !/^data:image\//.test(state.crestImg)) state.crestImg = '';
+  state.starters = blankStarters();
+  if (Array.isArray(obj.starters)) obj.starters.slice(0, 11).forEach((p, i) => {
+    if (p && typeof p === 'object') state.starters[i] = {num:String(p.num||''), name:String(p.name||''), pos:String(p.pos||'')};
+  });
+  state.subs = blankSubs();
+  if (Array.isArray(obj.subs)) obj.subs.slice(0, 9).forEach((p, i) => {
+    if (p && typeof p === 'object') state.subs[i] = {num:String(p.num||''), name:String(p.name||'')};
+  });
+  buildRosterRows(); syncControls(); changed();
+}
+
+// ---------- share link ----------
+function encodeState(){
+  const copy = Object.assign({}, state, {crestImg:''});
+  return btoa(unescape(encodeURIComponent(JSON.stringify(copy)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function decodeState(str){
+  const b64 = str.replace(/-/g,'+').replace(/_/g,'/');
+  const obj = JSON.parse(decodeURIComponent(escape(atob(b64))));
+  applyState(obj);
+  return true;
+}
+$('#shareBtn').addEventListener('click', async () => {
+  const enc = encodeState();
+  if (enc.length > 6000){ flash('This lineup is too large for a share link — use Save team instead.', 'err'); return; }
+  const url = location.origin + location.pathname + '#s=' + enc;
+  history.replaceState(null, '', '#s=' + enc);
+  try {
+    await navigator.clipboard.writeText(url);
+    flash(state.crestImg ? 'Link copied (uploaded crest image is not included in links).' : 'Share link copied.', 'ok');
+    flashBtn($('#shareBtn'));
+  } catch (e){ flash('Link is in the address bar — copy it from there.', 'ok'); }
+});
+
+// ---------- sample / clear / undo ----------
+function loadSample(){
+  applyState({
+    teamName:'Harborview Athletic', crestEmoji:'⚓', crestImg:'',
+    competition:'Coastal League · Matchday 8', opponent:'Eastgate Rovers', dateLine:'Sat 19 Jul · 15:00',
+    formation:'4-3-3', customFormation:'',
+    starters:[
+      {num:'1',  name:'M. Delacroix', pos:'GK'},
+      {num:'3',  name:'T. Okonkwo',   pos:'LB'},
+      {num:'5',  name:'R. Vasquez',   pos:'CB'},
+      {num:'4',  name:'J. Lindqvist', pos:'CB'},
+      {num:'2',  name:'D. Carrick',   pos:'RB'},
+      {num:'8',  name:'S. Almeida',   pos:'CM'},
+      {num:'6',  name:'K. Haugen',    pos:'CDM'},
+      {num:'10', name:'A. Ferrante',  pos:'CM'},
+      {num:'11', name:'Y. Diallo',    pos:'LW'},
+      {num:'9',  name:'V. Moreau',    pos:'ST'},
+      {num:'7',  name:'B. Castellanos', pos:'RW'}
+    ],
+    subs:[
+      {num:'13', name:'P. Igwe'}, {num:'15', name:'L. Brandt'}, {num:'17', name:'N. Sorensen'},
+      {num:'19', name:'E. Tanaka'}, {num:'21', name:'C. Whitfield'}, {num:'23', name:'O. Marchetti'},
+      {num:'25', name:'H. Duval'}, {num:'14', name:'G. Ashworth'}, {num:'27', name:'F. Kone'}
+    ],
+    coach:'D. Okafor',
+    layoutStyle:'pitch', primary:'#0b3d2e', secondary:'#e8c547', bgStyle:'gradient',
+    fontKind:'condensed', allCaps:true, showBadge:true, canvasSize:'1080x1350'
+  });
+  flash('Sample club loaded — swap in your own squad.', 'ok');
+}
+$('#sampleBtn').addEventListener('click', loadSample);
+$('#clearBtn').addEventListener('click', () => {
+  undoSnapshot = JSON.parse(JSON.stringify(state));
+  $('#undoBtn').disabled = false;
+  state.starters = blankStarters(); state.subs = blankSubs(); state.coach = '';
+  applyFormationLabels(true);
+  syncControls(); changed();
+  flash('Roster cleared — Undo is available.', 'ok');
+});
+$('#undoBtn').addEventListener('click', () => {
+  if (!undoSnapshot) return;
+  applyState(undoSnapshot);
+  undoSnapshot = null; $('#undoBtn').disabled = true;
+  flash('Roster restored.', 'ok');
+});
+
+// ---------- theme ----------
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next); localStorage.setItem('max-theme', next);
+});
+
+// ---------- boot ----------
+function boot(){
+  buildRosterRows();
+  let loaded = false;
+  if (location.hash.startsWith('#s=')){
+    try { loaded = decodeState(location.hash.slice(3)); flash('Lineup restored from share link.', 'ok'); }
+    catch (e){ loaded = false; }
+  }
+  if (!loaded){
+    try {
+      const saved = localStorage.getItem('lineup-card-state');
+      if (saved){ applyState(JSON.parse(saved)); loaded = true; }
+    } catch (e){ loaded = false; }
+  }
+  if (!loaded) loadSample();
+  else { syncControls(); renderPreview(); }
+}
+boot();
+
+// test / automation hooks
+window.lcg = {
+  state, buildSVG, loadSample, applyState, encodeState, decodeState,
+  parseCustom, labelsForLines, currentLines, inkFor, fitSize, renderPreview
+};
+</script>
+</body>
+</html>

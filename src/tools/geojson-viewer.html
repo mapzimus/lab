@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GeoJSON Viewer &amp; Editor</title>
+<meta name="description" content="View GeoJSON on a map, inspect and edit feature properties, validate, and export — paste, drop a file, or load from a URL. Your data stays in your browser.">
+
+<!-- Leaflet CSS (map). The Leaflet JS is background-loaded from the script
+     below, so a slow or blocked CDN never freezes the tool — everything
+     except the map itself works without it. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  /* extra tokens for this tool (checked in both themes) */
+  :root { --warn:#8a6100; }
+  :root[data-theme="dark"] { --warn:#e2b45e; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --warn:#e2b45e; } }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+  .btn.primary:disabled:hover { color: var(--accent-ink); filter: none; }
+  .btn.danger { color: var(--danger); }
+  .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+  .btn.copied, .copy.copied { color: var(--ok); border-color: var(--ok); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .panel h2 { font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; padding: 12px 14px 6px; font-weight: 600; }
+
+  .note { color: var(--muted); font-size: .8rem; margin: 8px 2px 0; }
+  .note.err { color: var(--danger); }
+  .note.warn { color: var(--warn); }
+
+  /* ---- load bar ---- */
+  .loadbar { display: flex; flex-wrap: wrap; gap: 10px; padding: 12px 14px; align-items: center; }
+  .urlrow { display: flex; gap: 8px; flex: 1 1 300px; min-width: 0; }
+  .urlrow input { flex: 1; min-width: 0; font-family: var(--mono); font-size: .84rem; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 9px; padding: 9px 11px; }
+  .urlrow input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  .urlrow .btn { flex: none; }
+
+  /* ---- stats bar ---- */
+  .stats { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 14px 2px 12px; font-size: .85rem; color: var(--muted); }
+  .stats .stat-count strong { color: var(--text); font-size: 1rem; }
+  .tchip { display: inline-flex; align-items: center; gap: 5px; margin-right: 10px; white-space: nowrap; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
+  .stat-bbox { display: inline-flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
+  .stat-bbox .lbl { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
+  .stat-bbox code { font-family: var(--mono); background: var(--surface-2); border: 1px solid var(--border); padding: 2px 7px; border-radius: 6px; font-size: .76rem; overflow-wrap: anywhere; }
+  .copy { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 7px; width: 28px; height: 28px; cursor: pointer; font-size: .85rem; display: inline-flex; align-items: center; justify-content: center; }
+  .copy:hover { color: var(--accent); border-color: var(--accent); }
+  .btn.small { padding: 4px 10px; font-size: .78rem; border-radius: 7px; }
+
+  /* ---- main grid: map + sidebar ---- */
+  .main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 880px) { .main { grid-template-columns: 1fr; } }
+  #map { height: 540px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); z-index: 0; }
+  #map.map-fallback { display: flex; align-items: center; justify-content: center; text-align: center; color: var(--muted); background: var(--surface-2); padding: 24px; font-size: .92rem; }
+  .leaflet-container { font-family: var(--sans); background: var(--surface-2); }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+  .popup { font-size: .84rem; max-width: 270px; }
+  .popup .ptype { display: inline-block; margin-left: 8px; font-size: .72rem; color: var(--muted); }
+  .popup table { border-collapse: collapse; margin-top: 6px; }
+  .popup td { padding: 2px 8px 2px 0; vertical-align: top; font-size: .78rem; overflow-wrap: anywhere; }
+  .popup td:first-child { color: var(--muted); font-family: var(--mono); }
+  .popup .pnone { color: var(--muted); margin: 4px 0 0; font-size: .78rem; }
+
+  .side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  #featList { max-height: 292px; overflow: auto; padding: 0 8px 8px; display: flex; flex-direction: column; gap: 2px; }
+  .feat-row { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 1px solid transparent; background: none; color: var(--text); border-radius: 8px; padding: 7px 8px; cursor: pointer; font-size: .85rem; font-family: var(--sans); }
+  .feat-row:hover { background: var(--surface-2); }
+  .feat-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .feat-row.sel { border-color: var(--accent); background: var(--surface-2); }
+  .feat-row .fi { color: var(--muted); font-family: var(--mono); font-size: .72rem; min-width: 2.2ch; text-align: right; flex: none; }
+  .feat-row .fname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .feat-row .ftype { flex: none; color: var(--muted); font-size: .72rem; }
+  .listnote { padding: 0 14px 12px; margin: 0; }
+
+  /* ---- properties editor ---- */
+  .ebody { padding: 2px 14px 14px; }
+  #editWho { text-transform: none; letter-spacing: 0; font-weight: 500; }
+  .prowhead, .prow { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) 30px; gap: 6px; margin-bottom: 6px; }
+  .prowhead { color: var(--muted); font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 4px; }
+  .prow input { font-family: var(--mono); font-size: .82rem; padding: 7px 8px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; color: var(--text); width: 100%; min-width: 0; }
+  .prow input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  .prow-del { border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 7px; cursor: pointer; font-size: .8rem; }
+  .prow-del:hover { color: var(--danger); border-color: var(--danger); }
+  .eactions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .eactions .spacer { flex: 1; }
+  .ehint { font-size: .74rem; }
+
+  /* ---- raw JSON panel ---- */
+  .rawpanel { margin-top: 16px; }
+  .rawhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding-right: 14px; }
+  .rawtools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-top: 8px; }
+  .check { display: inline-flex; gap: 6px; align-items: center; font-size: .82rem; color: var(--muted); cursor: pointer; user-select: none; }
+  .check input { accent-color: var(--accent); }
+  .rawbody { padding: 6px 14px 14px; }
+  #raw { display: block; width: 100%; min-height: 260px; resize: vertical; font-family: var(--mono); font-size: .8rem; line-height: 1.5; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; }
+  #raw:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+
+  /* ---- drag & drop overlay ---- */
+  .dropzone { position: fixed; inset: 0; z-index: 2000; background: rgba(20, 40, 90, .35); display: flex; align-items: center; justify-content: center; }
+  .dropzone > div { background: var(--surface); border: 2px dashed var(--accent); color: var(--text); border-radius: 16px; padding: 34px 46px; font-size: 1.05rem; box-shadow: var(--shadow); pointer-events: none; }
+
+  @media (max-width: 720px) {
+    #map { height: 360px; }
+    #featList { max-height: 240px; }
+    .loadbar { align-items: stretch; }
+    .loadbar > .btn { flex: 1 1 auto; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>GeoJSON Viewer &amp; Editor</h1>
+      <p>See any GeoJSON on a map, click a feature to inspect and edit its properties, and export the result. Paste it below, drop a .geojson file anywhere on this page, load one from a link — or try the example.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <!-- ---- input methods ---- -->
+  <section class="panel loadbar" aria-label="Load data">
+    <button class="btn" id="exampleBtn" type="button">Try an example</button>
+    <button class="btn" id="fileBtn" type="button">Open a file…</button>
+    <input class="visually-hidden" type="file" id="fileInput" accept=".geojson,.json,application/geo+json,application/json" aria-label="Choose a GeoJSON file">
+    <div class="urlrow">
+      <label class="visually-hidden" for="urlInput">Load GeoJSON from a URL</label>
+      <input id="urlInput" type="url" placeholder="https://example.com/data.geojson" spellcheck="false" autocomplete="off">
+      <button class="btn" id="urlBtn" type="button">Load from URL</button>
+    </div>
+  </section>
+  <p class="note">You can also drag &amp; drop a .geojson or .json file anywhere on this page. Loading from a URL only works if that server allows cross-origin requests (CORS) — if it refuses, download the file and drop it here instead.</p>
+  <p class="note err" id="loadErr" hidden aria-live="polite"></p>
+
+  <!-- ---- stats bar ---- -->
+  <div class="stats" aria-label="Data summary">
+    <span class="stat-count"><strong id="statCount">0</strong> <span id="statCountLbl">features</span></span>
+    <span id="statTypes"></span>
+    <span class="stat-bbox" id="bboxWrap" hidden>
+      <span class="lbl">bbox</span>
+      <code id="statBbox"></code>
+      <button class="copy" id="bboxCopy" type="button" title="Copy bounding box (west, south, east, north)" aria-label="Copy bounding box">⧉</button>
+    </span>
+    <button class="btn small" id="fitBtn" type="button" hidden title="Zoom the map to show everything">⤢ Fit all</button>
+  </div>
+
+  <!-- ---- map + sidebar ---- -->
+  <div class="main">
+    <section>
+      <div id="map" role="application" aria-label="Map showing the GeoJSON features"></div>
+    </section>
+
+    <aside class="side">
+      <section class="panel">
+        <h2>Features</h2>
+        <div id="featList" aria-label="Feature list"></div>
+        <p class="note listnote" id="listEmpty">Nothing loaded yet — click “Try an example”, open or drop a file, paste GeoJSON below, or load a URL.</p>
+        <p class="note listnote" id="listMore" hidden></p>
+      </section>
+
+      <section class="panel" id="editPanel">
+        <h2>Properties<span id="editWho"></span></h2>
+        <div class="ebody">
+          <p class="note" id="editEmpty" style="margin-top:2px">Select a feature on the map or in the list to view and edit its properties.</p>
+          <div id="editBody" hidden>
+            <div class="prowhead" id="prowHead"><span>Key</span><span>Value</span><span></span></div>
+            <div id="propRows"></div>
+            <p class="note" id="editNone" hidden style="margin:2px 0 6px">This feature has no properties yet — add one below.</p>
+            <div class="eactions">
+              <button class="btn" id="propAdd" type="button">+ Add property</button>
+              <button class="btn primary" id="propApply" type="button">Apply</button>
+              <span class="spacer"></span>
+              <button class="btn danger" id="featDelete" type="button">Delete feature</button>
+            </div>
+            <p class="note err" id="editErr" hidden aria-live="polite"></p>
+            <p class="note ehint">Values keep their type: <code>42</code> becomes a number, <code>true</code>/<code>false</code>/<code>null</code> stay special, <code>"42"</code> forces text, <code>{…}</code>/<code>[…]</code> parse as JSON. Anything else is plain text, and untouched values keep their original type.</p>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <!-- ---- raw JSON ---- -->
+  <section class="panel rawpanel">
+    <div class="rawhead">
+      <h2><label for="raw">Raw GeoJSON</label></h2>
+      <div class="rawtools">
+        <label class="check" for="minify"><input type="checkbox" id="minify"> Minified</label>
+        <button class="btn" id="copyBtn" type="button" disabled>⧉ Copy</button>
+        <button class="btn primary" id="dlBtn" type="button" disabled>Download .geojson</button>
+      </div>
+    </div>
+    <div class="rawbody">
+      <textarea id="raw" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder='Paste GeoJSON here — a FeatureCollection, a single Feature, or a bare geometry, e.g. {"type":"Point","coordinates":[2.29,48.86]}'></textarea>
+      <p class="note err" id="rawErr" hidden aria-live="polite"></p>
+      <p class="note" id="rawNote" hidden aria-live="polite"></p>
+    </div>
+  </section>
+
+  <footer class="app">Everything runs in your browser — your files and edits never leave this page. Map tiles come from OpenStreetMap; “Load from URL” fetches straight from your browser. · a <strong>max</strong> tool</footer>
+</div>
+
+<div class="dropzone" id="dropzone" hidden><div>Drop your .geojson file to load it</div></div>
+
+<script>
+'use strict';
+/* ============================================================
+   GeoJSON Viewer & Editor — standalone, client-side.
+   Dep: Leaflet 1.9.4 (background-loaded below; the tool degrades
+   gracefully to list + editor + raw JSON if the CDN is blocked).
+   ============================================================ */
+
+const $ = (id) => document.getElementById(id);
+const GEOM_TYPES = ['Point', 'MultiPoint', 'LineString', 'MultiLineString', 'Polygon', 'MultiPolygon', 'GeometryCollection'];
+const LIST_CAP = 500;
+const CANVAS_THRESHOLD = 800;   // above this many features, draw on <canvas> for speed
+
+const state = {
+  data: null,        // canonical model: a FeatureCollection (or null before any load)
+  selected: -1,
+  renderFails: 0,    // features Leaflet could not draw in the last render
+};
+
+/* ---------------- tiny utils ---------------- */
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function flash(btn, txt) {
+  const old = btn.textContent;
+  btn.classList.add('copied');
+  btn.textContent = txt;
+  setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1200);
+}
+async function copyText(btn, text) {
+  try { await navigator.clipboard.writeText(text); flash(btn, '✓ Copied'); }
+  catch (e) { flash(btn, 'Copy blocked'); }
+}
+function displayVal(v) {
+  if (v === undefined) return '';
+  return typeof v === 'string' ? v : JSON.stringify(v);
+}
+function geomType(f) {
+  return (f && f.geometry && f.geometry.type) ? f.geometry.type : 'No geometry';
+}
+function featureName(f, i) {
+  const p = (f && f.properties && typeof f.properties === 'object') ? f.properties : {};
+  for (const k of ['name', 'title', 'id']) {
+    const v = p[k];
+    if (typeof v === 'string' && v.trim()) return v;
+    if (typeof v === 'number') return String(v);
+  }
+  if (typeof f.id === 'string' || typeof f.id === 'number') return String(f.id);
+  return 'Feature ' + (i + 1);
+}
+
+/* ---------------- colors (distinct per geometry type, readable on light
+   map tiles and against both page themes) ---------------- */
+let ACCENT = '#2563eb';
+function refreshAccent() {
+  const v = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  if (v) ACCENT = v;
+}
+function colorFor(t) {
+  if (t === 'Point' || t === 'MultiPoint') return ACCENT;
+  if (t === 'LineString' || t === 'MultiLineString') return '#e17d00';
+  if (t === 'Polygon' || t === 'MultiPolygon') return '#0e9f6e';
+  if (t === 'GeometryCollection') return '#8f5bf0';
+  return '#8a96a3';
+}
+function styleFor(f, level) {   // level: 0 base, 1 hover, 2 selected
+  const c = colorFor(geomType(f));
+  return {
+    color: c, fillColor: c,
+    weight: level === 2 ? 4 : level === 1 ? 3 : 2,
+    opacity: level ? 1 : 0.85,
+    fillOpacity: level === 2 ? 0.4 : level === 1 ? 0.3 : 0.2,
+  };
+}
+
+/* ---------------- validation ----------------
+   JSON.parse happens before this. Structural problems throw (blocking);
+   out-of-range coordinates only warn. Bare geometries and single Features
+   are wrapped into a FeatureCollection. */
+function validateAndNormalize(obj) {
+  const warnings = [];
+  const ctx = { outOfRange: 0, empty: 0 };
+  if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) {
+    throw new Error('The top level must be a JSON object with a "type" property.');
+  }
+  if (!obj.type) throw new Error('Missing "type" — GeoJSON needs "type": "FeatureCollection", "Feature", or a geometry type.');
+
+  let fc, wrappedFrom = null;
+  if (obj.type === 'FeatureCollection') {
+    if (!Array.isArray(obj.features)) throw new Error('A FeatureCollection needs a "features" array.');
+    fc = obj;
+  } else if (obj.type === 'Feature') {
+    fc = { type: 'FeatureCollection', features: [obj] };
+    wrappedFrom = 'a single Feature';
+  } else if (GEOM_TYPES.includes(obj.type)) {
+    fc = { type: 'FeatureCollection', features: [{ type: 'Feature', properties: {}, geometry: obj }] };
+    wrappedFrom = 'a bare ' + obj.type + ' geometry';
+  } else {
+    throw new Error('"' + obj.type + '" is not a GeoJSON type. Expected FeatureCollection, Feature, or one of: ' + GEOM_TYPES.join(', ') + '.');
+  }
+
+  let noGeomMember = 0;
+  fc.features.forEach((f, i) => {
+    const at = 'Feature ' + (i + 1);
+    if (f === null || typeof f !== 'object' || Array.isArray(f)) throw new Error(at + ': every feature must be an object.');
+    if (f.type !== 'Feature') throw new Error(at + ': "type" must be "Feature" (got ' + JSON.stringify(f.type) + ').');
+    if (f.properties !== undefined && f.properties !== null && (typeof f.properties !== 'object' || Array.isArray(f.properties))) {
+      throw new Error(at + ': "properties" must be an object or null.');
+    }
+    if (f.geometry === undefined) noGeomMember++;
+    else if (f.geometry !== null) checkGeom(f.geometry, at, ctx);
+  });
+
+  if (noGeomMember) warnings.push(noGeomMember + ' feature' + (noGeomMember === 1 ? ' has' : 's have') + ' no "geometry" member — treated as empty.');
+  if (ctx.empty) warnings.push(ctx.empty + ' geometr' + (ctx.empty === 1 ? 'y has' : 'ies have') + ' empty coordinate arrays.');
+  if (ctx.outOfRange) warnings.push(ctx.outOfRange + ' coordinate' + (ctx.outOfRange === 1 ? ' is' : 's are') + ' outside the usual longitude/latitude ranges (±180 / ±90) — shown anyway, but check the axis order or CRS.');
+  return { fc, wrappedFrom, warnings };
+}
+function checkGeom(g, at, ctx) {
+  if (typeof g !== 'object' || Array.isArray(g)) throw new Error(at + ': geometry must be an object or null.');
+  if (g.type === 'GeometryCollection') {
+    if (!Array.isArray(g.geometries)) throw new Error(at + ': a GeometryCollection needs a "geometries" array.');
+    g.geometries.forEach((sub, j) => {
+      if (sub === null) return;
+      checkGeom(sub, at + ' → geometry ' + (j + 1), ctx);
+    });
+    return;
+  }
+  if (!GEOM_TYPES.includes(g.type)) throw new Error(at + ': unknown geometry type ' + JSON.stringify(g.type) + '.');
+  if (!Array.isArray(g.coordinates)) throw new Error(at + ': "coordinates" must be an array.');
+  if (g.type === 'Point') { checkPosition(g.coordinates, at, ctx); return; }
+  checkCoords(g.coordinates, at, ctx);
+}
+function checkPosition(a, at, ctx) {
+  if (a.length < 2) throw new Error(at + ': a coordinate needs at least [longitude, latitude].');
+  for (const n of a) {
+    if (typeof n !== 'number' || !isFinite(n)) throw new Error(at + ': coordinates must be finite numbers.');
+  }
+  const lon = a[0], lat = a[1];
+  if (lon < -180 || lon > 180 || lat < -90 || lat > 90) ctx.outOfRange++;
+}
+function checkCoords(arr, at, ctx) {
+  if (!arr.length) { ctx.empty++; return; }
+  if (typeof arr[0] === 'number') { checkPosition(arr, at, ctx); return; }
+  for (const sub of arr) {
+    if (!Array.isArray(sub)) throw new Error(at + ': malformed coordinates (mixed values and arrays).');
+    checkCoords(sub, at, ctx);
+  }
+}
+
+/* ---------------- bbox & stats ---------------- */
+function computeBbox(fc) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, has = false;
+  function walk(a) {
+    if (!Array.isArray(a) || !a.length) return;
+    if (typeof a[0] === 'number') {
+      if (typeof a[1] !== 'number') return;
+      has = true;
+      if (a[0] < minX) minX = a[0];
+      if (a[0] > maxX) maxX = a[0];
+      if (a[1] < minY) minY = a[1];
+      if (a[1] > maxY) maxY = a[1];
+      return;
+    }
+    for (const s of a) walk(s);
+  }
+  function walkGeom(g) {
+    if (!g || typeof g !== 'object') return;
+    if (g.type === 'GeometryCollection') { (g.geometries || []).forEach(walkGeom); return; }
+    walk(g.coordinates);
+  }
+  ((fc && fc.features) || []).forEach((f) => f && walkGeom(f.geometry));
+  return has ? [minX, minY, maxX, maxY] : null;
+}
+function renderStats() {
+  const feats = state.data ? state.data.features : [];
+  $('statCount').textContent = feats.length;
+  $('statCountLbl').textContent = feats.length === 1 ? 'feature' : 'features';
+  const counts = {};
+  feats.forEach((f) => { const t = geomType(f); counts[t] = (counts[t] || 0) + 1; });
+  $('statTypes').innerHTML = Object.keys(counts)
+    .map((t) => '<span class="tchip"><span class="dot" style="background:' + colorFor(t) + '"></span>' + counts[t] + ' ' + esc(t) + '</span>')
+    .join('');
+  const bb = computeBbox(state.data);
+  $('bboxWrap').hidden = !bb;
+  $('fitBtn').hidden = !bb || !map;
+  if (bb) $('statBbox').textContent = bb.map((v) => v.toFixed(6)).join(', ');
+  const noData = !state.data;
+  $('copyBtn').disabled = noData;
+  $('dlBtn').disabled = noData;
+}
+
+/* ---------------- map (Leaflet, background-loaded) ---------------- */
+let map = null, geoGroup = null, layerGroups = [], svgRenderer = null, canvasRenderer = null;
+let hovered = -1;
+
+(function loadLeaflet() {
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+  s.crossOrigin = '';
+  s.onload = () => { if (window.L) bootMap(); else mapFallback(); };
+  s.onerror = () => mapFallback();
+  document.head.appendChild(s);
+})();
+
+function mapFallback() {
+  const el = $('map');
+  el.classList.add('map-fallback');
+  el.innerHTML = 'Map unavailable — the Leaflet library could not be loaded.<br>The feature list, property editor, validation and export below all still work.';
+}
+function bootMap() {
+  map = L.map('map', { worldCopyJump: true }).setView([20, 0], 2);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+  svgRenderer = L.svg();
+  canvasRenderer = L.canvas();
+  renderMap(true);
+  renderStats();   // unhide the Fit button now that the map exists
+}
+function eachPath(group, fn) {
+  group.eachLayer((l) => { if (l instanceof L.LayerGroup) eachPath(l, fn); else fn(l); });
+}
+function renderMap(fit) {
+  if (!map) return;
+  if (geoGroup) geoGroup.remove();
+  layerGroups = [];
+  hovered = -1;
+  state.renderFails = 0;
+  geoGroup = L.featureGroup();
+  const feats = state.data ? state.data.features : [];
+  const renderer = feats.length > CANVAS_THRESHOLD ? canvasRenderer : svgRenderer;
+  feats.forEach((f, i) => {
+    let sub = null;
+    if (f && f.geometry) {
+      try {
+        sub = L.geoJSON(f, {
+          renderer,
+          style: () => styleFor(f, 0),
+          pointToLayer: (pf, latlng) => L.circleMarker(latlng, Object.assign({ renderer, radius: 6 }, styleFor(f, 0))),
+          onEachFeature: (pf, layer) => {
+            layer.bindPopup(() => popupHTML(f, i), { maxWidth: 300 });
+            layer.on('click', () => selectFeature(i, { zoom: false }));
+          },
+        });
+        if (!sub.getLayers().length) sub = null;   // e.g. empty coordinate arrays
+      } catch (e) { state.renderFails++; sub = null; }
+    }
+    layerGroups[i] = sub;
+    if (sub) geoGroup.addLayer(sub);
+  });
+  geoGroup.addTo(map);
+  if (state.selected >= 0) applyEmphasis(state.selected);
+  if (fit === true) {
+    fitAll();
+  } else if (fit === 'auto') {
+    const b = geoGroup.getBounds();
+    if (b.isValid() && !map.getBounds().contains(b)) fitAll();
+  }
+}
+function fitAll() {
+  if (!map || !geoGroup) return;
+  const b = geoGroup.getBounds();
+  if (b && b.isValid()) map.fitBounds(b.pad(0.12), { maxZoom: 15 });
+}
+function zoomTo(i) {
+  if (!map) return;
+  const sub = layerGroups[i];
+  if (!sub) return;
+  const b = sub.getBounds();
+  if (b && b.isValid()) map.fitBounds(b.pad(0.3), { maxZoom: 14 });
+}
+function applyEmphasis(i) {
+  const sub = layerGroups[i];
+  if (!sub || !state.data || !state.data.features[i]) return;
+  const f = state.data.features[i];
+  const level = i === state.selected ? 2 : i === hovered ? 1 : 0;
+  const st = styleFor(f, level);
+  sub.setStyle(st);
+  const radius = level === 2 ? 9 : level === 1 ? 7.5 : 6;
+  eachPath(sub, (l) => {
+    if (l.setRadius) l.setRadius(radius);
+    if (level && l.bringToFront) l.bringToFront();
+  });
+}
+function setHover(i) {
+  if (hovered === i) return;
+  const prev = hovered;
+  hovered = i;
+  if (prev >= 0) applyEmphasis(prev);
+  if (i >= 0) applyEmphasis(i);
+}
+function popupHTML(f, i) {
+  const p = (f.properties && typeof f.properties === 'object') ? f.properties : {};
+  const keys = Object.keys(p);
+  let rows = keys.slice(0, 8)
+    .map((k) => '<tr><td>' + esc(k) + '</td><td>' + esc(displayVal(p[k])) + '</td></tr>')
+    .join('');
+  if (keys.length > 8) rows += '<tr><td colspan="2">…and ' + (keys.length - 8) + ' more</td></tr>';
+  return '<div class="popup"><strong>' + esc(featureName(f, i)) + '</strong><span class="ptype">' + esc(geomType(f)) + '</span>'
+    + (rows ? '<table>' + rows + '</table>' : '<p class="pnone">No properties</p>') + '</div>';
+}
+
+/* ---------------- feature list ---------------- */
+let rowEls = [];
+function renderList() {
+  const wrapEl = $('featList');
+  wrapEl.innerHTML = '';
+  rowEls = [];
+  const feats = state.data ? state.data.features : [];
+  $('listEmpty').hidden = feats.length > 0;
+  const n = Math.min(feats.length, LIST_CAP);
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < n; i++) {
+    const f = feats[i];
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'feat-row' + (i === state.selected ? ' sel' : '');
+    b.innerHTML = '<span class="fi">' + (i + 1) + '</span><span class="dot" style="background:' + colorFor(geomType(f)) + '"></span><span class="fname"></span><span class="ftype">' + esc(geomType(f)) + '</span>';
+    b.querySelector('.fname').textContent = featureName(f, i);
+    b.addEventListener('click', () => selectFeature(i, { zoom: true, scrollEditor: true }));
+    b.addEventListener('mouseenter', () => setHover(i));
+    b.addEventListener('mouseleave', () => setHover(-1));
+    b.addEventListener('focus', () => setHover(i));
+    b.addEventListener('blur', () => setHover(-1));
+    frag.appendChild(b);
+    rowEls[i] = b;
+  }
+  wrapEl.appendChild(frag);
+  const more = feats.length - n;
+  $('listMore').hidden = more <= 0;
+  if (more > 0) $('listMore').textContent = 'Showing the first ' + LIST_CAP + ' of ' + feats.length + ' features — the other ' + more + ' are still on the map and in the JSON.';
+}
+function renderListSelection() {
+  rowEls.forEach((el, i) => { if (el) el.classList.toggle('sel', i === state.selected); });
+}
+function selectFeature(i, opts) {
+  opts = opts || {};
+  const prev = state.selected;
+  state.selected = i;
+  if (prev >= 0 && prev !== i) applyEmphasis(prev);
+  if (i >= 0) applyEmphasis(i);
+  renderListSelection();
+  renderEditor();
+  if (opts.zoom) zoomTo(i);
+  if (i >= 0 && rowEls[i] && !opts.zoom) rowEls[i].scrollIntoView({ block: 'nearest' });
+  if (opts.scrollEditor && window.innerWidth < 880) $('editPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ---------------- properties editor ---------------- */
+let editRows = [];
+let delTimer = null;
+function renderEditor() {
+  const feats = state.data ? state.data.features : [];
+  const i = state.selected;
+  const f = (i >= 0 && i < feats.length) ? feats[i] : null;
+  if (!f && i >= 0) state.selected = -1;
+  $('editEmpty').hidden = !!f;
+  $('editBody').hidden = !f;
+  $('editErr').hidden = true;
+  const del = $('featDelete');
+  del.dataset.armed = '';
+  del.textContent = 'Delete feature';
+  clearTimeout(delTimer);
+  editRows = [];
+  $('propRows').innerHTML = '';
+  if (!f) { $('editWho').textContent = ''; return; }
+  $('editWho').textContent = ' — ' + featureName(f, i);
+  const p = (f.properties && typeof f.properties === 'object' && !Array.isArray(f.properties)) ? f.properties : {};
+  const keys = Object.keys(p);
+  keys.forEach((k) => addPropRow(k, p[k], true));
+  $('editNone').hidden = keys.length > 0;
+  $('prowHead').hidden = keys.length === 0;
+}
+function addPropRow(key, val, hasOrig) {
+  const row = document.createElement('div');
+  row.className = 'prow';
+  const keyEl = document.createElement('input');
+  keyEl.value = key;
+  keyEl.placeholder = 'key';
+  keyEl.setAttribute('aria-label', 'Property key');
+  const valEl = document.createElement('input');
+  valEl.value = hasOrig ? displayVal(val) : '';
+  valEl.placeholder = 'value';
+  valEl.setAttribute('aria-label', 'Property value');
+  const del = document.createElement('button');
+  del.type = 'button';
+  del.className = 'prow-del';
+  del.title = 'Remove this property';
+  del.setAttribute('aria-label', 'Remove property ' + (key || '(new)'));
+  del.textContent = '✕';
+  const rec = { origVal: val, touched: !hasOrig, keyEl, valEl };
+  valEl.addEventListener('input', () => { rec.touched = true; });
+  del.addEventListener('click', () => { row.remove(); editRows = editRows.filter((r) => r !== rec); });
+  row.append(keyEl, valEl, del);
+  $('propRows').appendChild(row);
+  editRows.push(rec);
+  return rec;
+}
+function parseVal(raw) {
+  const t = raw.trim();
+  if (t === '') return '';
+  try { return JSON.parse(t); } catch (e) { return raw; }
+}
+function applyProps() {
+  const i = state.selected;
+  if (i < 0 || !state.data) return;
+  const f = state.data.features[i];
+  const out = {};
+  for (const r of editRows) {
+    const k = r.keyEl.value.trim();
+    const rawV = r.valEl.value;
+    if (!k && rawV.trim() === '') continue;
+    if (!k) { showEditErr('One row has a value but no key — every property needs a key.'); return; }
+    if (Object.prototype.hasOwnProperty.call(out, k)) { showEditErr('Duplicate key "' + k + '" — keys must be unique.'); return; }
+    out[k] = r.touched ? parseVal(rawV) : r.origVal;
+  }
+  f.properties = out;
+  modelChanged({ source: 'editor', fit: false });
+}
+function showEditErr(msg) {
+  const el = $('editErr');
+  el.textContent = msg;
+  el.hidden = false;
+}
+$('propAdd').addEventListener('click', () => {
+  $('editNone').hidden = true;
+  $('prowHead').hidden = false;
+  const rec = addPropRow('', '', false);
+  rec.keyEl.focus();
+});
+$('propApply').addEventListener('click', applyProps);
+$('featDelete').addEventListener('click', () => {
+  const b = $('featDelete');
+  if (b.dataset.armed !== '1') {
+    b.dataset.armed = '1';
+    b.textContent = 'Really delete? Click again';
+    clearTimeout(delTimer);
+    delTimer = setTimeout(() => { b.dataset.armed = ''; b.textContent = 'Delete feature'; }, 2600);
+    return;
+  }
+  clearTimeout(delTimer);
+  const i = state.selected;
+  if (i < 0 || !state.data) return;
+  state.data.features.splice(i, 1);
+  state.selected = -1;
+  modelChanged({ source: 'editor', fit: false, note: 'Feature deleted.' });
+});
+
+/* ---------------- raw JSON panel (two-way sync) ---------------- */
+let rawTimer = null;
+function renderRaw() {
+  clearTimeout(rawTimer);   // a pending user-edit parse would now parse our own text
+  $('raw').value = state.data ? JSON.stringify(state.data, null, 2) : '';
+}
+function clearRawMsgs() {
+  $('rawErr').hidden = true;
+  $('rawNote').hidden = true;
+  $('rawNote').classList.remove('warn');
+}
+function showRawErr(msg) {
+  const el = $('rawErr');
+  const hasData = !!(state.data && state.data.features.length);
+  el.textContent = msg + (hasData ? ' — the map, list and exports keep the last valid data.' : '');
+  el.hidden = false;
+  $('rawNote').hidden = true;
+}
+function setNote(txt, isWarn) {
+  const el = $('rawNote');
+  el.hidden = !txt;
+  el.classList.toggle('warn', !!isWarn);
+  if (txt) el.textContent = txt;
+}
+function parseErrMsg(e, src) {
+  let msg = e.message || 'Invalid JSON';
+  if (!/line \d+/i.test(msg)) {   // some browsers already include line/column
+    let pos = -1;
+    const pm = msg.match(/position (\d+)/i);
+    if (pm) pos = +pm[1];
+    else if (/end of (JSON )?input/i.test(msg)) pos = src.length;
+    else {
+      // newer V8: `Unexpected token X, ..."<context>" is not valid JSON`
+      // — the context shows the 10 characters before the failing spot
+      const sm = msg.match(/, \.\.\."([\s\S]*)" is not valid JSON$/);
+      if (sm) {
+        const first = src.indexOf(sm[1]);
+        if (first >= 0 && src.indexOf(sm[1], first + 1) < 0) pos = first + 10;
+      }
+    }
+    if (pos >= 0) {
+      let line = 1, col = 1;
+      for (let j = 0; j < pos && j < src.length; j++) {
+        if (src[j] === '\n') { line++; col = 1; } else col++;
+      }
+      msg += ' (line ' + line + ', column ' + col + ')';
+    }
+  }
+  return 'Invalid JSON: ' + msg;
+}
+$('raw').addEventListener('input', () => {
+  clearTimeout(rawTimer);
+  rawTimer = setTimeout(parseRaw, 400);
+});
+function parseRaw() {
+  const src = $('raw').value;
+  if (!src.trim()) {
+    clearRawMsgs();
+    state.data = null;
+    state.selected = -1;
+    modelChanged({ source: 'raw', fit: false });
+    return;
+  }
+  let obj;
+  try { obj = JSON.parse(src); }
+  catch (e) { showRawErr(parseErrMsg(e, src)); return; }
+  let res;
+  try { res = validateAndNormalize(obj); }
+  catch (e) { showRawErr(e.message); return; }
+  const hadFeatures = !!(state.data && state.data.features.length);
+  state.data = res.fc;
+  if (state.selected >= res.fc.features.length) state.selected = -1;
+  const notes = [];
+  if (res.wrappedFrom) notes.push('You pasted ' + res.wrappedFrom + ' — it was wrapped into a FeatureCollection for you.');
+  notes.push(...res.warnings);
+  modelChanged({
+    source: 'raw',
+    fit: hadFeatures ? 'auto' : true,
+    forceRaw: !!res.wrappedFrom,   // rewrite the textarea so it shows the wrapped document
+    note: notes.join(' ') || null,
+    noteWarn: res.warnings.length > 0,
+  });
+}
+
+/* ---------------- central re-render ---------------- */
+function modelChanged(opts) {
+  opts = opts || {};
+  renderMap(opts.fit);
+  renderList();
+  renderStats();
+  renderEditor();
+  if (opts.source !== 'raw' || opts.forceRaw) renderRaw();
+  if (opts.source !== 'raw') $('rawErr').hidden = true;
+  let note = opts.note || null;
+  if (state.renderFails) note = (note ? note + ' ' : '') + state.renderFails + ' feature' + (state.renderFails === 1 ? '' : 's') + ' could not be drawn on the map.';
+  setNote(note, !!opts.noteWarn);
+}
+
+/* ---------------- loading (example / file / URL) ---------------- */
+function showLoadErr(msg) {
+  const el = $('loadErr');
+  el.textContent = msg;
+  el.hidden = false;
+}
+function loadText(text, label) {
+  $('loadErr').hidden = true;
+  let obj;
+  try { obj = JSON.parse(text); }
+  catch (e) { showLoadErr(label + ': ' + parseErrMsg(e, text)); return false; }
+  let res;
+  try { res = validateAndNormalize(obj); }
+  catch (e) { showLoadErr(label + ': ' + e.message); return false; }
+  state.data = res.fc;
+  state.selected = -1;
+  clearRawMsgs();
+  const notes = [];
+  if (res.wrappedFrom) notes.push('The data contained ' + res.wrappedFrom + ' — it was wrapped into a FeatureCollection for you.');
+  notes.push(...res.warnings);
+  modelChanged({ source: label, fit: true, note: notes.join(' ') || null, noteWarn: res.warnings.length > 0 });
+  return true;
+}
+
+/* example: a small world-landmarks set covering all the geometry basics */
+const EXAMPLE = {
+  type: 'FeatureCollection',
+  features: [
+    { type: 'Feature', properties: { name: 'Eiffel Tower', kind: 'landmark', city: 'Paris', height_m: 330, unesco: true },
+      geometry: { type: 'Point', coordinates: [2.2945, 48.8584] } },
+    { type: 'Feature', properties: { name: 'Statue of Liberty', kind: 'landmark', city: 'New York', height_m: 93, unesco: true },
+      geometry: { type: 'Point', coordinates: [-74.0445, 40.6892] } },
+    { type: 'Feature', properties: { name: 'Sydney Opera House', kind: 'landmark', city: 'Sydney', height_m: 65, unesco: true },
+      geometry: { type: 'Point', coordinates: [151.2153, -33.8568] } },
+    { type: 'Feature', properties: { name: 'Trans-Siberian Railway (sketch)', kind: 'route', length_km: 9289, note: 'Moscow to Vladivostok, very simplified' },
+      geometry: { type: 'LineString', coordinates: [[37.6178, 55.7558], [60.5975, 56.8389], [73.3686, 54.9893], [82.9204, 55.0302], [104.2807, 52.2870], [113.5006, 52.0340], [131.8869, 43.1155]] } },
+    { type: 'Feature', properties: { name: 'Colorado doughnut (demo)', kind: 'demo polygon', comment: 'A polygon with a hole in the middle', area_km2: null },
+      geometry: { type: 'Polygon', coordinates: [
+        [[-109.05, 37.0], [-102.04, 37.0], [-102.04, 41.0], [-109.05, 41.0], [-109.05, 37.0]],
+        [[-107.5, 38.0], [-107.5, 40.0], [-103.5, 40.0], [-103.5, 38.0], [-107.5, 38.0]]
+      ] } },
+    { type: 'Feature', properties: { name: 'Hawaiian Islands (rough)', kind: 'archipelago', islands: 3 },
+      geometry: { type: 'MultiPolygon', coordinates: [
+        [[[-159.80, 21.85], [-159.28, 21.85], [-159.28, 22.25], [-159.80, 22.25], [-159.80, 21.85]]],
+        [[[-158.30, 21.25], [-157.62, 21.25], [-157.62, 21.72], [-158.30, 21.72], [-158.30, 21.25]]],
+        [[[-156.70, 20.55], [-155.95, 20.55], [-155.95, 21.05], [-156.70, 21.05], [-156.70, 20.55]]]
+      ] } }
+  ],
+};
+$('exampleBtn').addEventListener('click', () => { loadText(JSON.stringify(EXAMPLE), 'Example'); });
+
+/* file open + drag & drop */
+$('fileBtn').addEventListener('click', () => $('fileInput').click());
+$('fileInput').addEventListener('change', () => {
+  const f = $('fileInput').files && $('fileInput').files[0];
+  if (f) loadFile(f);
+  $('fileInput').value = '';
+});
+async function loadFile(file) {
+  if (file.size > 30 * 1024 * 1024) { showLoadErr('"' + file.name + '" is over 30 MB — too big for this in-browser editor.'); return; }
+  try {
+    const text = await file.text();
+    loadText(text, file.name);
+  } catch (e) {
+    showLoadErr('Could not read "' + file.name + '".');
+  }
+}
+function dragHasFiles(e) {
+  return e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+}
+let dragDepth = 0;
+window.addEventListener('dragenter', (e) => {
+  if (!dragHasFiles(e)) return;
+  e.preventDefault();
+  dragDepth++;
+  $('dropzone').hidden = false;
+});
+window.addEventListener('dragover', (e) => { if (dragHasFiles(e)) e.preventDefault(); });
+window.addEventListener('dragleave', (e) => {
+  if (!dragHasFiles(e)) return;
+  dragDepth = Math.max(0, dragDepth - 1);
+  if (!dragDepth) $('dropzone').hidden = true;
+});
+window.addEventListener('drop', (e) => {
+  if (!dragHasFiles(e)) return;
+  e.preventDefault();
+  dragDepth = 0;
+  $('dropzone').hidden = true;
+  const f = e.dataTransfer.files && e.dataTransfer.files[0];
+  if (f) loadFile(f);
+});
+
+/* URL loading (plain fetch — subject to the remote server's CORS policy) */
+async function loadURL() {
+  const url = $('urlInput').value.trim();
+  $('loadErr').hidden = true;
+  if (!url) return;
+  try { new URL(url); }
+  catch (e) { showLoadErr('That does not look like a full URL — include the https:// part.'); return; }
+  const btn = $('urlBtn');
+  const old = btn.textContent;
+  btn.textContent = 'Loading…';
+  btn.disabled = true;
+  try {
+    const resp = await fetch(url, { mode: 'cors' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const text = await resp.text();
+    loadText(text, 'URL');
+  } catch (e) {
+    showLoadErr('Could not load that URL (' + (e && e.message ? e.message : 'network error') + '). The server has to allow cross-origin requests (CORS), and many don\'t — if it keeps failing, download the file and drop it onto this page.');
+  }
+  btn.textContent = old;
+  btn.disabled = false;
+}
+$('urlBtn').addEventListener('click', loadURL);
+$('urlInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadURL(); });
+
+/* ---------------- export ---------------- */
+function exportText() {
+  if (!state.data) return null;
+  return $('minify').checked ? JSON.stringify(state.data) : JSON.stringify(state.data, null, 2);
+}
+$('copyBtn').addEventListener('click', () => {
+  const t = exportText();
+  if (t != null) copyText($('copyBtn'), t);
+});
+$('dlBtn').addEventListener('click', () => {
+  const t = exportText();
+  if (t == null) return;
+  const blob = new Blob([t], { type: 'application/geo+json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'data.geojson';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  flash($('dlBtn'), '✓ Downloaded');
+});
+
+/* ---------------- stats-bar buttons ---------------- */
+$('bboxCopy').addEventListener('click', () => copyText($('bboxCopy'), $('statBbox').textContent));
+$('fitBtn').addEventListener('click', fitAll);
+
+/* ---------------- boot ---------------- */
+refreshAccent();
+modelChanged({});   // renders the empty state
+
+/* ---------------- theme toggle ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+/* accent-colored map points + list dots follow the theme */
+document.getElementById('themeBtn').addEventListener('click', () => {
+  refreshAccent();
+  renderMap(false);
+  renderList();
+  renderStats();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Navigating Piracy — Unit Dashboard</title>
+<meta name="description" content="The working story and classroom dashboard for the Navigating Piracy middle-school unit.">
+<link rel="canonical" href="https://whydahstory.com/unit/">
+</head>
+<body>
+<p id="loading">Loading the unit dashboard…</p>
+<script>
+fetch('../whydah-dashboard.html')
+  .then(function(response){ if(!response.ok) throw new Error('Dashboard unavailable'); return response.text(); })
+  .then(function(html){
+    html = html
+      .replace('<head>', '<head><base href="/">')
+      .replaceAll("window.location.hash = '#overview';", "history.replaceState(null, '', '/unit/#overview');")
+      .replace("window.location.hash = '#' + id;", "history.replaceState(null, '', '/unit/#' + id); window.dispatchEvent(new HashChangeEvent('hashchange'));")
+      .replace("history.replaceState(null, '', '#' + id);", "history.replaceState(null, '', '/unit/#' + id);");
+    document.open(); document.write(html); document.close();
+  })
+  .catch(function(){ document.getElementById('loading').innerHTML = 'The dashboard could not load. <a href="../whydah-dashboard.html">Open the compatibility page</a>.'; });
+</script>
+</body>
+</html>

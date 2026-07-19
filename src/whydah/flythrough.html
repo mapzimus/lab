@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<meta charset="UTF-8">
+<title>Whydah Flythrough: A Geographic Tour</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<style>
+  body { margin: 0; padding: 0; font-family: Georgia, serif; background: #1a1410; color: #f5ecd9; overflow: hidden; }
+  #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  .maplibregl-ctrl-attrib { font-size: 10px; opacity: 0.7; }
+
+  #header {
+    position: absolute; top: 0; left: 0; right: 0;
+    background: linear-gradient(180deg, rgba(26, 20, 16, 0.85), rgba(26, 20, 16, 0));
+    padding: 14px 22px 30px;
+    pointer-events: none;
+    z-index: 10;
+  }
+  #header h1 { margin: 0; font-size: 22px; font-weight: normal; letter-spacing: 0.3px; }
+  #header .sub { margin-top: 3px; font-size: 13px; opacity: 0.75; }
+
+  #controls {
+    position: absolute; top: 18px; right: 22px;
+    background: rgba(42, 29, 15, 0.88);
+    color: #f5ecd9;
+    padding: 10px 14px; border-radius: 24px;
+    display: flex; gap: 10px; align-items: center;
+    font-size: 14px; z-index: 11;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  }
+  #controls button {
+    background: #6b4f2c; color: #f5ecd9; border: none;
+    padding: 6px 13px; border-radius: 4px; cursor: pointer;
+    font-family: Georgia, serif; font-size: 14px;
+    transition: background 0.15s;
+  }
+  #controls button:hover:not(:disabled) { background: #8c6c45; }
+  #controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+  #progress { font-variant-numeric: tabular-nums; padding: 0 6px; min-width: 90px; text-align: center; }
+
+  #caption-card {
+    position: absolute;
+    bottom: 28px; right: 22px;
+    width: 360px;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    background: rgba(245, 236, 217, 0.96);
+    color: #2a1d0f;
+    padding: 18px 22px;
+    border-radius: 6px;
+    border-left: 4px solid #6b4f2c;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+    pointer-events: none;
+    font-size: 14.5px;
+    line-height: 1.55;
+    z-index: 9;
+  }
+  #caption-card.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  #caption-card .stop-label { font-size: 11px; font-weight: bold; letter-spacing: 1px; color: #8c6c45; text-transform: uppercase; margin-bottom: 4px; }
+  #caption-card h3 { margin: 0 0 4px 0; font-size: 18px; color: #4a3318; line-height: 1.25; }
+  #caption-card .subtitle { font-style: italic; color: #6b4f2c; margin-bottom: 10px; font-size: 13.5px; }
+  #caption-card img { max-width: 150px; height: auto; float: right; margin: 0 0 8px 12px; border: 1px solid #c4b590; border-radius: 3px; }
+  #caption-card .meta { font-size: 11.5px; color: #6b4f2c; opacity: 0.85; margin-top: 10px; padding-top: 8px; border-top: 1px solid #d4c5a0; clear: both; }
+
+  #toc-toggle {
+    position: absolute; bottom: 18px; left: 22px;
+    background: rgba(42, 29, 15, 0.88); color: #f5ecd9;
+    border: none; padding: 8px 14px; border-radius: 4px;
+    cursor: pointer; font-family: Georgia, serif; font-size: 13px;
+    z-index: 11;
+  }
+  #toc-toggle:hover { background: #6b4f2c; }
+  #toc {
+    position: absolute; bottom: 60px; left: 22px;
+    width: 280px; max-height: 50vh; overflow-y: auto;
+    background: rgba(245, 236, 217, 0.96); color: #2a1d0f;
+    border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    padding: 8px 0; font-size: 13px;
+    display: none; z-index: 11;
+  }
+  #toc.visible { display: block; }
+  #toc .toc-item { padding: 6px 14px; cursor: pointer; border-left: 3px solid transparent; }
+  #toc .toc-item:hover { background: #ede1c5; border-left-color: #6b4f2c; }
+  #toc .toc-item.active { background: #ede1c5; border-left-color: #6b4f2c; font-weight: bold; }
+  #toc .toc-num { display: inline-block; width: 22px; color: #8c6c45; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<div id="header">
+  <h1>Whydah Flythrough</h1>
+  <div class="sub">A geographic tour of the Bellamy story, 1689–2026</div>
+</div>
+
+<div id="controls">
+  <button id="play-btn">▶ Play</button>
+  <button id="pause-btn" disabled>⏸ Pause</button>
+  <button id="prev-btn">◀ Prev</button>
+  <button id="next-btn">Next ▶</button>
+  <span id="progress">Stop 0 / 19</span>
+</div>
+
+<button id="toc-toggle">☰ All stops</button>
+<div id="toc"></div>
+
+<div id="caption-card"></div>
+
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+const stops = [
+  { name: "Hittisleigh, Devon, UK", subtitle: "Bellamy's birthplace, March 1689",
+    lng: -3.823, lat: 50.745, zoom: 12, pitch: 45,
+    description: `<b>Why this matters:</b> Devon was 18th-century England's nursery for the Royal Navy. Most British sailors came from a handful of West Country villages like this. Bellamy's path was set the day he was born here. His mother dying weeks after his birth left him a poor orphan in a region where boys went to sea by age 13. Every choice he makes later (joining the Navy, sailing for Cape Cod in 1715, eventually turning pirate) runs through this village. The "Maria Hallett of Eastham" love story is undocumented Cape folklore added 200 years later.`,
+    image: null },
+  { name: "London", subtitle: "Whydah Gally built, 1715",
+    lng: -0.099, lat: 51.510, zoom: 11, pitch: 45,
+    description: `<b>Why this matters:</b> The Whydah's whole life (slaver, then pirate flagship, then wreck) was set in motion the day she was launched here. London was where slave-trade capital lived; merchants like Sir Humphry Morice funded ships built specifically to carry enslaved Africans. At 300 tons, 110 ft, 18 guns, capable of 13 knots, she was state-of-the-art for the work she was built to do. Named for the West African port Ouidah, where she was bound on her maiden voyage. Without London capital, no Whydah.`,
+    image: "pics/pyrates-frontispiece.jpg",
+    meta: "Image: Frontispiece of Charles Johnson's 1724 General History of the Pyrates." },
+  { name: "Ouidah, Benin", subtitle: "West African slave port, 1716",
+    lng: 2.09, lat: 6.36, zoom: 11, pitch: 45,
+    description: `<b>Why this matters:</b> This is the human source of the Whydah's value. Captain Lawrence Prince sails her here in 1716 and takes <b>367 enslaved Africans</b> aboard for the Middle Passage to Jamaica. The treasure Bellamy will later steal (the £20-30,000 in gold and silver, the ivory, the indigo) is the proceeds of selling these 367 people. The Whydah is not "a pirate ship that happened to be a slaver." She is a slaver first, and the wealth she carries is human wealth.`,
+    image: "pics/brookes-slave-ship.jpg",
+    meta: "Image: 1788 Brookes diagram. Drawn 70 years after the Whydah era but documenting the same trade." },
+  { name: "Kingston / Port Royal, Jamaica", subtitle: "Whydah's slave market, late 1716",
+    lng: -76.84, lat: 17.94, zoom: 10, pitch: 40,
+    description: `<b>Why this matters:</b> This is where the Whydah cashed out. Of the 367 enslaved Africans taken aboard in Ouidah, <b>312 survived the Middle Passage and were sold here</b>; <b>55 died on the crossing</b>. The Whydah loaded gold, silver, ivory, indigo, and sugar for the return to England. Without this stop, no treasure for Bellamy to capture two months later in the Windward Passage. The £50 share each Whydah pirate received after the capture (per Hoof's deposition) traces directly back to the human transactions on this dock.`,
+    image: "pics/dow1923-piece-of-eight-mhs.jpg",
+    meta: "Image: Spanish 8-reales coin, the type the Whydah loaded as part of her return cargo." },
+  { name: "Sebastian Inlet, Florida", subtitle: "1715 Spanish treasure-fleet wrecks",
+    lng: -80.45, lat: 27.86, zoom: 9, pitch: 40,
+    description: `<b>Why this matters:</b> This is the pivot of Bellamy's life: the geographic moment he stops being a legal salvager and becomes a pirate. <b>July 1715:</b> a hurricane destroys the Spanish Treasure Fleet, dropping a year of Bolivian and Mexican silver onto the beach. <b>1716:</b> Bellamy and Williams sail south to try to salvage what's left. Spanish authorities are hostile, the easy gold is already gone, and they slide into outright piracy. Without this hurricane, no Bellamy career.`,
+    image: "pics/dow1923-spanish-doubloon-wellfleet.jpg",
+    meta: "Image: Spanish doubloon, 1715-fleet era." },
+  { name: "Nassau, New Providence", subtitle: "The Flying Gang base, 1715–1718",
+    lng: -77.35, lat: 25.04, zoom: 10, pitch: 40,
+    description: `<b>Why this matters:</b> Nassau is the political home of pirate democracy. It is the only place in the Atlantic world in 1716 where a working sailor could vote on who commanded him. <b>Summer 1716:</b> Hornigold's crew votes him out for refusing to attack English ships. Loyal Edward "Blackbeard" Teach leaves with him. The remaining ~90 men <b>elect Bellamy captain</b> of the sloop Marianne. Bellamy doesn't take command. His crew gives it to him. The whole "pirates as proto-democrats" reading of the Golden Age is built on moments like this.`,
+    image: "pics/blackbeard-1724.jpg",
+    meta: "Image: Blackbeard, from Johnson 1724. He and Bellamy were Hornigold's two prize lieutenants here." },
+  { name: "Windward Passage", subtitle: "Whydah captured, late February 1717",
+    lng: -73.5, lat: 20.0, zoom: 6, pitch: 30,
+    description: `<b>Why this matters:</b> Career peak. From this point on, Bellamy commands the largest, richest pirate flagship of the entire Golden Age. <b>Late February 1717:</b> the Whydah is homebound between Cuba and Hispaniola when Bellamy spots her with the Sultana and Marianne. <b>Three-day, 300-mile pursuit.</b> Captain Lawrence Prince surrenders near the lower Bahamas after a token cannon exchange. Bellamy gives Prince the Sultana plus ~£20 in silver and gold (Trials, p. 317) and lets him sail away. Pursuit not destruction; surrender accepted; captain freed alive. This is the style that earned Bellamy his "Robin Hood of the seas" reputation.`,
+    image: null },
+  { name: "Block Island, Rhode Island", subtitle: "Williams peels off, mid-April 1717",
+    lng: -71.58, lat: 41.18, zoom: 11, pitch: 40,
+    description: `<b>Why this matters:</b> The fleet's command structure breaks down here. Williams (Bellamy's second-in-command and partner since 1716) peels off to visit family at Block Island. He and Bellamy agree to <b>regroup at Damariscove Island, Maine</b> to careen the ships. <b>Williams' detour accidentally saves his life</b>. The April 26 storm catches Bellamy alone on the outer Cape. Counterfactual: had they stayed together, would two captains and combined seamanship have weathered the storm? We will never know.`,
+    image: null },
+  { name: "Damariscove Island, Maine", subtitle: "The destination they never reached",
+    lng: -69.617, lat: 43.760, zoom: 12, pitch: 50,
+    description: `<b>Why this matters:</b> This is the ghost of what Bellamy was trying to do. He wasn't sailing for plunder when he died. He was sailing for <em>maintenance</em>. Damariscove was a small, well-protected harbor used by Maine fishermen since the 1620s. Bellamy and Williams meant to careen here: beach the ships, scrape and re-tar the hulls, the unromantic but essential work that keeps a pirate operation running. The Whydah's 28 guns and 180-man crew couldn't save her from the basic need to be cleaned. <b>Bellamy died about 150 nautical miles short of this harbor.</b>`,
+    image: null },
+  { name: "Off Chatham, Cape Cod", subtitle: "Mary Anne wreck: April 26, 1717, 10–11 PM",
+    lng: -69.95, lat: 41.65, zoom: 11, pitch: 50,
+    description: `<b>Why this matters:</b> The first wreck of the night, and the reason we know the Whydah story at all. The wine pink Mary Anne (~7,000 gallons of Madeira aboard) wrecks first, around 10-11 PM, in fog and a rising nor'easter near a now-vanished island off Chatham. <b>All 10 aboard survive</b>, and their depositions in Boston that October are the eyewitness record we read today. From James Dunavan: <em>"the Prisoners at the Bar... Cryed out saying, For God's sake let us go down into the Hould &amp; Die together... ask'd the Deponent to Read to them the Common-Prayer Book..."</em> Without these 10 survivors, the Whydah would be a silent shipwreck.`,
+    image: null },
+  { name: "Marconi Beach, Wellfleet", subtitle: "The Whydah wreck: just after midnight, April 27, 1717",
+    lng: -69.957, lat: 41.891, zoom: 13, pitch: 60,
+    description: `<b>Why this matters:</b> The climax. Just after midnight on April 27, 1717, the Whydah grounds on a sandbar ~500 ft off Wellfleet. <b>144 of 146 aboard die in roughly 15 minutes</b>, including Bellamy. From Thomas Davis's deposition (Trials, p. 318): <em>"The Ship being at an Anchor, they cut their Cables and ran a shoar... the Main-mast was carried by the board, and in the Morning She was beat to pieces."</em> Two survive: Thomas Davis (Welsh carpenter, forced into piracy) and John Julian (16-year-old Miskito Indian pilot). The historical record of the entire story turns on these two men's testimony.`,
+    image: "pics/whydah-bell.jpg",
+    meta: "Image: the ship's bell, recovered 1985, inscribed THE WHYDAH GALLY 1716. Coordinates approximate; the exact site is restricted under federal salvage permit." },
+  { name: "Provincetown", subtitle: "Southack arrives, May 1717",
+    lng: -70.18, lat: 42.05, zoom: 12, pitch: 40,
+    description: `<b>Why this matters:</b> The shift from crime to aftermath. Cyprian Southack (Boston's chartmaker and Massachusetts' navy of one) arrives by sea with a royal commission from Governor Shute. The Crown wants its share of whatever can be recovered from the wreck. Southack hires a whaleboat here rather than sail around the dangerous outer Cape. The state machinery has now caught up with the dead pirates.`,
+    image: null },
+  { name: "Jeremiah's Gutter", subtitle: "Southack's whaleboat passage",
+    lng: -69.985, lat: 41.79, zoom: 13, pitch: 55,
+    description: `<b>Why this matters:</b> A 1.5-mile tidal shortcut that no longer exists, and the only reason Southack reached the wreck before more cargo was scavenged. This passage connected Boat Meadow Creek (Cape Cod Bay) to Town Cove (Atlantic side). Used by the Nauset since the 1600s; the storm of April 26 itself is credited with deepening it. Without this gutter, Southack would have had to sail around the Cape, costing him days. Today only a brackish creek remnant survives, severed by Route 6's Orleans rotary. A textbook GIS "then vs now" comparison.`,
+    image: "pics/southack-bay-of-fundy-1731.jpg",
+    meta: "Image: detail from a Southack chart of New England." },
+  { name: "Old State House, Boston", subtitle: "Vice-Admiralty Court, October 18–30, 1717",
+    lng: -71.058, lat: 42.359, zoom: 16, pitch: 60,
+    description: `<b>Why this matters:</b> Where the Atlantic legal system reached out and prosecuted the pirates. Bellamy died at sea, but his crew died in this courthouse. The Vice-Admiralty Court (Oct 18-30, 1717) is the imperial machinery that no longer tolerated pirates on this coast. Bench: Governor Shute, Lt. Gov Dummer, and a panel of councilors. (Popular accounts add <b>Judge Samuel Sewall</b>, the 1692 Salem witch-trial judge who apologized in 1697. But the primary record, <em>The Trials of Eight Persons</em> (1718), does not name him among the court; the documented Salem→Boston figure is Cotton Mather.) Defense counsel <b>Robert Auchmuty</b> resigned in protest after his motions were denied; the pirates defended themselves. <b>22 October:</b> six convicted. South and Davis acquitted as forced men. Same New England establishment, 25 years after the witch trials, doing the same legal work.`,
+    image: "pics/cotton-mather.jpg",
+    meta: "Image: Cotton Mather, who attended the trial and ministered to the condemned." },
+  { name: "Charlestown gallows site", subtitle: "Six executions, 15 November 1717",
+    lng: -71.063, lat: 42.378, zoom: 15, pitch: 50,
+    description: `<b>Why this matters:</b> Six pirates were executed here on November 15, 1717: not for what they personally did, but for what their captain represented. The location wasn't poetic. It was legal: the gallows stood at the low-tide mark because that was the limit of Admiralty jurisdiction. <b>Geography tells you who could hang you.</b> Mather's diary that day: <em>"I took a long and sad walk with them, from the Prison, to the Place of Execution... pray'd with them, and with the vast Assembly of Spectators..."</em> The site is now lost to "wharfing-out" of Boston Harbor, buried under modern fill.`,
+    image: "pics/samuel-sewall.jpg",
+    meta: "Image: Judge Samuel Sewall, the Salem witch-trial judge. Popularly tied to the Whydah trials, though the 1718 court record does not name him; the documented Salem link is Cotton Mather." },
+  { name: "Wellfleet wreck site, 1984", subtitle: "Clifford rediscovers the Whydah",
+    lng: -69.957, lat: 41.891, zoom: 13, pitch: 65,
+    description: `<b>Why this matters:</b> The Whydah comes back, 267 years later, because someone read a 1717 chart and modeled coastal erosion. <b>That's GIS work.</b> Barry Clifford located a magnetic anomaly using side-scan sonar and proton magnetometers, working backward from Southack's chart and accounting for ~3 ft/year of Cape Cod erosion. <b>1985:</b> recovery of the bell <em>"THE WHYDAH GALLY 1716"</em>, the first fully authenticated Golden Age pirate shipwreck ever discovered. Wreckage scattered ~4 miles parallel to the coast, buried under 10-50 ft of sand. The site was also a WWII firing range, complicating magnetometer surveys with modern military debris.`,
+    image: "pics/whydah-model.jpg",
+    meta: "Image: Modern reconstruction model of the Whydah Gally." },
+  { name: "Whydah Pirate Museum, West Yarmouth", subtitle: "The artifact home",
+    lng: -70.224, lat: 41.654, zoom: 14, pitch: 50,
+    description: `<b>Why this matters:</b> Where the past becomes touchable. Clifford's main museum on Cape Cod houses the bulk of 200,000+ recovered items: ~8,400 coins, gold bars, Akan jewelry from West Africa, cannons, navigational tools, gaming pieces, personal effects. Every coin in the museum is something a Whydah pirate held. Every bone fragment was a person aboard the ship. There is no other place in the world to literally touch the wreck.`,
+    image: "pics/whydah-silver.jpg",
+    meta: "Image: Spanish silver reales recovered from the wreck." },
+  { name: "Real Pirates Salem", subtitle: "285 Derby Street, opened 2022",
+    lng: -70.882, lat: 42.520, zoom: 15, pitch: 50,
+    description: `<b>Why this matters:</b> The Whydah arrives in Salem, the city our students live in. This is what makes the story <em>theirs</em>, not a distant pirate tale. Opened 2022 at 285 Derby Street, on Charlotte Forten Park, in the Salem Maritime National Historic Site area. Sister museum to the Whydah Pirate Museum. Salem is on the unceded ancestral lands of the Pawtucket and Massachusett Peoples; original Indigenous name Naumkeag ("Fishing Place"). Eight-gallery exhibit: Intro, Slavery, Piracy, Aboard, Treasure, Wreck, Fate, Discovery.`,
+    image: "pics/bellamy-cigarette-card.jpg",
+    meta: "Image: 1888 Allen & Ginter cigarette card, the popular afterlife of Bellamy." },
+  { name: "Salem Maritime NHS: Derby Wharf", subtitle: "America's first National Historic Site, 1938",
+    lng: -70.886, lat: 42.521, zoom: 15, pitch: 50,
+    description: `<b>Why this matters:</b> The coda: proof that Salem's whole maritime identity grew out of the same Atlantic Bellamy died in. Derby Wharf (~2,000 ft, built 1762), Custom House (1819, where Hawthorne worked 1846-49), Derby House (1762, oldest brick house in Salem). Two generations after Bellamy died, the same waterfront sent the Grand Turk (1786) to Mauritius. <b>The line from Bellamy (pirate, 1717) to Haraden (Revolutionary privateer, 1776) to Derby (merchant prince, 1786) is one continuous Atlantic story.</b> What changed across 70 years isn't the work. It's whose government holds the commission.`,
+    image: "pics/equiano.jpg",
+    meta: "Image: Olaudah Equiano (1745–1797), whose 1789 narrative gives the enslaved perspective on the Atlantic the Whydah crossed." }
+];
+
+const map = new maplibregl.Map({
+  container: 'map',
+  style: {
+    version: 8,
+    sources: {
+      satellite: {
+        type: 'raster',
+        tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+        tileSize: 256,
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+      }
+    },
+    layers: [{ id: 'satellite-layer', type: 'raster', source: 'satellite' }]
+  },
+  center: [-30, 25],
+  zoom: 1.5,
+  pitch: 0,
+  bearing: 0,
+  projection: 'globe'
+});
+
+map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'bottom-right');
+
+map.on('load', () => {
+  // Add line for Atlantic voyage
+  const route = stops.slice(1, 11).map(s => [s.lng, s.lat]);
+  map.addSource('route', {
+    type: 'geojson',
+    data: { type: 'Feature', geometry: { type: 'LineString', coordinates: route } }
+  });
+  map.addLayer({
+    id: 'route-line', type: 'line', source: 'route',
+    paint: { 'line-color': '#ffaa44', 'line-width': 2.5, 'line-opacity': 0.7 }
+  });
+
+  // Add markers
+  stops.forEach((stop, i) => {
+    const el = document.createElement('div');
+    el.style.cssText = `width:14px;height:14px;border-radius:50%;background:${i === 10 || i === 15 ? '#ff3333' : '#44aa44'};border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.5);cursor:pointer;`;
+    el.title = `Stop ${i + 1}: ${stop.name}`;
+    el.onclick = () => goToStop(i);
+    new maplibregl.Marker({ element: el }).setLngLat([stop.lng, stop.lat]).addTo(map);
+  });
+});
+
+// State
+let currentIdx = -1;
+let isPlaying = false;
+let cancelToken = { cancelled: false };
+
+const captionCard = document.getElementById('caption-card');
+const progress = document.getElementById('progress');
+const playBtn = document.getElementById('play-btn');
+const pauseBtn = document.getElementById('pause-btn');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const tocBtn = document.getElementById('toc-toggle');
+const toc = document.getElementById('toc');
+
+// Build TOC
+stops.forEach((stop, i) => {
+  const item = document.createElement('div');
+  item.className = 'toc-item';
+  item.innerHTML = `<span class="toc-num">${(i + 1).toString().padStart(2, '0')}.</span>${stop.name}`;
+  item.onclick = () => { goToStop(i); toc.classList.remove('visible'); };
+  toc.appendChild(item);
+});
+
+tocBtn.onclick = () => toc.classList.toggle('visible');
+
+function showCaption(stop, idx) {
+  captionCard.innerHTML = `
+    <div class="stop-label">Stop ${idx + 1} of ${stops.length}</div>
+    ${stop.image ? `<img src="${stop.image}" alt="${stop.name}">` : ''}
+    <h3>${stop.name}</h3>
+    <div class="subtitle">${stop.subtitle}</div>
+    <div>${stop.description}</div>
+    ${stop.meta ? `<div class="meta">${stop.meta}</div>` : ''}
+  `;
+  requestAnimationFrame(() => captionCard.classList.add('visible'));
+  // Highlight TOC
+  document.querySelectorAll('.toc-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+}
+
+function hideCaption() { captionCard.classList.remove('visible'); }
+
+function delay(ms, token) {
+  return new Promise((resolve) => {
+    const t = setTimeout(() => resolve(false), ms);
+    const check = setInterval(() => {
+      if (token.cancelled) { clearTimeout(t); clearInterval(check); resolve(true); }
+    }, 100);
+  });
+}
+
+function flyToPromise(opts) {
+  return new Promise((resolve) => {
+    map.flyTo(opts);
+    map.once('moveend', () => resolve());
+  });
+}
+
+// Tunable: how much to rotate at each stop (degrees) and how (linear/ease)
+const SPIN_DEGREES = 180;   // 90 = gentle pan, 180 = half-turn, 360 = full spin
+const SPIN_EASING = 'linear'; // 'linear' or 'easeInOut'
+
+function spinAtLocation(durationMs, token) {
+  return new Promise((resolve) => {
+    const startBearing = map.getBearing();
+    const startTime = performance.now();
+    function step(now) {
+      if (token.cancelled) { resolve(); return; }
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / durationMs);
+      const eased = SPIN_EASING === 'easeInOut'
+        ? (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2)
+        : t;
+      const bearing = (startBearing + eased * SPIN_DEGREES) % 360;
+      map.setBearing(bearing);
+      if (t >= 1) { resolve(); return; }
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+async function goToStop(idx, opts = {}) {
+  if (idx < 0 || idx >= stops.length) return;
+  cancelToken.cancelled = true;
+  cancelToken = { cancelled: false };
+  const localToken = cancelToken;
+  hideCaption();
+
+  const stop = stops[idx];
+  const prev = currentIdx >= 0 ? stops[currentIdx] : null;
+  currentIdx = idx;
+  progress.textContent = `Stop ${idx + 1} / ${stops.length}`;
+
+  // Phase 1: zoom-out arc context (only if there's a previous stop and we're auto-playing)
+  if (prev && opts.context !== false) {
+    const midLng = (prev.lng + stop.lng) / 2;
+    const midLat = (prev.lat + stop.lat) / 2;
+    const dist = Math.sqrt(Math.pow(prev.lng - stop.lng, 2) + Math.pow(prev.lat - stop.lat, 2));
+    const contextZoom = Math.max(2.5, Math.min(6, 8 - Math.log2(dist + 1)));
+    await flyToPromise({
+      center: [midLng, midLat],
+      zoom: contextZoom,
+      pitch: 0, bearing: 0,
+      duration: 2500, essential: true
+    });
+    if (localToken.cancelled) return;
+  }
+
+  // Phase 2: arrive at the new location
+  await flyToPromise({
+    center: [stop.lng, stop.lat],
+    zoom: stop.zoom, pitch: stop.pitch, bearing: 0,
+    duration: 3500, essential: true
+  });
+  if (localToken.cancelled) return;
+
+  // Phase 3: show caption + spin for 15 seconds
+  // Use requestAnimationFrame instead of flyTo because flyTo takes the shortest
+  // rotation path and 0->359 collapses to -1.
+  showCaption(stop, idx);
+  await spinAtLocation(15000, localToken);
+  if (localToken.cancelled) return;
+
+  // Phase 4: continue if auto-playing
+  if (isPlaying && idx + 1 < stops.length) {
+    goToStop(idx + 1);
+  } else if (idx + 1 >= stops.length) {
+    isPlaying = false;
+    playBtn.disabled = false;
+    pauseBtn.disabled = true;
+  }
+}
+
+playBtn.onclick = () => {
+  isPlaying = true;
+  playBtn.disabled = true;
+  pauseBtn.disabled = false;
+  if (currentIdx < 0) goToStop(0, { context: false });
+  else if (currentIdx + 1 < stops.length) goToStop(currentIdx + 1);
+  else goToStop(0, { context: false });
+};
+
+pauseBtn.onclick = () => {
+  isPlaying = false;
+  cancelToken.cancelled = true;
+  playBtn.disabled = false;
+  pauseBtn.disabled = true;
+};
+
+nextBtn.onclick = () => {
+  isPlaying = false;
+  playBtn.disabled = false;
+  pauseBtn.disabled = true;
+  goToStop(Math.min(stops.length - 1, currentIdx + 1));
+};
+
+prevBtn.onclick = () => {
+  isPlaying = false;
+  playBtn.disabled = false;
+  pauseBtn.disabled = true;
+  goToStop(Math.max(0, currentIdx - 1));
+};
+</script>
+</body>
+</html>

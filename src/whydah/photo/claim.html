@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camera Photo Pickup</title>
+<meta name="description" content="Claim and download your photos from the class digital cameras.">
+<meta name="theme-color" content="#14161a">
+<link rel="icon" type="image/png" sizes="32x32" href="../pics/favicon-32.png">
+<link rel="stylesheet" href="photo.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="site-header">
+    <div class="kicker">Photography Unit</div>
+    <h1>📸 Camera Photo Pickup</h1>
+    <div class="crumbs"><a href="../">whydahstory.com</a> / <a href="index.html">photo</a> / pickup</div>
+  </header>
+
+  <div class="card">
+    <strong>How this works:</strong>
+    <ol class="muted" style="margin:0.4em 0 0; padding-left:1.4em;">
+      <li>Photos from the class cameras get posted here in batches.</li>
+      <li>Find your photos — tap any photo to see it bigger.</li>
+      <li>Hit <strong>Claim</strong> and put in your name so everyone knows it's yours.</li>
+      <li>Hit <strong>Download</strong> to save it to your Chromebook (check your Downloads folder).</li>
+    </ol>
+  </div>
+
+  <div class="row" style="margin: 1em 0;">
+    <label for="batch-select"><strong>Batch:</strong></label>
+    <select id="batch-select"></select>
+    <button class="secondary" id="refresh-btn">↻ Refresh</button>
+    <button class="secondary" id="zip-btn" style="display:none;">⬇ Download my claimed photos (.zip)</button>
+  </div>
+
+  <div id="status" class="muted">Loading…</div>
+  <div id="grid" class="photo-grid"></div>
+
+  <details class="teacher">
+    <summary>Teacher: post a new batch of camera photos</summary>
+    <div style="margin-top:0.8em;">
+      <div class="row">
+        <input type="text" id="batch-name" placeholder="Batch name (e.g. july-15-photowalk)">
+        <input type="file" id="teacher-files" multiple accept="image/*">
+        <button id="teacher-upload-btn">Upload batch</button>
+      </div>
+      <div id="teacher-status" class="muted" style="margin-top:0.5em;"></div>
+      <progress id="teacher-progress" max="100" value="0" style="display:none;"></progress>
+    </div>
+  </details>
+
+  <nav class="footer-nav"><a href="index.html">← Photo home</a></nav>
+</div>
+
+<script src="photo.js"></script>
+<script>
+const grid = document.getElementById('grid');
+const statusEl = document.getElementById('status');
+const batchSel = document.getElementById('batch-select');
+const zipBtn = document.getElementById('zip-btn');
+let claims = {};   // photo_path -> claimed_by
+let photos = [];   // paths in current batch
+
+function myName() { return localStorage.getItem('photo-my-name') || ''; }
+
+async function loadBatches() {
+  statusEl.textContent = 'Loading…';
+  try {
+    const items = await storageList('drops');
+    const folders = items.filter(i => i.id === null).map(i => i.name).sort().reverse();
+    batchSel.innerHTML = '';
+    if (!folders.length) {
+      statusEl.textContent = 'No photo batches have been posted yet. Check back soon!';
+      return;
+    }
+    for (const f of folders) batchSel.appendChild(el('option', { value: f, text: f }));
+    await loadBatch(folders[0]);
+  } catch (e) {
+    statusEl.innerHTML = '';
+    statusEl.appendChild(el('div', { class: 'error', text: 'Could not load photos: ' + e.message }));
+  }
+}
+
+async function loadBatch(batch) {
+  statusEl.textContent = 'Loading photos…';
+  grid.innerHTML = '';
+  try {
+    const [items, claimRows] = await Promise.all([
+      storageList('drops/' + batch),
+      dbSelect('claims', 'select=photo_path,claimed_by'),
+    ]);
+    claims = {};
+    for (const c of claimRows) claims[c.photo_path] = c.claimed_by;
+    photos = items.filter(i => i.id !== null && isImage(i.name)).map(i => `drops/${batch}/${i.name}`);
+    statusEl.textContent = photos.length
+      ? `${photos.length} photo${photos.length === 1 ? '' : 's'} in this batch. ${Object.keys(claims).filter(p => photos.includes(p)).length} claimed so far.`
+      : 'This batch is empty.';
+    for (const p of photos) grid.appendChild(tile(p));
+    updateZipBtn();
+  } catch (e) {
+    statusEl.innerHTML = '';
+    statusEl.appendChild(el('div', { class: 'error', text: 'Could not load this batch: ' + e.message }));
+  }
+}
+
+function tile(path) {
+  const name = path.split('/').pop();
+  const claimedBy = claims[path];
+  const bar = el('div', { class: 'tile-bar' });
+  const claimLine = el('div', {}, claimedBy
+    ? el('span', { class: 'claimed', text: '✓ Claimed by ' + claimedBy })
+    : el('span', { class: 'badge', text: 'Unclaimed' }));
+  const actions = el('div', { class: 'tile-actions' });
+  if (!claimedBy) {
+    actions.appendChild(el('button', { text: 'Claim', onclick: () => claimPhoto(path) }));
+  }
+  actions.appendChild(el('button', { class: 'secondary', text: 'Download', onclick: async (ev) => {
+    ev.target.disabled = true; ev.target.textContent = 'Saving…';
+    try { await downloadFile(path, name); ev.target.textContent = 'Saved ✓'; }
+    catch (e) { ev.target.textContent = 'Failed — retry'; ev.target.disabled = false; }
+  }}));
+  bar.appendChild(claimLine);
+  bar.appendChild(actions);
+  return el('div', { class: 'photo-tile' },
+    el('img', { src: publicUrl(path), loading: 'lazy', alt: name, onclick: () => openLightbox(publicUrl(path), claimedBy ? 'Claimed by ' + claimedBy : 'Unclaimed') }),
+    bar);
+}
+
+async function claimPhoto(path) {
+  const name = prompt('Your first name and last initial (e.g. "Maya R"):', myName());
+  if (!name || !name.trim()) return;
+  localStorage.setItem('photo-my-name', name.trim());
+  try {
+    await dbInsert('claims', { photo_path: path, claimed_by: name.trim() });
+    claims[path] = name.trim();
+  } catch (e) {
+    if (e.status === 409) {
+      const rows = await dbSelect('claims', 'select=claimed_by&photo_path=eq.' + encodeURIComponent(path));
+      claims[path] = rows[0] ? rows[0].claimed_by : '(someone)';
+      alert('Someone beat you to it — that photo was already claimed by ' + claims[path] + '. If that\'s wrong, tell your teacher.');
+    } else {
+      alert('Claim didn\'t save: ' + e.message);
+      return;
+    }
+  }
+  await loadBatch(batchSel.value);
+}
+
+function updateZipBtn() {
+  const mine = photos.filter(p => claims[p] && claims[p].toLowerCase() === myName().toLowerCase());
+  zipBtn.style.display = mine.length ? '' : 'none';
+  zipBtn.textContent = `⬇ Download my ${mine.length} claimed photo${mine.length === 1 ? '' : 's'} (.zip)`;
+  zipBtn.onclick = async () => {
+    zipBtn.disabled = true;
+    await downloadAllAsZip(mine, 'my-photos-' + batchSel.value + '.zip',
+      (i, n) => { zipBtn.textContent = `Zipping ${i}/${n}…`; });
+    zipBtn.disabled = false;
+    updateZipBtn();
+  };
+}
+
+// Teacher bulk upload
+document.getElementById('teacher-upload-btn').onclick = async () => {
+  const files = document.getElementById('teacher-files').files;
+  const rawBatch = document.getElementById('batch-name').value.trim() || new Date().toISOString().slice(0, 10);
+  const batch = rawBatch.replace(/[^a-zA-Z0-9_-]+/g, '-');
+  const ts = document.getElementById('teacher-status');
+  const prog = document.getElementById('teacher-progress');
+  if (!files.length) { ts.textContent = 'Pick some photo files first.'; return; }
+  prog.style.display = ''; prog.max = files.length; prog.value = 0;
+  let ok = 0, failed = [];
+  for (let i = 0; i < files.length; i++) {
+    ts.textContent = `Uploading ${i + 1} of ${files.length} — ${files[i].name}`;
+    try {
+      const blob = await shrinkImage(files[i]);
+      await storageUpload(`drops/${batch}/${String(i + 1).padStart(3, '0')}_${uploadName(files[i], blob)}`, blob);
+      ok++;
+    } catch (e) { failed.push(files[i].name); }
+    prog.value = i + 1;
+  }
+  ts.textContent = `Done: ${ok} uploaded to batch "${batch}".` + (failed.length ? ` Failed: ${failed.join(', ')}` : '');
+  await loadBatches();
+};
+
+batchSel.onchange = () => loadBatch(batchSel.value);
+document.getElementById('refresh-btn').onclick = () => loadBatch(batchSel.value);
+loadBatches();
+</script>
+</body>
+</html>
