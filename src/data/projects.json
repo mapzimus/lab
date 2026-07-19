@@ -15,7 +15,7 @@
     "description": "Spherical-geometry experiments for great circles, equidistant points, polyhedra, and curve analysis on a globe.",
     "category": "experiments",
     "tags": ["geometry", "Leaflet", "research sandbox"],
-    "url": "https://maxwellhowegis.com/geopuesto/playground/",
+    "url": "https://mapzimus.com/geopuesto/playground/",
     "status": "live",
     "updated": "2026-07"
   },
@@ -25,7 +25,7 @@
     "description": "A generated four-tier North American transit network connecting Census places at continental, regional, metro, and commuter scales.",
     "category": "maps",
     "tags": ["Python", "Leaflet", "fantasy transit"],
-    "url": "https://maxwellhowegis.com/transit/",
+    "url": "https://mapzimus.com/transit/",
     "status": "live",
     "updated": "2026-07"
   },
@@ -35,7 +35,7 @@
     "description": "An alternate-history scrollytelling map that divides Concord, New Hampshire along the Merrimack River.",
     "category": "experiments",
     "tags": ["MapLibre", "scrollytelling", "alternate history"],
-    "url": "https://mapzimus.github.io/concord-war/",
+    "url": "https://mapzimus.com/concord-war/",
     "status": "live",
     "updated": "2026-07"
   },
@@ -45,17 +45,47 @@
     "description": "A compact browser strategy game about building an insect colony and surviving rival swarms.",
     "category": "play",
     "tags": ["strategy", "browser game"],
-    "url": "https://maxwellhowegis.com/bugwars/",
+    "url": "https://mapzimus.com/bug-wars/",
     "status": "live",
     "updated": "2026-07"
   },
   {
     "slug": "flip-game",
     "title": "Flip Game",
-    "description": "A small logic game built around flipping neighboring cells and finding the shortest path to a solved board.",
+    "description": "A bottle-flip party game — flick for a clean 360°, land upright, and steal lives. Installable PWA with Matter.js physics.",
     "category": "play",
-    "tags": ["logic", "browser game"],
-    "url": "https://github.com/mapzimus/flipgame",
+    "tags": ["physics", "party game", "PWA"],
+    "url": "https://mapzimus.com/flip-game/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "grog-flip",
+    "title": "Grog Flip",
+    "description": "The pirate-themed bottle-flip reskin for the Whydah classroom — amber grog bottle, ship-deck table, crew colors.",
+    "category": "play",
+    "tags": ["physics", "Whydah", "party game"],
+    "url": "https://mapzimus.com/grog-flip/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "whydah-voyage",
+    "title": "Whydah's Voyage",
+    "description": "Steer Black Sam Bellamy's 1717 voyage from the Caribbean to Maine — ten missions, ship battles, and the nor'easter the real crew never beat.",
+    "category": "play",
+    "tags": ["Whydah", "voyage", "canvas game"],
+    "url": "https://mapzimus.com/whydah-voyage/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "black-sam",
+    "title": "Black Sam",
+    "description": "A branching choose-your-own-destiny game about Samuel Bellamy and the Whydah — fifty-plus scenes, mini-games, and ten endings.",
+    "category": "play",
+    "tags": ["Whydah", "narrative", "mini-games"],
+    "url": "https://mapzimus.com/black-sam/",
     "status": "live",
     "updated": "2026-07"
   },
@@ -65,8 +95,39 @@
     "description": "A map experiment for comparing the apparent and actual size of places across latitudes.",
     "category": "maps",
     "tags": ["projection", "MapLibre", "scale"],
-    "url": "https://maxwellhowegis.com/truescale/",
+    "url": "https://mapzimus.com/true-scale/",
     "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "interstate-challenge",
+    "title": "Sequential Interstate Challenge",
+    "description": "Drive every two-digit Interstate end to end — an optimized order and orientation cuts connector drive time 86% versus strict numerical order.",
+    "category": "maps",
+    "tags": ["route optimization", "MapLibre", "OSRM"],
+    "url": "https://mapzimus.com/interstate-challenge/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "mapzimus-board",
+    "title": "Mapzimus Board",
+    "description": "The lab's idea engine — a live board that scores roughly 20,000 candidate map ideas by predicted virality with a weighted seven-dimension V-Score.",
+    "category": "experiments",
+    "tags": ["idea scoring", "vanilla JS", "Python"],
+    "url": "https://mapzimus.com/mapzimus-board/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "tappymaps",
+    "title": "TappyMaps",
+    "description": "Tap. Color. Share. A browser map maker for colored U.S. state and county maps, plus a growing arcade of geography games.",
+    "category": "play",
+    "tags": ["map design", "geography games"],
+    "url": "https://tappymaps.com",
+    "status": "live",
+    "external": true,
     "updated": "2026-07"
   },
   {

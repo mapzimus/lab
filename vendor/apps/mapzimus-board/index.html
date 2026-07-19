@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapzimus Idea Board</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root {
+  --bg:#0a0a0a; --surface:#141414; --surface2:#1c1c1c; --surface3:#222;
+  --border:#252525; --border2:#2e2e2e; --border3:#3a3a3a;
+  --text:#f0f0f0; --text2:#aaa; --text3:#555;
+  --red:#ef4444;    --orange:#f97316;  --yellow:#eab308;  --green:#22c55e;
+  --teal:#14b8a6;   --blue:#3b82f6;    --purple:#a855f7;  --pink:#ec4899;
+  --lime:#84cc16;   --sky:#0ea5e9;     --amber:#f59e0b;   --rose:#f43f5e;
+  --indigo:#6366f1; --mint:#10b981;    --peach:#fb923c;   --violet:#d946ef;
+  --radius:10px; --radius-sm:6px;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;}
+.container{max-width:980px;margin:0 auto;padding:24px 16px;}
+
+/* ── HEADER ───────────────────────────────────────────────────────────── */
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px;}
+header h1{font-size:20px;font-weight:700;letter-spacing:-0.5px;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.override-count{font-size:11px;color:var(--amber);background:#1a1500;border:1px solid #3a2800;border-radius:20px;padding:2px 10px;}
+.export-btn{height:28px;padding:0 12px;font-size:11px;font-weight:500;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;}
+.export-btn:hover{border-color:var(--amber);color:var(--amber);}
+
+/* ── MODES ────────────────────────────────────────────────────────────── */
+.modes{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.mode-btn{height:30px;padding:0 14px;font-size:12px;font-weight:500;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .12s;}
+.mode-btn.on{background:var(--indigo);color:#0a0a0a;border-color:var(--indigo);font-weight:600;}
+.pane{display:none;} .pane.on{display:block;}
+
+/* ── FILTER ROWS ──────────────────────────────────────────────────────── */
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.bar input{height:34px;flex:1;min-width:180px;padding:0 12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:13px;outline:none;}
+.bar input:focus{border-color:var(--blue);}
+.filter-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;align-items:center;}
+.filter-row>span{font-size:11px;color:var(--text3);min-width:56px;flex-shrink:0;}
+.fp{height:24px;padding:0 10px;font-size:11px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .1s;display:inline-flex;align-items:center;gap:5px;}
+.fp:hover{color:var(--text);border-color:var(--border3);}
+.fp.on{font-weight:600;}
+.fp.tp-MAP  {color:#22c55e;border-color:#22c55e55;background:#22c55e12;}
+.fp.tp-XREF {color:#3b82f6;border-color:#3b82f655;background:#3b82f612;}
+.fp.tp-CHART{color:#a855f7;border-color:#a855f755;background:#a855f712;}
+.fp.tp-RANK {color:#f59e0b;border-color:#f59e0b55;background:#f59e0b12;}
+.fp.tp-MAP.on  {background:#0e2e1a;color:var(--green); border-color:var(--green);}
+.fp.tp-XREF.on {background:#0e1e33;color:var(--blue);  border-color:var(--blue);}
+.fp.tp-CHART.on{background:#1e0e33;color:var(--purple);border-color:var(--purple);}
+.fp.tp-RANK.on {background:#2e1e00;color:var(--amber); border-color:var(--amber);}
+.fp.geo     {color:#14b8a6;border-color:#14b8a655;background:#14b8a612;}
+.fp.geo.on  {background:#0a2020;color:var(--teal);border-color:var(--teal);}
+.fp.fmt     {color:#fb923c;border-color:#fb923c55;background:#fb923c12;}
+.fp.fmt.on  {background:#2a1200;color:var(--peach);border-color:var(--peach);}
+.fp.st-idea        {color:#6366f1;border-color:#6366f155;background:#6366f112;}
+.fp.st-in-progress {color:#f59e0b;border-color:#f59e0b55;background:#f59e0b12;}
+.fp.st-built       {color:#22c55e;border-color:#22c55e55;background:#22c55e12;}
+.fp.st-published   {color:#3b82f6;border-color:#3b82f655;background:#3b82f612;}
+.fp.st-idea.on        {background:#111;    color:var(--indigo);border-color:var(--indigo);}
+.fp.st-in-progress.on {background:#1a1200;color:var(--amber); border-color:var(--amber);}
+.fp.st-built.on       {background:#0a1f14;color:var(--green); border-color:var(--green);}
+.fp.st-published.on   {background:#0d1b2e;color:var(--blue);  border-color:var(--blue);}
+.fp.nt      {color:#10b981;border-color:#10b98155;background:#10b98112;}
+.fp.nt.on   {background:#0a1a10;color:var(--mint);border-color:var(--mint);}
+.fp.topic.on{font-weight:700;}
+/* ── GEO ACCORDION ────────────────────────────────────────────────────── */
+.geo-accordion{align-items:flex-start!important;}
+.geo-row{display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
+.geo-sub{margin-left:62px;margin-bottom:4px;padding:5px 8px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);}
+.geo-row3{margin-top:-2px;}
+.geo-top{height:26px;padding:0 12px;font-size:11px;font-weight:600;border-radius:20px;border:1px solid var(--teal);background:var(--surface);color:var(--teal);cursor:pointer;transition:all .1s;}
+.geo-top.on{background:#0a2020;border-color:var(--teal);color:var(--teal);}
+.geo-pill{height:24px;padding:0 9px;font-size:11px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .1s;}
+.geo-pill:hover{color:var(--text);border-color:var(--border3);}
+.geo-pill.on{background:#0a2020;color:var(--teal);border-color:var(--teal);font-weight:600;}
+.geo-has-children{}
+.geo-state-grid{display:flex!important;flex-wrap:wrap;gap:4px;}
+.geo-state-grid .geo-pill{padding:0 6px;font-size:10px;font-weight:600;}
+.geo-bc{display:flex;align-items:center;gap:6px;margin-left:62px;margin-bottom:6px;}
+.geo-bc-label{font-size:11px;color:var(--teal);background:#0a2020;border:1px solid var(--teal);border-radius:20px;padding:2px 10px;}
+.geo-bc-x{font-size:13px;color:var(--text3);cursor:pointer;line-height:1;padding:0 4px;}
+.geo-bc-x:hover{color:var(--rose);}
+/* ── SAVED FILTERS ────────────────────────────────────────────────────── */
+.sf-bookmark{display:inline-flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--green);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--green);cursor:default;}
+.sf-bookmark>span:first-child{cursor:pointer;}
+.sf-bookmark>span:first-child:hover{text-decoration:underline;}
+.sf-x{color:var(--text3);cursor:pointer;font-size:13px;line-height:1;}
+.sf-x:hover{color:var(--rose);}
+.reset-btn{height:34px;padding:0 16px;font-size:11px;font-weight:600;border-radius:var(--radius-sm);border:1px solid var(--rose);background:transparent;color:var(--rose);cursor:pointer;white-space:nowrap;transition:all .1s;}
+.reset-btn:hover{background:#2a0808;}
+
+/* ── SORT ─────────────────────────────────────────────────────────────── */
+.sort-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;align-items:center;}
+.sort-row>span{font-size:11px;color:var(--text3);min-width:34px;}
+.sb{height:26px;padding:0 10px;font-size:11px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .1s;}
+.sb:hover{color:var(--text);border-color:var(--border3);}
+.sb.on{background:#0d1b2e;color:var(--blue);border-color:var(--blue);font-weight:600;}
+.sb.on::after{content:' \25BC';font-size:8px;opacity:.7;}
+.sb.on.asc::after{content:' \25B2';font-size:8px;opacity:.7;}
+.cnt{font-size:11px;color:var(--text3);margin-bottom:8px;}
+.grid{display:flex;flex-direction:column;gap:8px;}
+
+/* ── CARDS ────────────────────────────────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;transition:border-color .1s;}
+.card:hover{border-color:var(--border3);border-left-color:inherit;}
+.card.hi{border-color:var(--blue);border-left-color:var(--blue);}
+.card-main{min-width:0;}
+.card-header{display:flex;align-items:flex-start;gap:7px;margin-bottom:6px;}
+.badge-row{display:flex;flex-wrap:wrap;gap:4px;align-items:center;flex:1;min-width:0;}
+.sect-badge{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;white-space:nowrap;cursor:pointer;transition:opacity .12s,outline .1s;}.sect-badge:hover{opacity:.75;}.sect-badge.sect-active{outline:2px solid currentColor;outline-offset:2px;font-weight:700;}
+.topic-badge{font-size:9px;padding:1px 6px;border-radius:20px;font-weight:500;white-space:nowrap;}
+.status-wrap{position:relative;flex-shrink:0;padding-top:3px;}
+.sdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle;flex-shrink:0;}
+.status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;cursor:pointer;flex-shrink:0;transition:transform .12s;}
+.status-dot:hover{transform:scale(1.4);}
+.status-menu{position:absolute;top:18px;left:0;background:var(--surface3);border:1px solid var(--border3);border-radius:var(--radius-sm);padding:4px;z-index:100;min-width:130px;display:none;box-shadow:0 8px 24px rgba(0,0,0,.7);}
+.status-menu.open{display:block;}
+.st-opt{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:4px;font-size:12px;cursor:pointer;color:var(--text2);}
+.st-opt:hover{background:var(--surface2);color:var(--text);}
+.st-opt.active{color:var(--text);background:var(--surface2);font-weight:600;}
+.ct{font-size:14px;font-weight:600;line-height:1.35;margin-bottom:5px;}
+.cs{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px;}
+.pills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.pl{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;white-space:nowrap;}
+.XREF {background:#0e1e33;color:var(--blue);}
+.MAP  {background:#0e2e1a;color:var(--green);}
+.RANK {background:#2e1e00;color:var(--amber);}
+.CHART{background:#1e0e33;color:var(--purple);}
+.geo  {background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
+.fmt  {background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
+.dd   {background:#0a2a1a;color:#22c55e;border:1px solid #22c55e44;}
+.unk  {background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
+.data-block{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;margin-bottom:6px;}
+.data-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.5px;margin-bottom:4px;}
+.data-primary{font-size:11px;color:var(--text);font-weight:600;margin-bottom:3px;}
+.data-ext{list-style:none;border-top:1px solid var(--border);padding-top:5px;margin-top:3px;display:flex;flex-direction:column;gap:2px;}
+.data-ext li{font-size:10px;color:var(--text3);padding-left:10px;position:relative;}
+.data-ext li::before{content:'-';position:absolute;left:0;}
+.notes-area{margin-top:4px;}
+.notes-edit{font-size:11px;color:var(--amber);background:#1a1200;border:1px solid #3a2800;border-radius:var(--radius-sm);padding:5px 9px;cursor:pointer;}
+.notes-edit:hover{border-color:var(--amber);}
+.add-note-btn{background:none;border:1px dashed var(--border3);color:var(--text3);font-size:11px;padding:3px 9px;border-radius:var(--radius-sm);cursor:pointer;}
+.add-note-btn:hover{border-color:var(--amber);color:var(--amber);}
+.notes-editor{display:flex;flex-direction:column;gap:5px;}
+.notes-ta{width:100%;min-height:56px;padding:6px 9px;background:var(--surface3);border:1px solid var(--amber);border-radius:var(--radius-sm);color:var(--text);font-size:12px;font-family:inherit;resize:vertical;outline:none;}
+.notes-btns{display:flex;gap:5px;}
+.nb-save  {height:24px;padding:0 10px;font-size:11px;border-radius:var(--radius-sm);border:1px solid var(--green);background:#0a1f14;color:var(--green);cursor:pointer;}
+.nb-cancel{height:24px;padding:0 10px;font-size:11px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;}
+.nb-clear {height:24px;padding:0 10px;font-size:11px;border-radius:var(--radius-sm);border:1px solid #3a0808;background:none;color:var(--rose);cursor:pointer;}
+.right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;min-width:104px;}
+.vs{font-size:24px;font-weight:800;line-height:1;}
+.vl{font-size:9px;color:var(--text3);text-align:right;}
+.bp-tag{font-size:11px;font-weight:600;color:#22c55e;margin-left:2px;vertical-align:super;}
+.fmt-bonus{font-size:11px;font-weight:600;color:#22c55e;margin-left:2px;vertical-align:super;}
+.brs{display:flex;flex-direction:column;gap:3px;width:104px;}
+.br{display:flex;align-items:center;gap:4px;}
+.bl{font-size:9px;color:var(--text3);width:20px;text-align:right;flex-shrink:0;}
+.bt{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.bf{height:100%;border-radius:2px;}
+.bv{font-size:9px;color:var(--text3);width:22px;text-align:left;flex-shrink:0;}
+
+/* ── SCORE FILTER PANE ────────────────────────────────────────────────── */
+.scf-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px;}
+.scf-header h3{font-size:15px;font-weight:600;color:var(--text);}
+.scf-header p{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.5;}
+.clear-sc-btn{height:28px;padding:0 14px;font-size:11px;border-radius:20px;border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.clear-sc-btn:hover{border-color:var(--rose);color:var(--rose);}
+#sc-filter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:16px;}
+.scf{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;}
+.scf-label{font-size:11px;font-weight:700;letter-spacing:.4px;margin-bottom:8px;}
+.scf-row{display:flex;align-items:center;gap:6px;}
+.scf-range{flex:1;height:4px;cursor:pointer;accent-color:var(--blue);}
+.scf-val{font-size:11px;color:var(--text2);width:26px;text-align:center;flex-shrink:0;font-weight:600;}
+.scf-hint{font-size:10px;color:var(--text3);margin-top:5px;min-height:14px;}
+
+/* ── CORRELATE ────────────────────────────────────────────────────────── */
+.cv label{font-size:12px;color:var(--text2);margin-bottom:6px;display:block;font-weight:500;}
+.cv select{height:34px;width:100%;max-width:420px;padding:0 10px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:13px;margin-bottom:6px;}
+.cv-hint{font-size:12px;color:var(--text3);margin-bottom:12px;}
+
+/* ── FORMAT ───────────────────────────────────────────────────────────── */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:14px;}
+.fb{padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;text-align:left;font-size:13px;font-weight:500;}
+.fb .fct{font-size:11px;color:var(--text3);margin-top:3px;font-weight:400;}
+.fb.on{border-color:var(--blue);color:var(--blue);background:#0d1b2e;}
+
+#sentinel{height:1px;}
+.empty{padding:3rem;text-align:center;color:var(--text3);font-size:13px;}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);}
+
+@media(max-width:580px){
+  .card{grid-template-columns:1fr;}
+  .right{flex-direction:row;align-items:center;min-width:0;width:100%;gap:10px;}
+  .brs{display:none;} .vs{font-size:18px;} .vl{display:none;}
+}
+
+  /* Bonus breakdown tooltip */
+  .bp-tag { position:relative; cursor:default; }
+  .bp-tip { display:none; position:absolute; bottom:calc(100% + 4px); left:50%;
+            transform:translateX(-50%); background:#1a1a2e; color:#e0e0e0;
+            border:1px solid #444; border-radius:6px; padding:6px 10px;
+            white-space:nowrap; font-size:11px; z-index:999; min-width:130px; }
+  .bp-tip .bk-row { display:flex; justify-content:space-between; gap:12px; padding:1px 0; }
+  .bp-tag:hover .bp-tip, .bp-tag:focus .bp-tip { display:block; }
+
+/* ── GIS DASHBOARD ──────────────────────────────────────────────────────── */
+#gis-dashboard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;}
+.dash-header{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--border);}
+.dash-header-left{display:flex;align-items:center;gap:8px;}
+.dash-title{font-size:12px;font-weight:700;color:var(--text);letter-spacing:-.2px;}
+.dash-subtitle{font-size:11px;color:var(--text3);}
+#dash-toggle{background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;padding:2px 7px;border-radius:4px;line-height:1;}
+#dash-toggle:hover{color:var(--text);background:var(--surface2);}
+#dash-body{padding:12px 14px;display:flex;flex-direction:column;gap:12px;}
+.dash-cards{display:flex;gap:8px;flex-wrap:wrap;}
+.dash-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;flex:1;min-width:100px;text-align:center;}
+.dash-card-label{font-size:9px;color:var(--text3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:3px;}
+.dash-card-val{font-size:18px;font-weight:800;color:var(--text);line-height:1.1;}
+.dash-cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;}
+.dash-section{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 11px;}
+.dash-sec-title{font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:7px;}
+.db-row{display:flex;align-items:center;gap:5px;margin-bottom:3px;border-radius:3px;padding:1px 2px;transition:background .1s;}
+.db-row[onclick]{cursor:pointer;}.db-row[onclick]:hover{background:var(--surface3);}
+.db-label{font-size:10px;color:var(--text2);width:115px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.db-bar-wrap{flex:1;height:5px;background:var(--border2);border-radius:3px;overflow:hidden;}
+.db-bar{height:100%;border-radius:3px;}
+.db-count{font-size:10px;color:var(--text3);width:34px;text-align:right;flex-shrink:0;}
+.db-top-row{display:flex;align-items:center;gap:5px;padding:3px 4px;border-radius:4px;cursor:pointer;transition:background .1s;margin-bottom:2px;}
+.db-top-row:hover{background:var(--surface3);}
+.db-rank{font-size:9px;color:var(--text3);width:14px;text-align:center;font-weight:700;flex-shrink:0;}
+.db-top-title{font-size:10px;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.db-top-score{font-size:10px;font-weight:700;color:var(--amber);flex-shrink:0;}
+.db-bonus-sup{font-size:8px;color:var(--green);vertical-align:super;}
+.db-topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:3px;}
+.db-topic-row{display:flex;align-items:center;gap:4px;padding:2px 4px;border-radius:3px;cursor:pointer;transition:background .1s;}
+.db-topic-row:hover{background:var(--surface3);}
+.db-topic-bar-bg{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.db-topic-bar{height:100%;background:var(--indigo);border-radius:2px;}
+.db-topic-label{font-size:10px;color:var(--text2);width:86px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.db-topic-cnt{font-size:10px;color:var(--text3);width:30px;text-align:right;flex-shrink:0;}
+.db-gap-pill{display:inline-flex;align-items:center;gap:4px;background:var(--surface3);border:1px solid var(--border2);border-radius:20px;padding:2px 9px;font-size:10px;color:var(--text2);cursor:pointer;margin:2px;transition:border-color .1s;}
+.db-gap-pill:hover{border-color:var(--rose);color:var(--rose);}
+.db-gap-cnt{font-size:9px;color:var(--text3);}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>Viral Infographic Ideas</h1>
+  <div class="header-right">
+    <span class="override-count" id="override-count"></span>
+    <button class="export-btn" onclick="exportOverrides()">Export edits</button>
+  </div>
+</header>
+
+<div id="gis-dashboard">
+  <div class="dash-header">
+    <div class="dash-header-left">
+      <span class="dash-title">&#128506; GIS Dashboard</span>
+      <span class="dash-subtitle" id="dash-sub">Loading...</span>
+    </div>
+    <button id="dash-toggle" onclick="toggleDash()">&#9650;</button>
+  </div>
+  <div id="dash-body">
+    <div class="dash-cards">
+      <div class="dash-card"><div class="dash-card-label">Total Ideas</div><div class="dash-card-val" id="dc-total">0</div></div>
+      <div class="dash-card"><div class="dash-card-label">Avg V-Score</div><div class="dash-card-val" id="dc-avg" style="color:var(--amber)">0</div></div>
+      <div class="dash-card"><div class="dash-card-label">Bonus Ideas</div><div class="dash-card-val" id="dc-bonus-pct" style="color:var(--green)">0%</div></div>
+      <div class="dash-card"><div class="dash-card-label">Avg Bonus</div><div class="dash-card-val" id="dc-avg-bonus" style="color:var(--teal)">0</div></div>
+      <div class="dash-card"><div class="dash-card-label">Score Range</div><div class="dash-card-val" id="dc-score-range" style="color:var(--text2);font-size:13px">—</div></div>
+    </div>
+    <div class="dash-cols" style="grid-template-columns:repeat(3,1fr)">
+      <div class="dash-section"><div class="dash-sec-title">&#128202; All Formats</div><div id="dc-formats"></div></div>
+      <div class="dash-section"><div class="dash-sec-title">&#128269; Geographic Scale</div><div id="dc-geo"></div></div>
+      <div class="dash-section"><div class="dash-sec-title">&#9881; Format Type</div><div id="dc-complexity"></div></div>
+      <div class="dash-section"><div class="dash-sec-title">&#127991; Top Topics</div><div id="dc-sources"></div></div>
+      <div class="dash-section"><div class="dash-sec-title">&#128197; Data Freshness</div><div id="dc-freshness"></div></div>
+      <div class="dash-section"><div class="dash-sec-title">&#11088; Bonus Breakdown</div><div id="dc-bonuses"></div></div>
+    </div>
+    <div class="dash-cols" style="grid-template-columns:1.5fr 1fr;">
+      <div class="dash-section"><div class="dash-sec-title">&#127942; Top 10 Ideas</div><div id="dc-top10"></div></div>
+      <div class="dash-section"><div class="dash-sec-title">&#128201; Topic Gaps (least covered)</div><div id="dc-gaps"></div></div>
+    </div>
+    <div class="dash-section"><div class="dash-sec-title">&#127991; Topic Distribution</div><div id="dc-topics"></div></div>
+  </div>
+</div>
+<div class="modes">
+  <button class="mode-btn on" onclick="setMode('browse',this)">Browse</button>
+  <button class="mode-btn"   onclick="setMode('score-filters',this)">Score Filters</button>
+  <button class="mode-btn"   onclick="setMode('correlate',this)">Correlate</button>
+  <button class="mode-btn"   onclick="setMode('format',this)">By Format</button>
+</div>
+
+<!-- BROWSE PANE -->
+<div class="pane on" id="pane-browse">
+  <div class="bar">
+    <input id="q" placeholder="Search: housing, opioids, redline, water, democracy..." oninput="renderBrowse();updateResetBtn()">
+    <button class="reset-btn" onclick="resetAllFilters()" id="reset-btn" style="display:none">Reset filters</button>
+    <button class="reset-btn" style="border-color:var(--green);color:var(--green)" onclick="toggleSaveArea()">Save filter</button>
+  </div>
+  <div id="sf-save-area" style="display:none;align-items:center;gap:6px;margin-bottom:8px;">
+    <input id="sf-name-input" placeholder="Name this filter..." style="height:30px;padding:0 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:12px;outline:none;width:200px;">
+    <button class="reset-btn" style="border-color:var(--green);color:var(--green);height:30px" onclick="saveCurrentFilter()">Save</button>
+  </div>
+  <div id="saved-filters-strip" style="display:none;flex-wrap:wrap;gap:5px;margin-bottom:8px;"></div>
+  <div class="filter-row">
+    <span>Type:</span>
+    <button class="fp tp-MAP"   data-f="type" data-v="MAP"   onclick="togglePill(this)">MAP</button>
+    <button class="fp tp-XREF"  data-f="type" data-v="XREF"  onclick="togglePill(this)">XREF</button>
+    <button class="fp tp-CHART" data-f="type" data-v="CHART" onclick="togglePill(this)">CHART</button>
+    <button class="fp tp-RANK"  data-f="type" data-v="RANK"  onclick="togglePill(this)">RANK</button>
+  </div>
+  <!-- GEO ACCORDION -->
+  <div class="filter-row geo-accordion">
+    <span>Geo:</span>
+    <div id="geo-row1" class="geo-row"></div>
+  </div>
+  <div id="geo-row2" class="geo-row geo-sub" style="display:none"></div>
+  <div id="geo-row3" class="geo-row geo-sub geo-row3" style="display:none"></div>
+  <div id="geo-breadcrumb" class="geo-bc" style="display:none"></div>
+  <div class="filter-row">
+    <span>Maps:</span>
+    <button class="fp fmt" data-f="fmt" data-v="State choropleth"     onclick="togglePill(this)">State</button>
+    <button class="fp fmt" data-f="fmt" data-v="County choropleth"    onclick="togglePill(this)">County</button>
+    <button class="fp fmt" data-f="fmt" data-v="World choropleth"     onclick="togglePill(this)">World</button>
+    <button class="fp fmt" data-f="fmt" data-v="Bivariate choropleth" onclick="togglePill(this)">Bivariate</button>
+    <button class="fp fmt" data-f="fmt" data-v="Dot map"              onclick="togglePill(this)">Dot map</button>
+    <button class="fp fmt" data-f="fmt" data-v="Special map"          onclick="togglePill(this)">Special</button>
+  </div>
+  <div class="filter-row">
+    <span>Charts:</span>
+    <button class="fp fmt" data-f="fmt" data-v="Bar chart"            onclick="togglePill(this)">Bar</button>
+    <button class="fp fmt" data-f="fmt" data-v="Scatter plot"         onclick="togglePill(this)">Scatter</button>
+    <button class="fp fmt" data-f="fmt" data-v="Line chart"           onclick="togglePill(this)">Line</button>
+    <button class="fp fmt" data-f="fmt" data-v="Area chart"           onclick="togglePill(this)">Area</button>
+    <button class="fp fmt" data-f="fmt" data-v="Ranked list"          onclick="togglePill(this)">Ranked list</button>
+    <button class="fp fmt" data-f="fmt" data-v="Treemap"              onclick="togglePill(this)">Treemap</button>
+  </div>
+  <div class="filter-row">
+    <span>Status:</span>
+    <button class="fp st-idea"        data-f="status" data-v="idea"        onclick="togglePill(this)"><span class="sdot" style="background:var(--indigo)"></span>Ideas</button>
+    <button class="fp st-in-progress" data-f="status" data-v="in-progress" onclick="togglePill(this)"><span class="sdot" style="background:var(--amber)"></span>In Progress</button>
+    <button class="fp st-built"       data-f="status" data-v="built"       onclick="togglePill(this)"><span class="sdot" style="background:var(--green)"></span>Built</button>
+    <button class="fp st-published"   data-f="status" data-v="published"   onclick="togglePill(this)"><span class="sdot" style="background:var(--blue)"></span>Published</button>
+  </div>
+  <div class="filter-row">
+    <span>Notes:</span>
+    <button class="fp nt" data-f="notes" data-v="has"  onclick="togglePill(this)">Has notes</button>
+    <button class="fp nt" data-f="notes" data-v="none" onclick="togglePill(this)">No notes</button>
+  </div>
+  <div class="filter-row" id="topic-row">
+    <span>Category:</span>
+    <button class="fp topic" data-f="topics" data-v="agriculture"     onclick="toggleTopic(this)">Agriculture</button>
+    <button class="fp topic" data-f="topics" data-v="children"        onclick="toggleTopic(this)">Children</button>
+    <button class="fp topic" data-f="topics" data-v="climate"         onclick="toggleTopic(this)">Climate</button>
+    <button class="fp topic" data-f="topics" data-v="crime"           onclick="toggleTopic(this)">Crime</button>
+    <button class="fp topic" data-f="topics" data-v="drugs"           onclick="toggleTopic(this)">Drugs</button>
+    <button class="fp topic" data-f="topics" data-v="economy"         onclick="toggleTopic(this)">Economy</button>
+    <button class="fp topic" data-f="topics" data-v="education"       onclick="toggleTopic(this)">Education</button>
+    <button class="fp topic" data-f="topics" data-v="energy"          onclick="toggleTopic(this)">Energy</button>
+    <button class="fp topic" data-f="topics" data-v="entertainment"   onclick="toggleTopic(this)">Entertainment</button>
+    <button class="fp topic" data-f="topics" data-v="environment"     onclick="toggleTopic(this)">Environment</button>
+    <button class="fp topic" data-f="topics" data-v="finance"         onclick="toggleTopic(this)">Finance</button>
+    <button class="fp topic" data-f="topics" data-v="food"            onclick="toggleTopic(this)">Food</button>
+    <button class="fp topic" data-f="topics" data-v="gender"          onclick="toggleTopic(this)">Gender</button>
+    <button class="fp topic" data-f="topics" data-v="geography"       onclick="toggleTopic(this)">Geography</button>
+    <button class="fp topic" data-f="topics" data-v="guns"            onclick="toggleTopic(this)">Guns</button>
+    <button class="fp topic" data-f="topics" data-v="health"          onclick="toggleTopic(this)">Health</button>
+    <button class="fp topic" data-f="topics" data-v="history"         onclick="toggleTopic(this)">History</button>
+    <button class="fp topic" data-f="topics" data-v="housing"         onclick="toggleTopic(this)">Housing</button>
+    <button class="fp topic" data-f="topics" data-v="humor"           onclick="toggleTopic(this)">Humor</button>
+    <button class="fp topic" data-f="topics" data-v="immigration"     onclick="toggleTopic(this)">Immigration</button>
+    <button class="fp topic" data-f="topics" data-v="inequality"      onclick="toggleTopic(this)">Inequality</button>
+    <button class="fp topic" data-f="topics" data-v="infrastructure"  onclick="toggleTopic(this)">Infrastructure</button>
+    <button class="fp topic" data-f="topics" data-v="international"   onclick="toggleTopic(this)">International</button>
+    <button class="fp topic" data-f="topics" data-v="labor"           onclick="toggleTopic(this)">Labor</button>
+    <button class="fp topic" data-f="topics" data-v="media"           onclick="toggleTopic(this)">Media</button>
+    <button class="fp topic" data-f="topics" data-v="middle_east"     onclick="toggleTopic(this)">Middle East</button>
+    <button class="fp topic" data-f="topics" data-v="military"        onclick="toggleTopic(this)">Military</button>
+    <button class="fp topic" data-f="topics" data-v="politics"        onclick="toggleTopic(this)">Politics</button>
+    <button class="fp topic" data-f="topics" data-v="population"      onclick="toggleTopic(this)">Population</button>
+    <button class="fp topic" data-f="topics" data-v="psychology"      onclick="toggleTopic(this)">Psychology</button>
+    <button class="fp topic" data-f="topics" data-v="race"            onclick="toggleTopic(this)">Race</button>
+    <button class="fp topic" data-f="topics" data-v="religion"        onclick="toggleTopic(this)">Religion</button>
+    <button class="fp topic" data-f="topics" data-v="rural"           onclick="toggleTopic(this)">Rural</button>
+    <button class="fp topic" data-f="topics" data-v="science"         onclick="toggleTopic(this)">Science</button>
+    <button class="fp topic" data-f="topics" data-v="sports"          onclick="toggleTopic(this)">Sports</button>
+    <button class="fp topic" data-f="topics" data-v="technology"      onclick="toggleTopic(this)">Technology</button>
+    <button class="fp topic" data-f="topics" data-v="transportation"  onclick="toggleTopic(this)">Transportation</button>
+    </div>
+  <div class="sort-row">
+    <span>Sort:</span>
+    <button class="sb on" data-k="vscore"       onclick="setSort('vscore')">V-Score</button>
+    <button class="sb"    data-k="newest"       onclick="setSort('newest')">Newest</button>
+    <button class="sb"    data-k="oldest"       onclick="setSort('oldest')">Oldest</button>
+    <button class="sb"    data-k="bonus"        onclick="setSort('bonus')">&#11088; Most Bonus</button>
+    <button class="sb"    data-k="emotional"    onclick="setSort('emotional')">Emotional</button>
+    <button class="sb"    data-k="relatability" onclick="setSort('relatability')">Relatability</button>
+    <button class="sb"    data-k="clarity"      onclick="setSort('clarity')">Clarity</button>
+    <button class="sb"    data-k="surprise"     onclick="setSort('surprise')">Surprise</button>
+    <button class="sb"    data-k="tension"      onclick="setSort('tension')">Tension</button>
+    <button class="sb"    data-k="visual"       onclick="setSort('visual')">Visual</button>
+    <button class="sb"    data-k="data_ready"   onclick="setSort('data_ready')">Data Ready</button>
+    <button class="sb"    data-k="originality"  onclick="setSort('originality')">Originality</button>
+    <button class="sb"    data-k="dd"           onclick="setSort('dd')">Data Date</button>
+  </div>
+  <div class="sort-row" style="margin-top:-4px;">
+    <span style="font-weight:600">Bonus:</span>
+    <button class="sb bf-btn" data-v="has"  onclick="setBonusFilter('has')">&#11088; Any</button>
+    <button class="sb bf-btn" data-v="none" onclick="setBonusFilter('none')">None</button>
+    <button class="sb bf-btn" data-v="cl"   onclick="setBonusFilter('cl')">&#128161; Clarity</button>
+    <button class="sb bf-btn" data-v="df"   onclick="setBonusFilter('df')">&#128202; Fresh</button>
+    <button class="sb bf-btn" data-v="vm"   onclick="setBonusFilter('vm')">&#128293; Viral</button>
+    <button class="sb bf-btn" data-v="sh"   onclick="setBonusFilter('sh')">&#128228; Share</button>
+    <button class="sb bf-btn" data-v="og"   onclick="setBonusFilter('og')">&#10024; Original</button>
+  </div>
+  <div class="cnt" id="bcnt"></div>
+  <div class="grid" id="bgrid"></div>
+</div>
+
+<!-- SCORE FILTERS PANE -->
+<div class="pane" id="pane-score-filters">
+  <button class="clear-sc-btn" onclick="clearScFilters()">Clear all</button>
+  <div id="sc-filter-grid"></div>
+  <div class="cnt" id="sf-cnt"></div>
+  <div class="grid" id="sf-grid"></div>
+</div>
+
+<!-- CORRELATE PANE -->
+<div class="pane" id="pane-correlate">
+  <div class="cv">
+    <label>Pick a variable - find every idea it connects to</label>
+    <select id="varsel" onchange="renderCorr()"><option value="">- select a variable -</option></select>
+    <div class="cv-hint" id="corr-hint">Blue border = variable used directly. No border = joinable.</div>
+  </div>
+  <div class="cnt" id="ccnt"></div>
+  <div class="grid" id="cgrid"></div>
+</div>
+
+<!-- FORMAT PANE -->
+<div class="pane" id="pane-format">
+  <div class="fgrid" id="fgrid"></div>
+  <div class="cnt" id="fcnt"></div>
+  <div class="grid" id="fgridout"></div>
+</div>
+
+<footer>@mapzimus</footer>
+</div>
+<script src="data.js?v=27"></script>
+<script src="app.js?v=27"></script>
+
+<script id="gis-dashboard-script">
+(function(){
+function gf(d,f){return (d&&d[f]!=null)?String(d[f]):'';}
+function getBonus(d){return (d&&d.bonus)?+d.bonus:0;}
+function getScore(d){return (d&&d.vs)?+d.vs:0;}
+function getTopics(d){return (d&&Array.isArray(d.topics))?d.topics:[];}
+function getTitle(d){return (d&&d.title)?d.title:'(untitled)';}
+function getId(d){return (d&&d.id)?d.id:'';}
+
+function miniBar(label,count,max,color,clickFn){
+  var pct=max>0?Math.round(count/max*100):0;
+  var oc=clickFn?' onclick="'+clickFn+'" tabindex="0" style="cursor:pointer"':'';
+  return '<div class="db-row"'+oc+'><div class="db-label" title="'+label+'">'+label+'</div>'+
+    '<div class="db-bar-wrap"><div class="db-bar" style="width:'+pct+'%;background:'+color+'"></div></div>'+
+    '<div class="db-count">'+count.toLocaleString()+'</div></div>';
+}
+
+/* Normalize raw geo strings to canonical scale labels */
+function normGeo(raw){
+  var r=(raw||'').split(/[,|]/)[0].trim().toLowerCase().replace(/_/g,' ');
+  if(!r||r==='other'||r==='n/a')return null;
+  if(r==='world'||r==='worldwide'||r==='global'||r==='international'||r==='world country')return 'Global / World';
+  if(r==='usa'||r==='us'||r==='u.s.'||r==='united states'||r==='national'||r==='us national')return 'National (US)';
+  if(r==='state'||r==='states'||r==='us state'||r==='us states'||r==='us-state'||r==='us-states')return 'State';
+  if(r==='county'||r==='counties'||r==='us county'||r==='us-county')return 'County';
+  if(r==='city'||r==='cities'||r==='us city')return 'City / Metro';
+  if(r==='metro'||r==='us metro'||r==='urban')return 'City / Metro';
+  if(r==='region'||r==='regional'||r==='world region')return 'Region';
+  if(r==='country'||r==='countries')return 'Country';
+  if(r==='district'||r==='us zip'||r==='us tract'||r==='neighborhood'||r==='sub county')return 'Sub-county';
+  if(r==='top n list'||r==='list'||r==='ranking')return 'Ranking / List';
+  /* fallback: prettify */
+  return r.replace(/\b\w/g,function(c){return c.toUpperCase();});
+}
+
+function buildDashboard(){
+  if(typeof D==="undefined"||!D||!D.length)return;
+  var total=D.length;
+  var bonuses=D.map(getBonus);
+  var scores=D.map(getScore);
+  var avgScore=(scores.reduce(function(a,b){return a+b;},0)/total).toFixed(1);
+  var bonusIdeas=bonuses.filter(function(b){return b>0;});
+  var bonusPct=Math.round(bonusIdeas.length/total*100);
+  var avgBonus=bonusIdeas.length?(bonusIdeas.reduce(function(a,b){return a+b;},0)/bonusIdeas.length).toFixed(1):'0';
+  var effScores=D.map(function(d){return getScore(d)+getBonus(d);});
+  var maxScore=effScores.reduce(function(a,b){return a>b?a:b;},-Infinity);
+  var minScore=effScores.reduce(function(a,b){return a<b?a:b;},Infinity);
+  /* Count spatial (map) ideas */
+  var SPATIAL_FMTS={'State choropleth':1,'County choropleth':1,'World choropleth':1,
+    'Dot map':1,'Flow map':1,'Animated map':1,'Hex bin map':1,'Bivariate choropleth':1,
+    'Cartogram':1,'Special map':1,'Bubble map':1};
+  var spatialCount=D.filter(function(d){return SPATIAL_FMTS[gf(d,'fmt')];}).length;
+  var spatialPct=Math.round(spatialCount/total*100);
+
+  var el=function(id){return document.getElementById(id);};
+  if(el('dc-total'))    el('dc-total').textContent=total.toLocaleString();
+  if(el('dc-avg'))      el('dc-avg').textContent=avgScore;
+  if(el('dc-bonus-pct'))el('dc-bonus-pct').textContent=bonusPct+'%';
+  if(el('dc-avg-bonus'))el('dc-avg-bonus').textContent=avgBonus;
+  if(el('dc-score-range'))el('dc-score-range').textContent=minScore+' - '+maxScore;
+  if(el('dash-sub'))    el('dash-sub').textContent=total.toLocaleString()+' ideas';
+  if(el('dc-spatial-pct'))el('dc-spatial-pct').textContent=spatialPct+'% spatial';
+
+  /* ALL FORMATS - top by count, consolidate rare types (<10) into "Other" */
+  var FMT_CLR={'Bar chart':'#f59e0b','State choropleth':'#22c55e','Dot map':'#14b8a6',
+    'Scatter plot':'#a855f7','World choropleth':'#15803d','Line chart':'#fb923c',
+    'Article':'#64748b','County choropleth':'#16a34a','Bivariate choropleth':'#84cc16',
+    'Special map':'#f59e0b','Interactive':'#06b6d4','Narrative':'#6b7280',
+    'Area chart':'#ec4899','Ranked list':'#d946ef','Animated map':'#3b82f6',
+    'Timeline':'#8b5cf6','Infographic':'#e11d48','Flow chart':'#0ea5e9'};
+  var allFmtC={};
+  D.forEach(function(d){var v=gf(d,'fmt');if(v)allFmtC[v]=(allFmtC[v]||0)+1;});
+  var fmtOther=0;
+  var topFmt=[];
+  Object.entries(allFmtC).forEach(function(e){
+    if(e[1]<10)fmtOther+=e[1]; else topFmt.push(e);
+  });
+  topFmt.sort(function(a,b){return b[1]-a[1];});
+  if(fmtOther>0)topFmt.push(['Other (rare types)',fmtOther]);
+  var mxFmt=topFmt.length?topFmt[0][1]:1;
+  var GCC=['#22c55e','#14b8a6','#06b6d4','#3b82f6','#6366f1','#a855f7','#f59e0b','#fb923c','#ef4444','#84cc16','#ec4899','#64748b'];
+  if(el('dc-formats'))el('dc-formats').innerHTML=topFmt.map(function(e,i){
+    var safe=e[0].replace(/'/g,"\\'");
+    var clickFn=e[0]==='Other (rare types)'?null:"window.filterByFmt('"+safe+"')";
+    return miniBar(e[0],e[1],mxFmt,FMT_CLR[e[0]]||GCC[i%GCC.length],clickFn);
+  }).join('');
+
+  /* GEOGRAPHIC SCALE - normalized */
+  var geoC={};
+  D.forEach(function(d){
+    var lbl=normGeo(gf(d,'geo'));
+    if(lbl){geoC[lbl]=(geoC[lbl]||0)+1;}
+  });
+  var topGeo=Object.entries(geoC).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
+  var mxG=topGeo.length?topGeo[0][1]:1;
+  var GC=['#22c55e','#14b8a6','#06b6d4','#3b82f6','#6366f1','#a855f7','#f59e0b','#fb923c'];
+  if(el('dc-geo'))el('dc-geo').innerHTML=topGeo.map(function(e,i){
+    return miniBar(e[0],e[1],mxG,GC[i%GC.length],null);
+  }).join('');
+
+  /* FORMAT TYPE BREAKDOWN - Map vs Chart vs Other */
+  var cx={map:0,chart:0,xref:0,rank:0,article:0,other:0};
+  D.forEach(function(d){
+    var f=gf(d,'fmt').toLowerCase();
+    if(SPATIAL_FMTS[gf(d,'fmt')]||f==='bivariate choropleth')cx.map++;
+    else if(f.indexOf('chart')>=0||f.indexOf('plot')>=0)cx.chart++;
+    else if(f==='ranked list'||f==='timeline')cx.rank++;
+    else if(f==='article'||f==='narrative'||f==='infographic')cx.article++;
+    else if(f==='interactive'||f==='treemap'||f==='flow chart')cx.other++;
+    else cx.other++;
+  });
+  var mxC=Math.max(cx.map,cx.chart,cx.xref,cx.rank,cx.article,cx.other)||1;
+  var CXL={map:'Spatial / Map',chart:'Chart',rank:'Ranking / Timeline',article:'Article / Narrative',other:'Other'};
+  var CXC={map:'#22c55e',chart:'#f59e0b',rank:'#a855f7',article:'#64748b',other:'#374151'};
+  if(el('dc-complexity'))el('dc-complexity').innerHTML=['map','chart','rank','article','other']
+    .sort(function(a,b){return cx[b]-cx[a];})
+    .map(function(k){return miniBar(CXL[k],cx[k],mxC,CXC[k],null);}).join('');
+
+  /* TOP TOPICS (replacing section-based Categories) */
+  var catC={};
+  D.forEach(function(d){getTopics(d).forEach(function(t){catC[t]=(catC[t]||0)+1;});});
+  var topCat=Object.entries(catC).sort(function(a,b){return b[1]-a[1];}).slice(0,12);
+  var mxS=topCat.length?topCat[0][1]:1;
+  var SC=['#3b82f6','#06b6d4','#14b8a6','#22c55e','#84cc16','#f59e0b',
+          '#fb923c','#ef4444','#a855f7','#ec4899','#10b981','#8b5cf6'];
+  if(el('dc-sources'))el('dc-sources').innerHTML=topCat.map(function(e,i){
+    var safe=e[0].replace(/'/g,"\'");
+    return miniBar(e[0],e[1],mxS,SC[i%SC.length],"window.filterByTopicDash('"+safe+"')");
+  }).join('');
+
+  /* BONUS BREAKDOWN */
+  var BKK=['vm','sh','df','cl','og'];
+  var BKL={vm:'Viral',sh:'Share',df:'Fresh Data',cl:'Clarity',og:'Original'};
+  var BKC={vm:'#ef4444',sh:'#3b82f6',df:'#22c55e',cl:'#f59e0b',og:'#a855f7'};
+  var bkC={vm:0,sh:0,df:0,cl:0,og:0};
+  D.forEach(function(d){
+    BKK.forEach(function(k){
+      if(d.bonusBk&&d.bonusBk[k]&&+d.bonusBk[k]>0)bkC[k]++;
+    });
+  });
+  var mxB=BKK.reduce(function(a,k){return Math.max(a,bkC[k]);},0)||1;
+  if(el('dc-bonuses'))el('dc-bonuses').innerHTML=BKK
+    .slice().sort(function(a,b){return bkC[b]-bkC[a];})
+    .map(function(k){return miniBar(BKL[k],bkC[k],mxB,BKC[k],"window.filterByBonus('"+k+"')");}).join('');
+
+  /* TOP 10 */
+  var top10=D.slice().map(function(d){return {d:d,score:getScore(d)+getBonus(d)};})
+    .sort(function(a,b){return b.score-a.score;}).slice(0,10);
+  if(el('dc-top10'))el('dc-top10').innerHTML=top10.map(function(item,rank){
+    var d=item.d,score=item.score,title=getTitle(d),bonus=getBonus(d),id=getId(d);
+    var short=title.length>44?title.slice(0,44)+'...':title;
+    return '<div class="db-top-row" onclick="window.jumpToIdea(\''+id+'\')">' +
+      '<span class="db-rank">'+(rank+1)+'</span>'+
+      '<span class="db-top-title" title="'+title.replace(/"/g,'&quot;')+'">'+short+'</span>'+
+      '<span class="db-top-score">'+score+(bonus?'<sup class="db-bonus-sup">+'+bonus+'</sup>':'')+'</span>'+
+    '</div>';
+  }).join('');
+
+  /* TOPIC DISTRIBUTION - filter out noise (count < 5) */
+  var topC={};
+  D.forEach(function(d){getTopics(d).forEach(function(t){topC[t]=(topC[t]||0)+1;});});
+  var allT=Object.entries(topC).sort(function(a,b){return b[1]-a[1];});
+  var filteredT=allT.filter(function(e){return e[1]>=5;});
+  var mxT=filteredT.length?filteredT[0][1]:1;
+  if(el('dc-topics'))el('dc-topics').innerHTML='<div class="db-topic-grid">'+
+    filteredT.map(function(e){
+      return '<div class="db-topic-row" onclick="window.filterByTopicDash(\''+e[0]+'\')">'+
+        '<div class="db-topic-bar-bg"><div class="db-topic-bar" style="width:'+
+        Math.round(e[1]/mxT*100)+'%"></div></div>'+
+        '<span class="db-topic-label" title="'+e[0]+'">'+e[0]+'</span>'+
+        '<span class="db-topic-cnt">'+e[1]+'</span></div>';
+    }).join('')+'</div>';
+
+  /* TOPIC GAPS - underrepresented topics (5-25 ideas) */
+  var gapT=allT.slice().reverse().filter(function(e){return e[1]>=5;}).slice(0,15);
+  if(el('dc-gaps'))el('dc-gaps').innerHTML=gapT.map(function(e){
+    return '<div class="db-gap-pill" onclick="window.filterByTopicDash(\''+e[0]+'\')">'+
+      e[0]+' <span class="db-gap-cnt">'+e[1]+'</span></div>';
+  }).join('');
+
+  /* DATA FRESHNESS */
+  var frBk={fresh:0,recent:0,older:0,stale:0,none:0};
+  D.forEach(function(d){
+    var yr=parseInt((gf(d,'dd')||'').slice(0,4))||0;
+    if(!yr||yr<1900)frBk.none++;
+    else if(yr>=2024)frBk.fresh++;
+    else if(yr>=2022)frBk.recent++;
+    else if(yr>=2019)frBk.older++;
+    else frBk.stale++;
+  });
+  var frMax=Object.keys(frBk).reduce(function(a,k){return Math.max(a,frBk[k]);},0)||1;
+  var frL={fresh:'Fresh (2024+)',recent:'Recent (2022-23)',older:'Older (2019-21)',stale:'Stale (pre-2019)',none:'No date'};
+  var frC={fresh:'#22c55e',recent:'#eab308',older:'#f97316',stale:'#ef4444',none:'#555'};
+  if(el('dc-freshness'))el('dc-freshness').innerHTML=
+    Object.keys(frBk).sort(function(a,b){return frBk[b]-frBk[a];})
+    .map(function(k){return miniBar(frL[k],frBk[k],frMax,frC[k],null);}).join('');
+}
+
+window.jumpToIdea=function(id){
+  var b=document.querySelector('[onclick*="Browse"]')||document.querySelector('.nav-btn');
+  if(b)b.click();
+  setTimeout(function(){
+    var card=document.querySelector('[data-id="'+id+'"]');
+    if(card){card.scrollIntoView({behavior:'smooth',block:'center'});
+      card.classList.add('hi');setTimeout(function(){card.classList.remove('hi');},2000);}
+  },300);
+};
+window.filterByFmt=function(fmt){
+  var b=document.querySelector('[onclick*="Browse"]')||document.querySelector('.nav-btn');
+  if(b)b.click();
+  setTimeout(function(){
+    var btn=document.querySelector('[data-f="'+fmt+'"]');
+    if(btn)btn.click();
+  },200);
+};
+window.filterByBonus=function(bk){
+  var b=document.querySelector('[onclick*="Browse"]')||document.querySelector('.nav-btn');
+  if(b)b.click();
+};
+window.filterByTopicDash=function(topic){
+  var b=document.querySelector('[onclick*="Browse"]')||document.querySelector('.nav-btn');
+  if(b)b.click();
+  setTimeout(function(){
+    var btn=document.querySelector('[data-v="'+topic+'"]');
+    if(btn)btn.click();
+  },200);
+};
+
+/* Poll for D to load */
+var _poll=0;
+function tryBuild(){
+  if(typeof D!=="undefined"&&D&&D.length>0){buildDashboard();}
+  else if(_poll<30){_poll++;setTimeout(tryBuild,400);}
+  else{console.warn('GIS Dashboard: D never populated after 30 polls');}
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',tryBuild);
+}else{tryBuild();}
+})();
+</script>
+
+
+
+</body>
+</html>
+

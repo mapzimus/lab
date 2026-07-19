@@ -2,9 +2,15 @@
 
 Source for [mapzimus.com](https://mapzimus.com), the creative lab for Maxwell Howe's browser tools, games, unusual maps, and experiments.
 
-The initial release is a front door, not a forced migration. The 65 existing tools remain live at `mapzimus.github.io/max/`; this site provides the curated catalog, search, filters, favorites, and stable category routes. Individual tools can move to `mapzimus.com/tools/{slug}/` later without breaking their original URLs.
+Every catalog item that can run as static files is **hosted in this repo** and served as a first-party path on mapzimus.com. Snapshots live under `vendor/` (see `vendor/SOURCES.md`). The build copies them into `dist/` beside the front-door catalog.
 
-The first staging scaffold used a `public/` directory and a directly deployed static-assets Worker. The production implementation now follows the ecosystem plan: one source in `src/`, a reproducible `dist/` build, Cloudflare Pages Git integration, and preview deployments for branches and pull requests.
+- Tools: `mapzimus.com/{slug}/` (e.g. `/coordinate-converter/`)
+- Games & maps: `/flip-game/`, `/grog-flip/`, `/whydah-voyage/`, `/black-sam/`, `/bug-wars/`, `/transit/`, `/geopuesto/`, …
+- Lab experiments already in `src/lab/` stay at `/lab/…`
+
+Legacy `/max/*.html` URLs redirect here. TappyMaps keeps its own domain (`tappymaps.com`).
+
+The production setup: one source in `src/`, a reproducible `dist/` build, Cloudflare Pages Git integration, and preview deployments for branches and pull requests.
 
 ## Site sections
 
@@ -22,13 +28,14 @@ catalog in `src/data/skills.json`, sources under `.claude/skills/`), Links
 
 ```sh
 npm run build       # validates the catalog, then builds dist/
+npm run check       # build + static link check (no off-site github.io leftovers)
 npm run preview     # npx wrangler pages dev dist
 ```
 
 The build fails if the catalog data is invalid: missing required fields,
-duplicate slugs, unknown categories, non-https URLs, or a featured slug that
-isn't in the catalog. GitHub Actions runs the same build on every push and
-pull request.
+duplicate slugs, unknown categories, non-https source URLs, a featured slug that
+isn't in the catalog, or a non-external project missing a hosted route. GitHub
+Actions runs the same build on every push and pull request.
 
 ## Cloudflare Pages
 
@@ -40,9 +47,13 @@ pull request.
 
 The committed `wrangler.jsonc` matches those settings. Preview branches use normal Pages preview deployments.
 
-## Updating the legacy catalog
+## Updating the catalog
 
-`src/data/tools.json` is a normalized snapshot of the cards in `mapzimus/max`. Existing tool URLs are deliberately external during the first migration phase. Update the JSON when a legacy title, description, or tool URL changes.
+`src/data/tools.json` and `src/data/projects.json` hold the shelf metadata.
+Source `url` fields are provenance (where the item originally lived); the build
+rewrites public URLs to first-party paths and writes them into `dist/data/`.
+Drop a tool HTML file into `vendor/tools/{slug}.html` (or an app tree into
+`vendor/apps/{name}/`) and update `vendor/SOURCES.md` when mirroring something new.
 
 `src/data/featured.json` controls the "Featured from the lab" shelf on the
 homepage — an ordered list of catalog slugs. The tool count in the hero and the

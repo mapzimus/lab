@@ -1,0 +1,905 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRT Effect Lab</title>
+<meta name="description" content="Give text, an image or a demo scene a retro CRT / scanline look, tune every knob live, then copy the CSS or download a PNG. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.copyerr { color: var(--danger); border-color: var(--danger); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  /* ---- presets ---- */
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 7px 14px; font-size: .84rem; cursor: pointer; font-family: var(--sans); }
+  .chip:hover { border-color: var(--accent); }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .chip .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; border: 1px solid rgba(0,0,0,.25); }
+
+  /* ---- layout ---- */
+  .lab { display: grid; grid-template-columns: 380px 1fr; gap: 18px; align-items: start; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .stage-col { position: sticky; top: 16px; }
+
+  .grouplbl { font-size: .74rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 16px 0 8px; }
+  .grouplbl:first-child { margin-top: 0; }
+
+  label.f { display: inline-flex; align-items: center; gap: 8px; font-size: .86rem; }
+  select, input[type="number"], textarea { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 10px; font-size: .86rem; font-family: var(--sans); }
+  textarea { width: 100%; font-family: var(--mono); font-size: .82rem; line-height: 1.4; resize: vertical; min-height: 70px; }
+  input[type="range"] { accent-color: var(--accent); min-width: 0; width: 100%; }
+  input[type="color"] { inline-size: 40px; block-size: 32px; padding: 2px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; }
+
+  .row { display: flex; flex-wrap: wrap; gap: 12px 14px; align-items: center; margin: 10px 0; }
+  .sliderrow { display: grid; grid-template-columns: 130px 1fr 52px; gap: 10px; align-items: center; margin: 7px 0; }
+  .sliderrow > label { font-size: .83rem; }
+  .val { font-family: var(--mono); font-size: .78rem; color: var(--muted); text-align: right; }
+
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .seg button { border: none; background: var(--surface); color: var(--muted); padding: 7px 13px; font-size: .83rem; cursor: pointer; font-family: var(--sans); }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  /* ---- drop zone ---- */
+  .drop { border: 1.5px dashed var(--border); border-radius: 10px; padding: 14px; text-align: center; color: var(--muted); font-size: .84rem; cursor: pointer; background: var(--surface-2); }
+  .drop:hover, .drop.over { border-color: var(--accent); color: var(--accent); }
+  .drop strong { color: var(--text); }
+
+  /* ---- TV bezel + screen ---- */
+  .bezel {
+    background: linear-gradient(160deg, #2a2d33, #16171b 55%, #050506);
+    border-radius: 22px; padding: 26px 26px 34px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08), inset 0 -2px 8px rgba(0,0,0,.6);
+    position: relative;
+  }
+  .bezel::after { content: "◉ POWER"; position: absolute; right: 22px; bottom: 10px; font-size: .6rem; letter-spacing: .12em; color: #6f7378; font-family: var(--mono); }
+  .screenwrap { border-radius: 14px; overflow: hidden; background: #000; box-shadow: inset 0 0 0 2px #0b0c0e, inset 0 0 30px rgba(0,0,0,.9); }
+  canvas#screen { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; }
+  .stage-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+  /* ---- code output ---- */
+  .codebox { position: relative; margin-top: 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .codebox pre { margin: 0; font-family: var(--mono); font-size: .78rem; line-height: 1.5; white-space: pre; overflow-x: auto; max-height: 340px; overflow-y: auto; }
+  .codehead { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .codehead h2 { font-size: 1rem; margin: 0; }
+  .codehead .sep { flex: 1; }
+  .note { color: var(--muted); font-size: .8rem; margin: 8px 0 0; }
+  .note.err { color: var(--danger); }
+
+  .toggle { display: inline-flex; align-items: center; gap: 8px; font-size: .84rem; }
+  input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+
+  @media (max-width: 860px) {
+    .lab { grid-template-columns: 1fr; }
+    .stage-col { position: static; order: -1; }
+  }
+  @media (max-width: 480px) {
+    .sliderrow { grid-template-columns: 108px 1fr 46px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>CRT Effect Lab</h1>
+      <p>Apply a retro CRT / scanline look to text, an image or a built-in demo scene. Tune every knob live, then copy the CSS or save a PNG. Your whole setup lives in the page address, so you can share it as a link.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="presets" id="presets" role="group" aria-label="Presets"></div>
+
+  <div class="lab">
+    <!-- ============ CONTROLS ============ -->
+    <section class="panel" aria-label="Controls">
+      <div class="grouplbl">Subject</div>
+      <div class="row">
+        <span class="seg" role="group" aria-label="What to apply the effect to">
+          <button id="subText" type="button" aria-pressed="true">Text</button>
+          <button id="subImage" type="button" aria-pressed="false">Image</button>
+          <button id="subDemo" type="button" aria-pressed="false">Demo</button>
+        </span>
+      </div>
+
+      <div id="textCtl">
+        <label class="f" for="msg" style="display:block;margin-bottom:6px">Terminal message</label>
+        <textarea id="msg" spellcheck="false" aria-label="Terminal message text"></textarea>
+        <div class="row">
+          <label class="f">Ink <input type="color" id="ink" value="#33ff66" aria-label="Text color"></label>
+          <label class="f">Font
+            <select id="font">
+              <option value="mono">Monospace</option>
+              <option value="sans">Sans-serif</option>
+            </select>
+          </label>
+        </div>
+        <div class="sliderrow">
+          <label for="fontSize">Font size</label>
+          <input type="range" id="fontSize" min="12" max="52" step="1" value="26" aria-label="Font size">
+          <span class="val" id="fontSizeVal">26px</span>
+        </div>
+      </div>
+
+      <div id="imageCtl" hidden>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Drop an image or click to choose">
+          <strong>Drop an image</strong> here, or click to choose.<br>Stays on your device.
+        </div>
+        <input type="file" id="file" accept="image/*" hidden>
+        <p class="note" id="imgNote"></p>
+      </div>
+
+      <div class="grouplbl">Screen tint / phosphor</div>
+      <div class="row">
+        <label class="f">Colour
+          <select id="tint">
+            <option value="g">Green (P1)</option>
+            <option value="a">Amber</option>
+            <option value="w">White</option>
+            <option value="f">Full colour</option>
+            <option value="c">Custom…</option>
+          </select>
+        </label>
+        <label class="f" id="customWrap" hidden>Custom <input type="color" id="custom" value="#8bac0f" aria-label="Custom phosphor color"></label>
+      </div>
+
+      <div class="grouplbl">CRT effects</div>
+      <div id="fxControls"></div>
+      <label class="toggle" style="margin-top:6px"><input type="checkbox" id="rollBand"> Rolling scanline band (animated)</label>
+      <p class="note" id="motionNote" hidden>Reduced-motion is on in your system, so animated effects (flicker, rolling band, live noise) are paused.</p>
+
+      <div class="row" style="margin-top:14px">
+        <button class="btn" id="resetBtn" type="button">↺ Reset all</button>
+      </div>
+    </section>
+
+    <!-- ============ STAGE ============ -->
+    <section class="stage-col">
+      <div class="bezel">
+        <div class="screenwrap">
+          <canvas id="screen" width="640" height="480" role="img" aria-label="Live CRT preview"></canvas>
+        </div>
+      </div>
+      <div class="stage-actions">
+        <button class="btn primary" id="pngBtn" type="button">⬇ Download PNG</button>
+        <button class="btn" id="linkBtn" type="button">🔗 Copy share link</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ CSS EXPORT ============ -->
+  <section class="panel" style="margin-top:18px">
+    <div class="codehead">
+      <h2>Export CSS</h2>
+      <span class="sep"></span>
+      <button class="btn" id="cssCopy" type="button">Copy CSS</button>
+    </div>
+    <div class="codebox">
+      <pre id="cssCode" aria-label="Generated CRT CSS"></pre>
+    </div>
+    <p class="note">Paste this onto any element (give it <code>class="crt"</code>). Pure-CSS scanlines, aperture-grille, glow, chromatic-aberration, vignette and flicker all reproduce. True barrel <em>warp</em> can't be done in pure CSS — the snippet approximates the bulge with rounded corners; the PNG export captures the real warp.</p>
+  </section>
+
+  <footer class="app">Everything runs in your browser — nothing is uploaded · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const clamp = (n,a,b) => Math.max(a, Math.min(b, n));
+const clone = (o) => JSON.parse(JSON.stringify(o));
+
+/* ---------- effect slider config ---------- */
+const FX = [
+  {k:'scanIntensity', l:'Scanline intensity', min:0, max:100, unit:'%'},
+  {k:'scanSpacing',   l:'Scanline spacing',   min:2, max:14,  unit:'px'},
+  {k:'curvature',     l:'Screen curvature',   min:0, max:100, unit:'%'},
+  {k:'glow',          l:'Phosphor glow',      min:0, max:100, unit:'%'},
+  {k:'grille',        l:'Aperture grille',    min:0, max:100, unit:'%'},
+  {k:'aberration',    l:'Chromatic aberr.',   min:0, max:100, unit:'%'},
+  {k:'vignette',      l:'Vignette',           min:0, max:100, unit:'%'},
+  {k:'flicker',       l:'Flicker',            min:0, max:100, unit:'%'},
+  {k:'noise',         l:'Noise / static',     min:0, max:100, unit:'%'},
+  {k:'brightness',    l:'Brightness',         min:50,max:150, unit:'%'},
+  {k:'contrast',      l:'Contrast',           min:50,max:150, unit:'%'},
+];
+
+/* ---------- presets ---------- */
+const PRESETS = {
+  'Green terminal': {subject:'text', tint:'g',
+    scanIntensity:55, scanSpacing:4, curvature:18, glow:45, grille:12, aberration:8, vignette:42, flicker:14, noise:12, brightness:106, contrast:112, rollBand:false, dot:'#33ff66'},
+  'Amber monitor': {subject:'text', tint:'a',
+    scanIntensity:50, scanSpacing:4, curvature:16, glow:42, grille:10, aberration:6, vignette:40, flicker:11, noise:10, brightness:108, contrast:110, rollBand:false, dot:'#ffb000'},
+  'Arcade CRT': {subject:'demo', tint:'f',
+    scanIntensity:46, scanSpacing:3, curvature:32, glow:55, grille:48, aberration:16, vignette:46, flicker:8, noise:8, brightness:104, contrast:116, rollBand:false, dot:'#ff3b6b'},
+  'Broadcast TV': {subject:'demo', tint:'f',
+    scanIntensity:30, scanSpacing:3, curvature:20, glow:34, grille:16, aberration:24, vignette:36, flicker:6, noise:34, brightness:102, contrast:106, rollBand:true, dot:'#4f86ff'},
+  'Game Boy DMG': {subject:'demo', tint:'c', custom:'#8bac0f',
+    scanIntensity:8, scanSpacing:3, curvature:6, glow:14, grille:0, aberration:0, vignette:22, flicker:0, noise:6, brightness:100, contrast:122, rollBand:false, dot:'#8bac0f'},
+  'Clean': {subject:'demo', tint:'f',
+    scanIntensity:0, scanSpacing:4, curvature:0, glow:0, grille:0, aberration:0, vignette:0, flicker:0, noise:0, brightness:100, contrast:100, rollBand:false, dot:'#e7ecf2'},
+};
+
+const DEFAULT_TEXT = "READY.\n\n> RUN GAME_\n\nSCORE 013370\nLIVES ***  HI 099999";
+
+const DEFAULTS = Object.assign({
+  subject:'text', text:DEFAULT_TEXT, fontSize:26, font:'mono', ink:'#33ff66',
+  tint:'g', custom:'#8bac0f',
+}, PRESETS['Green terminal']);
+delete DEFAULTS.dot;
+
+let state = clone(DEFAULTS);
+state.text = DEFAULT_TEXT;
+let img = null;             // loaded HTMLImageElement (not serialized)
+let booting = true;
+
+/* ---------- canvas / render engine ---------- */
+const W = 640, H = 480;
+const screen = $('#screen');
+const vctx = screen.getContext('2d', { willReadFrequently: false });
+
+const subjectCanvas = mkCanvas(W, H);
+const workCanvas = mkCanvas(W, H);
+const baseCanvas = mkCanvas(W, H);
+const tmpCanvas  = mkCanvas(W, H);
+const sctx = subjectCanvas.getContext('2d', { willReadFrequently: true });
+const wctx = workCanvas.getContext('2d', { willReadFrequently: true });
+const bctx = baseCanvas.getContext('2d', { willReadFrequently: true });
+const tctx = tmpCanvas.getContext('2d');
+
+function mkCanvas(w,h){ const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+
+const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+const motionOK = () => !mqReduce.matches;
+
+/* phosphor colours */
+function tintRGB(){
+  switch(state.tint){
+    case 'g': return [51,255,102];
+    case 'a': return [255,176,0];
+    case 'w': return [244,246,255];
+    case 'c': return hexRGB(state.custom);
+    default:  return null; // full colour
+  }
+}
+function hexRGB(hex){ const h = String(hex).replace('#',''); const n = parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16); return [(n>>16)&255,(n>>8)&255,n&255]; }
+function inkColor(){ return state.tint==='f' ? state.ink : '#ffffff'; }
+
+/* ----- draw the subject ----- */
+function drawSubject(){
+  sctx.clearRect(0,0,W,H);
+  sctx.fillStyle = '#000';
+  sctx.fillRect(0,0,W,H);
+  if (state.subject === 'image' && img){ drawImageSubject(); }
+  else if (state.subject === 'image'){ drawImagePlaceholder(); }
+  else if (state.subject === 'demo'){ drawDemo(); }
+  else { drawText(); }
+}
+function drawText(){
+  const fam = state.font === 'sans' ? 'system-ui, sans-serif' : 'ui-monospace, Menlo, Consolas, monospace';
+  const fs = state.fontSize;
+  sctx.font = `${fs}px ${fam}`;
+  sctx.textBaseline = 'top';
+  sctx.fillStyle = inkColor();
+  const lines = state.text.split('\n');
+  const lh = fs * 1.4;
+  let y = 34;
+  for (const ln of lines){ sctx.fillText(ln, 30, y); y += lh; }
+  // blinking-caret block bottom
+  sctx.fillRect(30, y + 4, fs * 0.6, fs * 0.9);
+}
+function drawImageSubject(){
+  const r = Math.min(W / img.width, H / img.height);
+  const dw = img.width * r, dh = img.height * r;
+  sctx.drawImage(img, (W-dw)/2, (H-dh)/2, dw, dh);
+}
+function drawImagePlaceholder(){
+  sctx.fillStyle = inkColor();
+  sctx.font = '22px ui-monospace, monospace';
+  sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+  sctx.fillText('NO SIGNAL', W/2, H/2 - 12);
+  sctx.font = '14px ui-monospace, monospace';
+  sctx.fillText('drop an image on the left', W/2, H/2 + 18);
+  sctx.textAlign = 'left';
+}
+function drawDemo(){
+  // SMPTE-style colour bars
+  const bars = ['#c0c0c0','#c0c000','#00c0c0','#00c000','#c000c0','#c00000','#0000c0'];
+  const bw = W / bars.length, bh = H * 0.55;
+  bars.forEach((c,i)=>{ sctx.fillStyle = c; sctx.fillRect(i*bw, 0, bw+1, bh); });
+  // lower band
+  sctx.fillStyle = '#0a0a14'; sctx.fillRect(0, bh, W, H-bh);
+  const grad = sctx.createLinearGradient(0,0,W,0);
+  grad.addColorStop(0,'#111'); grad.addColorStop(1,'#eee');
+  sctx.fillStyle = grad; sctx.fillRect(0, H*0.82, W, H*0.18);
+  // blocky "invader" sprites
+  const sprite = [
+    "00100100","01111110","11011011","11111111","10111101","10100101","00011000"
+  ];
+  const drawSprite = (ox,oy,px,col)=>{
+    sctx.fillStyle = col;
+    sprite.forEach((row,ry)=>{ for(let cx=0;cx<row.length;cx++){ if(row[cx]==='1') sctx.fillRect(ox+cx*px, oy+ry*px, px, px); } });
+  };
+  drawSprite(70, bh+18, 7, '#39ff14');
+  drawSprite(180, bh+18, 7, '#ff2d95');
+  drawSprite(290, bh+18, 7, '#25c9ff');
+  // label
+  sctx.fillStyle = '#ffffff';
+  sctx.font = 'bold 44px ui-monospace, Menlo, monospace';
+  sctx.textBaseline = 'top';
+  sctx.fillText('CRT LAB', 400, bh+16);
+  sctx.font = '18px ui-monospace, monospace';
+  sctx.fillStyle = '#ffd34d';
+  sctx.fillText('TEST PATTERN', 400, bh+70);
+}
+
+/* ----- pixel helpers ----- */
+function applyTintAndAdjust(src){
+  const out = wctx.createImageData(W, H);
+  const s = src.data, o = out.data;
+  const b = state.brightness/100, c = state.contrast/100;
+  const t = tintRGB();
+  for (let i=0;i<s.length;i+=4){
+    if (t){
+      let lum = (0.299*s[i] + 0.587*s[i+1] + 0.114*s[i+2]) / 255;
+      lum = ((lum - 0.5) * c + 0.5) * b;
+      lum = clamp(lum, 0, 1);
+      o[i]   = t[0]*lum; o[i+1] = t[1]*lum; o[i+2] = t[2]*lum;
+    } else {
+      for (let k=0;k<3;k++){
+        let v = s[i+k]/255;
+        v = ((v - 0.5) * c + 0.5) * b;
+        o[i+k] = clamp(v,0,1)*255;
+      }
+    }
+    o[i+3] = 255;
+  }
+  return out;
+}
+function applyCA(src, caPx){
+  if (caPx <= 0) return src;
+  const out = wctx.createImageData(W, H);
+  const s = src.data, o = out.data;
+  const off = Math.round(caPx);
+  for (let y=0;y<H;y++){
+    for (let x=0;x<W;x++){
+      const i = (y*W+x)*4;
+      const xr = clamp(x-off,0,W-1), xb = clamp(x+off,0,W-1);
+      o[i]   = s[(y*W+xr)*4];       // R shifted left-source (appears right)
+      o[i+1] = s[i+1];
+      o[i+2] = s[(y*W+xb)*4 + 2];   // B shifted
+      o[i+3] = 255;
+    }
+  }
+  return out;
+}
+function applyWarp(srcCanvas, kAmt){
+  const src = srcCanvas.getContext('2d').getImageData(0,0,W,H);
+  const dst = bctx.createImageData(W, H);
+  const s = src.data, d = dst.data;
+  const k = kAmt;
+  for (let y=0;y<H;y++){
+    const ny = (y/(H-1))*2 - 1;
+    for (let x=0;x<W;x++){
+      const di = (y*W+x)*4;
+      const nx = (x/(W-1))*2 - 1;
+      const r2 = nx*nx + ny*ny;
+      const f = 1 + k*r2;
+      const sx = nx*f, sy = ny*f;
+      if (sx < -1 || sx > 1 || sy < -1 || sy > 1){ d[di+3] = 255; continue; }
+      const px = Math.round((sx+1)/2*(W-1));
+      const py = Math.round((sy+1)/2*(H-1));
+      const si = (py*W+px)*4;
+      d[di]=s[si]; d[di+1]=s[si+1]; d[di+2]=s[si+2]; d[di+3]=255;
+    }
+  }
+  return dst;
+}
+
+/* ----- pattern builders ----- */
+function scanPattern(){
+  const sp = Math.max(2, Math.round(state.scanSpacing));
+  const a = state.scanIntensity/100 * 0.72;
+  const t = mkCanvas(4, sp);
+  const c = t.getContext('2d');
+  const th = Math.max(1, Math.floor(sp/2));
+  c.fillStyle = `rgba(0,0,0,${a})`;
+  c.fillRect(0, sp-th, 4, th);
+  return vctx.createPattern(t, 'repeat');
+}
+function grillePattern(){
+  const k = state.grille/100 * 0.85;
+  const lo = Math.round(255*(1-k));
+  const cell = 2;
+  const t = mkCanvas(cell*3, 3);
+  const c = t.getContext('2d');
+  c.fillStyle = `rgb(255,${lo},${lo})`; c.fillRect(0,0,cell,3);
+  c.fillStyle = `rgb(${lo},255,${lo})`; c.fillRect(cell,0,cell,3);
+  c.fillStyle = `rgb(${lo},${lo},255)`; c.fillRect(cell*2,0,cell,3);
+  // subtle horizontal shadow-mask line
+  c.fillStyle = `rgba(0,0,0,${k*0.25})`; c.fillRect(0,2,cell*3,1);
+  return vctx.createPattern(t, 'repeat');
+}
+
+/* ----- noise tiles ----- */
+const NOISE_TILES = [];
+(function buildNoise(){
+  for (let n=0;n<6;n++){
+    const t = mkCanvas(220,165);
+    const c = t.getContext('2d');
+    const id = c.createImageData(220,165);
+    for (let i=0;i<id.data.length;i+=4){
+      const v = Math.random()*255;
+      id.data[i]=id.data[i+1]=id.data[i+2]=v;
+      id.data[i+3] = Math.random()*255;
+    }
+    c.putImageData(id,0,0);
+    NOISE_TILES.push(t);
+  }
+})();
+const noisePatterns = NOISE_TILES.map(t => vctx.createPattern(t,'repeat'));
+
+/* ----- build the static base image ----- */
+function renderBase(){
+  drawSubject();
+  const subj = sctx.getImageData(0,0,W,H);
+  let data = applyTintAndAdjust(subj);
+  const caPx = state.aberration/100 * 6;
+  data = applyCA(data, caPx);
+  wctx.putImageData(data, 0, 0);
+
+  // bloom / glow
+  if (state.glow > 0){
+    const r = state.glow/100 * 14;
+    const a = state.glow/100 * 0.9;
+    tctx.clearRect(0,0,W,H);
+    tctx.drawImage(workCanvas,0,0);
+    wctx.save();
+    wctx.globalCompositeOperation = 'lighter';
+    wctx.globalAlpha = a;
+    wctx.filter = `blur(${r}px)`;
+    wctx.drawImage(tmpCanvas,0,0);
+    wctx.restore();
+  }
+
+  // scanlines
+  if (state.scanIntensity > 0){
+    wctx.save();
+    wctx.fillStyle = scanPattern();
+    wctx.fillRect(0,0,W,H);
+    wctx.restore();
+  }
+  // aperture grille
+  if (state.grille > 0){
+    wctx.save();
+    wctx.globalCompositeOperation = 'multiply';
+    wctx.fillStyle = grillePattern();
+    wctx.fillRect(0,0,W,H);
+    wctx.restore();
+  }
+  // vignette
+  if (state.vignette > 0){
+    const vg = state.vignette/100;
+    const g = wctx.createRadialGradient(W/2,H/2, W*0.28, W/2,H/2, W*0.62);
+    g.addColorStop(0,'rgba(0,0,0,0)');
+    g.addColorStop(1,`rgba(0,0,0,${vg*0.92})`);
+    wctx.save();
+    wctx.fillStyle = g;
+    wctx.fillRect(0,0,W,H);
+    wctx.restore();
+  }
+
+  // barrel warp -> baseCanvas
+  const k = state.curvature/100 * 0.35;
+  bctx.clearRect(0,0,W,H);
+  bctx.fillStyle = '#000'; bctx.fillRect(0,0,W,H);
+  if (k > 0){
+    bctx.putImageData(applyWarp(workCanvas, k), 0, 0);
+  } else {
+    bctx.drawImage(workCanvas, 0, 0);
+  }
+}
+
+/* ----- per-frame composite ----- */
+function renderFrame(t){
+  vctx.clearRect(0,0,W,H);
+  vctx.drawImage(baseCanvas, 0, 0);
+  const motion = motionOK();
+
+  if (state.noise > 0){
+    const idx = motion ? Math.floor(t/90) % noisePatterns.length : 0;
+    vctx.save();
+    vctx.globalCompositeOperation = 'overlay';
+    vctx.globalAlpha = state.noise/100 * 0.55;
+    vctx.fillStyle = noisePatterns[idx];
+    vctx.fillRect(0,0,W,H);
+    vctx.restore();
+  }
+  if (state.rollBand && motion){
+    const bandH = H * 0.28, period = 3400;
+    const pos = ((t % period)/period) * (H + bandH) - bandH;
+    const g = vctx.createLinearGradient(0, pos, 0, pos+bandH);
+    g.addColorStop(0,'rgba(255,255,255,0)');
+    g.addColorStop(0.5,'rgba(255,255,255,0.10)');
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    vctx.save();
+    vctx.globalCompositeOperation = 'lighter';
+    vctx.fillStyle = g;
+    vctx.fillRect(0, pos, W, bandH);
+    vctx.restore();
+  }
+  if (state.flicker > 0 && motion){
+    const amp = state.flicker/100 * 0.10;
+    const a = amp * (0.5 + 0.5*Math.sin(t*0.028));
+    vctx.save();
+    vctx.fillStyle = `rgba(0,0,0,${a})`;
+    vctx.fillRect(0,0,W,H);
+    vctx.restore();
+  }
+}
+
+/* ----- animation loop (coalesced + stops when idle) ----- */
+let dirty = true, rafId = null;
+function animating(){ return (state.flicker>0 || state.rollBand || state.noise>0); }
+function loop(t){
+  if (dirty){ renderBase(); dirty = false; }
+  renderFrame(t);
+  if (animating() && motionOK()){ rafId = requestAnimationFrame(loop); }
+  else { rafId = null; }
+}
+function kick(){ if (rafId == null) rafId = requestAnimationFrame(loop); }
+function scheduleRender(){ dirty = true; kick(); syncHash(); buildCSS(); }
+
+mqReduce.addEventListener('change', () => { $('#motionNote').hidden = motionOK(); dirty = true; kick(); });
+
+/* ==================== BUILD CONTROLS ==================== */
+const fxWrap = $('#fxControls');
+const fxRefs = {};
+FX.forEach(f => {
+  const row = document.createElement('div');
+  row.className = 'sliderrow';
+  row.innerHTML = `<label for="fx_${f.k}">${f.l}</label>
+    <input type="range" id="fx_${f.k}" min="${f.min}" max="${f.max}" step="1" value="${state[f.k]}" aria-label="${f.l}">
+    <span class="val" id="fxv_${f.k}">${state[f.k]}${f.unit}</span>`;
+  const input = row.querySelector('input');
+  const val = row.querySelector('.val');
+  fxRefs[f.k] = { input, val, unit:f.unit };
+  input.addEventListener('input', () => {
+    state[f.k] = +input.value;
+    val.textContent = state[f.k] + f.unit;
+    clearActivePreset();
+    scheduleRender();
+  });
+  fxWrap.appendChild(row);
+});
+
+$('#rollBand').addEventListener('change', e => { state.rollBand = e.target.checked; clearActivePreset(); scheduleRender(); });
+
+/* subject seg */
+function setSubject(v){
+  state.subject = v;
+  $('#subText').setAttribute('aria-pressed', v==='text');
+  $('#subImage').setAttribute('aria-pressed', v==='image');
+  $('#subDemo').setAttribute('aria-pressed', v==='demo');
+  $('#textCtl').hidden = v!=='text';
+  $('#imageCtl').hidden = v!=='image';
+  scheduleRender();
+}
+$('#subText').addEventListener('click', ()=>{ setSubject('text'); });
+$('#subImage').addEventListener('click', ()=>{ setSubject('image'); });
+$('#subDemo').addEventListener('click', ()=>{ setSubject('demo'); });
+
+/* text controls */
+$('#msg').addEventListener('input', e => { state.text = e.target.value; scheduleRender(); });
+$('#ink').addEventListener('input', e => { state.ink = e.target.value; scheduleRender(); });
+$('#font').addEventListener('change', e => { state.font = e.target.value; scheduleRender(); });
+$('#fontSize').addEventListener('input', e => { state.fontSize = +e.target.value; $('#fontSizeVal').textContent = state.fontSize+'px'; scheduleRender(); });
+
+/* tint */
+$('#tint').addEventListener('change', e => {
+  state.tint = e.target.value;
+  $('#customWrap').hidden = state.tint !== 'c';
+  clearActivePreset(); scheduleRender();
+});
+$('#custom').addEventListener('input', e => { state.custom = e.target.value; clearActivePreset(); scheduleRender(); });
+
+/* image load */
+const drop = $('#drop'), fileInput = $('#file');
+drop.addEventListener('click', () => fileInput.click());
+drop.addEventListener('keydown', e => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); fileInput.click(); } });
+fileInput.addEventListener('change', e => { if (e.target.files[0]) loadImage(e.target.files[0]); });
+['dragover','dragenter'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) loadImage(f); });
+function loadImage(file){
+  if (!file.type.startsWith('image/')){ $('#imgNote').textContent = 'That file is not an image.'; $('#imgNote').className = 'note err'; return; }
+  const url = URL.createObjectURL(file);
+  const im = new Image();
+  im.onload = () => { img = im; $('#imgNote').textContent = `Loaded ${file.name} (${im.width}×${im.height}).`; $('#imgNote').className = 'note'; setSubject('image'); };
+  im.onerror = () => { $('#imgNote').textContent = 'Could not read that image.'; $('#imgNote').className = 'note err'; };
+  im.src = url;
+}
+
+/* ==================== PRESETS ==================== */
+const presetWrap = $('#presets');
+Object.keys(PRESETS).forEach(name => {
+  const p = PRESETS[name];
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'chip'; b.dataset.preset = name;
+  b.setAttribute('aria-pressed','false');
+  b.innerHTML = `<span class="dot" style="background:${p.dot}"></span>${name}`;
+  b.addEventListener('click', () => applyPreset(name));
+  presetWrap.appendChild(b);
+});
+function applyPreset(name){
+  const p = PRESETS[name];
+  Object.keys(p).forEach(k => { if (k!=='dot') state[k] = p[k]; });
+  if (name === 'Game Boy DMG') state.custom = p.custom;
+  syncControls();
+  markActivePreset(name);
+  scheduleRender();
+}
+function markActivePreset(name){
+  presetWrap.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.preset===name)));
+}
+function clearActivePreset(){ presetWrap.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed','false')); }
+
+$('#resetBtn').addEventListener('click', () => {
+  state = clone(DEFAULTS); state.text = DEFAULT_TEXT;
+  syncControls(); markActivePreset('Green terminal'); scheduleRender();
+});
+
+/* push state -> control widgets */
+function syncControls(){
+  FX.forEach(f => { fxRefs[f.k].input.value = state[f.k]; fxRefs[f.k].val.textContent = state[f.k] + fxRefs[f.k].unit; });
+  $('#rollBand').checked = !!state.rollBand;
+  $('#msg').value = state.text;
+  $('#ink').value = state.ink;
+  $('#font').value = state.font;
+  $('#fontSize').value = state.fontSize; $('#fontSizeVal').textContent = state.fontSize+'px';
+  $('#tint').value = state.tint; $('#customWrap').hidden = state.tint!=='c';
+  $('#custom').value = state.custom;
+  setSubjectUI(state.subject);
+}
+function setSubjectUI(v){
+  $('#subText').setAttribute('aria-pressed', v==='text');
+  $('#subImage').setAttribute('aria-pressed', v==='image');
+  $('#subDemo').setAttribute('aria-pressed', v==='demo');
+  $('#textCtl').hidden = v!=='text';
+  $('#imageCtl').hidden = v!=='image';
+}
+
+/* ==================== CSS EXPORT ==================== */
+function phosphor(){
+  const t = tintRGB();
+  if (state.tint==='f') return { ink: state.ink, bg:'#050505' };
+  const map = { g:'#030a04', a:'#0a0600', w:'#05060a', c:'#050705' };
+  return { ink: `rgb(${t[0]},${t[1]},${t[2]})`, bg: map[state.tint] || '#050505' };
+}
+function buildCSS(){
+  const s = state;
+  const ph = phosphor();
+  const sp = Math.max(2, Math.round(s.scanSpacing));
+  const scanA = (s.scanIntensity/100*0.72).toFixed(2);
+  const br = (s.brightness/100).toFixed(2), ct = (s.contrast/100).toFixed(2);
+  const glowR = (s.glow/100*8).toFixed(1);
+  const ca = (s.aberration/100*3).toFixed(1);
+  const curv = Math.round(s.curvature/100*26);
+  const vigA = (s.vignette/100*0.95).toFixed(2);
+  const grK = (s.grille/100*0.45).toFixed(2);
+  const flDim = (1 - s.flicker/100*0.06).toFixed(3);
+
+  // text-shadow (chromatic aberration + glow)
+  const shadow = [];
+  if (s.aberration>0){ shadow.push(`${ca}px 0 rgba(255,0,60,.55)`, `-${ca}px 0 rgba(0,220,255,.55)`); }
+  if (s.glow>0){ shadow.push(`0 0 ${(s.glow/100*10).toFixed(1)}px ${ph.ink}`); }
+  const textShadow = shadow.length ? shadow.join(', ') : 'none';
+
+  const filterParts = [`brightness(${br})`, `contrast(${ct})`];
+  if (s.glow>0) filterParts.push(`drop-shadow(0 0 ${glowR}px ${ph.ink})`);
+  if (s.tint!=='f') filterParts.push('saturate(1.15)');
+
+  // box-shadow: vignette (inset) + bezel bloom — always non-empty
+  const box = [];
+  if (s.vignette>0) box.push(`inset 0 0 90px 24px rgba(0,0,0,${vigA})`);
+  else box.push('inset 0 0 0 1px rgba(0,0,0,.35)');
+  if (s.glow>0) box.push(`0 0 26px rgba(${(tintRGB()||[120,160,255]).join(',')},.30)`);
+  else box.push('0 2px 10px rgba(0,0,0,.4)');
+
+  let css = `/* --- CRT Effect Lab · apply class="crt" to any element --- */
+.crt {
+  --crt-ink: ${ph.ink};
+  position: relative;
+  display: inline-block;
+  padding: 22px 26px;
+  font-family: ${s.font==='sans' ? 'system-ui, sans-serif' : 'ui-monospace, Menlo, Consolas, monospace'};
+  font-size: ${s.fontSize}px;
+  line-height: 1.4;
+  color: var(--crt-ink);
+  background-color: ${ph.bg};
+  background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0, rgba(0,0,0,0) ${sp-1}px,
+      rgba(0,0,0,${scanA}) ${sp-1}px, rgba(0,0,0,${scanA}) ${sp}px);
+  border-radius: ${curv}px;
+  overflow: hidden;
+  text-shadow: ${textShadow};
+  filter: ${filterParts.join(' ')};
+  box-shadow: ${box.join(',\n    ')};${s.flicker>0 ? `\n  animation: crt-flicker ${(0.12 + (100-s.flicker)/100*0.2).toFixed(2)}s steps(2,end) infinite;` : ''}
+}`;
+
+  if (s.grille>0){
+    css += `
+/* aperture grille (RGB sub-pixel mask) */
+.crt::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: repeating-linear-gradient(
+      to right,
+      rgba(255,0,0,${grK}) 0, rgba(255,0,0,${grK}) 1px,
+      rgba(0,255,0,${grK}) 1px, rgba(0,255,0,${grK}) 2px,
+      rgba(0,0,255,${grK}) 2px, rgba(0,0,255,${grK}) 3px);
+  mix-blend-mode: multiply;
+}`;
+  }
+  if (s.rollBand){
+    css += `
+/* rolling scanline band */
+.crt::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 26%;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,.10), transparent);
+  mix-blend-mode: screen; pointer-events: none;
+  animation: crt-roll 3.4s linear infinite;
+}
+@keyframes crt-roll { from { transform: translateY(-120%); } to { transform: translateY(420%); } }`;
+  }
+  if (s.flicker>0){
+    css += `
+@keyframes crt-flicker { 0%,100% { opacity: 1; } 50% { opacity: ${flDim}; } }`;
+  }
+  if (s.flicker>0 || s.rollBand){
+    css += `
+@media (prefers-reduced-motion: reduce) {
+  .crt { animation: none; }
+  .crt::after { animation: none; display: none; }
+}`;
+  }
+  $('#cssCode').textContent = css;
+  return css;
+}
+
+/* ==================== COPY / DOWNLOAD ==================== */
+function flashBtn(b, txt, err){
+  if (!b.dataset.orig) b.dataset.orig = b.textContent;
+  b.textContent = txt; b.classList.add(err ? 'copyerr' : 'copied');
+  setTimeout(() => { b.textContent = b.dataset.orig; b.classList.remove('copied','copyerr'); }, 1200);
+}
+$('#cssCopy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText($('#cssCode').textContent); flashBtn($('#cssCopy'), '✓ Copied'); }
+  catch(e){ flashBtn($('#cssCopy'), 'Copy failed', true); }
+});
+$('#linkBtn').addEventListener('click', async () => {
+  syncHash();
+  try { await navigator.clipboard.writeText(location.href); flashBtn($('#linkBtn'), '✓ Link copied'); }
+  catch(e){ flashBtn($('#linkBtn'), 'Copy failed', true); }
+});
+$('#pngBtn').addEventListener('click', () => {
+  // ensure a fresh frame is on the visible canvas
+  if (dirty){ renderBase(); dirty = false; }
+  renderFrame(performance.now());
+  screen.toBlob(blob => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'crt-effect.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    flashBtn($('#pngBtn'), '✓ Saved');
+  }, 'image/png');
+});
+
+/* ==================== URL HASH ==================== */
+function syncHash(){
+  if (booting) return;
+  const s = state;
+  const p = [];
+  p.push('su=' + s.subject[0]);            // t / i / d
+  p.push('tx=' + encodeURIComponent(s.text));
+  p.push('fs=' + s.fontSize);
+  p.push('ff=' + (s.font==='sans'?'s':'m'));
+  p.push('ic=' + s.ink.slice(1));
+  p.push('tn=' + s.tint);
+  p.push('cc=' + s.custom.slice(1));
+  FX.forEach(f => p.push(f.k + '=' + Math.round(s[f.k])));
+  p.push('rb=' + (s.rollBand?1:0));
+  history.replaceState(null, '', '#' + p.join('&'));
+}
+function readHash(){
+  const h = location.hash.slice(1);
+  if (!h) return;
+  const m = {};
+  h.split('&').forEach(kv => { const i = kv.indexOf('='); if (i>0) m[kv.slice(0,i)] = kv.slice(i+1); });
+  try {
+    if (m.su) state.subject = ({t:'text', i:'image', d:'demo'})[m.su] || 'text';
+    if (state.subject === 'image') state.subject = 'demo'; // image can't be restored from URL
+    if (m.tx!=null) state.text = decodeURIComponent(m.tx);
+    if (m.fs) state.fontSize = clamp(Math.round(+m.fs)||26, 12, 52);
+    if (m.ff) state.font = m.ff==='s' ? 'sans' : 'mono';
+    if (m.ic && /^[0-9a-fA-F]{6}$/.test(m.ic)) state.ink = '#'+m.ic;
+    if (m.tn && ['g','a','w','f','c'].includes(m.tn)) state.tint = m.tn;
+    if (m.cc && /^[0-9a-fA-F]{6}$/.test(m.cc)) state.custom = '#'+m.cc;
+    FX.forEach(f => { if (m[f.k]!=null && isFinite(+m[f.k])) state[f.k] = clamp(Math.round(+m[f.k]), f.min, f.max); });
+    if (m.rb!=null) state.rollBand = m.rb==='1';
+  } catch(e){ state = clone(DEFAULTS); state.text = DEFAULT_TEXT; }
+}
+
+/* ==================== theme toggle ==================== */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+
+/* ==================== boot ==================== */
+readHash();
+syncControls();
+$('#motionNote').hidden = motionOK();
+// mark preset chip if state exactly matches one
+(function detectPreset(){
+  for (const name of Object.keys(PRESETS)){
+    const p = PRESETS[name];
+    if (Object.keys(p).every(k => k==='dot' || k==='custom' || state[k]===p[k])){ markActivePreset(name); return; }
+  }
+})();
+booting = false;
+buildCSS();
+scheduleRender();
+</script>
+</body>
+</html>

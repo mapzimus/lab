@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spatial Data Scraper</title>
+<meta name="description" content="Extract locations from a URL or pasted page text, optionally geocode via free OpenStreetMap with a map preview, and export JSON, CSV or GeoJSON. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin:0; min-height:100%; }
+  body { background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.5; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 56px; }
+
+  header.app { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:16px; }
+  header.app h1 { font-size:1.5rem; margin:0 0 4px; letter-spacing:-0.01em; }
+  header.app p { margin:0; color:var(--muted); font-size:.92rem; max-width:66ch; }
+  .theme-toggle { flex:none; border:1px solid var(--border); background:var(--surface); color:var(--text); border-radius:999px; padding:8px 14px; cursor:pointer; font-size:.85rem; }
+  .theme-toggle:hover { background:var(--surface-2); }
+  .backlink { display:inline-block; color:var(--muted); text-decoration:none; font-size:.82rem; margin:0 0 10px; }
+  .backlink:hover { color:var(--accent); }
+
+  .panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px; }
+  .cap { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:8px; }
+  .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  input[type=url], input[type=number] { font-family:var(--mono); font-size:.93rem; background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:9px; padding:11px 12px; }
+  input[type=url] { flex:1 1 320px; }
+  input[type=number] { width:84px; }
+  input:focus, textarea:focus { outline:2px solid var(--accent); outline-offset:-1px; border-color:var(--accent); }
+  textarea { width:100%; min-height:130px; font-family:var(--mono); font-size:.82rem; background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:9px; padding:10px; }
+  textarea.drag { border-color:var(--accent); outline:2px dashed var(--accent); }
+  .or { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:.78rem; margin:14px 0 8px; text-transform:uppercase; letter-spacing:.06em; }
+  .or::before, .or::after { content:''; flex:1; height:1px; background:var(--border); }
+  label.opt { font-size:.88rem; display:inline-flex; align-items:center; gap:6px; }
+  label.opt input[type=checkbox] { accent-color:var(--accent); width:16px; height:16px; }
+  .opts { display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin-top:12px; }
+  .btn { border:1px solid var(--border); background:var(--surface); color:var(--text); border-radius:9px; padding:11px 16px; font-size:.9rem; cursor:pointer; }
+  .btn:hover { border-color:var(--accent); color:var(--accent); }
+  .btn.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:600; }
+  .btn.primary:hover { filter:brightness(1.05); color:var(--accent-ink); }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+  .status { margin-top:12px; color:var(--muted); font-size:.88rem; min-height:1.2em; }
+  .status.err { color:var(--danger); }
+  .hint { color:var(--muted); font-size:.78rem; margin-top:6px; }
+
+  .results { margin-top:20px; }
+  .results-head { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .results-head h2 { font-size:1.1rem; margin:0; }
+  .tablewrap { overflow-x:auto; border:1px solid var(--border); border-radius:10px; max-height:60vh; overflow-y:auto; }
+  table { border-collapse:collapse; width:100%; font-size:.84rem; }
+  th, td { border-bottom:1px solid var(--border); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { position:sticky; top:0; background:var(--surface-2); z-index:1; }
+  td.ctx { color:var(--muted); max-width:340px; }
+  td.num { font-family:var(--mono); white-space:nowrap; }
+  .tag { font-size:.72rem; border:1px solid var(--border); border-radius:6px; padding:1px 7px; background:var(--surface-2); text-transform:capitalize; white-space:nowrap; }
+
+  .fmt-label { color:var(--muted); font-size:.82rem; }
+  select.fmt { font-family:var(--sans); font-size:.88rem; background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:9px; padding:10px 12px; cursor:pointer; }
+  select.fmt:focus { outline:2px solid var(--accent); outline-offset:-1px; border-color:var(--accent); }
+  .btn.copied { color:var(--ok); border-color:var(--ok); }
+  .note.err { color:var(--danger); font-size:.8rem; margin:0 0 10px; text-align:right; }
+
+  .mappanel { margin-top:20px; }
+  #map, .map-fallback { height:380px; border-radius:9px; border:1px solid var(--border); background:var(--surface-2); }
+  .map-fallback { display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:.9rem; text-align:center; padding:24px; }
+  .leaflet-container { font-family:var(--sans); }
+  @media (max-width:720px){ #map, .map-fallback { height:280px; } }
+
+  footer.app { margin-top:22px; color:var(--muted); font-size:.8rem; text-align:center; }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>🗺️ Spatial Data Scraper</h1>
+      <p>Point it at a URL — or paste page text / drop an .html file — and it finds the locations mentioned: addresses, cities, countries, landmarks, rivers, parks. Optionally geocode them and preview them on a map, then export JSON, CSV or GeoJSON. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <section class="panel">
+    <div class="cap">Source</div>
+    <div class="row">
+      <input type="url" id="url" placeholder="https://en.wikipedia.org/wiki/Grand_Canyon" spellcheck="false">
+      <button class="btn primary" id="go">Extract</button>
+    </div>
+    <p class="hint">URL fetching tries a direct request first, then free CORS proxies (<a href="https://allorigins.win" target="_blank" rel="noopener">AllOrigins</a>, corsproxy.io) — so the URL you scrape passes through those services. Heavily script-rendered sites may come back thin; use paste instead.</p>
+    <div class="or">or paste text / HTML — or drop a saved .html file below</div>
+    <textarea id="paste" spellcheck="false" placeholder="Paste the page's text or HTML source here (Ctrl+A, Ctrl+C on any page), then press Extract."></textarea>
+    <div class="opts">
+      <label class="opt"><input type="checkbox" id="geocode"> Geocode to lat/lng <span class="tag">~1/sec · OpenStreetMap</span></label>
+      <label class="opt">Max geocode <input type="number" id="max" value="40" min="1" max="500"></label>
+    </div>
+    <div class="status" id="status"></div>
+  </section>
+
+  <section class="results" id="results" hidden>
+    <div class="results-head">
+      <h2 id="rtitle">Locations</h2>
+      <div class="row">
+        <label class="fmt-label" for="fmt">Export as</label>
+        <select class="fmt" id="fmt" aria-label="Export format">
+          <option value="json" selected>JSON</option>
+          <option value="csv">CSV</option>
+          <option value="geojson">GeoJSON</option>
+        </select>
+        <button class="btn" id="copyBtn">⧉ Copy</button>
+        <button class="btn" id="dlBtn">⬇ Download</button>
+      </div>
+    </div>
+    <p class="note err" id="exportNote" hidden></p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Location</th><th>Type</th><th>×</th><th>Lat</th><th>Lng</th><th>Context</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel mappanel" id="mapPanel" hidden>
+    <div class="cap">Map preview — geocoded locations</div>
+    <div id="map" aria-label="Map showing the geocoded locations"></div>
+  </section>
+
+  <footer class="app">Best-effort NER — review results before publishing · respect sites’ terms · a <strong>max</strong> tool</footer>
+</div>
+
+<script type="module">
+/* ============================================================
+   Spatial Data Scraper — fully client-side.
+   Fetch tiers: direct → public CORS proxies → paste/drop fallback.
+   Extraction: regex + gazetteer inline; compromise NER loaded in
+   the background (tool works without it).
+   Geocoding: OpenStreetMap Nominatim (CORS-enabled), ~1 req/sec.
+   ============================================================ */
+const $ = (s) => document.querySelector(s);
+
+// ---- optional NER lib, background-loaded (never blocks the tool) ----
+let nlp = null;
+import('https://cdn.jsdelivr.net/npm/compromise@14.14.0/+esm')
+  .then((m) => { nlp = m.default; })
+  .catch(() => console.warn('compromise NER unavailable — regex/gazetteer extraction still active.'));
+
+/* ---------------- extraction ---------------- */
+const STREET = "Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Way|Place|Pl|Terrace|Ter|Highway|Hwy|Parkway|Pkwy|Circle|Cir|Square|Sq|Trail|Trl|Alley|Row";
+const NATURAL = "River|Lake|Mountains?|Mount|Mt|Falls|Bay|Beach|Islands?|Forest|Desert|Valley|Canyon|Glacier|Volcano|Reef|Sea|Ocean|Gulf|Strait|Peninsula|Cape|Springs?|Creek|Lagoon|Marsh|Wetlands?|Dunes?|Cliffs?|Gorge|Plateau|Fjord|Delta|Basin";
+const LANDMARK = "National Park|State Park|Bridge|Cathedral|Temple|Mosque|Basilica|Palace|Castle|Fort|Tower|Stadium|Arena|Airport|Station|University|College|Museum|Gallery|Library|Market|Plaza|Monument|Memorial|Gardens?|Zoo|Aquarium|Observatory";
+const COUNTRIES = new Set(['afghanistan','albania','algeria','argentina','armenia','australia','austria','azerbaijan','bahamas','bahrain','bangladesh','belarus','belgium','belize','benin','bhutan','bolivia','bosnia','botswana','brazil','brunei','bulgaria','burkina faso','burundi','cambodia','cameroon','canada','chad','chile','china','colombia','congo','costa rica','croatia','cuba','cyprus','czechia','czech republic','denmark','djibouti','dominican republic','ecuador','egypt','el salvador','estonia','ethiopia','fiji','finland','france','gabon','gambia','georgia','germany','ghana','greece','guatemala','guinea','guyana','haiti','honduras','hungary','iceland','india','indonesia','iran','iraq','ireland','israel','italy','jamaica','japan','jordan','kazakhstan','kenya','kosovo','kuwait','kyrgyzstan','laos','latvia','lebanon','lesotho','liberia','libya','lithuania','luxembourg','madagascar','malawi','malaysia','maldives','mali','malta','mauritania','mauritius','mexico','moldova','monaco','mongolia','montenegro','morocco','mozambique','myanmar','namibia','nepal','netherlands','new zealand','nicaragua','niger','nigeria','north korea','north macedonia','norway','oman','pakistan','panama','papua new guinea','paraguay','peru','philippines','poland','portugal','qatar','romania','russia','rwanda','samoa','saudi arabia','senegal','serbia','seychelles','sierra leone','singapore','slovakia','slovenia','somalia','south africa','south korea','south sudan','spain','sri lanka','sudan','suriname','sweden','switzerland','syria','taiwan','tajikistan','tanzania','thailand','togo','tonga','trinidad','tunisia','turkey','turkmenistan','uganda','ukraine','united arab emirates','united kingdom','united states','uruguay','uzbekistan','vanuatu','venezuela','vietnam','yemen','zambia','zimbabwe','uk','usa','uae']);
+const US_STATES = new Set(['alabama','alaska','arizona','arkansas','california','colorado','connecticut','delaware','florida','georgia','hawaii','idaho','illinois','indiana','iowa','kansas','kentucky','louisiana','maine','maryland','massachusetts','michigan','minnesota','mississippi','missouri','montana','nebraska','nevada','new hampshire','new jersey','new mexico','new york','north carolina','north dakota','ohio','oklahoma','oregon','pennsylvania','rhode island','south carolina','south dakota','tennessee','texas','utah','vermont','virginia','washington','west virginia','wisconsin','wyoming']);
+const TYPE_RANK = { address:6, country:5, region:5, natural:4, landmark:3, place:1 };
+const betterType = (a,b) => (TYPE_RANK[b]||0) > (TYPE_RANK[a]||0) ? b : a;
+const escapeRe = (s) => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+// table/citation vocabulary that never belongs inside a place name
+const STATUS_RE = /\b(Terminated|Seasonal|Begins|Resumes|Focus|Retrieved|Archived|References?|Press|Release|Rank|Notes?|Refs?|edit|update|Sources?|Closes|Opens|Axes|Ends|Cuts|Adds|Launches|Expands|Announces|Extended|Destinations|Network)\b/i;
+// feature words that can't stand alone as a location ("International Airport")
+const GENERIC_WORDS = new Set(['international','regional','national','municipal','memorial','intercontinental','airport','airports','station','jetport','terminal','city','beach','park','bridge','university','museum','market','plaza','gardens','garden','tower','palace','castle']);
+// single words that are never a useful location on their own
+const STOP_SINGLE = new Set(['new','north','south','east','west','northern','southern','eastern','western','central','the','la','los','las','el','de','del','grand','great','san','santa','saint','st','mount','mt','lake','cape','fort','rio','sierra','isla','island','islands','other','top','domestic','destinations','country','territory','continent','range','star','colo','fares']);
+
+function snippet(text, idx, len){
+  if (idx == null || idx < 0) return '';
+  const start = Math.max(0, idx-55), end = Math.min(text.length, idx+len+55);
+  let s = text.slice(start,end).replace(/\s+/g,' ').trim();
+  if (start>0) s = '…'+s; if (end<text.length) s += '…';
+  return s;
+}
+
+function extractLocations(rawText){
+  // Normalize, then convert structure that never belongs inside one place name
+  // into hard line boundaries: citation markers, brackets/parens, quotes,
+  // pipes, arrows, and " / " alternatives. Extraction never crosses a line.
+  const text = String(rawText||'')
+    .replace(/ /g,' ')
+    .replace(/\[[^\]\n]{0,80}\]/g,'\n')
+    .replace(/[()\[\]{}|"“”«»·•↑↓←→]/g,'\n')
+    .replace(/[^\S\n]+\/[^\S\n]+/g,'\n')
+    .replace(/[^\S\n]*\n[^\S\n]*/g,'\n');
+  const S = "[^\\S\\n]";   // whitespace that can't cross a line boundary
+  const found = new Map();
+  const countOccurrences = (term) => {
+    try { return (text.match(new RegExp('\\b'+escapeRe(term)+'\\b','gi'))||[]).length || 1; } catch { return 1; }
+  };
+  const isJunk = (t) => {
+    if (t.length < 2 || /^[\d\s.,-]+$/.test(t) || t.includes('\n')) return true;
+    if (/^[a-z]/.test(t)) return true;                                      // "eastern United States" — not a proper noun
+    if (/^[A-Z]{2,4}$/.test(t)) return true;                                // IATA codes: "LAX", "JFK"
+    if (/\s[–—]\s/.test(t)) return true;                                    // route patterns: "BOSTON – EUROPE"
+    if (STATUS_RE.test(t)) return true;                                    // "...Airport Seasonal", "...Resumes"
+    const words = t.split(/\s+/);
+    if (words.length > 6) return true;                                     // runaway concatenations
+    if (words.length === 1 && STOP_SINGLE.has(t.toLowerCase())) return true;   // "New", "North", ...
+    if (words.every(w => GENERIC_WORDS.has(w.toLowerCase()))) return true;      // "International Airport"
+    if (/^(\S+(?:\s+\S+)?)\s+\1\b/i.test(t)) return true;                  // "Belize Belize City"
+    if (words.length >= 2 && words.some(w => /^(Star|Times|Post|Herald|Tribune|Journal|Gazette|Chronicle|Globe)$/i.test(w))) return true; // newspaper names: "Kansas City Star"
+    return false;
+  };
+  const add = (raw, type, idx) => {
+    const t = raw.trim().replace(/\s+/g,' ')
+      .replace(/^["'“”‘’.,;:!?\-–—\s]+/,'')
+      .replace(/["'“”‘’.,;:!?\-–—\s]+$/,'');
+    if (isJunk(t)) return;
+    const key = t.toLowerCase();
+    let e = found.get(key);
+    if (!e){ found.set(key, { text:t, type, count:countOccurrences(t), context:snippet(text, idx, t.length), lat:null, lng:null, displayName:null }); }
+    else e.type = betterType(e.type, type);
+  };
+  const scan = (re, type) => { let m; while ((m = re.exec(text)) !== null) add(m[0], type, m.index); };
+
+  scan(new RegExp(`\\b\\d{1,6}${S}+(?:\\p{Lu}[\\p{L}.'’–—-]+${S}+){1,4}(?:${STREET})\\b\\.?`,'gu'), 'address');
+  scan(new RegExp(`\\b(?:\\p{Lu}[\\p{L}'’–—-]+${S}+){1,3}(?:${NATURAL})\\b`,'gu'), 'natural');
+  scan(new RegExp(`\\b(?:Mount|Mt|Lake|Cape|Rio)\\.?${S}+\\p{Lu}[\\p{L}'’–—-]+\\b`,'gu'), 'natural');
+  scan(new RegExp(`\\b(?:Fort|San|Santa|Saint|St|Sierra|Isla)\\.?${S}+\\p{Lu}[\\p{L}'’–—-]+\\b`,'gu'), 'place');
+  scan(new RegExp(`\\b(?:\\p{Lu}[\\p{L}'’–—-]+${S}+){1,4}(?:${LANDMARK})\\b`,'gu'), 'landmark');
+
+  if (nlp){
+    try {
+      const doc = nlp(text.slice(0, 400000));   // NER cost guard on huge pages
+      let places = [];
+      try { places = doc.places().out('array'); } catch { places = doc.match('#Place+').out('array'); }
+      for (const p of places){
+        const t = p.trim().replace(/[.,;:]+$/,'');
+        if (t.length < 2) continue;
+        const low = t.toLowerCase();
+        const type = COUNTRIES.has(low) ? 'country' : (US_STATES.has(low) ? 'region' : 'place');
+        add(t, type, text.indexOf(t));
+      }
+    } catch { /* NER is optional */ }
+  }
+
+  for (const [name, type] of [...[...COUNTRIES].map(c=>[c,'country']), ...[...US_STATES].map(s=>[s,'region'])]){
+    if (name.length < 4) continue;
+    const m = new RegExp(`\\b${escapeRe(name)}\\b`,'i').exec(text);
+    if (m) add(m[0], type, m.index);
+  }
+
+  // Suppress substring shadows: partial matches ("Lake City", "Dominican")
+  // that never occur outside a longer entity ("Salt Lake City", "Dominican
+  // Republic"). Kept when they also appear on their own (count exceeds the
+  // container's).
+  const list = [...found.values()];
+  const kept = list.filter(e => {
+    if (list.some(c =>
+      c !== e && c.text.length > e.text.length &&
+      new RegExp(`\\b${escapeRe(e.text)}\\b`,'i').test(c.text) &&
+      e.count <= c.count)) return false;
+    const hm = /^(\p{Lu}[\p{L}]+)-(\p{Lu}[\p{L}]+)$/u.exec(e.text);
+    if (hm && found.has(hm[1].toLowerCase()) && found.has(hm[2].toLowerCase())) return false;
+    return true;
+  });
+  return kept.sort((a,b)=> b.count-a.count || a.text.localeCompare(b.text));
+}
+
+/* ---------------- HTML → text ---------------- */
+// Block-level elements become line boundaries so table cells, list items and
+// paragraphs can never fuse into one "location". <sup> (citation markers) is
+// dropped entirely.
+const BLOCK_TAGS = new Set(['P','DIV','LI','UL','OL','TABLE','THEAD','TBODY','TFOOT','TR','TD','TH','CAPTION','H1','H2','H3','H4','H5','H6','BR','HR','SECTION','ARTICLE','HEADER','FOOTER','NAV','ASIDE','BLOCKQUOTE','PRE','FIGURE','FIGCAPTION','DL','DT','DD','ADDRESS','FORM','FIELDSET']);
+function htmlToText(html){
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  doc.querySelectorAll('script,style,noscript,svg,template,iframe,sup').forEach(n=>n.remove());
+  const title = doc.title || '';
+  const parts = [];
+  (function walk(node){
+    for (const child of node.childNodes){
+      if (child.nodeType === 3){
+        const s = child.nodeValue.replace(/\s+/g,' ');
+        if (s.trim()) parts.push(s);
+      } else if (child.nodeType === 1){
+        const block = BLOCK_TAGS.has(child.tagName);
+        if (block) parts.push('\n');
+        walk(child);
+        if (block) parts.push('\n');
+      }
+    }
+  })(doc.body || doc.documentElement);
+  const text = parts.join(' ')
+    .replace(/[ \t]*\n[ \t]*/g,'\n')
+    .replace(/\n{2,}/g,'\n')
+    .replace(/[ \t]{2,}/g,' ')
+    .trim();
+  return { title, text };
+}
+const looksLikeHtml = (s) => /<[a-z][\s\S]*>/i.test(s) && /<\/(p|div|body|a|span|h\d|li|html)>/i.test(s);
+
+/* ---------------- URL fetching (tiered) ---------------- */
+async function fetchPage(url, onLog){
+  const attempts = [
+    { name:'direct', u:url },
+    { name:'AllOrigins proxy', u:'https://api.allorigins.win/raw?url='+encodeURIComponent(url) },
+    { name:'corsproxy.io', u:'https://corsproxy.io/?url='+encodeURIComponent(url) },
+  ];
+  for (const a of attempts){
+    try {
+      onLog(`Fetching (${a.name})…`);
+      const res = await fetch(a.u, { redirect:'follow' });
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      const body = await res.text();
+      if (body && body.trim().length > 40) return { body, via:a.name };
+    } catch (e) { /* try next tier */ }
+  }
+  throw new Error('Couldn’t fetch that URL from the browser (CORS or the proxies are down). Open the page yourself, select-all + copy, and paste it below.');
+}
+
+/* ---------------- geocoding (Nominatim) ---------------- */
+const geoCache = new Map();
+const sleep = (ms) => new Promise(r=>setTimeout(r,ms));
+async function geocodeOne(q){
+  if (geoCache.has(q)) return geoCache.get(q);
+  let out = { lat:null, lng:null, displayName:null };
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(q)}`, { headers:{ 'Accept':'application/json' } });
+    if (res.ok){ const d = await res.json(); if (d && d[0]) out = { lat:+d[0].lat, lng:+d[0].lon, displayName:d[0].display_name }; }
+  } catch { /* fail soft */ }
+  geoCache.set(q, out);
+  return out;
+}
+async function geocodeAll(entities, max, onLog){
+  const targets = entities.slice(0, max);
+  let resolved = 0;
+  for (let i=0;i<targets.length;i++){
+    const e = targets[i];
+    const r = await geocodeOne(e.text);
+    e.lat = r.lat; e.lng = r.lng; e.displayName = r.displayName;
+    if (r.lat != null){ resolved++; updateMapPreview(entities); }   // fire-and-forget: map streams in behind the queue
+    onLog(`Geocoding ${i+1}/${targets.length}…`);
+    if (i < targets.length-1) await sleep(1100);   // Nominatim: stay ≤1 req/sec
+  }
+  return resolved;
+}
+
+/* ---------------- map preview (Leaflet 1.9.4, fetched on demand) ----------------
+   Nothing Leaflet-related touches the network on page load: the library is
+   background-loaded only when geocoding produces its first hit, and the tool
+   keeps working (with a friendly note in the panel) if the CDN is blocked. */
+let leafletLoading = null, mapFailed = false;
+let map = null, markerLayer = null, mapEntities = null;
+function loadLeaflet(){
+  if (window.L) return Promise.resolve();
+  if (!leafletLoading){
+    leafletLoading = new Promise((resolve, reject) => {
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='; css.crossOrigin = '';
+      const js = document.createElement('script');
+      js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      js.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='; js.crossOrigin = '';
+      js.onload = () => window.L ? resolve() : reject(new Error('Leaflet did not initialize'));
+      js.onerror = () => reject(new Error('Leaflet failed to load'));
+      document.head.append(css, js);
+    });
+  }
+  return leafletLoading;
+}
+async function updateMapPreview(entities){
+  if (entities !== mapEntities) return;                        // a newer extraction owns the map
+  const pts = entities.filter(e => e.lat != null && e.lng != null);
+  if (!pts.length) return;
+  $('#mapPanel').hidden = false;
+  if (mapFailed) return;
+  try { await loadLeaflet(); }
+  catch {
+    mapFailed = true;
+    const el = $('#map');
+    el.className = 'map-fallback';
+    el.textContent = 'Map preview unavailable — the Leaflet library didn’t load. Geocoding and exports still work.';
+    return;
+  }
+  if (entities !== mapEntities) return;                        // run changed while the library loaded
+  if (!map){
+    map = L.map('map', { worldCopyJump:true });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+    markerLayer = L.layerGroup().addTo(map);
+  }
+  markerLayer.clearLayers();
+  for (const e of pts){
+    L.circleMarker([e.lat, e.lng], { radius:6, weight:2, color:'#2563eb', fillColor:'#3b82f6', fillOpacity:.45 })
+      .bindPopup(`<strong>${escHtml(e.text)}</strong>${e.displayName ? '<br>'+escHtml(e.displayName) : ''}`)
+      .addTo(markerLayer);
+  }
+  map.invalidateSize();
+  map.fitBounds(pts.map(e => [e.lat, e.lng]), { padding:[30,30], maxZoom:10 });
+}
+
+/* ---------------- formats ---------------- */
+function toCSV(entities){
+  const esc = (v) => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+  const head = 'text,type,count,latitude,longitude,matched_name,context';
+  return [head, ...entities.map(e => [e.text, e.type, e.count, e.lat ?? '', e.lng ?? '', e.displayName ?? '', e.context].map(esc).join(','))].join('\n');
+}
+function toJSONDoc(result){ return JSON.stringify(result, null, 2); }
+// GeoJSON: one Point Feature per successfully geocoded entity; the rest are omitted.
+function toGeoJSON(entities){
+  const features = entities.filter(e => e.lat != null && e.lng != null).map(e => ({
+    type: 'Feature',
+    geometry: { type:'Point', coordinates:[e.lng, e.lat] },
+    properties: { name:e.text, type:e.type, mentions:e.count, matched:e.displayName },
+  }));
+  return JSON.stringify({ type:'FeatureCollection', features }, null, 2);
+}
+
+/* ---------------- app ---------------- */
+let last = null;
+const setStatus = (msg, err) => { const s = $('#status'); s.textContent = msg; s.classList.toggle('err', !!err); };
+
+async function run(){
+  const url = $('#url').value.trim();
+  const pasted = $('#paste').value.trim();
+  if (!url && !pasted){ setStatus('Enter a URL or paste page text/HTML first.', true); return; }
+  $('#go').disabled = true;
+  try {
+    let title = '', text = '', sourceDesc = '';
+    if (url){
+      if (!/^https?:\/\//i.test(url)) throw new Error('URL must start with http:// or https://');
+      const { body, via } = await fetchPage(url, setStatus);
+      ({ title, text } = looksLikeHtml(body) ? htmlToText(body) : { title:'', text: body });
+      sourceDesc = `${url} (${via})`;
+    } else {
+      ({ title, text } = looksLikeHtml(pasted) ? htmlToText(pasted) : { title:'', text: pasted });
+      sourceDesc = 'pasted content';
+    }
+    setStatus('Extracting locations…');
+    await sleep(30); // let the status paint
+    const entities = extractLocations(text);
+    mapEntities = entities;                      // this run owns the map preview now
+    $('#mapPanel').hidden = true;                // reappears at the first geocode hit
+    if (markerLayer) markerLayer.clearLayers();
+    let geocoded = 0;
+    if ($('#geocode').checked && entities.length){
+      geocoded = await geocodeAll(entities, Math.min(150, +$('#max').value || 40), setStatus);
+    }
+    last = {
+      source: { url: url || null, title, scrapedAt: new Date().toISOString(), textLength: text.length },
+      counts: { locations: entities.length, geocoded },
+      locations: entities,
+    };
+    render(last);
+    setStatus(`Found ${entities.length} locations${geocoded ? `, geocoded ${geocoded}` : ''}${title ? ` · “${title}”` : ''} — from ${sourceDesc}`);
+  } catch (e) {
+    setStatus(e.message || String(e), true);
+  } finally {
+    $('#go').disabled = false;
+  }
+}
+
+const escHtml = (s) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function render(data){
+  $('#results').hidden = false;
+  exportNote('');
+  $('#rtitle').textContent = `${data.locations.length} locations`;
+  $('#rows').innerHTML = data.locations.map(e => `<tr>
+    <td>${escHtml(e.text)}</td>
+    <td><span class="tag">${escHtml(e.type)}</span></td>
+    <td class="num">${e.count}</td>
+    <td class="num">${e.lat ?? ''}</td>
+    <td class="num">${e.lng ?? ''}</td>
+    <td class="ctx">${escHtml(e.context)}</td></tr>`).join('')
+    || '<tr><td colspan="6" style="color:var(--muted)">No locations recognized.</td></tr>';
+}
+
+function download(name, content, mime){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type:mime }));
+  a.download = name; a.click(); URL.revokeObjectURL(a.href);
+}
+$('#go').addEventListener('click', run);
+$('#url').addEventListener('keydown', (e)=>{ if (e.key==='Enter') run(); });
+
+/* ---------------- export: format select + download + copy ---------------- */
+const exportNote = (msg) => { const n = $('#exportNote'); n.textContent = msg || ''; n.hidden = !msg; };
+function currentExport(){
+  if (!last) return null;
+  const fmt = $('#fmt').value;
+  if (fmt === 'geojson' && !last.locations.some(e => e.lat != null && e.lng != null)){
+    exportNote('Run geocoding first — GeoJSON needs coordinates.');
+    return null;
+  }
+  exportNote('');
+  if (fmt === 'csv')     return { name:'locations.csv',     mime:'text/csv',             content: toCSV(last.locations) };
+  if (fmt === 'geojson') return { name:'locations.geojson', mime:'application/geo+json', content: toGeoJSON(last.locations) };
+  return { name:'locations.json', mime:'application/json', content: toJSONDoc(last) };
+}
+$('#fmt').addEventListener('change', ()=> exportNote(''));
+$('#dlBtn').addEventListener('click', ()=>{ const p = currentExport(); if (p) download(p.name, p.content, p.mime); });
+let copyTimer = 0;
+$('#copyBtn').addEventListener('click', async ()=>{
+  const p = currentExport(); if (!p) return;
+  const b = $('#copyBtn');
+  try {
+    await navigator.clipboard.writeText(p.content);
+    clearTimeout(copyTimer);
+    b.classList.add('copied'); b.textContent = '✓ Copied';
+    copyTimer = setTimeout(()=>{ b.classList.remove('copied'); b.textContent = '⧉ Copy'; }, 1200);
+  } catch {
+    exportNote('Copy blocked by browser — use Download instead.');
+  }
+});
+
+// drop a saved .html/.txt file onto the textarea
+const ta = $('#paste');
+['dragover','dragleave','drop'].forEach(ev => ta.addEventListener(ev, (e)=>{
+  e.preventDefault();
+  ta.classList.toggle('drag', ev==='dragover');
+  if (ev==='drop' && e.dataTransfer.files[0]){
+    const f = e.dataTransfer.files[0];
+    f.text().then(t => { ta.value = t; $('#url').value=''; setStatus(`Loaded “${f.name}” (${t.length.toLocaleString()} chars) — press Extract.`); });
+  }
+}));
+
+/* ---------------- theme ---------------- */
+const root = document.documentElement;
+const saved = localStorage.getItem('sds-theme');
+if (saved) root.setAttribute('data-theme', saved);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next); localStorage.setItem('sds-theme', next);
+});
+
+// exposed for automated tests
+window.__sds = { extractLocations, htmlToText, toCSV, toGeoJSON };
+</script>
+</body>
+</html>

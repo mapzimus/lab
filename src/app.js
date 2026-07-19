@@ -66,15 +66,18 @@
     }).join("");
     const favorite = state.favorites.has(item.slug);
     const cardClass = featured ? "featured-card" : "catalog-card";
+    const external = item.external || /^https?:\/\//i.test(item.url || "");
+    const targetAttrs = external ? ' target="_blank" rel="noopener"' : "";
+    const openLabel = external ? "Open ↗" : "Open";
     return `<article class="${cardClass}" data-slug="${escapeHtml(item.slug)}">
       <button class="star" type="button" aria-label="${favorite ? "Remove from" : "Add to"} favorites" aria-pressed="${favorite}">${favorite ? "★" : "☆"}</button>
-      <a class="card-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener" data-open-slug="${escapeHtml(item.slug)}">
+      <a class="card-link" href="${escapeHtml(item.url)}"${targetAttrs} data-open-slug="${escapeHtml(item.slug)}">
         <div class="card-icon" aria-hidden="true">${escapeHtml(item.icon || "↗")}</div>
         <div class="card-type">${escapeHtml(categoryLabels[item.category] || item.category)}</div>
         <h3>${escapeHtml(item.title)}</h3>
         <p class="card-copy">${escapeHtml(item.description)}</p>
         ${featured ? "" : `<div class="tags">${tags}</div>`}
-        <div class="card-footer"><span class="status">${escapeHtml(item.status || "live")}</span><span>Open ↗</span></div>
+        <div class="card-footer"><span class="status">${escapeHtml(item.status || "live")}</span><span>${openLabel}</span></div>
       </a>
     </article>`;
   }
@@ -169,6 +172,6 @@
   }).catch(function () {
     resultCount.textContent = "Catalog unavailable";
     emptyState.hidden = false;
-    emptyState.textContent = "The catalog could not be loaded. The legacy tools remain available at mapzimus.github.io/max/.";
+    emptyState.textContent = "The catalog could not be loaded. Try refreshing, or browse /tools/ directly.";
   });
 })();
