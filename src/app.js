@@ -169,6 +169,6 @@
   }).catch(function () {
     resultCount.textContent = "Catalog unavailable";
     emptyState.hidden = false;
-    emptyState.textContent = "The catalog could not be loaded. The legacy tools remain available at mapzimus.github.io/max/.";
+    emptyState.textContent = "The catalog could not be loaded. The legacy tools remain available at mapzimus.com/tools/.";
   });
 })();
