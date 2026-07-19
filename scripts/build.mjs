@@ -50,6 +50,9 @@ const hostedProjectRoutes = {
   "mapzimus-board": "/mapzimus-board/",
   "train-route-atlas": "/lab/train-routes/",
   "predicting-housing-crisis": "/lab/housing-crisis/",
+  "tappymaps": "/tappymaps/",
+  "mcas-dashboard": "/mcas/",
+  "savvas-extraction": "/savvas/",
 };
 
 /** vendor/apps/<dir> → public route */

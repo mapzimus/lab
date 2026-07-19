@@ -27,8 +27,15 @@ if (!fs.existsSync(output)) {
   process.exit(1);
 }
 
+// Single-page snapshots of multi-page apps: their internal links point at
+// sub-pages that were deliberately not vendored, so skip dead-link checks
+// inside them (the pages themselves are still checked as link targets).
+const SNAPSHOT_APPS = ["tappymaps", "whydah", "mcas", "savvas", "geopuesto"];
+
 const htmlFiles = walk(output).filter((file) => file.endsWith(".html"));
 for (const file of htmlFiles) {
+  const rel = path.relative(output, file);
+  if (SNAPSHOT_APPS.some((dir) => rel === `${dir}/index.html` || rel.startsWith(`${dir}${path.sep}`))) continue;
   const html = fs.readFileSync(file, "utf8");
   const markup = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
   if (/mapzimus\.github\.io/i.test(markup)) {
