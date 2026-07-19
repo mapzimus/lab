@@ -24,7 +24,11 @@ const projects = loadCatalog("projects.json");
 const featuredSlugs = loadCatalog("featured.json");
 const fieldNotes = loadCatalog("field-notes.json");
 const linkGroups = loadCatalog("links.json");
-const catalog = [...tools, ...projects];
+// Source drives the section split: single-page tools vs bigger projects.
+const catalog = [
+  ...tools.map((item) => ({ ...item, source: "tools" })),
+  ...projects.map((item) => ({ ...item, source: "projects" })),
+];
 
 const problems = [];
 const seenSlugs = new Set();
@@ -67,12 +71,13 @@ const categoryLabels = {
   play: "Games",
   experiments: "Experiments",
 };
+// One home per item: map things → Maps, playable things → Games, utility
+// tools → Tools. Lab is source-based (all projects + anything unfinished).
 const viewCategories = {
   home: null,
-  lab: ["experiments"],
-  tools: ["maps", "data", "design", "teaching", "math", "fun"],
+  tools: ["data", "design", "teaching", "math", "fun"],
   maps: ["maps"],
-  games: ["fun", "play"],
+  games: ["play"],
 };
 
 function escapeHtml(value) {
@@ -96,9 +101,13 @@ function card(item, { featured = false, star = true } = {}) {
 
 function itemsForView(view, category) {
   return catalog.filter((item) => {
-    if (view === "lab" && (item.status || "live") !== "live") return true;
-    const allowed = viewCategories[view];
-    if (allowed && !allowed.includes(item.category)) return false;
+    if (view === "lab") {
+      if (item.source !== "projects" && (item.status || "live") === "live") return false;
+    } else {
+      if (view === "tools" && item.source !== "tools") return false;
+      const allowed = viewCategories[view];
+      if (allowed && !allowed.includes(item.category)) return false;
+    }
     return !category || item.category === category;
   });
 }
@@ -120,13 +129,16 @@ fs.rmSync(path.join(output, "_template.html"));
 
 const template = fs.readFileSync(path.join(source, "_template.html"), "utf8");
 const toolCategories = {
-  maps: ["Map tools", "Converters, viewers, geocoders, and other client-side GIS utilities."],
   data: ["Data tools", "CSV wrangling, charts, converters, and small data utilities."],
   design: ["Design tools", "Color, layout, media, and design helpers."],
   teaching: ["Teaching tools", "Classroom helpers and interactive teaching aids."],
   math: ["Math tools", "Calculators, solvers, and math visualizations."],
   fun: ["Fun & learning", "Playful tools and learning experiments."],
 };
+
+const utilityCount = itemsForView("tools", "").length;
+const mapCount = itemsForView("maps", "").length;
+const projectCount = itemsForView("lab", "").length;
 
 const pages = {
   home: {
@@ -142,41 +154,41 @@ const pages = {
   lab: {
     path: "lab/index.html",
     title: "Lab · Mapzimus",
-    description: "Prototypes and experiments in active development at Mapzimus.",
+    description: `The ${projectCount} projects of the Mapzimus lab: map apps, games, and experiments, including works in progress.`,
     canonical: "https://mapzimus.com/lab/",
-    eyebrow: "In development",
-    heading: "Works in progress",
-    intro: "Experiments and prototypes that are useful before they're finished. Things here can be rough, half-built, or change without notice.",
-    catalogHeading: "Experiments",
+    eyebrow: "The lab",
+    heading: "Projects and experiments",
+    intro: `The ${projectCount} bigger builds: map apps, games, and experiments — everything beyond the single-page tools, including works in progress.`,
+    catalogHeading: "All projects",
   },
   tools: {
     path: "tools/index.html",
     title: "Browser tools · Mapzimus",
-    description: `A searchable catalog of ${toolCount} standalone browser tools for maps, data, design, teaching, and math.`,
+    description: `A searchable catalog of ${utilityCount} standalone browser tools for data, design, teaching, and math.`,
     canonical: "https://mapzimus.com/tools/",
     eyebrow: "The tool catalog",
     heading: "Every tool, one page each",
-    intro: `${toolCount} standalone browser tools for maps, data, design, teaching, and math. Each is a single page that loads fast and does one job.`,
+    intro: `${utilityCount} standalone browser tools for data, design, teaching, math, and fun. Each is a single page that loads fast and does one job. Map tools have their own shelf under Maps.`,
     catalogHeading: "All tools",
   },
   maps: {
     path: "maps/index.html",
     title: "Maps · Mapzimus",
-    description: "Map projects and client-side GIS tools from Mapzimus.",
+    description: `All ${mapCount} map tools and map projects from Mapzimus: converters, GIS utilities, projection experiments, transit networks, and atlases.`,
     canonical: "https://mapzimus.com/maps/",
     eyebrow: "Maps & GIS",
-    heading: "Map projects and map tools",
-    intro: "Client-side GIS utilities next to projection experiments and fantasy transit networks.",
+    heading: "Everything maps",
+    intro: `All ${mapCount} map things in one place — converters and GIS utilities alongside projection experiments, transit networks, and atlases.`,
     catalogHeading: "All maps",
   },
   games: {
     path: "games/index.html",
     title: "Games · Mapzimus",
-    description: "Free browser games from Mapzimus: strategy, logic, geography, and classroom games.",
+    description: "Free browser games from Mapzimus — strategy and logic, no downloads.",
     canonical: "https://mapzimus.com/games/",
     eyebrow: "Playable",
-    heading: "Games and things to play",
-    intro: "Strategy and logic games, geography challenges, and classroom games — free in the browser, nothing to download.",
+    heading: "Games",
+    intro: "Actual games, made to be played — free in the browser, nothing to download.",
     catalogHeading: "All games",
   },
 };
@@ -271,6 +283,24 @@ const notesHtml = publishedNotes.map((note) => `<article class="note">
   ${note.body.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n  ")}
 </article>`).join("\n");
 fillStatic("field-notes/index.html", { NOTES: notesHtml || `<p class="empty">No notes yet.</p>` });
+
+const skills = loadCatalog("skills.json");
+const skillCards = skills.map((skill) => `<article class="skill-card">
+  <div class="card-top">
+    <div>
+      <span class="tagline">${escapeHtml(skill.tagline)}</span>
+      <h2>${escapeHtml(skill.title)}</h2>
+    </div>
+    <span class="meta">v${escapeHtml(skill.version)} · ${escapeHtml(skill.updated)} · ${escapeHtml(skill.sizeKb)} KB</span>
+  </div>
+  <p>${escapeHtml(skill.description)}</p>
+  <ul>${skill.teaches.map((t) => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
+  <div class="skill-actions">
+    <a class="download-button" href="${escapeHtml(skill.file)}" download>Download ${escapeHtml(skill.slug)}.skill</a>
+    <a class="source-link" href="${escapeHtml(skill.source)}">Read the source ↗</a>
+  </div>
+</article>`).join("\n");
+fillStatic("skills/index.html", { SKILL_CARDS: skillCards });
 
 // ---- Sitemap ----
 

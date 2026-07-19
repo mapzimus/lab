@@ -16,10 +16,9 @@
   // the initial grids so the catalog works without JavaScript.
   const viewCategories = {
     home: null,
-    lab: ["experiments"],
-    tools: ["maps", "data", "design", "teaching", "math", "fun"],
+    tools: ["data", "design", "teaching", "math", "fun"],
     maps: ["maps"],
-    games: ["fun", "play"],
+    games: ["play"],
   };
 
   function readFavorites() {
@@ -83,7 +82,8 @@
   }
 
   function allowedByView(item) {
-    if (view === "lab" && (item.status || "live") !== "live") return true;
+    if (view === "lab") return item.source === "projects" || (item.status || "live") !== "live";
+    if (view === "tools" && item.source !== "tools") return false;
     const allowed = viewCategories[view];
     return !allowed || allowed.includes(item.category);
   }
@@ -180,7 +180,9 @@
     fetch("/data/featured.json").then(function (response) { return response.json(); }),
   ]).then(function (collections) {
     state.featuredSlugs = collections.pop();
-    state.items = collections.flat();
+    // Tag the source; the Tools and Lab views split on it (matches build.mjs).
+    state.items = collections[0].map(function (item) { return { ...item, source: "tools" }; })
+      .concat(collections[1].map(function (item) { return { ...item, source: "projects" }; }));
     renderFilters();
     renderFeatured();
     renderCatalog();
