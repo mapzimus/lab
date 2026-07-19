@@ -70,18 +70,9 @@ const appRoutes = {
 const tools = loadCatalog("tools.json");
 const projects = loadCatalog("projects.json");
 const featuredSlugs = loadCatalog("featured.json");
-<<<<<<< HEAD
 const sourceCatalog = [...tools, ...projects];
-=======
 const fieldNotes = loadCatalog("field-notes.json");
 const linkGroups = loadCatalog("links.json");
-// Source drives the section split: single-page tools vs bigger projects.
-const catalog = [
-  ...tools.map((item) => ({ ...item, source: "tools" })),
-  ...projects.map((item) => ({ ...item, source: "projects" })),
-];
-
->>>>>>> origin/main
 const problems = [];
 const seenSlugs = new Set();
 
@@ -94,18 +85,9 @@ for (const item of sourceCatalog) {
     if (seenSlugs.has(item.slug)) problems.push(`${label}: duplicate slug`);
     seenSlugs.add(item.slug);
   }
-<<<<<<< HEAD
-  if (item.category && !knownCategories.has(item.category)) {
-    problems.push(`${label}: unknown category "${item.category}"`);
-  }
-  if (item.url && !/^https:\/\//.test(item.url)) {
-    problems.push(`${label}: source url is not https`);
-  }
-=======
   if (item.category && !knownCategories.has(item.category)) problems.push(`${label}: unknown category "${item.category}"`);
   if (item.url && !/^https:\/\//.test(item.url)) problems.push(`${label}: url is not https`);
   if (/&(amp|lt|gt|quot|#\d+);/.test(`${item.title} ${item.description}`)) problems.push(`${label}: title/description contains an HTML entity; store plain text`);
->>>>>>> origin/main
 }
 for (const slug of featuredSlugs) {
   if (!seenSlugs.has(slug)) problems.push(`featured.json: "${slug}" is not in the catalog`);
@@ -130,6 +112,7 @@ const publicTools = tools.map((item) => {
     url: `/${item.slug}/`,
     sourceUrl: item.url,
     collection: "tool",
+    source: "tools",
     status: hasSnapshot ? item.status || "live" : "in-progress",
     hosted: hasSnapshot,
   };
@@ -142,6 +125,7 @@ const publicProjects = projects.map((item) => ({
   url: item.external ? item.url : hostedProjectRoutes[item.slug],
   sourceUrl: item.url,
   collection: "project",
+  source: "projects",
 }));
 
 const catalog = [...publicTools, ...publicProjects];
@@ -275,15 +259,10 @@ const pages = {
     title: "Browser tools · Mapzimus",
     description: `A searchable catalog of ${utilityCount} standalone browser tools for data, design, teaching, and math.`,
     canonical: "https://mapzimus.com/tools/",
-<<<<<<< HEAD
-    heading: "Tools that get out of the way.",
-    intro: "Every tool I have made, organized by type. Most run entirely in the browser — and every one is hosted here.",
-=======
     eyebrow: "The tool catalog",
     heading: "Every tool, one page each",
     intro: `${utilityCount} standalone browser tools for data, design, teaching, math, and fun. Each is a single page that loads fast and does one job. Map tools have their own shelf under Maps.`,
     catalogHeading: "All tools",
->>>>>>> origin/main
   },
   maps: {
     path: "maps/index.html",
@@ -300,15 +279,10 @@ const pages = {
     title: "Games · Mapzimus",
     description: "Free browser games from Mapzimus — strategy and logic, no downloads.",
     canonical: "https://mapzimus.com/games/",
-<<<<<<< HEAD
-    heading: "Things made to be played.",
-    intro: "Strategy games, logic puzzles, bottle flips, and the Whydah voyage games — all running on this site.",
-=======
     eyebrow: "Playable",
     heading: "Games",
     intro: "Actual games, made to be played — free in the browser, nothing to download.",
     catalogHeading: "All games",
->>>>>>> origin/main
   },
 };
 
@@ -360,7 +334,6 @@ for (const [key, page] of Object.entries(pages)) {
   fs.writeFileSync(target, html, "utf8");
 }
 
-<<<<<<< HEAD
 requirePath(hostedToolSource, "vendor/tools");
 const placeholderTemplate = `<!doctype html>
 <html lang="en">
@@ -413,7 +386,7 @@ for (const [sourceName, route] of Object.entries(appRoutes)) {
   const appSource = requirePath(path.join(vendor, "apps", sourceName), `vendor/apps/${sourceName}`);
   fs.cpSync(appSource, path.join(output, route), { recursive: true });
 }
-=======
+
 // ---- Static pages that carry pre-rendered blocks ----
 
 function fillStatic(relPath, replacements) {
@@ -476,7 +449,6 @@ const skillCards = skills.map((skill) => `<article class="skill-card">
 fillStatic("skills/index.html", { SKILL_CARDS: skillCards });
 
 // ---- Sitemap ----
->>>>>>> origin/main
 
 const staticPages = ["field-notes", "radars", "radar", "geo-radar", "soccer-radar", "stocks-radar", "politics-radar", "skills", "links", "about"];
 const sitemapUrls = [
@@ -486,7 +458,6 @@ const sitemapUrls = [
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...new Set(sitemapUrls)].map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n`;
 fs.writeFileSync(path.join(output, "sitemap.xml"), sitemap, "utf8");
-<<<<<<< HEAD
 
 const missingTools = publicTools.filter((item) => !item.hosted).map((item) => item.slug);
 console.log(
@@ -494,6 +465,5 @@ console.log(
     (missingTools.length ? ` (${missingTools.length} placeholders: ${missingTools.join(", ")})` : "") +
     `, and ${Object.keys(appRoutes).length} hosted apps in dist/.`,
 );
-=======
+
 console.log(`Built ${Object.keys(pages).length + 3} Mapzimus pages in dist/ (${catalog.length} catalog items pre-rendered).`);
->>>>>>> origin/main
