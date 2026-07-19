@@ -1,0 +1,1054 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Probability Lab</title>
+<meta name="description" content="Run random experiments — coins, dice, spinners, cards, marbles, the birthday paradox — and watch the empirical results converge to the exact theory. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 66ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  a { color: var(--accent); }
+
+  /* tabs */
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; border-bottom: 1px solid var(--border); }
+  .tab { border: 1px solid transparent; border-bottom: none; background: transparent; color: var(--muted); border-radius: 9px 9px 0 0; padding: 9px 14px; font-size: .9rem; cursor: pointer; font-family: var(--sans); }
+  .tab:hover { color: var(--text); background: var(--surface-2); }
+  .tab[aria-selected="true"] { color: var(--text); background: var(--surface); border-color: var(--border); font-weight: 600; margin-bottom: -1px; }
+
+  .panel[hidden] { display: none; }
+  .panel { display: grid; grid-template-columns: 320px 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 820px){ .panel { grid-template-columns: 1fr; } }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .card h2 { font-size: 1rem; margin: 0 0 10px; letter-spacing: -0.01em; }
+  .card h3 { font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 18px 0 8px; font-weight: 600; }
+  .card h3:first-child { margin-top: 0; }
+
+  .caption { color: var(--muted); font-size: .86rem; margin: 0 0 14px; }
+  .caption strong { color: var(--text); font-weight: 600; }
+
+  label.field { display: block; font-size: .85rem; margin: 0 0 12px; }
+  label.field > span { display: block; color: var(--muted); margin-bottom: 5px; }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  input[type="number"], select { width: 100%; border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 8px; padding: 8px 10px; font-size: .9rem; font-family: var(--sans); }
+  .rangeval { font-family: var(--mono); font-weight: 600; color: var(--text); }
+  .inline { display: flex; gap: 10px; }
+  .inline > * { flex: 1; }
+
+  .segmented { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .segmented button { border: none; background: var(--surface); color: var(--muted); padding: 7px 12px; font-size: .84rem; cursor: pointer; font-family: var(--sans); }
+  .segmented button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 12px; font-size: .84rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: var(--sans); }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .runbar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+  .runbar .primary { grid-column: 1 / -1; }
+
+  /* stats */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; }
+  .stat .lbl { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+  .stat .val { font-family: var(--mono); font-size: 1.25rem; font-weight: 600; margin-top: 3px; line-height: 1.1; }
+  .stat.emp .val { color: var(--accent); }
+  .stat.theo .val { color: #d97706; }
+  :root[data-theme="dark"] .stat.theo .val { color: #f5b942; }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .stat.theo .val { color: #f5b942; } }
+
+  /* visuals */
+  .stage { display: flex; align-items: center; justify-content: center; min-height: 132px; background: var(--surface-2); border: 1px dashed var(--border); border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+
+  .coin { width: 92px; height: 92px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2rem; color: #4a3b00; background: radial-gradient(circle at 35% 30%, #ffe9a8, #e8b923 60%, #b8860b); box-shadow: inset 0 -4px 8px rgba(0,0,0,.25), 0 3px 8px rgba(0,0,0,.25); }
+  .coin.tails { background: radial-gradient(circle at 35% 30%, #e7ecf2, #b7c0cc 60%, #8a95a4); color: #2a3240; }
+  .coin.spin { animation: coinflip .6s ease-out; }
+  @keyframes coinflip { 0%{ transform: rotateX(0) scale(1);} 50%{ transform: rotateX(900deg) scale(1.12);} 100%{ transform: rotateX(1800deg) scale(1);} }
+
+  .dice-row { display: flex; gap: 12px; }
+  .die { width: 62px; height: 62px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.6rem; font-family: var(--mono); }
+  .die.roll { animation: dieroll .5s ease; }
+  @keyframes dieroll { 0%{ transform: rotate(0) scale(1);} 50%{ transform: rotate(180deg) scale(1.12);} 100%{ transform: rotate(360deg) scale(1);} }
+
+  .playcard { width: 84px; height: 118px; border-radius: 10px; background: #fff; border: 1px solid #cbd2da; box-shadow: var(--shadow); position: relative; color: #1a1f28; }
+  .playcard.red { color: #c62828; }
+  .playcard .corner { position: absolute; top: 6px; left: 8px; font-weight: 700; font-size: .95rem; line-height: 1; text-align: center; }
+  .playcard .corner .s { display: block; font-size: 1rem; }
+  .playcard .pip { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2.6rem; }
+  .playcard.flip { animation: cardflip .45s ease; }
+  @keyframes cardflip { 0%{ transform: rotateY(0);} 50%{ transform: rotateY(90deg) scale(1.04);} 100%{ transform: rotateY(0);} }
+
+  .marbles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; max-width: 340px; }
+  .marble { width: 30px; height: 30px; border-radius: 50%; box-shadow: inset -4px -4px 6px rgba(0,0,0,.28), inset 3px 3px 5px rgba(255,255,255,.4); }
+  .marble.hit { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .people { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; justify-content: center; max-width: 380px; }
+  .person { width: 15px; height: 15px; border-radius: 50%; background: var(--accent); opacity: .85; }
+  .person.hit { background: var(--danger); opacity: 1; outline: 2px solid var(--danger); outline-offset: 1px; }
+  .dice-row:empty::before, .marbles:empty::before, .people:empty::before { content: attr(data-hint); color: var(--muted); font-size: .85rem; }
+
+  canvas.chart { width: 100%; display: block; }
+  .chartbox { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 8px 6px; margin-bottom: 12px; }
+  .chartbox .ttl { font-size: .82rem; color: var(--muted); margin: 2px 6px 4px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .legend { display: flex; gap: 14px; font-size: .78rem; color: var(--muted); align-items: center; }
+  .legend .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: -1px; margin-right: 4px; }
+  .legend .sw.emp { background: var(--accent); }
+  .legend .sw.th { border: 2px solid #f59e0b; }
+
+  table.dist { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  table.dist th, table.dist td { text-align: right; padding: 4px 8px; border-bottom: 1px solid var(--border); font-family: var(--mono); }
+  table.dist th { color: var(--muted); font-weight: 600; font-family: var(--sans); text-transform: uppercase; font-size: .72rem; letter-spacing: .03em; }
+  table.dist td:first-child, table.dist th:first-child { text-align: left; }
+  .tablewrap { max-height: 220px; overflow: auto; border: 1px solid var(--border); border-radius: 8px; }
+
+  .note { color: var(--muted); font-size: .84rem; margin: 8px 0 0; }
+  .note.big { font-size: .9rem; }
+  .weightrow { display: grid; grid-template-columns: 1fr 84px 30px; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .weightrow input { margin: 0; }
+  .iconbtn { border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 7px; width: 30px; height: 34px; cursor: pointer; font-size: 1rem; }
+  .iconbtn:hover { color: var(--danger); border-color: var(--danger); }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  code { font-family: var(--mono); background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 5px; font-size: .85em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Probability Lab</h1>
+      <p>Run random experiments and watch the <em>empirical</em> results settle toward the <em>exact theory</em> — the law of large numbers, made visible. Every draw uses your browser's cryptographic randomness. Nothing leaves your device.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Experiments">
+    <button class="tab" role="tab" data-exp="coins" aria-selected="true">🪙 Coin flips</button>
+    <button class="tab" role="tab" data-exp="dice" aria-selected="false">🎲 Dice</button>
+    <button class="tab" role="tab" data-exp="spinner" aria-selected="false">🎡 Spinner</button>
+    <button class="tab" role="tab" data-exp="cards" aria-selected="false">🃏 Cards</button>
+    <button class="tab" role="tab" data-exp="marbles" aria-selected="false">🔴 Marbles</button>
+    <button class="tab" role="tab" data-exp="birthday" aria-selected="false">🎂 Birthday</button>
+  </div>
+
+  <!-- ============ COINS ============ -->
+  <section class="panel" id="panel-coins" role="tabpanel">
+    <div class="card">
+      <h2>Coin flips</h2>
+      <label class="field">
+        <span>Chance of heads&nbsp;·&nbsp;<span class="rangeval" id="coinPval">0.50</span></span>
+        <input type="range" id="coinP" min="0.01" max="0.99" step="0.01" value="0.5">
+      </label>
+      <div class="inline" style="margin-bottom:14px">
+        <button class="btn" id="coinFair">Fair (0.50)</button>
+        <button class="btn" id="coinBias">Biased (0.80)</button>
+      </div>
+      <h3>Trials</h3>
+      <div class="runbar">
+        <button class="btn primary" data-run="coins" data-n="1">Flip once</button>
+        <button class="btn" data-run="coins" data-n="100">Run 100</button>
+        <button class="btn" data-run="coins" data-n="1000">Run 1,000</button>
+        <button class="btn" data-run="coins" data-n="10000">Run 10,000</button>
+        <button class="btn" data-reset="coins" style="grid-column:1/-1">Reset</button>
+      </div>
+    </div>
+    <div>
+      <p class="caption">What you're seeing: each flip is independent. The <strong>running proportion of heads</strong> jumps around wildly at first, then homes in on the true chance <em>p</em> as trials pile up. That settling is the <strong>law of large numbers</strong>.</p>
+      <div class="stage"><div class="coin" id="coinVisual">?</div></div>
+      <div class="stats">
+        <div class="stat"><div class="lbl">Heads</div><div class="val" id="coinH">0</div></div>
+        <div class="stat"><div class="lbl">Tails</div><div class="val" id="coinT">0</div></div>
+        <div class="stat emp"><div class="lbl">Empirical P(heads)</div><div class="val" id="coinEmp">—</div></div>
+        <div class="stat theo"><div class="lbl">Theoretical p</div><div class="val" id="coinTheo">0.5000</div></div>
+        <div class="stat"><div class="lbl">Total flips</div><div class="val" id="coinN">0</div></div>
+        <div class="stat"><div class="lbl">|difference|</div><div class="val" id="coinDiff">—</div></div>
+      </div>
+      <div class="chartbox">
+        <div class="ttl"><span>Running proportion of heads vs. theoretical p</span>
+          <span class="legend"><span><i class="sw emp"></i>Empirical</span><span><i class="sw th"></i>Theoretical</span></span></div>
+        <canvas class="chart" id="coinChart" height="240"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DICE ============ -->
+  <section class="panel" id="panel-dice" role="tabpanel" hidden>
+    <div class="card">
+      <h2>Dice</h2>
+      <label class="field">
+        <span>Sides per die&nbsp;·&nbsp;<span class="rangeval" id="diceSidesVal">6</span></span>
+        <input type="range" id="diceSides" min="2" max="20" step="1" value="6">
+      </label>
+      <label class="field">
+        <span>Number of dice&nbsp;·&nbsp;<span class="rangeval" id="diceCountVal">2</span></span>
+        <input type="range" id="diceCount" min="1" max="3" step="1" value="2">
+      </label>
+      <h3>Trials</h3>
+      <div class="runbar">
+        <button class="btn primary" data-run="dice" data-n="1">Roll once</button>
+        <button class="btn" data-run="dice" data-n="100">Run 100</button>
+        <button class="btn" data-run="dice" data-n="1000">Run 1,000</button>
+        <button class="btn" data-run="dice" data-n="10000">Run 10,000</button>
+        <button class="btn" data-reset="dice" style="grid-column:1/-1">Reset</button>
+      </div>
+    </div>
+    <div>
+      <p class="caption">What you're seeing: the <strong>sum</strong> of the dice. Sums in the middle can happen many ways, so they're far more likely than the extremes. The exact curve (amber outline) comes from <strong>convolving</strong> the dice — every combination counted precisely.</p>
+      <div class="stage"><div class="dice-row" id="diceVisual" data-hint="Roll once to see the dice"></div></div>
+      <div class="stats">
+        <div class="stat"><div class="lbl">Last sum</div><div class="val" id="diceLast">—</div></div>
+        <div class="stat emp"><div class="lbl">Empirical mean</div><div class="val" id="diceMeanEmp">—</div></div>
+        <div class="stat theo"><div class="lbl">Theoretical mean</div><div class="val" id="diceMeanTheo">7.000</div></div>
+        <div class="stat"><div class="lbl">Total rolls</div><div class="val" id="diceN">0</div></div>
+      </div>
+      <div class="chartbox">
+        <div class="ttl"><span>Distribution of the sum: observed vs. exact</span>
+          <span class="legend"><span><i class="sw emp"></i>Observed</span><span><i class="sw th"></i>Exact</span></span></div>
+        <canvas class="chart" id="diceChart" height="230"></canvas>
+      </div>
+      <div class="chartbox">
+        <div class="ttl"><span>Running mean of the sum vs. theoretical mean</span></div>
+        <canvas class="chart" id="diceMeanChart" height="170"></canvas>
+      </div>
+      <div class="tablewrap">
+        <table class="dist"><thead><tr><th>Sum</th><th>Exact P</th><th>Observed P</th><th>Ways</th></tr></thead><tbody id="diceTable"></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SPINNER ============ -->
+  <section class="panel" id="panel-spinner" role="tabpanel" hidden>
+    <div class="card">
+      <h2>Spinner</h2>
+      <p class="note" style="margin-top:0">Set outcomes and their weights. Bigger weight = bigger slice = more likely.</p>
+      <div id="spinRows"></div>
+      <button class="btn" id="spinAdd" style="width:100%;margin-bottom:14px">+ Add outcome</button>
+      <h3>Trials</h3>
+      <div class="runbar">
+        <button class="btn primary" data-run="spinner" data-n="1">Spin once</button>
+        <button class="btn" data-run="spinner" data-n="100">Run 100</button>
+        <button class="btn" data-run="spinner" data-n="1000">Run 1,000</button>
+        <button class="btn" data-run="spinner" data-n="10000">Run 10,000</button>
+        <button class="btn" data-reset="spinner" style="grid-column:1/-1">Reset</button>
+      </div>
+    </div>
+    <div>
+      <p class="caption">What you're seeing: observed frequencies (blue) climbing toward each slice's <strong>expected</strong> frequency (amber). The <strong>chi-square</strong> number below is an informal "how far from expected are we?" gauge — it shrinks toward its typical value as you spin more.</p>
+      <div class="stage"><canvas id="spinWheel" width="200" height="200" style="width:200px;height:200px"></canvas></div>
+      <div class="stats">
+        <div class="stat"><div class="lbl">Last result</div><div class="val" id="spinLast" style="font-size:1rem">—</div></div>
+        <div class="stat"><div class="lbl">Total spins</div><div class="val" id="spinN">0</div></div>
+      </div>
+      <div class="chartbox">
+        <div class="ttl"><span>Observed vs. expected frequency</span>
+          <span class="legend"><span><i class="sw emp"></i>Observed</span><span><i class="sw th"></i>Expected</span></span></div>
+        <canvas class="chart" id="spinChart" height="230"></canvas>
+      </div>
+      <p class="note big" id="spinChi">Spin to compute a chi-square value.</p>
+    </div>
+  </section>
+
+  <!-- ============ CARDS ============ -->
+  <section class="panel" id="panel-cards" role="tabpanel" hidden>
+    <div class="card">
+      <h2>Cards</h2>
+      <label class="field">
+        <span>Track this event</span>
+        <select id="cardEvent"></select>
+      </label>
+      <label class="field">
+        <span>Drawing method</span>
+      </label>
+      <div class="segmented" id="cardReplace" style="margin-bottom:14px">
+        <button data-v="1" aria-pressed="true">With replacement</button>
+        <button data-v="0" aria-pressed="false">Without</button>
+      </div>
+      <h3>Trials</h3>
+      <div class="runbar">
+        <button class="btn primary" data-run="cards" data-n="1">Draw one</button>
+        <button class="btn" data-run="cards" data-n="100">Run 100</button>
+        <button class="btn" data-run="cards" data-n="1000">Run 1,000</button>
+        <button class="btn" data-run="cards" data-n="10000">Run 10,000</button>
+        <button class="btn" data-reset="cards" style="grid-column:1/-1">Reset</button>
+      </div>
+    </div>
+    <div>
+      <p class="caption">What you're seeing: draw a card, ask "did the event happen?", repeat. <strong>With replacement</strong> the deck is reshuffled every draw, so each draw is independent. <strong>Without</strong>, cards are removed until the deck runs out, then reshuffled. Either way a single draw's probability is the event's fraction of the 52 cards.</p>
+      <div class="stage"><div class="playcard" id="cardVisual"><div class="corner"><span class="r">?</span></div></div></div>
+      <div class="stats">
+        <div class="stat"><div class="lbl">Event hits</div><div class="val" id="cardHits">0</div></div>
+        <div class="stat emp"><div class="lbl">Empirical P</div><div class="val" id="cardEmp">—</div></div>
+        <div class="stat theo"><div class="lbl">Theoretical P</div><div class="val" id="cardTheo">—</div></div>
+        <div class="stat"><div class="lbl">Total draws</div><div class="val" id="cardN">0</div></div>
+        <div class="stat"><div class="lbl">|difference|</div><div class="val" id="cardDiff">—</div></div>
+      </div>
+      <div class="chartbox">
+        <div class="ttl"><span>Running proportion vs. theoretical probability</span>
+          <span class="legend"><span><i class="sw emp"></i>Empirical</span><span><i class="sw th"></i>Theoretical</span></span></div>
+        <canvas class="chart" id="cardChart" height="240"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MARBLES ============ -->
+  <section class="panel" id="panel-marbles" role="tabpanel" hidden>
+    <div class="card">
+      <h2>Marbles in an urn</h2>
+      <div id="urnRows"></div>
+      <label class="field">
+        <span>Count marbles of this color</span>
+        <select id="marbleTarget"></select>
+      </label>
+      <label class="field">
+        <span>Marbles drawn per trial&nbsp;·&nbsp;<span class="rangeval" id="marbleKVal">5</span></span>
+        <input type="range" id="marbleK" min="1" max="12" step="1" value="5">
+      </label>
+      <label class="field"><span>Drawing method</span></label>
+      <div class="segmented" id="marbleReplace" style="margin-bottom:14px">
+        <button data-v="0" aria-pressed="true">Without replacement</button>
+        <button data-v="1" aria-pressed="false">With</button>
+      </div>
+      <h3>Trials</h3>
+      <div class="runbar">
+        <button class="btn primary" data-run="marbles" data-n="1">Draw once</button>
+        <button class="btn" data-run="marbles" data-n="100">Run 100</button>
+        <button class="btn" data-run="marbles" data-n="1000">Run 1,000</button>
+        <button class="btn" data-run="marbles" data-n="10000">Run 10,000</button>
+        <button class="btn" data-reset="marbles" style="grid-column:1/-1">Reset</button>
+      </div>
+    </div>
+    <div>
+      <p class="caption">What you're seeing: draw a handful and count the target color. <strong>Without replacement</strong> the exact answer is the <strong>hypergeometric</strong> distribution; <strong>with replacement</strong> it's the <strong>binomial</strong>. The histogram shows how often each count shows up vs. that exact distribution.</p>
+      <div class="stage"><div class="marbles" id="marbleVisual" data-hint="Draw once to see the marbles"></div></div>
+      <div class="stats">
+        <div class="stat emp"><div class="lbl">Empirical mean count</div><div class="val" id="marbleMeanEmp">—</div></div>
+        <div class="stat theo"><div class="lbl">Theoretical mean</div><div class="val" id="marbleMeanTheo">—</div></div>
+        <div class="stat"><div class="lbl">Total draws</div><div class="val" id="marbleN">0</div></div>
+        <div class="stat"><div class="lbl">Model</div><div class="val" id="marbleModel" style="font-size:.95rem">—</div></div>
+      </div>
+      <div class="chartbox">
+        <div class="ttl"><span>Count of target color: observed vs. exact</span>
+          <span class="legend"><span><i class="sw emp"></i>Observed</span><span><i class="sw th"></i>Exact</span></span></div>
+        <canvas class="chart" id="marbleChart" height="230"></canvas>
+      </div>
+      <p class="note" id="marbleNote"></p>
+    </div>
+  </section>
+
+  <!-- ============ BIRTHDAY ============ -->
+  <section class="panel" id="panel-birthday" role="tabpanel" hidden>
+    <div class="card">
+      <h2>Birthday paradox</h2>
+      <label class="field">
+        <span>People in the room&nbsp;·&nbsp;<span class="rangeval" id="bdayGVal">23</span></span>
+        <input type="range" id="bdayG" min="2" max="80" step="1" value="23">
+      </label>
+      <p class="note" style="margin-top:0">How likely is it that <em>at least two</em> people share a birthday? (365 days, no leap years.)</p>
+      <h3>Trials</h3>
+      <div class="runbar">
+        <button class="btn primary" data-run="birthday" data-n="1">One room</button>
+        <button class="btn" data-run="birthday" data-n="100">Run 100</button>
+        <button class="btn" data-run="birthday" data-n="1000">Run 1,000</button>
+        <button class="btn" data-run="birthday" data-n="10000">Run 10,000</button>
+        <button class="btn" data-reset="birthday" style="grid-column:1/-1">Reset</button>
+      </div>
+    </div>
+    <div>
+      <p class="caption">What you're seeing: the famous surprise — with just <strong>23 people</strong> the chance of a shared birthday is already about <strong>50.7%</strong>. Each simulated "room" fills with random birthdays; a red dot marks anyone who collides. The empirical estimate converges to the exact formula curve.</p>
+      <div class="stage"><div class="people" id="bdayVisual" data-hint="Simulate one room to see the people"></div></div>
+      <div class="stats">
+        <div class="stat"><div class="lbl">Rooms with a match</div><div class="val" id="bdayMatch">0</div></div>
+        <div class="stat emp"><div class="lbl">Empirical P(shared)</div><div class="val" id="bdayEmp">—</div></div>
+        <div class="stat theo"><div class="lbl">Theoretical P(shared)</div><div class="val" id="bdayTheo">—</div></div>
+        <div class="stat"><div class="lbl">Rooms simulated</div><div class="val" id="bdayN">0</div></div>
+        <div class="stat"><div class="lbl">|difference|</div><div class="val" id="bdayDiff">—</div></div>
+      </div>
+      <div class="chartbox">
+        <div class="ttl"><span>Exact P(shared birthday) by group size</span></div>
+        <canvas class="chart" id="bdayCurve" height="220"></canvas>
+      </div>
+      <div class="chartbox">
+        <div class="ttl"><span>Empirical estimate converging (at current group size)</span>
+          <span class="legend"><span><i class="sw emp"></i>Empirical</span><span><i class="sw th"></i>Theoretical</span></span></div>
+        <canvas class="chart" id="bdayChart" height="200"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <footer class="app">
+    Randomness comes from <code>crypto.getRandomValues</code> with rejection sampling for unbiased integers — no <code>Math.random</code>. Everything runs locally in your browser · a <strong>max</strong> tool
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Probability Lab — standalone, client-side, no dependencies.
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const TAU = Math.PI * 2;
+const THEO = '#f59e0b';            // amber — theoretical/reference (works in light+dark)
+const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+
+/* ---------- honest randomness ----------
+   getRandomValues gives uniform 32-bit words. For an unbiased integer in
+   [0,n) we reject the small tail that would otherwise skew the modulo.
+   A refill buffer keeps 10k+ trials fast without per-call overhead. */
+const RNG = (() => {
+  const N = 8192;
+  const buf = new Uint32Array(N);
+  let idx = N;
+  const M = 4294967296; // 2^32
+  function next(){ if (idx >= N){ crypto.getRandomValues(buf); idx = 0; } return buf[idx++]; }
+  function float(){ return next() / M; }           // uniform [0,1)
+  function int(n){                                  // uniform integer 0..n-1, unbiased
+    if (n <= 1) return 0;
+    const limit = M - (M % n);
+    let x; do { x = next(); } while (x >= limit);
+    return x % n;
+  }
+  return { float, int };
+})();
+
+/* ---------- exact combinatorics via log-factorials ---------- */
+const LOGF = [0];
+(function(){ for (let i=1;i<=400;i++) LOGF[i] = LOGF[i-1] + Math.log(i); })();
+function logComb(n,r){ if (r<0||r>n) return -Infinity; return LOGF[n]-LOGF[r]-LOGF[n-r]; }
+function comb(n,r){ if (r<0||r>n) return 0; return Math.round(Math.exp(logComb(n,r))); }
+function binomPmf(k,i,p){
+  if (i<0||i>k) return 0;
+  if (p<=0) return i===0?1:0;
+  if (p>=1) return i===k?1:0;
+  return Math.exp(logComb(k,i) + i*Math.log(p) + (k-i)*Math.log(1-p));
+}
+function hyperPmf(N,K,k,i){ // population N, successes K, draws k, want i successes
+  const lo = Math.max(0, k-(N-K)), hi = Math.min(k,K);
+  if (i<lo || i>hi) return 0;
+  return Math.exp(logComb(K,i) + logComb(N-K,k-i) - logComb(N,k));
+}
+
+/* ---------- formatting ---------- */
+const fmt4 = x => (x==null||!isFinite(x)) ? '—' : x.toFixed(4);
+const fmt3 = x => (x==null||!isFinite(x)) ? '—' : x.toFixed(3);
+const fmtN = n => n>=1000 ? (n%1000===0 ? (n/1000)+'k' : (n/1000).toFixed(1)+'k') : String(n);
+const commas = n => n.toLocaleString('en-US');
+
+/* ---------- canvas helpers ---------- */
+function cvar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function fitCanvas(cv){
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const w = cv.clientWidth || 560;
+  const h = cv.clientHeight || (+cv.getAttribute('height')) || 220;
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  return { ctx, w, h };
+}
+
+/* running-estimate history: samples in trial-space, decimated to stay small */
+function makeHist(cap=1400){ return { xs:[], ys:[], step:1, since:0, cap }; }
+function histReset(h){ h.xs.length=0; h.ys.length=0; h.step=1; h.since=0; }
+function histPush(h,n,y){
+  h.since++;
+  if (h.since >= h.step){
+    h.xs.push(n); h.ys.push(y); h.since = 0;
+    if (h.xs.length > h.cap){
+      const nx=[], ny=[];
+      for (let i=0;i<h.xs.length;i+=2){ nx.push(h.xs[i]); ny.push(h.ys[i]); }
+      h.xs=nx; h.ys=ny; h.step*=2;
+    }
+  }
+}
+function histForce(h,n,y){ // ensure the latest point is present
+  if (h.xs.length && h.xs[h.xs.length-1]===n){ h.ys[h.ys.length-1]=y; return; }
+  h.xs.push(n); h.ys.push(y);
+}
+
+function drawConvergence(cv, hist, ref, o={}){
+  const { ctx, w, h } = fitCanvas(cv);
+  const muted=cvar('--muted'), grid=cvar('--border'), emp=cvar('--accent');
+  const padL=48, padR=54, padT=14, padB=32;
+  const pw=w-padL-padR, ph=h-padT-padB;
+  let ymin, ymax;
+  if (o.y){ [ymin,ymax]=o.y; }
+  else {
+    let lo=ref, hi=ref;
+    for (const v of hist.ys){ if (v<lo)lo=v; if (v>hi)hi=v; }
+    const pad=(hi-lo)*0.18 || 0.05; ymin=lo-pad; ymax=hi+pad;
+  }
+  if (ymax-ymin < 1e-9) ymax = ymin + 1;
+  const maxN = Math.max(1, hist.xs.length ? hist.xs[hist.xs.length-1] : 1);
+  const X = n => padL + pw*(n/maxN);
+  const Y = v => padT + ph*(1-(v-ymin)/(ymax-ymin));
+  const dec = o.dec ?? 3;
+  ctx.font = '11px '+cvar('--sans');
+  // y grid + ticks
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  for (let i=0;i<=5;i++){
+    const v=ymin+(ymax-ymin)*i/5, y=Y(v);
+    ctx.strokeStyle=grid; ctx.globalAlpha=.45; ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+pw,y); ctx.stroke(); ctx.globalAlpha=1;
+    ctx.fillStyle=muted; ctx.fillText(v.toFixed(dec), padL-6, y);
+  }
+  // x ticks
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  for (let i=0;i<=4;i++){ const n=Math.round(maxN*i/4); ctx.fillStyle=muted; ctx.fillText(fmtN(n), X(n), padT+ph+6); }
+  // reference line
+  ctx.strokeStyle=THEO; ctx.lineWidth=1.5; ctx.setLineDash([6,4]);
+  ctx.beginPath(); ctx.moveTo(padL,Y(clamp(ref,ymin,ymax))); ctx.lineTo(padL+pw,Y(clamp(ref,ymin,ymax))); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=THEO; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText(ref.toFixed(dec), padL+pw+6, Y(clamp(ref,ymin,ymax)));
+  // data polyline
+  if (hist.xs.length){
+    ctx.strokeStyle=emp; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.beginPath();
+    for (let i=0;i<hist.xs.length;i++){ const x=X(hist.xs[i]), y=Y(clamp(hist.ys[i],ymin,ymax)); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+    ctx.stroke();
+    const lx=X(hist.xs[hist.xs.length-1]), ly=Y(clamp(hist.ys[hist.ys.length-1],ymin,ymax));
+    ctx.fillStyle=emp; ctx.beginPath(); ctx.arc(lx,ly,3.2,0,TAU); ctx.fill();
+  } else {
+    ctx.fillStyle=muted; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('Run some trials to see the curve settle', padL+pw/2, padT+ph/2);
+  }
+  ctx.fillStyle=muted; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.fillText(o.xLabel||'trials', padL+pw/2, h-6);
+}
+
+function drawBars(cv, labels, obs, exp, o={}){
+  const { ctx, w, h } = fitCanvas(cv);
+  const muted=cvar('--muted'), grid=cvar('--border'), emp=cvar('--accent');
+  const padL=42, padR=10, padT=12, padB=34;
+  const pw=w-padL-padR, ph=h-padT-padB;
+  const n=labels.length;
+  let maxY=0; for (const v of obs) if (v>maxY)maxY=v; for (const v of exp) if (v>maxY)maxY=v;
+  maxY = (maxY||0.1)*1.18;
+  const Y=v=>padT+ph*(1-v/maxY);
+  ctx.font='11px '+cvar('--sans');
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  for (let i=0;i<=4;i++){
+    const v=maxY*i/4, y=Y(v);
+    ctx.strokeStyle=grid; ctx.globalAlpha=.45; ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+pw,y); ctx.stroke(); ctx.globalAlpha=1;
+    ctx.fillStyle=muted; ctx.fillText(v.toFixed(2), padL-5, y);
+  }
+  const bw=pw/n, barW=Math.min(40, bw*0.72);
+  for (let i=0;i<n;i++){
+    const cx=padL+bw*(i+0.5);
+    const yo=Y(obs[i]||0);
+    ctx.fillStyle=emp; ctx.fillRect(cx-barW/2, yo, barW, (padT+ph)-yo);
+    const ye=Y(exp[i]||0);
+    ctx.strokeStyle=THEO; ctx.lineWidth=2; ctx.strokeRect(cx-barW/2, ye, barW, (padT+ph)-ye);
+  }
+  ctx.fillStyle=muted; ctx.textAlign='center'; ctx.textBaseline='top';
+  const stepL=Math.ceil(n/18);
+  for (let i=0;i<n;i++){ if (i%stepL) continue; ctx.fillText(labels[i], padL+bw*(i+0.5), padT+ph+6); }
+}
+
+/* ==================================================================
+   1. COINS
+   ================================================================== */
+const coins = { p:0.5, heads:0, tails:0, total:0, hist:makeHist() };
+function coinReset(){ coins.heads=coins.tails=coins.total=0; histReset(coins.hist); }
+function coinTrial(){
+  const isH = RNG.float() < coins.p;
+  if (isH) coins.heads++; else coins.tails++;
+  coins.total++;
+  histPush(coins.hist, coins.total, coins.heads/coins.total);
+  return isH;
+}
+function coinUpdate(){
+  $('#coinH').textContent = commas(coins.heads);
+  $('#coinT').textContent = commas(coins.tails);
+  $('#coinN').textContent = commas(coins.total);
+  const emp = coins.total ? coins.heads/coins.total : null;
+  $('#coinEmp').textContent = fmt4(emp);
+  $('#coinTheo').textContent = fmt4(coins.p);
+  $('#coinDiff').textContent = emp==null ? '—' : fmt4(Math.abs(emp-coins.p));
+}
+function drawCoins(){ coinUpdate(); histForce(coins.hist, coins.total, coins.total?coins.heads/coins.total:coins.p); drawConvergence($('#coinChart'), coins.hist, coins.p, { y:[0,1], dec:2, xLabel:'flips' }); }
+function coinVisual(isH){
+  const el = $('#coinVisual');
+  el.classList.toggle('tails', !isH);
+  el.textContent = isH ? 'H' : 'T';
+  el.classList.remove('spin'); void el.offsetWidth; el.classList.add('spin');
+}
+$('#coinP').addEventListener('input', e=>{ coins.p=+e.target.value; $('#coinPval').textContent=coins.p.toFixed(2); coinReset(); drawCoins(); });
+$('#coinFair').addEventListener('click', ()=>{ coins.p=0.5; $('#coinP').value=0.5; $('#coinPval').textContent='0.50'; coinReset(); drawCoins(); });
+$('#coinBias').addEventListener('click', ()=>{ coins.p=0.8; $('#coinP').value=0.8; $('#coinPval').textContent='0.80'; coinReset(); drawCoins(); });
+
+/* ==================================================================
+   2. DICE
+   ================================================================== */
+const dice = { sides:6, count:2, counts:null, total:0, sumTotal:0, dist:null, hist:makeHist() };
+function diceDistribution(sides, ndice){
+  let res = new Array(sides+1).fill(0);
+  for (let f=1; f<=sides; f++) res[f] = 1/sides;
+  for (let d=1; d<ndice; d++){
+    const next = new Array(res.length + sides).fill(0);
+    for (let s=0; s<res.length; s++){
+      if (!res[s]) continue;
+      for (let f=1; f<=sides; f++) next[s+f] += res[s]/sides;
+    }
+    res = next;
+  }
+  return res; // res[sum] for sum in ndice..ndice*sides
+}
+function diceRebuild(){
+  dice.dist = diceDistribution(dice.sides, dice.count);
+  const min=dice.count, max=dice.count*dice.sides;
+  dice.counts = new Float64Array(max-min+1);
+  dice.total=0; dice.sumTotal=0; histReset(dice.hist);
+}
+function diceTrial(){
+  let sum=0; for (let d=0; d<dice.count; d++) sum += RNG.int(dice.sides)+1;
+  dice.counts[sum-dice.count]++;
+  dice.total++; dice.sumTotal+=sum;
+  histPush(dice.hist, dice.total, dice.sumTotal/dice.total);
+  return sum;
+}
+function diceTheoMean(){ return dice.count*(dice.sides+1)/2; }
+function diceUpdate(){
+  $('#diceN').textContent = commas(dice.total);
+  $('#diceMeanEmp').textContent = dice.total ? fmt3(dice.sumTotal/dice.total) : '—';
+  $('#diceMeanTheo').textContent = fmt3(diceTheoMean());
+  // table
+  const min=dice.count, max=dice.count*dice.sides, rows=[];
+  const totalWays = Math.pow(dice.sides, dice.count);
+  for (let s=min; s<=max; s++){
+    const p=dice.dist[s]||0;
+    const obs=dice.total ? dice.counts[s-min]/dice.total : 0;
+    rows.push(`<tr><td>${s}</td><td>${p.toFixed(4)}</td><td>${dice.total?obs.toFixed(4):'—'}</td><td>${Math.round(p*totalWays)}</td></tr>`);
+  }
+  $('#diceTable').innerHTML = rows.join('');
+}
+function drawDiceCharts(){
+  const min=dice.count, max=dice.count*dice.sides;
+  const labels=[], obs=[], exp=[];
+  for (let s=min; s<=max; s++){ labels.push(String(s)); obs.push(dice.total?dice.counts[s-min]/dice.total:0); exp.push(dice.dist[s]||0); }
+  drawBars($('#diceChart'), labels, obs, exp);
+  histForce(dice.hist, dice.total, dice.total?dice.sumTotal/dice.total:diceTheoMean());
+  drawConvergence($('#diceMeanChart'), dice.hist, diceTheoMean(), { dec:2, xLabel:'rolls' });
+}
+function drawDice(){ diceUpdate(); drawDiceCharts(); }
+function diceVisual(){
+  const row=$('#diceVisual'); row.innerHTML='';
+  const parts=lastDiceFaces || [];
+  for (let d=0; d<dice.count; d++){
+    const el=document.createElement('div'); el.className='die roll';
+    el.textContent = parts[d]!=null ? parts[d] : '?';
+    row.appendChild(el);
+  }
+}
+let lastDiceFaces=null;
+$('#diceSides').addEventListener('input', e=>{ dice.sides=+e.target.value; $('#diceSidesVal').textContent=dice.sides; diceRebuild(); drawDice(); });
+$('#diceCount').addEventListener('input', e=>{ dice.count=+e.target.value; $('#diceCountVal').textContent=dice.count; diceRebuild(); drawDice(); });
+
+/* ==================================================================
+   3. SPINNER
+   ================================================================== */
+const spinner = { names:['Red','Green','Blue','Yellow'], weights:[3,1,1,1], counts:[0,0,0,0], total:0, rotation:0 };
+function sliceColor(i,n){ return `hsl(${Math.round(i*360/Math.max(1,n)+12)}deg 62% 55%)`; }
+function spinReset(){ spinner.counts = spinner.names.map(()=>0); spinner.total=0; }
+function spinRebuildRows(){
+  const box=$('#spinRows'); box.innerHTML='';
+  spinner.names.forEach((nm,i)=>{
+    const row=document.createElement('div'); row.className='weightrow';
+    row.innerHTML=`<input type="text" value="${nm.replace(/"/g,'&quot;')}" aria-label="Outcome name" data-sn="${i}">
+      <input type="number" min="0" step="1" value="${spinner.weights[i]}" aria-label="Weight" data-sw="${i}">
+      <button class="iconbtn" data-sd="${i}" title="Remove"${spinner.names.length<=2?' disabled':''}>✕</button>`;
+    box.appendChild(row);
+  });
+}
+function spinSampleIndex(){
+  const total=spinner.weights.reduce((a,b)=>a+Math.max(0,b),0);
+  let r=RNG.float()*total, i=0;
+  for (; i<spinner.weights.length; i++){ r-=Math.max(0,spinner.weights[i]); if (r<0) return i; }
+  return spinner.weights.length-1;
+}
+function spinTrial(){ const i=spinSampleIndex(); spinner.counts[i]++; spinner.total++; return i; }
+function spinUpdate(){
+  $('#spinN').textContent=commas(spinner.total);
+  const total=spinner.weights.reduce((a,b)=>a+Math.max(0,b),0)||1;
+  // chi-square
+  if (spinner.total>0){
+    let chi=0; const K=spinner.names.length;
+    for (let i=0;i<K;i++){ const E=spinner.total*Math.max(0,spinner.weights[i])/total; if (E>0){ const O=spinner.counts[i]; chi+=(O-E)*(O-E)/E; } }
+    const df=K-1, ratio=df>0?chi/df:0;
+    let verdict = ratio<2 ? 'observed frequencies closely match the weights' : ratio<5 ? 'a reasonable match — small deviations are normal' : 'a notable deviation (or you just need more spins)';
+    $('#spinChi').innerHTML = `χ² = <strong>${chi.toFixed(2)}</strong> on ${df} degrees of freedom (expected ≈ ${df}). As a rough guide, ${verdict}.`;
+  } else {
+    $('#spinChi').textContent='Spin to compute a chi-square value.';
+  }
+}
+function drawSpinCharts(){
+  const total=spinner.weights.reduce((a,b)=>a+Math.max(0,b),0)||1;
+  const labels=spinner.names.map((n,i)=> n.length>6 ? n.slice(0,6)+'…' : n);
+  const obs=spinner.names.map((n,i)=> spinner.total?spinner.counts[i]/spinner.total:0);
+  const exp=spinner.names.map((n,i)=> Math.max(0,spinner.weights[i])/total);
+  drawBars($('#spinChart'), labels, obs, exp);
+  drawWheel();
+}
+function drawWheel(){
+  const cv=$('#spinWheel'); const { ctx, w, h } = fitCanvas(cv);
+  const cx=w/2, cy=h/2, R=Math.min(w,h)/2-8;
+  const total=spinner.weights.reduce((a,b)=>a+Math.max(0,b),0)||1;
+  let a=spinner.rotation - Math.PI/2;
+  for (let i=0;i<spinner.names.length;i++){
+    const frac=Math.max(0,spinner.weights[i])/total, a1=a+frac*TAU;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,R,a,a1); ctx.closePath();
+    ctx.fillStyle=sliceColor(i,spinner.names.length); ctx.fill();
+    ctx.strokeStyle=cvar('--surface'); ctx.lineWidth=2; ctx.stroke();
+    if (frac>0.04){
+      const mid=(a+a1)/2, lr=R*0.6;
+      ctx.fillStyle='#fff'; ctx.font='600 11px '+cvar('--sans'); ctx.textAlign='center'; ctx.textBaseline='middle';
+      const nm=spinner.names[i]; ctx.fillText(nm.length>7?nm.slice(0,7):nm, cx+Math.cos(mid)*lr, cy+Math.sin(mid)*lr);
+    }
+    a=a1;
+  }
+  ctx.fillStyle=cvar('--text');
+  ctx.beginPath(); ctx.moveTo(cx, cy-R+2); ctx.lineTo(cx-9, cy-R-13); ctx.lineTo(cx+9, cy-R-13); ctx.closePath(); ctx.fill();
+}
+function drawSpinner(){ spinUpdate(); drawSpinCharts(); }
+function spinAnimateTo(i){
+  const total=spinner.weights.reduce((a,b)=>a+Math.max(0,b),0)||1;
+  let cum=0; for (let j=0;j<i;j++) cum+=Math.max(0,spinner.weights[j]);
+  const midFrac=(cum+Math.max(0,spinner.weights[i])/2)/total;
+  const target = TAU*4 - midFrac*TAU + (Math.floor(spinner.rotation/TAU))*TAU;
+  const start=spinner.rotation, t0=performance.now(), dur=700;
+  function frame(now){
+    const t=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-t,3);
+    spinner.rotation = start + (target-start)*e;
+    drawWheel();
+    if (t<1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+$('#spinAdd').addEventListener('click', ()=>{
+  if (spinner.names.length>=8) return;
+  spinner.names.push('Outcome '+(spinner.names.length+1)); spinner.weights.push(1);
+  spinReset(); spinRebuildRows(); drawSpinner();
+});
+$('#spinRows').addEventListener('input', e=>{
+  const t=e.target;
+  if (t.dataset.sn!=null){ spinner.names[+t.dataset.sn]=t.value||('#'+(+t.dataset.sn+1)); spinReset(); drawSpinner(); }
+  else if (t.dataset.sw!=null){ spinner.weights[+t.dataset.sw]=Math.max(0,+t.value||0); spinReset(); drawSpinner(); }
+});
+$('#spinRows').addEventListener('click', e=>{
+  const b=e.target.closest('[data-sd]'); if (!b || spinner.names.length<=2) return;
+  const i=+b.dataset.sd; spinner.names.splice(i,1); spinner.weights.splice(i,1);
+  spinReset(); spinRebuildRows(); drawSpinner();
+});
+
+/* ==================================================================
+   4. CARDS
+   ================================================================== */
+const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const SUITS=[{s:'♠',red:false},{s:'♥',red:true},{s:'♦',red:true},{s:'♣',red:false}];
+const CARD_EVENTS=[
+  { label:'Red card', test:(su,ra)=>SUITS[su].red },
+  { label:'Black card', test:(su,ra)=>!SUITS[su].red },
+  { label:'A heart', test:(su,ra)=>su===1 },
+  { label:'A face card (J, Q, K)', test:(su,ra)=>ra>=10 },
+  { label:'An ace', test:(su,ra)=>ra===0 },
+  { label:'Ten or higher (10-K)', test:(su,ra)=>ra>=9 },
+];
+function cardEventCount(ev){ let c=0; for (let su=0;su<4;su++) for (let ra=0;ra<13;ra++) if (ev.test(su,ra)) c++; return c; }
+const cards = { eventIdx:2, replace:true, hits:0, total:0, deck:[], pos:52, last:null, hist:makeHist() };
+function cardReset(){ cards.hits=0; cards.total=0; cards.pos=52; histReset(cards.hist); }
+function cardTheo(){ return cardEventCount(CARD_EVENTS[cards.eventIdx])/52; }
+function shuffleDeck(){
+  cards.deck=[...Array(52).keys()];
+  for (let i=51;i>0;i--){ const j=RNG.int(i+1); [cards.deck[i],cards.deck[j]]=[cards.deck[j],cards.deck[i]]; }
+  cards.pos=0;
+}
+function cardTrial(){
+  let idx;
+  if (cards.replace){ idx=RNG.int(52); }
+  else { if (cards.pos>=52) shuffleDeck(); idx=cards.deck[cards.pos++]; }
+  const su=Math.floor(idx/13), ra=idx%13;
+  const ok=CARD_EVENTS[cards.eventIdx].test(su,ra);
+  if (ok) cards.hits++;
+  cards.total++; cards.last=idx;
+  histPush(cards.hist, cards.total, cards.hits/cards.total);
+  return { idx, ok };
+}
+function cardUpdate(){
+  $('#cardHits').textContent=commas(cards.hits);
+  $('#cardN').textContent=commas(cards.total);
+  const emp=cards.total?cards.hits/cards.total:null, th=cardTheo();
+  $('#cardEmp').textContent=fmt4(emp);
+  $('#cardTheo').textContent=fmt4(th);
+  $('#cardDiff').textContent=emp==null?'—':fmt4(Math.abs(emp-th));
+}
+function drawCards(){ cardUpdate(); histForce(cards.hist, cards.total, cards.total?cards.hits/cards.total:cardTheo()); drawConvergence($('#cardChart'), cards.hist, cardTheo(), { y:[0,1], dec:3, xLabel:'draws' }); }
+function cardVisual(idx){
+  const el=$('#cardVisual'); const su=Math.floor(idx/13), ra=idx%13;
+  el.classList.toggle('red', SUITS[su].red);
+  el.innerHTML=`<div class="corner"><span class="r">${RANKS[ra]}</span><span class="s">${SUITS[su].s}</span></div><div class="pip">${SUITS[su].s}</div>`;
+  el.classList.remove('flip'); void el.offsetWidth; el.classList.add('flip');
+}
+(function initCardEvents(){
+  $('#cardEvent').innerHTML=CARD_EVENTS.map((e,i)=>{ const c=cardEventCount(e); return `<option value="${i}">${e.label} — ${c}/52</option>`; }).join('');
+  $('#cardEvent').value=String(cards.eventIdx);
+})();
+$('#cardEvent').addEventListener('change', e=>{ cards.eventIdx=+e.target.value; cardReset(); drawCards(); });
+$('#cardReplace').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if (!b) return;
+  cards.replace = b.dataset.v==='1';
+  $$('#cardReplace button').forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
+  cardReset(); drawCards();
+});
+
+/* ==================================================================
+   5. MARBLES
+   ================================================================== */
+const MARBLE_COLORS=[{name:'Red',hex:'#e0524a'},{name:'Blue',hex:'#3b82f6'},{name:'Green',hex:'#22a06b'},{name:'Yellow',hex:'#eab308'}];
+const marbles = { counts:[5,3,2,0], target:0, k:5, replace:false, pool:[], obs:null, total:0, sumTgt:0, dist:null, lastDraw:[], hist:makeHist() };
+function marbleTotal(){ return marbles.counts.reduce((a,b)=>a+b,0); }
+function marbleP(){ const t=marbleTotal(); return t?marbles.counts[marbles.target]/t:0; }
+function marbleEffectiveK(){ const N=marbleTotal(); return marbles.replace ? marbles.k : Math.min(marbles.k, N); }
+function marbleRebuild(){
+  // pool of color indices
+  marbles.pool=[]; marbles.counts.forEach((c,ci)=>{ for (let j=0;j<c;j++) marbles.pool.push(ci); });
+  const k=marbleEffectiveK();
+  marbles.obs=new Float64Array(k+1);
+  marbles.total=0; marbles.sumTgt=0; histReset(marbles.hist);
+  // theoretical distribution
+  const N=marbleTotal(), K=marbles.counts[marbles.target], p=marbleP();
+  marbles.dist=new Array(k+1).fill(0);
+  for (let i=0;i<=k;i++){ marbles.dist[i]= marbles.replace ? binomPmf(k,i,p) : hyperPmf(N,K,k,i); }
+}
+function marbleTrial(){
+  const k=marbleEffectiveK(), N=marbles.pool.length; let hit=0; const draw=[];
+  if (marbles.replace){
+    for (let j=0;j<k;j++){ const ci=marbles.pool[RNG.int(N)]; draw.push(ci); if (ci===marbles.target) hit++; }
+  } else {
+    // partial Fisher-Yates on the shared pool (stays a valid permutation)
+    for (let j=0;j<k;j++){ const r=j+RNG.int(N-j); const tmp=marbles.pool[j]; marbles.pool[j]=marbles.pool[r]; marbles.pool[r]=tmp; const ci=marbles.pool[j]; draw.push(ci); if (ci===marbles.target) hit++; }
+  }
+  marbles.obs[hit]++; marbles.total++; marbles.sumTgt+=hit; marbles.lastDraw=draw;
+  histPush(marbles.hist, marbles.total, marbles.sumTgt/marbles.total);
+  return hit;
+}
+function marbleTheoMean(){ return marbleEffectiveK()*marbleP(); }
+function marbleUpdate(){
+  $('#marbleN').textContent=commas(marbles.total);
+  $('#marbleMeanEmp').textContent=marbles.total?fmt3(marbles.sumTgt/marbles.total):'—';
+  $('#marbleMeanTheo').textContent=fmt3(marbleTheoMean());
+  $('#marbleModel').textContent=marbles.replace?'Binomial':'Hypergeometric';
+  const N=marbleTotal(), K=marbles.counts[marbles.target], k=marbleEffectiveK();
+  $('#marbleNote').innerHTML = marbles.replace
+    ? `Drawing <strong>with replacement</strong>: each of the ${k} draws is independent with p = ${K}/${N} = <strong>${fmt4(marbleP())}</strong>. Exact model = Binomial(${k}, ${fmt4(marbleP())}).`
+    : `Drawing <strong>without replacement</strong>: ${k} marbles taken from ${N} (${K} target). Exact model = Hypergeometric(N=${N}, K=${K}, n=${k}).`;
+}
+function drawMarbles(){
+  marbleUpdate();
+  const k=marbleEffectiveK(); const labels=[], obs=[], exp=[];
+  for (let i=0;i<=k;i++){ labels.push(String(i)); obs.push(marbles.total?marbles.obs[i]/marbles.total:0); exp.push(marbles.dist[i]||0); }
+  drawBars($('#marbleChart'), labels, obs, exp);
+}
+function marbleVisual(){
+  const box=$('#marbleVisual'); box.innerHTML='';
+  marbles.lastDraw.forEach(ci=>{
+    const m=document.createElement('div'); m.className='marble'+(ci===marbles.target?' hit':'');
+    m.style.background=MARBLE_COLORS[ci].hex; box.appendChild(m);
+  });
+}
+function marbleRebuildRows(){
+  const box=$('#urnRows'); box.innerHTML='<h3 style="margin-top:0">Marbles in the urn</h3>';
+  MARBLE_COLORS.forEach((c,i)=>{
+    const row=document.createElement('label'); row.className='field'; row.style.marginBottom='8px';
+    row.innerHTML=`<span style="display:flex;align-items:center;gap:7px"><i style="width:14px;height:14px;border-radius:50%;display:inline-block;background:${c.hex}"></i>${c.name}</span>
+      <input type="number" min="0" max="30" step="1" value="${marbles.counts[i]}" data-mc="${i}" aria-label="${c.name} count">`;
+    box.appendChild(row);
+  });
+}
+function marbleRefreshTarget(){
+  const sel=$('#marbleTarget');
+  sel.innerHTML=MARBLE_COLORS.map((c,i)=>`<option value="${i}"${i===marbles.target?' selected':''}${marbles.counts[i]===0?' disabled':''}>${c.name} (${marbles.counts[i]})</option>`).join('');
+}
+$('#urnRows').addEventListener('input', e=>{
+  const t=e.target; if (t.dataset.mc==null) return;
+  marbles.counts[+t.dataset.mc]=clamp(+t.value||0,0,30);
+  if (marbles.counts[marbles.target]===0){ const alt=marbles.counts.findIndex(c=>c>0); if (alt>=0) marbles.target=alt; }
+  marbleRefreshTarget(); marbleRebuild(); drawMarbles();
+});
+$('#marbleTarget').addEventListener('change', e=>{ marbles.target=+e.target.value; marbleRebuild(); drawMarbles(); });
+$('#marbleK').addEventListener('input', e=>{ marbles.k=+e.target.value; $('#marbleKVal').textContent=marbles.k; marbleRebuild(); drawMarbles(); });
+$('#marbleReplace').addEventListener('click', e=>{
+  const b=e.target.closest('button'); if (!b) return;
+  marbles.replace=b.dataset.v==='1';
+  $$('#marbleReplace button').forEach(x=>x.setAttribute('aria-pressed', String(x===b)));
+  marbleRebuild(); drawMarbles();
+});
+
+/* ==================================================================
+   6. BIRTHDAY
+   ================================================================== */
+const birthday = { g:23, match:0, rooms:0, hist:makeHist(), curve:[] };
+function birthdayProb(g){ if (g<2) return 0; let p=1; for (let i=0;i<g;i++) p*=(365-i)/365; return 1-p; }
+(function(){ for (let g=0; g<=80; g++) birthday.curve[g]=birthdayProb(g); })();
+function bdayReset(){ birthday.match=0; birthday.rooms=0; histReset(birthday.hist); }
+const _seen=new Int32Array(366); let _stamp=0;
+function bdayHasDup(g){ _stamp++; for (let i=0;i<g;i++){ const b=RNG.int(365); if (_seen[b]===_stamp) { /* finish loop to keep RNG count deterministic-ish not needed */ return true; } _seen[b]=_stamp; } return false; }
+function bdayTrial(){ const dup=bdayHasDup(birthday.g); if (dup) birthday.match++; birthday.rooms++; histPush(birthday.hist, birthday.rooms, birthday.match/birthday.rooms); return dup; }
+function bdaySampleRoom(){ // returns birthdays + which indices collide (for the visual)
+  const bd=[]; const seen={}; const hit=new Array(birthday.g).fill(false);
+  for (let i=0;i<birthday.g;i++){ const b=RNG.int(365); bd.push(b); if (seen[b]!=null){ hit[i]=true; hit[seen[b]]=true; } seen[b]=i; }
+  return { bd, hit };
+}
+function bdayUpdate(){
+  $('#bdayMatch').textContent=commas(birthday.match);
+  $('#bdayN').textContent=commas(birthday.rooms);
+  const emp=birthday.rooms?birthday.match/birthday.rooms:null, th=birthday.curve[birthday.g];
+  $('#bdayEmp').textContent=fmt4(emp);
+  $('#bdayTheo').textContent=fmt4(th);
+  $('#bdayDiff').textContent=emp==null?'—':fmt4(Math.abs(emp-th));
+}
+function drawBdayCurve(){
+  const cv=$('#bdayCurve'); const { ctx, w, h } = fitCanvas(cv);
+  const muted=cvar('--muted'), grid=cvar('--border');
+  const padL=42, padR=14, padT=12, padB=30, pw=w-padL-padR, ph=h-padT-padB;
+  const X=g=>padL+pw*(g/80), Y=p=>padT+ph*(1-p);
+  ctx.font='11px '+cvar('--sans');
+  ctx.textAlign='right'; ctx.textBaseline='middle';
+  for (let i=0;i<=5;i++){ const p=i/5, y=Y(p); ctx.strokeStyle=grid; ctx.globalAlpha=.45; ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+pw,y); ctx.stroke(); ctx.globalAlpha=1; ctx.fillStyle=muted; ctx.fillText(p.toFixed(1), padL-5, y); }
+  ctx.textAlign='center'; ctx.textBaseline='top';
+  for (let g=0; g<=80; g+=20){ ctx.fillStyle=muted; ctx.fillText(String(g), X(g), padT+ph+6); }
+  // curve
+  ctx.strokeStyle=THEO; ctx.lineWidth=2.4; ctx.beginPath();
+  for (let g=0; g<=80; g++){ const x=X(g), y=Y(birthday.curve[g]); g?ctx.lineTo(x,y):ctx.moveTo(x,y); }
+  ctx.stroke();
+  // current group marker
+  const gx=X(birthday.g), gy=Y(birthday.curve[birthday.g]);
+  ctx.strokeStyle=cvar('--border'); ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(gx,padT); ctx.lineTo(gx,padT+ph); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=THEO; ctx.beginPath(); ctx.arc(gx,gy,4,0,TAU); ctx.fill();
+  // empirical marker
+  if (birthday.rooms){ const emp=birthday.match/birthday.rooms; ctx.fillStyle=cvar('--accent'); ctx.beginPath(); ctx.arc(gx,Y(emp),4,0,TAU); ctx.fill(); }
+  ctx.fillStyle=cvar('--text'); ctx.textAlign='center'; ctx.textBaseline='bottom'; ctx.font='600 11px '+cvar('--sans');
+  ctx.fillText(`g=${birthday.g}: ${(birthday.curve[birthday.g]*100).toFixed(1)}%`, clamp(gx,padL+40,padL+pw-40), gy-8);
+}
+function drawBirthday(){
+  bdayUpdate(); drawBdayCurve();
+  histForce(birthday.hist, birthday.rooms, birthday.rooms?birthday.match/birthday.rooms:birthday.curve[birthday.g]);
+  drawConvergence($('#bdayChart'), birthday.hist, birthday.curve[birthday.g], { y:[0,1], dec:3, xLabel:'rooms' });
+}
+function bdayVisual(room){
+  const box=$('#bdayVisual'); box.innerHTML='';
+  room.bd.forEach((b,i)=>{ const d=document.createElement('div'); d.className='person'+(room.hit[i]?' hit':''); d.title='Day '+(b+1); box.appendChild(d); });
+}
+$('#bdayG').addEventListener('input', e=>{ birthday.g=+e.target.value; $('#bdayGVal').textContent=birthday.g; bdayReset(); drawBirthday(); });
+
+/* ==================================================================
+   Trial dispatch (single animated + fast batches)
+   ================================================================== */
+const RUNNERS = {
+  coins: { trial:coinTrial, draw:drawCoins, single(r){ coinVisual(r); } },
+  dice:  { trial:diceTrial, draw:drawDice, single(){ diceVisual(); } },
+  spinner:{ trial:spinTrial, draw:drawSpinner, single(i){ $('#spinLast').textContent=spinner.names[i]; spinAnimateTo(i); } },
+  cards: { trial:cardTrial, draw:drawCards, single(r){ cardVisual(r.idx); } },
+  marbles:{ trial:marbleTrial, draw:drawMarbles, single(){ marbleVisual(); } },
+  birthday:{ trial:bdayTrial, draw:drawBirthday, single(dup){ bdayVisual(bdaySampleRoom()); } },
+};
+
+function runTrials(exp, n){
+  const R=RUNNERS[exp];
+  if (n===1){
+    // single: run once, animate. For dice we need the individual faces:
+    if (exp==='dice'){ lastDiceFaces=[]; let sum=0; for (let d=0; d<dice.count; d++){ const f=RNG.int(dice.sides)+1; lastDiceFaces.push(f); sum+=f; } dice.counts[sum-dice.count]++; dice.total++; dice.sumTotal+=sum; histPush(dice.hist,dice.total,dice.sumTotal/dice.total); $('#diceLast').textContent=sum; diceVisual(); R.draw(); return; }
+    const out=R.trial(); R.single(out); R.draw();
+    if (exp==='marbles'){ /* visual uses lastDraw already set */ }
+    return;
+  }
+  // batch: no per-trial DOM
+  for (let i=0;i<n;i++) R.trial();
+  if (exp==='dice') $('#diceLast').textContent = '—';
+  R.draw();
+}
+
+$$('[data-run]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{ runTrials(btn.dataset.run, +btn.dataset.n); });
+});
+$$('[data-reset]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const exp=btn.dataset.reset;
+    ({ coins:coinReset, dice:diceRebuild, spinner:spinReset, cards:cardReset, marbles:marbleRebuild, birthday:bdayReset })[exp]();
+    if (exp==='coins'){ $('#coinVisual').textContent='?'; $('#coinVisual').classList.remove('tails'); }
+    if (exp==='dice'){ $('#diceVisual').innerHTML=''; $('#diceLast').textContent='—'; lastDiceFaces=null; }
+    if (exp==='cards'){ $('#cardVisual').classList.remove('red'); $('#cardVisual').innerHTML='<div class="corner"><span class="r">?</span></div>'; }
+    if (exp==='marbles'){ $('#marbleVisual').innerHTML=''; }
+    if (exp==='birthday'){ $('#bdayVisual').innerHTML=''; }
+    if (exp==='spinner'){ $('#spinLast').textContent='—'; }
+    RUNNERS[exp].draw();
+  });
+});
+
+/* ==================================================================
+   Tabs + redraw wiring
+   ================================================================== */
+let activeExp='coins';
+const DRAW={ coins:drawCoins, dice:drawDice, spinner:drawSpinner, cards:drawCards, marbles:drawMarbles, birthday:drawBirthday };
+function redrawActive(){ DRAW[activeExp](); }
+$$('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    activeExp=tab.dataset.exp;
+    $$('.tab').forEach(t=>t.setAttribute('aria-selected', String(t===tab)));
+    $$('.panel').forEach(p=>{ p.hidden = p.id !== 'panel-'+activeExp; });
+    redrawActive();
+  });
+});
+let rT; window.addEventListener('resize', ()=>{ clearTimeout(rT); rT=setTimeout(redrawActive, 120); });
+
+/* ---------- theme ---------- */
+const root=document.documentElement;
+const savedTheme=localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('#themeBtn').addEventListener('click', ()=>{
+  const cur=root.getAttribute('data-theme');
+  const isDark = cur ? cur==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next=isDark?'light':'dark';
+  root.setAttribute('data-theme', next); localStorage.setItem('max-theme', next);
+  redrawActive();
+});
+
+/* ---------- boot ---------- */
+diceRebuild();
+spinRebuildRows(); spinReset();
+marbleRebuildRows(); marbleRefreshTarget(); marbleRebuild();
+drawCoins();
+</script>
+</body>
+</html>

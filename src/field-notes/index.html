@@ -4,56 +4,78 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Field Notes · Mapzimus</title>
-  <meta name="description" content="The workbench journal of the Mapzimus lab: notes on the tools, maps, games, and experiments as they get built.">
+  <meta name="description" content="Short write-ups from the Mapzimus lab: what got built, how it works, and what it taught me.">
   <link rel="canonical" href="https://mapzimus.com/field-notes/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Field Notes · Mapzimus">
-  <meta property="og:description" content="The workbench journal of the Mapzimus lab.">
+  <meta property="og:description" content="Short write-ups from the Mapzimus lab.">
   <meta property="og:url" content="https://mapzimus.com/field-notes/">
   <meta name="twitter:card" content="summary">
-  <meta name="theme-color" content="#f4f0e7">
+  <meta name="theme-color" content="#121721">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/field-notes/field-notes.css">
+  <script src="/theme.js"></script>
   <script src="/field-notes/field-notes.js" defer></script>
 </head>
 <body data-view="field-notes">
+<div class="sheet">
   <a class="skip-link" href="#notes">Skip to notes</a>
   <header class="site-header">
     <a class="brand" href="/" aria-label="Mapzimus home">
       <span class="brand-mark" aria-hidden="true">MZ</span>
-      <span>Mapzimus</span>
+      <span class="brand-name">Mapzimus</span>
     </a>
-    <nav aria-label="Primary navigation">
-      <a href="/lab/">Lab</a>
+    <nav class="site-nav" aria-label="Primary navigation">
       <a href="/tools/">Tools</a>
       <a href="/maps/">Maps</a>
-      <a href="/field-notes/" aria-current="page">Field Notes</a>
       <a href="/games/">Games</a>
+      <a href="/lab/">Lab</a>
+      <a href="/field-notes/" aria-current="page">Notes</a>
       <a href="/radars/">Radars</a>
       <a href="/skills/">Skills</a>
       <a href="/links/">Links</a>
       <a href="/about/">About</a>
-      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Portfolio ↗</a>
     </nav>
+    <details class="menu">
+      <summary aria-label="Open menu">Menu</summary>
+      <div class="menu-panel">
+        <a href="/tools/">Tools</a>
+        <a href="/maps/">Maps</a>
+        <a href="/games/">Games</a>
+        <a href="/lab/">Lab</a>
+        <a href="/field-notes/" aria-current="page">Field Notes</a>
+        <a href="/radars/">Radars</a>
+        <a href="/skills/">Skills</a>
+        <a href="/links/">Links</a>
+        <a href="/about/">About</a>
+        <a href="https://maxwellhowegis.com">Portfolio ↗</a>
+      </div>
+    </details>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme">
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+    </button>
   </header>
 
   <main>
     <section class="hero">
-      <div class="eyebrow">The workbench journal</div>
-      <h1>Field notes.</h1>
-      <p>Notes on what's being built and what it taught me. Drafted here, sometimes graduating to LinkedIn.</p>
+      <span class="coord coord-ne" aria-hidden="true">42°31′ N</span>
+      <span class="coord coord-sw" aria-hidden="true">70°54′ W · SALEM, MASS.</span>
+      <div class="eyebrow">Notes</div>
+      <h1>Field notes</h1>
+      <p>Short write-ups on what I'm building and what it taught me.</p>
     </section>
 
-    <section class="notes" id="notes" aria-label="Posts">
-      <p class="empty" id="notesEmpty">Loading notes…</p>
-    </section>
+    <section class="notes" id="notes" aria-label="Posts">{{NOTES}}</section>
   </main>
 
   <footer>
-    <p>Mapzimus is the creative lab of Maxwell Howe.</p>
-    <p class="footer-note">Add posts in src/data/field-notes.json. Drafts show with ?drafts.</p>
+    <p>Mapzimus is the lab of Maxwell Howe — browser tools, maps, and games, all free.<br>Professional GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
+    <p class="footer-note">MAPZIMUS QUADRANGLE · STATIC SITE · NO TRACKING</p>
   </footer>
-
+</div>
 </body>
 </html>

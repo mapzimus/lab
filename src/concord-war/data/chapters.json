@@ -1,0 +1,472 @@
+{
+ "version": 1,
+ "chapters": [
+  {
+   "id": "intro",
+   "title": "The Two Banks",
+   "subtitle": "One city, split by a river and an interstate",
+   "body": "Concord, New Hampshire is cut in three. The Merrimack River runs northwest to southeast; Interstate 93 shadows it just to the east. Between them lies a contested no-man's-land. West of both sits the body of the city: 30,755 people, the State House, the hospitals, the prison, the water. East of both sits the fist: the airport, the National Guard reservation, the high ground, the logistics belt and 13,221 residents. The strategic logic is brutal and simple. East holds the weapons and the heights; West holds the population and the lifelines. East wins a blitz. West wins a siege.",
+   "stats": [
+    {
+     "label": "West Concord population",
+     "value": "30,755 (70%)"
+    },
+    {
+     "label": "East Concord population",
+     "value": "13,221 (30%)"
+    },
+    {
+     "label": "Front line",
+     "value": "Interstate 93"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "territory_west",
+    "territory_east",
+    "territory_contested",
+    "territory_contested_stripes",
+    "city_pois"
+   ],
+   "camera": {
+    "center": [
+     -71.54,
+     43.22
+    ],
+    "zoom": 11,
+    "pitch": 0,
+    "bearing": 0
+   }
+  },
+  {
+   "id": "west_body",
+   "title": "West — the Body",
+   "subtitle": "People, medicine, water, and the dungeon",
+   "body": "West Concord is where the city lives. Downtown, the State House, and the courts anchor the civilian core, alongside Concord Hospital and NH Hospital. The State Prison for Men on North State Street holds roughly 1,400 inmates with a corrections force chronically near half-staffed. Policing mass concentrates here too: Concord PD with its Lenco BearCat, the Merrimack County Sheriff, and on Hazen Drive the NH State Police and Department of Safety headquarters. This is the body of the war effort, dense and vulnerable, holding the people, the medicine, and the only armored vehicle in the city.",
+   "stats": [
+    {
+     "label": "Prison capacity",
+     "value": "~1,400 inmates"
+    },
+    {
+     "label": "Corrections staffing",
+     "value": "~50% vacant"
+    },
+    {
+     "label": "Armored vehicles, West",
+     "value": "1 Lenco BearCat"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "territory_west",
+    "resources_medical",
+    "resources_police",
+    "resources_govt",
+    "resources_manpower"
+   ],
+   "camera": {
+    "center": [
+     -71.538,
+     43.207
+    ],
+    "zoom": 13,
+    "pitch": 0,
+    "bearing": 0
+   }
+  },
+  {
+   "id": "east_fist",
+   "title": "East — the Fist",
+   "subtitle": "Arms, aircraft, and the command brain",
+   "body": "East Concord is small but armed. At the State Military Reservation on Minuteman Way sits the headquarters of the 3rd Battalion, 197th Field Artillery — a confirmed M142 HIMARS unit, along with Joint Force Headquarters NH and the 22-soldier 12th Civil Support Team. At the adjacent Army Aviation Support Facility, two Black Hawk fleets stand ready: A Company, 1-169th flies UH-60L lift birds, and C Company, 3-238th flies HH-60M MEDEVAC. The HIMARS firing batteries home-station outside the city, so East commands the rockets but the launchers must road-march in. The fist is here; some of its knuckles arrive late.",
+   "stats": [
+    {
+     "label": "HIMARS battalion HQ",
+     "value": "3-197th FA"
+    },
+    {
+     "label": "Black Hawk fleets",
+     "value": "Lift + MEDEVAC"
+    },
+    {
+     "label": "CBRNE team",
+     "value": "12th CST, 22 soldiers"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "territory_east",
+    "resources_military",
+    "himars",
+    "blackhawks",
+    "resources_command",
+    "tanks"
+   ],
+   "camera": {
+    "center": [
+     -71.504,
+     43.205
+    ],
+    "zoom": 13,
+    "pitch": 0,
+    "bearing": 0
+   }
+  },
+  {
+   "id": "high_ground",
+   "title": "The High Ground",
+   "subtitle": "Oak Hill and the Heights look down on the West",
+   "body": "Elevation decides this war. The Heights and Oak Hill rise on the eastern bank, giving observers a clean line of sight across the river to downtown. From these crests, forward observers can range the State House, the hospitals, and the crossings, while West Concord has no answering height to overlook the East. Whoever holds Oak Hill holds the eyes of the battlefield — and the eyes that cue the rockets. The exposed western core lies open beneath the eastern viewshed, every key building visible from ground the East already owns.",
+   "stats": [
+    {
+     "label": "Dominant height",
+     "value": "Oak Hill, NE"
+    },
+    {
+     "label": "Observation advantage",
+     "value": "East"
+    },
+    {
+     "label": "Exposed core",
+     "value": "Downtown West"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "territory_east",
+    "territory_west",
+    "terrain_3d",
+    "viewshed_east",
+    "exposed_west"
+   ],
+   "camera": {
+    "center": [
+     -71.49,
+     43.255
+    ],
+    "zoom": 12,
+    "pitch": 60,
+    "bearing": -20
+   }
+  },
+  {
+   "id": "fire_zones",
+   "title": "Neighborhoods Under the Guns",
+   "subtitle": "Who lives inside the East's field of fire",
+   "body": "Artillery does not respect property lines. Laid against Concord's neighborhoods, the East's line-of-sight fire shows exactly who lives in the beaten zone. The downtown core and the river wards sit under heavy observed fire — every street visible from the Heights and rangeable from the gun line. Penacook and the western fringes lie partly sheltered behind terrain. The range rings from the East battery mark the tactical distances: inside a few kilometers, nothing on the west bank is truly out of reach of indirect fire.",
+   "stats": [
+    {
+     "label": "Heaviest exposure",
+     "value": "Downtown + river wards"
+    },
+    {
+     "label": "Most sheltered",
+     "value": "Western fringes"
+    },
+    {
+     "label": "Battery",
+     "value": "NHARNG armory (East)"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "neighborhoods",
+    "artillery_rings",
+    "himars",
+    "tanks"
+   ],
+   "camera": {
+    "center": [
+     -71.535,
+     43.212
+    ],
+    "zoom": 11,
+    "pitch": 0,
+    "bearing": 0
+   }
+  },
+  {
+   "id": "allies",
+   "title": "The Allied Towns",
+   "subtitle": "Which neighbors fall in with which bank",
+   "body": "No city fights alone. Concord's eight bordering towns each fall to the bank they share the most boundary with — and where a town barely touches the line, to the nearer side. Beyond them a second ring is drawn in by direction: the West gains Warner and Weare to the northwest and west; the East gains Deerfield and Northwood to the southeast. West rallies Bow, Hopkinton, Webster, Boscawen, Dunbarton, Warner, and Weare — the commuter and farm towns of the river's west side. East draws Pembroke, Chichester, Loudon, Canterbury, Epsom, Allenstown, Deerfield, and Northwood, the towns beyond the Heights and the Soucook. The alliance is lopsided — the West bloc holds more land and people, but the East's ring wraps the high country the guns fire from and the eastern roads into town.",
+   "stats": [
+    {
+     "label": "West-allied (7)",
+     "value": "Bow, Hopkinton, Webster, Boscawen, Dunbarton, Warner, Weare"
+    },
+    {
+     "label": "East-allied (8)",
+     "value": "Pembroke, Chichester, Loudon, Canterbury, Epsom, Allenstown, Deerfield, Northwood"
+    },
+    {
+     "label": "Rule",
+     "value": "Shared border; outer ring by direction"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "allied_towns",
+    "territory_west",
+    "territory_east"
+   ],
+   "camera": {
+    "center": [
+     -71.535,
+     43.215
+    ],
+    "zoom": 10,
+    "pitch": 0,
+    "bearing": 0
+   }
+  },
+  {
+   "id": "lifelines",
+   "title": "The Lifelines",
+   "subtitle": "Water, power, and gas — almost all of it West",
+   "body": "Civilian survival runs through the western bank. Drinking water comes from Penacook Lake and the Hutchins Street treatment plant; both wastewater plants and the gas distribution office sit West too. Power distribution control — Unitil's region operations and the aging downtown switching hubs — is western as well. East holds generation and fuel, not control: Rymes Propane's bulk depot and a 6.7 MW landfill solar array. The exceptions are mid-river. Garvins Falls hydro, 12.4 MW on the southern Bow line, is genuinely contested, and gas arrives only through the single Concord Lateral pipeline up the I-93 corridor — a chokepoint, not a local supply.",
+   "stats": [
+    {
+     "label": "Drinking water source",
+     "value": "Penacook Lake, West"
+    },
+    {
+     "label": "Garvins Falls hydro",
+     "value": "12.4 MW, contested"
+    },
+    {
+     "label": "Gas supply",
+     "value": "1 pipeline lateral"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "territory_contested",
+    "lifelines_water",
+    "resources_water",
+    "lifelines_power",
+    "resources_energy",
+    "garvins_falls"
+   ],
+   "camera": {
+    "center": [
+     -71.54,
+     43.22
+    ],
+    "zoom": 11,
+    "pitch": 0,
+    "bearing": 0
+   }
+  },
+  {
+   "id": "crossings",
+   "title": "The Crossings",
+   "subtitle": "The bridges and interchanges that decide everything",
+   "body": "A divided city fights over its seams. The Merrimack's bridges and the I-93 interchanges are the only ways to move force between banks, and each is a kill box. The I-93 exits — Exit 17 at Penacook in the north, Fort Eddy Road in the center, and the Bow Junction at the southern gate — control whether East can pour armor west or West can counterattack east. Hold a crossing and you hold initiative; lose one and your half of the city is sealed off. The front line is not the interstate itself but the handful of spans that breach it.",
+   "stats": [
+    {
+     "label": "Central interchange",
+     "value": "Fort Eddy Rd"
+    },
+    {
+     "label": "Northern gate",
+     "value": "Exit 17, Penacook"
+    },
+    {
+     "label": "Southern gate",
+     "value": "Bow Junction"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "territory_west",
+    "territory_east",
+    "territory_contested",
+    "crossings",
+    "i93_exits"
+   ],
+   "camera": {
+    "center": [
+     -71.528,
+     43.2
+    ],
+    "zoom": 12,
+    "pitch": 0,
+    "bearing": 0
+   }
+  },
+  {
+   "id": "flashpoints",
+   "title": "The Contested Ground",
+   "subtitle": "The strip between the river and the interstate",
+   "body": "Between the Merrimack and I-93 lies the no-man's-land, and it is full of prizes. Fort Eddy Road and the Everett Arena, NHTI and the McAuliffe-Shepard center, the airport's approach corridor, and the Penacook plazas at Exit 17 all sit in the contested strip. So does Garvins Falls hydro, mid-river on the Bow line, and the state data center on the Hazen Drive seam. These are the flashpoints — assets neither bank fully controls, where any push to seize one tips the whole balance. The contested ground is where the first shots, and the first collapses, will come.",
+   "stats": [
+    {
+     "label": "Contested anchor",
+     "value": "Fort Eddy / Everett Arena"
+    },
+    {
+     "label": "Mid-river power",
+     "value": "Garvins Falls 12.4 MW"
+    },
+    {
+     "label": "Data center",
+     "value": "27 Hazen Dr, seam"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "territory_contested",
+    "territory_contested_stripes",
+    "flashpoints",
+    "crossings"
+   ],
+   "camera": {
+    "center": [
+     -71.52,
+     43.205
+    ],
+    "zoom": 12,
+    "pitch": 0,
+    "bearing": 0
+   }
+  },
+  {
+   "id": "blitz",
+   "title": "Scenario — The Blitz",
+   "subtitle": "East strikes first and fast",
+   "body": "If East moves first, it moves hard. HIMARS — once the launchers road-march in from Plymouth, Littleton, and Nashua — can range the entire western core, ATACMS-class fires reaching far beyond the crossings. Black Hawks from the airport provide air mobility, lifting troops over the river to seize bridges and the State House before West can react. The blitz arcs converge on downtown: rockets suppress, helicopters envelop, and the contested strip is overrun in hours. East's whole advantage is tempo. The opening hours are when the fist lands, and the western body has no armor to stop it.",
+   "stats": [
+    {
+     "label": "HIMARS reach",
+     "value": "ATACMS-class, citywide"
+    },
+    {
+     "label": "Air mobility",
+     "value": "UH-60 lift, airport"
+    },
+    {
+     "label": "Decisive window",
+     "value": "First hours"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "territory_east",
+    "territory_west",
+    "blitz_arcs",
+    "himars",
+    "blackhawks",
+    "crossings",
+    "tanks"
+   ],
+   "camera": {
+    "center": [
+     -71.52,
+     43.21
+    ],
+    "zoom": 12,
+    "pitch": 0,
+    "bearing": 10
+   }
+  },
+  {
+   "id": "siege",
+   "title": "Scenario — The Siege",
+   "subtitle": "West holds the taps and waits",
+   "body": "If the blitz stalls, the war inverts. West holds the body's organs: the drinking water, both wastewater plants, the power distribution control, the gas office, and the dense population that can absorb and outlast a strike. East, for all its firepower, depends on supply it does not fully own — gas through one pipeline lateral, fuel from a single propane depot, generation it cannot distribute. In a siege, West squeezes the lifelines and trades space for time. The fist tires; the body endures. Whoever cannot resupply loses, and in a long fight that is the East.",
+   "stats": [
+    {
+     "label": "Water & sewer",
+     "value": "West controls both"
+    },
+    {
+     "label": "Population reserve",
+     "value": "30,755 West"
+    },
+    {
+     "label": "East gas supply",
+     "value": "1 pipeline, exposed"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "territory_west",
+    "territory_east",
+    "siege_overlay",
+    "lifelines_water",
+    "lifelines_power"
+   ],
+   "camera": {
+    "center": [
+     -71.54,
+     43.22
+    ],
+    "zoom": 11,
+    "pitch": 0,
+    "bearing": 0
+   }
+  },
+  {
+   "id": "explorer",
+   "title": "Explore the War",
+   "subtitle": "The whole map is yours",
+   "body": "You have seen the logic: West is the body, East is the fist, and the contested strip between river and interstate is where they collide. East wins the blitz on firepower, heights, and air mobility; West wins the siege on people, water, and patience. Now the map is open. Toggle the territories, the forces, the lifelines, and the scenarios to test the balance yourself. Every asset traces to real public data with a source and a confidence flag — this is fiction built on fact. Find the crossing, the height, or the lifeline that decides your version of the war.",
+   "stats": [
+    {
+     "label": "Zones",
+     "value": "West / East / Contested"
+    },
+    {
+     "label": "Decisive terrain",
+     "value": "Crossings & heights"
+    },
+    {
+     "label": "Verdict",
+     "value": "Blitz vs. siege"
+    }
+   ],
+   "layers": [
+    "city",
+    "river",
+    "front_line",
+    "territory_west",
+    "territory_east",
+    "territory_contested",
+    "city_pois"
+   ],
+   "camera": {
+    "center": [
+     -71.54,
+     43.22
+    ],
+    "zoom": 11,
+    "pitch": 0,
+    "bearing": 0
+   }
+  }
+ ]
+}

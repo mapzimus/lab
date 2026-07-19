@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 13 · Where Ships Squeeze Through · Navigating Piracy</title>
+<meta name="description" content="Day 13 student missions: hunt the world's chokepoints on the live map, plot a 1717 voyage by dead reckoning, and name the three things that make a piracy hotspot.">
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<script src="day-config.js" defer></script>
+<style>
+  :root{
+    --ink:#12222B; --ink2:#1C3743; --parch:#F3E8CE; --parch2:#EAD9B4;
+    --brass:#A9781F; --brassl:#D8B25A; --ox:#8C2C1E; --inktx:#2B2114; --muted:#6E5B3C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--parch); color:var(--inktx); font-family:"Segoe UI",system-ui,-apple-system,sans-serif; line-height:1.5;}
+  .hero{background:var(--ink); color:var(--parch); padding:2.2em 1em 1.8em; text-align:center;}
+  .hero .kicker{color:var(--brassl); font-weight:700; letter-spacing:.25em; font-size:.85em; text-transform:uppercase;}
+  .hero h1{font-family:Georgia,"Times New Roman",serif; font-size:clamp(1.9em,5vw,3em); margin:.25em 0 .2em;}
+  .hero .sub{color:#C7BCA0; font-style:italic; font-size:1.05em;}
+  .wrap{max-width:880px; margin:0 auto; padding:1.2em 1em 3em;}
+  .mission{background:var(--parch2); border:1.5px solid var(--brass); border-radius:10px; padding:1.2em 1.3em 1.3em; margin:1.3em 0; box-shadow:2px 3px 10px rgba(42,29,15,.14);}
+  .mission-top{display:flex; align-items:baseline; gap:.7em; flex-wrap:wrap;}
+  .mnum{background:var(--ox); color:var(--parch); font-family:Georgia,serif; font-weight:700; font-size:1.25em; border-radius:50%; width:1.9em; height:1.9em; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .mission h2{font-family:Georgia,serif; font-size:1.45em; color:var(--inktx);}
+  .meta{color:var(--ox); font-weight:700; font-size:.92em; margin:.15em 0 .6em;}
+  .mission p{margin:.5em 0;}
+  .btn{display:inline-block; background:var(--brass); color:#FBF4E2; font-weight:700; font-size:1.06em; text-decoration:none; padding:.85em 1.25em; border-radius:8px; margin:.45em .45em .2em 0; border:2px solid #8a6119;}
+  .btn:hover,.btn:focus{background:#8a6119; outline:3px solid var(--ox);}
+  .btn.alt{background:var(--ink2); border-color:var(--ink);}
+  .btn.alt:hover,.btn.alt:focus{background:var(--ink);}
+  .log{background:#FBF4E2; border:1.5px dashed var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .log b{color:var(--ox);}
+  .hunt{margin:.5em 0 .3em 1.2em;}
+  .hunt li{margin:.35em 0;}
+  .bonus{font-style:italic; color:var(--muted); margin-top:.6em;}
+  .vocab{display:flex; gap:.6em; justify-content:center; flex-wrap:wrap; margin:1em 0;}
+  .chip{background:var(--ink); color:var(--brassl); font-family:Georgia,serif; font-weight:700; padding:.45em 1.1em; border-radius:999px; letter-spacing:.06em;}
+  .foot{background:var(--ink); color:#C7BCA0; text-align:center; padding:1.6em 1em 2em; font-size:.95em;}
+  .foot a{color:var(--brassl);}
+  .divider{text-align:center; color:var(--ox); font-size:1.3em; margin:1.6em 0 .2em; font-family:Georgia,serif; font-weight:700;}
+  .note{font-size:.9em; color:var(--muted); font-style:italic;}
+  .card-fields{background:#FBF4E2; border:1.5px solid var(--brass); border-radius:8px; padding:.8em 1em; margin:.6em 0;}
+  .card-fields div{padding:.28em 0; border-bottom:1px dashed var(--parch2); font-weight:700; color:var(--ink2);}
+  .card-fields div:last-child{border-bottom:none;}
+  .card-fields span{color:var(--muted); font-weight:400; font-style:italic;}
+  .race{background:#FBF4E2; border:2px solid var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .race b{color:var(--ox);}
+  @media (max-width:520px){ .mission{padding:1em .9em;} .btn{display:block; text-align:center; margin-right:0;} }
+</style>
+</head>
+<body>
+<div id="today-banner"></div>
+
+<header class="hero">
+  <div class="kicker">Day 13 · Week 4 · Then and Now</div>
+  <h1>Where Ships Squeeze Through</h1>
+  <div class="sub">The ocean is wide. The money sails through a few narrow doors. Pirates knew the doors in 1717. Pirates know them now.</div>
+</header>
+
+<main class="wrap">
+
+  <section class="mission" id="m0">
+    <div class="mission-top"><span class="mnum">0</span><h2>Rig your sheet</h2></div>
+    <div class="meta">2 minutes · solo · paper + pencil</div>
+    <p>One sheet, folded like a book. Cover: <b>your name, "Day 13," the date.</b> Then:</p>
+    <div class="card-fields">
+      <div>Page 1: THE SQUEEZE <span>the chokepoints you find, and the three-factor table</span></div>
+      <div>Page 2: LEAVE OR JOIN <span>this week's big write, plus tonight's Captain's Log</span></div>
+      <div>Back cover: MY COURSE <span>your tracker. Pitch Day is Thursday. Two days.</span></div>
+    </div>
+    <p>One more piece of kit. Grab a <b>DEAD RECKONING sheet</b> from the stack. The grid with the compass rose. Your 1717 voyage gets plotted there.</p>
+  </section>
+
+  <section class="mission" id="m1">
+    <div class="mission-top"><span class="mnum">1</span><h2>The Squeeze Hunt</h2></div>
+    <div class="meta">~12 minutes · with your first mate · one Chromebook per pair</div>
+    <p>Zoom out on the live map and the ocean looks free. It is not. Ships crowd into a few narrow doors, and they line up to get through. Find the crowds.</p>
+    <a class="btn" href="whydah-dashboard.html#maps-geo" target="_blank" rel="noopener">Open the global live map →</a>
+    <p>Four doors to hunt. Jump straight to any of them:</p>
+    <ol class="hunt">
+      <li><a href="https://www.marinetraffic.com/en/ais/home/centerx:32/centery:30/zoom:6" target="_blank" rel="noopener"><b>Suez Canal.</b></a> One canal through a desert. About 12 percent of world trade squeezes through it.</li>
+      <li><a href="https://www.marinetraffic.com/en/ais/home/centerx:103/centery:3/zoom:6" target="_blank" rel="noopener"><b>Strait of Malacca.</b></a> About a third of global shipping rides this one strait.</li>
+      <li><a href="https://www.marinetraffic.com/en/ais/home/centerx:42/centery:14/zoom:5" target="_blank" rel="noopener"><b>Red Sea, Bab-el-Mandeb.</b></a> The narrow south door of the Red Sea. Since 2023, attacks on cargo ships here have pushed many crews to sail the long way around Africa instead. Thousands of miles longer.</li>
+      <li><a href="https://www.marinetraffic.com/en/ais/home/centerx:-80/centery:9/zoom:8" target="_blank" rel="noopener"><b>Panama Canal.</b></a> A shortcut cut through a continent. In 2023 and 2024 a drought cut its daily traffic by about a third. Rain refilled it. Sailors still watch the sky there.</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> For each door you visit, write on THE SQUEEZE page: the chokepoint's name. What makes the squeeze: land on both sides? a canal? a strait? And one real ship you can see waiting in the line.</div>
+    <div class="race"><b>THE SQUEEZE HUNT:</b> log two doors and shout "SQUEEZE." First crew: 5 points. Second: 2. Log all four before missions end: 3 bonus points.</div>
+    <p class="bonus">Check your adopted ship. Is a door ahead on its route? Your captain will want that in tonight's log.</p>
+  </section>
+
+  <section class="mission" id="m2">
+    <div class="mission-top"><span class="mnum">2</span><h2>Plot Like It's 1717</h2></div>
+    <div class="meta">~18 minutes · solo · DEAD RECKONING sheet + pencil · lids at 45</div>
+    <p>It is spring 1717. You are the navigator. Your sloop lies off Jamaica, and the plan is the same one Bellamy sailed: run north for the Carolinas. He took more than 50 ships in about a year on this hunting ground.</p>
+    <p>You have no GPS. You have three numbers: <b>heading, speed, time.</b> That is dead reckoning. Plot it:</p>
+    <ol class="hunt">
+      <li>Mark your start dot near the bottom of the grid. That is Jamaica.</li>
+      <li><b>Leg 1: heading 045°, speed 5 knots, 6 hours.</b> Distance = speed times time = 30 nautical miles. One square = 10, so draw 3 squares toward 045°. Use the compass rose.</li>
+      <li><b>Leg 2: heading 030°, 4 knots, 8 hours.</b> You do the math this time. Draw it from where Leg 1 ended.</li>
+      <li><b>Leg 3: heading 010°, 6 knots, 5 hours.</b> Same drill.</li>
+      <li>The end of Leg 3 is where you <b>think</b> you are. Mark it with an X.</li>
+    </ol>
+    <p>Now the sea cheats. A current pushed you <b>10 nautical miles west</b> and you never felt it. Mark a dot one full square west of your X. That dot is where you really are. The gap between X and dot is <b>dead reckoning error</b>. It grew every day at sea.</p>
+    <p>So how did pirates ever find prey on all that water? Mostly they did not chase. They parked at the doors. Even a lost ship must pass a door. Your Leg 1 runs at one: the <b>Windward Passage</b>, the gap between Cuba and Hispaniola. Bellamy took the Whydah herself near it, after a three-day chase.</p>
+    <div class="log"><b>LOG IT:</b> You're done when your sheet shows three legs drawn, three distances written, the X, the dot, and the gap labeled ERROR.</div>
+  </section>
+
+  <section class="mission" id="m3">
+    <div class="mission-top"><span class="mnum">3</span><h2>The Same Machine</h2></div>
+    <div class="meta">~10 minutes · talk with your first mate, write solo · THE SQUEEZE page</div>
+    <p>1717 and 2026. Three hundred years apart, and piracy runs on the same machine. Three parts:</p>
+    <div class="card-fields">
+      <div>1. TRAFFIC WORTH ROBBING <span>rich cargo, moving on a schedule</span></div>
+      <div>2. GEOGRAPHY THAT SQUEEZES IT <span>straits, canals, island gaps. The ocean narrows to a door and the ships line up.</span></div>
+      <div>3. WEAK POLICING <span>nobody guarding that door</span></div>
+    </div>
+    <p>All three lined up in the 1717 Caribbean. Treasure and trade ships on set routes. Island gaps like the Windward Passage. And navies an ocean away.</p>
+    <p>Do they line up today? Test it. Not long ago, pirates seized a cargo ship called the <b>Ruen</b> off Somalia. In 2024, navy sailors freed the ship and its crew. Ask the three questions: was the cargo worth money? Did geography squeeze the ships into a line? Was anyone guarding the water?</p>
+    <div class="log"><b>LOG IT:</b> On THE SQUEEZE page, make a small table. Three rows: the three factors. Two columns: <b>Windward Passage 1717</b> and <b>one modern chokepoint you logged</b>. Fill all six boxes. Your modern column must name a real place.</div>
+    <p class="note">Modern piracy is real, and it is about ships and cargo. Crews train for it. Navies patrol for it. It is a geography problem, and you now know the three parts. That is why it belongs on your map.</p>
+    <p class="bonus">Fast finishers: earn game time. <a href="navigator/" target="_blank" rel="noopener">Navigator</a> awaits.</p>
+  </section>
+
+  <div class="divider">✦</div>
+
+  <section class="mission" id="reflect">
+    <div class="mission-top"><span class="mnum">✦</span><h2>The Question</h2></div>
+    <div class="meta">2 minutes · think it, write it, or say it</div>
+    <p><b>What does where someone chooses to sail tell you about what they're running from, or toward?</b></p>
+    <p class="note">Bellamy chose the doors. Your adopted ship's owners chose its route. You are choosing a course too.</p>
+  </section>
+
+  <section class="mission" id="write">
+    <div class="mission-top"><span class="mnum">★</span><h2>The Big Write: Leave or Join</h2></div>
+    <div class="meta">~10 minutes · solo · LEAVE OR JOIN page</div>
+    <div class="log"><b>WRITE IT:</b> What is one reason to leave and one reason to join that you think mattered most for the Whydah's crew? Support with evidence.</div>
+    <p>Evidence you already own: the four doors from kayak day. The vote from Day 8. The articles you signed on Day 9. The numbers from Day 5. Use at least one.</p>
+    <a class="btn alt" href="whydah-dashboard.html#why-piracy" target="_blank" rel="noopener">The push and pull evidence →</a>
+  </section>
+
+  <section class="mission" id="log">
+    <div class="mission-top"><span class="mnum">★</span><h2>Captain's Log</h2></div>
+    <div class="meta">5 minutes · solo · in your captain's voice · bottom of LEAVE OR JOIN</div>
+    <p>Your ship is out there right now. Somewhere ahead on its route, there is probably a door.</p>
+    <div class="log"><b>LOG IT:</b> Which chokepoint is next on your ship's course, or which one did it last pass? What does your captain think about sailing into a squeeze? Two or three sentences, captain's voice. Date it like a sailor: "28 July 2026."</div>
+  </section>
+
+  <section class="mission" id="close">
+    <div class="mission-top"><span class="mnum">★</span><h2>Chart Your Course</h2></div>
+    <div class="meta">3 minutes · solo · back cover, MY COURSE</div>
+    <p>Pitch Day is <b>Thursday</b>. Two days. Time to commit, in pencil.</p>
+    <ol class="hunt">
+      <li>Circle <b>ONE person</b> on your list. Your lead.</li>
+      <li>Circle <b>ONE format</b>. The way you would actually build it.</li>
+    </ol>
+    <a class="btn alt" href="whydah-dashboard.html#final-project" target="_blank" rel="noopener">Your Project HQ →</a>
+    <p class="note">Tomorrow you test your pick against Salem itself. Thursday you stand and claim it. A circle in pencil tonight beats a blank stare Thursday.</p>
+  </section>
+
+  <div class="vocab">
+    <span class="chip">chokepoint</span><span class="chip">sea lane</span><span class="chip">dead reckoning</span><span class="chip">hotspot</span>
+  </div>
+  <p style="text-align:center; font-size:.92em; color:var(--muted); max-width:660px; margin:0 auto;">
+    <b>chokepoint</b> = a narrow stretch of water most ships must pass through ·
+    <b>sea lane</b> = the regular route ships follow across open water, an ocean highway ·
+    <b>dead reckoning</b> = working out where you are from speed, direction, and time ·
+    <b>hotspot</b> = a stretch of water where piracy keeps happening because all three factors line up
+  </p>
+
+</main>
+
+<footer class="foot">
+  <p><b>Tomorrow:</b> Salem, then and now. The same machine once ran through the wharves down the street. And Thursday is Pitch Day. Come with your circle drawn.</p>
+  <p style="margin-top:.6em;"><a href="whydah-dashboard.html#overview">⚓ Back to the ship's logbook (dashboard)</a></p>
+</footer>
+
+</body>
+</html>

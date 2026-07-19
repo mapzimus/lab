@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Galleries</title>
+<meta name="description" content="Upload photos from your phone and download them on your Chromebook.">
+<meta name="theme-color" content="#14161a">
+<link rel="icon" type="image/png" sizes="32x32" href="../pics/favicon-32.png">
+<link rel="stylesheet" href="photo.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="site-header">
+    <div class="kicker">Photography Unit</div>
+    <h1>🖼️ Student Galleries</h1>
+    <div class="crumbs"><a href="../">whydahstory.com</a> / <a href="index.html">photo</a> / galleries</div>
+  </header>
+
+  <!-- ============ LIST VIEW ============ -->
+  <div id="list-view">
+    <div class="card">
+      <strong>Phone → Chromebook in 3 steps:</strong>
+      <ol class="muted" style="margin:0.4em 0 0; padding-left:1.4em;">
+        <li><strong>On your phone:</strong> create your gallery below and upload your photos.</li>
+        <li><strong>On your Chromebook:</strong> come back to this page and open your gallery.</li>
+        <li>Hit <strong>Download all</strong> — your photos land in your Downloads folder, ready to edit.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>Start a new gallery</h2>
+      <div class="row">
+        <input type="text" id="new-student" placeholder="Your first name + last initial" maxlength="60">
+        <input type="text" id="new-title" placeholder="Gallery title (e.g. Salem Walk)" maxlength="80">
+        <button id="create-btn">Create gallery</button>
+      </div>
+      <div id="create-status" class="muted" style="margin-top:0.5em;"></div>
+    </div>
+
+    <h2>All galleries</h2>
+    <div id="gallery-list" class="card-grid"><span class="muted">Loading…</span></div>
+  </div>
+
+  <!-- ============ GALLERY VIEW ============ -->
+  <div id="gallery-view" style="display:none;">
+    <p><a href="gallery.html">← All galleries</a></p>
+    <h2 id="g-title"></h2>
+    <p class="muted" id="g-sub"></p>
+
+    <div class="card">
+      <div class="row">
+        <input type="file" id="upload-files" multiple accept="image/*">
+        <button id="upload-btn">Upload photos</button>
+        <button class="secondary" id="download-all-btn">⬇ Download all (.zip)</button>
+      </div>
+      <div id="upload-status" class="muted" style="margin-top:0.5em;"></div>
+      <progress id="upload-progress" max="100" value="0" style="display:none;"></progress>
+    </div>
+
+    <div id="g-grid" class="photo-grid"></div>
+  </div>
+
+  <nav class="footer-nav"><a href="index.html">← Photo home</a></nav>
+</div>
+
+<script src="photo.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const galleryId = params.get('g');
+
+/* ---------- List view ---------- */
+async function loadList() {
+  const box = document.getElementById('gallery-list');
+  try {
+    const rows = await dbSelect('galleries', 'select=*&order=created_at.desc');
+    box.innerHTML = '';
+    if (!rows.length) { box.innerHTML = '<span class="muted">No galleries yet — be the first!</span>'; return; }
+    for (const g of rows) {
+      box.appendChild(el('a', { class: 'card big-link', href: 'gallery.html?g=' + g.id },
+        el('h2', { text: g.title, style: 'font-size:1.1em;' }),
+        el('div', { class: 'muted', text: 'by ' + g.student_name + ' · ' + new Date(g.created_at).toLocaleDateString() })));
+    }
+  } catch (e) {
+    box.innerHTML = '';
+    box.appendChild(el('div', { class: 'error', text: 'Could not load galleries: ' + e.message }));
+  }
+}
+
+document.getElementById('create-btn').onclick = async () => {
+  const student = document.getElementById('new-student').value.trim();
+  const title = document.getElementById('new-title').value.trim();
+  const st = document.getElementById('create-status');
+  if (!student || !title) { st.textContent = 'Fill in your name and a title first.'; return; }
+  try {
+    const g = await dbInsert('galleries', { student_name: student, title });
+    localStorage.setItem('photo-my-name', student);
+    location.href = 'gallery.html?g=' + g.id;
+  } catch (e) { st.textContent = 'Could not create gallery: ' + e.message; }
+};
+
+/* ---------- Gallery view ---------- */
+async function loadGallery() {
+  document.getElementById('list-view').style.display = 'none';
+  document.getElementById('gallery-view').style.display = '';
+  const rows = await dbSelect('galleries', 'select=*&id=eq.' + encodeURIComponent(galleryId));
+  if (!rows.length) { document.getElementById('g-title').textContent = 'Gallery not found'; return; }
+  const g = rows[0];
+  document.getElementById('g-title').textContent = '🖼️ ' + g.title;
+  document.getElementById('g-sub').textContent = 'by ' + g.student_name;
+  document.title = g.title + ' — Student Galleries';
+  await loadPhotos();
+}
+
+let gPaths = [];
+async function loadPhotos() {
+  const grid = document.getElementById('g-grid');
+  grid.innerHTML = '';
+  const items = await storageList('galleries/' + galleryId);
+  gPaths = items.filter(i => i.id !== null && isImage(i.name)).map(i => `galleries/${galleryId}/${i.name}`);
+  if (!gPaths.length) {
+    grid.appendChild(el('span', { class: 'muted', text: 'No photos yet — upload some above (works great from a phone).' }));
+  }
+  for (const p of gPaths) {
+    const name = p.split('/').pop();
+    grid.appendChild(el('div', { class: 'photo-tile' },
+      el('img', { src: publicUrl(p), loading: 'lazy', alt: name, onclick: () => openLightbox(publicUrl(p)) }),
+      el('div', { class: 'tile-bar' },
+        el('div', { class: 'tile-actions' },
+          el('button', { class: 'secondary', text: 'Download', onclick: async (ev) => {
+            ev.target.disabled = true; ev.target.textContent = 'Saving…';
+            try { await downloadFile(p, name); ev.target.textContent = 'Saved ✓'; }
+            catch (e) { ev.target.textContent = 'Failed — retry'; ev.target.disabled = false; }
+          }})))));
+  }
+}
+
+document.getElementById('upload-btn').onclick = async () => {
+  const files = document.getElementById('upload-files').files;
+  const st = document.getElementById('upload-status');
+  const prog = document.getElementById('upload-progress');
+  if (!files.length) { st.textContent = 'Pick some photos first.'; return; }
+  prog.style.display = ''; prog.max = files.length; prog.value = 0;
+  let ok = 0, failed = [];
+  for (let i = 0; i < files.length; i++) {
+    st.textContent = `Uploading ${i + 1} of ${files.length}…`;
+    try {
+      const blob = await shrinkImage(files[i]);
+      const stamp = Date.now().toString(36) + '_' + i;
+      await storageUpload(`galleries/${galleryId}/${stamp}_${uploadName(files[i], blob)}`, blob);
+      ok++;
+    } catch (e) { failed.push(files[i].name); }
+    prog.value = i + 1;
+  }
+  st.textContent = `Done: ${ok} uploaded.` + (failed.length ? ` Failed: ${failed.join(', ')}` : '');
+  document.getElementById('upload-files').value = '';
+  await loadPhotos();
+};
+
+document.getElementById('download-all-btn').onclick = async (ev) => {
+  if (!gPaths.length) return;
+  ev.target.disabled = true;
+  const title = (document.getElementById('g-title').textContent || 'gallery').replace(/[^a-zA-Z0-9_-]+/g, '-');
+  await downloadAllAsZip(gPaths, title + '.zip', (i, n) => { ev.target.textContent = `Zipping ${i}/${n}…`; });
+  ev.target.textContent = '⬇ Download all (.zip)';
+  ev.target.disabled = false;
+};
+
+if (galleryId) loadGallery().catch(e => {
+  document.getElementById('g-sub').textContent = 'Error: ' + e.message;
+});
+else loadList();
+</script>
+</body>
+</html>

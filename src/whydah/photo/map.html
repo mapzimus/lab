@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Salem Photography Walks — Collins Middle School</title>
+<meta name="description" content="Interactive map of walkable photography spots around Collins Middle School in Salem, MA — nature, historic, urban, and train-watching locations with a 15-minute walk-shed from the school." />
+<meta name="theme-color" content="#14161a" />
+<link rel="icon" type="image/png" sizes="32x32" href="../pics/favicon-32.png" />
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.7.0/dist/tabler-icons.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --nature: #2D6A4F;
+    --historic: #9C6644;
+    --urban: #6A4C93;
+    --train: #BC4749;
+    --anchor: #1B2A41;
+    --ink: #1d2733;
+    --muted: #5a6675;
+    --panel: rgba(255,255,255,0.96);
+    --hair: rgba(20,30,45,0.10);
+    --shadow: 0 2px 16px rgba(15,25,40,0.18);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; font-family: "Inter", system-ui, -apple-system, sans-serif; color: var(--ink); }
+  #map { position: absolute; inset: 0; background: #e8eef2; }
+
+  .panel { background: var(--panel); border: 1px solid var(--hair); border-radius: 12px; box-shadow: var(--shadow); backdrop-filter: blur(6px); }
+
+  /* Title card */
+  .title-card { padding: 14px 16px; max-width: 320px; }
+  .title-card .brand { display: flex; align-items: center; gap: 9px; }
+  .title-card .brand .dot { width: 26px; height: 26px; border-radius: 7px; background: var(--anchor); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; flex: none; }
+  .title-card h1 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; }
+  .title-card .sub { margin: 6px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+  .title-card .meta { margin: 10px 0 0; padding-top: 9px; border-top: 1px solid var(--hair); font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .title-card .meta b { color: var(--ink); font-weight: 600; }
+
+  /* Toolbar */
+  .toolbar { display: flex; gap: 6px; padding: 6px; }
+  .toolbar button, .toolbar a { font-family: inherit; font-size: 12px; font-weight: 500; color: var(--ink); background: #fff; border: 1px solid var(--hair); border-radius: 8px; padding: 7px 10px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: background .12s, border-color .12s; text-decoration: none; }
+  .toolbar button:hover, .toolbar a:hover { background: #f1f5f8; border-color: rgba(20,30,45,0.2); }
+  .toolbar button:active, .toolbar a:active { transform: translateY(1px); }
+  .toolbar button i, .toolbar a i { font-size: 15px; }
+
+  /* Legend */
+  .legend { padding: 12px 14px; max-width: 240px; font-size: 12px; line-height: 1.3; }
+  .legend h2 { margin: 0 0 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .legend .row { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
+  .legend .row.sub { margin-left: 2px; }
+  .legend .swatch { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--hair); flex: none; }
+  .legend .bar { width: 16px; height: 11px; border-radius: 3px; flex: none; }
+  .legend .sec { margin-top: 11px; padding-top: 9px; border-top: 1px solid var(--hair); }
+  .legend .rail-active { width: 18px; height: 0; border-top: 3px solid #2b2b2b; position: relative; flex: none; }
+  .legend .rail-active::after { content: ""; position: absolute; inset: -3px 0 0 0; border-top: 3px dotted #fff; }
+  .legend .rail-freight { width: 18px; border-top: 2px dashed #8a93a0; flex: none; }
+  .legend .north { display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: 700; color: var(--muted); line-height: 1; }
+
+  /* Map pins */
+  .pin { display: flex; align-items: center; justify-content: center; color: #fff; border-radius: 50%; border: 2.5px solid #fff; box-shadow: 0 1px 5px rgba(0,0,0,0.42); width: 30px; height: 30px; font-size: 15px; }
+  .pin.nature { background: var(--nature); }
+  .pin.historic { background: var(--historic); }
+  .pin.urban { background: var(--urban); }
+  .pin.train { background: var(--train); }
+  .pin.anchor { width: 40px; height: 40px; font-size: 21px; background: var(--anchor); border-width: 3px; }
+  .pin.approx { box-shadow: 0 0 0 3px rgba(212,160,23,0.65), 0 1px 5px rgba(0,0,0,0.42); }
+
+  /* Popups */
+  .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: var(--shadow); }
+  .leaflet-popup-content { margin: 13px 15px; font-family: "Inter", sans-serif; font-size: 13px; line-height: 1.5; color: var(--ink); }
+  .pp-head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .pp-head .ic { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; flex: none; }
+  .pp-head h3 { margin: 0; font-size: 14px; font-weight: 700; line-height: 1.15; }
+  .pp-chip { display: inline-block; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 7px; border-radius: 20px; }
+  .pp-note { margin: 7px 0; color: #36424f; }
+  .pp-meta { margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--hair); font-size: 11.5px; color: var(--muted); display: flex; flex-direction: column; gap: 3px; }
+  .pp-meta .ln { display: flex; align-items: center; gap: 6px; }
+  .pp-meta code { font-size: 11px; background: #f1f4f7; padding: 1px 5px; border-radius: 4px; color: #36424f; cursor: pointer; }
+  .pp-flag { display: inline-flex; align-items: center; gap: 5px; margin-top: 7px; font-size: 11px; font-weight: 600; color: #8a6300; background: #fdf3da; border: 1px solid #f0dca5; padding: 4px 8px; border-radius: 7px; }
+
+  .leaflet-bar a, .leaflet-control-layers-toggle { border-radius: 8px !important; }
+  .leaflet-control-layers { border-radius: 10px !important; border: 1px solid var(--hair) !important; box-shadow: var(--shadow) !important; }
+  .leaflet-control-layers-expanded { padding: 10px 12px 8px !important; font-family: "Inter", sans-serif; font-size: 12.5px; }
+  .leaflet-control-layers-group-name, .leaflet-control-layers label { font-weight: 500; }
+  .leaflet-control-attribution { font-size: 10px !important; font-family: "Inter", sans-serif; }
+  @media (max-width: 640px) {
+    .title-card { max-width: 230px; padding: 11px 12px; }
+    .title-card h1 { font-size: 15px; }
+    .legend { max-width: 200px; }
+    .toolbar button span, .toolbar a span { display: none; }
+  }
+</style>
+</head>
+<body>
+<div id="map" role="application" aria-label="Interactive map of Salem photography walk locations"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+<script>
+/* ============================================================
+   Salem Photography Walks — interactive scouting map
+   Data provenance:
+     · Point locations  — OSM Nominatim geocoding + OSM Overpass features
+     · Walk-shed (5/10/15 min) — FOSSGIS Valhalla pedestrian isochrone
+     · Rail network     — OSM Overpass (railway=rail)
+   ============================================================ */
+
+const COLLINS = { name: "Collins Middle School", lat: 42.5143494, lon: -70.9048589 };
+
+const CATS = {
+  nature:   { label: "Parks / nature",          color: "#2D6A4F", icon: "ti-tree" },
+  historic: { label: "Historic / architecture", color: "#9C6644", icon: "ti-building-monument" },
+  urban:    { label: "Urban / street",          color: "#6A4C93", icon: "ti-camera" },
+  train:    { label: "Train viewpoint",         color: "#BC4749", icon: "ti-train" }
+};
+
+const SPOTS = [
+  { name:"Collins Playground", cat:"nature", lat:42.5149, lon:-70.9053, src:"confirmed", note:"Right next to school — quick/easy day or warm-up." },
+  { name:"Football Field", cat:"nature", lat:42.5121189, lon:-70.9041304, src:"OSM", note:"Open turf; wide shots, motion, big sky. ~250 m south." },
+  { name:"Splaine Park", cat:"nature", lat:42.5171778, lon:-70.9071030, src:"geocoded", note:"Neighborhood park near the CVS; greenery + benches." },
+  { name:"Gallows Hill Park", cat:"nature", lat:42.5159797, lon:-70.9129295, src:"geocoded", note:"Hilltop park, open views; pairs with the skate park." },
+  { name:"Leslie's Retreat / Dog Park", cat:"nature", lat:42.5228448, lon:-70.9033706, src:"geocoded", note:"Riverside + dogs; ~17 min, the very edge of the walk-shed — ambitious." },
+  { name:"Chestnut Street", cat:"historic", lat:42.5193819, lon:-70.9010761, src:"geocoded", note:"Among America's most photographed Federal-era streets; symmetry, doorways, brick." },
+  { name:"Warren Street", cat:"historic", lat:42.5180156, lon:-70.9031120, src:"geocoded", note:"Quiet historic residential block; gates, fences, facades." },
+  { name:"Ropes Mansion", cat:"historic", lat:42.5212125, lon:-70.8997969, src:"geocoded", note:"Georgian mansion + formal garden (the Hocus Pocus house)." },
+  { name:"Broad Street Cemetery", cat:"historic", lat:42.5182515, lon:-70.8990538, src:"geocoded", note:"1655 burying ground; slate stones, texture, raking light." },
+  { name:"Pickering House", cat:"historic", lat:42.5185428, lon:-70.9002526, src:"geocoded", note:"1664 — among the oldest houses in the US still lived in." },
+  { name:"Friends Cemetery", cat:"historic", lat:42.5188809, lon:-70.9048890, src:"geocoded", note:"Small Quaker burial ground; calm, minimal, repetition." },
+  { name:"Salem Athenaeum & Botts Court", cat:"historic", lat:42.5204318, lon:-70.9004821, src:"geocoded", note:"Historic library + the narrow Botts Court alley." },
+  { name:"Proctor's Ledge Memorial", cat:"historic", lat:42.5174319, lon:-70.9091478, src:"address", note:"1692 witch-trial execution-site memorial; granite wall, somber. Off Pope St near Splaine." },
+  { name:"Skate Park (Gallows Hill)", cat:"urban", lat:42.5161, lon:-70.9118, src:"confirmed", note:"Concrete, rails, motion, graffiti texture — strong urban/action frames." },
+  { name:"Essex Street & Library", cat:"urban", lat:42.5202711, lon:-70.9032027, src:"geocoded", note:"Salem Public Library + the Essex St streetscape (not downtown)." },
+  { name:"Mansell Playground", cat:"urban", lat:42.5165362, lon:-70.9104031, src:"OSM", note:"Bonus spot near Gallows Hill (from OSM) — play structures, color." },
+  { name:"Salem Police Station", cat:"train", lat:42.5157421, lon:-70.8966075, src:"geocoded", note:"Active commuter line runs ~30 m behind the station — best train-watching spot, plus police cars. Ask about a visit. Eastern edge of the walk-shed." }
+];
+
+const ISO = {"features":[{"properties":{"contour":15.0},"geometry":{"coordinates":[[[-70.900858,42.52243],[-70.901858,42.522668],[-70.906858,42.52255],[-70.907842,42.521333],[-70.909967,42.521241],[-70.910858,42.521558],[-70.91191,42.520401],[-70.911821,42.518349],[-70.911364,42.517349],[-70.911858,42.516848],[-70.912858,42.517344],[-70.913928,42.516419],[-70.913858,42.515923],[-70.912858,42.514919],[-70.91265,42.513349],[-70.913413,42.509349],[-70.914221,42.508349],[-70.913858,42.507402],[-70.912858,42.507754],[-70.910858,42.506579],[-70.909858,42.506915],[-70.907858,42.506853],[-70.905587,42.509078],[-70.905615,42.509592],[-70.906424,42.510349],[-70.906086,42.511576],[-70.905628,42.51158],[-70.904858,42.510709],[-70.903858,42.510673],[-70.903306,42.510797],[-70.902858,42.511756],[-70.900858,42.509987],[-70.89905,42.51254],[-70.897858,42.512881],[-70.896622,42.515349],[-70.896804,42.518295],[-70.896174,42.519349],[-70.897265,42.520349],[-70.900858,42.52243]]],"type":"Polygon"},"type":"Feature"},{"properties":{"contour":10.0},"geometry":{"coordinates":[[[-70.903858,42.519675],[-70.905858,42.519685],[-70.906532,42.519023],[-70.908021,42.518349],[-70.908584,42.517075],[-70.909858,42.517053],[-70.911802,42.515349],[-70.910988,42.513349],[-70.911126,42.511617],[-70.910552,42.509656],[-70.909858,42.509428],[-70.907858,42.509686],[-70.906858,42.510331],[-70.906569,42.511349],[-70.905858,42.511961],[-70.904858,42.511087],[-70.903149,42.511349],[-70.903987,42.51222],[-70.903858,42.514564],[-70.903015,42.513192],[-70.901761,42.513251],[-70.900007,42.515349],[-70.901499,42.516349],[-70.900936,42.517349],[-70.901159,42.518048],[-70.903858,42.519675]]],"type":"Polygon"},"type":"Feature"},{"properties":{"contour":5.0},"geometry":{"coordinates":[[[-70.904858,42.516247],[-70.905858,42.516316],[-70.906568,42.515059],[-70.908048,42.514349],[-70.908,42.512349],[-70.906858,42.511675],[-70.906707,42.512198],[-70.905016,42.512192],[-70.904858,42.51184],[-70.904111,42.512601],[-70.904103,42.515349],[-70.904858,42.516247]]],"type":"Polygon"},"type":"Feature"}],"type":"FeatureCollection"};
+
+const RAIL = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8959264,42.5176866],[-70.8959598,42.5174420],[-70.8959715,42.5173474],[-70.8960095,42.5170495],[-70.8960703,42.5166886]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8959859,42.5239637],[-70.8959991,42.5238385],[-70.8959973,42.5237056],[-70.8959844,42.5235472],[-70.8959621,42.5233048],[-70.8958254,42.5224207],[-70.8956743,42.5214439],[-70.8955043,42.5203449],[-70.8954941,42.5202398],[-70.8955001,42.5201376],[-70.8958675,42.5180313]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8968225,42.5116516],[-70.8968465,42.5114949],[-70.8968721,42.5113009],[-70.8968913,42.5111541],[-70.8969553,42.5106933],[-70.8969799,42.5105034],[-70.8970046,42.5103370],[-70.8970340,42.5101126]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8934246,42.5283814],[-70.8929727,42.5290784],[-70.8928497,42.5292718],[-70.8921935,42.5301919],[-70.8918599,42.5306611],[-70.8914439,42.5312470],[-70.8910396,42.5318316],[-70.8907323,42.5323106],[-70.8906443,42.5324608],[-70.8904537,42.5327969],[-70.8904151,42.5328714],[-70.8903403,42.5330033],[-70.8902785,42.5331239],[-70.8902278,42.5332315],[-70.8901473,42.5333879],[-70.8900660,42.5335612],[-70.8899840,42.5337431],[-70.8898791,42.5339875],[-70.8897642,42.5342719],[-70.8897332,42.5343543],[-70.8896768,42.5345071],[-70.8896099,42.5346923],[-70.8895740,42.5347958],[-70.8894116,42.5352546],[-70.8893194,42.5355319],[-70.8891382,42.5360617],[-70.8889490,42.5366275]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8889038,42.5366209],[-70.8891859,42.5357872],[-70.8892741,42.5355256],[-70.8895577,42.5346967],[-70.8896568,42.5344164],[-70.8898161,42.5340162],[-70.8899833,42.5336249],[-70.8901740,42.5332270],[-70.8903872,42.5328117],[-70.8908479,42.5320426],[-70.8909884,42.5318273],[-70.8913173,42.5313461],[-70.8934246,42.5283814]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8961191,42.5166925],[-70.8962527,42.5159080],[-70.8964241,42.5146879],[-70.8967433,42.5122466],[-70.8967798,42.5119691],[-70.8968225,42.5116516]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8959264,42.5176866],[-70.8959724,42.5174457],[-70.8959994,42.5173204],[-70.8960591,42.5170382],[-70.8961191,42.5166925]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8960703,42.5166886],[-70.8962114,42.5158593],[-70.8962485,42.5156153],[-70.8963223,42.5151005],[-70.8965091,42.5136470],[-70.8967727,42.5116505]]}},{"type":"Feature","properties":{"name":"Danvers Industrial Track","usage":"industrial","active":false},"geometry":{"type":"LineString","coordinates":[[-70.9120608,42.5224573],[-70.9119357,42.5224101]]}},{"type":"Feature","properties":{"name":"Danvers Industrial Track","usage":"industrial","active":false},"geometry":{"type":"LineString","coordinates":[[-70.9119357,42.5224101],[-70.9104340,42.5218129],[-70.9103625,42.5217856],[-70.9102632,42.5217477],[-70.9093521,42.5213886],[-70.9090690,42.5212782],[-70.9088920,42.5212222],[-70.9086606,42.5211594],[-70.9084507,42.5211176],[-70.9082575,42.5210944],[-70.9080670,42.5210845],[-70.9077923,42.5210751],[-70.9076828,42.5210749],[-70.9075801,42.5210776],[-70.9074347,42.5210861],[-70.9072693,42.5211050],[-70.9070598,42.5211377],[-70.9069678,42.5211545],[-70.9068784,42.5211762],[-70.9067722,42.5212027],[-70.9066689,42.5212326],[-70.9064701,42.5212965],[-70.9062502,42.5213755],[-70.9060909,42.5214346],[-70.9056222,42.5216133]]}},{"type":"Feature","properties":{"name":"Danvers Industrial Track","usage":"industrial","active":false},"geometry":{"type":"LineString","coordinates":[[-70.9056222,42.5216133],[-70.9054652,42.5216708]]}},{"type":"Feature","properties":{"name":"Danvers Industrial Track","usage":"industrial","active":false},"geometry":{"type":"LineString","coordinates":[[-70.9054652,42.5216708],[-70.9049304,42.5218797],[-70.9046683,42.5219970],[-70.9045598,42.5220507],[-70.9043983,42.5221172],[-70.9036726,42.5223914]]}},{"type":"Feature","properties":{"name":"Danvers Industrial Track","usage":"industrial","active":false},"geometry":{"type":"LineString","coordinates":[[-70.9036726,42.5223914],[-70.9034454,42.5225000],[-70.9033112,42.5225639],[-70.9030945,42.5226493],[-70.9024485,42.5228974],[-70.9020043,42.5230651],[-70.9015317,42.5232476],[-70.9010575,42.5234263],[-70.9006174,42.5235971],[-70.9000804,42.5238015],[-70.8999134,42.5238611]]}}]};
+
+/* ---------- map + basemaps ---------- */
+const map = L.map("map", { zoomControl: true, attributionControl: true });
+L.control.zoom({ position: "topright" }).remove();
+map.zoomControl.setPosition("topright");
+
+const baseAtt = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+const positron = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { attribution: baseAtt + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains:"abcd", maxZoom: 20 });
+const voyager  = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { attribution: baseAtt + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains:"abcd", maxZoom: 20 });
+const esriImg  = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { attribution: "Imagery &copy; Esri, Maxar, Earthstar Geographics", maxZoom: 20 });
+const esriLab  = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", { maxZoom: 20, pane: "overlayPane" });
+const satellite = L.layerGroup([esriImg, esriLab]);
+const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: baseAtt, maxZoom: 19 });
+
+positron.addTo(map);
+
+/* ---------- walk-shed (true network isochrone, drawn as clean rings via turf) ---------- */
+const SHED = { 5: "#08519C", 10: "#3182BD", 15: "#9ECAE1" };
+const polyByMin = {};
+ISO.features.forEach(f => { polyByMin[Math.round(f.properties.contour)] = f; });
+
+function bandStyle(color) { return { color: color, weight: 1, opacity: 0.55, fillColor: color, fillOpacity: 0.30 }; }
+const walkShed = L.layerGroup();
+try {
+  const ring15 = turf.difference(polyByMin[15], polyByMin[10]);
+  const ring10 = turf.difference(polyByMin[10], polyByMin[5]);
+  const ring5  = polyByMin[5];
+  L.geoJSON(ring15, { style: bandStyle(SHED[15]) }).addTo(walkShed);
+  L.geoJSON(ring10, { style: bandStyle(SHED[10]) }).addTo(walkShed);
+  L.geoJSON(ring5,  { style: bandStyle(SHED[5]) }).addTo(walkShed);
+} catch (e) {
+  // fallback: stacked translucent fills
+  [15,10,5].forEach(m => L.geoJSON(polyByMin[m], { style: bandStyle(SHED[m]) }).addTo(walkShed));
+}
+walkShed.addTo(map);
+
+/* ---------- rail ---------- */
+const railLayer = L.layerGroup();
+const freightLayer = L.layerGroup();
+RAIL.features.forEach(f => {
+  if (f.properties.active) {
+    // classic railway symbology: dark casing + white "ties" on top
+    L.geoJSON(f, { style: { color: "#2b2b2b", weight: 4, opacity: 0.95 } }).addTo(railLayer);
+    L.geoJSON(f, { style: { color: "#ffffff", weight: 3, opacity: 0.9, dashArray: "1,7", lineCap: "butt" } }).addTo(railLayer);
+  } else {
+    L.geoJSON(f, { style: { color: "#8a93a0", weight: 2, opacity: 0.8, dashArray: "5,5" } }).addTo(freightLayer);
+  }
+});
+railLayer.addTo(map);
+
+/* ---------- helpers ---------- */
+function haversine(aLat, aLon, bLat, bLon) {
+  const R = 6371000, toR = Math.PI/180;
+  const dLat = (bLat-aLat)*toR, dLon = (bLon-aLon)*toR;
+  const s = Math.sin(dLat/2)**2 + Math.cos(aLat*toR)*Math.cos(bLat*toR)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1-s));
+}
+function walkMin(m) { return Math.max(1, Math.round(m * 1.35 / 80)); }
+
+function popupHTML(s, lat, lon) {
+  const c = CATS[s.cat];
+  const d = Math.round(haversine(COLLINS.lat, COLLINS.lon, lat, lon));
+  const flag = s.approx ? `<div class="pp-flag"><i class="ti ti-map-pin-question"></i> Approximate — drag pin to the exact spot</div>` : "";
+  return `
+    <div class="pp-head">
+      <div class="ic" style="background:${c.color}"><i class="ti ${c.icon}"></i></div>
+      <h3>${s.name}</h3>
+    </div>
+    <span class="pp-chip" style="background:${c.color}1a;color:${c.color}">${c.label}</span>
+    <p class="pp-note">${s.note}</p>
+    ${flag}
+    <div class="pp-meta">
+      <div class="ln"><i class="ti ti-walk"></i> ~${walkMin(d)} min walk &middot; ${d} m from Collins (straight-line)</div>
+      <div class="ln"><i class="ti ti-map-2"></i> <code title="Click to copy" data-coord="${lat.toFixed(6)}, ${lon.toFixed(6)}">${lat.toFixed(5)}, ${lon.toFixed(5)}</code></div>
+      <div class="ln" style="opacity:.85"><i class="ti ti-database"></i> source: ${s.src}</div>
+    </div>`;
+}
+
+function pinIcon(s, big) {
+  const c = CATS[s.cat];
+  const cls = big ? "pin anchor" : `pin ${s.cat}${s.approx ? " approx" : ""}`;
+  const icon = big ? "ti-school" : c.icon;
+  const size = big ? 40 : 30;
+  return L.divIcon({ className: "", html: `<div class="${cls}"><i class="ti ${icon}"></i></div>`, iconSize: [size,size], iconAnchor: [size/2,size/2], popupAnchor: [0,-size/2] });
+}
+
+/* ---------- category layers + markers ---------- */
+const catLayers = { nature: L.layerGroup(), historic: L.layerGroup(), urban: L.layerGroup(), train: L.layerGroup() };
+const registry = [];
+
+SPOTS.forEach(s => {
+  const m = L.marker([s.lat, s.lon], { icon: pinIcon(s, false), draggable: true, autoPan: true });
+  m.bindPopup(popupHTML(s, s.lat, s.lon), { maxWidth: 290, minWidth: 230 });
+  m.on("dragend", e => {
+    const p = e.target.getLatLng();
+    m.setPopupContent(popupHTML(s, p.lat, p.lng));
+    m.openPopup();
+  });
+  m.on("popupopen", e => {
+    const code = e.popup.getElement().querySelector("code[data-coord]");
+    if (code) code.addEventListener("click", () => {
+      navigator.clipboard && navigator.clipboard.writeText(code.dataset.coord);
+      code.textContent = "copied!";
+      setTimeout(() => { code.textContent = code.dataset.coord.replace(/(-?\d+\.\d{5})\d*/g, "$1"); }, 1100);
+    });
+  });
+  m.addTo(catLayers[s.cat]);
+  registry.push({ s, m });
+});
+Object.values(catLayers).forEach(l => l.addTo(map));
+
+/* Collins anchor (always on) */
+const anchorLayer = L.layerGroup().addTo(map);
+const anchorMarker = L.marker([COLLINS.lat, COLLINS.lon], { icon: pinIcon({cat:"anchor"}, true), zIndexOffset: 1000 })
+  .bindPopup(`<div class="pp-head"><div class="ic" style="background:var(--anchor)"><i class="ti ti-school"></i></div><h3>Collins Middle School</h3></div>
+    <p class="pp-note">Start and end point for every walk — 29 Highland Ave. The blue bands show how far you can actually walk along streets in 5, 10, and 15 minutes.</p>
+    <div class="pp-meta"><div class="ln"><i class="ti ti-map-2"></i> <code>${COLLINS.lat.toFixed(5)}, ${COLLINS.lon.toFixed(5)}</code></div></div>`, { maxWidth: 290 })
+  .addTo(anchorLayer);
+
+/* ---------- layer control ---------- */
+const baseLayers = { "Carto Light": positron, "Carto Voyager": voyager, "Satellite (scouting)": satellite, "OpenStreetMap": osm };
+const overlays = {
+  "<b>15-min walk-shed</b>": walkShed,
+  "Commuter rail (active)": railLayer,
+  "Freight / industrial track": freightLayer,
+  '<span style="color:#2D6A4F">&#9679;</span> Parks / nature': catLayers.nature,
+  '<span style="color:#9C6644">&#9679;</span> Historic / architecture': catLayers.historic,
+  '<span style="color:#6A4C93">&#9679;</span> Urban / street': catLayers.urban,
+  '<span style="color:#BC4749">&#9679;</span> Train viewpoints': catLayers.train
+};
+L.control.layers(baseLayers, overlays, { position: "topright", collapsed: true }).addTo(map);
+L.control.scale({ position: "bottomleft", imperial: true, metric: true, maxWidth: 160 }).addTo(map);
+
+/* ---------- fit view to walk-shed ---------- */
+const shedBounds = L.geoJSON(polyByMin[15]).getBounds();
+function resetView() { map.fitBounds(shedBounds, { padding: [60,60] }); }
+resetView();
+
+/* ---------- title card ---------- */
+const TitleCard = L.Control.extend({
+  onAdd: function() {
+    const d = L.DomUtil.create("div", "panel title-card");
+    d.innerHTML = `
+      <div class="brand">
+        <div class="dot"><i class="ti ti-camera"></i></div>
+        <div>
+          <h1>Salem Photography Walks</h1>
+        </div>
+      </div>
+      <p class="sub">Walkable shooting locations from Collins Middle School — nature, historic, urban &amp; train spots.</p>
+      <div class="meta"><i class="ti ti-walk"></i><span><b>17 spots</b> within a true 15-min walk &middot; LEAP Expanding Horizons &middot; Summer 2026</span></div>`;
+    L.DomEvent.disableClickPropagation(d);
+    return d;
+  }
+});
+new TitleCard({ position: "topleft" }).addTo(map);
+
+/* ---------- toolbar ---------- */
+const Toolbar = L.Control.extend({
+  onAdd: function() {
+    const d = L.DomUtil.create("div", "panel toolbar");
+    d.innerHTML = `
+      <a id="btn-home" href="index.html" title="Back to Photo home"><i class="ti ti-arrow-left"></i><span>Photo</span></a>
+      <button id="btn-reset" title="Reset to walk-shed view"><i class="ti ti-focus-2"></i><span>Reset</span></button>
+      <button id="btn-export" title="Download photo spots as GeoJSON"><i class="ti ti-download"></i><span>GeoJSON</span></button>
+      <button id="btn-print" title="Print / save as PDF"><i class="ti ti-printer"></i><span>Print</span></button>`;
+    L.DomEvent.disableClickPropagation(d);
+    d.querySelector("#btn-reset").onclick = resetView;
+    d.querySelector("#btn-print").onclick = () => window.print();
+    d.querySelector("#btn-export").onclick = exportGeoJSON;
+    return d;
+  }
+});
+new Toolbar({ position: "topleft" }).addTo(map);
+
+/* ---------- legend ---------- */
+const Legend = L.Control.extend({
+  onAdd: function() {
+    const d = L.DomUtil.create("div", "panel legend");
+    const catRows = Object.values(CATS).map(c =>
+      `<div class="row"><span class="swatch" style="background:${c.color}"></span>${c.label}</div>`).join("");
+    d.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <h2>Photo spots</h2>
+        <div class="north"><i class="ti ti-arrow-up" style="font-size:15px;color:#1d2733"></i>N</div>
+      </div>
+      ${catRows}
+      <div class="sec">
+        <h2>Walk time from Collins</h2>
+        <div class="row"><span class="bar" style="background:${SHED[5]};opacity:.85"></span>&le; 5 min</div>
+        <div class="row"><span class="bar" style="background:${SHED[10]};opacity:.85"></span>5 &ndash; 10 min</div>
+        <div class="row"><span class="bar" style="background:${SHED[15]};opacity:.9"></span>10 &ndash; 15 min</div>
+      </div>
+      <div class="sec">
+        <h2>Rail</h2>
+        <div class="row"><span class="rail-active"></span>Commuter line (active)</div>
+        <div class="row"><span class="rail-freight"></span>Freight / industrial</div>
+      </div>`;
+    L.DomEvent.disableClickPropagation(d);
+    return d;
+  }
+});
+new Legend({ position: "bottomright" }).addTo(map);
+
+map.attributionControl.addAttribution('Walk-shed: <a href="https://valhalla.openstreetmap.de">Valhalla/FOSSGIS</a> &middot; Geocoding: Nominatim');
+
+/* ---------- export ---------- */
+function exportGeoJSON() {
+  const features = registry.map(({ s, m }) => {
+    const p = m.getLatLng();
+    return { type: "Feature", properties: { name: s.name, category: s.cat, note: s.note, source: s.src, approximate: !!s.approx }, geometry: { type: "Point", coordinates: [ +p.lng.toFixed(6), +p.lat.toFixed(6) ] } };
+  });
+  features.unshift({ type: "Feature", properties: { name: COLLINS.name, category: "anchor", note: "Start/end point — 29 Highland Ave.", source: "geocoded", approximate: false }, geometry: { type: "Point", coordinates: [ +COLLINS.lon.toFixed(6), +COLLINS.lat.toFixed(6) ] } });
+  const fc = { type: "FeatureCollection", name: "salem_photo_spots", crs: { type: "name", properties: { name: "urn:ogc:def:crs:OGC:1.3:CRS84" } }, features };
+  const blob = new Blob([JSON.stringify(fc, null, 2)], { type: "application/geo+json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "salem_photo_spots.geojson";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>

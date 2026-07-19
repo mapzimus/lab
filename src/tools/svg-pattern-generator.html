@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SVG Pattern Generator</title>
+<meta name="description" content="Design a seamless, tileable background pattern, preview it tiled, and copy or download it as SVG, CSS or PNG. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --chkc: rgba(120,130,145,.16);
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --chkc: rgba(150,162,177,.14);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --chkc: rgba(150,162,177,.14);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.copyerr { color: var(--danger); border-color: var(--danger); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .layout { display: grid; grid-template-columns: 340px 1fr; gap: 18px; align-items: start; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .panelhead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .panelhead h2 { font-size: 1rem; margin: 0; letter-spacing: -0.01em; }
+  .panelhead .sep { flex: 1; }
+  .linklike { border: none; background: none; color: var(--muted); font-size: .8rem; text-decoration: underline; cursor: pointer; padding: 4px; font-family: var(--sans); }
+  .linklike:hover { color: var(--accent); }
+
+  .grouplbl { font-size: .72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 16px 0 8px; display: block; }
+  .grouplbl:first-child { margin-top: 0; }
+  label.f { display: inline-flex; align-items: center; gap: 8px; font-size: .86rem; }
+  select { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 10px; font-size: .86rem; font-family: var(--sans); width: 100%; }
+  input[type="range"] { accent-color: var(--accent); min-width: 0; width: 100%; }
+  input[type="color"] { inline-size: 46px; block-size: 34px; padding: 2px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; }
+  input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+  input[type="text"] { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 7px 9px; font-size: .82rem; font-family: var(--mono); width: 92px; }
+  .val { font-family: var(--mono); font-size: .78rem; color: var(--muted); min-width: 46px; text-align: right; }
+
+  .sliderrow { display: grid; grid-template-columns: 100px 1fr 50px; gap: 10px; align-items: center; margin: 8px 0; }
+  .sliderrow > label { font-size: .83rem; }
+  .colorrow { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 8px 0; }
+  .colorfield { display: flex; align-items: center; gap: 8px; }
+  .colorfield > span { font-size: .83rem; min-width: 82px; }
+  .checkrow { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: .85rem; }
+  .checkrow label { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
+
+  .btnrow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+
+  /* preview */
+  .stage-wrap { padding: 0; overflow: hidden; }
+  .stagehead { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .stagehead h2 { font-size: 1rem; margin: 0; }
+  .stage { position: relative; width: 100%; height: 460px; }
+  .stage.checker {
+    background-color: var(--surface-2);
+    background-image:
+      linear-gradient(45deg, var(--chkc) 25%, transparent 25%, transparent 75%, var(--chkc) 75%),
+      linear-gradient(45deg, var(--chkc) 25%, transparent 25%, transparent 75%, var(--chkc) 75%);
+    background-position: 0 0, 11px 11px; background-size: 22px 22px;
+  }
+  .stage svg { display: block; width: 100%; height: 100%; }
+
+  /* presets */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 5px 12px 5px 6px; font-size: .8rem; cursor: pointer; font-family: var(--sans); }
+  .chip:hover { border-color: var(--accent); }
+  .chip .sw { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--border); flex: none; background-size: cover; background-repeat: repeat; }
+
+  /* export */
+  .export { margin-top: 18px; }
+  .exportgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .codebox { position: relative; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .codebox h3 { font-size: .8rem; margin: 0 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .codebox pre { margin: 0; font-family: var(--mono); font-size: .76rem; line-height: 1.5; white-space: pre-wrap; word-break: break-all; max-height: 168px; overflow: auto; }
+  .codebox .actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .note { color: var(--muted); font-size: .8rem; }
+  .note.err { color: var(--danger); }
+  .pngctl { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .pngctl select { width: auto; }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .exportgrid { grid-template-columns: 1fr; }
+    .stage { height: 360px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>SVG Pattern Generator</h1>
+      <p>Design a seamless, repeating background pattern with live controls, then copy it as SVG or CSS, or download a PNG. Every tile wraps cleanly, so it tiles forever with no visible seams. Your setup is saved in the page address — share it with a link.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="layout">
+    <!-- ============ CONTROLS ============ -->
+    <section class="panel controls">
+      <div class="panelhead">
+        <h2>Design</h2>
+        <span class="sep"></span>
+        <button class="linklike" id="resetBtn" type="button">Reset</button>
+      </div>
+
+      <span class="grouplbl">Pattern</span>
+      <label class="f" style="width:100%">
+        <select id="typeSel" aria-label="Pattern type"></select>
+      </label>
+
+      <span class="grouplbl">Colors</span>
+      <div class="colorrow">
+        <div class="colorfield"><span>Foreground</span><input type="color" id="fgColor" aria-label="Foreground color"></div>
+      </div>
+      <div class="colorrow">
+        <div class="colorfield"><span>Background</span><input type="color" id="bgColor" aria-label="Background color"></div>
+      </div>
+      <div class="checkrow">
+        <label><input type="checkbox" id="transparentChk"> Transparent background</label>
+      </div>
+
+      <span class="grouplbl">Size &amp; shape</span>
+      <div id="sliders"></div>
+
+      <div class="checkrow" id="toggles"></div>
+
+      <span class="grouplbl">Presets</span>
+      <div class="chips" id="presets" role="group" aria-label="Pattern presets"></div>
+
+      <div class="btnrow" style="margin-top:14px">
+        <button class="btn primary" id="randomBtn" type="button">🎲 Randomize</button>
+      </div>
+    </section>
+
+    <!-- ============ PREVIEW ============ -->
+    <section class="panel stage-wrap">
+      <div class="stagehead">
+        <h2>Live preview <span class="note" style="font-weight:400">— tiled</span></h2>
+        <span class="sep" style="flex:1"></span>
+        <label class="f" style="font-size:.82rem"><input type="checkbox" id="checkerChk" checked> Transparency checker</label>
+      </div>
+      <div class="stage checker" id="stage" role="img" aria-label="Live tiled pattern preview"></div>
+    </section>
+  </div>
+
+  <!-- ============ EXPORT ============ -->
+  <section class="panel export">
+    <div class="panelhead">
+      <h2>Export</h2>
+      <span class="sep"></span>
+      <span class="note" id="exportNote" aria-live="polite"></span>
+    </div>
+    <div class="exportgrid">
+      <div class="codebox">
+        <h3>SVG markup</h3>
+        <pre id="svgCode" aria-label="SVG markup"></pre>
+        <div class="actions">
+          <button class="btn" id="copySvg" type="button">Copy SVG</button>
+          <button class="btn" id="dlSvg" type="button">Download .svg</button>
+        </div>
+      </div>
+      <div class="codebox">
+        <h3>CSS background</h3>
+        <pre id="cssCode" aria-label="CSS background"></pre>
+        <div class="actions">
+          <button class="btn" id="copyCss" type="button">Copy CSS</button>
+          <span class="note" id="cssNote"></span>
+        </div>
+      </div>
+    </div>
+    <div class="codebox" style="margin-top:16px">
+      <h3>PNG image</h3>
+      <div class="pngctl">
+        <label class="f">Size
+          <select id="pngSize" aria-label="PNG size">
+            <option value="256">256 × 256</option>
+            <option value="512" selected>512 × 512</option>
+            <option value="1024">1024 × 1024</option>
+            <option value="2048">2048 × 2048</option>
+          </select>
+        </label>
+        <button class="btn" id="dlPng" type="button">Download PNG</button>
+        <span class="note">Rasterizes a tiled area of the pattern.</span>
+      </div>
+    </div>
+  </section>
+
+  <footer class="app">Everything runs in your browser — nothing is uploaded · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const SVGNS = 'http://www.w3.org/2000/svg';
+const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const rand = (a, b) => a + Math.random() * (b - a);
+const randi = (a, b) => Math.round(rand(a, b));
+
+/* ---------- color helpers ---------- */
+function hexToRgb(hex){
+  let h = String(hex).replace('#','').trim();
+  if (h.length === 3) h = h.split('').map(c=>c+c).join('');
+  if (!/^[0-9a-fA-F]{6}$/.test(h)) return null;
+  const n = parseInt(h,16); return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+}
+function rgbToHex({r,g,b}){ return '#' + [r,g,b].map(v => clamp(Math.round(v),0,255).toString(16).padStart(2,'0')).join(''); }
+function hslToHex(h,s,l){
+  h=((h%360)+360)%360/360; s=clamp(s,0,100)/100; l=clamp(l,0,100)/100;
+  if (s===0){ const v=Math.round(l*255); return rgbToHex({r:v,g:v,b:v}); }
+  const q = l<0.5 ? l*(1+s) : l+s-l*s, p = 2*l-q;
+  const hue = (t)=>{ t=(t%1+1)%1; if(t<1/6) return p+(q-p)*6*t; if(t<1/2) return q; if(t<2/3) return p+(q-p)*(2/3-t)*6; return p; };
+  return rgbToHex({ r:hue(h+1/3)*255, g:hue(h)*255, b:hue(h-1/3)*255 });
+}
+const safeHex = (v, fb) => (hexToRgb(v) ? rgbToHex(hexToRgb(v)) : fb);
+
+/* ---------- pattern registry ---------- */
+const TYPES = [
+  ['dots','Dots / polka'],
+  ['grid','Grid / graph lines'],
+  ['stripes','Stripes'],
+  ['checker','Checkerboard'],
+  ['hatch','Hatch / crosshatch'],
+  ['waves','Waves / chevron'],
+  ['triangles','Triangles / isometric'],
+  ['hexagons','Hexagons (honeycomb)'],
+  ['plus','Plus / cross tiles'],
+  ['scales','Scales / fish-scale'],
+];
+const TYPE_KEYS = TYPES.map(t=>t[0]);
+
+// Hero-patterns honeycomb path — designed to tile at 28 x 49.
+const HEX_PATH = "M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v11.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z";
+
+/*
+ * tile(s) returns { w, h, motif } where motif is the foreground markup only.
+ * The background is drawn separately (solid or transparent-checker), so every
+ * pattern is just "foreground over background". Motifs are authored so that
+ * anything crossing a tile edge is redrawn on the opposite edge → seamless.
+ */
+function tile(s){
+  const sc = s.scale, sw = Math.max(0.5, s.stroke), fg = s.fg;
+  switch (s.type){
+    case 'dots': {
+      const r = clamp(s.radius, 0.5, sc/2);
+      let m = '';
+      // one dot per corner → the corner dot is shared by all 4 tiles meeting there
+      for (const [cx,cy] of [[0,0],[sc,0],[0,sc],[sc,sc]])
+        m += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fg}"/>`;
+      if (s.offset) m += `<circle cx="${sc/2}" cy="${sc/2}" r="${r}" fill="${fg}"/>`;
+      return { w:sc, h:sc, motif:m };
+    }
+    case 'grid': {
+      const N = s.major ? clamp(s.majorEvery,2,8) : 1;
+      const W = sc * N;
+      let m = '';
+      for (let i=0;i<N;i++){
+        const maj = s.major && i === Math.floor(N/2);
+        const lw = maj ? sw*2.2 : sw;
+        const c = (i+0.5)*sc - lw/2;                 // centered lines → symmetric edges
+        m += `<rect x="${c.toFixed(2)}" y="0" width="${lw}" height="${W}" fill="${fg}"/>`;
+        m += `<rect x="0" y="${c.toFixed(2)}" width="${W}" height="${lw}" fill="${fg}"/>`;
+      }
+      return { w:W, h:W, motif:m };
+    }
+    case 'stripes': {
+      const band = clamp(sc * s.ratio, 1, sc-0.5);
+      // centered foreground band → the gaps show the background colour
+      const x = (sc - band)/2;
+      return { w:sc, h:sc, motif:`<rect x="${x.toFixed(2)}" y="-1" width="${band.toFixed(2)}" height="${sc+2}" fill="${fg}"/>` };
+    }
+    case 'checker': {
+      const c = sc, W = c*2;
+      const m = `<rect x="0" y="0" width="${c}" height="${c}" fill="${fg}"/>`+
+                `<rect x="${c}" y="${c}" width="${c}" height="${c}" fill="${fg}"/>`;
+      return { w:W, h:W, motif:m };
+    }
+    case 'hatch': {
+      const cx = (sc - sw)/2;
+      let m = `<rect x="${cx.toFixed(2)}" y="-1" width="${sw}" height="${sc+2}" fill="${fg}"/>`;
+      if (s.cross) m += `<rect x="-1" y="${cx.toFixed(2)}" width="${sc+2}" height="${sw}" fill="${fg}"/>`;
+      return { w:sc, h:sc, motif:m };
+    }
+    case 'waves': {
+      const h = sc;
+      const mid = h/2;
+      const amp = clamp(s.amp, 1, mid - sw/2 - 1);
+      const w = sc;
+      let d;
+      if (s.wstyle === 'wave')
+        d = `M0 ${mid} Q ${w/4} ${mid-amp} ${w/2} ${mid} Q ${3*w/4} ${mid+amp} ${w} ${mid}`;
+      else
+        d = `M0 ${mid} L ${w/2} ${mid-amp} L ${w} ${mid}`;
+      return { w, h, motif:`<path d="${d}" fill="none" stroke="${fg}" stroke-width="${sw}" stroke-linejoin="round" stroke-linecap="round"/>` };
+    }
+    case 'triangles': {
+      const w = sc, h = sc;
+      // up-triangle: apex at top-centre, base along the bottom edge.
+      // the background fills the complementary down-triangles automatically.
+      return { w, h, motif:`<polygon points="${w/2},0 ${w},${h} 0,${h}" fill="${fg}"/>` };
+    }
+    case 'hexagons': {
+      const k = sc/28;
+      const w = 28*k, h = 49*k;
+      return { w, h, motif:`<g transform="scale(${k})" fill="${fg}"><path d="${HEX_PATH}"/></g>` };
+    }
+    case 'plus': {
+      const w = sc, h = sc;
+      const t = clamp(sw*1.8, 1.5, sc*0.4);
+      const L = clamp(sc*0.5, t*1.4, sc*0.9);
+      const plus = (cx,cy) =>
+        `<rect x="${(cx-t/2).toFixed(2)}" y="${(cy-L/2).toFixed(2)}" width="${t.toFixed(2)}" height="${L.toFixed(2)}" fill="${fg}"/>`+
+        `<rect x="${(cx-L/2).toFixed(2)}" y="${(cy-t/2).toFixed(2)}" width="${L.toFixed(2)}" height="${t.toFixed(2)}" fill="${fg}"/>`;
+      let m = plus(w/2, h/2);
+      for (const [cx,cy] of [[0,0],[w,0],[0,h],[w,h]]) m += plus(cx,cy);
+      return { w, h, motif:m };
+    }
+    case 'scales': {
+      const w = sc, h = sc, r = sc/2;
+      const arc = (mx,my,ex,ey) => `<path d="M${mx} ${my} A ${r} ${r} 0 0 1 ${ex} ${ey}"/>`;
+      const m = `<g fill="none" stroke="${fg}" stroke-width="${sw}">`+
+        arc(0, r, w, r) +                 // row A, apex up at (w/2, 0)
+        arc(-r, h, r, h) +                // row B left half (centre x=0)
+        arc(r, h, w+r, h) +               // row B right half (centre x=w)
+        `</g>`;
+      return { w, h, motif:m };
+    }
+  }
+  return { w:sc, h:sc, motif:'' };
+}
+
+/* ---------- SVG builders ---------- */
+function patternDef(s, id, withTransform){
+  const { w, h, motif } = tile(s);
+  const tr = (withTransform && s.angle) ? ` patternTransform="rotate(${s.angle} ${(w/2).toFixed(2)} ${(h/2).toFixed(2)})"` : '';
+  const op = clamp(s.opacity,0,100)/100;
+  const g = op < 1 ? `<g opacity="${op}">${motif}</g>` : motif;
+  return { w, h, def:`<pattern id="${id}" patternUnits="userSpaceOnUse" width="${w.toFixed(3)}" height="${h.toFixed(3)}"${tr}>${g}</pattern>` };
+}
+// full tiled area (used by preview, .svg export, PNG). Rotation supported.
+function areaSVG(s, W, H, id){
+  id = id || 'p';
+  const { def } = patternDef(s, id, true);
+  const bg = s.transparent ? '' : `<rect width="${W}" height="${H}" fill="${s.bg}"/>`;
+  return `<svg xmlns="${SVGNS}" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs>${def}</defs>${bg}<rect width="${W}" height="${H}" fill="url(#${id})"/></svg>`;
+}
+// single tile (used by CSS data-URI). No rotation (a rotated lattice can't be a
+// single repeating image); rotation is dropped for CSS, noted to the user.
+function tileSVG(s){
+  const { w, h, motif } = tile(s);
+  const op = clamp(s.opacity,0,100)/100;
+  const g = op < 1 ? `<g opacity="${op}">${motif}</g>` : motif;
+  const bg = s.transparent ? '' : `<rect width="${w}" height="${h}" fill="${s.bg}"/>`;
+  return `<svg xmlns="${SVGNS}" width="${w.toFixed(3)}" height="${h.toFixed(3)}" viewBox="0 0 ${w.toFixed(3)} ${h.toFixed(3)}">${bg}${g}</svg>`;
+}
+// preview: a responsive svg filling the stage, tiled in CSS pixels
+function previewSVG(s){
+  const { def } = patternDef(s, 'pv', true);
+  const bg = s.transparent ? '' : `<rect width="100%" height="100%" fill="${s.bg}"/>`;
+  return `<svg xmlns="${SVGNS}" width="100%" height="100%" preserveAspectRatio="none"><defs>${def}</defs>${bg}<rect width="100%" height="100%" fill="url(#pv)"/></svg>`;
+}
+const dataURI = (svg) => 'data:image/svg+xml,' + encodeURIComponent(svg);
+
+/* ---------- state ---------- */
+const DEFAULTS = {
+  type:'dots', fg:'#6366f1', bg:'#eef2ff',
+  scale:40, stroke:2, radius:6, opacity:100, angle:0, transparent:false,
+  offset:true, ratio:0.5, major:false, majorEvery:5, amp:12, wstyle:'zigzag', cross:true,
+};
+let state = clone(DEFAULTS);
+let booting = true;
+
+/* ---------- control definitions ---------- */
+// slider controls: key, label, min, max, step, unit, shownFor (null = all)
+const SLIDERS = [
+  { key:'scale',  label:'Scale',        min:12, max:160, step:1, unit:'px' },
+  { key:'radius', label:'Dot radius',   min:1,  max:60,  step:1, unit:'px', show:['dots'] },
+  { key:'stroke', label:'Line weight',  min:1,  max:24,  step:1, unit:'px', show:['grid','hatch','waves','plus','scales'] },
+  { key:'ratio',  label:'Stripe width', min:5,  max:95,  step:1, unit:'%',  show:['stripes'], scale:100 },
+  { key:'amp',    label:'Amplitude',    min:2,  max:80,  step:1, unit:'px', show:['waves'] },
+  { key:'majorEvery', label:'Major every', min:2, max:8, step:1, unit:'', show:['grid'], when:s=>s.major },
+  { key:'angle',  label:'Rotation',     min:0,  max:360, step:1, unit:'°' },
+  { key:'opacity',label:'Opacity',      min:0,  max:100, step:1, unit:'%' },
+];
+const TOGGLES = [
+  { key:'offset', label:'Offset rows',   show:['dots'] },
+  { key:'major',  label:'Major grid lines', show:['grid'] },
+  { key:'cross',  label:'Crosshatch',    show:['hatch'] },
+];
+
+function typeShows(def){ return !def.show || def.show.includes(state.type); }
+
+function buildSliders(){
+  const box = $('#sliders'); box.innerHTML = '';
+  for (const d of SLIDERS){
+    if (!typeShows(d)) continue;
+    if (d.when && !d.when(state)) continue;
+    const scale = d.scale || 1;
+    const row = document.createElement('div');
+    row.className = 'sliderrow';
+    const disp = Math.round(state[d.key]*scale) + d.unit;
+    row.innerHTML = `<label for="sl_${d.key}">${d.label}</label>
+      <input type="range" id="sl_${d.key}" min="${d.min}" max="${d.max}" step="${d.step}" value="${Math.round(state[d.key]*scale)}" aria-label="${d.label}">
+      <span class="val" id="vl_${d.key}">${disp}</span>`;
+    const r = row.querySelector('input'), vl = row.querySelector('.val');
+    r.addEventListener('input', () => {
+      const v = +r.value / scale;
+      state[d.key] = v;
+      vl.textContent = (+r.value) + d.unit;      // show the raw slider value + unit
+      updateOutputs();
+    });
+    box.appendChild(row);
+  }
+}
+function buildToggles(){
+  const box = $('#toggles'); box.innerHTML = '';
+  const active = TOGGLES.filter(typeShows);
+  if (!active.length){ box.style.display='none'; return; }
+  box.style.display='flex';
+  for (const d of active){
+    const lab = document.createElement('label');
+    lab.innerHTML = `<input type="checkbox" ${state[d.key]?'checked':''}> ${d.label}`;
+    lab.querySelector('input').addEventListener('change', (e) => {
+      state[d.key] = e.target.checked;
+      buildSliders();          // e.g. "major grid" reveals "major every"
+      updateOutputs();
+    });
+    box.appendChild(lab);
+  }
+}
+
+/* ---------- render ---------- */
+function updateOutputs(){
+  // preview
+  $('#stage').innerHTML = previewSVG(state);
+  // svg markup (a small tiled area that opens & tiles as an image)
+  const A = clamp(Math.round(state.scale * 6), 180, 480);
+  const svg = areaSVG(state, A, A, 'pattern');
+  $('#svgCode').textContent = svg;
+  // css
+  const uri = dataURI(tileSVG(state));
+  let css = '';
+  if (!state.transparent) css += `background-color: ${state.bg};\n`;
+  css += `background-image: url("${uri}");`;
+  $('#cssCode').textContent = css;
+  $('#cssNote').textContent = state.angle ? 'Rotation applies to SVG/PNG only.' : '';
+  syncHash();
+}
+function syncControls(){
+  $('#typeSel').value = state.type;
+  $('#fgColor').value = state.fg;
+  $('#bgColor').value = state.bg;
+  $('#transparentChk').checked = state.transparent;
+  buildSliders();
+  buildToggles();
+}
+
+/* ---------- populate type select ---------- */
+for (const [v,label] of TYPES){
+  const o = document.createElement('option'); o.value = v; o.textContent = label;
+  $('#typeSel').appendChild(o);
+}
+$('#typeSel').addEventListener('change', (e) => {
+  state.type = e.target.value;
+  buildSliders(); buildToggles(); updateOutputs();
+});
+$('#fgColor').addEventListener('input', (e) => { state.fg = e.target.value; updateOutputs(); });
+$('#bgColor').addEventListener('input', (e) => { state.bg = e.target.value; updateOutputs(); });
+$('#transparentChk').addEventListener('change', (e) => { state.transparent = e.target.checked; updateOutputs(); });
+$('#checkerChk').addEventListener('change', (e) => { $('#stage').classList.toggle('checker', e.target.checked); });
+$('#resetBtn').addEventListener('click', () => { state = clone(DEFAULTS); syncControls(); updateOutputs(); });
+
+/* ---------- presets ---------- */
+const PRESETS = [
+  { name:'Indigo dots',  st:{ type:'dots', fg:'#6366f1', bg:'#eef2ff', scale:40, radius:6, offset:true } },
+  { name:'Blueprint',    st:{ type:'grid', fg:'#dbeafe', bg:'#1e3a8a', scale:26, stroke:1, major:true, majorEvery:5 } },
+  { name:'Graph paper',  st:{ type:'grid', fg:'#93a4b8', bg:'#ffffff', scale:22, stroke:1, major:true, majorEvery:5 } },
+  { name:'Candy stripes',st:{ type:'stripes', fg:'#fb7185', bg:'#fff1f2', scale:30, ratio:0.5, angle:45 } },
+  { name:'Chessboard',   st:{ type:'checker', fg:'#111827', bg:'#f9fafb', scale:22 } },
+  { name:'Mint waves',   st:{ type:'waves', fg:'#10b981', bg:'#ecfdf5', scale:38, amp:11, stroke:2, wstyle:'wave' } },
+  { name:'Chevron',      st:{ type:'waves', fg:'#f59e0b', bg:'#fffbeb', scale:34, amp:14, stroke:3, wstyle:'zigzag' } },
+  { name:'Honeycomb',    st:{ type:'hexagons', fg:'#f59e0b', bg:'#451a03', scale:30 } },
+  { name:'Isometric',    st:{ type:'triangles', fg:'#8b5cf6', bg:'#f5f3ff', scale:34 } },
+  { name:'Crosshatch',   st:{ type:'hatch', fg:'#334155', bg:'#f8fafc', scale:12, stroke:1.5, cross:true, angle:30 } },
+  { name:'Kraft scales', st:{ type:'scales', fg:'#b45309', bg:'#fef3c7', scale:34, stroke:2 } },
+  { name:'Night plus',   st:{ type:'plus', fg:'#475569', bg:'#0f172a', scale:34, stroke:3 } },
+];
+function applyPreset(st){
+  state = clone(DEFAULTS);
+  Object.assign(state, st);
+  syncControls(); updateOutputs();
+}
+for (const p of PRESETS){
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'chip';
+  const prev = clone(DEFAULTS); Object.assign(prev, p.st);
+  const uri = dataURI(tileSVG(prev));
+  b.innerHTML = `<span class="sw" style="background-image:url('${uri}');background-color:${prev.transparent?'transparent':prev.bg}" aria-hidden="true"></span>${p.name}`;
+  b.addEventListener('click', () => applyPreset(p.st));
+  $('#presets').appendChild(b);
+}
+
+/* ---------- randomize ---------- */
+$('#randomBtn').addEventListener('click', () => {
+  const type = TYPE_KEYS[randi(0, TYPE_KEYS.length-1)];
+  const hue = rand(0,360);
+  const dark = Math.random() < 0.45;
+  let bg, fg;
+  if (dark){
+    bg = hslToHex(hue, rand(28,52), rand(11,20));
+    fg = hslToHex(hue + rand(-24,40), rand(55,85), rand(55,72));
+  } else {
+    bg = hslToHex(hue, rand(35,70), rand(92,97));
+    fg = hslToHex(hue + rand(-24,40), rand(50,78), rand(38,58));
+  }
+  const scale = randi(22, 68);
+  const st = { type, fg, bg, scale,
+    stroke: clamp(randi(1,4), 1, 24),
+    radius: clamp(Math.round(scale*rand(0.12,0.3)), 1, scale/2),
+    opacity: 100, transparent: false,
+    offset: Math.random()<0.7,
+    ratio: rand(0.35,0.6),
+    major: Math.random()<0.5, majorEvery: randi(4,6),
+    amp: Math.round(scale*rand(0.16,0.34)),
+    wstyle: Math.random()<0.5 ? 'wave' : 'zigzag',
+    cross: Math.random()<0.6,
+    angle: (type==='stripes'||type==='hatch') ? randi(0,6)*15 : 0,
+  };
+  state = clone(DEFAULTS); Object.assign(state, st);
+  syncControls(); updateOutputs();
+});
+
+/* ---------- copy / download ---------- */
+function flashBtn(b, txt, err){
+  if (!b.dataset.orig) b.dataset.orig = b.textContent;
+  b.textContent = txt; b.classList.add(err ? 'copyerr' : 'copied');
+  setTimeout(() => { b.textContent = b.dataset.orig; b.classList.remove('copied','copyerr'); }, 1200);
+}
+async function copyText(btn, text){
+  try { await navigator.clipboard.writeText(text); flashBtn(btn, '✓ Copied'); }
+  catch(e){ flashBtn(btn, 'Copy failed', true); }
+}
+$('#copySvg').addEventListener('click', (e) => copyText(e.currentTarget, $('#svgCode').textContent));
+$('#copyCss').addEventListener('click', (e) => copyText(e.currentTarget, $('#cssCode').textContent));
+
+function downloadBlob(blob, name){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click();
+  a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+$('#dlSvg').addEventListener('click', () => {
+  const A = clamp(Math.round(state.scale * 6), 180, 480);
+  const svg = areaSVG(state, A, A, 'pattern');
+  downloadBlob(new Blob([svg], { type:'image/svg+xml' }), `pattern-${state.type}.svg`);
+});
+$('#dlPng').addEventListener('click', () => {
+  const size = +$('#pngSize').value;
+  const svg = areaSVG(state, size, size, 'pattern');
+  const img = new Image();
+  img.onload = () => {
+    const cv = document.createElement('canvas');
+    cv.width = size; cv.height = size;
+    const ctx = cv.getContext('2d');
+    ctx.drawImage(img, 0, 0, size, size);
+    cv.toBlob((blob) => {
+      if (blob) downloadBlob(blob, `pattern-${state.type}-${size}.png`);
+      else $('#exportNote').textContent = 'PNG export failed in this browser.';
+    }, 'image/png');
+  };
+  img.onerror = () => { $('#exportNote').textContent = 'Could not rasterize the pattern.'; };
+  img.src = dataURI(svg);
+});
+
+/* ---------- share URL hash ---------- */
+function syncHash(){
+  if (booting) return;
+  try {
+    const compact = {};
+    for (const k in DEFAULTS){ if (JSON.stringify(state[k]) !== JSON.stringify(DEFAULTS[k])) compact[k] = state[k]; }
+    const str = JSON.stringify(compact);
+    history.replaceState(null, '', str === '{}' ? location.pathname + location.search : '#' + encodeURIComponent(str));
+  } catch(e){}
+}
+function readHash(){
+  const h = location.hash.slice(1);
+  if (!h) return;
+  try {
+    const obj = JSON.parse(decodeURIComponent(h));
+    if (!obj || typeof obj !== 'object') return;
+    const s = clone(DEFAULTS);
+    if (TYPE_KEYS.includes(obj.type)) s.type = obj.type;
+    s.fg = safeHex(obj.fg, s.fg);
+    s.bg = safeHex(obj.bg, s.bg);
+    s.transparent = !!obj.transparent;
+    s.offset = !!obj.offset; s.major = !!obj.major; s.cross = !!obj.cross;
+    if (obj.wstyle === 'wave' || obj.wstyle === 'zigzag') s.wstyle = obj.wstyle;
+    const num = (k, lo, hi, dv) => { const v = +obj[k]; return isFinite(v) ? clamp(v, lo, hi) : dv; };
+    s.scale = num('scale', 4, 400, s.scale);
+    s.stroke = num('stroke', 0.5, 40, s.stroke);
+    s.radius = num('radius', 0.5, 200, s.radius);
+    s.opacity = num('opacity', 0, 100, s.opacity);
+    s.angle = num('angle', 0, 360, s.angle);
+    s.ratio = num('ratio', 0.02, 0.98, s.ratio);
+    s.amp = num('amp', 1, 200, s.amp);
+    s.majorEvery = Math.round(num('majorEvery', 2, 8, s.majorEvery));
+    state = s;
+  } catch(e){ state = clone(DEFAULTS); }
+}
+
+/* ---------- theme toggle ---------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+
+/* ---------- boot ---------- */
+readHash();
+syncControls();
+booting = false;
+updateOutputs();
+</script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 3: Reading the 1719 World Map · Navigating Piracy</title>
+<meta name="description" content="Day 3 student missions: Reading the 1719 World Map. Whydah unit, LEAP4Ed Summer 2026.">
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<script src="day-config.js" defer></script>
+<style>
+  :root{
+    --ink:#12222B; --ink2:#1C3743; --parch:#F3E8CE; --parch2:#EAD9B4;
+    --brass:#A9781F; --brassl:#D8B25A; --ox:#8C2C1E; --inktx:#2B2114; --muted:#6E5B3C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--parch); color:var(--inktx); font-family:"Segoe UI",system-ui,-apple-system,sans-serif; line-height:1.5;}
+  .hero{background:var(--ink); color:var(--parch); padding:2.2em 1em 1.8em; text-align:center;}
+  .hero .kicker{color:var(--brassl); font-weight:700; letter-spacing:.25em; font-size:.85em; text-transform:uppercase;}
+  .hero h1{font-family:Georgia,"Times New Roman",serif; font-size:clamp(1.8em,5vw,2.8em); margin:.25em 0 .2em;}
+  .hero .sub{color:#C7BCA0; font-style:italic; font-size:1.05em;}
+  .wrap{max-width:880px; margin:0 auto; padding:1.2em 1em 3em;}
+  .mission{background:var(--parch2); border:1.5px solid var(--brass); border-radius:10px; padding:1.2em 1.3em 1.3em; margin:1.3em 0; box-shadow:2px 3px 10px rgba(42,29,15,.14);}
+  .mission-top{display:flex; align-items:baseline; gap:.7em; flex-wrap:wrap;}
+  .mnum{background:var(--ox); color:var(--parch); font-family:Georgia,serif; font-weight:700; font-size:1.25em; border-radius:50%; width:1.9em; height:1.9em; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .mission h2{font-family:Georgia,serif; font-size:1.45em; color:var(--inktx);}
+  .meta{color:var(--ox); font-weight:700; font-size:.92em; margin:.15em 0 .6em;}
+  .mission p{margin:.5em 0;}
+  .btn{display:inline-block; background:var(--brass); color:#FBF4E2; font-weight:700; font-size:1.06em; text-decoration:none; padding:.85em 1.25em; border-radius:8px; margin:.45em .45em .2em 0; border:2px solid #8a6119;}
+  .btn:hover,.btn:focus{background:#8a6119; outline:3px solid var(--ox);}
+  .btn.alt{background:var(--ink2); border-color:var(--ink);}
+  .btn.alt:hover,.btn.alt:focus{background:var(--ink);}
+  .log{background:#FBF4E2; border:1.5px dashed var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .log b{color:var(--ox);}
+  .hunt{margin:.5em 0 .3em 1.2em;}
+  .hunt li{margin:.35em 0;}
+  .bonus{font-style:italic; color:var(--muted); margin-top:.6em;}
+  .vocab{display:flex; gap:.6em; justify-content:center; flex-wrap:wrap; margin:1em 0;}
+  .chip{background:var(--ink); color:var(--brassl); font-family:Georgia,serif; font-weight:700; padding:.45em 1.1em; border-radius:999px; letter-spacing:.06em;}
+  .foot{background:var(--ink); color:#C7BCA0; text-align:center; padding:1.6em 1em 2em; font-size:.95em;}
+  .foot a{color:var(--brassl);}
+  .divider{text-align:center; color:var(--ox); font-size:1.3em; margin:1.6em 0 .2em; font-family:Georgia,serif; font-weight:700;}
+  img.chart{width:100%; height:auto; border:1.5px solid var(--brass); border-radius:6px; margin:.6em 0;}
+  .note{font-size:.9em; color:var(--muted); font-style:italic;}
+  .card-fields{background:#FBF4E2; border:1.5px solid var(--brass); border-radius:8px; padding:.8em 1em; margin:.6em 0;}
+  .card-fields div{padding:.28em 0; border-bottom:1px dashed var(--parch2); font-weight:700; color:var(--ink2);}
+  .card-fields div:last-child{border-bottom:none;}
+  .card-fields span{color:var(--muted); font-weight:400; font-style:italic;}
+  @media (max-width:520px){ .mission{padding:1em .9em;} .btn{display:block; text-align:center; margin-right:0;} }
+</style>
+</head>
+<body>
+<div id="today-banner"></div>
+
+<header class="hero">
+  <div class="kicker">Day 3 · Week 1: Setting Sail</div>
+  <h1>Reading the 1719 World Map</h1>
+  <div class="sub">Drawn in London, from the voyages of buccaneers and privateers. Time to interrogate it.</div>
+</header>
+
+<main class="wrap">
+
+  <section class="mission" id="m0">
+    <div class="mission-top"><span class="mnum">0</span><h2>Rig your Analysis Card</h2></div>
+    <div class="meta">2 minutes · solo · paper + pencil</div>
+    <p>One sheet, folded like a book. Cover: <b>your name, "Day 3," the date.</b> Inside, write these four field labels. Leave room under each:</p>
+    <div class="card-fields">
+      <div>THE MAPMAKER<span>: who drew it, and whose travels did he copy?</span></div>
+      <div>WHAT IT SHOWS / COULDN'T SHOW<span>: at least 2 of each</span></div>
+      <div>WHOSE EYES? <span>The world drawn from whose point of view?</span></div>
+      <div>THE ARGUMENT<span>: "This map argues that ___ because I can see ___ on it."</span></div>
+    </div>
+    <p class="note">Three of these (<b>the mapmaker</b>, <b>whose eyes</b>, and <b>the argument</b>) are your exit ticket today. This is a real historian's tool: you're not just looking at the map, you're cross-examining it.</p>
+  </section>
+
+  <section class="mission" id="m1">
+    <div class="mission-top"><span class="mnum">1</span><h2>Something's Wrong</h2></div>
+    <div class="meta">~8 minutes · with your first mate (pairs)</div>
+    <p>This is Herman Moll's <b>"New &amp; Correct Map of the Whole World," 1719</b>, as new and correct as maps got. Except…</p>
+    <img class="chart" src="pics/moll-1719-world-map.jpg" alt="Herman Moll's 1719 world map: A New and Correct Map of the Whole World.">
+    <a class="btn" href="pics/moll-1719-world-map.jpg" target="_blank" rel="noopener">Open the FULL map →</a>
+    <p class="note">Zoom: <b>Ctrl</b> + scroll (or pinch). Bonus: the <a href="https://upload.wikimedia.org/wikipedia/commons/b/bf/A_new_and_correct_map_of_the_whole_world%2C_shewing_ye_situation_of_its_principal_parts._..._according_to_the_newest_and_most_exact_observations_-_by_Herman_Moll%2C_geographer%2C_1719._NYPL1630430.jpg" target="_blank" rel="noopener">library mega-scan</a> (huge, can be slow).</p>
+    <p style="margin-top:.7em; font-weight:700;">Detective hunt. Find what's wrong to modern eyes:</p>
+    <ol class="hunt">
+      <li>Look at <b>California</b>, very closely. What did Moll do to it?</li>
+      <li>Find the words <b>"PARTS UNKNOWN."</b> Now find them <b>again</b>, somewhere else. How many can you spot?</li>
+      <li>Bottom-right: find the continent that just… <b>stops</b>, like the artist put the pen down.</li>
+      <li>What does Moll call the <b>Pacific Ocean</b>? (Hint: it's huge, bottom-left.)</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> On your card: <b>THE MAPMAKER</b> (his name and year are in the fancy title box, top-left) + <b>two things</b> under WHAT IT SHOWS / COULDN'T SHOW. (California-as-an-island and the missing coast are things Moll <i>couldn't</i> show. Nobody had sailed there yet.)</div>
+    <p class="bonus">Sharp-eyes bonus: find the round inset map of the <b>North Pole</b>, a big circle labeled "THE NORTH POLE," <b>bottom-left, below the tip of South America.</b> Why would Moll draw the pole <b>separately</b> instead of on the main map? (Day-2 clue: what does Mercator do to the top and bottom of the world?)</p>
+    <p class="bonus" style="color:var(--ox);"><b>Big idea:</b> these aren't just goofs. They're what people in 1719 <b>believed</b>. And what they <b>wanted</b> to believe. That's the whole point of today.</p>
+  </section>
+
+  <section class="mission" id="m2">
+    <div class="mission-top"><span class="mnum">2</span><h2>The Argument in the Picture</h2></div>
+    <div class="meta">~9 minutes · pairs</div>
+    <p>A map argues with more than coastlines. Look at the <b>fancy artwork</b> in Moll's title box, the top-left corner. Every figure in it is making a claim about who runs the world.</p>
+    <img class="chart" src="pics/moll-1719-cartouche.jpg" alt="The decorated title cartouche of Moll's 1719 map: figures around an oval title, a god shining in the clouds, a lion at the base.">
+    <a class="btn" href="pics/moll-1719-cartouche.jpg" target="_blank" rel="noopener">Open it big →</a>
+    <p style="margin-top:.7em; font-weight:700;">Read the picture. Find:</p>
+    <ol class="hunt">
+      <li>Who's <b>sitting</b> comfortably, in armor, like they own the place? And who's <b>standing at the edges</b>, half-dressed, holding a bow?</li>
+      <li>Up in the clouds, someone shines down over the whole scene. Who does the mapmaker put <b>above everyone</b>?</li>
+      <li>Find the <b>lion.</b> Find the person with the <b>bow</b>, and the person with a <b>flag.</b> What is each one supposed to say about its part of the world?</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> Start <b>THE ARGUMENT.</b> This drawing isn't decoration. It's a poster for an idea about who's on top. In one phrase: what is the picture <b>bragging</b> about?</div>
+    <p class="bonus">The figures at the edges (the bow, the feathers) stand for the "new" lands. Notice they're drawn as <b>scenery or servants</b>, never in charge. That's an argument, made in a picture.</p>
+  </section>
+
+  <section class="mission" id="m3">
+    <div class="mission-top"><span class="mnum">3</span><h2>Flip the Map</h2></div>
+    <div class="meta">~8 minutes · pairs</div>
+    <p>Here's a world map made <b>~560 years before Moll's</b>, by a mapmaker named <b>al-Idrisi</b>, working for a king in Sicily in <b>1154</b>. Something about it will feel <i>wrong</i> to your eyes. It isn't. It's just drawn from a different point of view.</p>
+    <img class="chart" src="pics/alidrisi-1154-world-map.jpg" alt="Al-Idrisi's 1154 world map, the Tabula Rogeriana, drawn with south at the top.">
+    <a class="btn" href="pics/alidrisi-1154-world-map.jpg" target="_blank" rel="noopener">Open it big →</a>
+    <ol class="hunt">
+      <li>Which way is <b>up</b>? Al-Idrisi drew his map with <b>SOUTH at the top.</b> There's no law that north goes up. It's a <b>choice</b>, and he made the opposite one.</li>
+      <li>Near the top-center he put the places <b>he</b> thought mattered most: Arabia and North Africa, <b>his</b> world. Every mapmaker centers their own.</li>
+      <li>So back to Moll: he put <b>Europe</b> big, up near the top, north-up. Whose world is <b>Moll's</b> map centered on?</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> Fill <b>WHOSE EYES?</b> Moll's map is the world as ___ saw it. (Two mapmakers, two centers, two "ups." Neither one is "the truth.")</div>
+  </section>
+
+  <section class="mission" id="m4">
+    <div class="mission-top"><span class="mnum">4</span><h2>Fill the Blank</h2></div>
+    <div class="meta">~9 minutes · pairs</div>
+    <p>Moll's map is covered in places named <b>"New"</b> (New England, New Britain, New Holland) plus big spaces stamped <b>"Parts Unknown."</b> New to whom? Unknown to whom? <b>People already lived there.</b> Let's put them back on the map.</p>
+    <a class="btn" href="https://native-land.ca/" target="_blank" rel="noopener">Open Native-Land.ca →</a>
+    <ol class="hunt">
+      <li>On Moll's map, find <b>two</b> places starting with "New." Someone renamed them. Who was there <b>first</b>?</li>
+      <li>On native-land.ca, search <b>our town: Salem, MA.</b> Whose land is this? Let the map tell you.</li>
+      <li>Now search a spot Moll stamped <b>"Parts Unknown"</b> (try the middle of North America). It was never empty. Just unknown to <b>Europeans</b>.</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> Add to <b>WHOSE EYES?</b> or <b>THE ARGUMENT</b>: a "blank" on Moll's map usually means <b>"we didn't know it"</b>, not "nobody's there." Whose story does that erase?</div>
+    <p class="bonus">Even native-land.ca calls itself <b>"a starting point, not the final word"</b>, because it's a map too, and every map is somebody's argument. Including that one.</p>
+  </section>
+
+  <section class="mission" id="m5">
+    <div class="mission-top"><span class="mnum">5</span><h2>The Whydah's World</h2></div>
+    <div class="meta">~6 minutes · pairs · the payoff</div>
+    <p>Back to Moll one last time. He drew this <b>two years after our ship went down</b>, and her whole world is on it. Find the three places:</p>
+    <ol class="hunt">
+      <li><b>GUINEA</b>: the West African coast she was built to sail <i>to</i>, to buy enslaved people. (She's named for a port there: Ouidah.)</li>
+      <li>The <b>Caribbean</b>: where she delivered them, and where Bellamy's pirates later captured her.</li>
+      <li><b>New England</b>: <i>not</i> a stop on the slave route. It's only where the pirates sailed her afterward, and where she wrecked and still lies (yesterday's live-cam water).</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> One line on the back of your card: this map shows the Whydah's whole world. But <b>what about her story can a map like this never show?</b> (Think about the 367 people aboard her as cargo.)</div>
+  </section>
+
+  <div class="divider">✦</div>
+
+  <section class="mission" id="close">
+    <div class="mission-top"><span class="mnum">★</span><h2>Make Your Case</h2></div>
+    <div class="meta">whole class · your claim, then on your feet</div>
+    <p>Finish <b>THE ARGUMENT</b> on your card like a historian. A claim, backed by <b>evidence</b>:</p>
+    <p style="font-family:Georgia,serif; font-size:1.15em; font-weight:700; text-align:center; padding:.4em 0; color:var(--ink2);">"This map argues that ______<br>because I can see ______ on it."</p>
+    <ol class="hunt">
+      <li><b>Walk your sentence up to the board</b> when Mr. Howe calls for it. Every crew's claim goes up.</li>
+      <li>Then <b>stand on the line.</b> One wall = "<b>MOLL</b> made this map." The other wall = "the <b>EMPIRE</b> that paid for it made it." The pirates who fed him the intelligence? Somewhere in between. <b>Go stand where you believe</b>, and be ready to defend your spot.</li>
+    </ol>
+    <p class="note">There's a real case for each: a map has a mapmaker, a source, and a paymaster. So who <i>really</i> made it?</p>
+  </section>
+
+  <div class="vocab">
+    <span class="chip">cartographer</span><span class="chip">empire</span><span class="chip">intelligence</span><span class="chip">argument</span>
+  </div>
+  <p style="text-align:center; font-size:.92em; color:var(--muted); max-width:660px; margin:0 auto;">
+    <b>cartographer</b> = a mapmaker · <b>empire</b> = one country ruling lands and people far away ·
+    <b>intelligence</b> = secret, valuable information · <b>argument</b> = a claim a map (or anything) is trying to prove
+  </p>
+
+</main>
+
+<footer class="foot">
+  <p><b>Tomorrow:</b> you adopt a <b>real ship</b> (one that's sailing the ocean <i>right now</i>) and start its captain's log.</p>
+  <p style="margin-top:.6em;"><a href="whydah-dashboard.html#overview">⚓ Back to the ship's logbook (dashboard)</a></p>
+</footer>
+
+</body>
+</html>

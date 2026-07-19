@@ -1,0 +1,1011 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSV Explorer</title>
+<meta name="description" content="Peek inside a CSV or TSV file — sort, filter, get column stats, clean up the mess and export, all without a spreadsheet. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
+  .note { color: var(--muted); font-size: .8rem; }
+  .note.err { color: var(--danger); }
+  .note.okc { color: var(--ok); }
+  .hide { display: none !important; }
+  body:not(.loaded) .needs-data { display: none; }
+  .spacer { flex: 1 1 auto; }
+  .cap { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+
+  input[type="text"], input[type="search"], textarea, select { font-family: var(--sans); font-size: .88rem; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+
+  /* ---- input card ---- */
+  #fileInput { display: none; }
+  #dropzone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 30px 16px; text-align: center; cursor: pointer; background: var(--surface-2); transition: border-color .15s, background .15s; }
+  #dropzone:hover, #dropzone:focus-visible, #dropzone.drag { border-color: var(--accent); }
+  #dropzone.drag { background: var(--surface); }
+  #dropzone .dz-icon { font-size: 1.7rem; line-height: 1; margin-bottom: 8px; color: var(--muted); }
+  #dropzone .dz-main { font-size: .95rem; }
+  #dropzone .dz-main .linky { color: var(--accent); text-decoration: underline; }
+  #dropzone .dz-sub { color: var(--muted); font-size: .8rem; margin-top: 4px; }
+  body.loaded #dropzone { padding: 12px 16px; }
+  body.loaded #dropzone .dz-icon, body.loaded #dropzone .dz-sub { display: none; }
+  .input-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 12px; }
+  .inline-lbl { display: inline-flex; align-items: center; gap: 7px; font-size: .84rem; color: var(--muted); white-space: nowrap; }
+  .inline-lbl input[type="text"] { width: 150px; }
+  #pasteBox { margin-top: 12px; }
+  #pasteBox summary { cursor: pointer; font-size: .86rem; color: var(--muted); }
+  #pasteBox summary:hover { color: var(--accent); }
+  #pasteBox textarea { width: 100%; min-height: 150px; margin-top: 10px; font-family: var(--mono); font-size: .8rem; white-space: pre; }
+
+  /* ---- stats strip ---- */
+  .strip { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .pill { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 5px 13px; font-size: .82rem; color: var(--muted); }
+  .pill strong { color: var(--text); font-weight: 600; }
+
+  /* ---- toolbar ---- */
+  .tb-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .tb-row + .tb-row { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+  .vsep { width: 1px; align-self: stretch; background: var(--border); margin: 0 2px; }
+  .chk { display: inline-flex; align-items: center; gap: 6px; font-size: .84rem; }
+  #opNote { flex: 1 1 200px; min-height: 1.1em; }
+
+  /* ---- grid ---- */
+  .grid-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px; }
+  #filterBox { flex: 0 1 280px; min-width: 170px; }
+  .grid-wrap { max-height: 62vh; overflow: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  table.datagrid { border-collapse: separate; border-spacing: 0; width: 100%; font-size: .84rem; font-variant-numeric: tabular-nums; }
+  .datagrid th, .datagrid td { padding: 6px 10px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); white-space: nowrap; max-width: 340px; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+  .datagrid th:last-child, .datagrid td:last-child { border-right: none; }
+  .datagrid thead th { position: sticky; top: 0; z-index: 3; background: var(--surface-2); }
+  .datagrid td { background: var(--surface); }
+  .datagrid .rownum, .datagrid .rownum-h { position: sticky; left: 0; color: var(--muted); font-family: var(--mono); font-size: .72rem; text-align: right; }
+  .datagrid .rownum { z-index: 1; }
+  .datagrid .rownum-h { z-index: 4; background: var(--surface-2); }
+  .datagrid tbody tr:hover td, .datagrid tbody tr:hover td.rownum { background: var(--surface-2); }
+  .datagrid td.cempty::after { content: "–"; color: var(--muted); opacity: .35; }
+  .datagrid td.nomatch { text-align: center; color: var(--muted); padding: 22px; white-space: normal; }
+  .hcell { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .hsort { border: none; background: none; color: var(--text); font: inherit; font-weight: 600; cursor: pointer; padding: 1px 2px; display: inline-flex; align-items: center; gap: 5px; max-width: 220px; }
+  .hsort:hover { color: var(--accent); }
+  .hsort .hname { overflow: hidden; text-overflow: ellipsis; }
+  .hsort .arrow { color: var(--accent); font-size: .72rem; }
+  .hbtn { border: none; background: none; color: var(--muted); cursor: pointer; font-size: .82rem; padding: 1px 3px; border-radius: 5px; line-height: 1.2; }
+  .hbtn:hover { color: var(--accent); background: var(--surface); }
+  .badge { font-size: .6rem; letter-spacing: .05em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-weight: 600; }
+  .b-number { color: var(--accent); }
+  .b-date { color: var(--ok); }
+  .b-empty { color: var(--danger); }
+  .grid-hint { margin-top: 8px; }
+
+  /* ---- column stats panel ---- */
+  .stats-panel { margin-top: 12px; border: 1px solid var(--border); border-radius: 10px; padding: 14px; background: var(--surface-2); }
+  .sp-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .sp-head strong { font-size: .98rem; }
+  .btn.sm { padding: 4px 10px; font-size: .78rem; }
+  .sp-body { display: flex; flex-wrap: wrap; gap: 16px 22px; align-items: flex-start; }
+  .stat { display: flex; flex-direction: column; min-width: 72px; }
+  .stat .k, .sp-top .k, .hist-lbls .k { font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .stat .v { font-size: 1.02rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  #spNumBlock { display: flex; flex-wrap: wrap; gap: 16px 22px; align-items: flex-start; }
+  .hist canvas { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; }
+  .hist-lbls { display: flex; justify-content: space-between; gap: 8px; font-size: .7rem; color: var(--muted); margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .sp-top ol { margin: 6px 0 0; padding-left: 1.3em; font-size: .84rem; }
+  .sp-top li { margin-bottom: 2px; }
+  .sp-top .tv { white-space: pre; font-family: var(--mono); font-size: .8rem; }
+  .sp-top .tc { color: var(--muted); margin-left: 8px; }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 16px 12px 40px; }
+    #dropzone { padding: 20px 12px; }
+    .inline-lbl input[type="text"] { width: 120px; }
+    .grid-wrap { max-height: 55vh; }
+    .vsep { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>CSV Explorer</h1>
+      <p>Peek inside a CSV or TSV file — sort it, filter it, see column stats, tidy up the mess and export the clean version. No spreadsheet needed, nothing is uploaded.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <!-- ============ input ============ -->
+  <section class="panel" id="inputCard" aria-label="Load data">
+    <div id="dropzone" tabindex="0" role="button" aria-label="Drop a CSV or TSV file here, or press Enter to choose a file">
+      <div class="dz-icon" aria-hidden="true">⇪</div>
+      <div class="dz-main">Drop a <strong>.csv</strong> or <strong>.tsv</strong> file here — or <span class="linky">choose a file</span></div>
+      <div class="dz-sub">Everything runs in your browser. Your data never leaves this page.</div>
+    </div>
+    <input type="file" id="fileInput" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain" aria-hidden="true" tabindex="-1">
+    <div class="input-row">
+      <button class="btn" id="exampleBtn" type="button">Try an example</button>
+      <label class="inline-lbl">Delimiter
+        <select id="delimSel">
+          <option value="auto" selected>Auto-detect</option>
+          <option value="comma">Comma ,</option>
+          <option value="semicolon">Semicolon ;</option>
+          <option value="tab">Tab</option>
+          <option value="pipe">Pipe |</option>
+        </select>
+      </label>
+      <span class="note" id="inputNote" role="status"></span>
+    </div>
+    <details id="pasteBox">
+      <summary>Or paste data as text</summary>
+      <textarea id="pasteArea" spellcheck="false" aria-label="Paste CSV or TSV text here" placeholder="name,city,age&#10;Ada,London,36&#10;Grace,New York,45"></textarea>
+      <div style="margin-top:8px"><button class="btn primary" id="loadPasteBtn" type="button">Load pasted text</button></div>
+    </details>
+  </section>
+
+  <!-- ============ stats strip ============ -->
+  <section class="strip needs-data" id="statsStrip" aria-label="Dataset summary">
+    <span class="pill" id="stName"></span>
+    <span class="pill"><strong id="stShape"></strong></span>
+    <span class="pill" id="stSize"></span>
+    <span class="pill" id="stDelim"></span>
+  </section>
+
+  <!-- ============ cleaning toolbar ============ -->
+  <section class="panel needs-data" id="toolbar" aria-label="Cleaning tools">
+    <div class="cap">Clean up (applies to all rows, not just the ones shown)</div>
+    <div class="tb-row">
+      <button class="btn" id="opTrim" type="button">Trim whitespace</button>
+      <button class="btn" id="opDups" type="button">Remove duplicate rows</button>
+      <button class="btn" id="opEmptyRows" type="button">Remove empty rows</button>
+      <button class="btn" id="opEmptyCols" type="button">Remove empty columns</button>
+      <span class="vsep" aria-hidden="true"></span>
+      <button class="btn" id="undoBtn" type="button" disabled title="Nothing to undo">↶ Undo</button>
+      <span class="note" id="opNote" role="status"></span>
+    </div>
+    <div class="tb-row">
+      <label class="inline-lbl">Find <input type="text" id="frFind" placeholder="text to find"></label>
+      <label class="inline-lbl">Replace with <input type="text" id="frRepl" placeholder="replacement"></label>
+      <label class="inline-lbl">In <select id="frCol" aria-label="Column to search"><option value="all">All columns</option></select></label>
+      <label class="chk"><input type="checkbox" id="frWhole"> Match entire cell</label>
+      <button class="btn" id="frApply" type="button">Replace</button>
+    </div>
+    <div class="tb-row">
+      <label class="inline-lbl">Rename <select id="renCol" aria-label="Column to rename"></select></label>
+      <label class="inline-lbl">to <input type="text" id="renName" placeholder="new name"></label>
+      <button class="btn" id="renApply" type="button">Rename</button>
+      <span class="vsep" aria-hidden="true"></span>
+      <label class="inline-lbl">Delete <select id="delCol" aria-label="Column to delete"></select></label>
+      <button class="btn danger" id="delApply" type="button">Delete column</button>
+    </div>
+  </section>
+
+  <!-- ============ grid ============ -->
+  <section class="panel needs-data" id="gridCard" aria-label="Data grid">
+    <div class="grid-top">
+      <input type="search" id="filterBox" placeholder="Rows containing…" aria-label="Show only rows containing this text">
+      <span class="note" id="filterNote" role="status"></span>
+      <span class="spacer"></span>
+      <span class="note" id="showingNote"></span>
+    </div>
+    <div class="grid-wrap" tabindex="0" aria-label="Data table (scrollable)"><table class="datagrid" id="grid"></table></div>
+    <div class="grid-hint note">Click a column name to sort (click again for descending, again to reset) · ⓘ shows column stats · ✎ renames the column.</div>
+
+    <div id="statsPanel" class="stats-panel hide" aria-label="Column statistics">
+      <div class="sp-head">
+        <strong id="spName"></strong>
+        <span class="badge" id="spType"></span>
+        <span class="spacer"></span>
+        <button class="btn sm" id="spClose" type="button" aria-label="Close column stats">× Close</button>
+      </div>
+      <div class="sp-body">
+        <div class="stat"><span class="k">Non-empty</span><span class="v" id="spNonEmpty"></span></div>
+        <div class="stat"><span class="k">Empty</span><span class="v" id="spEmpty"></span></div>
+        <div class="stat"><span class="k">Unique</span><span class="v" id="spUnique"></span></div>
+        <div id="spNumBlock" class="hide">
+          <div class="stat"><span class="k">Min</span><span class="v" id="spMin"></span></div>
+          <div class="stat"><span class="k">Max</span><span class="v" id="spMax"></span></div>
+          <div class="stat"><span class="k">Mean</span><span class="v" id="spMean"></span></div>
+          <div class="stat"><span class="k">Median</span><span class="v" id="spMedian"></span></div>
+          <div class="hist">
+            <canvas id="spHist" width="200" height="60" aria-label="Value distribution histogram"></canvas>
+            <div class="hist-lbls"><span id="spHistMin"></span><span class="k">10 bins</span><span id="spHistMax"></span></div>
+          </div>
+        </div>
+        <div id="spTopBlock" class="sp-top hide">
+          <span class="k">Top 5 most frequent values</span>
+          <ol id="spTop"></ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ export ============ -->
+  <section class="panel needs-data" id="exportCard" aria-label="Export">
+    <div class="tb-row">
+      <button class="btn primary" id="dlCsv" type="button">⬇ Download CSV</button>
+      <button class="btn" id="dlJson" type="button">⬇ Download JSON</button>
+      <button class="btn" id="copyCsv" type="button">⧉ Copy CSV</button>
+      <span class="spacer"></span>
+      <span class="note" id="dirtyNote"></span>
+    </div>
+    <div class="note" style="margin-top:8px">Exports include every row after cleaning — the filter and sort above are view-only.</div>
+  </section>
+
+  <footer class="app">Your file is processed entirely in your browser — nothing is uploaded. · a <strong>max</strong> tool</footer>
+</div>
+
+<script type="module">
+/* ============================================================
+   CSV Explorer — standalone, fully client-side, zero dependencies.
+   Parse once; the grid renders at most 500 rows; every cleaning
+   operation works on the full dataset.
+   ============================================================ */
+const $ = (s) => document.querySelector(s);
+const MAX_RENDER = 500;
+const DELIM_CHARS = { comma: ',', semicolon: ';', tab: '\t', pipe: '|' };
+const DELIM_NAMES = { ',': 'comma', ';': 'semicolon', '\t': 'tab', '|': 'pipe' };
+
+// ---------- state ----------
+const S = {
+  loaded: false,
+  headers: [], rows: [], types: [],
+  srcText: '', srcName: '', srcSize: 0, delim: ',',
+  sortCol: null, sortDir: 'asc',
+  filter: '', view: [],
+  version: 0, lc: null, lcV: -1,     // lazy lowercase cache for filtering
+  undo: null,                         // { headers, rows, sortCol, sortDir, label }
+  changes: 0,
+  statsCol: null,
+  lastDelimSel: 'auto',
+};
+
+// ---------- tiny helpers ----------
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const escAttr = (s) => esc(s).replace(/"/g, '&quot;');
+const fmtInt = (n) => n.toLocaleString();
+const fmtNum = (n) => n.toLocaleString(undefined, { maximumFractionDigits: 4 });
+const plural = (n, word) => fmtInt(n) + ' ' + word + (n === 1 ? '' : 's');
+function fmtBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+  return (n / 1048576).toFixed(1) + ' MB';
+}
+function parseNum(v) {
+  const s = String(v).trim();
+  if (s === '') return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+const DATE_RE_ISO = /^\d{4}-\d{1,2}-\d{1,2}([T ]\d{1,2}:\d{2}(:\d{2}(\.\d+)?)?\s*(Z|[+-]\d{2}:?\d{2})?)?$/;
+const DATE_RE_SLASH = /^\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4}$/;
+const DATE_RE_YMD = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
+const isDateStr = (s) => DATE_RE_ISO.test(s) || DATE_RE_SLASH.test(s) || DATE_RE_YMD.test(s);
+const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// ---------- quote-aware delimited-text parser ----------
+// Handles "quoted fields", doubled "" escapes, and newlines inside quotes.
+function parseRows(text, delim) {
+  const rows = [];
+  let row = [], field = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; } else q = false;
+      } else field += ch;
+    } else if (ch === '"' && field === '') {
+      q = true;
+    } else if (ch === delim) {
+      row.push(field); field = '';
+    } else if (ch === '\n') {
+      row.push(field); rows.push(row); row = []; field = '';
+    } else if (ch === '\r') {
+      if (text[i + 1] === '\n') i++;
+      row.push(field); rows.push(row); row = []; field = '';
+    } else field += ch;
+  }
+  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+function buildModel(text, delim) {
+  const raw = parseRows(text, delim);
+  if (!raw.length) return { headers: [], rows: [] };
+  let width = 0;
+  for (const r of raw) if (r.length > width) width = r.length;
+  const headers = raw[0].slice();
+  while (headers.length < width) headers.push('');
+  const named = headers.map((h, i) => h.trim() === '' ? 'Column ' + (i + 1) : h);
+  const rows = raw.slice(1).map(r => {
+    if (r.length === width) return r;
+    const c = r.slice();
+    while (c.length < width) c.push('');
+    return c;
+  });
+  return { headers: named, rows };
+}
+function detectDelimiter(text) {
+  const sample = text.slice(0, 65536);
+  let best = ',', bestScore = 0;
+  for (const d of [',', '\t', ';', '|']) {
+    const rs = parseRows(sample, d).slice(0, 30);
+    if (!rs.length) continue;
+    const first = rs[0].length;
+    if (first < 2) continue;
+    let consistent = 0;
+    for (const r of rs) if (r.length === first) consistent++;
+    const score = first * (consistent / rs.length);
+    if (score > bestScore) { bestScore = score; best = d; }
+  }
+  return best;
+}
+
+// ---------- type sniffing (sampled, cheap) ----------
+function sniffTypes() {
+  S.types = S.headers.map((_, c) => {
+    let samples = 0, nums = 0, dates = 0;
+    for (let i = 0; i < S.rows.length; i++) {
+      const s = S.rows[i][c].trim();
+      if (s === '') continue;
+      samples++;
+      if (parseNum(s) != null) nums++;
+      else if (isDateStr(s)) dates++;
+      if (samples >= 2500) break;
+    }
+    if (!samples) return 'empty';
+    if (nums / samples >= 0.8) return 'number';
+    if (dates / samples >= 0.8) return 'date';
+    return 'text';
+  });
+}
+
+// ---------- view (filter + sort), grid rendering ----------
+function rebuildView() {
+  const q = S.filter.trim().toLowerCase();
+  let idx;
+  if (q) {
+    if (S.lcV !== S.version) { S.lc = S.rows.map(r => r.join('\u0001').toLowerCase()); S.lcV = S.version; }
+    idx = [];
+    const lc = S.lc;
+    for (let i = 0; i < lc.length; i++) if (lc[i].includes(q)) idx.push(i);
+  } else {
+    idx = new Array(S.rows.length);
+    for (let i = 0; i < idx.length; i++) idx[i] = i;
+  }
+  const c = S.sortCol;
+  if (c != null && c < S.headers.length) {
+    const type = S.types[c];
+    const dir = S.sortDir === 'desc' ? -1 : 1;
+    const keys = new Array(S.rows.length);
+    if (type === 'number') {
+      for (const i of idx) keys[i] = parseNum(S.rows[i][c]);
+    } else if (type === 'date') {
+      for (const i of idx) {
+        const s = S.rows[i][c].trim();
+        if (s === '') { keys[i] = null; continue; }
+        const ts = Date.parse(s);
+        keys[i] = Number.isFinite(ts) ? ts : null;
+      }
+    } else {
+      for (const i of idx) {
+        const s = S.rows[i][c].trim().toLowerCase();
+        keys[i] = s === '' ? null : s;
+      }
+    }
+    idx.sort((a, b) => {
+      const ka = keys[a], kb = keys[b];
+      if (ka == null && kb == null) return a - b;
+      if (ka == null) return 1;      // empties always last
+      if (kb == null) return -1;
+      if (ka < kb) return -dir;
+      if (ka > kb) return dir;
+      return a - b;                   // stable tiebreak
+    });
+  }
+  S.view = idx;
+  renderGrid();
+}
+
+function renderGrid() {
+  const arrows = { asc: '▲', desc: '▼' };
+  let h = '<thead><tr><th class="rownum-h" aria-label="Original row number">#</th>';
+  for (let c = 0; c < S.headers.length; c++) {
+    const hd = S.headers[c];
+    const sorted = S.sortCol === c ? S.sortDir : null;
+    const t = S.types[c] || 'text';
+    h += '<th' + (sorted ? ' aria-sort="' + (sorted === 'asc' ? 'ascending' : 'descending') + '"' : '') + '><div class="hcell">'
+      + '<button type="button" class="hsort" data-sort="' + c + '" title="Sort by ' + escAttr(hd) + '"><span class="hname">' + esc(hd) + '</span>'
+      + (sorted ? '<span class="arrow" aria-hidden="true">' + arrows[sorted] + '</span>' : '') + '</button>'
+      + '<span class="badge b-' + t + '">' + t + '</span>'
+      + '<button type="button" class="hbtn" data-info="' + c + '" title="Column stats" aria-label="Stats for ' + escAttr(hd) + '">ⓘ</button>'
+      + '<button type="button" class="hbtn" data-ren="' + c + '" title="Rename column" aria-label="Rename ' + escAttr(hd) + '">✎</button>'
+      + '</div></th>';
+  }
+  h += '</tr></thead><tbody>';
+  const n = Math.min(S.view.length, MAX_RENDER);
+  for (let k = 0; k < n; k++) {
+    const i = S.view[k];
+    const r = S.rows[i];
+    h += '<tr><td class="rownum">' + (i + 1) + '</td>';
+    for (let c = 0; c < S.headers.length; c++) {
+      const v = r[c];
+      h += v === '' ? '<td class="cempty"></td>' : '<td>' + esc(v) + '</td>';
+    }
+    h += '</tr>';
+  }
+  if (!n) {
+    h += '<tr><td class="nomatch" colspan="' + (S.headers.length + 1) + '">'
+      + (S.rows.length ? 'No rows match your filter.' : 'This file has headers but no data rows.') + '</td></tr>';
+  }
+  h += '</tbody>';
+  $('#grid').innerHTML = h;
+
+  $('#showingNote').textContent = S.view.length > MAX_RENDER
+    ? 'Showing first ' + fmtInt(MAX_RENDER) + ' of ' + fmtInt(S.view.length) + ' rows'
+    : (S.view.length ? 'Showing all ' + plural(S.view.length, 'row') : '');
+  $('#filterNote').textContent = S.filter.trim()
+    ? fmtInt(S.view.length) + ' of ' + fmtInt(S.rows.length) + ' rows match'
+    : '';
+}
+
+function renderStrip() {
+  $('#stName').textContent = S.srcName || 'pasted data';
+  $('#stShape').textContent = plural(S.rows.length, 'row') + ' × ' + plural(S.headers.length, 'column');
+  $('#stSize').textContent = fmtBytes(S.srcSize);
+  $('#stDelim').textContent = (DELIM_NAMES[S.delim] || '?') + '-separated';
+}
+
+function refreshColSelects() {
+  const opts = S.headers.map((h, i) => '<option value="' + i + '">' + esc(h) + '</option>').join('');
+  for (const [sel, extra] of [[$('#frCol'), '<option value="all">All columns</option>'], [$('#renCol'), ''], [$('#delCol'), '']]) {
+    const prev = sel.value;
+    sel.innerHTML = extra + opts;
+    if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+  }
+}
+
+// ---------- column stats panel (computed lazily on open) ----------
+function openStats(c) { S.statsCol = c; renderStats(); $('#statsPanel').classList.remove('hide'); }
+function hideStats() { S.statsCol = null; $('#statsPanel').classList.add('hide'); }
+function refreshStatsPanel() {
+  if (S.statsCol == null) return;
+  if (S.statsCol < S.headers.length) renderStats(); else hideStats();
+}
+function renderStats() {
+  const c = S.statsCol;
+  let nonEmpty = 0, empty = 0;
+  const freq = new Map();
+  const nums = [];
+  for (let i = 0; i < S.rows.length; i++) {
+    const v = S.rows[i][c];
+    if (v.trim() === '') { empty++; continue; }
+    nonEmpty++;
+    freq.set(v, (freq.get(v) || 0) + 1);
+    const n = parseNum(v);
+    if (n != null) nums.push(n);
+  }
+  const t = S.types[c] || 'text';
+  $('#spName').textContent = S.headers[c];
+  const badge = $('#spType');
+  badge.textContent = t;
+  badge.className = 'badge b-' + t;
+  $('#spNonEmpty').textContent = fmtInt(nonEmpty);
+  $('#spEmpty').textContent = fmtInt(empty);
+  $('#spUnique').textContent = fmtInt(freq.size);
+
+  const numeric = t === 'number' && nums.length > 0;
+  $('#spNumBlock').classList.toggle('hide', !numeric);
+  $('#spTopBlock').classList.toggle('hide', numeric);
+  if (numeric) {
+    nums.sort((a, b) => a - b);
+    const min = nums[0], max = nums[nums.length - 1];
+    let sum = 0;
+    for (const n of nums) sum += n;
+    const mean = sum / nums.length;
+    const mid = nums.length >> 1;
+    const median = nums.length % 2 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+    $('#spMin').textContent = fmtNum(min);
+    $('#spMax').textContent = fmtNum(max);
+    $('#spMean').textContent = fmtNum(mean);
+    $('#spMedian').textContent = fmtNum(median);
+    drawHist(nums, min, max);
+  } else {
+    const top = [...freq.entries()].sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0]))).slice(0, 5);
+    $('#spTop').innerHTML = top.length
+      ? top.map(([v, n]) => '<li><span class="tv">“' + esc(v) + '”</span><span class="tc">× ' + fmtInt(n) + '</span></li>').join('')
+      : '<li class="note">No values in this column.</li>';
+  }
+}
+function drawHist(sortedNums, min, max) {
+  const cv = $('#spHist');
+  const W = 200, H = 60;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const bins = new Array(10).fill(0);
+  if (max > min) {
+    const w = (max - min) / 10;
+    for (const n of sortedNums) {
+      let b = Math.floor((n - min) / w);
+      if (b > 9) b = 9;
+      bins[b]++;
+    }
+  } else bins[0] = sortedNums.length;
+  const peak = Math.max(1, ...bins);
+  const cs = getComputedStyle(document.documentElement);
+  ctx.strokeStyle = cs.getPropertyValue('--border').trim();
+  ctx.beginPath(); ctx.moveTo(0, H - .5); ctx.lineTo(W, H - .5); ctx.stroke();
+  ctx.fillStyle = cs.getPropertyValue('--accent').trim();
+  const bw = W / 10;
+  for (let b = 0; b < 10; b++) {
+    if (!bins[b]) continue;
+    const bh = Math.max(1.5, bins[b] / peak * (H - 8));
+    ctx.fillRect(b * bw + 1.5, H - 1 - bh, bw - 3, bh);
+  }
+  $('#spHistMin').textContent = fmtNum(min);
+  $('#spHistMax').textContent = fmtNum(max);
+}
+
+// ---------- cleaning operations ----------
+function opNote(msg, kind) {
+  const el = $('#opNote');
+  el.textContent = msg;
+  el.className = 'note' + (kind === 'err' ? ' err' : kind === 'ok' ? ' okc' : '');
+}
+function pushUndo(label) {
+  S.undo = { headers: S.headers, rows: S.rows, sortCol: S.sortCol, sortDir: S.sortDir, label };
+}
+function updateDirty() {
+  const u = $('#undoBtn');
+  u.disabled = !S.undo;
+  u.title = S.undo ? 'Undo: ' + S.undo.label : 'Nothing to undo';
+  $('#dirtyNote').textContent = S.changes === 0
+    ? 'No changes applied yet'
+    : plural(S.changes, 'change') + ' applied';
+}
+function afterData() {
+  S.version++;
+  sniffTypes();
+  refreshColSelects();
+  renderStrip();
+  rebuildView();
+  refreshStatsPanel();
+  updateDirty();
+}
+
+$('#opTrim').addEventListener('click', () => {
+  let cells = 0, hch = 0;
+  const nh = S.headers.map(hd => { const t = hd.trim(); if (t !== hd) hch++; return t; });
+  const nr = S.rows.map(r => {
+    let changed = false;
+    const out = r.map(v => { const t = v.trim(); if (t !== v) { cells++; changed = true; } return t; });
+    return changed ? out : r;
+  });
+  if (!cells && !hch) { opNote('Nothing to trim — no stray whitespace found.'); return; }
+  pushUndo('Trim whitespace');
+  S.headers = nh; S.rows = nr; S.changes++;
+  opNote('Trimmed whitespace in ' + plural(cells + hch, 'cell') + '.', 'ok');
+  afterData();
+});
+
+$('#opDups').addEventListener('click', () => {
+  const seen = new Set();
+  const keep = [];
+  let removed = 0;
+  for (const r of S.rows) {
+    const k = r.join('\u0001');
+    if (seen.has(k)) removed++;
+    else { seen.add(k); keep.push(r); }
+  }
+  if (!removed) { opNote('No duplicate rows found.'); return; }
+  pushUndo('Remove duplicate rows');
+  S.rows = keep; S.changes++;
+  opNote('Removed ' + plural(removed, 'duplicate row') + '.', 'ok');
+  afterData();
+});
+
+$('#opEmptyRows').addEventListener('click', () => {
+  const keep = S.rows.filter(r => !r.every(v => v.trim() === ''));
+  const removed = S.rows.length - keep.length;
+  if (!removed) { opNote('No empty rows found.'); return; }
+  pushUndo('Remove empty rows');
+  S.rows = keep; S.changes++;
+  opNote('Removed ' + plural(removed, 'empty row') + '.', 'ok');
+  afterData();
+});
+
+$('#opEmptyCols').addEventListener('click', () => {
+  if (!S.rows.length) { opNote('No data rows — nothing to scan for empty columns.'); return; }
+  const keepIdx = [], removedNames = [];
+  for (let c = 0; c < S.headers.length; c++) {
+    let has = false;
+    for (let i = 0; i < S.rows.length; i++) {
+      if (S.rows[i][c].trim() !== '') { has = true; break; }
+    }
+    if (has) keepIdx.push(c); else removedNames.push(S.headers[c]);
+  }
+  if (removedNames.length === 0) { opNote('No empty columns found.'); return; }
+  if (keepIdx.length === 0) { opNote('Every column is empty — refusing to delete them all.', 'err'); return; }
+  pushUndo('Remove empty columns');
+  S.headers = keepIdx.map(c => S.headers[c]);
+  S.rows = S.rows.map(r => keepIdx.map(c => r[c]));
+  S.sortCol = S.sortCol == null ? null : (keepIdx.indexOf(S.sortCol) === -1 ? null : keepIdx.indexOf(S.sortCol));
+  if (S.statsCol != null) {
+    const ni = keepIdx.indexOf(S.statsCol);
+    if (ni === -1) hideStats(); else S.statsCol = ni;
+  }
+  S.changes++;
+  opNote('Removed ' + plural(removedNames.length, 'empty column') + ': ' + removedNames.join(', ') + '.', 'ok');
+  afterData();
+});
+
+$('#frApply').addEventListener('click', () => {
+  const find = $('#frFind').value;
+  if (find === '') { opNote('Enter some text to find first.', 'err'); return; }
+  const repl = $('#frRepl').value;
+  const colSel = $('#frCol').value;
+  const colIdx = colSel === 'all' ? null : +colSel;
+  const whole = $('#frWhole').checked;
+  let occ = 0, cellsChanged = 0;
+  const nr = S.rows.map(r => {
+    let out = r, changed = false;
+    for (let c = 0; c < r.length; c++) {
+      if (colIdx != null && c !== colIdx) continue;
+      const v = r[c];
+      let nv = v, n = 0;
+      if (whole) {
+        if (v === find) { nv = repl; n = 1; }
+      } else if (v.includes(find)) {
+        const parts = v.split(find);
+        n = parts.length - 1;
+        nv = parts.join(repl);
+      }
+      if (n) {
+        if (!changed) { out = r.slice(); changed = true; }
+        out[c] = nv;
+        occ += n; cellsChanged++;
+      }
+    }
+    return out;
+  });
+  if (!occ) { opNote('No matches for “' + find + '”.'); return; }
+  pushUndo('Find & replace');
+  S.rows = nr; S.changes++;
+  opNote('Replaced ' + plural(occ, 'occurrence') + ' of “' + find + '” in ' + plural(cellsChanged, 'cell') + '.', 'ok');
+  afterData();
+});
+
+$('#renApply').addEventListener('click', () => {
+  const c = +$('#renCol').value;
+  const name = $('#renName').value.trim();
+  if (!Number.isInteger(c) || c < 0 || c >= S.headers.length) return;
+  if (!name) { opNote('Enter a new column name first.', 'err'); return; }
+  if (S.headers[c] === name) { opNote('That is already this column’s name.'); return; }
+  pushUndo('Rename column');
+  const nh = S.headers.slice();
+  const old = nh[c];
+  nh[c] = name;
+  S.headers = nh; S.changes++;
+  $('#renName').value = '';
+  opNote('Renamed “' + old + '” to “' + name + '”.', 'ok');
+  afterData();
+});
+
+$('#delApply').addEventListener('click', () => {
+  const c = +$('#delCol').value;
+  if (!Number.isInteger(c) || c < 0 || c >= S.headers.length) return;
+  if (S.headers.length <= 1) { opNote('Cannot delete the only column.', 'err'); return; }
+  pushUndo('Delete column');
+  const name = S.headers[c];
+  S.headers = S.headers.filter((_, i) => i !== c);
+  S.rows = S.rows.map(r => { const n = r.slice(); n.splice(c, 1); return n; });
+  if (S.sortCol != null) { if (S.sortCol === c) S.sortCol = null; else if (S.sortCol > c) S.sortCol--; }
+  if (S.statsCol != null) { if (S.statsCol === c) hideStats(); else if (S.statsCol > c) S.statsCol--; }
+  S.changes++;
+  opNote('Deleted column “' + name + '”.', 'ok');
+  afterData();
+});
+
+$('#undoBtn').addEventListener('click', () => {
+  if (!S.undo) return;
+  const u = S.undo;
+  S.undo = null;
+  S.headers = u.headers; S.rows = u.rows;
+  S.sortCol = u.sortCol; S.sortDir = u.sortDir;
+  S.changes = Math.max(0, S.changes - 1);
+  if (S.statsCol != null && S.statsCol >= S.headers.length) hideStats();
+  opNote('Undid: ' + u.label.toLowerCase() + '.');
+  afterData();
+});
+
+// ---------- grid interactions ----------
+$('#grid').addEventListener('click', (e) => {
+  const sBtn = e.target.closest('button[data-sort]');
+  if (sBtn) {
+    const c = +sBtn.dataset.sort;
+    if (S.sortCol !== c) { S.sortCol = c; S.sortDir = 'asc'; }
+    else if (S.sortDir === 'asc') S.sortDir = 'desc';
+    else S.sortCol = null;
+    rebuildView();
+    return;
+  }
+  const iBtn = e.target.closest('button[data-info]');
+  if (iBtn) { openStats(+iBtn.dataset.info); return; }
+  const rBtn = e.target.closest('button[data-ren]');
+  if (rBtn) {
+    const c = +rBtn.dataset.ren;
+    $('#renCol').value = String(c);
+    $('#renName').value = S.headers[c];
+    $('#toolbar').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    $('#renName').focus({ preventScroll: true });
+    $('#renName').select();
+  }
+});
+$('#spClose').addEventListener('click', hideStats);
+
+let filterTimer = 0;
+$('#filterBox').addEventListener('input', (e) => {
+  clearTimeout(filterTimer);
+  filterTimer = setTimeout(() => { S.filter = e.target.value; rebuildView(); }, 180);
+});
+
+// ---------- loading ----------
+function inputNote(msg, isErr) {
+  const el = $('#inputNote');
+  el.textContent = msg;
+  el.className = 'note' + (isErr ? ' err' : '');
+}
+function loadText(text, name, size) {
+  text = String(text).replace(/^\uFEFF/, '');
+  if (!text.trim()) { inputNote('That looks empty — nothing to load.', true); return; }
+  const sel = $('#delimSel').value;
+  const delim = sel === 'auto' ? detectDelimiter(text) : DELIM_CHARS[sel];
+  const m = buildModel(text, delim);
+  if (!m.headers.length) { inputNote('Could not find any data in there.', true); return; }
+  S.srcText = text;
+  S.srcName = name || '';
+  S.srcSize = size != null ? size : new Blob([text]).size;
+  S.delim = delim;
+  S.headers = m.headers;
+  S.rows = m.rows;
+  S.sortCol = null; S.sortDir = 'asc';
+  S.filter = ''; $('#filterBox').value = '';
+  S.undo = null; S.changes = 0;
+  hideStats();
+  S.lastDelimSel = sel;
+  S.loaded = true;
+  document.body.classList.add('loaded');
+  inputNote('');
+  opNote('Loaded ' + plural(m.rows.length, 'row') + ' × ' + plural(m.headers.length, 'column') + '.');
+  afterData();
+}
+async function readFile(f) {
+  if (!f) return;
+  if (f.size > 50 * 1024 * 1024) { inputNote('That file is over 50 MB — too big for this in-browser tool.', true); return; }
+  try {
+    const text = await f.text();
+    loadText(text, f.name, f.size);
+  } catch (err) {
+    inputNote('Could not read that file: ' + err.message, true);
+  }
+}
+
+const dz = $('#dropzone'), fi = $('#fileInput');
+dz.addEventListener('click', () => fi.click());
+dz.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fi.click(); } });
+['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add('drag'); }));
+['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove('drag'); }));
+dz.addEventListener('drop', (e) => { readFile(e.dataTransfer.files && e.dataTransfer.files[0]); });
+fi.addEventListener('change', () => { readFile(fi.files[0]); fi.value = ''; });
+window.addEventListener('dragover', (e) => e.preventDefault());
+window.addEventListener('drop', (e) => e.preventDefault());
+
+$('#loadPasteBtn').addEventListener('click', () => {
+  if (S.loaded && S.changes > 0 && !confirm('Replace your current data (and its cleaning changes) with the pasted text?')) return;
+  loadText($('#pasteArea').value, '');
+});
+$('#exampleBtn').addEventListener('click', () => {
+  if (S.loaded && S.changes > 0 && !confirm('Replace your current data (and its cleaning changes) with the example dataset?')) return;
+  $('#delimSel').value = 'auto';
+  loadText(EXAMPLE_CSV, 'orders-example.csv');
+});
+$('#delimSel').addEventListener('change', () => {
+  if (!S.loaded || !S.srcText) { S.lastDelimSel = $('#delimSel').value; return; }
+  if (S.changes > 0 && !confirm('Re-parsing with a different delimiter reloads the original data and discards your cleaning changes. Continue?')) {
+    $('#delimSel').value = S.lastDelimSel;
+    return;
+  }
+  loadText(S.srcText, S.srcName, S.srcSize);
+});
+
+// ---------- export ----------
+function csvText() {
+  const d = S.delim;
+  const needs = new RegExp('["\\n\\r' + (d === '\t' ? '\\t' : reEsc(d)) + ']');
+  const escF = (v) => needs.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+  const lines = [S.headers.map(escF).join(d)];
+  for (const r of S.rows) lines.push(r.map(escF).join(d));
+  return lines.join('\n');
+}
+function jsonText() {
+  const keys = [];
+  const seen = new Map();
+  S.headers.forEach((h, i) => {
+    let k = h.trim() || 'column_' + (i + 1);
+    if (seen.has(k)) { const n = seen.get(k) + 1; seen.set(k, n); k = k + '_' + n; }
+    else seen.set(k, 1);
+    keys.push(k);
+  });
+  const numericCol = S.types.map(t => t === 'number');
+  const arr = S.rows.map(r => {
+    const o = {};
+    for (let i = 0; i < keys.length; i++) {
+      const v = r[i];
+      if (numericCol[i]) { const n = parseNum(v); o[keys[i]] = n != null ? n : v; }
+      else o[keys[i]] = v;
+    }
+    return o;
+  });
+  return JSON.stringify(arr, null, S.rows.length > 2000 ? undefined : 2);
+}
+function download(name, text, mime) {
+  const blob = new Blob([text], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function baseName() {
+  const n = (S.srcName || 'data').replace(/\.[^.]+$/, '');
+  return (n || 'data') + '-cleaned';
+}
+$('#dlCsv').addEventListener('click', () => download(baseName() + (S.delim === '\t' ? '.tsv' : '.csv'), csvText(), 'text/csv;charset=utf-8'));
+$('#dlJson').addEventListener('click', () => download(baseName() + '.json', jsonText(), 'application/json;charset=utf-8'));
+$('#copyCsv').addEventListener('click', async () => {
+  const btn = $('#copyCsv');
+  try {
+    await navigator.clipboard.writeText(csvText());
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1200);
+  } catch (err) {
+    opNote('Copy failed — your browser blocked clipboard access. Use Download instead.', 'err');
+  }
+});
+
+// ---------- example dataset (realistic + intentionally messy) ----------
+// 60 rows: 3 exact duplicate rows, 1 fully empty row, an all-empty "notes"
+// column, stray whitespace in 7 cells, and a few empty cells — so every
+// cleaning button visibly does something.
+const EXAMPLE_CSV = `order_id,order_date,customer,product,category,qty,unit_price,discount,region,notes
+1001,2025-01-05,Acme Corp,Widget Pro,Hardware,1,49.99,0,Americas,
+1002,2025-01-07,Globex,Gizmo Max,Hardware,8,129.50,5,EMEA,
+1003,2025-01-09,Initech,  Doohickey,Accessories,15,7.25,10,APAC,
+1004,2025-01-11,Umbrella LLC,Sprocket,Hardware,22,15.00,,Americas,
+1005,2025-01-13,"Fabrikam, Inc.",Flux Capacitor,Tools,6,88.80,n/a,EMEA,
+1006,2025-01-15,Stark Industries,Cable Pack,Accessories,13,12.99,5,APAC,
+1007,2025-01-17,Wayne Enterprises,Widget Pro,Hardware,20,49.99,10,Americas,
+1008,2025-01-19,Wonka Ltd,Gizmo Max,Hardware,4,129.50,15,,
+1009,2025-01-21,Acme Corp,Doohickey,Accessories,11,7.25,0,APAC,
+1010,2025-01-23,Globex  ,Sprocket,Hardware,18,15.00,5,Americas,
+1011,2025-01-25,Initech,Flux Capacitor,Tools,2,88.80,,EMEA,
+1012,2025-01-27,Umbrella LLC,Cable Pack,Accessories,9,12.99,15,APAC,
+1006,2025-01-15,Stark Industries,Cable Pack,Accessories,13,12.99,5,APAC,
+1013,2025-01-29,"Fabrikam, Inc.",Widget Pro,Hardware,16,49.99,0,Americas,
+1014,2025-01-31,Stark Industries,Gizmo Max,Hardware,23,129.50,n/a, EMEA,
+1015,2025-02-02,Wayne Enterprises,Doohickey,Accessories,7,7.25,10,APAC,
+1016,2025-02-04,Wonka Ltd,Sprocket,Hardware,14,15.00,15,Americas,
+1017,2025-02-06,Acme Corp,Flux Capacitor,Tools,21,88.80,0,EMEA,
+1018,2025-02-08,Globex,Cable Pack,Accessories,5,12.99,,APAC,
+1019,2025-02-10,Initech,Widget Pro,Hardware,12,49.99,10,,
+1020,2025-02-12,Umbrella LLC,Gizmo Max,Hardware,19,129.50,15,EMEA,
+1021,2025-02-14,"Fabrikam, Inc.",Doohickey,Accessories,3,7.25,0,APAC,
+1022,2025-02-16,Stark Industries,Sprocket,Hardware,10,15.00,5,Americas,
+1023,2025-02-18,Wayne Enterprises,Flux Capacitor,Tools,17,88.80,n/a,EMEA ,
+1024,2025-02-20,Wonka Ltd,Cable Pack,Accessories,1,12.99,15,APAC,
+1025,2025-02-22,Acme Corp,Widget Pro,Hardware,8,49.99,,Americas,
+1026,2025-02-24,Globex,Gizmo Max,Hardware,15,129.50,5,EMEA,
+1027,2025-02-26,Initech,Doohickey,Accessories,22,7.25,10,APAC,
+1028,2025-02-28,Umbrella LLC,Sprocket,Hardware,6,15.00,15,Americas,
+1029,2025-03-02,"Fabrikam, Inc.",Flux Capacitor,Tools,13,88.80,0,EMEA,
+,,,,,,,,,
+1030,2025-03-04,Stark Industries,Cable Pack,Accessories,20,12.99,5,,
+1031,2025-03-06,Wayne Enterprises,Widget Pro, Hardware,4,49.99,10,Americas,
+1032,2025-03-08,Wonka Ltd,Gizmo Max,Hardware,11,129.50,n/a,EMEA,
+1033,2025-03-10,Acme Corp,Doohickey,Accessories,18,7.25,0,APAC,
+1034,2025-03-12,Globex,Sprocket,Hardware,2,15.00,5,Americas,
+1035,2025-03-14,Initech,Flux Capacitor,Tools,9,88.80,10,EMEA,
+1036,2025-03-16,Umbrella LLC,Cable Pack,Accessories, 16,12.99,15,APAC,
+1037,2025-03-18,"Fabrikam, Inc.",Widget Pro,Hardware,23,49.99,0,Americas,
+1038,2025-03-20,Stark Industries,Gizmo Max,Hardware,7,129.50,5,EMEA,
+1039,2025-03-22,Wayne Enterprises,Doohickey,Accessories,14,7.25,,APAC,
+1040,2025-03-24,Wonka Ltd,Sprocket,Hardware,21,15.00,15,Americas,
+1041,2025-03-26,Acme Corp,Flux Capacitor,Tools,5,88.80,n/a,,
+1019,2025-02-10,Initech,Widget Pro,Hardware,12,49.99,10,,
+1042,2025-03-28,Globex,Cable Pack,Accessories,12,12.99,5,APAC,
+1043,2025-03-30,Initech,Widget Pro,Hardware,19,49.99,10,Americas,
+1044,2025-04-01,Umbrella LLC,Gizmo Max,Hardware,3,129.50,15,EMEA,
+1045,2025-04-03 ,"Fabrikam, Inc.",Doohickey,Accessories,10,7.25,0,APAC,
+1046,2025-04-05,Stark Industries,Sprocket,Hardware,17,15.00,,Americas,
+1047,2025-04-07,Wayne Enterprises,Flux Capacitor,Tools,1,88.80,10,EMEA,
+1048,2025-04-09,Wonka Ltd,Cable Pack,Accessories,8,12.99,15,APAC,
+1049,2025-04-11,Acme Corp,Widget Pro,Hardware,15,49.99,0,Americas,
+1050,2025-04-13,Globex,Gizmo Max,Hardware,22,129.50,n/a,EMEA,
+1051,2025-04-15,Initech,Doohickey,Accessories,6,7.25,10,APAC,
+1052,2025-04-17,Umbrella LLC,Sprocket,Hardware,13,15.00,15,,
+1053,2025-04-19,"Fabrikam, Inc.",Flux Capacitor,Tools,20,88.80,,EMEA,
+1054,2025-04-21,Stark Industries,Cable Pack,Accessories,4,12.99,5,APAC,
+1041,2025-03-26,Acme Corp,Flux Capacitor,Tools,5,88.80,n/a,,
+1055,2025-04-23,Wayne Enterprises,Widget Pro,Hardware,11,49.99,10,Americas,
+1056,2025-04-25,Wonka Ltd,Gizmo Max,Hardware,18,129.50,15,EMEA,`;
+
+// ---------- theme (redraw the histogram after a theme switch) ----------
+document.getElementById('themeBtn').addEventListener('click', () => {
+  requestAnimationFrame(() => refreshStatsPanel());
+});
+
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

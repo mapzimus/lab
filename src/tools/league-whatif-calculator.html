@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>League Table What-If Calculator</title>
+<meta name="description" content="Enter current standings and remaining fixtures, click W/D/L on each fixture and watch the league table reshuffle live — with best/worst-finish analysis, position probabilities and shareable scenarios. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --champ:#f2b705; --zone-champ:rgba(242,183,5,.16); --zone-po:rgba(37,99,235,.10); --zone-rel:rgba(192,57,43,.10);
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --champ:#ffcf33; --zone-champ:rgba(255,207,51,.13); --zone-po:rgba(79,134,255,.13); --zone-rel:rgba(255,107,94,.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --champ:#ffcf33; --zone-champ:rgba(255,207,51,.13); --zone-po:rgba(79,134,255,.13); --zone-rel:rgba(255,107,94,.12);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 66ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 12px; font-size: .84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.small { padding: 6px 10px; font-size: .8rem; }
+  .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  select, input[type=text], input[type=number], textarea { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 7px 9px; font-size: .84rem; font-family: var(--sans); }
+  textarea { width: 100%; resize: vertical; line-height: 1.5; font-family: var(--mono); font-size: .8rem; }
+  input[type=number] { width: 64px; }
+  input[type=checkbox] { accent-color: var(--accent); }
+  label.fld { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); }
+  a { color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 12px 14px; margin-bottom: 14px; }
+  .panel h2 { font-size: 1rem; margin: 0 0 10px; letter-spacing: -.01em; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .row + .row { margin-top: 8px; }
+  .grouplbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 2px; align-self: center; }
+  .sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 2px; }
+  .spacer { flex: 1; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .chip { border: 1px dashed var(--border); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); border-style: solid; }
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+
+  details.setup { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 14px; margin-bottom: 14px; }
+  details.setup summary { cursor: pointer; font-weight: 600; font-size: .95rem; }
+  details.setup .body { margin-top: 10px; }
+  .setup-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; }
+  @media (max-width: 980px){ .setup-grid { grid-template-columns: minmax(0,1fr); } }
+
+  .layout { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(0,.95fr); gap: 16px; align-items: start; }
+  @media (max-width: 980px) { .layout { grid-template-columns: minmax(0,1fr); } }
+
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+  table.standings { border-collapse: collapse; width: 100%; font-size: .84rem; }
+  table.standings th, table.standings td { border-bottom: 1px solid var(--border); padding: 6px 8px; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  table.standings thead th { background: var(--surface-2); font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); position: sticky; top: 0; }
+  table.standings td.tm { text-align: left; font-weight: 600; max-width: 180px; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  table.standings td.tm:hover { color: var(--accent); }
+  table.standings td.pts { font-weight: 700; }
+  table.standings tbody tr { background: transparent; will-change: transform; }
+  table.standings tbody tr.z-champ td { background: var(--zone-champ); }
+  table.standings tbody tr.z-po td { background: var(--zone-po); }
+  table.standings tbody tr.z-rel td { background: var(--zone-rel); }
+  table.standings tbody tr.selteam td.tm { color: var(--accent); }
+  .mv { font-size: .72rem; margin-left: 4px; font-weight: 700; }
+  .mv.up { color: var(--ok); }
+  .mv.dn { color: var(--danger); }
+  .mv.same { color: var(--muted); font-weight: 400; }
+  .tiebadge { display: inline-block; margin-left: 5px; font-size: .68rem; border: 1px dashed var(--border); border-radius: 999px; padding: 0 6px; color: var(--muted); cursor: help; }
+
+  .zone-legend { display: flex; flex-wrap: wrap; gap: 10px 16px; font-size: .76rem; color: var(--muted); margin-top: 8px; align-items: center; }
+  .zone-legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid var(--border); vertical-align: -2px; margin-right: 4px; }
+  .zone-legend input[type=number] { width: 52px; padding: 3px 6px; font-size: .76rem; }
+
+  .fixlist { list-style: none; margin: 0; padding: 0; }
+  .fixlist li.md-head { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; padding: 8px 2px 3px; }
+  .fixlist li.fx { display: flex; align-items: center; gap: 6px; padding: 5px 4px; border-top: 1px solid var(--border); font-size: .83rem; flex-wrap: wrap; }
+  .fixlist li.fx:first-child { border-top: none; }
+  .fixlist .names { flex: 1 1 150px; min-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .fixlist .names b { font-weight: 600; }
+  .fixlist .names .vs { color: var(--muted); font-size: .76rem; margin: 0 3px; }
+  .wdl { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .wdl button { border: none; background: var(--surface); color: var(--muted); padding: 5px 9px; font-size: .76rem; cursor: pointer; font-weight: 600; border-left: 1px solid var(--border); min-width: 34px; }
+  .wdl button:first-child { border-left: none; }
+  .wdl button:hover { background: var(--surface-2); color: var(--text); }
+  .wdl button.on { background: var(--accent); color: var(--accent-ink); }
+  .scorebox { display: inline-flex; align-items: center; gap: 2px; }
+  .scorebox input { width: 34px; padding: 4px 3px; text-align: center; font-size: .78rem; -moz-appearance: textfield; }
+  .scorebox input::-webkit-outer-spin-button, .scorebox input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .scorebox .dash { color: var(--muted); }
+  .fixlist .rm { border: none; background: transparent; color: var(--muted); cursor: pointer; font-size: .95rem; padding: 2px 5px; border-radius: 5px; }
+  .fixlist .rm:hover { color: var(--danger); background: var(--surface-2); }
+
+  .poss-grid { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 16px; align-items: start; }
+  @media (max-width: 980px){ .poss-grid { grid-template-columns: minmax(0,1fr); } }
+  .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; margin-bottom: 10px; }
+  .stat-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .stat-card .lbl { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 4px; }
+  .stat-card .val { font-size: 1.3rem; font-weight: 700; }
+  .stat-card .sub { font-size: .74rem; color: var(--muted); margin-top: 2px; }
+  .bars { display: grid; gap: 5px; }
+  .bar-row { display: grid; grid-template-columns: 34px 1fr 56px; gap: 8px; align-items: center; font-size: .78rem; }
+  .bar-row .pos { color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+  .bar-track { background: var(--surface-2); border-radius: 6px; height: 16px; overflow: hidden; border: 1px solid var(--border); }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 5px; transition: width .35s ease; min-width: 0; }
+  .bar-row .pct { font-variant-numeric: tabular-nums; color: var(--muted); }
+  .facts { margin: 10px 0 0; padding-left: 18px; font-size: .84rem; }
+  .facts li { margin-bottom: 4px; }
+  .facts li b { color: var(--accent); }
+
+  .scen-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .scen-item { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--border); border-radius: 999px; padding: 4px 6px 4px 12px; font-size: .8rem; background: var(--surface-2); }
+  .scen-item button { border: none; background: transparent; cursor: pointer; color: var(--muted); font-size: .8rem; padding: 2px 5px; border-radius: 5px; }
+  .scen-item button:hover { color: var(--accent); background: var(--surface); }
+  .scen-item button.del:hover { color: var(--danger); }
+
+  .progress { height: 6px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin: 8px 0; display: none; }
+  .progress.show { display: block; }
+  .progress > div { height: 100%; background: var(--accent); width: 0; transition: width .15s linear; }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  @media (max-width: 480px){
+    .fixlist .names { flex-basis: 100%; }
+    .wrap { padding: 16px 12px 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>League Table What-If Calculator</h1>
+      <p>Enter the current standings and remaining fixtures, then click W / D / L on each match and watch the table reshuffle live. Pick a team to see every possible finishing position. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="chips">
+    <button class="chip" id="sampleChip" type="button">⚽ Load sample — 6-team title race, 3 matchdays left</button>
+    <button class="chip" id="resetChip" type="button">↺ Reset all results to baseline</button>
+    <button class="chip" id="undoChip" type="button" disabled>↶ Undo</button>
+    <button class="chip" id="shareChip" type="button">🔗 Copy share link</button>
+    <button class="chip" id="csvChip" type="button">⬇ Export standings CSV</button>
+    <button class="chip" id="txtChip" type="button">⬇ Export scenario summary</button>
+  </div>
+  <div class="note" id="status">Load the sample to see it in action, or open “Setup” to enter your own league.</div>
+
+  <details class="setup" id="setupBox">
+    <summary>Setup — teams, standings, points system &amp; fixtures</summary>
+    <div class="body">
+      <div class="setup-grid">
+        <div>
+          <div class="row"><span class="grouplbl">Teams / current table</span></div>
+          <textarea id="setupText" rows="8" placeholder="Either one team name per line:&#10;  Arsenal&#10;  Chelsea&#10;  …&#10;or paste a table as CSV (Team,P,W,D,L,GF,GA,Pts):&#10;  Arsenal,30,20,6,4,66,28,66"></textarea>
+          <div class="row" style="margin-top:8px">
+            <button class="btn" id="parseBtn" type="button">Use teams / table</button>
+            <button class="btn" id="freshBtn" type="button">Start fresh (full double round-robin)</button>
+          </div>
+          <div class="note" id="parseNote" style="margin-top:6px">Names only → everyone starts on 0. CSV rows → points are recomputed from W/D/L using the points system.</div>
+        </div>
+        <div>
+          <div class="row"><span class="grouplbl">Points system</span>
+            <label class="fld">Win <input type="number" id="ptsW" value="3" min="0" max="10"></label>
+            <label class="fld">Draw <input type="number" id="ptsD" value="1" min="0" max="10"></label>
+            <label class="fld">Loss <input type="number" id="ptsL" value="0" min="0" max="10"></label>
+            <span class="sep"></span>
+            <label class="fld"><input type="checkbox" id="hthChk"> Head-to-head tiebreak (before GD)</label>
+          </div>
+          <div class="row" style="margin-top:12px"><span class="grouplbl">Add fixture</span></div>
+          <div class="row">
+            <select id="addHome"></select>
+            <span class="note">vs</span>
+            <select id="addAway"></select>
+            <label class="fld">MD <input type="number" id="addMd" min="1" max="99" placeholder="–" style="width:56px"></label>
+            <button class="btn small" id="addFxBtn" type="button">+ Add</button>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn small" id="genSingleBtn" type="button">Auto-generate: every pairing once</button>
+            <button class="btn small" id="genDoubleBtn" type="button">home &amp; away (twice)</button>
+            <button class="btn small danger" id="clearFxBtn" type="button">Clear fixtures</button>
+          </div>
+          <div class="note" style="margin-top:6px">Auto-generate adds all pairings as unplayed fixtures — delete any that have already been played.</div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <div class="layout">
+    <div class="panel">
+      <h2>Standings <span class="note" id="tblMeta" style="display:inline"></span></h2>
+      <div class="tbl-wrap">
+        <table class="standings" id="standTbl">
+          <thead><tr><th>Pos</th><th style="text-align:left">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th></tr></thead>
+          <tbody id="standBody"></tbody>
+        </table>
+      </div>
+      <div class="zone-legend">
+        <span><span class="sw" style="background:var(--zone-champ)"></span>Champions / promotion — top <input type="number" id="zoneC" value="1" min="0" max="30"></span>
+        <span><span class="sw" style="background:var(--zone-po)"></span>Playoff — next <input type="number" id="zoneP" value="0" min="0" max="30"></span>
+        <span><span class="sw" style="background:var(--zone-rel)"></span>Relegation — bottom <input type="number" id="zoneR" value="0" min="0" max="30"></span>
+      </div>
+      <div class="note" style="margin-top:6px">Tiebreakers: points → head-to-head (if enabled) → goal difference → goals for → alphabetical. Hover the ⚖ badge to see which rule separated tied teams. Click a team name to analyse it below. ▲▼ arrows compare against the baseline table (no what-if results).</div>
+    </div>
+
+    <div class="panel">
+      <h2>Remaining fixtures <span class="note" id="fxMeta" style="display:inline"></span></h2>
+      <ul class="fixlist" id="fixList"></ul>
+      <div class="note" id="fxEmpty" style="margin-top:6px">No fixtures yet — open Setup to add or auto-generate them.</div>
+      <div class="note" style="margin-top:8px">Click W / D / L to set a result (points only), or type an exact score for goal-difference effects. Click an active button again to unset.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Possibilities — <span id="possTeamName">pick a team</span></h2>
+    <div class="row">
+      <span class="grouplbl">Team</span>
+      <select id="possTeam"></select>
+      <button class="btn small primary" id="possRun" type="button">Analyse</button>
+      <span class="note" id="possMode"></span>
+    </div>
+    <div class="progress" id="possProg"><div></div></div>
+    <div class="poss-grid" id="possOut" style="margin-top:10px; display:none">
+      <div>
+        <div class="stat-cards">
+          <div class="stat-card"><div class="lbl">Best possible finish</div><div class="val" id="possBest">–</div><div class="sub" id="possBestSub"></div></div>
+          <div class="stat-card"><div class="lbl">Worst possible finish</div><div class="val" id="possWorst">–</div><div class="sub" id="possWorstSub"></div></div>
+          <div class="stat-card"><div class="lbl">Max points</div><div class="val" id="possMaxPts">–</div><div class="sub">if they win every game</div></div>
+        </div>
+        <ul class="facts" id="possFacts"></ul>
+      </div>
+      <div>
+        <div class="grouplbl" style="margin-bottom:6px">% of outcomes at each final position <span class="note" id="possNote" style="display:inline"></span></div>
+        <div class="bars" id="possBars"></div>
+      </div>
+    </div>
+    <div class="note" id="possHint" style="margin-top:6px">Counts every remaining W/D/L combination (or a 20,000-outcome random sample when there are more than 15 undecided fixtures, all results equally likely). Hypothetical results are treated as score-less, so goal difference stays fixed during the sweep; head-to-head is ignored inside the sweep.</div>
+  </div>
+
+  <div class="panel">
+    <h2>Saved scenarios</h2>
+    <div class="row">
+      <input type="text" id="scenName" placeholder="Scenario name, e.g. “City drop points”" style="flex:1; min-width:160px; max-width:300px">
+      <button class="btn small" id="scenSave" type="button">💾 Save current</button>
+    </div>
+    <div class="scen-list" id="scenList" style="margin-top:10px"></div>
+    <div class="note" id="scenNote" style="margin-top:6px">Scenarios are stored in this browser (localStorage) and capture the whole setup plus your clicked results.</div>
+  </div>
+
+  <footer class="app">Everything runs locally — nothing is uploaded. Part of the <a href="./index.html">max tools</a> collection.</footer>
+</div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+// ---------------- state ----------------
+const state = {
+  teams: [],          // [{name, w, d, l, gf, ga}] baseline record
+  fixtures: [],       // [{h, a, md, res:null|'H'|'D'|'A', hs:null, as:null}] (h/a = team index)
+  ptsW: 3, ptsD: 1, ptsL: 0,
+  hth: false,
+  zones: { c: 1, p: 0, r: 0 },
+};
+let selTeam = -1;              // index of team selected for possibilities
+let baselinePos = new Map();   // name -> baseline position
+let undoStack = [];
+
+// ---------------- helpers ----------------
+function esc(s){ const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function clampInt(v, lo, hi, dflt){ const n = parseInt(v, 10); if (isNaN(n)) return dflt; return Math.max(lo, Math.min(hi, n)); }
+function snapshot(){ return JSON.stringify({ teams: state.teams, fixtures: state.fixtures, ptsW: state.ptsW, ptsD: state.ptsD, ptsL: state.ptsL, hth: state.hth, zones: state.zones }); }
+function pushUndo(){ undoStack.push(snapshot()); if (undoStack.length > 30) undoStack.shift(); $('#undoChip').disabled = false; }
+function restore(json){
+  try {
+    const o = JSON.parse(json);
+    state.teams = o.teams || []; state.fixtures = o.fixtures || [];
+    state.ptsW = o.ptsW ?? 3; state.ptsD = o.ptsD ?? 1; state.ptsL = o.ptsL ?? 0;
+    state.hth = !!o.hth; state.zones = o.zones || { c: 1, p: 0, r: 0 };
+    syncSettingsUI(); rebuildAll(); return true;
+  } catch (e) { return false; }
+}
+let flashTimer = null;
+function flash(msg, kind){
+  const s = $('#status'); s.textContent = msg; s.className = 'note' + (kind ? ' ' + kind : '');
+  clearTimeout(flashTimer);
+  if (msg) flashTimer = setTimeout(() => { s.textContent = 'Click W / D / L on a fixture to explore a scenario.'; s.className = 'note'; }, 3200);
+}
+function flashBtn(btn){ if (!btn) return; btn.classList.add('copied'); setTimeout(() => btn.classList.remove('copied'), 1200); }
+function ordinal(n){ const s = ['th','st','nd','rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+
+// ---------------- setup parsing ----------------
+function parseSetup(text){
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  if (!lines.length) return { err: 'Nothing to parse — type at least one team name.' };
+  const teams = []; const seen = new Set();
+  let anyStats = false;
+  for (const line of lines){
+    const parts = line.split(/[,;\t]/).map(p => p.trim()).filter(p => p !== '');
+    if (!parts.length) continue;
+    const name = parts[0];
+    if (!name) continue;
+    if (/^(team|club|name)$/i.test(name) && parts.length > 1) continue; // header row
+    if (seen.has(name.toLowerCase())) return { err: 'Duplicate team name: "' + name + '"' };
+    seen.add(name.toLowerCase());
+    const nums = parts.slice(1).map(Number).filter(n => !isNaN(n));
+    let w = 0, d = 0, l = 0, gf = 0, ga = 0;
+    if (nums.length >= 6){ // P,W,D,L,GF,GA[,Pts]
+      w = nums[1]; d = nums[2]; l = nums[3]; gf = nums[4]; ga = nums[5]; anyStats = true;
+    } else if (nums.length === 5){ // W,D,L,GF,GA
+      w = nums[0]; d = nums[1]; l = nums[2]; gf = nums[3]; ga = nums[4]; anyStats = true;
+    } else if (nums.length === 3){ // W,D,L
+      w = nums[0]; d = nums[1]; l = nums[2]; anyStats = true;
+    } else if (nums.length !== 0){
+      return { err: 'Could not read stats for "' + name + '" — use Team,P,W,D,L,GF,GA[,Pts] or W,D,L[,GF,GA], or just the name.' };
+    }
+    if ([w, d, l, gf, ga].some(n => n < 0 || !Number.isInteger(n))) return { err: 'Stats for "' + name + '" must be whole numbers ≥ 0.' };
+    teams.push({ name, w, d, l, gf, ga });
+  }
+  if (teams.length < 2) return { err: 'Need at least 2 teams.' };
+  if (teams.length > 30) return { err: 'Capped at 30 teams.' };
+  return { teams, anyStats };
+}
+
+function applySetup(genFixtures){
+  const res = parseSetup($('#setupText').value);
+  const note = $('#parseNote');
+  if (res.err){ note.textContent = res.err; note.className = 'note err'; return; }
+  pushUndo();
+  state.teams = res.teams;
+  state.fixtures = [];
+  selTeam = -1;
+  if (genFixtures) generateFixtures(true);
+  note.textContent = res.teams.length + ' teams loaded' + (res.anyStats ? ' with current records (points recomputed from W/D/L).' : ' — everyone starts on 0.');
+  note.className = 'note ok';
+  rebuildAll();
+  flash(res.teams.length + ' teams loaded.', 'ok');
+}
+
+function generateFixtures(double){
+  const n = state.teams.length;
+  const existing = new Set(state.fixtures.map(f => f.h + '-' + f.a));
+  // circle-method round robin so matchdays are balanced
+  const ids = state.teams.map((_, i) => i);
+  if (n % 2 === 1) ids.push(-1); // bye
+  const m = ids.length, rounds = m - 1;
+  let arr = ids.slice();
+  const legs = double ? 2 : 1;
+  for (let leg = 0; leg < legs; leg++){
+    arr = ids.slice();
+    for (let r = 0; r < rounds; r++){
+      for (let i = 0; i < m / 2; i++){
+        let h = arr[i], a = arr[m - 1 - i];
+        if (h === -1 || a === -1) continue;
+        if ((r + i) % 2 === 1) [h, a] = [a, h];       // alternate home/away a bit
+        if (leg === 1) [h, a] = [a, h];               // reverse fixture in second leg
+        const key = h + '-' + a;
+        if (!existing.has(key)){ existing.add(key); state.fixtures.push({ h, a, md: leg * rounds + r + 1, res: null, hs: null, as: null }); }
+      }
+      arr.splice(1, 0, arr.pop()); // rotate all but first
+    }
+  }
+}
+
+// ---------------- table computation ----------------
+function computeRecords(){
+  // returns array of {i, name, p, w, d, l, gf, ga, gd, pts}
+  const recs = state.teams.map((t, i) => ({ i, name: t.name, p: t.w + t.d + t.l, w: t.w, d: t.d, l: t.l, gf: t.gf, ga: t.ga }));
+  for (const f of state.fixtures){
+    if (!f.res) continue;
+    const H = recs[f.h], A = recs[f.a];
+    if (!H || !A) continue;
+    H.p++; A.p++;
+    if (f.res === 'H'){ H.w++; A.l++; }
+    else if (f.res === 'A'){ A.w++; H.l++; }
+    else { H.d++; A.d++; }
+    if (f.hs != null && f.as != null){ H.gf += f.hs; H.ga += f.as; A.gf += f.as; A.ga += f.hs; }
+  }
+  for (const r of recs){ r.gd = r.gf - r.ga; r.pts = r.w * state.ptsW + r.d * state.ptsD + r.l * state.ptsL; }
+  return recs;
+}
+
+function headToHeadOrder(group){
+  // mini-table among tied teams from entered fixture results only
+  const idx = new Map(group.map((r, k) => [r.i, k]));
+  const mini = group.map(() => ({ pts: 0, gd: 0 }));
+  for (const f of state.fixtures){
+    if (!f.res || !idx.has(f.h) || !idx.has(f.a)) continue;
+    const h = mini[idx.get(f.h)], a = mini[idx.get(f.a)];
+    if (f.res === 'H') h.pts += state.ptsW, a.pts += state.ptsL;
+    else if (f.res === 'A') a.pts += state.ptsW, h.pts += state.ptsL;
+    else h.pts += state.ptsD, a.pts += state.ptsD;
+    if (f.hs != null && f.as != null){ h.gd += f.hs - f.as; a.gd += f.as - f.hs; }
+  }
+  return r => mini[idx.get(r.i)];
+}
+
+function sortTable(recs){
+  // sort by points; then resolve groups; annotate rule that separated adjacent teams
+  const rows = recs.slice().sort((a, b) => b.pts - a.pts || a.name.localeCompare(b.name));
+  const out = [];
+  let g = 0;
+  while (g < rows.length){
+    let h = g; while (h + 1 < rows.length && rows[h + 1].pts === rows[g].pts) h++;
+    const group = rows.slice(g, h + 1);
+    if (group.length > 1){
+      const hth = state.hth ? headToHeadOrder(group) : null;
+      group.sort((a, b) => {
+        if (hth){
+          const ha = hth(a), hb = hth(b);
+          if (hb.pts !== ha.pts) return hb.pts - ha.pts;
+          if (hb.gd !== ha.gd) return hb.gd - ha.gd;
+        }
+        return b.gd - a.gd || b.gf - a.gf || a.name.localeCompare(b.name);
+      });
+      for (let k = 0; k < group.length; k++){
+        const r = group[k]; let rule = null;
+        if (k > 0){
+          const prev = group[k - 1];
+          if (hth){
+            const hp = hth(prev), hr = hth(r);
+            if (hp.pts !== hr.pts) rule = 'head-to-head points';
+            else if (hp.gd !== hr.gd) rule = 'head-to-head goal difference';
+          }
+          if (!rule){
+            if (prev.gd !== r.gd) rule = 'goal difference';
+            else if (prev.gf !== r.gf) rule = 'goals scored';
+            else rule = 'alphabetical order';
+          }
+        }
+        r.tieRule = rule;
+        out.push(r);
+      }
+    } else { group[0].tieRule = null; out.push(group[0]); }
+    g = h + 1;
+  }
+  out.forEach((r, k) => r.pos = k + 1);
+  return out;
+}
+
+function computeBaseline(){
+  // table with no what-if results applied
+  const saved = state.fixtures.map(f => f.res);
+  const savedS = state.fixtures.map(f => [f.hs, f.as]);
+  state.fixtures.forEach(f => { f.res = null; f.hs = null; f.as = null; });
+  const base = sortTable(computeRecords());
+  state.fixtures.forEach((f, i) => { f.res = saved[i]; f.hs = savedS[i][0]; f.as = savedS[i][1]; });
+  baselinePos = new Map(base.map(r => [r.name, r.pos]));
+}
+
+// ---------------- standings render (FLIP) ----------------
+const rowCache = new Map(); // name -> <tr>
+function renderStandings(animate){
+  const tbody = $('#standBody');
+  const rows = sortTable(computeRecords());
+  const n = rows.length;
+  const firstTops = new Map();
+  if (animate) for (const [name, tr] of rowCache) if (tr.isConnected) firstTops.set(name, tr.getBoundingClientRect().top);
+
+  // drop rows for removed teams
+  const names = new Set(rows.map(r => r.name));
+  for (const [name, tr] of rowCache) if (!names.has(name)){ tr.remove(); rowCache.delete(name); }
+
+  const frag = document.createDocumentFragment();
+  for (const r of rows){
+    let tr = rowCache.get(r.name);
+    if (!tr){ tr = document.createElement('tr'); rowCache.set(r.name, tr); }
+    const bpos = baselinePos.get(r.name) ?? r.pos;
+    const diff = bpos - r.pos;
+    const mv = diff > 0 ? '<span class="mv up">▲' + diff + '</span>' : diff < 0 ? '<span class="mv dn">▼' + (-diff) + '</span>' : '<span class="mv same">–</span>';
+    const tie = r.tieRule ? '<span class="tiebadge" title="Separated from the team above by: ' + esc(r.tieRule) + '">⚖</span>' : '';
+    tr.innerHTML = '<td>' + r.pos + mv + '</td><td class="tm" data-i="' + r.i + '" title="Click to analyse ' + esc(r.name) + '">' + esc(r.name) + tie + '</td>' +
+      '<td>' + r.p + '</td><td>' + r.w + '</td><td>' + r.d + '</td><td>' + r.l + '</td><td>' + r.gf + '</td><td>' + r.ga + '</td>' +
+      '<td>' + (r.gd > 0 ? '+' : '') + r.gd + '</td><td class="pts">' + r.pts + '</td>';
+    tr.className = '';
+    if (r.pos <= state.zones.c) tr.classList.add('z-champ');
+    else if (r.pos <= state.zones.c + state.zones.p) tr.classList.add('z-po');
+    if (r.pos > n - state.zones.r) { tr.classList.remove('z-champ', 'z-po'); tr.classList.add('z-rel'); }
+    if (r.i === selTeam) tr.classList.add('selteam');
+    frag.appendChild(tr);
+  }
+  tbody.appendChild(frag);
+
+  if (animate){ // FLIP
+    for (const [name, tr] of rowCache){
+      if (!firstTops.has(name)) continue;
+      const dy = firstTops.get(name) - tr.getBoundingClientRect().top;
+      if (Math.abs(dy) < 1) continue;
+      tr.style.transition = 'none'; tr.style.transform = 'translateY(' + dy + 'px)';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        tr.style.transition = 'transform .4s cubic-bezier(.2,.8,.25,1)'; tr.style.transform = '';
+        tr.addEventListener('transitionend', () => { tr.style.transition = ''; }, { once: true });
+      }));
+    }
+  }
+  const played = state.fixtures.filter(f => f.res).length;
+  $('#tblMeta').textContent = played ? '· ' + played + ' what-if result' + (played === 1 ? '' : 's') + ' applied' : '· baseline';
+}
+
+$('#standBody').addEventListener('click', e => {
+  const td = e.target.closest('td.tm');
+  if (!td) return;
+  selTeam = parseInt(td.dataset.i, 10);
+  $('#possTeam').value = String(selTeam);
+  renderStandings(false);
+  runPossibilities();
+  $('#possOut').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+
+// ---------------- fixtures render ----------------
+function renderFixtures(){
+  const list = $('#fixList');
+  list.innerHTML = '';
+  const fs = state.fixtures.map((f, i) => ({ f, i })).sort((a, b) => (a.f.md ?? 999) - (b.f.md ?? 999) || a.i - b.i);
+  let lastMd;
+  for (const { f, i } of fs){
+    if (f.md !== lastMd && fs.some(x => x.f.md != null)){
+      lastMd = f.md;
+      const head = document.createElement('li');
+      head.className = 'md-head';
+      head.textContent = f.md != null ? 'Matchday ' + f.md : 'Unscheduled';
+      list.appendChild(head);
+    }
+    const li = document.createElement('li');
+    li.className = 'fx';
+    const hn = state.teams[f.h]?.name ?? '?', an = state.teams[f.a]?.name ?? '?';
+    li.innerHTML =
+      '<span class="names"><b>' + esc(hn) + '</b><span class="vs">vs</span><b>' + esc(an) + '</b></span>' +
+      '<span class="wdl" role="group" aria-label="' + esc(hn) + ' vs ' + esc(an) + ' result">' +
+        '<button type="button" data-i="' + i + '" data-r="H" class="' + (f.res === 'H' ? 'on' : '') + '" title="' + esc(hn) + ' win">H&nbsp;win</button>' +
+        '<button type="button" data-i="' + i + '" data-r="D" class="' + (f.res === 'D' ? 'on' : '') + '" title="Draw">Draw</button>' +
+        '<button type="button" data-i="' + i + '" data-r="A" class="' + (f.res === 'A' ? 'on' : '') + '" title="' + esc(an) + ' win">A&nbsp;win</button>' +
+      '</span>' +
+      '<span class="scorebox"><input type="number" min="0" max="99" data-i="' + i + '" data-s="h" value="' + (f.hs ?? '') + '" aria-label="Home goals" placeholder="·"><span class="dash">–</span>' +
+      '<input type="number" min="0" max="99" data-i="' + i + '" data-s="a" value="' + (f.as ?? '') + '" aria-label="Away goals" placeholder="·"></span>' +
+      '<button type="button" class="rm" data-i="' + i + '" title="Remove fixture">✕</button>';
+    list.appendChild(li);
+  }
+  const und = state.fixtures.filter(f => !f.res).length;
+  $('#fxMeta').textContent = state.fixtures.length ? '· ' + state.fixtures.length + ' fixtures, ' + und + ' undecided' : '';
+  $('#fxEmpty').style.display = state.fixtures.length ? 'none' : '';
+}
+
+$('#fixList').addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const i = parseInt(btn.dataset.i, 10);
+  const f = state.fixtures[i];
+  if (!f) return;
+  if (btn.classList.contains('rm')){
+    pushUndo();
+    state.fixtures.splice(i, 1);
+    renderFixtures(); renderStandings(true); autoRerunPoss();
+    flash('Fixture removed.', 'ok');
+    return;
+  }
+  if (btn.dataset.r){
+    if (f.res === btn.dataset.r){ f.res = null; }        // toggle off
+    else f.res = btn.dataset.r;
+    if (f.res === null){ f.hs = null; f.as = null; }
+    renderFixtures(); renderStandings(true); autoRerunPoss();
+  }
+});
+$('#fixList').addEventListener('input', e => {
+  const inp = e.target.closest('input[type=number]');
+  if (!inp) return;
+  const i = parseInt(inp.dataset.i, 10);
+  const f = state.fixtures[i];
+  if (!f) return;
+  const v = inp.value === '' ? null : clampInt(inp.value, 0, 99, null);
+  if (inp.dataset.s === 'h') f.hs = v; else f.as = v;
+  if (f.hs != null && f.as != null){
+    f.res = f.hs > f.as ? 'H' : f.hs < f.as ? 'A' : 'D';
+    // update WDL buttons without rebuilding (keeps input focus)
+    const li = inp.closest('li');
+    li.querySelectorAll('.wdl button').forEach(b => b.classList.toggle('on', b.dataset.r === f.res));
+  }
+  renderStandings(true); autoRerunPoss();
+});
+
+// ---------------- setup actions ----------------
+$('#parseBtn').addEventListener('click', () => applySetup(false));
+$('#freshBtn').addEventListener('click', () => applySetup(true));
+$('#addFxBtn').addEventListener('click', () => {
+  const h = parseInt($('#addHome').value, 10), a = parseInt($('#addAway').value, 10);
+  if (isNaN(h) || isNaN(a)) { flash('Add teams first.', 'err'); return; }
+  if (h === a){ flash('A team cannot play itself.', 'err'); return; }
+  if (state.fixtures.some(f => f.h === h && f.a === a && !f.res)){ flash('That fixture is already listed.', 'err'); return; }
+  const md = $('#addMd').value === '' ? null : clampInt($('#addMd').value, 1, 99, null);
+  pushUndo();
+  state.fixtures.push({ h, a, md, res: null, hs: null, as: null });
+  renderFixtures(); renderStandings(false);
+  flash('Fixture added.', 'ok');
+});
+$('#genSingleBtn').addEventListener('click', () => { if (!state.teams.length){ flash('Add teams first.', 'err'); return; } pushUndo(); generateFixtures(false); rebuildAll(); flash('Pairings generated.', 'ok'); });
+$('#genDoubleBtn').addEventListener('click', () => { if (!state.teams.length){ flash('Add teams first.', 'err'); return; } pushUndo(); generateFixtures(true); rebuildAll(); flash('Home & away pairings generated.', 'ok'); });
+$('#clearFxBtn').addEventListener('click', () => { if (!state.fixtures.length) return; pushUndo(); state.fixtures = []; rebuildAll(); flash('Fixtures cleared.', 'ok'); });
+
+function syncSettingsUI(){
+  $('#ptsW').value = state.ptsW; $('#ptsD').value = state.ptsD; $('#ptsL').value = state.ptsL;
+  $('#hthChk').checked = state.hth;
+  $('#zoneC').value = state.zones.c; $('#zoneP').value = state.zones.p; $('#zoneR').value = state.zones.r;
+}
+for (const [id, key] of [['#ptsW', 'ptsW'], ['#ptsD', 'ptsD'], ['#ptsL', 'ptsL']]){
+  $(id).addEventListener('input', e => { state[key] = clampInt(e.target.value, 0, 10, key === 'ptsW' ? 3 : key === 'ptsD' ? 1 : 0); computeBaseline(); renderStandings(true); autoRerunPoss(); });
+}
+$('#hthChk').addEventListener('change', e => { state.hth = e.target.checked; computeBaseline(); renderStandings(true); });
+for (const [id, key] of [['#zoneC', 'c'], ['#zoneP', 'p'], ['#zoneR', 'r']]){
+  $(id).addEventListener('input', e => { state.zones[key] = clampInt(e.target.value, 0, 30, 0); renderStandings(false); });
+}
+
+function fillTeamSelects(){
+  const opts = state.teams.map((t, i) => '<option value="' + i + '">' + esc(t.name) + '</option>').join('');
+  $('#addHome').innerHTML = opts; $('#addAway').innerHTML = opts;
+  if (state.teams.length > 1) $('#addAway').value = '1';
+  $('#possTeam').innerHTML = '<option value="-1">— pick a team —</option>' + opts;
+  $('#possTeam').value = String(selTeam >= 0 && selTeam < state.teams.length ? selTeam : -1);
+}
+
+function rebuildAll(){
+  fillTeamSelects();
+  computeBaseline();
+  renderFixtures();
+  renderStandings(false);
+  $('#possOut').style.display = 'none';
+  $('#possTeamName').textContent = selTeam >= 0 ? state.teams[selTeam].name : 'pick a team';
+}
+
+// ---------------- possibilities ----------------
+const ENUM_CAP = 15, MC_SAMPLES = 20000;
+let possToken = 0;
+
+function staticTiebreakKey(recs){
+  // lower key = better; used inside the sweep where GD/GF never change
+  return recs.map(r => [-r.gd, -r.gf, r.name]);
+}
+function beats(keyA, keyB){ // does A rank above B on static tiebreaks?
+  if (keyA[0] !== keyB[0]) return keyA[0] < keyB[0];
+  if (keyA[1] !== keyB[1]) return keyA[1] < keyB[1];
+  return keyA[2] < keyB[2];
+}
+
+function runPossibilities(){
+  const sel = parseInt($('#possTeam').value, 10);
+  selTeam = isNaN(sel) ? -1 : sel;
+  renderStandings(false);
+  const out = $('#possOut'), prog = $('#possProg');
+  if (selTeam < 0 || selTeam >= state.teams.length){ out.style.display = 'none'; $('#possTeamName').textContent = 'pick a team'; return; }
+  $('#possTeamName').textContent = state.teams[selTeam].name;
+
+  const recs = computeRecords();
+  const nT = recs.length;
+  const und = state.fixtures.map((f, i) => ({ f, i })).filter(x => !x.f.res);
+  const n = und.length;
+  const basePts = recs.map(r => r.pts);
+  const keys = staticTiebreakKey(recs);
+  const W = state.ptsW, D = state.ptsD, L = state.ptsL;
+  const s = selTeam;
+  const ownFx = und.map((x, k) => x.f.h === s ? { k, win: 0 } : x.f.a === s ? { k, win: 2 } : null).filter(Boolean);
+  const maxPts = basePts[s] + ownFx.length * W;
+  $('#possMaxPts').textContent = maxPts;
+
+  if (n === 0){
+    // season decided — position is fixed
+    const table = sortTable(recs);
+    const pos = table.find(r => r.i === s).pos;
+    showPossResults({ counts: fillCounts(nT, pos), total: 1, best: pos, worst: pos, winAllWorst: pos, exact: true, nT, maxPts });
+    $('#possMode').textContent = 'No undecided fixtures — the table is final.';
+    return;
+  }
+
+  const exact = n <= ENUM_CAP;
+  const total = exact ? Math.pow(3, n) : MC_SAMPLES;
+  $('#possMode').textContent = exact
+    ? 'Enumerating all 3^' + n + ' = ' + total.toLocaleString() + ' outcomes…'
+    : n + ' undecided fixtures — sampling ' + MC_SAMPLES.toLocaleString() + ' random outcomes.';
+  prog.classList.add('show'); prog.firstElementChild.style.width = '0%';
+
+  const token = ++possToken;
+  const counts = new Float64Array(nT + 1);
+  let best = nT + 1, worst = 0, winAllWorst = 0;
+  const pts = basePts.slice();
+  // list of [homeIdx, awayIdx] for undecided fixtures
+  const hs = und.map(x => x.f.h), as = und.map(x => x.f.a);
+  const ownWin = new Int8Array(n).fill(-1);
+  for (const o of ownFx) ownWin[o.k] = o.win;
+
+  function evalLeaf(digitsAllWin){
+    let ahead = 0;
+    const ps = pts[s], ks = keys[s];
+    for (let t = 0; t < nT; t++){
+      if (t === s) continue;
+      if (pts[t] > ps || (pts[t] === ps && beats(keys[t], ks))) ahead++;
+    }
+    const pos = ahead + 1;
+    counts[pos]++;
+    if (pos < best) best = pos;
+    if (pos > worst) worst = pos;
+    if (digitsAllWin && pos > winAllWorst) winAllWorst = pos;
+  }
+  function applyDigit(k, dg, sign){
+    if (dg === 0){ pts[hs[k]] += sign * W; pts[as[k]] += sign * L; }
+    else if (dg === 1){ pts[hs[k]] += sign * D; pts[as[k]] += sign * D; }
+    else { pts[hs[k]] += sign * L; pts[as[k]] += sign * W; }
+  }
+
+  if (exact){
+    const digits = new Uint8Array(n); // 0=H,1=D,2=A ; odometer enumeration
+    for (let k = 0; k < n; k++) applyDigit(k, 0, +1);
+    let done = 0;
+    const CHUNK = 250000;
+    function selWinsAll(){
+      for (const o of ownFx) if (digits[o.k] !== o.win) return false;
+      return true;
+    }
+    function step(){
+      if (token !== possToken) return;
+      const end = Math.min(done + CHUNK, total);
+      let more = true;
+      while (done < end && more){
+        evalLeaf(selWinsAll());
+        done++;
+        // increment odometer
+        let k = n - 1;
+        for (;;){
+          if (k < 0){ more = false; break; }
+          applyDigit(k, digits[k], -1);
+          if (digits[k] < 2){ digits[k]++; applyDigit(k, digits[k], +1); break; }
+          digits[k] = 0; applyDigit(k, 0, +1); k--;
+        }
+      }
+      prog.firstElementChild.style.width = (done / total * 100).toFixed(1) + '%';
+      if (done < total && more) setTimeout(step, 0);
+      else {
+        for (let k = 0; k < n; k++) applyDigit(k, digits[k], -1); // restore
+        prog.classList.remove('show');
+        $('#possMode').textContent = 'All ' + total.toLocaleString() + ' outcomes counted (exact).';
+        showPossResults({ counts, total: done, best, worst, winAllWorst, exact: true, nT, maxPts });
+      }
+    }
+    step();
+  } else {
+    let done = 0;
+    const CHUNK = 2500;
+    const draws = new Uint8Array(n);
+    function step(){
+      if (token !== possToken) return;
+      const end = Math.min(done + CHUNK, total);
+      while (done < end){
+        let allWin = true;
+        for (let k = 0; k < n; k++){
+          const dg = (Math.random() * 3) | 0;
+          draws[k] = dg;
+          applyDigit(k, dg, +1);
+          if (ownWin[k] !== -1 && dg !== ownWin[k]) allWin = false;
+        }
+        evalLeaf(allWin && ownFx.length > 0);
+        for (let k = 0; k < n; k++) applyDigit(k, draws[k], -1);
+        done++;
+      }
+      prog.firstElementChild.style.width = (done / total * 100).toFixed(1) + '%';
+      if (done < total) setTimeout(step, 0);
+      else {
+        prog.classList.remove('show');
+        $('#possMode').textContent = MC_SAMPLES.toLocaleString() + ' outcomes sampled (approximate — labelled as sampled).';
+        showPossResults({ counts, total: done, best, worst, winAllWorst: winAllWorst || null, exact: false, nT, maxPts });
+      }
+    }
+    step();
+  }
+}
+
+function fillCounts(nT, pos){ const c = new Float64Array(nT + 1); c[pos] = 1; return c; }
+
+function showPossResults(r){
+  const name = state.teams[selTeam].name;
+  $('#possOut').style.display = '';
+  $('#possBest').textContent = ordinal(r.best);
+  $('#possWorst').textContent = ordinal(r.worst);
+  $('#possBestSub').textContent = r.exact ? 'guaranteed reachable' : 'best seen in the sample';
+  $('#possWorstSub').textContent = r.exact ? 'across every outcome' : 'worst seen in the sample';
+  $('#possNote').textContent = r.exact ? '(exact)' : '(sampled — approximate)';
+
+  // bar chart
+  const bars = $('#possBars');
+  bars.innerHTML = '';
+  let maxPct = 0;
+  const pcts = [];
+  for (let p = 1; p <= r.nT; p++){ const pct = r.counts[p] / r.total * 100; pcts.push(pct); if (pct > maxPct) maxPct = pct; }
+  for (let p = 1; p <= r.nT; p++){
+    const pct = pcts[p - 1];
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = '<span class="pos">' + ordinal(p) + '</span><span class="bar-track"><span class="bar-fill" style="display:block;width:0%"></span></span><span class="pct">' + (pct === 0 ? '—' : pct < 0.05 ? '<0.1%' : pct.toFixed(1) + '%') + '</span>';
+    bars.appendChild(row);
+    const fill = row.querySelector('.bar-fill');
+    requestAnimationFrame(() => { fill.style.width = (maxPct ? pct / maxPct * 100 : 0) + '%'; });
+  }
+
+  // facts
+  const facts = [];
+  const verb = r.exact ? '' : ' (based on the sample)';
+  const { c: zc, r: zr } = state.zones;
+  const nT = r.nT;
+  if (r.exact){
+    if (r.best === r.worst) facts.push('<b>' + esc(name) + '</b> is guaranteed to finish <b>' + ordinal(r.best) + '</b> — nothing left can change it.');
+    else {
+      facts.push('<b>' + esc(name) + '</b> cannot finish above <b>' + ordinal(r.best) + '</b> or below <b>' + ordinal(r.worst) + '</b>.');
+      if (zc > 0 && r.worst <= zc) facts.push('<b>' + esc(name) + '</b> has already clinched a top-' + zc + ' finish.');
+      if (zc > 0 && r.best > zc) facts.push('<b>' + esc(name) + '</b> can no longer finish in the top ' + zc + '.');
+      if (zr > 0 && r.best > nT - zr) facts.push('<b>' + esc(name) + '</b> is already condemned to the relegation zone (bottom ' + zr + ').');
+      if (zr > 0 && r.worst <= nT - zr) facts.push('<b>' + esc(name) + '</b> is mathematically safe from the bottom ' + zr + '.');
+    }
+    if (r.winAllWorst > 0 && r.best !== r.worst){
+      facts.push('If <b>' + esc(name) + '</b> wins every remaining game, the worst they can finish is <b>' + ordinal(r.winAllWorst) + '</b>' + (r.winAllWorst === 1 ? ' — the title is in their own hands.' : '.'));
+    }
+  } else {
+    facts.push('Observed range' + verb + ': <b>' + ordinal(r.best) + '</b> to <b>' + ordinal(r.worst) + '</b>. With this many fixtures the true extremes could be slightly wider.');
+    if (r.winAllWorst) facts.push('When <b>' + esc(name) + '</b> won all their games in the sample, they never finished below <b>' + ordinal(r.winAllWorst) + '</b>.');
+  }
+  // "clinches with k more wins" — conservative sufficient condition on points
+  const recs = computeRecords();
+  const remaining = state.fixtures.filter(f => !f.res);
+  const gamesLeft = recs.map((_, i) => remaining.filter(f => f.h === i || f.a === i).length);
+  const myPts = recs[selTeam].pts, myLeft = gamesLeft[selTeam];
+  let rivalMax = -Infinity, rivalName = '';
+  for (let i = 0; i < recs.length; i++){
+    if (i === selTeam) continue;
+    const mx = recs[i].pts + gamesLeft[i] * state.ptsW;
+    if (mx > rivalMax){ rivalMax = mx; rivalName = recs[i].name; }
+  }
+  if (state.zones.c > 0 && recs.length > 1 && myLeft > 0){
+    for (let k = 1; k <= myLeft; k++){
+      if (myPts + k * state.ptsW > rivalMax){
+        if (r.exact && r.worst > 1) facts.push('<b>' + esc(name) + '</b> clinches top spot outright with <b>' + k + ' more win' + (k === 1 ? '' : 's') + '</b>, whatever anyone else does (points can no longer be matched — currently ' + myPts + ' pts vs ' + esc(rivalName) + '’s ceiling of ' + rivalMax + ').');
+        break;
+      }
+      if (k === myLeft && myPts + k * state.ptsW <= rivalMax - state.ptsW) {
+        facts.push('Even winning out, <b>' + esc(name) + '</b> tops out at ' + (myPts + myLeft * state.ptsW) + ' pts vs ' + esc(rivalName) + '’s possible ' + rivalMax + ' — they need favours elsewhere.');
+      }
+    }
+  }
+  $('#possFacts').innerHTML = facts.map(f => '<li>' + f + '</li>').join('') || '<li class="note">No standout facts for this team right now.</li>';
+}
+
+$('#possRun').addEventListener('click', runPossibilities);
+$('#possTeam').addEventListener('change', runPossibilities);
+function autoRerunPoss(){
+  // re-run analysis automatically only when it is cheap or sampled (always fine async)
+  if (selTeam >= 0 && $('#possOut').style.display !== 'none'){
+    const n = state.fixtures.filter(f => !f.res).length;
+    if (n <= 10 || n > ENUM_CAP) runPossibilities();
+    else $('#possMode').textContent = 'Fixtures changed — press Analyse to refresh.';
+  }
+}
+
+// ---------------- scenarios (localStorage) ----------------
+const SCEN_KEY = 'lwc-scenarios';
+function loadScenarios(){ try { return JSON.parse(localStorage.getItem(SCEN_KEY)) || []; } catch (e){ return []; } }
+function saveScenarios(list){
+  try { localStorage.setItem(SCEN_KEY, JSON.stringify(list)); return true; }
+  catch (e){ flash('Could not save (storage full or blocked).', 'err'); return false; }
+}
+function renderScenarios(){
+  const list = loadScenarios();
+  const box = $('#scenList');
+  box.innerHTML = '';
+  if (!list.length){ box.innerHTML = '<span class="note">No saved scenarios yet.</span>'; return; }
+  for (let k = 0; k < list.length; k++){
+    const sc = list[k];
+    const el = document.createElement('span');
+    el.className = 'scen-item';
+    el.innerHTML = esc(sc.name) + ' <button type="button" data-k="' + k + '" data-act="load" title="Load">📂</button><button type="button" class="del" data-k="' + k + '" data-act="del" title="Delete">✕</button>';
+    box.appendChild(el);
+  }
+}
+$('#scenSave').addEventListener('click', () => {
+  const name = $('#scenName').value.trim() || 'Scenario ' + new Date().toLocaleString();
+  if (!state.teams.length){ flash('Nothing to save yet.', 'err'); return; }
+  const list = loadScenarios();
+  const existing = list.findIndex(s => s.name === name);
+  const item = { name, data: snapshot(), saved: Date.now() };
+  if (existing >= 0) list[existing] = item; else list.push(item);
+  if (saveScenarios(list)){ renderScenarios(); flash('Scenario "' + name + '" saved.', 'ok'); $('#scenName').value = ''; }
+});
+$('#scenList').addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  const list = loadScenarios();
+  const k = parseInt(btn.dataset.k, 10);
+  if (!list[k]) return;
+  if (btn.dataset.act === 'load'){
+    pushUndo();
+    if (restore(list[k].data)) flash('Scenario "' + list[k].name + '" loaded.', 'ok');
+    else flash('That scenario could not be read.', 'err');
+  } else {
+    const nm = list[k].name;
+    list.splice(k, 1);
+    if (saveScenarios(list)){ renderScenarios(); flash('Scenario "' + nm + '" deleted.', 'ok'); }
+  }
+});
+
+// ---------------- toolbar: reset / undo / share / export ----------------
+$('#resetChip').addEventListener('click', () => {
+  if (!state.fixtures.some(f => f.res)) { flash('Already at baseline.', 'ok'); return; }
+  pushUndo();
+  state.fixtures.forEach(f => { f.res = null; f.hs = null; f.as = null; });
+  renderFixtures(); renderStandings(true); autoRerunPoss();
+  flash('All what-if results cleared — back to baseline.', 'ok');
+});
+$('#undoChip').addEventListener('click', () => {
+  const prev = undoStack.pop();
+  if (prev) { restore(prev); flash('Undone.', 'ok'); }
+  $('#undoChip').disabled = undoStack.length === 0;
+});
+
+function encodeState(){
+  const o = { w: state.ptsW, d: state.ptsD, l: state.ptsL, h: state.hth ? 1 : 0,
+    z: [state.zones.c, state.zones.p, state.zones.r],
+    t: state.teams.map(t => [t.name, t.w, t.d, t.l, t.gf, t.ga]),
+    f: state.fixtures.map(f => [f.h, f.a, f.md ?? -1, f.res ?? '', f.hs ?? -1, f.as ?? -1]) };
+  return 's=' + btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodeState(hash){
+  const m = /(?:^|&)s=([A-Za-z0-9\-_]+)/.exec(hash);
+  if (!m) return false;
+  const b64 = m[1].replace(/-/g, '+').replace(/_/g, '/');
+  const o = JSON.parse(decodeURIComponent(escape(atob(b64))));
+  if (!Array.isArray(o.t) || o.t.length < 2) return false;
+  state.ptsW = clampInt(o.w, 0, 10, 3); state.ptsD = clampInt(o.d, 0, 10, 1); state.ptsL = clampInt(o.l, 0, 10, 0);
+  state.hth = !!o.h;
+  state.zones = { c: clampInt(o.z?.[0], 0, 30, 1), p: clampInt(o.z?.[1], 0, 30, 0), r: clampInt(o.z?.[2], 0, 30, 0) };
+  state.teams = o.t.slice(0, 30).map(t => ({ name: String(t[0]).slice(0, 40), w: clampInt(t[1], 0, 999, 0), d: clampInt(t[2], 0, 999, 0), l: clampInt(t[3], 0, 999, 0), gf: clampInt(t[4], 0, 999, 0), ga: clampInt(t[5], 0, 999, 0) }));
+  state.fixtures = (o.f || []).filter(f => Array.isArray(f) && state.teams[f[0]] && state.teams[f[1]]).map(f => ({
+    h: f[0], a: f[1], md: f[2] === -1 ? null : clampInt(f[2], 1, 99, null),
+    res: ['H', 'D', 'A'].includes(f[3]) ? f[3] : null,
+    hs: f[4] === -1 ? null : clampInt(f[4], 0, 99, null), as: f[5] === -1 ? null : clampInt(f[5], 0, 99, null) }));
+  return true;
+}
+$('#shareChip').addEventListener('click', e => {
+  if (!state.teams.length){ flash('Nothing to share yet.', 'err'); return; }
+  const url = location.origin + location.pathname + '#' + encodeState();
+  history.replaceState(null, '', '#' + encodeState());
+  (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(
+    () => { flashBtn(e.target); flash('Share link copied to clipboard.', 'ok'); },
+    () => flash('Link is in the address bar — copy it from there.', 'ok'));
+});
+
+function download(name, text, type){
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 500);
+}
+function csvCell(s){ return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+$('#csvChip').addEventListener('click', () => {
+  if (!state.teams.length){ flash('Nothing to export yet.', 'err'); return; }
+  const rows = sortTable(computeRecords());
+  const lines = ['Pos,Team,P,W,D,L,GF,GA,GD,Pts'];
+  for (const r of rows) lines.push([r.pos, csvCell(r.name), r.p, r.w, r.d, r.l, r.gf, r.ga, r.gd, r.pts].join(','));
+  download('league-standings.csv', lines.join('\n'), 'text/csv');
+  flash('Standings CSV downloaded.', 'ok');
+});
+$('#txtChip').addEventListener('click', () => {
+  if (!state.teams.length){ flash('Nothing to export yet.', 'err'); return; }
+  const rows = sortTable(computeRecords());
+  const L = [];
+  L.push('League Table What-If — scenario summary');
+  L.push('Generated ' + new Date().toLocaleString());
+  L.push('Points: win ' + state.ptsW + ' / draw ' + state.ptsD + ' / loss ' + state.ptsL + (state.hth ? ' · head-to-head tiebreak on' : ''));
+  L.push('');
+  L.push('STANDINGS');
+  const w = Math.max(...rows.map(r => r.name.length), 4);
+  L.push('Pos  ' + 'Team'.padEnd(w) + '   P   W   D   L   GF   GA   GD  Pts');
+  for (const r of rows){
+    const bpos = baselinePos.get(r.name) ?? r.pos;
+    const mv = bpos > r.pos ? ' (+' + (bpos - r.pos) + ')' : bpos < r.pos ? ' (-' + (r.pos - bpos) + ')' : '';
+    L.push(String(r.pos).padStart(3) + '  ' + r.name.padEnd(w) + ' ' + String(r.p).padStart(3) + ' ' + String(r.w).padStart(3) + ' ' + String(r.d).padStart(3) + ' ' + String(r.l).padStart(3) + ' ' + String(r.gf).padStart(4) + ' ' + String(r.ga).padStart(4) + ' ' + String(r.gd).padStart(4) + ' ' + String(r.pts).padStart(4) + mv);
+  }
+  L.push('');
+  const decided = state.fixtures.filter(f => f.res);
+  L.push('WHAT-IF RESULTS APPLIED (' + decided.length + ')');
+  for (const f of decided){
+    const score = (f.hs != null && f.as != null) ? ' ' + f.hs + '-' + f.as : '';
+    const res = f.res === 'H' ? 'home win' : f.res === 'A' ? 'away win' : 'draw';
+    L.push('  ' + state.teams[f.h].name + ' vs ' + state.teams[f.a].name + ': ' + res + score + (f.md != null ? '  (MD' + f.md + ')' : ''));
+  }
+  const undec = state.fixtures.filter(f => !f.res);
+  L.push('');
+  L.push('STILL UNDECIDED (' + undec.length + ')');
+  for (const f of undec) L.push('  ' + state.teams[f.h].name + ' vs ' + state.teams[f.a].name + (f.md != null ? '  (MD' + f.md + ')' : ''));
+  download('league-scenario.txt', L.join('\n'), 'text/plain');
+  flash('Scenario summary downloaded.', 'ok');
+});
+
+// ---------------- sample ----------------
+function loadSample(){
+  state.ptsW = 3; state.ptsD = 1; state.ptsL = 0; state.hth = false;
+  state.zones = { c: 1, p: 2, r: 1 };
+  // 6 teams, 7 of 10 matchdays played, title race within 2 pts. GF/GA totals balance (56-56).
+  state.teams = [
+    { name: 'Harborview Rovers',  w: 5, d: 1, l: 1, gf: 15, ga: 7 },   // 16 pts
+    { name: 'Ironbridge United',  w: 4, d: 3, l: 0, gf: 13, ga: 6 },   // 15 pts
+    { name: 'Calder Vale',        w: 3, d: 3, l: 1, gf: 10, ga: 8 },   // 12 pts
+    { name: 'Northgate Athletic', w: 2, d: 2, l: 3, gf: 8,  ga: 10 },  // 8 pts
+    { name: 'Silverpine FC',      w: 1, d: 1, l: 5, gf: 6,  ga: 14 },  // 4 pts
+    { name: 'Dunmore Town',       w: 0, d: 2, l: 5, gf: 4,  ga: 11 },  // 2 pts
+  ];
+  state.fixtures = [
+    { h: 0, a: 1, md: 8,  res: null, hs: null, as: null }, // the crunch match
+    { h: 2, a: 3, md: 8,  res: null, hs: null, as: null },
+    { h: 4, a: 5, md: 8,  res: null, hs: null, as: null },
+    { h: 1, a: 2, md: 9,  res: null, hs: null, as: null },
+    { h: 0, a: 4, md: 9,  res: null, hs: null, as: null },
+    { h: 5, a: 3, md: 9,  res: null, hs: null, as: null },
+    { h: 3, a: 1, md: 10, res: null, hs: null, as: null },
+    { h: 2, a: 4, md: 10, res: null, hs: null, as: null },
+    { h: 5, a: 0, md: 10, res: null, hs: null, as: null },
+  ];
+  selTeam = 0;
+  syncSettingsUI();
+  rebuildAll();
+  $('#possTeam').value = '0';
+  runPossibilities();
+  $('#setupText').value = state.teams.map(t => [t.name, t.w + t.d + t.l, t.w, t.d, t.l, t.gf, t.ga, t.w * 3 + t.d].join(',')).join('\n');
+}
+$('#sampleChip').addEventListener('click', () => {
+  if (state.teams.length && !confirm('Replace the current league with the sample? (You can Undo.)')) return;
+  pushUndo();
+  loadSample();
+  flash('Sample league loaded — try clicking results on the Harborview vs Ironbridge crunch match.', 'ok');
+});
+
+// ---------------- theme ----------------
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next); localStorage.setItem('max-theme', next);
+});
+
+// ---------------- boot ----------------
+function boot(){
+  renderScenarios();
+  let loaded = false;
+  if (location.hash.length > 1){ try { loaded = decodeState(location.hash.slice(1)); } catch (e){ loaded = false; } }
+  if (loaded){
+    syncSettingsUI(); rebuildAll();
+    flash('Shared league loaded from link.', 'ok');
+  } else {
+    loadSample();
+    $('#setupBox').open = false;
+  }
+}
+boot();
+
+// test / automation hooks
+window.lwc = {
+  state,
+  computeRecords, sortTable, parseSetup, generateFixtures,
+  loadSample, runPossibilities, encodeState, decodeState,
+  renderStandings, renderFixtures,
+  get selTeam(){ return selTeam; },
+  setResult(i, r){ const f = state.fixtures[i]; if (!f) return; f.res = r; renderFixtures(); renderStandings(true); },
+};
+</script>
+</body>
+</html>

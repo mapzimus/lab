@@ -1,0 +1,1334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GeoJSON Diff Viewer</title>
+<meta name="description" content="Compare two GeoJSON files and see what was added, removed, moved, or changed — as a list and on a map. Your data stays in your browser.">
+
+<!-- Leaflet CSS (map). The Leaflet JS is background-loaded from the script
+     below, so a slow or blocked CDN never freezes the tool — everything
+     except the map itself (list, diff, export) still works without it. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  /* extra tokens for this tool (checked in both themes) */
+  :root { --amber:#a3620a; --neutral:#7c8794; }
+  :root[data-theme="dark"] { --amber:#e2a53e; --neutral:#8a96a3; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --amber:#e2a53e; --neutral:#8a96a3; } }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+  .btn.small { padding: 5px 11px; font-size: .78rem; border-radius: 7px; }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 16px; }
+  .panel h2 { font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; padding: 12px 14px 6px; font-weight: 600; }
+  .note { color: var(--muted); font-size: .8rem; margin: 8px 2px 0; }
+  .note.err { color: var(--danger); }
+
+  /* ---- input panels (Before / After) ---- */
+  .diffgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .side-input { padding: 12px 14px 14px; min-width: 0; }
+  .side-input + .side-input { border-left: 1px solid var(--border); }
+  @media (max-width: 760px) { .diffgrid { grid-template-columns: 1fr; } .side-input + .side-input { border-left: none; border-top: 1px solid var(--border); } }
+  .side-input h2 { display: flex; align-items: center; gap: 8px; padding: 0 0 8px; }
+  .side-input h2 .badge { font-size: .68rem; padding: 2px 7px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); letter-spacing: .04em; color: var(--text); }
+  .side-input.side-a h2 .badge { color: var(--accent); border-color: var(--accent); }
+  .side-input.side-b h2 .badge { color: var(--ok); border-color: var(--ok); }
+  .loadrow { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .side-input textarea { display: block; width: 100%; min-height: 110px; resize: vertical; font-family: var(--mono); font-size: .78rem; line-height: 1.5; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 9px; padding: 9px 10px; }
+  .side-input textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  .side-input.drag-hover textarea { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+  .side-status { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: .8rem; color: var(--muted); flex-wrap: wrap; }
+  .side-status .n { color: var(--text); font-weight: 600; }
+
+  /* ---- options bar ---- */
+  .optionsbar { padding: 12px 14px 14px; }
+  .optrow { display: flex; gap: 16px 22px; flex-wrap: wrap; align-items: end; }
+  .optfield { display: flex; flex-direction: column; gap: 4px; font-size: .78rem; color: var(--muted); }
+  .optfield select, .optfield input[type="number"], .optfield input[type="text"] {
+    font-family: var(--mono); font-size: .82rem; background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; min-width: 0;
+  }
+  .optfield select:focus, .optfield input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  .optfield.grow { flex: 1 1 220px; }
+  .optfield .unit { font-family: var(--sans); color: var(--muted); font-size: .74rem; margin-left: 4px; }
+  .opt-inline { display: flex; align-items: center; gap: 6px; }
+  .opt-inline input { width: 90px; }
+
+  /* ---- stats header ---- */
+  .stats { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; margin: 4px 2px 14px; font-size: .85rem; color: var(--muted); }
+  .stats .stat-count strong { color: var(--text); font-size: 1rem; }
+  .tchip { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .tchip strong { color: var(--text); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+  .dot.dash { border-radius: 2px; }
+
+  /* ---- main grid: map + sidebar ---- */
+  .main { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (max-width: 880px) { .main { grid-template-columns: 1fr; } }
+  #map { height: 500px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); z-index: 0; }
+  #map.map-fallback { display: flex; align-items: center; justify-content: center; text-align: center; color: var(--muted); background: var(--surface-2); padding: 24px; font-size: .92rem; }
+  .leaflet-container { font-family: var(--sans); background: var(--surface-2); }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+  .popup { font-size: .82rem; max-width: 290px; }
+  .popup .ptag { display: inline-block; margin-left: 6px; font-size: .68rem; padding: 1px 7px; border-radius: 999px; border: 1px solid; }
+  .popup table { border-collapse: collapse; margin-top: 6px; width: 100%; }
+  .popup td { padding: 2px 6px 2px 0; vertical-align: top; font-size: .76rem; overflow-wrap: anywhere; }
+  .popup td.k { color: var(--muted); font-family: var(--mono); white-space: nowrap; }
+  .popup .old { color: var(--danger); text-decoration: line-through; }
+  .popup .new { color: var(--ok); }
+  .popup .geomnote { margin-top: 6px; font-size: .76rem; color: var(--amber); }
+  .popup p.pnone { color: var(--muted); margin: 4px 0 0; font-size: .78rem; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 16px; padding: 10px 4px 0; font-size: .8rem; }
+  .legend label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; color: var(--text); }
+  .legend input { accent-color: var(--accent); }
+  .legend .swatch { width: 22px; height: 3px; border-radius: 2px; display: inline-block; }
+  .legend .swatch.dash { background-image: linear-gradient(90deg, currentColor 60%, transparent 0%); background-size: 7px 3px; background-color: transparent; }
+
+  /* ---- results list ---- */
+  .side { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+  #results { max-height: 620px; overflow: auto; padding: 4px 8px 10px; }
+  .catgroup { margin-bottom: 4px; }
+  .catgroup summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 6px; border-radius: 8px; font-size: .84rem; font-weight: 600; }
+  .catgroup summary::-webkit-details-marker { display: none; }
+  .catgroup summary:hover { background: var(--surface-2); }
+  .catgroup summary .arrow { transition: transform .15s; color: var(--muted); font-size: .7rem; }
+  .catgroup[open] summary .arrow { transform: rotate(90deg); }
+  .catgroup summary .cnt { color: var(--muted); font-weight: 400; margin-left: auto; font-size: .78rem; }
+  .catrows { display: flex; flex-direction: column; gap: 2px; padding: 2px 0 8px 4px; }
+  .res-row { display: flex; align-items: flex-start; gap: 8px; width: 100%; text-align: left; border: 1px solid transparent; background: none; color: var(--text); border-radius: 8px; padding: 7px 8px; cursor: pointer; font-size: .82rem; font-family: var(--sans); }
+  .res-row:hover { background: var(--surface-2); }
+  .res-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .res-row.sel { border-color: var(--accent); background: var(--surface-2); }
+  .res-row .rdot { margin-top: 4px; }
+  .res-row .rbody { min-width: 0; flex: 1; }
+  .res-row .rname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .res-row .rsummary { color: var(--muted); font-size: .74rem; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .emptynote { padding: 26px 16px; text-align: center; color: var(--muted); font-size: .86rem; }
+  .listmore { padding: 4px 8px 6px; margin: 0; font-size: .74rem; color: var(--muted); }
+
+  /* ---- export ---- */
+  .exportrow { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 14px 14px; }
+
+  /* ---- drag & drop ---- */
+  @media (max-width: 720px) {
+    #map { height: 340px; }
+    #results { max-height: 320px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>GeoJSON Diff Viewer</h1>
+      <p>Load a “before” and “after” GeoJSON file and see exactly what was added, removed, moved, or changed — as a list and on a map. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <!-- ---- input panels ---- -->
+  <section class="panel">
+    <div class="diffgrid">
+      <div class="side-input side-a" data-side="a">
+        <h2>Before <span class="badge">A</span></h2>
+        <div class="loadrow">
+          <button class="btn small" id="exampleBtnA" type="button">Try an example</button>
+          <button class="btn small" id="fileBtnA" type="button">Open a file…</button>
+          <input class="visually-hidden" type="file" id="fileInputA" accept=".geojson,.json,application/geo+json,application/json" aria-label="Choose a Before GeoJSON file">
+        </div>
+        <label class="visually-hidden" for="rawA">Before (A) GeoJSON</label>
+        <textarea id="rawA" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Paste GeoJSON here, or drop a .geojson / .json file onto this box…"></textarea>
+        <div class="side-status">
+          <span><span class="n" id="countA">0</span> features</span>
+          <span id="wrapNoteA"></span>
+        </div>
+        <p class="note err" id="errA" hidden aria-live="polite"></p>
+      </div>
+      <div class="side-input side-b" data-side="b">
+        <h2>After <span class="badge">B</span></h2>
+        <div class="loadrow">
+          <button class="btn small" id="exampleBtnB" type="button">Try an example</button>
+          <button class="btn small" id="fileBtnB" type="button">Open a file…</button>
+          <input class="visually-hidden" type="file" id="fileInputB" accept=".geojson,.json,application/geo+json,application/json" aria-label="Choose an After GeoJSON file">
+        </div>
+        <label class="visually-hidden" for="rawB">After (B) GeoJSON</label>
+        <textarea id="rawB" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Paste GeoJSON here, or drop a .geojson / .json file onto this box…"></textarea>
+        <div class="side-status">
+          <span><span class="n" id="countB">0</span> features</span>
+          <span id="wrapNoteB"></span>
+        </div>
+        <p class="note err" id="errB" hidden aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+  <p class="note">Loading from a file replaces that side's pasted text. “Try an example” loads a small, realistic before/after pair — one added feature, one removed, one moved, one with a changed property, and a few unchanged.</p>
+
+  <!-- ---- options ---- -->
+  <section class="panel optionsbar">
+    <div class="optrow">
+      <div class="optfield">
+        <label for="idField">Match features by ID field</label>
+        <select id="idField"><option value="">None — use geometry matching</option></select>
+      </div>
+      <div class="optfield">
+        <label for="epsilon">“Moved” threshold</label>
+        <span class="opt-inline"><input type="number" id="epsilon" value="1" min="0" step="0.5"><span class="unit">meters</span></span>
+      </div>
+      <div class="optfield grow">
+        <label for="ignoreList">Ignore these properties (comma-separated)</label>
+        <input type="text" id="ignoreList" placeholder="e.g. updated_at, last_seen, _internal_id" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="optfield">
+        <label>&nbsp;</label>
+        <span class="opt-inline">
+          <button class="btn small" id="computeBtn" type="button">Recompute diff</button>
+          <button class="btn small" id="swapBtn" type="button" title="Swap Before and After">⇄ Swap</button>
+        </span>
+      </div>
+    </div>
+    <p class="note">An ID field (e.g. <code>id</code>, <code>osm_id</code>) is by far the most reliable way to match features across files. Without one, points are matched to their nearest neighbor within 1&nbsp;km, and lines/polygons by a coarse bounding-box + vertex-count similarity — both are best-effort guesses. Practical limit: a few thousand features per file; geometry-based matching for non-point shapes is skipped above ~700×700 unmatched features (with a note) to stay fast.</p>
+    <p class="note" id="matchNote" hidden></p>
+  </section>
+
+  <!-- ---- stats ---- -->
+  <div class="stats" id="statsBar" aria-label="Diff summary">
+    <span class="stat-count"><strong id="statA">0</strong> features in A</span>
+    <span class="stat-count"><strong id="statB">0</strong> features in B</span>
+    <span class="tchip"><span class="dot" style="background:var(--ok)"></span><strong id="cAdded">0</strong> added</span>
+    <span class="tchip"><span class="dot dash" style="background:var(--danger)"></span><strong id="cRemoved">0</strong> removed</span>
+    <span class="tchip"><span class="dot" style="background:var(--amber)"></span><strong id="cChanged">0</strong> changed</span>
+    <span class="tchip"><span class="dot" style="background:var(--neutral)"></span><strong id="cUnchanged">0</strong> unchanged</span>
+  </div>
+
+  <!-- ---- map + results ---- -->
+  <div class="main">
+    <section>
+      <div id="map" role="application" aria-label="Map showing the diff between the two GeoJSON files"></div>
+      <div class="legend" aria-label="Layer visibility">
+        <label><input type="checkbox" id="legAdded" checked><span class="swatch" style="background:var(--ok)"></span> Added</label>
+        <label><input type="checkbox" id="legRemoved" checked><span class="swatch dash" style="color:var(--danger)"></span> Removed</label>
+        <label><input type="checkbox" id="legChanged" checked><span class="swatch" style="background:var(--amber)"></span> Changed (before dashed → after solid)</label>
+        <label><input type="checkbox" id="legUnchanged"><span class="swatch" style="background:var(--neutral)"></span> Unchanged</label>
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="panel">
+        <h2>Changes</h2>
+        <div id="results">
+          <p class="emptynote" id="resultsEmpty">Load a “Before” and “After” GeoJSON above (or click “Try an example” on each side) to see what changed.</p>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <!-- ---- export ---- -->
+  <section class="panel" id="exportPanel">
+    <h2>Export</h2>
+    <div class="exportrow">
+      <button class="btn" id="dlJson" type="button" disabled>⬇ Diff report (.json)</button>
+      <button class="btn" id="dlMd" type="button" disabled>⬇ Summary (.md)</button>
+      <button class="btn" id="copySummary" type="button" disabled>⧉ Copy summary</button>
+      <button class="btn primary" id="dlGeojson" type="button" disabled>⬇ Changes-only GeoJSON</button>
+    </div>
+    <p class="note" style="padding:0 14px 12px; margin-top:-6px">The changes-only GeoJSON contains added, removed and changed features (not unchanged ones), each tagged with a <code>_diffStatus</code> property.</p>
+  </section>
+
+  <footer class="app">Everything runs in your browser — your files never leave this page. Map tiles come from OpenStreetMap. · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+'use strict';
+/* ============================================================
+   GeoJSON Diff Viewer — standalone, client-side.
+   Dep: Leaflet 1.9.4 (background-loaded below; the tool degrades
+   gracefully to list + diff + export if the CDN is blocked).
+   ============================================================ */
+
+const $ = (id) => document.getElementById(id);
+const GEOM_TYPES = ['Point', 'MultiPoint', 'LineString', 'MultiLineString', 'Polygon', 'MultiPolygon', 'GeometryCollection'];
+const MATCH_TOLERANCE_M = 1000;      // geometry-fallback candidate radius for point matching
+const SHAPE_PAIR_CAP = 700 * 700;    // cap on pairwise line/polygon coarse-matching comparisons
+const CAT_LIST_CAP = 300;            // rows rendered per category before "showing first N"
+
+/* ---------------- tiny utils ---------------- */
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function flash(btn, txt) {
+  const old = btn.textContent;
+  btn.classList.add('copied');
+  btn.textContent = txt;
+  setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1200);
+}
+async function copyText(btn, text) {
+  try { await navigator.clipboard.writeText(text); flash(btn, '✓ Copied'); }
+  catch (e) { flash(btn, 'Copy blocked'); }
+}
+function displayVal(v) {
+  if (v === undefined) return '(none)';
+  if (v === null) return 'null';
+  return typeof v === 'string' ? v : JSON.stringify(v);
+}
+function geomType(f) {
+  return (f && f.geometry && f.geometry.type) ? f.geometry.type : 'No geometry';
+}
+function download(filename, text, mime) {
+  const blob = new Blob([text], { type: mime || 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* ---------------- validation (shared with geojson-viewer.html) ----------------
+   JSON.parse happens before this. Structural problems throw (blocking);
+   out-of-range coordinates only warn. Bare geometries and single Features
+   are wrapped into a FeatureCollection. */
+function validateAndNormalize(obj) {
+  const warnings = [];
+  const ctx = { outOfRange: 0, empty: 0 };
+  if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) {
+    throw new Error('The top level must be a JSON object with a "type" property.');
+  }
+  if (!obj.type) throw new Error('Missing "type" — GeoJSON needs "type": "FeatureCollection", "Feature", or a geometry type.');
+
+  let fc, wrappedFrom = null;
+  if (obj.type === 'FeatureCollection') {
+    if (!Array.isArray(obj.features)) throw new Error('A FeatureCollection needs a "features" array.');
+    fc = obj;
+  } else if (obj.type === 'Feature') {
+    fc = { type: 'FeatureCollection', features: [obj] };
+    wrappedFrom = 'a single Feature';
+  } else if (GEOM_TYPES.includes(obj.type)) {
+    fc = { type: 'FeatureCollection', features: [{ type: 'Feature', properties: {}, geometry: obj }] };
+    wrappedFrom = 'a bare ' + obj.type + ' geometry';
+  } else {
+    throw new Error('"' + obj.type + '" is not a GeoJSON type. Expected FeatureCollection, Feature, or one of: ' + GEOM_TYPES.join(', ') + '.');
+  }
+
+  let noGeomMember = 0;
+  fc.features.forEach((f, i) => {
+    const at = 'Feature ' + (i + 1);
+    if (f === null || typeof f !== 'object' || Array.isArray(f)) throw new Error(at + ': every feature must be an object.');
+    if (f.type !== 'Feature') throw new Error(at + ': "type" must be "Feature" (got ' + JSON.stringify(f.type) + ').');
+    if (f.properties !== undefined && f.properties !== null && (typeof f.properties !== 'object' || Array.isArray(f.properties))) {
+      throw new Error(at + ': "properties" must be an object or null.');
+    }
+    if (f.geometry === undefined) noGeomMember++;
+    else if (f.geometry !== null) checkGeom(f.geometry, at, ctx);
+  });
+
+  if (noGeomMember) warnings.push(noGeomMember + ' feature' + (noGeomMember === 1 ? ' has' : 's have') + ' no "geometry" member — treated as empty.');
+  if (ctx.empty) warnings.push(ctx.empty + ' geometr' + (ctx.empty === 1 ? 'y has' : 'ies have') + ' empty coordinate arrays.');
+  if (ctx.outOfRange) warnings.push(ctx.outOfRange + ' coordinate' + (ctx.outOfRange === 1 ? ' is' : 's are') + ' outside the usual longitude/latitude ranges (±180 / ±90) — shown anyway, but check the axis order or CRS.');
+  return { fc, wrappedFrom, warnings };
+}
+function checkGeom(g, at, ctx) {
+  if (typeof g !== 'object' || Array.isArray(g)) throw new Error(at + ': geometry must be an object or null.');
+  if (g.type === 'GeometryCollection') {
+    if (!Array.isArray(g.geometries)) throw new Error(at + ': a GeometryCollection needs a "geometries" array.');
+    g.geometries.forEach((sub, j) => {
+      if (sub === null) return;
+      checkGeom(sub, at + ' → geometry ' + (j + 1), ctx);
+    });
+    return;
+  }
+  if (!GEOM_TYPES.includes(g.type)) throw new Error(at + ': unknown geometry type ' + JSON.stringify(g.type) + '.');
+  if (!Array.isArray(g.coordinates)) throw new Error(at + ': "coordinates" must be an array.');
+  if (g.type === 'Point') { checkPosition(g.coordinates, at, ctx); return; }
+  checkCoords(g.coordinates, at, ctx);
+}
+function checkPosition(a, at, ctx) {
+  if (a.length < 2) throw new Error(at + ': a coordinate needs at least [longitude, latitude].');
+  for (const n of a) {
+    if (typeof n !== 'number' || !isFinite(n)) throw new Error(at + ': coordinates must be finite numbers.');
+  }
+  const lon = a[0], lat = a[1];
+  if (lon < -180 || lon > 180 || lat < -90 || lat > 90) ctx.outOfRange++;
+}
+function checkCoords(arr, at, ctx) {
+  if (!arr.length) { ctx.empty++; return; }
+  if (typeof arr[0] === 'number') { checkPosition(arr, at, ctx); return; }
+  for (const sub of arr) {
+    if (!Array.isArray(sub)) throw new Error(at + ': malformed coordinates (mixed values and arrays).');
+    checkCoords(sub, at, ctx);
+  }
+}
+function parseErrMsg(e, src) {
+  let msg = e.message || 'Invalid JSON';
+  if (!/line \d+/i.test(msg)) {
+    let pos = -1;
+    const pm = msg.match(/position (\d+)/i);
+    if (pm) pos = +pm[1];
+    else if (/end of (JSON )?input/i.test(msg)) pos = src.length;
+    else {
+      const sm = msg.match(/, \.\.\."([\s\S]*)" is not valid JSON$/);
+      if (sm) {
+        const first = src.indexOf(sm[1]);
+        if (first >= 0 && src.indexOf(sm[1], first + 1) < 0) pos = first + 10;
+      }
+    }
+    if (pos >= 0) {
+      let line = 1, col = 1;
+      for (let j = 0; j < pos && j < src.length; j++) {
+        if (src[j] === '\n') { line++; col = 1; } else col++;
+      }
+      msg += ' (line ' + line + ', column ' + col + ')';
+    }
+  }
+  return 'Invalid JSON: ' + msg;
+}
+
+/* ---------------- geometry helpers ---------------- */
+function distanceMeters(lon1, lat1, lon2, lat2) {
+  const R = 6371000, toRad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * toRad, dLon = (lon2 - lon1) * toRad;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * toRad) * Math.cos(lat2 * toRad) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(Math.min(1, a)));
+}
+function fmtDist(m) {
+  if (m == null) return '';
+  if (m < 1000) return (m < 10 ? m.toFixed(1) : Math.round(m)) + ' m';
+  return (m / 1000).toFixed(2) + ' km';
+}
+function bboxOfGeometry(g) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, has = false;
+  function walk(a) {
+    if (!Array.isArray(a) || !a.length) return;
+    if (typeof a[0] === 'number') {
+      if (typeof a[1] !== 'number') return;
+      has = true;
+      if (a[0] < minX) minX = a[0]; if (a[0] > maxX) maxX = a[0];
+      if (a[1] < minY) minY = a[1]; if (a[1] > maxY) maxY = a[1];
+      return;
+    }
+    a.forEach(walk);
+  }
+  if (g.type === 'GeometryCollection') {
+    (g.geometries || []).forEach((sg) => {
+      const b = bboxOfGeometry(sg);
+      if (b) { has = true; minX = Math.min(minX, b[0]); minY = Math.min(minY, b[1]); maxX = Math.max(maxX, b[2]); maxY = Math.max(maxY, b[3]); }
+    });
+  } else {
+    walk(g.coordinates);
+  }
+  return has ? [minX, minY, maxX, maxY] : null;
+}
+function vertexCount(g) {
+  let n = 0;
+  function walk(a) {
+    if (!Array.isArray(a)) return;
+    if (typeof a[0] === 'number') { n++; return; }
+    a.forEach(walk);
+  }
+  if (g.type === 'GeometryCollection') (g.geometries || []).forEach((sg) => { n += vertexCount(sg); });
+  else walk(g.coordinates);
+  return n;
+}
+/* Structural, lock-step comparison: same type + same nesting -> max vertex
+   displacement in meters. Different type/shape -> "changed", no distance. */
+function geomDelta(g1, g2, epsM) {
+  const has1 = !!g1, has2 = !!g2;
+  if (!has1 && !has2) return { changed: false, maxDist: 0, reason: null };
+  if (!has1 || !has2) return { changed: true, maxDist: null, reason: has1 ? 'geometry removed' : 'geometry added' };
+  if (g1.type !== g2.type) return { changed: true, maxDist: null, reason: 'type changed from ' + g1.type + ' to ' + g2.type };
+  if (g1.type === 'GeometryCollection') {
+    const ga = g1.geometries || [], gb = g2.geometries || [];
+    if (ga.length !== gb.length) return { changed: true, maxDist: null, reason: 'number of sub-geometries differs' };
+    let maxDist = 0, anyBad = false, reason = null;
+    for (let i = 0; i < ga.length; i++) {
+      const d = geomDelta(ga[i], gb[i], epsM);
+      if (d.maxDist == null) { anyBad = true; reason = d.reason; break; }
+      if (d.maxDist > maxDist) maxDist = d.maxDist;
+    }
+    if (anyBad) return { changed: true, maxDist: null, reason };
+    return { changed: maxDist > epsM, maxDist, reason: maxDist > epsM ? 'moved up to ' + fmtDist(maxDist) : null };
+  }
+  let maxDist = 0, structMismatch = false;
+  (function walk(a, b) {
+    if (structMismatch) return;
+    if (!Array.isArray(a) || !Array.isArray(b)) { structMismatch = true; return; }
+    if (typeof a[0] === 'number' && typeof b[0] === 'number') {
+      const d = distanceMeters(a[0], a[1], b[0], b[1]);
+      if (d > maxDist) maxDist = d;
+      return;
+    }
+    if (a.length !== b.length) { structMismatch = true; return; }
+    for (let i = 0; i < a.length; i++) walk(a[i], b[i]);
+  })(g1.coordinates, g2.coordinates);
+  if (structMismatch) return { changed: true, maxDist: null, reason: 'vertex count or nesting differs' };
+  const changed = maxDist > epsM;
+  return { changed, maxDist, reason: changed ? 'moved ' + (g1.type === 'Point' ? '' : 'up to ') + fmtDist(maxDist) : null };
+}
+function stableStringify(v) {
+  if (v === null || typeof v !== 'object') return JSON.stringify(v);
+  if (Array.isArray(v)) return '[' + v.map(stableStringify).join(',') + ']';
+  const keys = Object.keys(v).sort();
+  return '{' + keys.map((k) => JSON.stringify(k) + ':' + stableStringify(v[k])).join(',') + '}';
+}
+function propDiff(propsA, propsB, ignoreSet) {
+  const pa = (propsA && typeof propsA === 'object') ? propsA : {};
+  const pb = (propsB && typeof propsB === 'object') ? propsB : {};
+  const keys = new Set([...Object.keys(pa), ...Object.keys(pb)]);
+  const changes = [];
+  for (const k of keys) {
+    if (ignoreSet.has(k)) continue;
+    const hasA = Object.prototype.hasOwnProperty.call(pa, k);
+    const hasB = Object.prototype.hasOwnProperty.call(pb, k);
+    if (hasA && !hasB) changes.push({ key: k, before: pa[k], after: undefined, status: 'removed' });
+    else if (!hasA && hasB) changes.push({ key: k, before: undefined, after: pb[k], status: 'added' });
+    else if (stableStringify(pa[k]) !== stableStringify(pb[k])) changes.push({ key: k, before: pa[k], after: pb[k], status: 'changed' });
+  }
+  return changes;
+}
+function displayName(f, i) {
+  const p = (f && f.properties && typeof f.properties === 'object') ? f.properties : {};
+  for (const k of ['name', 'title', 'id']) {
+    const v = p[k];
+    if (typeof v === 'string' && v.trim()) return v;
+    if (typeof v === 'number') return String(v);
+  }
+  if (typeof f.id === 'string' || typeof f.id === 'number') return String(f.id);
+  return 'Feature ' + (i + 1);
+}
+
+/* ---------------- feature matching ---------------- */
+function idValueOf(f, idField) {
+  if (!idField) return null;
+  if (idField === '__featureid__') return (f.id !== undefined && f.id !== null) ? String(f.id) : null;
+  const p = f.properties;
+  if (!p || typeof p !== 'object') return null;
+  const v = p[idField];
+  return (v !== undefined && v !== null) ? String(v) : null;
+}
+function pointCoordOf(f) {
+  const g = f.geometry;
+  if (!g) return null;
+  if (g.type === 'Point') return (g.coordinates && g.coordinates.length >= 2) ? g.coordinates : null;
+  if (g.type === 'MultiPoint') {
+    const pts = g.coordinates || [];
+    if (!pts.length) return null;
+    let sx = 0, sy = 0;
+    pts.forEach((p) => { sx += p[0]; sy += p[1]; });
+    return [sx / pts.length, sy / pts.length];
+  }
+  return null;
+}
+function bboxIoU(b1, b2) {
+  if (!b1 || !b2) return 0;
+  const ix1 = Math.max(b1[0], b2[0]), iy1 = Math.max(b1[1], b2[1]), ix2 = Math.min(b1[2], b2[2]), iy2 = Math.min(b1[3], b2[3]);
+  const iw = Math.max(0, ix2 - ix1), ih = Math.max(0, iy2 - iy1);
+  const inter = iw * ih;
+  if (inter <= 0) return 0;
+  const a1 = (b1[2] - b1[0]) * (b1[3] - b1[1]), a2 = (b2[2] - b2[0]) * (b2[3] - b2[1]);
+  const union = a1 + a2 - inter;
+  return union > 0 ? inter / union : 0;
+}
+function matchPointsGrid(featsA, featsB, idxA, idxB, matches, usedB, matchedA) {
+  const tol = MATCH_TOLERANCE_M;
+  const cellDeg = Math.max(tol / 111320, 0.0005);
+  const grid = new Map();
+  const coordB = new Map();
+  idxB.forEach((i) => {
+    const c = pointCoordOf(featsB[i]);
+    if (!c) return;
+    coordB.set(i, c);
+    const key = Math.floor(c[1] / cellDeg) + '_' + Math.floor(c[0] / cellDeg);
+    if (!grid.has(key)) grid.set(key, []);
+    grid.get(key).push(i);
+  });
+  idxA.forEach((i) => {
+    const c = pointCoordOf(featsA[i]);
+    if (!c) return;
+    const cy = Math.floor(c[1] / cellDeg), cx = Math.floor(c[0] / cellDeg);
+    let best = -1, bestD = Infinity;
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const bucket = grid.get((cy + dy) + '_' + (cx + dx));
+        if (!bucket) continue;
+        for (const bi of bucket) {
+          if (usedB.has(bi)) continue;
+          const cb = coordB.get(bi);
+          const d = distanceMeters(c[0], c[1], cb[0], cb[1]);
+          if (d < bestD) { bestD = d; best = bi; }
+        }
+      }
+    }
+    if (best >= 0 && bestD <= tol) {
+      matches.push({ a: i, b: best, method: 'geometry' });
+      usedB.add(best); matchedA.add(i);
+    }
+  });
+}
+function matchShapesCoarse(featsA, featsB, idxA, idxB, matches, usedB, matchedA) {
+  const statsA = idxA.map((i) => ({ i, bb: bboxOfGeometry(featsA[i].geometry), vc: vertexCount(featsA[i].geometry) }));
+  const statsB = idxB.map((i) => ({ i, bb: bboxOfGeometry(featsB[i].geometry), vc: vertexCount(featsB[i].geometry) }));
+  const candidates = [];
+  for (const sa of statsA) {
+    for (const sb of statsB) {
+      if (featsA[sa.i].geometry.type !== featsB[sb.i].geometry.type) continue;
+      const iou = bboxIoU(sa.bb, sb.bb);
+      if (iou < 0.3) continue;
+      const vsim = 1 - Math.abs(sa.vc - sb.vc) / Math.max(sa.vc, sb.vc, 1);
+      const score = 0.7 * iou + 0.3 * vsim;
+      if (score >= 0.5) candidates.push({ a: sa.i, b: sb.i, score });
+    }
+  }
+  candidates.sort((x, y) => y.score - x.score);
+  const usedAlocal = new Set();
+  for (const c of candidates) {
+    if (usedAlocal.has(c.a) || usedB.has(c.b)) continue;
+    matches.push({ a: c.a, b: c.b, method: 'geometry' });
+    usedB.add(c.b); matchedA.add(c.a); usedAlocal.add(c.a);
+  }
+}
+function geometryFallbackMatch(featsA, featsB, leftoverA, leftoverB, matches, usedB, matchedA) {
+  const notes = [];
+  const isPointLike = (f) => f.geometry && (f.geometry.type === 'Point' || f.geometry.type === 'MultiPoint');
+  const isShapeLike = (f) => f.geometry && !isPointLike(f);
+  const ptA = [], ptB = [], shA = [], shB = [];
+  leftoverA.forEach((i) => { const f = featsA[i]; if (isPointLike(f)) ptA.push(i); else if (isShapeLike(f)) shA.push(i); });
+  leftoverB.forEach((i) => { const f = featsB[i]; if (isPointLike(f)) ptB.push(i); else if (isShapeLike(f)) shB.push(i); });
+  if (ptA.length && ptB.length) matchPointsGrid(featsA, featsB, ptA, ptB, matches, usedB, matchedA);
+  if (shA.length && shB.length) {
+    if (shA.length * shB.length <= SHAPE_PAIR_CAP) {
+      matchShapesCoarse(featsA, featsB, shA, shB, matches, usedB, matchedA);
+    } else {
+      notes.push(shA.length + ' vs ' + shB.length + ' unmatched line/polygon features were too many to compare pairwise, so they were left unmatched (shown as added/removed) — pick an ID field for reliable matching at this size.');
+    }
+  }
+  return notes.join(' ');
+}
+function computeMatches(featsA, featsB, idField) {
+  const usedB = new Set(), matchedA = new Set(), matches = [];
+  if (idField) {
+    const mapB = new Map();
+    featsB.forEach((f, i) => { const idv = idValueOf(f, idField); if (idv != null && !mapB.has(idv)) mapB.set(idv, i); });
+    featsA.forEach((f, i) => {
+      const idv = idValueOf(f, idField);
+      if (idv != null && mapB.has(idv)) {
+        const bi = mapB.get(idv);
+        if (!usedB.has(bi)) { matches.push({ a: i, b: bi, method: 'id' }); usedB.add(bi); matchedA.add(i); }
+      }
+    });
+  }
+  const leftoverA = [], leftoverB = [];
+  for (let i = 0; i < featsA.length; i++) if (!matchedA.has(i)) leftoverA.push(i);
+  for (let i = 0; i < featsB.length; i++) if (!usedB.has(i)) leftoverB.push(i);
+  const geomNote = geometryFallbackMatch(featsA, featsB, leftoverA, leftoverB, matches, usedB, matchedA);
+  const addedIdx = [], removedIdx = [];
+  for (let i = 0; i < featsB.length; i++) if (!usedB.has(i)) addedIdx.push(i);
+  for (let i = 0; i < featsA.length; i++) if (!matchedA.has(i)) removedIdx.push(i);
+  return { matches, addedIdx, removedIdx, geomNote };
+}
+
+/* ---------------- app state ---------------- */
+const sideState = {
+  a: { fc: null, wrappedFrom: null },
+  b: { fc: null, wrappedFrom: null },
+};
+let diffResult = null;   // computed by runDiff()
+let selectedKey = null;  // "added:3" / "removed:1" / "changed:2" / "unchanged:0"
+
+/* ---------------- loading a side (paste / file) ---------------- */
+function sideEls(side) {
+  return {
+    raw: $('raw' + side.toUpperCase()),
+    err: $('err' + side.toUpperCase()),
+    count: $('count' + side.toUpperCase()),
+    wrapNote: $('wrapNote' + side.toUpperCase()),
+    fileInput: $('fileInput' + side.toUpperCase()),
+    panel: document.querySelector('.side-input[data-side="' + side + '"]'),
+  };
+}
+function showSideErr(side, msg) {
+  const el = sideEls(side).err;
+  if (msg) { el.textContent = msg; el.hidden = false; } else { el.hidden = true; }
+}
+function parseSide(side) {
+  const els = sideEls(side);
+  const text = els.raw.value;
+  showSideErr(side, null);
+  els.wrapNote.textContent = '';
+  if (!text.trim()) {
+    sideState[side].fc = null;
+    els.count.textContent = '0';
+    scheduleDiff();
+    return;
+  }
+  let obj;
+  try { obj = JSON.parse(text); }
+  catch (e) { showSideErr(side, parseErrMsg(e, text)); sideState[side].fc = null; els.count.textContent = '0'; scheduleDiff(); return; }
+  let res;
+  try { res = validateAndNormalize(obj); }
+  catch (e) { showSideErr(side, e.message); sideState[side].fc = null; els.count.textContent = '0'; scheduleDiff(); return; }
+  sideState[side].fc = res.fc;
+  sideState[side].wrappedFrom = res.wrappedFrom;
+  els.count.textContent = String(res.fc.features.length);
+  if (res.wrappedFrom) els.wrapNote.textContent = '(wrapped from ' + res.wrappedFrom + ')';
+  else if (res.warnings.length) els.wrapNote.textContent = res.warnings.join(' ');
+  scheduleDiff();
+  refreshIdFieldOptions();
+}
+function loadSideText(side, text, label) {
+  sideEls(side).raw.value = text;
+  parseSide(side);
+  if (!sideState[side].fc) showSideErr(side, (label ? label + ': ' : '') + 'could not be loaded — see message above.');
+}
+['a', 'b'].forEach((side) => {
+  const els = sideEls(side);
+  let t = null;
+  els.raw.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => parseSide(side), 350); });
+  $('fileBtn' + side.toUpperCase()).addEventListener('click', () => els.fileInput.click());
+  els.fileInput.addEventListener('change', () => {
+    const f = els.fileInput.files && els.fileInput.files[0];
+    if (f) loadSideFile(side, f);
+    els.fileInput.value = '';
+  });
+  ['dragenter', 'dragover'].forEach((ev) => els.panel.addEventListener(ev, (e) => {
+    if (!e.dataTransfer || !Array.from(e.dataTransfer.types || []).includes('Files')) return;
+    e.preventDefault();
+    els.panel.classList.add('drag-hover');
+  }));
+  ['dragleave', 'drop'].forEach((ev) => els.panel.addEventListener(ev, (e) => {
+    els.panel.classList.remove('drag-hover');
+    if (ev === 'drop') {
+      if (!e.dataTransfer) return;
+      e.preventDefault();
+      const f = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) loadSideFile(side, f);
+    }
+  }));
+});
+async function loadSideFile(side, file) {
+  if (file.size > 30 * 1024 * 1024) { showSideErr(side, '"' + file.name + '" is over 30 MB — too big for this in-browser tool.'); return; }
+  try { const text = await file.text(); loadSideText(side, text, file.name); }
+  catch (e) { showSideErr(side, 'Could not read "' + file.name + '".'); }
+}
+
+/* ---------------- example pair ---------------- */
+const EXAMPLE_A = {
+  type: 'FeatureCollection',
+  features: [
+    { type: 'Feature', id: 1, properties: { id: 1, name: 'Golden Gate Park', kind: 'park', status: 'open' }, geometry: { type: 'Point', coordinates: [-122.4862, 37.7694] } },
+    { type: 'Feature', id: 2, properties: { id: 2, name: 'Ferry Building', kind: 'landmark', status: 'open' }, geometry: { type: 'Point', coordinates: [-122.3937, 37.7955] } },
+    { type: 'Feature', id: 3, properties: { id: 3, name: 'Coit Tower', kind: 'landmark', status: 'open' }, geometry: { type: 'Point', coordinates: [-122.4058, 37.8024] } },
+    { type: 'Feature', id: 4, properties: { id: 4, name: 'Pier 39', kind: 'landmark', status: 'open' }, geometry: { type: 'Point', coordinates: [-122.4098, 37.8087] } },
+    { type: 'Feature', id: 5, properties: { id: 5, name: 'Old Mint', kind: 'museum', status: 'open' }, geometry: { type: 'Point', coordinates: [-122.4058, 37.7822] } },
+  ],
+};
+const EXAMPLE_B = {
+  type: 'FeatureCollection',
+  features: [
+    { type: 'Feature', id: 1, properties: { id: 1, name: 'Golden Gate Park', kind: 'park', status: 'open' }, geometry: { type: 'Point', coordinates: [-122.4862, 37.7694] } },
+    { type: 'Feature', id: 2, properties: { id: 2, name: 'Ferry Building', kind: 'landmark', status: 'open' }, geometry: { type: 'Point', coordinates: [-122.3937, 37.7955] } },
+    { type: 'Feature', id: 3, properties: { id: 3, name: 'Coit Tower', kind: 'landmark', status: 'closed for renovation' }, geometry: { type: 'Point', coordinates: [-122.4058, 37.8024] } },
+    { type: 'Feature', id: 4, properties: { id: 4, name: 'Pier 39', kind: 'landmark', status: 'open' }, geometry: { type: 'Point', coordinates: [-122.4083, 37.8098] } },
+    { type: 'Feature', id: 6, properties: { id: 6, name: 'Exploratorium', kind: 'museum', status: 'open' }, geometry: { type: 'Point', coordinates: [-122.3975, 37.8016] } },
+  ],
+};
+$('exampleBtnA').addEventListener('click', () => loadSideText('a', JSON.stringify(EXAMPLE_A, null, 2), 'Example'));
+$('exampleBtnB').addEventListener('click', () => loadSideText('b', JSON.stringify(EXAMPLE_B, null, 2), 'Example'));
+
+/* ---------------- swap ---------------- */
+$('swapBtn').addEventListener('click', () => {
+  const av = $('rawA').value, bv = $('rawB').value;
+  $('rawA').value = bv; $('rawB').value = av;
+  parseSide('a'); parseSide('b');
+});
+
+/* ---------------- ID field dropdown ---------------- */
+const PRIORITY_KEYS = ['id', 'uid', 'osm_id', 'gid', 'objectid', 'code', 'ref', 'name'];
+let idFieldUserChosen = false;
+function refreshIdFieldOptions() {
+  const sel = $('idField');
+  const prevVal = sel.value;
+  const fcA = sideState.a.fc, fcB = sideState.b.fc;
+  const keysA = new Set(), keysB = new Set();
+  let anyFeatureIdA = false, anyFeatureIdB = false;
+  (fcA ? fcA.features : []).forEach((f) => {
+    if (f.properties && typeof f.properties === 'object') Object.keys(f.properties).forEach((k) => keysA.add(k));
+    if (f.id !== undefined && f.id !== null) anyFeatureIdA = true;
+  });
+  (fcB ? fcB.features : []).forEach((f) => {
+    if (f.properties && typeof f.properties === 'object') Object.keys(f.properties).forEach((k) => keysB.add(k));
+    if (f.id !== undefined && f.id !== null) anyFeatureIdB = true;
+  });
+  const common = [...keysA].filter((k) => keysB.has(k));
+  common.sort((x, y) => {
+    const px = PRIORITY_KEYS.indexOf(x), py = PRIORITY_KEYS.indexOf(y);
+    if (px !== -1 || py !== -1) return (px === -1 ? 999 : px) - (py === -1 ? 999 : py);
+    return x.localeCompare(y);
+  });
+  sel.innerHTML = '';
+  const noneOpt = document.createElement('option');
+  noneOpt.value = ''; noneOpt.textContent = 'None — use geometry matching';
+  sel.appendChild(noneOpt);
+  if (anyFeatureIdA || anyFeatureIdB) {
+    const o = document.createElement('option');
+    o.value = '__featureid__'; o.textContent = 'GeoJSON feature id (top-level "id")';
+    sel.appendChild(o);
+  }
+  common.forEach((k) => {
+    const o = document.createElement('option');
+    o.value = k; o.textContent = 'properties.' + k;
+    sel.appendChild(o);
+  });
+  // Only a genuine user selection sticks across reloads. Otherwise always
+  // recompute the heuristic default — this avoids "locking in" a transient
+  // auto-pick made back when only one side had loaded.
+  const values = Array.from(sel.options).map((o) => o.value);
+  if (idFieldUserChosen && values.includes(prevVal)) {
+    sel.value = prevVal;
+  } else {
+    let def = '';
+    for (const k of PRIORITY_KEYS) { if (common.includes(k)) { def = k; break; } }
+    if (!def && (anyFeatureIdA || anyFeatureIdB)) def = '__featureid__';
+    sel.value = def;
+  }
+}
+$('idField').addEventListener('change', () => { idFieldUserChosen = true; scheduleDiff(); });
+$('epsilon').addEventListener('input', scheduleDiff);
+$('ignoreList').addEventListener('input', scheduleDiff);
+$('computeBtn').addEventListener('click', runDiff);
+
+let diffTimer = null;
+function scheduleDiff() { clearTimeout(diffTimer); diffTimer = setTimeout(runDiff, 300); }
+
+/* ---------------- diff computation ---------------- */
+function runDiff() {
+  clearTimeout(diffTimer);
+  const fcA = sideState.a.fc, fcB = sideState.b.fc;
+  if (!fcA || !fcB) {
+    diffResult = null;
+    renderAll();
+    return;
+  }
+  const featsA = fcA.features, featsB = fcB.features;
+  const idField = $('idField').value || null;
+  const epsilonM = Math.max(0, parseFloat($('epsilon').value));
+  const epsM = isFinite(epsilonM) ? epsilonM : 1;
+  const ignoreSet = new Set($('ignoreList').value.split(',').map((s) => s.trim()).filter(Boolean));
+
+  const { matches, addedIdx, removedIdx, geomNote } = computeMatches(featsA, featsB, idField);
+
+  const added = addedIdx.map((i) => ({ bIndex: i, feature: featsB[i], name: displayName(featsB[i], i) }));
+  const removed = removedIdx.map((i) => ({ aIndex: i, feature: featsA[i], name: displayName(featsA[i], i) }));
+  const changed = [];
+  const unchanged = [];
+  for (const m of matches) {
+    const fa = featsA[m.a], fb = featsB[m.b];
+    const gd = geomDelta(fa.geometry, fb.geometry, epsM);
+    const pd = propDiff(fa.properties, fb.properties, ignoreSet);
+    if (gd.changed || pd.length) {
+      changed.push({ aIndex: m.a, bIndex: m.b, method: m.method, featureA: fa, featureB: fb, name: displayName(fb, m.b), geomChanged: gd.changed, moveM: gd.maxDist, geomReason: gd.reason, propChanges: pd });
+    } else {
+      unchanged.push({ aIndex: m.a, bIndex: m.b, method: m.method, featureA: fa, featureB: fb, name: displayName(fb, m.b) });
+    }
+  }
+  diffResult = {
+    added, removed, changed, unchanged,
+    idFieldUsed: idField, epsilonM: epsM, ignoreKeys: [...ignoreSet], geomNote,
+    countA: featsA.length, countB: featsB.length,
+  };
+  selectedKey = null;
+  renderAll();
+}
+
+/* ---------------- map (Leaflet, background-loaded) ---------------- */
+let map = null, svgRenderer = null;
+let groupAdded = null, groupRemoved = null, groupChanged = null, groupUnchanged = null;
+let itemLayers = { added: [], removed: [], changed: [], unchanged: [] };
+
+(function loadLeaflet() {
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+  s.crossOrigin = '';
+  s.onload = () => { if (window.L) bootMap(); else mapFallback(); };
+  s.onerror = () => mapFallback();
+  document.head.appendChild(s);
+})();
+function mapFallback() {
+  const el = $('map');
+  el.classList.add('map-fallback');
+  el.innerHTML = 'Map unavailable — the Leaflet library could not be loaded.<br>The results list and export below still work.';
+}
+function bootMap() {
+  map = L.map('map', { worldCopyJump: true }).setView([20, 0], 2);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
+  svgRenderer = L.svg();
+  groupAdded = L.layerGroup().addTo(map);
+  groupRemoved = L.layerGroup().addTo(map);
+  groupChanged = L.layerGroup().addTo(map);
+  groupUnchanged = L.layerGroup();
+  renderMap();
+}
+
+function styleForCat(cat, part) {
+  // part: 'old' (changed-before) or 'new'/undefined (added / changed-after / removed / unchanged)
+  if (cat === 'added') return { color: getCss('--ok'), weight: 2.5, opacity: 0.95, fillOpacity: 0.3 };
+  if (cat === 'removed') return { color: getCss('--danger'), weight: 2.5, opacity: 0.85, fillOpacity: 0.12, dashArray: '6,4' };
+  if (cat === 'changed') {
+    return part === 'old'
+      ? { color: getCss('--amber'), weight: 1.5, opacity: 0.55, fillOpacity: 0.05, dashArray: '4,4' }
+      : { color: getCss('--amber'), weight: 3, opacity: 0.95, fillOpacity: 0.3 };
+  }
+  return { color: getCss('--neutral'), weight: 1.5, opacity: 0.6, fillOpacity: 0.1 };
+}
+function getCss(varName) {
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || '#888';
+}
+
+function buildOneLayer(feature, style, popupHtml, onClick) {
+  if (!feature || !feature.geometry) return null;
+  let layer = null;
+  try {
+    const gj = L.geoJSON(feature, {
+      renderer: svgRenderer,
+      style: () => style,
+      pointToLayer: (pf, latlng) => L.circleMarker(latlng, Object.assign({ renderer: svgRenderer, radius: 6 }, style)),
+    });
+    if (!gj.getLayers().length) return null;
+    layer = gj;
+  } catch (e) { return null; }
+  // remember each sub-layer's resting style so hover/select highlighting can revert to it
+  layer.eachLayer((sub) => {
+    sub.options._baseWeight = style.weight;
+    sub.options._baseRadius = 6;
+  });
+  if (popupHtml) layer.bindPopup(popupHtml, { maxWidth: 320 });
+  if (onClick) layer.on('click', onClick);
+  return layer;
+}
+function propTableRows(props) {
+  const p = (props && typeof props === 'object') ? props : {};
+  const keys = Object.keys(p);
+  let rows = keys.slice(0, 10).map((k) => '<tr><td class="k">' + esc(k) + '</td><td>' + esc(displayVal(p[k])) + '</td></tr>').join('');
+  if (keys.length > 10) rows += '<tr><td colspan="2">…and ' + (keys.length - 10) + ' more</td></tr>';
+  return rows ? '<table>' + rows + '</table>' : '<p class="pnone">No properties</p>';
+}
+function popupAdded(item) {
+  return '<div class="popup"><strong>' + esc(item.name) + '</strong><span class="ptag" style="color:var(--ok);border-color:var(--ok)">Added</span>' + propTableRows(item.feature.properties) + '</div>';
+}
+function popupRemoved(item) {
+  return '<div class="popup"><strong>' + esc(item.name) + '</strong><span class="ptag" style="color:var(--danger);border-color:var(--danger)">Removed</span>' + propTableRows(item.feature.properties) + '</div>';
+}
+function popupChanged(item) {
+  let rows;
+  if (item.propChanges.length) {
+    rows = '<table>' + item.propChanges.map((c) =>
+      '<tr><td class="k">' + esc(c.key) + '</td><td><span class="old">' + esc(displayVal(c.before)) + '</span> → <span class="new">' + esc(displayVal(c.after)) + '</span></td></tr>'
+    ).join('') + '</table>';
+  } else {
+    rows = '<p class="pnone">No property changes</p>';
+  }
+  const geomNote = item.geomChanged ? '<p class="geomnote">Geometry ' + esc(item.geomReason || 'changed') + '</p>' : '';
+  return '<div class="popup"><strong>' + esc(item.name) + '</strong><span class="ptag" style="color:var(--amber);border-color:var(--amber)">Changed</span>' + rows + geomNote + '</div>';
+}
+function popupUnchanged(item) {
+  return '<div class="popup"><strong>' + esc(item.name) + '</strong><span class="ptag" style="color:var(--neutral);border-color:var(--neutral)">Unchanged</span>' + propTableRows(item.featureB.properties) + '</div>';
+}
+
+function renderMap() {
+  if (!map) return;
+  [groupAdded, groupRemoved, groupChanged, groupUnchanged].forEach((g) => g && g.clearLayers());
+  itemLayers = { added: [], removed: [], changed: [], unchanged: [] };
+  if (!diffResult) return;
+
+  diffResult.added.forEach((item, idx) => {
+    const layer = buildOneLayer(item.feature, styleForCat('added'), () => popupAdded(item), () => selectResult('added', idx, false));
+    itemLayers.added[idx] = layer ? { layers: [layer] } : { layers: [] };
+    if (layer) groupAdded.addLayer(layer);
+  });
+  diffResult.removed.forEach((item, idx) => {
+    const layer = buildOneLayer(item.feature, styleForCat('removed'), () => popupRemoved(item), () => selectResult('removed', idx, false));
+    itemLayers.removed[idx] = layer ? { layers: [layer] } : { layers: [] };
+    if (layer) groupRemoved.addLayer(layer);
+  });
+  diffResult.changed.forEach((item, idx) => {
+    const layers = [];
+    const layerOld = buildOneLayer(item.featureA, styleForCat('changed', 'old'), () => popupChanged(item), () => selectResult('changed', idx, false));
+    const layerNew = buildOneLayer(item.featureB, styleForCat('changed', 'new'), () => popupChanged(item), () => selectResult('changed', idx, false));
+    if (layerOld) { layers.push(layerOld); groupChanged.addLayer(layerOld); }
+    if (layerNew) { layers.push(layerNew); groupChanged.addLayer(layerNew); }
+    let connector = null;
+    const ca = pointCoordOf(item.featureA), cb = pointCoordOf(item.featureB);
+    if (ca && cb && item.geomChanged) {
+      connector = L.polyline([[ca[1], ca[0]], [cb[1], cb[0]]], { renderer: svgRenderer, color: getCss('--amber'), weight: 1.5, opacity: 0.8, dashArray: '2,5' });
+      connector.options._baseWeight = 1.5;
+      groupChanged.addLayer(connector);
+      layers.push(connector);
+    }
+    itemLayers.changed[idx] = { layers };
+  });
+  diffResult.unchanged.forEach((item, idx) => {
+    const layer = buildOneLayer(item.featureB, styleForCat('unchanged'), () => popupUnchanged(item), () => selectResult('unchanged', idx, false));
+    itemLayers.unchanged[idx] = layer ? { layers: [layer] } : { layers: [] };
+    if (layer) groupUnchanged.addLayer(layer);
+  });
+
+  fitAllDiff();
+}
+function fitAllDiff() {
+  if (!map) return;
+  const bounds = L.latLngBounds([]);
+  let has = false;
+  [groupAdded, groupRemoved, groupChanged].forEach((g) => {
+    if (!g) return;
+    g.eachLayer((l) => { if (l.getBounds) { const b = l.getBounds(); if (b.isValid()) { bounds.extend(b); has = true; } } else if (l.getLatLng) { bounds.extend(l.getLatLng()); has = true; } });
+  });
+  if (!has && groupUnchanged) {
+    groupUnchanged.eachLayer((l) => { if (l.getBounds) { const b = l.getBounds(); if (b.isValid()) { bounds.extend(b); has = true; } } else if (l.getLatLng) { bounds.extend(l.getLatLng()); has = true; } });
+  }
+  if (has) map.fitBounds(bounds.pad(0.15), { maxZoom: 15 });
+}
+function zoomToItem(cat, idx) {
+  if (!map) return;
+  const rec = itemLayers[cat] && itemLayers[cat][idx];
+  if (!rec || !rec.layers.length) return;
+  const bounds = L.latLngBounds([]);
+  let has = false;
+  rec.layers.forEach((l) => {
+    if (l.getBounds) { const b = l.getBounds(); if (b.isValid()) { bounds.extend(b); has = true; } }
+    else if (l.getLatLng) { bounds.extend(l.getLatLng()); has = true; }
+  });
+  if (has) map.fitBounds(bounds.pad(0.4), { maxZoom: 16 });
+}
+function highlightItem(cat, idx, on) {
+  const rec = itemLayers[cat] && itemLayers[cat][idx];
+  if (!rec) return;
+  rec.layers.forEach((l) => {
+    l.eachLayer ? l.eachLayer((sub) => emphasizeLayer(sub, on)) : emphasizeLayer(l, on);
+  });
+}
+function emphasizeLayer(l, on) {
+  const base = (l.options && l.options._baseWeight) || (l.options ? l.options.weight : 2) || 2;
+  if (l.setStyle) l.setStyle({ weight: on ? base + 2.5 : base });
+  if (l.setRadius) l.setRadius(on ? 9 : (l.options._baseRadius || 6));
+  if (on && l.bringToFront) l.bringToFront();
+}
+
+/* ---------------- results list ---------------- */
+const CAT_META = {
+  added: { label: 'Added', color: 'var(--ok)', open: true },
+  removed: { label: 'Removed', color: 'var(--danger)', open: true },
+  changed: { label: 'Changed', color: 'var(--amber)', open: true },
+  unchanged: { label: 'Unchanged', color: 'var(--neutral)', open: false },
+};
+function summaryForChanged(item) {
+  const parts = [];
+  if (item.geomChanged) parts.push(item.geomReason || 'geometry changed');
+  if (item.propChanges.length) parts.push(item.propChanges.length + ' propert' + (item.propChanges.length === 1 ? 'y' : 'ies') + ' changed: ' + item.propChanges.slice(0, 3).map((c) => c.key).join(', ') + (item.propChanges.length > 3 ? '…' : ''));
+  return parts.join(' · ') || 'changed';
+}
+function renderResults() {
+  const wrap = $('results');
+  wrap.innerHTML = '';
+  if (!diffResult) {
+    wrap.innerHTML = '<p class="emptynote" id="resultsEmpty">Load a “Before” and “After” GeoJSON above (or click “Try an example” on each side) to see what changed.</p>';
+    return;
+  }
+  const cats = ['added', 'removed', 'changed', 'unchanged'];
+  const frag = document.createDocumentFragment();
+  cats.forEach((cat) => {
+    const list = diffResult[cat];
+    const meta = CAT_META[cat];
+    const details = document.createElement('details');
+    details.className = 'catgroup';
+    details.dataset.cat = cat;
+    if (meta.open && list.length) details.open = true;
+    const summary = document.createElement('summary');
+    summary.innerHTML = '<span class="arrow">▶</span><span class="dot" style="background:' + meta.color + '"></span>' + meta.label + '<span class="cnt">' + list.length + '</span>';
+    details.appendChild(summary);
+    const rowsWrap = document.createElement('div');
+    rowsWrap.className = 'catrows';
+    const n = Math.min(list.length, CAT_LIST_CAP);
+    for (let i = 0; i < n; i++) {
+      const item = list[i];
+      const row = document.createElement('button');
+      row.type = 'button';
+      row.className = 'res-row';
+      row.dataset.cat = cat;
+      row.dataset.idx = String(i);
+      let summaryText = '';
+      if (cat === 'changed') summaryText = summaryForChanged(item);
+      else if (cat === 'added') summaryText = geomType(item.feature);
+      else if (cat === 'removed') summaryText = geomType(item.feature);
+      else summaryText = geomType(item.featureB);
+      row.innerHTML = '<span class="dot rdot" style="background:' + meta.color + '"></span><span class="rbody"><span class="rname"></span><span class="rsummary"></span></span>';
+      row.querySelector('.rname').textContent = item.name;
+      row.querySelector('.rsummary').textContent = summaryText;
+      row.addEventListener('click', () => selectResult(cat, i, true));
+      rowsWrap.appendChild(row);
+    }
+    details.appendChild(rowsWrap);
+    if (list.length > n) {
+      const more = document.createElement('p');
+      more.className = 'listmore';
+      more.textContent = 'Showing the first ' + CAT_LIST_CAP + ' of ' + list.length + ' — the rest are still on the map and in the exports.';
+      details.appendChild(more);
+    }
+    frag.appendChild(details);
+  });
+  wrap.appendChild(frag);
+  applySelectionStyle();
+}
+function applySelectionStyle() {
+  document.querySelectorAll('#results .res-row').forEach((el) => {
+    const key = el.dataset.cat + ':' + el.dataset.idx;
+    el.classList.toggle('sel', key === selectedKey);
+  });
+}
+function selectResult(cat, idx, zoom) {
+  const prevKey = selectedKey;
+  if (prevKey) {
+    const [pc, pi] = prevKey.split(':');
+    highlightItem(pc, +pi, false);
+  }
+  selectedKey = cat + ':' + idx;
+  highlightItem(cat, idx, true);
+  applySelectionStyle();
+  if (zoom) zoomToItem(cat, idx);
+}
+
+/* ---------------- stats + legend ---------------- */
+function renderStats() {
+  const statsBar = $('statsBar');
+  if (!diffResult) {
+    $('statA').textContent = sideState.a.fc ? String(sideState.a.fc.features.length) : '0';
+    $('statB').textContent = sideState.b.fc ? String(sideState.b.fc.features.length) : '0';
+    $('cAdded').textContent = '0'; $('cRemoved').textContent = '0'; $('cChanged').textContent = '0'; $('cUnchanged').textContent = '0';
+    statsBar.style.opacity = 0.5;
+    return;
+  }
+  statsBar.style.opacity = 1;
+  $('statA').textContent = String(diffResult.countA);
+  $('statB').textContent = String(diffResult.countB);
+  $('cAdded').textContent = String(diffResult.added.length);
+  $('cRemoved').textContent = String(diffResult.removed.length);
+  $('cChanged').textContent = String(diffResult.changed.length);
+  $('cUnchanged').textContent = String(diffResult.unchanged.length);
+}
+function renderMatchNote() {
+  const el = $('matchNote');
+  if (diffResult && diffResult.geomNote) { el.textContent = diffResult.geomNote; el.hidden = false; }
+  else { el.hidden = true; }
+}
+['legAdded', 'legRemoved', 'legChanged', 'legUnchanged'].forEach((id) => {
+  $(id).addEventListener('change', updateLegendVisibility);
+});
+function updateLegendVisibility() {
+  if (!map) return;
+  toggleGroup(groupAdded, $('legAdded').checked);
+  toggleGroup(groupRemoved, $('legRemoved').checked);
+  toggleGroup(groupChanged, $('legChanged').checked);
+  toggleGroup(groupUnchanged, $('legUnchanged').checked);
+}
+function toggleGroup(group, on) {
+  if (!group || !map) return;
+  const has = map.hasLayer(group);
+  if (on && !has) map.addLayer(group);
+  if (!on && has) map.removeLayer(group);
+}
+
+/* ---------------- export ---------------- */
+function buildJsonReport() {
+  if (!diffResult) return null;
+  const meta = {
+    generatedAt: new Date().toISOString(),
+    idFieldUsed: diffResult.idFieldUsed,
+    epsilonMeters: diffResult.epsilonM,
+    ignoredProperties: diffResult.ignoreKeys,
+    featuresInA: diffResult.countA,
+    featuresInB: diffResult.countB,
+  };
+  return {
+    meta,
+    counts: { added: diffResult.added.length, removed: diffResult.removed.length, changed: diffResult.changed.length, unchanged: diffResult.unchanged.length },
+    added: diffResult.added.map((it) => ({ name: it.name, geometryType: geomType(it.feature), properties: it.feature.properties || {}, geometry: it.feature.geometry || null })),
+    removed: diffResult.removed.map((it) => ({ name: it.name, geometryType: geomType(it.feature), properties: it.feature.properties || {}, geometry: it.feature.geometry || null })),
+    changed: diffResult.changed.map((it) => ({
+      name: it.name,
+      matchedBy: it.method,
+      propertyChanges: it.propChanges,
+      geometryChanged: it.geomChanged,
+      movedMeters: it.moveM,
+      geometryNote: it.geomReason,
+      before: { properties: it.featureA.properties || {}, geometry: it.featureA.geometry || null },
+      after: { properties: it.featureB.properties || {}, geometry: it.featureB.geometry || null },
+    })),
+    unchangedCount: diffResult.unchanged.length,
+  };
+}
+function buildMarkdownSummary() {
+  if (!diffResult) return '';
+  const lines = [];
+  lines.push('# GeoJSON diff summary');
+  lines.push('');
+  lines.push('- Features in A (before): ' + diffResult.countA);
+  lines.push('- Features in B (after): ' + diffResult.countB);
+  lines.push('- Added: ' + diffResult.added.length);
+  lines.push('- Removed: ' + diffResult.removed.length);
+  lines.push('- Changed: ' + diffResult.changed.length);
+  lines.push('- Unchanged: ' + diffResult.unchanged.length);
+  lines.push('- Matched by ID field: ' + (diffResult.idFieldUsed || '(none — geometry matching used)'));
+  lines.push('- "Moved" threshold: ' + diffResult.epsilonM + ' m');
+  if (diffResult.ignoreKeys.length) lines.push('- Ignored properties: ' + diffResult.ignoreKeys.join(', '));
+  lines.push('');
+  if (diffResult.added.length) {
+    lines.push('## Added (' + diffResult.added.length + ')');
+    diffResult.added.forEach((it) => lines.push('- ' + it.name + ' (' + geomType(it.feature) + ')'));
+    lines.push('');
+  }
+  if (diffResult.removed.length) {
+    lines.push('## Removed (' + diffResult.removed.length + ')');
+    diffResult.removed.forEach((it) => lines.push('- ' + it.name + ' (' + geomType(it.feature) + ')'));
+    lines.push('');
+  }
+  if (diffResult.changed.length) {
+    lines.push('## Changed (' + diffResult.changed.length + ')');
+    diffResult.changed.forEach((it) => {
+      lines.push('- ' + it.name + (it.geomChanged ? ' — ' + (it.geomReason || 'geometry changed') : ''));
+      it.propChanges.forEach((c) => lines.push('  - ' + c.key + ': ' + displayVal(c.before) + ' → ' + displayVal(c.after)));
+    });
+    lines.push('');
+  }
+  lines.push('## Unchanged: ' + diffResult.unchanged.length + ' feature' + (diffResult.unchanged.length === 1 ? '' : 's'));
+  return lines.join('\n');
+}
+function buildChangesOnlyGeoJSON() {
+  if (!diffResult) return null;
+  const feats = [];
+  diffResult.added.forEach((it) => {
+    feats.push({ type: 'Feature', geometry: it.feature.geometry || null, properties: Object.assign({}, it.feature.properties || {}, { _diffStatus: 'added' }) });
+  });
+  diffResult.removed.forEach((it) => {
+    feats.push({ type: 'Feature', geometry: it.feature.geometry || null, properties: Object.assign({}, it.feature.properties || {}, { _diffStatus: 'removed' }) });
+  });
+  diffResult.changed.forEach((it) => {
+    feats.push({
+      type: 'Feature', geometry: it.featureB.geometry || null,
+      properties: Object.assign({}, it.featureB.properties || {}, {
+        _diffStatus: 'changed',
+        _diffChangedProperties: it.propChanges.map((c) => c.key),
+        _diffGeometryChanged: it.geomChanged,
+        _diffMovedMeters: it.moveM,
+      }),
+    });
+  });
+  return { type: 'FeatureCollection', features: feats };
+}
+function refreshExportButtons() {
+  const has = !!diffResult;
+  ['dlJson', 'dlMd', 'copySummary', 'dlGeojson'].forEach((id) => { $(id).disabled = !has; });
+}
+$('dlJson').addEventListener('click', () => {
+  const r = buildJsonReport();
+  if (!r) return;
+  download('geojson-diff-report.json', JSON.stringify(r, null, 2), 'application/json');
+  flash($('dlJson'), '✓ Downloaded');
+});
+$('dlMd').addEventListener('click', () => {
+  const md = buildMarkdownSummary();
+  if (!md) return;
+  download('geojson-diff-summary.md', md, 'text/markdown');
+  flash($('dlMd'), '✓ Downloaded');
+});
+$('copySummary').addEventListener('click', () => {
+  const md = buildMarkdownSummary();
+  if (md) copyText($('copySummary'), md);
+});
+$('dlGeojson').addEventListener('click', () => {
+  const gj = buildChangesOnlyGeoJSON();
+  if (!gj) return;
+  download('geojson-diff-changes-only.geojson', JSON.stringify(gj, null, 2), 'application/geo+json');
+  flash($('dlGeojson'), '✓ Downloaded');
+});
+
+/* ---------------- central re-render ---------------- */
+function renderAll() {
+  renderStats();
+  renderMatchNote();
+  renderResults();
+  renderMap();
+  refreshExportButtons();
+  updateLegendVisibility();
+}
+
+/* ---------------- boot ---------------- */
+refreshIdFieldOptions();
+renderAll();
+
+/* ---------------- theme toggle ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+  // re-render map styles so amber/neutral/ok/danger tokens follow the new theme
+  setTimeout(renderMap, 0);
+});
+</script>
+</body>
+</html>

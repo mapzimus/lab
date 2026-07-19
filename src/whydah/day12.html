@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 12 · Lost and Found · Navigating Piracy</title>
+<meta name="description" content="Day 12 student missions: one map across 267 years, mark your dig, and THE DIG: a grid game where every find needs a coordinate.">
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<script src="day-config.js" defer></script>
+<style>
+  :root{
+    --ink:#12222B; --ink2:#1C3743; --parch:#F3E8CE; --parch2:#EAD9B4;
+    --brass:#A9781F; --brassl:#D8B25A; --ox:#8C2C1E; --inktx:#2B2114; --muted:#6E5B3C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--parch); color:var(--inktx); font-family:"Segoe UI",system-ui,-apple-system,sans-serif; line-height:1.5;}
+  .hero{background:var(--ink); color:var(--parch); padding:2.2em 1em 1.8em; text-align:center;}
+  .hero .kicker{color:var(--brassl); font-weight:700; letter-spacing:.25em; font-size:.85em; text-transform:uppercase;}
+  .hero h1{font-family:Georgia,"Times New Roman",serif; font-size:clamp(1.9em,5vw,3em); margin:.25em 0 .2em;}
+  .hero .sub{color:#C7BCA0; font-style:italic; font-size:1.05em;}
+  .wrap{max-width:880px; margin:0 auto; padding:1.2em 1em 3em;}
+  .mission{background:var(--parch2); border:1.5px solid var(--brass); border-radius:10px; padding:1.2em 1.3em 1.3em; margin:1.3em 0; box-shadow:2px 3px 10px rgba(42,29,15,.14);}
+  .mission-top{display:flex; align-items:baseline; gap:.7em; flex-wrap:wrap;}
+  .mnum{background:var(--ox); color:var(--parch); font-family:Georgia,serif; font-weight:700; font-size:1.25em; border-radius:50%; width:1.9em; height:1.9em; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .mission h2{font-family:Georgia,serif; font-size:1.45em; color:var(--inktx);}
+  .meta{color:var(--ox); font-weight:700; font-size:.92em; margin:.15em 0 .6em;}
+  .mission p{margin:.5em 0;}
+  .btn{display:inline-block; background:var(--brass); color:#FBF4E2; font-weight:700; font-size:1.06em; text-decoration:none; padding:.85em 1.25em; border-radius:8px; margin:.45em .45em .2em 0; border:2px solid #8a6119;}
+  .btn:hover,.btn:focus{background:#8a6119; outline:3px solid var(--ox);}
+  .btn.alt{background:var(--ink2); border-color:var(--ink);}
+  .btn.alt:hover,.btn.alt:focus{background:var(--ink);}
+  .log{background:#FBF4E2; border:1.5px dashed var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .log b{color:var(--ox);}
+  .hunt{margin:.5em 0 .3em 1.2em;}
+  .hunt li{margin:.35em 0;}
+  .bonus{font-style:italic; color:var(--muted); margin-top:.6em;}
+  .vocab{display:flex; gap:.6em; justify-content:center; flex-wrap:wrap; margin:1em 0;}
+  .chip{background:var(--ink); color:var(--brassl); font-family:Georgia,serif; font-weight:700; padding:.45em 1.1em; border-radius:999px; letter-spacing:.06em;}
+  .foot{background:var(--ink); color:#C7BCA0; text-align:center; padding:1.6em 1em 2em; font-size:.95em;}
+  .foot a{color:var(--brassl);}
+  .divider{text-align:center; color:var(--ox); font-size:1.3em; margin:1.6em 0 .2em; font-family:Georgia,serif; font-weight:700;}
+  .note{font-size:.9em; color:var(--muted); font-style:italic;}
+  .card-fields{background:#FBF4E2; border:1.5px solid var(--brass); border-radius:8px; padding:.8em 1em; margin:.6em 0;}
+  .card-fields div{padding:.28em 0; border-bottom:1px dashed var(--parch2); font-weight:700; color:var(--ink2);}
+  .card-fields div:last-child{border-bottom:none;}
+  .card-fields span{color:var(--muted); font-weight:400; font-style:italic;}
+  .race{background:#FBF4E2; border:2px solid var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .race b{color:var(--ox);}
+  .dig{border-collapse:collapse; margin:.8em auto .2em;}
+  .dig th{background:var(--ink); color:var(--brassl); font-family:Georgia,serif; font-weight:700; border:1.5px solid var(--ink2); width:2.1em; height:1.7em; text-align:center; font-size:.95em;}
+  .dig td{background:#FBF4E2; border:1.5px solid var(--ink2); width:2.1em; height:2.1em; text-align:center; color:var(--muted); font-size:.78em; font-style:italic;}
+  .dig caption{caption-side:bottom; font-size:.85em; color:var(--muted); font-style:italic; padding-top:.5em;}
+  @media (max-width:520px){ .mission{padding:1em .9em;} .btn{display:block; text-align:center; margin-right:0;} }
+</style>
+</head>
+<body>
+<div id="today-banner"></div>
+
+<header class="hero">
+  <div class="kicker">Day 12 · Week 4 · Pitch Week</div>
+  <h1>Lost and Found</h1>
+  <div class="sub">Lost in 1717. Found in 1984. Same map. Today you dig, and you log every find like a pro.</div>
+</header>
+
+<main class="wrap">
+
+  <section class="mission" id="m0">
+    <div class="mission-top"><span class="mnum">0</span><h2>Rig your sheet</h2></div>
+    <div class="meta">5 minutes · solo · paper + pencil</div>
+    <p>One sheet, folded like a book. Cover: <b>your name, "Day 12," the date.</b> Then:</p>
+    <div class="card-fields">
+      <div>Page 1: THE DIG <span>your 6x6 grid. Copy the one below, BIG.</span></div>
+      <div>Page 2: FINDS LOG <span>every find gets logged by its square. Captain's Log lands here too.</span></div>
+      <div>Back cover: MY COURSE <span>person locked. Today is format day.</span></div>
+    </div>
+    <table class="dig" aria-label="6 by 6 dig grid, columns A to F, rows 1 to 6">
+      <caption>Letter first, then number. So B4 means column B, row 4.</caption>
+      <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+      <tr><th>1</th><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><th>2</th><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><th>3</th><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><th>4</th><td></td><td>B4</td><td></td><td></td><td></td><td></td></tr>
+      <tr><th>5</th><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><th>6</th><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    </table>
+    <p class="note">36 squares. Every square has a name. Draw yours big enough to write one word inside a square. Your grid is your instrument today. Rig it right.</p>
+  </section>
+
+  <section class="mission" id="m1">
+    <div class="mission-top"><span class="mnum">1</span><h2>One Map, 267 Years</h2></div>
+    <div class="meta">~8 minutes · with your first mate · one Chromebook per pair</div>
+    <p>April 26, 1717. Our ship breaks apart in a storm off Cape Cod. The sea keeps her.</p>
+    <p>One week later a mapmaker named <b>Cyprian Southack</b> arrives. The governor sent him with one job: salvage that pirate wreck. He lands near Provincetown. He rows a whaleboat through a tidal creek clear across the Cape, a shortcut called <b>Jeremiah's Gutter</b>. Then everything goes wrong. The beach is already picked clean. He posts notices: return what you took. Nobody does. The surf is too heavy to dive. He sails home with almost nothing.</p>
+    <p>Almost nothing. On his chart, in his own hand, he marks <b>where she went down</b>.</p>
+    <p>1984. A Cape Cod diver named <b>Barry Clifford</b> reads that same chart and finds her. In 1985 his crew raises a bell. Cast into the bronze: <b>THE WHYDAH GALLY 1716</b>. Proof.</p>
+    <a class="btn" href="pics/southack-1717-chart-clean.jpg" target="_blank" rel="noopener">Open Southack's chart →</a>
+    <a class="btn alt" href="whydah-dashboard.html#artifacts" target="_blank" rel="noopener">The real finds →</a>
+    <ol class="hunt">
+      <li>Find Southack's wreck note on the chart, near Wellfleet. He spelled the ship <b>"Whido."</b></li>
+      <li>Find his note about the dead. The town buried 102 men from our ship.</li>
+      <li>Look at the shape of the Cape. He charted it from a small boat in rough weather. What would you double-check before trusting it?</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> Top of your FINDS LOG page, one line: the salvage failed, so what did Southack actually bring home that mattered?</div>
+  </section>
+
+  <section class="mission" id="m2">
+    <div class="mission-top"><span class="mnum">2</span><h2>Mark Your Dig</h2></div>
+    <div class="meta">~10 minutes · solo, then crew huddle · chart on screen, grid on paper</div>
+    <p>The chart gets you close. Close is not found.</p>
+    <p>The wreck lies under sand off Marconi Beach, near <b>41.891 north, 69.957 west</b>. Divers there do not wander around with shovels. They drop a grid on the seabed and give every square a name. Then they dig square by square.</p>
+    <p>Pretend your 6x6 grid is that patch of seabed. Time to bet.</p>
+    <ol class="hunt">
+      <li>Study the chart one last time. Then look at your 36 squares.</li>
+      <li>Pick the <b>one square</b> you would dig first. Gut call. Mark a small dot in it.</li>
+      <li>Under the grid, one line: why that square?</li>
+      <li>Crew huddle: compare dots. Agree on your crew's opening call for the game.</li>
+    </ol>
+    <p class="bonus">Feeling sure about your square? Read the Do-Now message again.</p>
+  </section>
+
+  <section class="mission" id="m3">
+    <div class="mission-top"><span class="mnum">3</span><h2>THE DIG</h2></div>
+    <div class="meta">~25 minutes · whole room, crew vs crew · paper only, lids down</div>
+    <p>Your teacher holds the seabed: a hidden answer grid with the same 36 squares. Eight squares hold something. The rest are sand.</p>
+    <p>Down there somewhere: <b>coins. A bell. A shoe. Concretions.</b> A concretion is sand and rusted iron fused into one rock. Surprises hide inside.</p>
+    <ol class="hunt">
+      <li>Crews call in turns. One square per turn. Letter first, like a sailor: <b>"B4."</b></li>
+      <li>Your teacher calls back what is there. <b>Every crew marks every call</b> on their own grid. X for sand. A word for a find.</li>
+      <li>A dug square stays dug. Call it again and your turn is gone. The grid remembers. So should you.</li>
+      <li>A find counts <b>only</b> when it is in your FINDS LOG: square, find, one line on what it might tell us. No square, no find.</li>
+      <li>Watch where the hits land. Wrecks leave patterns. Crews that read the pattern win.</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> FINDS LOG, one line per find: <b>SQUARE · FIND · what it might tell us.</b> Write it so a stranger could redo your dig.</div>
+    <div class="race"><b>THE DIG:</b> first crew to 3 logged finds: 5 points. Second crew: 2. The bell is special. It names the ship. Raise it for 1 bonus point.</div>
+    <p class="bonus">When the seabed empties, your teacher reveals the answer grid. Look at the shape the finds make. Wrecks do not scatter randomly. Crew done logging while others dig? Sharpen your tell-us lines. Best one in the room wins points. Then <a href="navigator/" target="_blank" rel="noopener">Navigator</a> awaits.</p>
+  </section>
+
+  <div class="divider">✦</div>
+
+  <section class="mission" id="reflect">
+    <div class="mission-top"><span class="mnum">✦</span><h2>The Question</h2></div>
+    <div class="meta">2 minutes · think, then write</div>
+    <p><b>Why does evidence matter for the story you tell?</b></p>
+    <p>A shoe in a glass case is just sad. A shoe logged at one square of one wreck became a real boy named John King. Location turned a thing into a story.</p>
+    <div class="log"><b>LOG IT:</b> One sentence at the bottom of your FINDS LOG: why does WHERE you found it matter as much as WHAT you found?</div>
+  </section>
+
+  <section class="mission" id="log">
+    <div class="mission-top"><span class="mnum">★</span><h2>Captain's Log</h2></div>
+    <div class="meta">5 minutes · solo · in your captain's voice</div>
+    <p>Three hundred years from now, divers drop a grid on YOUR ship's wreck site. They raise one object.</p>
+    <div class="log"><b>LOG IT:</b> What is the object? What true thing does it prove about your ship? What would it get wrong? Two or three sentences, captain's voice. Date it like a sailor: "27 July 2026."</div>
+  </section>
+
+  <section class="mission" id="close">
+    <div class="mission-top"><span class="mnum">★</span><h2>Chart Your Course</h2></div>
+    <div class="meta">3 minutes · solo · back cover, MY COURSE</div>
+    <p>Pitch is Thursday. Your person is locked. Today you pick the HOW.</p>
+    <ol class="hunt">
+      <li>Write your person's name at the top of MY COURSE. Ink it. Locked.</li>
+      <li>Look at your two formats. Which one shows your person's <b>evidence</b> best? Circle one.</li>
+      <li>One line: why that format fits that person.</li>
+    </ol>
+    <a class="btn alt" href="whydah-dashboard.html#final-project" target="_blank" rel="noopener">Your Project HQ →</a>
+    <p class="note">Thursday you stand up and say it in under a minute: one person, one format, one reason. That is the whole pitch. You are closer than you think.</p>
+  </section>
+
+  <div class="vocab">
+    <span class="chip">salvage</span><span class="chip">grid</span><span class="chip">archaeology</span><span class="chip">evidence</span>
+  </div>
+  <p style="text-align:center; font-size:.92em; color:var(--muted); max-width:660px; margin:0 auto;">
+    <b>salvage</b> = saving what you can from a wreck ·
+    <b>grid</b> = squares with names, so every find gets an address ·
+    <b>archaeology</b> = reading the human past from the things people left behind ·
+    <b>evidence</b> = a find that can prove part of a story
+  </p>
+
+</main>
+
+<footer class="foot">
+  <p><b>Tomorrow:</b> the ocean's narrow doors. Every ship in 1717 squeezed through them. Every ship today still does.</p>
+  <p style="margin-top:.6em;"><a href="whydah-dashboard.html#overview">⚓ Back to the ship's logbook (dashboard)</a></p>
+</footer>
+
+</body>
+</html>

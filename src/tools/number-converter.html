@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Number Converter</title>
+<meta name="description" content="Convert instantly between fractions, decimals, and percents, simplify fractions, and solve proportions. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; margin-bottom: 18px; }
+  .card h2 { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0 0 14px; }
+  .card .sub { color: var(--muted); font-size: .9rem; margin: 0 0 14px; }
+
+  .trio { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; align-items: start; }
+  .panel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .panel label { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; }
+  .panel input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); font-size: 1.05rem; text-align: center; }
+  .panel input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+
+  .frac-panel { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .frac-panel label { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; }
+  .frac-inputs { display: flex; flex-direction: column; align-items: center; width: 100%; }
+  .frac-inputs input { width: 100%; max-width: 90px; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 1.05rem; text-align: center; }
+  .frac-inputs input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .frac-line { width: 100%; max-width: 90px; height: 3px; background: var(--accent); margin: 4px 0; }
+
+  @media (max-width: 480px) { .trio { grid-template-columns: 1fr; } }
+
+  .bar-wrap { margin-top: 14px; }
+  .bar-label { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .bar-track { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; height: 22px; width: 100%; overflow: hidden; }
+  .bar-fill { background: var(--accent); height: 100%; border-radius: 8px; transition: width .25s; }
+  .bar-pct { font-size: .85rem; color: var(--muted); text-align: right; margin-top: 4px; }
+
+  .simplify-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .simplified { font-size: .95rem; color: var(--ok); font-weight: 700; }
+
+  .prop-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; align-items: center; font-size: 1.3rem; font-weight: 700; }
+  .prop-row input { width: 72px; min-width: 0; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 1.2rem; text-align: center; }
+  .prop-row input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .prop-row span { color: var(--muted); }
+
+  .result-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 1rem; color: var(--text); display: none; }
+  .result-box b { color: var(--accent); }
+  .result-box.err { color: var(--danger); border-color: var(--danger); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← max</a>
+      <h1>Number Converter</h1>
+      <p>Convert between fractions, decimals, and percents as you type, then solve proportions of the form a/b = c/d.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="card">
+    <h2>Fraction ↔ Decimal ↔ Percent</h2>
+    <div class="trio">
+      <div class="frac-panel">
+        <label for="fn">Fraction</label>
+        <div class="frac-inputs">
+          <input type="number" id="fn" placeholder="num" inputmode="decimal" aria-label="Fraction numerator">
+          <div class="frac-line"></div>
+          <input type="number" id="fd" placeholder="den" inputmode="decimal" aria-label="Fraction denominator">
+        </div>
+        <div class="simplify-row">
+          <button class="btn" id="simplBtn" style="font-size:.8rem;padding:6px 12px;" type="button">Simplify</button>
+          <span class="simplified" id="simplResult"></span>
+        </div>
+      </div>
+      <div class="panel">
+        <label for="dec">Decimal</label>
+        <input type="number" id="dec" placeholder="0.375" step="any" inputmode="decimal">
+      </div>
+      <div class="panel">
+        <label for="pct">Percent</label>
+        <input type="number" id="pct" placeholder="37.5" step="any" inputmode="decimal">
+      </div>
+    </div>
+    <div class="bar-wrap">
+      <div class="bar-label">Visual</div>
+      <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+      <div class="bar-pct" id="barPct"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Proportion Solver</h2>
+    <p class="sub">Fill in three values — leave one blank to solve for it.</p>
+    <div class="prop-row">
+      <input type="number" id="pa" placeholder="a" inputmode="decimal" aria-label="Proportion value a">
+      <span>/</span>
+      <input type="number" id="pb" placeholder="b" inputmode="decimal" aria-label="Proportion value b">
+      <span>=</span>
+      <input type="number" id="pc" placeholder="c" inputmode="decimal" aria-label="Proportion value c">
+      <span>/</span>
+      <input type="number" id="pd" placeholder="d" inputmode="decimal" aria-label="Proportion value d">
+    </div>
+    <div style="margin-top:12px;text-align:center;">
+      <button class="btn primary" id="solveBtn" type="button">Solve</button>
+    </div>
+    <div class="result-box" id="propResult"></div>
+  </div>
+
+  <footer class="app">Nothing you type ever leaves your browser · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = b; b = a % b; a = t; } return a || 1; }
+  function fmt(n) { var r = Math.round(n * 1000000) / 1000000; return isFinite(r) ? String(r) : "?"; }
+  // decimal → best fraction (limited denominator search)
+  function decToFrac(d) {
+    if (!isFinite(d)) return null;
+    var best = { n: Math.round(d), d: 1, err: Math.abs(d - Math.round(d)) };
+    for (var den = 2; den <= 1000; den++) {
+      var num = Math.round(d * den), err = Math.abs(d - num / den);
+      if (err < best.err) { best = { n: num, d: den, err: err }; }
+      if (best.err < 1e-9) break;
+    }
+    var g = gcd(Math.abs(best.n), best.d);
+    return [best.n / g, best.d / g];
+  }
+
+  var fn = document.getElementById("fn"), fd = document.getElementById("fd"),
+      dec = document.getElementById("dec"), pct = document.getElementById("pct"),
+      barFill = document.getElementById("barFill"), barPct = document.getElementById("barPct");
+
+  var updating = false;
+  function updateFromFrac() {
+    if (updating) return; updating = true;
+    var n = parseFloat(fn.value), d = parseFloat(fd.value);
+    if (isFinite(n) && isFinite(d) && d !== 0) {
+      var v = n / d;
+      dec.value = fmt(Math.round(v * 1e9) / 1e9);
+      pct.value = fmt(Math.round(v * 100 * 1e7) / 1e7);
+      updateBar(v * 100);
+    }
+    updating = false;
+  }
+  function updateFromDec() {
+    if (updating) return; updating = true;
+    var v = parseFloat(dec.value);
+    if (isFinite(v)) {
+      pct.value = fmt(v * 100);
+      var f = decToFrac(v);
+      if (f) { fn.value = f[0]; fd.value = f[1]; }
+      updateBar(v * 100);
+    }
+    updating = false;
+  }
+  function updateFromPct() {
+    if (updating) return; updating = true;
+    var v = parseFloat(pct.value);
+    if (isFinite(v)) {
+      dec.value = fmt(v / 100);
+      var f = decToFrac(v / 100);
+      if (f) { fn.value = f[0]; fd.value = f[1]; }
+      updateBar(v);
+    }
+    updating = false;
+  }
+  function updateBar(pctVal) {
+    var w = Math.min(Math.max(pctVal, 0), 100);
+    barFill.style.width = w + "%";
+    barPct.textContent = isFinite(pctVal) ? fmt(Math.round(pctVal * 100) / 100) + "%" : "";
+  }
+
+  fn.oninput = fd.oninput = updateFromFrac;
+  dec.oninput = updateFromDec;
+  pct.oninput = updateFromPct;
+
+  document.getElementById("simplBtn").onclick = function () {
+    var n = parseInt(fn.value, 10), d = parseInt(fd.value, 10);
+    if (!isFinite(n) || !isFinite(d) || d === 0) return;
+    var g = gcd(Math.abs(n), Math.abs(d));
+    if (d < 0) { n = -n; d = -d; }
+    fn.value = n / g; fd.value = d / g;
+    document.getElementById("simplResult").textContent = (g > 1 ? "÷" + g : "already simplified");
+    updateFromFrac();
+  };
+
+  // proportion solver: a/b = c/d, one blank
+  document.getElementById("solveBtn").onclick = function () {
+    var pa = document.getElementById("pa").value,
+        pb = document.getElementById("pb").value,
+        pc = document.getElementById("pc").value,
+        pd = document.getElementById("pd").value;
+    var vals = [pa, pb, pc, pd].map(function (v) { return v === "" ? null : parseFloat(v); });
+    var blanks = vals.filter(function (v) { return v === null; }).length;
+    var res = document.getElementById("propResult");
+    if (blanks !== 1) { res.classList.add("err"); res.innerHTML = "Fill in exactly three values."; res.style.display = "block"; return; }
+    res.classList.remove("err");
+    var a = vals[0], b = vals[1], c = vals[2], d = vals[3], ans, label;
+    // a/b = c/d → cross multiply
+    if (a === null) {
+      if (d === 0) { res.classList.add("err"); res.innerHTML = "Can't divide by zero."; res.style.display = "block"; return; }
+      ans = b * c / d; label = "a = b×c/d = " + fmt(b) + "×" + fmt(c) + "/" + fmt(d) + " = <b>" + fmt(ans) + "</b>";
+    }
+    else if (b === null) {
+      if (c === 0) { res.classList.add("err"); res.innerHTML = "Can't divide by zero."; res.style.display = "block"; return; }
+      ans = a * d / c; label = "b = a×d/c = " + fmt(a) + "×" + fmt(d) + "/" + fmt(c) + " = <b>" + fmt(ans) + "</b>";
+    }
+    else if (c === null) {
+      if (b === 0) { res.classList.add("err"); res.innerHTML = "Can't divide by zero."; res.style.display = "block"; return; }
+      ans = a * d / b; label = "c = a×d/b = " + fmt(a) + "×" + fmt(d) + "/" + fmt(b) + " = <b>" + fmt(ans) + "</b>";
+    }
+    else {
+      if (a === 0) { res.classList.add("err"); res.innerHTML = "Can't divide by zero."; res.style.display = "block"; return; }
+      ans = b * c / a; label = "d = b×c/a = " + fmt(b) + "×" + fmt(c) + "/" + fmt(a) + " = <b>" + fmt(ans) + "</b>";
+    }
+    res.innerHTML = label; res.style.display = "block";
+  };
+})();
+
+/* ---------- theme ---------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>
