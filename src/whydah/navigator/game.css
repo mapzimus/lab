@@ -1,0 +1,107 @@
+/* Whydah’s Voyage — voyage roguelite. Self-contained, no external assets. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #0b1620;
+  color: #f4e7c9;
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: none;               /* stop mobile scroll/zoom fighting the game */
+  overscroll-behavior: none;
+}
+#game-wrap {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(120% 80% at 50% -10%, #1c3a4f 0%, #0b1620 70%);
+}
+#scene {
+  display: block;
+  width: 100%; height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+/* ---- On-screen controls (touch + trackpad friendly) ---- */
+#controls {
+  position: fixed; inset: auto 0 0 0;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding: 14px clamp(10px, 3vw, 28px) calc(clamp(12px, 3vh, 26px) + env(safe-area-inset-bottom, 0px));
+  padding-left: calc(clamp(10px, 3vw, 28px) + env(safe-area-inset-left, 0px));
+  padding-right: calc(clamp(10px, 3vw, 28px) + env(safe-area-inset-right, 0px));
+  pointer-events: none;             /* only buttons catch input */
+  z-index: 5;
+}
+.ctl-cluster { display: flex; gap: 12px; pointer-events: none; }
+.btn {
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  width: clamp(58px, 15vw, 84px); height: clamp(58px, 15vw, 84px);
+  border-radius: 50%;
+  border: 2px solid rgba(244,231,201,.55);
+  background: rgba(20,40,55,.42);
+  color: #f4e7c9;
+  font-size: clamp(22px, 6vw, 32px);
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(3px);
+  transition: transform .06s ease, background .12s ease;
+}
+.btn:active, .btn.held { transform: scale(.92); background: rgba(210,170,90,.5); }
+.btn.fire {
+  width: clamp(66px, 17vw, 96px); height: clamp(66px, 17vw, 96px);
+  border-color: rgba(224,178,92,.8);
+  background: rgba(150,52,40,.5);
+}
+/* the powder-blast button only appears once the meter is charged */
+.btn.blast {
+  width: clamp(50px, 13vw, 74px); height: clamp(50px, 13vw, 74px);
+  border-color: rgba(255,210,74,.9);
+  background: rgba(120,70,180,.5);
+  display: none;
+}
+.btn.blast.ready { display: flex; animation: blastpulse .7s ease-in-out infinite; }
+@keyframes blastpulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,210,74,.6); transform: scale(1); }
+  50% { box-shadow: 0 0 14px 4px rgba(255,210,74,.5); transform: scale(1.06); }
+}
+#top-controls {
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  right: calc(10px + env(safe-area-inset-right, 0px));
+  display: flex; gap: 8px; z-index: 6;
+}
+.mini-btn {
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 40px; height: 40px; padding: 0 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(244,231,201,.4);
+  background: rgba(11,22,32,.55);
+  color: #f4e7c9; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Controls are hidden until a run starts; JS toggles .playing on <body> */
+#controls, #top-controls { opacity: 0; transition: opacity .3s ease; pointer-events: none; }
+body.playing #controls, body.playing #top-controls { opacity: 1; }
+body.playing #top-controls { pointer-events: auto; }
+body.hide-touch .ctl-cluster { display: none; }   /* keyboard players: hide steer pads, keep top bar */
+
+@media (min-width: 900px) {
+  /* On big screens the steer pads are optional; keep them faint */
+  .ctl-cluster { opacity: .8; }
+}
+/* Short landscape phones: shrink the pads so they don't cover the sea */
+@media (max-height: 480px) {
+  .btn { width: 52px; height: 52px; font-size: 20px; }
+  .btn.fire { width: 60px; height: 60px; }
+  #controls { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  .mini-btn { height: 34px; min-width: 34px; font-size: 15px; }
+}
+/* Narrow portrait phones: keep both steer pads reachable by thumbs */
+@media (max-width: 420px) {
+  .ctl-cluster { gap: 8px; }
+}
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

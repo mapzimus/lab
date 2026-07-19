@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 10 · The Wreck · Navigating Piracy</title>
+<meta name="description" content="Day 10 student missions: draw the storm before the evidence, learn the night of April 26 1717, plot the wreck site, and hear what happened after.">
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<script src="day-config.js" defer></script>
+<style>
+  :root{
+    --ink:#12222B; --ink2:#1C3743; --parch:#F3E8CE; --parch2:#EAD9B4;
+    --brass:#A9781F; --brassl:#D8B25A; --ox:#8C2C1E; --inktx:#2B2114; --muted:#6E5B3C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--parch); color:var(--inktx); font-family:"Segoe UI",system-ui,-apple-system,sans-serif; line-height:1.5;}
+  .hero{background:var(--ink); color:var(--parch); padding:2.2em 1em 1.8em; text-align:center;}
+  .hero .kicker{color:var(--brassl); font-weight:700; letter-spacing:.25em; font-size:.85em; text-transform:uppercase;}
+  .hero h1{font-family:Georgia,"Times New Roman",serif; font-size:clamp(1.9em,5vw,3em); margin:.25em 0 .2em;}
+  .hero .sub{color:#C7BCA0; font-style:italic; font-size:1.05em;}
+  .wrap{max-width:880px; margin:0 auto; padding:1.2em 1em 3em;}
+  .mission{background:var(--parch2); border:1.5px solid var(--brass); border-radius:10px; padding:1.2em 1.3em 1.3em; margin:1.3em 0; box-shadow:2px 3px 10px rgba(42,29,15,.14);}
+  .mission-top{display:flex; align-items:baseline; gap:.7em; flex-wrap:wrap;}
+  .mnum{background:var(--ox); color:var(--parch); font-family:Georgia,serif; font-weight:700; font-size:1.25em; border-radius:50%; width:1.9em; height:1.9em; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .mission h2{font-family:Georgia,serif; font-size:1.45em; color:var(--inktx);}
+  .meta{color:var(--ox); font-weight:700; font-size:.92em; margin:.15em 0 .6em;}
+  .mission p{margin:.5em 0;}
+  .btn{display:inline-block; background:var(--brass); color:#FBF4E2; font-weight:700; font-size:1.06em; text-decoration:none; padding:.85em 1.25em; border-radius:8px; margin:.45em .45em .2em 0; border:2px solid #8a6119;}
+  .btn:hover,.btn:focus{background:#8a6119; outline:3px solid var(--ox);}
+  .btn.alt{background:var(--ink2); border-color:var(--ink);}
+  .btn.alt:hover,.btn.alt:focus{background:var(--ink);}
+  .log{background:#FBF4E2; border:1.5px dashed var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .log b{color:var(--ox);}
+  .hunt{margin:.5em 0 .3em 1.2em;}
+  .hunt li{margin:.35em 0;}
+  .bonus{font-style:italic; color:var(--muted); margin-top:.6em;}
+  .vocab{display:flex; gap:.6em; justify-content:center; flex-wrap:wrap; margin:1em 0;}
+  .chip{background:var(--ink); color:var(--brassl); font-family:Georgia,serif; font-weight:700; padding:.45em 1.1em; border-radius:999px; letter-spacing:.06em;}
+  .foot{background:var(--ink); color:#C7BCA0; text-align:center; padding:1.6em 1em 2em; font-size:.95em;}
+  .foot a{color:var(--brassl);}
+  .divider{text-align:center; color:var(--ox); font-size:1.3em; margin:1.6em 0 .2em; font-family:Georgia,serif; font-weight:700;}
+  .note{font-size:.9em; color:var(--muted); font-style:italic;}
+  .card-fields{background:#FBF4E2; border:1.5px solid var(--brass); border-radius:8px; padding:.8em 1em; margin:.6em 0;}
+  .card-fields div{padding:.28em 0; border-bottom:1px dashed var(--parch2); font-weight:700; color:var(--ink2);}
+  .card-fields div:last-child{border-bottom:none;}
+  .card-fields span{color:var(--muted); font-weight:400; font-style:italic;}
+  .race{background:#FBF4E2; border:2px solid var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .race b{color:var(--ox);}
+  @media (max-width:520px){ .mission{padding:1em .9em;} .btn{display:block; text-align:center; margin-right:0;} }
+</style>
+</head>
+<body>
+<div id="today-banner"></div>
+
+<header class="hero">
+  <div class="kicker">Day 10 · Week 3 · April 26, 1717</div>
+  <h1>The Wreck</h1>
+  <div class="sub">One storm. Four ships. 146 people aboard ours. Today we tell it straight.</div>
+</header>
+
+<main class="wrap">
+
+  <section class="mission" id="m0">
+    <div class="mission-top"><span class="mnum">0</span><h2>Rig your sheet</h2></div>
+    <div class="meta">2 minutes · solo · paper + pencil</div>
+    <p>One sheet, folded like a book. Cover: <b>your name, "Day 10," the date.</b> Then:</p>
+    <div class="card-fields">
+      <div>Page 1: THE STORM <span>you draw it before you see any evidence</span></div>
+      <div>Page 2: AFTER <span>the land acknowledgment, one person, your log</span></div>
+      <div>Back cover: MY COURSE <span>one person circled by Friday</span></div>
+    </div>
+    <p class="note">Your teacher also hands out a grid sheet today. That is for the wreck map. It files into your folder with this one.</p>
+  </section>
+
+  <section class="mission" id="m1">
+    <div class="mission-top"><span class="mnum">1</span><h2>Draw the Storm</h2></div>
+    <div class="meta">13 minutes · solo · pencil only. Screens closed. No pictures yet.</div>
+    <p>Close your eyes for ten seconds. Here is where we are.</p>
+    <p>It is 12:15 in the morning. April 26, 1717. A nor'easter is blowing, a savage spring storm off the Atlantic. Rain like thrown gravel. The wind is shoving our ship toward land in the dark. Sailors call that a <b>lee shore</b>: beach ahead, wind at your back, no room to turn. You can hear the breakers. You cannot see them. There are <b>146 people aboard.</b></p>
+    <p>Draw that on your THE STORM page. The dark. The sea. The ship. The people, if you want them. There is no wrong drawing.</p>
+    <p class="note">Why draw first? Because today you imagine it before you see one piece of evidence. Then you test your picture against the record. That is how historians work. No screens until your teacher says so.</p>
+    <div class="log"><b>LOG IT:</b> give your drawing a one-line caption. Your words, nobody else's.</div>
+  </section>
+
+  <section class="mission" id="m2">
+    <div class="mission-top"><span class="mnum">2</span><h2>The Night Itself</h2></div>
+    <div class="meta">with your teacher · about 20 minutes · eyes up, pencils down</div>
+    <p>Bellamy was not sailing one ship that night. He was sailing four.</p>
+    <div class="card-fields">
+      <div>Whydah <span>flagship, Bellamy aboard. Wrecked at Wellfleet. 2 of 146 survive.</span></div>
+      <div>Mary Anne <span>a wine ship captured that same day. Wrecked farther south. All 10 aboard live.</span></div>
+      <div>Marianne <span>Williams's sloop. Safe. He had stopped at Block Island to visit family.</span></div>
+      <div>Anne Galley <span>separated in the storm. Survived it.</span></div>
+    </div>
+    <p>Same storm. Four different endings. Ours got the worst of it. She struck a sandbar about 500 feet from the beach. The mainmast went over the side. By morning she was in pieces.</p>
+    <p>Two of the 146 reached the sand alive. <b>Thomas Davis</b>, a Welsh carpenter. <b>John Julian</b>, the pilot, sixteen years old.</p>
+    <p>Cape Cod woke up to it. A local man, Samuel Harding, took the two survivors in that morning. Then he went down to the beach and hauled away what washed ashore. Whole towns did the same. A week later the governor's mapmaker, <b>Cyprian Southack</b>, crossed the Cape in a whaleboat to take it all back for the Crown. The locals gave him almost nothing. But he marked the wreck on his chart. Remember that chart.</p>
+    <div class="log"><b>LOG IT:</b> under your storm drawing, write the numbers: 146 aboard. 2 ashore alive. Then one line: which number is hardest to look at?</div>
+  </section>
+
+  <section class="mission" id="m3">
+    <div class="mission-top"><span class="mnum">3</span><h2>Plot the Wreck</h2></div>
+    <div class="meta">~30 minutes · pairs · grid sheet + one Chromebook per pair</div>
+    <p>The Whydah is still there. Under the sand, off a beach called Marconi. We know exactly where because of maps. Now you plot it yourself.</p>
+    <ol class="hunt">
+      <li>On your grid sheet, plot the point <b>41.891 N, 69.957 W</b>. Latitude first. Take your time.</li>
+      <li>Label it: <b>WHYDAH · April 26, 1717.</b> Sketch the Cape Cod coastline around it if you can.</li>
+      <li>Now check yourself. Open the maps tab. Find Wellfleet on Cape Cod. Does your point sit just off that outer shore?</li>
+      <li>Scroll to the <b>live beach cams</b>. That is Marconi Beach right now, this minute. Same sand. The wreck lies out past the surf in that picture.</li>
+    </ol>
+    <a class="btn" href="whydah-dashboard.html#maps-geo" target="_blank" rel="noopener">Open the maps + live cams →</a>
+    <p>One more thing, and it is the good part. In 1984 a diver named <b>Barry Clifford</b> found the Whydah. His treasure map was Cyprian Southack's chart from 1717. <b>You just plotted the same coordinates Clifford used.</b> A 267-year-old map found the only proven pirate wreck on Earth.</p>
+    <div class="log"><b>LOG IT:</b> your point, plotted and labeled. Under it, one line: what did a map do here that nothing else could?</div>
+    <p class="bonus">Fast finishers: Mission 5 is open. Read its briefing first. It has rules today.</p>
+  </section>
+
+  <section class="mission" id="m4">
+    <div class="mission-top"><span class="mnum">4</span><h2>After. The Coda.</h2></div>
+    <div class="meta">8 minutes · listen first, pencils down · then write</div>
+    <p>Your teacher tells this part out loud. It is short. It is true. Listen, then write.</p>
+    <div class="log">
+      <p style="font-family:Georgia,serif; font-size:1.08em; font-style:italic; margin:.2em 0;">The survivors went to Boston in chains. In October, eight men stood trial: Davis of the Whydah, and seven of Bellamy's men taken off the wrecked Mary Anne. Six of the Mary Anne men were found guilty. On November 15, 1717, they were hanged at Charlestown, by the water's edge. The minister Cotton Mather walked with them from the prison to the gallows. He called it a long and sad walk. Two men went free: the court ruled that Davis and Thomas South had been forced into piracy. And John Julian, the sixteen-year-old pilot who lived through the wreck, was never tried at all. He was sold into slavery in Boston. The wreck spared him. The system did not.</p>
+      <p class="note" style="margin-top:.5em;">The trial, the hangings, and the long sad walk come from the 1717 court records and Mather's own diary. Julian's sale shows up in Boston records later.</p>
+    </div>
+    <p>Now the oldest truth of the day. The wreck lies off <b>Punonakanit land. Wampanoag territory.</b> People lived on that shore for thousands of years before any of these ships, and the Wampanoag are still here today. Yet in everything written down in 1717, the trial, the letters, the maps, their voice is missing. Not lost. Never written down. We say that plainly, because a record with a hole in it is evidence too.</p>
+    <div class="log"><b>WRITE IT:</b> on your AFTER page, write a land acknowledgment in your own words. Two or three sentences. Name whose land it is. Name whose voice the record left out.</div>
+    <p class="note">No race on this mission. Some pages you fill quietly.</p>
+  </section>
+
+  <section class="mission" id="m5">
+    <div class="mission-top"><span class="mnum">5</span><h2>The Legend Hunt</h2></div>
+    <div class="meta">fast finishers during Mission 3 · maybe all together at the end · pairs</div>
+    <p>Our site has a game. <b>Black Sam and the Whydah.</b> Max built it. It walks Bellamy's whole road, 1715 to 1717, and it calls itself true-ish. Today you find out exactly how true.</p>
+    <p>First, the rule of the day. We just spent the morning with the real people. So the game gets played with respect: you go in as a <b>HISTORIAN</b>, not a player. Winning is not the mission. Catching it is.</p>
+    <ol class="hunt">
+      <li>Open the game. If it offers <b>Continue</b>, take it. You are closer to the storm. If not, start fresh and move with purpose.</li>
+      <li>As you play, make two catches. Catch one thing the game shows that is <b>DOCUMENTED</b>: it is in the real record. Catch one thing that is <b>LEGEND</b>: a story people tell that no record backs up.</li>
+      <li>Proof or it does not count. For each catch, one line on your AFTER page: what it was, and how you know which pile it goes in. Hint: when you reach an ending, read the <b>What really happened</b> note. The game is honest about its own tall tales.</li>
+    </ol>
+    <a class="btn" href="black-sam/" target="_blank" rel="noopener">Play: Black Sam and the Whydah →</a>
+    <div class="race"><b>LEGEND HUNT:</b> first crew with both catches, labeled RECORD and LEGEND, with a because for each, takes league points. Second crew scores too. Bring your page to the teacher.</div>
+  </section>
+
+  <div class="divider">✦</div>
+
+  <section class="mission" id="reflect">
+    <div class="mission-top"><span class="mnum">✦</span><h2>The Question</h2></div>
+    <div class="meta">2 minutes · think it, write it, or say it. Your call.</div>
+    <p><b>If the Whydah had not wrecked, would we know any of these people's names?</b></p>
+    <p class="note">Sit with it. The storm killed 144 people. The storm is also the only reason anyone wrote their names down. Both things are true.</p>
+  </section>
+
+  <section class="mission" id="person">
+    <div class="mission-top"><span class="mnum">★</span><h2>One Person, One Paragraph</h2></div>
+    <div class="meta">~8 minutes · solo · Page 2, AFTER</div>
+    <p><b>Pick one person who died in the wreck or stood trial. Write a paragraph about who you imagine they were.</b></p>
+    <p>Need a name? The People tab has them. The records give you facts: a home port, an age, a job. Start from the facts. Then imagine the rest, carefully. You practiced telling record from legend an hour ago. Same skill here. This time it is an act of respect.</p>
+    <a class="btn alt" href="whydah-dashboard.html#people" target="_blank" rel="noopener">The people of the Whydah →</a>
+    <div class="log"><b>LOG IT:</b> one paragraph on your AFTER page. Begin with a real fact. End with something you imagine. Label them if it helps: RECORD / IMAGINED.</div>
+  </section>
+
+  <section class="mission" id="log">
+    <div class="mission-top"><span class="mnum">★</span><h2>Captain's Log</h2></div>
+    <div class="meta">5 minutes · solo · in your captain's voice</div>
+    <p>Your adopted ship is out there tonight. Real water, real weather. Every captain alive has heard of a night like April 26, 1717.</p>
+    <div class="log"><b>LOG IT:</b> news of the Whydah reaches your captain. What goes in the log that night? What does your captain swear to never do? Two or three sentences, captain's voice. Date it like a sailor: "22 July 2026." Bottom of the AFTER page.</div>
+  </section>
+
+  <section class="mission" id="close">
+    <div class="mission-top"><span class="mnum">★</span><h2>Chart Your Course</h2></div>
+    <div class="meta">3 minutes · solo · back cover, MY COURSE</div>
+    <p>You are down to two people. Today you watched what one night can do to a name.</p>
+    <ol class="hunt">
+      <li>Look at your two. Did today change how you see either one?</li>
+      <li><b>By Friday, circle ONE.</b> Not final. Circled. Pitch Day is Thursday, July 30. Five class days out.</li>
+    </ol>
+    <p class="note">A circled name is not a cage. It is a heading. You can still adjust later, but from Friday you sail toward someone.</p>
+  </section>
+
+  <div class="vocab">
+    <span class="chip">wreck</span><span class="chip">survivor</span><span class="chip">evidence</span><span class="chip">land acknowledgment</span>
+  </div>
+  <p style="text-align:center; font-size:.92em; color:var(--muted); max-width:660px; margin:0 auto;">
+    <b>wreck</b> = a ship destroyed at sea, and what is left of her afterward ·
+    <b>survivor</b> = a person who lives through something terrible ·
+    <b>evidence</b> = the records and objects that show what really happened ·
+    <b>land acknowledgment</b> = naming whose land you are on, out loud, on purpose
+  </p>
+
+</main>
+
+<footer class="foot">
+  <p><b>Tomorrow:</b> Field Trip 3. Georges Island, a stone fort in the middle of Boston Harbor. The water you have been mapping all month, under your feet.</p>
+  <p style="margin-top:.6em;"><a href="whydah-dashboard.html#overview">⚓ Back to the ship's logbook (dashboard)</a></p>
+</footer>
+
+</body>
+</html>

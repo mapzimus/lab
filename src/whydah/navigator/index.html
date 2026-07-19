@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>Whydah’s Voyage</title>
+    <meta name="description" content="Whydah’s Voyage — live the true 1717 voyage of the Whydah Gally: dive the wrecks, take the ship, fight your way north, and survive the storm." />
+    <meta name="theme-color" content="#0b1620" />
+    <link rel="icon" type="image/png" sizes="32x32" href="../pics/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="../pics/favicon-16.png" />
+    <link rel="icon" href="../favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png" />
+    <link rel="manifest" href="../site.webmanifest" />
+    <link rel="stylesheet" href="game.css" />
+  </head>
+  <body>
+    <div id="game-wrap">
+      <canvas id="scene" aria-label="Whydah’s Voyage — a sailing game. Use arrow keys to steer and space to fire."></canvas>
+    </div>
+
+    <div id="top-controls">
+      <button id="btn-pause" class="mini-btn" type="button" aria-label="Pause">⏸</button>
+      <button id="btn-mute" class="mini-btn" type="button" aria-label="Toggle sound">🔇</button>
+    </div>
+
+    <div id="controls" aria-hidden="true">
+      <div class="ctl-cluster">
+        <button id="btn-left" class="btn" type="button" aria-label="Steer left">◀</button>
+        <button id="btn-right" class="btn" type="button" aria-label="Steer right">▶</button>
+      </div>
+      <div class="ctl-cluster">
+        <button id="btn-blast" class="btn blast" type="button" aria-label="Powder blast">⚡</button>
+        <button id="btn-fire" class="btn fire" type="button" aria-label="Fire">🔥</button>
+      </div>
+    </div>
+
+    <p class="sr-only">Whydah’s Voyage is a sailing adventure game based on the true story of the Whydah Gally. Steer your ship north to Maine, avoid rocks and enemy fire, defeat a sea serpent, play navigator mini-games for points, and try to survive the final storm.</p>
+
+    <script src="game.js"></script>
+  </body>
+</html>

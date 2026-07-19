@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flag Designer Studio</title>
+<meta name="description" content="Design a flag from real vexillological building blocks — divisions, crosses, stars and charges — get live feedback against NAVA's Good Flag / Bad Flag principles, and export crisp SVG or PNG. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --warn:#b8860b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b; --warn:#e2b23a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b; --warn:#e2b23a;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 68ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: var(--sans); }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.copyerr { color: var(--danger); border-color: var(--danger); }
+  .btn.sm { padding: 5px 9px; font-size: .8rem; }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .layout { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr); gap: 18px; align-items: start; }
+  @media (max-width: 900px){ .layout { grid-template-columns: 1fr; } }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .card + .card { margin-top: 16px; }
+  .card h2 { font-size: 1rem; margin: 0 0 12px; letter-spacing: -0.01em; }
+  .card h2 .sub { font-weight: 400; color: var(--muted); font-size: .82rem; margin-left: 6px; }
+
+  /* chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; font-family: var(--sans); }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+  /* flag preview */
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .flagbox { width: 100%; max-width: 520px; }
+  svg.flag { width: 100%; height: auto; display: block; border-radius: 4px; touch-action: none; cursor: default; }
+  svg.flag .charge { cursor: grab; }
+  svg.flag .charge:active { cursor: grabbing; }
+  .previews { display: flex; gap: 18px; align-items: flex-end; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+  .mini { text-align: center; }
+  .mini svg { display: block; }
+  .mini span { font-size: .72rem; color: var(--muted); }
+
+  /* controls */
+  .field { margin-bottom: 12px; }
+  .field > label, .lbl { display: block; font-size: .78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 0 0 6px; }
+  select, input[type="number"], input[type="text"] { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 10px; font-size: .86rem; font-family: var(--sans); max-width: 100%; }
+  select { width: 100%; }
+  input[type="range"] { accent-color: var(--accent); width: 100%; }
+  input[type="color"] { inline-size: 40px; block-size: 30px; padding: 2px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; }
+  .colorslots { display: flex; flex-wrap: wrap; gap: 12px; }
+  .slot { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: .72rem; color: var(--muted); }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .row .grow { flex: 1; min-width: 90px; }
+  .val { font-family: var(--mono); font-size: .78rem; color: var(--muted); min-width: 40px; text-align: right; }
+
+  /* charge palette */
+  .chargepal { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px,1fr)); gap: 6px; }
+  .chargepal button { border: 1px solid var(--border); background: var(--surface); border-radius: 9px; padding: 6px 2px 3px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text); }
+  .chargepal button:hover { border-color: var(--accent); }
+  .chargepal button svg { width: 26px; height: 26px; }
+  .chargepal button small { font-size: .6rem; color: var(--muted); }
+
+  .charge-list { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+  .charge-item { border: 1px solid var(--border); border-radius: 9px; padding: 7px 10px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: .84rem; background: var(--surface); }
+  .charge-item[aria-selected="true"] { border-color: var(--accent); background: var(--surface-2); }
+  .charge-item .sw { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); flex: none; }
+  .charge-item .grow { flex: 1; }
+  .charge-item button { border: none; background: transparent; color: var(--muted); cursor: pointer; font-size: .95rem; padding: 2px 4px; border-radius: 6px; }
+  .charge-item button:hover { color: var(--danger); background: var(--surface-2); }
+  .editor { border: 1px dashed var(--border); border-radius: 9px; padding: 12px; margin-top: 10px; }
+  .editor[hidden] { display: none; }
+
+  /* palette swatches */
+  .swatches { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .swatches .pw { position: relative; width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border); overflow: hidden; cursor: pointer; }
+  .swatches .pw input { position: absolute; inset: -4px; width: 140%; height: 140%; border: none; padding: 0; cursor: pointer; }
+  .swatches .addsw { width: 30px; height: 30px; border: 1px dashed var(--border); border-radius: 7px; background: var(--surface); cursor: pointer; color: var(--muted); font-size: 1.1rem; }
+  .usedcount { font-size: .82rem; color: var(--muted); margin-left: auto; }
+  .usedcount b { color: var(--text); }
+
+  /* nava */
+  .nava-overall { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 9px; background: var(--surface-2); margin-bottom: 12px; font-weight: 600; font-size: .92rem; }
+  .nava-overall .big { font-size: 1.3rem; }
+  .principle { display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid var(--border); }
+  .principle:first-of-type { border-top: none; }
+  .principle .badge { flex: none; width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: .95rem; font-weight: 700; }
+  .badge.ok { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .badge.warn { background: color-mix(in srgb, var(--warn) 22%, transparent); color: var(--warn); }
+  .badge.bad { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+  .badge.info { background: var(--surface-2); color: var(--muted); }
+  .principle .txt strong { display: block; font-size: .86rem; }
+  .principle .txt span { font-size: .8rem; color: var(--muted); }
+
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .exports { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .hint { font-size: .78rem; color: var(--muted); margin: 8px 0 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Flag Designer Studio</h1>
+      <p>Build a flag from real vexillological pieces — fields, crosses, stripes and charges. See it judged live against NAVA's five "Good Flag, Bad Flag" principles, then export crisp SVG or PNG. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="layout">
+    <!-- LEFT: canvas + critique + export -->
+    <div>
+      <div class="card">
+        <div class="row" style="margin-bottom:12px">
+          <span class="lbl" style="margin:0">Aspect ratio</span>
+          <div class="chips" id="ratioChips" style="margin-left:auto"></div>
+        </div>
+        <div class="stage">
+          <div class="flagbox">
+            <svg class="flag" id="flagSvg" role="img" aria-label="Flag preview"></svg>
+          </div>
+          <div class="previews">
+            <div class="mini"><svg id="poleMini" width="150" height="110" aria-hidden="true"></svg><span>On a pole</span></div>
+            <div class="mini"><svg id="waveMini" width="150" height="100" aria-hidden="true"></svg><span>Waving</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>NAVA critique <span class="sub">Good Flag, Bad Flag — updates live</span></h2>
+        <div class="nava-overall" id="navaOverall"></div>
+        <div id="navaList"></div>
+        <p class="hint">Principles from the North American Vexillological Association. The color and simplicity checks are computed; symbolism and distinctiveness are reminders only you can judge.</p>
+      </div>
+
+      <div class="card">
+        <h2>Export &amp; share</h2>
+        <div class="exports">
+          <button class="btn primary" id="dlSvg">⬇ SVG</button>
+          <button class="btn" id="dlPng">⬇ PNG</button>
+          <button class="btn" id="copySvg">⧉ Copy SVG</button>
+          <button class="btn" id="copyLink">🔗 Copy link</button>
+          <span class="note" id="exportNote" style="margin-left:auto"></span>
+        </div>
+        <p class="hint">The link encodes your whole design — anyone who opens it sees the same flag. PNG renders at 1200px wide.</p>
+      </div>
+    </div>
+
+    <!-- RIGHT: building blocks -->
+    <div>
+      <div class="card">
+        <h2>Start from an example</h2>
+        <div class="chips" id="exampleChips"></div>
+      </div>
+
+      <div class="card">
+        <h2>Division <span class="sub">the field layout</span></h2>
+        <div class="field">
+          <label for="divisionSel">Field division</label>
+          <select id="divisionSel"></select>
+        </div>
+        <div class="field" id="stripeField" hidden>
+          <label for="stripeCount">Number of stripes: <span id="stripeVal" class="val"></span></label>
+          <input type="range" id="stripeCount" min="3" max="13" step="1" value="5">
+        </div>
+        <div class="field">
+          <span class="lbl">Colors</span>
+          <div class="colorslots" id="divColors"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Charges <span class="sub">symbols on top · up to 8</span></h2>
+        <div class="chargepal" id="chargePalette"></div>
+        <div class="charge-list" id="chargeList"></div>
+        <div class="note" id="chargeHint" style="margin-top:8px">Click a symbol above to place it, then drag it on the flag to reposition. Select a placed charge to edit size, rotation, color and repeats.</div>
+        <div class="editor" id="chargeEditor" hidden></div>
+      </div>
+
+      <div class="card">
+        <h2>Palette</h2>
+        <div class="row" style="margin-bottom:8px">
+          <div class="swatches" id="swatches"></div>
+          <span class="usedcount">Distinct colors in flag: <b id="distinctCount">0</b></span>
+        </div>
+        <p class="hint">Click a swatch to apply it to the selected charge (or the first field color). Aim for two or three colors total.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app">Nothing you design leaves your browser · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+"use strict";
+const $ = (s)=>document.querySelector(s);
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const esc=(s)=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============ geometry helpers ============ */
+const FW = 300;                 // flag width in flag-space units (constant)
+function ratioH(r){ const [a,b]=r.split(':').map(Number); return FW*(a/b); }  // a:b = height:width
+
+function polyPath(pts){ return 'M'+pts.map(p=>p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' L ')+' Z'; }
+function starPath(spikes, ro, ri){
+  const pts=[]; const step=Math.PI/spikes; let a=-Math.PI/2;
+  for(let i=0;i<spikes*2;i++){ const r=(i%2)?ri:ro; pts.push([Math.cos(a)*r, Math.sin(a)*r]); a+=step; }
+  return polyPath(pts);
+}
+function plusPath(s,t){
+  return polyPath([[-t,-s],[t,-s],[t,-t],[s,-t],[s,t],[t,t],[t,s],[-t,s],[-t,t],[-s,t],[-s,-t],[-t,-t]]);
+}
+function crescent(s,color){
+  const sr=(s*0.82).toFixed(2), cx=(s*0.5).toFixed(2), ss=s.toFixed(2), ns=(-s).toFixed(2), nsr=(-s*0.82).toFixed(2);
+  return `<path fill-rule="evenodd" fill="${color}" d="M 0 ${ns} A ${ss} ${ss} 0 1 0 0 ${ss} A ${ss} ${ss} 0 1 0 0 ${ns} Z M ${cx} ${nsr} A ${sr} ${sr} 0 1 0 ${cx} ${sr} A ${sr} ${sr} 0 1 0 ${cx} ${nsr} Z"/>`;
+}
+
+/* ============ charge catalog ============ */
+const CHARGES = {
+  star5:{ name:'Star', draw:(s,c)=>`<path d="${starPath(5,s,s*0.382)}" fill="${c}"/>` },
+  star6:{ name:'6-star', draw:(s,c)=>`<path d="${starPath(6,s,s*0.577)}" fill="${c}"/>` },
+  circle:{ name:'Disc', draw:(s,c)=>`<circle r="${s.toFixed(2)}" fill="${c}"/>` },
+  ring:{ name:'Ring', draw:(s,c)=>`<circle r="${(s*0.85).toFixed(2)}" fill="none" stroke="${c}" stroke-width="${(s*0.3).toFixed(2)}"/>` },
+  crescent:{ name:'Crescent', draw:(s,c)=>crescent(s,c) },
+  triangle:{ name:'Triangle', draw:(s,c)=>`<path d="${polyPath([[0,-s],[s*0.866,s*0.5],[-s*0.866,s*0.5]])}" fill="${c}"/>` },
+  square:{ name:'Square', draw:(s,c)=>`<rect x="${(-s).toFixed(2)}" y="${(-s).toFixed(2)}" width="${(2*s).toFixed(2)}" height="${(2*s).toFixed(2)}" fill="${c}"/>` },
+  diamond:{ name:'Diamond', draw:(s,c)=>`<path d="${polyPath([[0,-s],[s,0],[0,s],[-s,0]])}" fill="${c}"/>` },
+  cross:{ name:'Cross', draw:(s,c)=>`<path d="${plusPath(s,s*0.34)}" fill="${c}"/>` },
+  sun:{ name:'Sun', draw:(s,c)=>`<g fill="${c}"><path d="${starPath(12,s,s*0.62)}"/><circle r="${(s*0.5).toFixed(2)}"/></g>` },
+  leaf:{ name:'Leaf', draw:(s,c)=>`<g fill="${c}"><path d="${starPath(11,s,s*0.45)}"/><rect x="${(-s*0.06).toFixed(2)}" y="${(s*0.3).toFixed(2)}" width="${(s*0.12).toFixed(2)}" height="${(s*0.62).toFixed(2)}"/></g>` },
+  stripe:{ name:'Bar', draw:(s,c)=>`<rect x="${(-s).toFixed(2)}" y="${(-s*0.2).toFixed(2)}" width="${(2*s).toFixed(2)}" height="${(s*0.4).toFixed(2)}" fill="${c}"/>` },
+};
+const CHARGE_ORDER = Object.keys(CHARGES);
+
+/* ============ division catalog ============ */
+function rect(x,y,w,h,c){ return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}" fill="${c}"/>`; }
+const DIVISIONS = {
+  solid:{ name:'Solid field', slots:['Field'], render:(W,H,c)=>rect(0,0,W,H,c[0]) },
+  vbicolor:{ name:'Vertical bicolor', slots:['Hoist','Fly'], render:(W,H,c)=>rect(0,0,W/2,H,c[0])+rect(W/2,0,W/2,H,c[1]) },
+  vtricolor:{ name:'Vertical tricolor', slots:['Hoist','Center','Fly'], render:(W,H,c)=>rect(0,0,W/3,H,c[0])+rect(W/3,0,W/3,H,c[1])+rect(2*W/3,0,W/3,H,c[2]) },
+  hbicolor:{ name:'Horizontal bicolor', slots:['Top','Bottom'], render:(W,H,c)=>rect(0,0,W,H/2,c[0])+rect(0,H/2,W,H/2,c[1]) },
+  htricolor:{ name:'Horizontal tricolor', slots:['Top','Middle','Bottom'], render:(W,H,c)=>rect(0,0,W,H/3,c[0])+rect(0,H/3,W,H/3,c[1])+rect(0,2*H/3,W,H/3,c[2]) },
+  nordic:{ name:'Nordic cross', slots:['Field','Cross'], render:(W,H,c)=>{ const t=H*0.2, vx=W*0.34; return rect(0,0,W,H,c[0])+rect(0,(H-t)/2,W,t,c[1])+rect(vx-t/2,0,t,H,c[1]); } },
+  greek:{ name:'Greek cross', slots:['Field','Cross'], render:(W,H,c)=>{ const t=H*0.2; return rect(0,0,W,H,c[0])+rect(0,(H-t)/2,W,t,c[1])+rect((W-t)/2,0,t,H,c[1]); } },
+  saltire:{ name:'Saltire (X)', slots:['Field','Saltire'], render:(W,H,c)=>{ const t=H*0.18; return rect(0,0,W,H,c[0])+`<g stroke="${c[1]}" stroke-width="${t.toFixed(2)}"><line x1="0" y1="0" x2="${W}" y2="${H}"/><line x1="0" y1="${H}" x2="${W}" y2="0"/></g>`; } },
+  pale:{ name:'Pale (vertical band)', slots:['Field','Band'], render:(W,H,c)=>rect(0,0,W,H,c[0])+rect(W/3,0,W/3,H,c[1]) },
+  fess:{ name:'Fess (horizontal band)', slots:['Field','Band'], render:(W,H,c)=>rect(0,0,W,H,c[0])+rect(0,H/3,W,H/3,c[1]) },
+  bend:{ name:'Bend (diagonal band)', slots:['Field','Band'], render:(W,H,c)=>{ const t=Math.hypot(W,H)*0.18; return rect(0,0,W,H,c[0])+`<line x1="0" y1="0" x2="${W}" y2="${H}" stroke="${c[1]}" stroke-width="${t.toFixed(2)}"/>`; } },
+  quarterly:{ name:'Quarterly', slots:['Top-hoist','Top-fly','Bottom-hoist','Bottom-fly'], render:(W,H,c)=>rect(0,0,W/2,H/2,c[0])+rect(W/2,0,W/2,H/2,c[1])+rect(0,H/2,W/2,H/2,c[2])+rect(W/2,H/2,W/2,H/2,c[3]) },
+  canton:{ name:'Canton (upper hoist box)', slots:['Field','Canton'], render:(W,H,c)=>rect(0,0,W,H,c[0])+rect(0,0,W*0.4,H*0.54,c[1]) },
+  vstripes:{ name:'Vertical stripes', slots:['Stripe A','Stripe B'], stripes:true, render:(W,H,c,n)=>{ let o=''; const w=W/n; for(let i=0;i<n;i++) o+=rect(i*w,0,w+0.5,H,c[i%2]); return o; } },
+  hstripes:{ name:'Horizontal stripes', slots:['Stripe A','Stripe B'], stripes:true, render:(W,H,c,n)=>{ let o=''; const h=H/n; for(let i=0;i<n;i++) o+=rect(0,i*h,W,h+0.5,c[i%2]); return o; } },
+  bordure:{ name:'Bordure (border)', slots:['Field','Border'], render:(W,H,c)=>{ const t=H*0.1; return rect(0,0,W,H,c[1])+rect(t,t,W-2*t,H-2*t,c[0]); } },
+};
+const DIV_ORDER = Object.keys(DIVISIONS);
+
+/* ============ state ============ */
+const state = {
+  ratio:'2:3',
+  division:'solid',
+  divColors:['#0A3161','#FFD100','#B31942','#FFFFFF'],
+  stripes:5,
+  palette:['#0A3161','#FFFFFF','#B31942','#FFD100','#009543','#111111'],
+  charges:[],
+  sel:null,
+};
+let cidSeq = 1;
+const MAX_CHARGES = 8;
+
+function newCharge(type){
+  const H=ratioH(state.ratio);
+  return { id:cidSeq++, type, x:FW/2, y:H/2, size:Math.min(FW,H)*0.2, rot:0, color:'#FFD100',
+           arr:'single', count:6, gap:FW*0.13, arcR:Math.min(FW,H)*0.28, spread:360, rows:2, cols:3 };
+}
+
+/* ============ charge positions ============ */
+function positions(c){
+  const out=[];
+  if(c.arr==='single'){ out.push([0,0]); }
+  else if(c.arr==='row'){ const n=Math.max(1,c.count|0); for(let i=0;i<n;i++) out.push([(i-(n-1)/2)*c.gap,0]); }
+  else if(c.arr==='ring'){
+    const n=Math.max(1,c.count|0); const full=Math.abs(c.spread-360)<0.5;
+    for(let i=0;i<n;i++){ const deg = full ? (-90 + i*360/n) : (n<=1 ? -90 : (-90 - c.spread/2 + i*c.spread/(n-1)));
+      const a=deg*Math.PI/180; out.push([Math.cos(a)*c.arcR, Math.sin(a)*c.arcR]); }
+  } else if(c.arr==='grid'){
+    const rows=Math.max(1,c.rows|0), cols=Math.max(1,c.cols|0);
+    for(let r=0;r<rows;r++) for(let col=0;col<cols;col++) out.push([(col-(cols-1)/2)*c.gap,(r-(rows-1)/2)*c.gap]);
+  }
+  return out;
+}
+function chargeReach(c){
+  let m=c.size;
+  positions(c).forEach(([dx,dy])=>{ m=Math.max(m, Math.hypot(dx,dy)+c.size); });
+  return m;
+}
+function chargeMarkup(c){
+  const inner = positions(c).map(([dx,dy])=>
+    `<g transform="translate(${dx.toFixed(2)} ${dy.toFixed(2)}) rotate(${c.rot})">${CHARGES[c.type].draw(c.size,c.color)}</g>`
+  ).join('');
+  return `<g class="charge" data-cid="${c.id}" transform="translate(${c.x.toFixed(2)} ${c.y.toFixed(2)})">${inner}</g>`;
+}
+
+/* ============ build flag SVG ============ */
+function usedDivColors(){
+  const d=DIVISIONS[state.division];
+  return d.slots.map((_,i)=>state.divColors[i]);
+}
+function fieldMarkup(W,H){
+  const d=DIVISIONS[state.division];
+  return d.render(W,H,usedDivColors(),state.stripes);
+}
+function allChargesMarkup(){ return state.charges.map(chargeMarkup).join(''); }
+
+function buildInner(W,H){
+  return `<g class="field">${fieldMarkup(W,H)}</g><g class="charges">${allChargesMarkup()}</g>`;
+}
+
+function renderFlag(){
+  const H=ratioH(state.ratio);
+  const svg=$('#flagSvg');
+  svg.setAttribute('viewBox',`0 0 ${FW} ${H}`);
+  let sel='';
+  if(state.sel!=null){
+    const c=state.charges.find(x=>x.id===state.sel);
+    if(c){ const r=chargeReach(c)+6; sel=`<rect class="selbox" x="${(c.x-r).toFixed(2)}" y="${(c.y-r).toFixed(2)}" width="${(2*r).toFixed(2)}" height="${(2*r).toFixed(2)}" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="5 4" pointer-events="none"/>`; }
+  }
+  svg.innerHTML =
+    `<defs><filter id="fdshadow" x="-15%" y="-15%" width="130%" height="140%">`+
+    `<feDropShadow dx="0" dy="${(H*0.02).toFixed(2)}" stdDeviation="${(H*0.02).toFixed(2)}" flood-color="#000" flood-opacity="0.28"/></filter></defs>`+
+    `<g filter="url(#fdshadow)">${buildInner(FW,H)}</g>`+
+    `<rect x="0.5" y="0.5" width="${FW-1}" height="${H-1}" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="1"/>`+
+    `<text x="6" y="14" font-family="sans-serif" font-size="11" fill="rgba(0,0,0,0.45)">hoist</text>`+
+    `<text x="${FW-6}" y="14" text-anchor="end" font-family="sans-serif" font-size="11" fill="rgba(0,0,0,0.45)">fly</text>`+
+    sel;
+  renderMinis(H);
+}
+
+function renderMinis(H){
+  const scale = 130/FW, fh = H*scale;
+  // pole
+  const pm=$('#poleMini');
+  pm.setAttribute('viewBox','0 0 150 110'); pm.setAttribute('width','150'); pm.setAttribute('height','110');
+  pm.innerHTML =
+    `<rect x="6" y="4" width="4" height="104" rx="2" fill="#8a939e"/><circle cx="8" cy="6" r="4" fill="#c9a227"/>`+
+    `<g transform="translate(12,8)"><svg width="130" height="${fh.toFixed(1)}" viewBox="0 0 ${FW} ${H}">${buildInner(FW,H)}<rect x="0.5" y="0.5" width="${FW-1}" height="${H-1}" fill="none" stroke="rgba(0,0,0,0.2)"/></svg></g>`;
+  // wave (animated turbulence displacement)
+  const wm=$('#waveMini');
+  wm.setAttribute('viewBox','0 0 150 100'); wm.setAttribute('width','150'); wm.setAttribute('height','100');
+  wm.innerHTML =
+    `<defs><filter id="fdwave"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="4" result="n">`+
+    `<animate attributeName="baseFrequency" dur="6s" values="0.012 0.02;0.02 0.028;0.012 0.02" repeatCount="indefinite"/></feTurbulence>`+
+    `<feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/></filter></defs>`+
+    `<g filter="url(#fdwave)" transform="translate(6,${((100-fh)/2).toFixed(1)})"><svg width="138" height="${(fh).toFixed(1)}" viewBox="0 0 ${FW} ${H}">${buildInner(FW,H)}</svg></g>`;
+}
+
+function buildExportSVG(){
+  const H=ratioH(state.ratio);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${FW}" height="${H.toFixed(2)}" viewBox="0 0 ${FW} ${H.toFixed(2)}">${buildInner(FW,H)}</svg>`;
+}
+
+/* ============ NAVA critique ============ */
+function distinctColors(){
+  const set=new Set();
+  usedDivColors().forEach(c=>set.add((c||'').toLowerCase()));
+  state.charges.forEach(c=>set.add((c.color||'').toLowerCase()));
+  return set;
+}
+function elementCount(){
+  const divW = state.division==='solid' ? 0 : 1;
+  return divW + state.charges.length;
+}
+function renderNava(){
+  const dc = distinctColors();
+  $('#distinctCount').textContent = dc.size;
+
+  const P=[];
+  // 1 simplicity
+  const ec=elementCount();
+  let s;
+  if(ec<=3) s={b:'✓',cls:'ok',t:'Simple enough to draw from memory.'};
+  else if(ec<=5) s={b:'⚠',cls:'warn',t:`Getting busy (${ec} elements) — could a child redraw it?`};
+  else s={b:'✗',cls:'bad',t:`Too complex (${ec} elements). Strip it back.`};
+  P.push({title:'Keep it simple', ...s});
+  // 2 symbolism
+  P.push({title:'Use meaningful symbolism', b:'ℹ', cls:'info', t:'Only you can judge this — pick shapes & colors that mean something.'});
+  // 3 colors
+  let cc;
+  if(dc.size<=3) cc={b:'✓',cls:'ok',t:`${dc.size} color${dc.size===1?'':'s'} — within the 2–3 ideal.`};
+  else if(dc.size===4) cc={b:'⚠',cls:'warn',t:'4 colors — one over. Try to drop one.'};
+  else cc={b:'✗',cls:'bad',t:`${dc.size} colors — too many. Limit to two or three.`};
+  P.push({title:'Use 2 or 3 colors', ...cc});
+  // 4 lettering/seals
+  P.push({title:'No lettering or seals', b:'✓', cls:'ok', t:'This tool has no text or seal — automatic pass.'});
+  // 5 distinctive
+  P.push({title:'Be distinctive or be related', b:'ℹ', cls:'info', t:'Make it your own — or deliberately echo a related flag.'});
+
+  $('#navaList').innerHTML = P.map(p=>
+    `<div class="principle"><div class="badge ${p.cls}">${p.b}</div><div class="txt"><strong>${esc(p.title)}</strong><span>${esc(p.t)}</span></div></div>`
+  ).join('');
+
+  const good = s.cls!=='bad' && cc.cls!=='bad';
+  const okish = good && s.cls==='ok' && cc.cls==='ok';
+  const ov=$('#navaOverall');
+  if(okish){ ov.innerHTML = `<span class="big">🏆</span> This designs like a good flag.`; ov.style.color='var(--ok)'; }
+  else if(good){ ov.innerHTML = `<span class="big">👍</span> Solid start — mind the warnings.`; ov.style.color='var(--warn)'; }
+  else { ov.innerHTML = `<span class="big">⚑</span> Breaks a core principle — see below.`; ov.style.color='var(--danger)'; }
+}
+
+/* ============ render controls ============ */
+function renderRatioChips(){
+  const opts=[['2:3','2:3'],['1:2','1:2'],['3:5','3:5'],['10:19','10:19 US'],['1:1','1:1'],['11:20','11:20']];
+  $('#ratioChips').innerHTML = opts.map(([v,l])=>`<button class="chip" data-ratio="${v}" aria-pressed="${state.ratio===v}">${l}</button>`).join('');
+}
+function renderDivisionControls(){
+  const sel=$('#divisionSel');
+  if(!sel.options.length) sel.innerHTML = DIV_ORDER.map(k=>`<option value="${k}">${DIVISIONS[k].name}</option>`).join('');
+  sel.value=state.division;
+  const d=DIVISIONS[state.division];
+  $('#stripeField').hidden = !d.stripes;
+  $('#stripeVal').textContent = state.stripes;
+  $('#stripeCount').value = state.stripes;
+  $('#divColors').innerHTML = d.slots.map((label,i)=>
+    `<label class="slot">${esc(label)}<input type="color" data-slot="${i}" value="${state.divColors[i]}" aria-label="${esc(label)} color"></label>`
+  ).join('');
+}
+function chargeGlyph(type){
+  const s=11, H=28;
+  return `<svg viewBox="-14 -14 28 28">${CHARGES[type].draw(s,'currentColor')}</svg>`;
+}
+function renderChargePalette(){
+  $('#chargePalette').innerHTML = CHARGE_ORDER.map(t=>
+    `<button data-add="${t}" title="Add ${CHARGES[t].name}">${chargeGlyph(t)}<small>${esc(CHARGES[t].name)}</small></button>`
+  ).join('');
+}
+function renderChargeList(){
+  const list=$('#chargeList');
+  if(!state.charges.length){ list.innerHTML=''; }
+  else list.innerHTML = state.charges.map(c=>
+    `<div class="charge-item" data-cid="${c.id}" aria-selected="${state.sel===c.id}">`+
+    `<span class="sw" style="background:${c.color}"></span>`+
+    `<span class="grow">${esc(CHARGES[c.type].name)}${c.arr!=='single'?` ×${c.arr==='grid'?(c.rows*c.cols):c.count}`:''}</span>`+
+    `<button data-del="${c.id}" title="Delete" aria-label="Delete charge">✕</button></div>`
+  ).join('');
+  renderChargeEditor();
+}
+function field(label, inner){ return `<div class="field"><span class="lbl">${label}</span>${inner}</div>`; }
+function renderChargeEditor(){
+  const ed=$('#chargeEditor');
+  const c=state.charges.find(x=>x.id===state.sel);
+  if(!c){ ed.hidden=true; ed.innerHTML=''; return; }
+  ed.hidden=false;
+  const H=ratioH(state.ratio);
+  ed.innerHTML =
+    `<div class="row" style="justify-content:space-between"><strong style="font-size:.9rem">Editing: ${esc(CHARGES[c.type].name)}</strong>`+
+    `<button class="btn sm" data-del="${c.id}">Delete</button></div>`+
+    field(`Size <span class="val" id="eSizeV">${Math.round(c.size)}</span>`,
+      `<input type="range" id="eSize" min="4" max="${Math.round(Math.min(FW,H)*0.8)}" value="${Math.round(c.size)}">`)+
+    field(`Rotation <span class="val" id="eRotV">${c.rot}°</span>`,
+      `<input type="range" id="eRot" min="0" max="359" value="${c.rot}">`)+
+    `<div class="row"><label class="slot" style="flex-direction:row;gap:8px">Color <input type="color" id="eColor" value="${c.color}"></label>`+
+      `<div class="grow"><span class="lbl" style="margin-bottom:2px">Arrange</span>`+
+      `<select id="eArr">`+
+      ['single','row','ring','grid'].map(a=>`<option value="${a}" ${c.arr===a?'selected':''}>${a}</option>`).join('')+
+      `</select></div></div>`+
+    (c.arr==='row'? field(`Count <span class="val">${c.count}</span>`,`<input type="range" id="eCount" min="2" max="15" value="${c.count}">`)+field(`Spacing`,`<input type="range" id="eGap" min="4" max="${Math.round(FW*0.5)}" value="${Math.round(c.gap)}">`):'')+
+    (c.arr==='ring'? field(`Count <span class="val">${c.count}</span>`,`<input type="range" id="eCount" min="2" max="24" value="${c.count}">`)+field(`Radius`,`<input type="range" id="eArcR" min="6" max="${Math.round(Math.min(FW,H)*0.5)}" value="${Math.round(c.arcR)}">`)+field(`Spread <span class="val">${c.spread}°</span>`,`<input type="range" id="eSpread" min="30" max="360" value="${c.spread}">`):'')+
+    (c.arr==='grid'? field(`Rows <span class="val">${c.rows}</span>`,`<input type="range" id="eRows" min="1" max="9" value="${c.rows}">`)+field(`Columns <span class="val">${c.cols}</span>`,`<input type="range" id="eCols" min="1" max="10" value="${c.cols}">`)+field(`Spacing`,`<input type="range" id="eGap" min="4" max="${Math.round(FW*0.3)}" value="${Math.round(c.gap)}">`):'');
+  bindEditor(c);
+}
+function bindEditor(c){
+  const on=(id,fn)=>{ const el=$('#'+id); if(el) el.addEventListener('input',fn); };
+  on('eSize',e=>{ c.size=+e.target.value; $('#eSizeV').textContent=Math.round(c.size); softRender(); });
+  on('eRot',e=>{ c.rot=+e.target.value; $('#eRotV').textContent=c.rot+'°'; softRender(); });
+  on('eColor',e=>{ c.color=e.target.value; renderChargeList(); softRender(); renderNava(); });
+  on('eArr',e=>{ c.arr=e.target.value; renderChargeEditor(); softRender(); renderChargeList(); });
+  on('eCount',e=>{ c.count=+e.target.value; renderChargeEditor(); softRender(); renderChargeList(); });
+  on('eGap',e=>{ c.gap=+e.target.value; softRender(); });
+  on('eArcR',e=>{ c.arcR=+e.target.value; softRender(); });
+  on('eSpread',e=>{ c.spread=+e.target.value; renderChargeEditor(); softRender(); });
+  on('eRows',e=>{ c.rows=+e.target.value; renderChargeEditor(); softRender(); renderChargeList(); });
+  on('eCols',e=>{ c.cols=+e.target.value; renderChargeEditor(); softRender(); renderChargeList(); });
+}
+function renderSwatches(){
+  $('#swatches').innerHTML = state.palette.map((h,i)=>
+    `<span class="pw" title="${h}"><input type="color" data-sw="${i}" value="${h}" aria-label="Palette color ${i+1}"></span>`
+  ).join('') + `<button class="addsw" id="addSw" title="Add swatch" aria-label="Add swatch">+</button>`;
+}
+
+/* soft render = flag + nava + minis without rebuilding right-panel controls */
+function softRender(){ renderFlag(); renderNava(); syncHash(); }
+function fullRender(){ renderRatioChips(); renderDivisionControls(); renderChargeList(); renderSwatches(); renderFlag(); renderNava(); syncHash(); }
+
+/* ============ interactions ============ */
+$('#ratioChips').addEventListener('click',e=>{
+  const b=e.target.closest('[data-ratio]'); if(!b) return;
+  const oldH=ratioH(state.ratio); state.ratio=b.dataset.ratio; const newH=ratioH(state.ratio);
+  const k=newH/oldH; state.charges.forEach(c=>{ c.y=clamp(c.y*k,0,newH); });
+  renderRatioChips(); softRender();
+});
+$('#divisionSel').addEventListener('change',e=>{ state.division=e.target.value; renderDivisionControls(); softRender(); });
+$('#stripeCount').addEventListener('input',e=>{ state.stripes=+e.target.value; $('#stripeVal').textContent=state.stripes; softRender(); });
+$('#divColors').addEventListener('input',e=>{ const s=e.target.dataset.slot; if(s!=null){ state.divColors[+s]=e.target.value; softRender(); } });
+
+$('#chargePalette').addEventListener('click',e=>{
+  const b=e.target.closest('[data-add]'); if(!b) return;
+  if(state.charges.length>=MAX_CHARGES){ flash($('#chargeHint'),'Maximum of 8 charges reached.'); return; }
+  const c=newCharge(b.dataset.add); state.charges.push(c); state.sel=c.id;
+  renderChargeList(); softRender();
+});
+$('#chargeList').addEventListener('click',e=>{
+  const del=e.target.closest('[data-del]');
+  if(del){ e.stopPropagation(); const id=+del.dataset.del; state.charges=state.charges.filter(c=>c.id!==id); if(state.sel===id) state.sel=null; renderChargeList(); softRender(); return; }
+  const item=e.target.closest('[data-cid]'); if(!item) return;
+  state.sel=+item.dataset.cid; renderChargeList(); renderFlag();
+});
+$('#chargeEditor').addEventListener('click',e=>{
+  const del=e.target.closest('[data-del]'); if(!del) return;
+  const id=+del.dataset.del; state.charges=state.charges.filter(c=>c.id!==id); if(state.sel===id) state.sel=null;
+  renderChargeList(); softRender();
+});
+$('#swatches').addEventListener('click',e=>{ if(e.target.id==='addSw'){ state.palette.push('#888888'); renderSwatches(); } });
+$('#swatches').addEventListener('input',e=>{
+  const i=e.target.dataset.sw; if(i==null) return;
+  state.palette[+i]=e.target.value;
+  // apply to selected charge, else first field color
+  const c=state.charges.find(x=>x.id===state.sel);
+  if(c){ c.color=e.target.value; renderChargeList(); } else { state.divColors[0]=e.target.value; renderDivisionControls(); }
+  softRender();
+});
+
+/* ---- dragging charges in flag-space ---- */
+const svgEl=$('#flagSvg');
+let drag=null;
+function clientToFlag(cx,cy){
+  const ctm=svgEl.getScreenCTM(); if(!ctm) return {x:0,y:0};
+  const pt=svgEl.createSVGPoint(); pt.x=cx; pt.y=cy;
+  const r=pt.matrixTransform(ctm.inverse()); return {x:r.x,y:r.y};
+}
+svgEl.addEventListener('pointerdown',e=>{
+  const g=e.target.closest('.charge'); if(!g) return;
+  const id=+g.dataset.cid; state.sel=id; renderChargeList();
+  const c=state.charges.find(x=>x.id===id); if(!c) return;
+  const p=clientToFlag(e.clientX,e.clientY);
+  drag={ id, g, ox:p.x-c.x, oy:p.y-c.y };
+  svgEl.setPointerCapture(e.pointerId); e.preventDefault();
+});
+svgEl.addEventListener('pointermove',e=>{
+  if(!drag) return;
+  const c=state.charges.find(x=>x.id===drag.id); if(!c) return;
+  const H=ratioH(state.ratio);
+  const p=clientToFlag(e.clientX,e.clientY);
+  c.x=clamp(p.x-drag.ox,0,FW); c.y=clamp(p.y-drag.oy,0,H);
+  drag.g.setAttribute('transform',`translate(${c.x.toFixed(2)} ${c.y.toFixed(2)})`);
+  const box=svgEl.querySelector('.selbox');
+  if(box){ const r=chargeReach(c)+6; box.setAttribute('x',(c.x-r).toFixed(2)); box.setAttribute('y',(c.y-r).toFixed(2)); }
+});
+function endDrag(e){ if(!drag) return; try{ svgEl.releasePointerCapture(e.pointerId); }catch(_){}; drag=null; softRender(); }
+svgEl.addEventListener('pointerup',endDrag);
+svgEl.addEventListener('pointercancel',endDrag);
+
+/* ============ export ============ */
+function downloadBlob(blob,name){ const u=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),1500); }
+function flash(el,msg,err){ el.textContent=msg; el.classList.toggle('err',!!err); if(msg) setTimeout(()=>{ if(el.textContent===msg) el.textContent=''; },1800); }
+$('#dlSvg').addEventListener('click',()=>{ downloadBlob(new Blob([buildExportSVG()],{type:'image/svg+xml'}),'flag.svg'); flash($('#exportNote'),'SVG downloaded'); });
+$('#dlPng').addEventListener('click',()=>{
+  const H=ratioH(state.ratio); const svgStr=buildExportSVG();
+  const blob=new Blob([svgStr],{type:'image/svg+xml;charset=utf-8'});
+  const url=URL.createObjectURL(blob); const img=new Image();
+  img.onload=()=>{ const cw=1200, ch=Math.round(1200*H/FW); const cv=document.createElement('canvas'); cv.width=cw; cv.height=ch;
+    const ctx=cv.getContext('2d'); ctx.drawImage(img,0,0,cw,ch);
+    cv.toBlob(b=>{ downloadBlob(b,'flag.png'); URL.revokeObjectURL(url); flash($('#exportNote'),'PNG downloaded'); },'image/png'); };
+  img.onerror=()=>{ URL.revokeObjectURL(url); flash($('#exportNote'),'PNG export failed',true); };
+  img.src=url;
+});
+$('#copySvg').addEventListener('click',async e=>{ try{ await navigator.clipboard.writeText(buildExportSVG()); mark(e.currentTarget); flash($('#exportNote'),'SVG markup copied'); }catch(_){ flash($('#exportNote'),'Copy blocked',true); } });
+$('#copyLink').addEventListener('click',async e=>{ syncHash(); try{ await navigator.clipboard.writeText(location.href); mark(e.currentTarget); flash($('#exportNote'),'Shareable link copied'); }catch(_){ flash($('#exportNote'),'Copy blocked',true); } });
+function mark(btn){ btn.classList.add('copied'); setTimeout(()=>btn.classList.remove('copied'),1100); }
+
+/* ============ share hash ============ */
+function encodeState(){
+  const p={ r:state.ratio, d:state.division, c:state.divColors, s:state.stripes, p:state.palette,
+    g:state.charges.map(c=>({t:c.type,x:Math.round(c.x),y:Math.round(c.y),z:Math.round(c.size),o:c.rot,k:c.color,a:c.arr,n:c.count,gp:Math.round(c.gap),ar:Math.round(c.arcR),sp:c.spread,rw:c.rows,cl:c.cols})) };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(p))));
+}
+function syncHash(){ try{ history.replaceState(null,'','#'+encodeState()); }catch(_){} }
+function decodeState(h){
+  try{
+    const p=JSON.parse(decodeURIComponent(escape(atob(h))));
+    if(!p||!DIVISIONS[p.d]) return false;
+    state.ratio=p.r||'2:3'; state.division=p.d; state.divColors=(p.c&&p.c.length?p.c:state.divColors).slice(0,4);
+    while(state.divColors.length<4) state.divColors.push('#cccccc');
+    state.stripes=p.s||5; if(Array.isArray(p.p)&&p.p.length) state.palette=p.p;
+    state.charges=(p.g||[]).filter(c=>CHARGES[c.t]).map(c=>({ id:cidSeq++, type:c.t, x:+c.x, y:+c.y, size:+c.z, rot:+c.o||0, color:c.k||'#FFD100', arr:c.a||'single', count:+c.n||6, gap:+c.gp||FW*0.13, arcR:+c.ar||60, spread:+c.sp||360, rows:+c.rw||2, cols:+c.cl||3 }));
+    state.sel=null;
+    return true;
+  }catch(_){ return false; }
+}
+
+/* ============ examples ============ */
+const EXAMPLES = {
+  'Nordic':()=>{ state.ratio='2:3'; state.division='nordic'; state.divColors=['#005b99','#ffd200','#005b99','#fff']; state.charges=[]; state.sel=null; },
+  'Tricolor':()=>{ state.ratio='2:3'; state.division='vtricolor'; state.divColors=['#0055A4','#FFFFFF','#EF4135','#fff']; state.charges=[]; state.sel=null; },
+  'Star ring (EU)':()=>{ state.ratio='2:3'; state.division='solid'; state.divColors=['#003399','#fff','#fff','#fff'];
+    const H=ratioH('2:3'); state.charges=[{ id:cidSeq++, type:'star5', x:FW/2, y:H/2, size:H*0.09, rot:0, color:'#FFCC00', arr:'ring', count:12, gap:40, arcR:H*0.33, spread:360, rows:2, cols:3 }]; state.sel=state.charges[0].id; },
+  'Star grid (US)':()=>{ state.ratio='10:19'; state.division='hstripes'; state.stripes=13; state.divColors=['#B31942','#FFFFFF','#B31942','#fff'];
+    const H=ratioH('10:19'); state.charges=[
+      { id:cidSeq++, type:'square', x:FW*0.2, y:H*0.27, size:H*0.27, rot:0, color:'#0A3161', arr:'single', count:1, gap:40, arcR:60, spread:360, rows:1, cols:1 },
+      { id:cidSeq++, type:'star5', x:FW*0.2, y:H*0.27, size:H*0.028, rot:0, color:'#FFFFFF', arr:'grid', count:6, gap:FW*0.033, arcR:60, spread:360, rows:5, cols:6 }
+    ]; state.sel=null; },
+};
+function renderExamples(){ $('#exampleChips').innerHTML = Object.keys(EXAMPLES).map(k=>`<button class="chip" data-ex="${esc(k)}">${esc(k)}</button>`).join(''); }
+$('#exampleChips').addEventListener('click',e=>{ const b=e.target.closest('[data-ex]'); if(!b) return; EXAMPLES[b.dataset.ex](); fullRender(); });
+
+/* ============ theme ============ */
+const root=document.documentElement;
+const savedTheme=localStorage.getItem('max-theme');
+if(savedTheme) root.setAttribute('data-theme',savedTheme);
+$('#themeBtn').addEventListener('click',()=>{
+  const cur=root.getAttribute('data-theme');
+  const isDark=cur?cur==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next=isDark?'light':'dark';
+  root.setAttribute('data-theme',next); localStorage.setItem('max-theme',next);
+});
+
+/* ============ debug hook (for tests) ============ */
+window.flagDebug = { state, buildExportSVG, distinctColors, elementCount, ratioH };
+
+/* ============ boot ============ */
+(function boot(){
+  renderRatioChips(); renderChargePalette(); renderExamples();
+  const h=location.hash.replace(/^#/,'');
+  if(h && decodeState(h)){ fullRender(); }
+  else { EXAMPLES['Star ring (EU)'](); fullRender(); }
+})();
+</script>
+</body>
+</html>

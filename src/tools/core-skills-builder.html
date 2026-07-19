@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core Skills Builder</title>
+<meta name="description" content="Practice fraction arithmetic, simplifying fractions, GCF, LCM, order of operations, and prime factorization with instant feedback, step-by-step solutions, and a running score. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+
+  .label { font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 6px; font-weight: 600; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 7px 14px; font-weight: 600; font-size: .82rem; font-family: inherit; }
+  .pill:hover { border-color: var(--accent); color: var(--accent); }
+  .pill[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .pill:focus-visible, .btn:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 26px 22px; text-align: center; margin: 16px 0;
+  }
+  .prompt { color: var(--muted); font-size: .95rem; margin-bottom: 8px; }
+  .problem { font-size: 2.1rem; font-weight: 800; color: var(--accent); line-height: 1.3; overflow-wrap: anywhere; }
+  .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 3px; line-height: 1.1; }
+  .frac .num { border-bottom: 3px solid var(--accent); padding: 0 4px 1px; }
+  .frac .den { padding: 1px 4px 0; }
+
+  .answerrow { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+  input[type=number] { width: 110px; padding: 11px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 9px; font-size: 1.15rem; text-align: center; font-family: var(--mono); }
+  .frac-input { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .frac-input .bar-div { width: 90px; height: 3px; background: var(--accent); }
+  .frac-input input { width: 90px; padding: 8px; font-size: 1.05rem; }
+
+  .feedback { min-height: 1.6em; font-weight: 700; margin-top: 12px; font-size: 1.05rem; }
+  .feedback.ok { color: var(--ok); }
+  .feedback.no { color: var(--danger); }
+  .reveal { margin-top: 10px; color: var(--text); font-size: .93rem; line-height: 1.6; text-align: left; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; display: none; }
+  .reveal b { color: var(--accent); }
+
+  .controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .score { text-align: center; color: var(--muted); font-size: .85rem; margin-top: 16px; }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  @media (max-width: 480px) {
+    .problem { font-size: 1.7rem; }
+    .card { padding: 20px 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← max</a>
+      <h1>Core Skills Builder</h1>
+      <p>Drill fraction arithmetic, simplifying fractions, GCF, LCM, order of operations, and prime factorization. Pick a skill and difficulty, answer, and check your work with step-by-step solutions.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="label" id="typesLabel">Skill</div>
+  <div class="pills" id="types" role="group" aria-labelledby="typesLabel">
+    <button class="pill" type="button" data-t="fractions-add" aria-pressed="true">Add Fractions</button>
+    <button class="pill" type="button" data-t="fractions-sub">Subtract Fractions</button>
+    <button class="pill" type="button" data-t="fractions-mul">Multiply Fractions</button>
+    <button class="pill" type="button" data-t="fractions-div">Divide Fractions</button>
+    <button class="pill" type="button" data-t="simplify-frac">Simplify Fractions</button>
+    <button class="pill" type="button" data-t="gcf">GCF</button>
+    <button class="pill" type="button" data-t="lcm">LCM</button>
+    <button class="pill" type="button" data-t="pemdas">Order of Operations</button>
+    <button class="pill" type="button" data-t="prime-factor">Prime Factorization</button>
+  </div>
+
+  <div class="label" id="diffsLabel">Difficulty</div>
+  <div class="pills" id="diffs" role="group" aria-labelledby="diffsLabel">
+    <button class="pill" type="button" data-d="easy" aria-pressed="true">Easy</button>
+    <button class="pill" type="button" data-d="med">Medium</button>
+    <button class="pill" type="button" data-d="hard">Hard</button>
+  </div>
+
+  <div class="card">
+    <div class="prompt" id="prompt">—</div>
+    <div class="problem" id="problem"></div>
+    <div class="answerrow" id="answerrow"></div>
+    <div class="feedback" id="feedback" role="status"></div>
+    <div class="reveal" id="reveal"></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="revealBtn" type="button">Show steps</button>
+    <button class="btn primary" id="next" type="button">Next ›</button>
+  </div>
+  <div class="score" id="score">Answered: 0 · Correct: 0</div>
+
+  <footer class="app">Nothing you answer ever leaves this browser · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var PKEY="max-core-skills-prefs", SKEY="max-core-skills-stats";
+  var prefs={type:"fractions-add",diff:"easy"};
+  var stats={total:0,correct:0};
+  try{var p=JSON.parse(localStorage.getItem(PKEY));if(p)prefs=Object.assign(prefs,p);}catch(e){}
+  try{var s=JSON.parse(localStorage.getItem(SKEY));if(s)stats=Object.assign(stats,s);}catch(e){}
+  var cur=null, answered=false;
+
+  function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+  function savePrefs(){try{localStorage.setItem(PKEY,JSON.stringify(prefs));}catch(e){}}
+  function saveStats(){try{localStorage.setItem(SKEY,JSON.stringify(stats));}catch(e){}}
+
+  function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){var t=b;b=a%b;a=t;}return a;}
+  function lcm(a,b){return Math.abs(a*b)/gcd(a,b);}
+  function simplify(n,d){if(d===0)return[n,d];var g=gcd(Math.abs(n),Math.abs(d));if(d<0){n=-n;d=-d;}return[n/g,d/g];}
+  function primes(n){var f=[];for(var i=2;i<=n;i++)while(n%i===0){f.push(i);n/=i;}return f;}
+
+  // fraction display as HTML
+  function fracHtml(n,d){return '<span class="frac"><span class="num">'+n+'</span><span class="den">'+d+'</span></span>';}
+
+  // ranges by difficulty
+  var RANGE={easy:[2,6],med:[2,12],hard:[2,20]};
+  function R(){var r=RANGE[prefs.diff];return[r[0],r[1]];}
+
+  function generate(){
+    var t=prefs.type, r=R(), lo=r[0], hi=r[1];
+    var a,b,c,d,n,g,L,steps;
+    switch(t){
+      case "fractions-add":{
+        a=rnd(lo,hi);b=rnd(lo,hi);c=rnd(lo,hi);d=rnd(lo,hi);
+        L=lcm(b,d);
+        var rn=a*(L/b)+c*(L/d);
+        var rs=simplify(rn,L);
+        steps="LCD of "+b+" and "+d+" = "+L+"<br>"+
+              fracHtml(a,b)+" = "+fracHtml(a*(L/b),L)+" &nbsp; "+
+              fracHtml(c,d)+" = "+fracHtml(c*(L/d),L)+"<br>"+
+              "Add numerators: "+fracHtml(rn,L);
+        if(rs[1]!==L||rs[0]!==rn) steps+=" = "+fracHtml(rs[0],rs[1])+" (simplified)";
+        return{prompt:"Add the fractions:",q:fracHtml(a,b)+" + "+fracHtml(c,d),
+               fracAns:true,an:rs[0],ad:rs[1],steps:steps};}
+
+      case "fractions-sub":{
+        a=rnd(lo,hi);b=rnd(lo,hi);c=rnd(lo,hi);d=rnd(lo,hi);
+        L=lcm(b,d);
+        var rn2=a*(L/b)-c*(L/d);
+        var rs2=simplify(rn2,L);
+        steps="LCD of "+b+" and "+d+" = "+L+"<br>"+
+              fracHtml(a,b)+" = "+fracHtml(a*(L/b),L)+" &nbsp; "+
+              fracHtml(c,d)+" = "+fracHtml(c*(L/d),L)+"<br>"+
+              "Subtract numerators: "+fracHtml(rn2,L);
+        if(rs2[1]!==L||rs2[0]!==rn2) steps+=" = "+fracHtml(rs2[0],rs2[1])+" (simplified)";
+        return{prompt:"Subtract the fractions:",q:fracHtml(a,b)+" − "+fracHtml(c,d),
+               fracAns:true,an:rs2[0],ad:rs2[1],steps:steps};}
+
+      case "fractions-mul":{
+        a=rnd(lo,hi);b=rnd(lo,hi);c=rnd(lo,hi);d=rnd(lo,hi);
+        var mn=a*c,md=b*d,ms=simplify(mn,md);
+        steps="Multiply straight across: "+fracHtml(a+"×"+c,b+"×"+d)+" = "+fracHtml(mn,md);
+        if(ms[0]!==mn||ms[1]!==md) steps+=" = "+fracHtml(ms[0],ms[1])+" (simplified)";
+        return{prompt:"Multiply the fractions:",q:fracHtml(a,b)+" × "+fracHtml(c,d),
+               fracAns:true,an:ms[0],ad:ms[1],steps:steps};}
+
+      case "fractions-div":{
+        a=rnd(lo,hi);b=rnd(lo,hi);c=rnd(lo,hi);d=rnd(lo,hi);
+        var dn=a*d,dd=b*c,ds=simplify(dn,dd);
+        steps="Multiply by the reciprocal: "+fracHtml(a,b)+" × "+fracHtml(d,c)+" = "+fracHtml(dn,dd);
+        if(ds[0]!==dn||ds[1]!==dd) steps+=" = "+fracHtml(ds[0],ds[1])+" (simplified)";
+        return{prompt:"Divide the fractions:",q:fracHtml(a,b)+" ÷ "+fracHtml(c,d),
+               fracAns:true,an:ds[0],ad:ds[1],steps:steps};}
+
+      case "simplify-frac":{
+        g=rnd(lo,Math.min(hi,8));a=rnd(2,8);b=rnd(2,8);while(b===a)b=rnd(2,8);
+        var fn=a*g,fd=b*g,fs=simplify(fn,fd);
+        var realG=gcd(fn,fd);
+        steps="GCF of "+fn+" and "+fd+" = "+realG+"<br>Divide both by "+realG+": "+fracHtml(fs[0],fs[1]);
+        return{prompt:"Simplify the fraction:",q:fracHtml(fn,fd),
+               fracAns:true,an:fs[0],ad:fs[1],steps:steps};}
+
+      case "gcf":{
+        a=rnd(lo,hi);b=rnd(lo,hi);g=gcd(a,b);
+        var fa=[];for(var i=1;i<=a;i++)if(a%i===0)fa.push(i);
+        var fb=[];for(var j=1;j<=b;j++)if(b%j===0)fb.push(j);
+        steps="Factors of "+a+": "+fa.join(", ")+"<br>Factors of "+b+": "+fb.join(", ")+"<br><b>GCF = "+g+"</b>";
+        return{prompt:"Find the GCF:",q:"GCF("+a+", "+b+")",fracAns:false,a:g,steps:steps};}
+
+      case "lcm":{
+        a=rnd(2,prefs.diff==="easy"?8:prefs.diff==="med"?12:18);
+        b=rnd(2,prefs.diff==="easy"?8:prefs.diff==="med"?12:18);
+        var lv=lcm(a,b);
+        var pa=primes(a),pb=primes(b);
+        steps="Prime factors of "+a+": "+pa.join("×")+"<br>Prime factors of "+b+": "+pb.join("×")+"<br><b>LCM = "+lv+"</b>";
+        return{prompt:"Find the LCM:",q:"LCM("+a+", "+b+")",fracAns:false,a:lv,steps:steps};}
+
+      case "pemdas":{
+        // generate a 2-op expression, evaluate with real operator precedence (× before +/−)
+        var ops=["+","−","×"];
+        var x=rnd(1,9),y=rnd(1,9),z=rnd(1,9),op1=ops[rnd(0,2)],op2=ops[rnd(0,2)];
+        var jsOp=function(o){return o==="×"?"*":o==="−"?"-":"+";};
+        // force at least one × so order-of-operations actually matters
+        if(op1!=="×"&&op2!=="×"){op1="×";}
+        var val=eval(x+jsOp(op1)+y+jsOp(op2)+z);  // eval is safe: all inputs from rnd()
+        steps="Evaluate left-to-right respecting × before +/−:<br><b>"+x+" "+op1+" "+y+" "+op2+" "+z+" = "+val+"</b>";
+        return{prompt:"Evaluate (use order of operations):",q:x+" "+op1+" "+y+" "+op2+" "+z,fracAns:false,a:val,steps:steps};}
+
+      case "prime-factor":{
+        var hi2=prefs.diff==="easy"?30:prefs.diff==="med"?60:100;
+        n=rnd(2,hi2);
+        var pf=primes(n);
+        // ask for number of prime factors (simplest gradeable form)
+        return{prompt:"How many prime factors does "+n+" have? (count with repeats)",
+               q:n,fracAns:false,a:pf.length,steps:"Prime factorization: "+pf.join(" × ")+" → "+pf.length+" factors"};}
+
+      default: return generate();
+    }
+  }
+
+  function buildAnswerRow(c){
+    var row=document.getElementById("answerrow"); row.innerHTML="";
+    if(c.fracAns){
+      var fi=document.createElement("div"); fi.className="frac-input";
+      var ni=document.createElement("input"); ni.type="number"; ni.id="ans-n"; ni.placeholder="num"; ni.inputMode="numeric"; ni.setAttribute("aria-label","Numerator");
+      var bar=document.createElement("div"); bar.className="bar-div";
+      var di=document.createElement("input"); di.type="number"; di.id="ans-d"; di.placeholder="den"; di.inputMode="numeric"; di.setAttribute("aria-label","Denominator");
+      fi.appendChild(ni); fi.appendChild(bar); fi.appendChild(di);
+      row.appendChild(fi);
+      ni.addEventListener("keydown",function(e){if(e.key==="Enter")check();});
+      di.addEventListener("keydown",function(e){if(e.key==="Enter")check();});
+    } else {
+      var inp=document.createElement("input"); inp.type="number"; inp.id="ans-n"; inp.placeholder="Answer"; inp.inputMode="numeric"; inp.setAttribute("aria-label","Your answer");
+      row.appendChild(inp);
+      inp.addEventListener("keydown",function(e){if(e.key==="Enter")check();});
+      inp.focus();
+    }
+    var chk=document.createElement("button"); chk.className="btn primary"; chk.type="button"; chk.textContent="Check";
+    chk.onclick=check; row.appendChild(chk);
+    if(c.fracAns){ var ni2=document.getElementById("ans-n"); if(ni2) ni2.focus(); }
+  }
+
+  function newProblem(){
+    cur=generate(); answered=false;
+    document.getElementById("prompt").textContent=cur.prompt;
+    document.getElementById("problem").innerHTML=cur.q;
+    document.getElementById("feedback").textContent=""; document.getElementById("feedback").className="feedback";
+    document.getElementById("reveal").style.display="none"; document.getElementById("reveal").innerHTML="";
+    buildAnswerRow(cur);
+  }
+
+  function check(){
+    if(!cur||answered) return;
+    var n=document.getElementById("ans-n"), d=document.getElementById("ans-d");
+    if(!n||n.value==="") return;
+    var right;
+    if(cur.fracAns){
+      if(!d||d.value==="") return;
+      var sv=simplify(parseInt(n.value,10),parseInt(d.value,10));
+      var ca=simplify(cur.an,cur.ad);
+      right=(sv[0]===ca[0]&&sv[1]===ca[1]);
+    } else {
+      right=(parseFloat(n.value)===cur.a);
+    }
+    answered=true;
+    stats.total++; if(right) stats.correct++; saveStats(); updateScore();
+    var fb=document.getElementById("feedback");
+    if(right){fb.textContent="✓ Correct!"; fb.className="feedback ok";}
+    else {
+      var ans=cur.fracAns?fracHtml(cur.an,cur.ad):cur.a;
+      fb.innerHTML="✗ Not quite — the answer is <b>"+ans+"</b>"; fb.className="feedback no";
+    }
+    if(cur.steps){var r=document.getElementById("reveal");r.innerHTML=cur.steps;r.style.display="block";}
+  }
+
+  function updateScore(){document.getElementById("score").textContent="Answered: "+stats.total+" · Correct: "+stats.correct;}
+
+  // type pills
+  Array.prototype.forEach.call(document.querySelectorAll("#types button"),function(b){
+    b.setAttribute("aria-pressed",b.getAttribute("data-t")===prefs.type);
+    b.onclick=function(){
+      prefs.type=b.getAttribute("data-t"); savePrefs();
+      Array.prototype.forEach.call(document.querySelectorAll("#types button"),function(x){x.setAttribute("aria-pressed",x===b);});
+      newProblem();
+    };
+  });
+  // diff pills
+  Array.prototype.forEach.call(document.querySelectorAll("#diffs button"),function(b){
+    b.setAttribute("aria-pressed",b.getAttribute("data-d")===prefs.diff);
+    b.onclick=function(){
+      prefs.diff=b.getAttribute("data-d"); savePrefs();
+      Array.prototype.forEach.call(document.querySelectorAll("#diffs button"),function(x){x.setAttribute("aria-pressed",x===b);});
+      newProblem();
+    };
+  });
+
+  document.getElementById("revealBtn").onclick=function(){
+    if(!cur) return;
+    var r=document.getElementById("reveal");
+    r.innerHTML=cur.steps; r.style.display="block";
+  };
+  document.getElementById("next").onclick=newProblem;
+
+  updateScore(); newProblem();
+})();
+
+var root = document.documentElement;
+var savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', function() {
+  var cur = root.getAttribute('data-theme');
+  var isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

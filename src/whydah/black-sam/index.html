@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Captain Bellamy — Run the Whydah</title>
+  <meta name="description" content="Ship management game: play as Samuel Bellamy, give crew orders, and survive the voyage of the Whydah." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="sea-bg" aria-hidden="true">
+    <div class="waves"></div>
+    <div class="vignette"></div>
+  </div>
+
+  <main class="stage" id="stage">
+    <!-- Title -->
+    <section class="card title-card" id="titleCard">
+      <p class="kicker">Ship Command · 1715–1717</p>
+      <h1 class="game-title">Captain<br /><span class="title-name">Bellamy</span></h1>
+      <p class="subtitle">You run the ship. You boss the crew. Short orders — big consequences.</p>
+      <div class="title-actions">
+        <button class="btn btn-primary" id="startBtn">Take Command</button>
+        <button class="btn btn-ghost" id="continueBtn" hidden>Continue Voyage</button>
+        <button class="btn btn-ghost" id="boardBtn">&#9873; Hall of Fame</button>
+      </div>
+      <p class="flourish" aria-hidden="true">&#9875;</p>
+      <p class="hist-note">Manage gold, food, morale, and hull.<br />Tap crew. Give orders. Survive the nor&rsquo;easter.<br />Keys 1–9 pick an order.</p>
+    </section>
+
+    <!-- Captain dashboard -->
+    <section class="card game-card" id="gameCard" hidden>
+      <header class="cmd-hud" role="group" aria-label="Ship status">
+        <div class="cmd-meta">
+          <span class="cmd-phase" id="phaseLabel">Cape Cod</span>
+          <span class="cmd-ship" id="shipLabel">No ship yet</span>
+          <span class="cmd-day" id="dayLabel">Day 1</span>
+        </div>
+        <button class="btn btn-tiny mute-btn" id="muteBtn" title="Toggle sound" aria-pressed="false">&#9834; Sound Off</button>
+      </header>
+
+      <div class="stat-grid" aria-label="Ship resources">
+        <div class="stat-block" data-stat="gold">
+          <div class="stat-top"><span>Gold</span><strong id="valGold">0</strong></div>
+          <div class="bar-track"><div class="bar-fill bar-gold" id="barGold"></div></div>
+        </div>
+        <div class="stat-block" data-stat="food">
+          <div class="stat-top"><span>Food</span><strong id="valFood">0</strong></div>
+          <div class="bar-track"><div class="bar-fill bar-food" id="barFood"></div></div>
+        </div>
+        <div class="stat-block" data-stat="morale">
+          <div class="stat-top"><span>Morale</span><strong id="valMorale">0</strong></div>
+          <div class="bar-track"><div class="bar-fill bar-morale" id="barMorale"></div></div>
+        </div>
+        <div class="stat-block" data-stat="hull">
+          <div class="stat-top"><span>Hull</span><strong id="valHull">0</strong></div>
+          <div class="bar-track"><div class="bar-fill bar-hull" id="barHull"></div></div>
+        </div>
+        <div class="stat-block" data-stat="renown">
+          <div class="stat-top"><span>Renown</span><strong id="valRenown">0</strong></div>
+          <div class="bar-track"><div class="bar-fill bar-renown" id="barRenown"></div></div>
+        </div>
+      </div>
+
+      <div class="scene-art" id="sceneArt" hidden></div>
+
+      <p class="prompt" id="prompt" tabindex="-1"></p>
+      <div id="endingPanel" class="ending-panel" hidden></div>
+
+      <div class="crew-row" id="crewRow" aria-label="Crew — tap for orders"></div>
+
+      <div class="actions" id="actions" role="group" aria-label="Captain orders"></div>
+
+      <div class="log-wrap">
+        <p class="log-title">Captain&rsquo;s log</p>
+        <ul class="captain-log" id="captainLog"></ul>
+      </div>
+
+      <footer class="scene-footer">
+        <button class="btn btn-tiny" id="restartBtn" title="Abandon voyage">Start Over</button>
+        <span class="footer-note" id="footerNote" role="status" aria-live="polite"></span>
+      </footer>
+    </section>
+
+    <!-- Hall of Fame -->
+    <section class="card board-card" id="boardCard" hidden>
+      <p class="kicker">Captain&rsquo;s Log</p>
+      <h2 class="board-title" id="boardTitle" tabindex="-1">Hall of Fame</h2>
+      <div class="board-body" id="boardBody"></div>
+      <footer class="board-footer">
+        <button class="btn btn-primary" id="boardBackBtn">Back to Port</button>
+        <button class="btn btn-tiny" id="boardClearBtn" title="Erase every logged voyage">Clear the Log</button>
+      </footer>
+    </section>
+  </main>
+
+  <script src="js/art.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/minigames.js"></script>
+  <script src="js/campaign.js"></script>
+  <script src="js/scoreboard.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+# Whitelist approach — ignore everything by default, then unignore what should be public
+*
+
+# Files to publish on GitHub Pages
+!index.html
+!whydah-dashboard.html
+!day*.html
+!day-config.js
+!CNAME
+!handouts.html
+!flythrough.html
+!unit-at-a-glance.html
+!curriculum-guide.html
+!README.md
+!.gitignore
+!*.jpg
+!*.jpeg
+!*.png
+!*.svg
+!*.webp
+!*.gif
+
+# Favicon + web app manifest (root-level default lookup paths)
+!favicon.ico
+!site.webmanifest
+
+# Subdirectories for assets
+!pics/
+!pics/**
+
+# The Navigator game (whole folder is public)
+!navigator/
+!navigator/**
+
+# Black Sam & the Whydah game (whole folder is public)
+!black-sam/
+!black-sam/**
+
+# Photography unit (whole folder is public)
+!photo/
+!photo/**
+
+# Stable route for the live unit dashboard
+!unit/
+!unit/**

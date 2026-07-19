@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vacation Selector</title>
+<meta name="description" content="A short adaptive survey that matches you to travel destinations from a curated worldwide set. Fully client-side, no data leaves your browser.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:14px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --shadow-lg:0 2px 6px rgba(16,24,40,.08), 0 12px 32px rgba(16,24,40,.10);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --shadow-lg:0 2px 8px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --shadow-lg:0 2px 8px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 56px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px; }
+
+  /* progress */
+  .progress { margin-bottom: 18px; }
+  .progress .bar { height: 6px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+  .progress .bar > i { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width .25s ease; }
+  .progress .steps { display: flex; justify-content: space-between; margin-top: 8px; gap: 4px; }
+  .progress .steps span { font-size: .74rem; color: var(--muted); flex: 1; text-align: center; }
+  .progress .steps span.on { color: var(--accent); font-weight: 600; }
+  .progress .steps span.done { color: var(--ok); }
+
+  .step h2 { font-size: 1.15rem; margin: 0 0 2px; }
+  .step .sub { color: var(--muted); font-size: .88rem; margin: 0 0 16px; }
+  .q { margin-bottom: 18px; }
+  .q .qlabel { font-weight: 600; font-size: .96rem; margin-bottom: 3px; }
+  .q .qhint { color: var(--muted); font-size: .8rem; margin-bottom: 10px; }
+  .q .qgroup { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; margin: 14px 0 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+    border-radius: 999px; padding: 8px 14px; font-size: .88rem; cursor: pointer; user-select: none;
+    display: inline-flex; align-items: center; gap: 6px; transition: border-color .1s, background .1s, color .1s;
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+  .nav { display: flex; gap: 10px; align-items: center; margin-top: 22px; }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 10px; padding: 11px 18px; font-size: .92rem; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .nav .spacer { flex: 1; }
+  .note { color: var(--danger); font-size: .84rem; min-height: 1.1em; }
+
+  /* results */
+  .results-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 16px; flex-wrap: wrap; }
+  .results-head h2 { margin: 0; font-size: 1.2rem; }
+  .results-head .ctrls { display: flex; gap: 8px; align-items: center; }
+  select { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 10px; font-size: .84rem; font-family: var(--sans); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+  .rcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; transition: transform .12s, box-shadow .12s; }
+  .rcard:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .photo { position: relative; aspect-ratio: 16/10; background: linear-gradient(135deg, hsl(var(--h,210) 70% 55%), hsl(calc(var(--h,210) + 40) 70% 45%)); display: flex; align-items: center; justify-content: center; }
+  .photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .photo .flag { font-size: 2.6rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,.35)); }
+  .photo .match { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,.62); color: #fff; font-size: .78rem; font-weight: 700; padding: 4px 9px; border-radius: 999px; backdrop-filter: blur(3px); z-index: 2; }
+  .photo .rank { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,.92); color: #111; font-size: .74rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; z-index: 2; }
+  .photo .kill { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,.55); color:#fff; border:none; width: 28px; height: 28px; border-radius: 999px; cursor: pointer; font-size: .9rem; z-index: 2; }
+  .photo .kill:hover { background: var(--danger); }
+  .rbody { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .rbody h3 { margin: 0; font-size: 1.08rem; }
+  .rbody h3 .country { color: var(--muted); font-weight: 500; font-size: .86rem; }
+  .rbody .blurb { margin: 0; color: var(--muted); font-size: .88rem; }
+  .why { display: flex; flex-wrap: wrap; gap: 5px; }
+  .why span { font-size: .72rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; color: var(--text); }
+  .meta { font-size: .8rem; color: var(--muted); margin-top: auto; }
+  .rlinks { display: flex; gap: 8px; margin-top: 6px; }
+  .rlinks a { font-size: .82rem; color: var(--accent); text-decoration: none; border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; }
+  .rlinks a:hover { border-color: var(--accent); }
+  .morewrap { text-align: center; margin-top: 20px; }
+
+  /* shared-link note + budget filter */
+  .shared-note { margin: 0 0 14px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; font-size: .85rem; color: var(--muted); }
+  .filter-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }
+  .filter-row .flabel { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+  .filter-row .chip { padding: 6px 13px; font-family: var(--mono); font-weight: 600; }
+  .filter-row .fnote { font-size: .8rem; color: var(--muted); font-style: italic; }
+  .btn.copied { border-color: var(--ok); color: var(--ok); }
+
+  .hide { display: none !important; }
+  footer.app { margin-top: 24px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Vacation Selector</h1>
+      <p>A few quick questions — each page tailored to your last answers — and you’ll get destinations matched from a curated set of ~80 places worldwide. It all runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <!-- ---- Wizard ---- -->
+  <section class="panel" id="wizardPanel">
+    <div class="progress">
+      <div class="bar"><i id="progBar" style="width:25%"></i></div>
+      <div class="steps" id="progSteps"></div>
+    </div>
+    <div class="step" id="stepBody"></div>
+    <div class="nav">
+      <button class="btn" id="backBtn">← Back</button>
+      <span class="spacer"></span>
+      <span class="note" id="wizNote"></span>
+      <button class="btn primary" id="nextBtn">Next →</button>
+    </div>
+  </section>
+
+  <!-- ---- Results ---- -->
+  <section id="resultsPanel" class="hide">
+    <p class="shared-note hide" id="sharedNote">Loaded from a shared link — answers applied.</p>
+    <div class="results-head">
+      <h2 id="resultsTitle">Your top matches</h2>
+      <div class="ctrls">
+        <select id="sortSel" aria-label="Sort results">
+          <option value="match">Best match</option>
+          <option value="budget">Lowest budget</option>
+          <option value="az">A–Z</option>
+        </select>
+        <button class="btn" id="shareBtn">🔗 Share result</button>
+        <button class="btn" id="retakeBtn">↺ Start over</button>
+      </div>
+    </div>
+    <div class="filter-row" id="budgetFilter" role="group" aria-label="Filter shown matches by budget tier">
+      <span class="flabel">Budget</span>
+      <button type="button" class="chip" aria-pressed="true" data-tier="1" aria-label="Show budget ($) destinations">$</button>
+      <button type="button" class="chip" aria-pressed="true" data-tier="2" aria-label="Show mid-range ($$) destinations">$$</button>
+      <button type="button" class="chip" aria-pressed="true" data-tier="3" aria-label="Show luxury ($$$) destinations">$$$</button>
+      <span class="fnote hide" id="budgetNote">No matches at this budget — showing all</span>
+    </div>
+    <div class="cards" id="cards"></div>
+    <div class="morewrap"><button class="btn" id="moreBtn">Show more matches</button></div>
+  </section>
+
+  <footer class="app">Suggestions are a starting point, not booking advice · a <strong>max</strong> tool</footer>
+</div>
+
+<script type="module">
+/* ============================================================
+   Vacation Selector — adaptive multi-step survey, no deps.
+   ============================================================ */
+const $ = (s) => document.querySelector(s);
+
+// ---------- labels ----------
+const VIBE = { beach:'Beach & relax', adventure:'Adventure & outdoors', culture:'Culture & history', food:'Food & drink', nightlife:'City & nightlife', nature:'Nature & wildlife' };
+const CLIMATE = { warm:'Warm & tropical', mild:'Mild & temperate', cold:'Cold & snowy' };
+const BUDGET = { 1:'Budget', 2:'Mid-range', 3:'Luxury' };
+const COMP = { solo:'solo travel', couple:'couples', family:'families', friends:'groups of friends' };
+const SEASON = { spring:'spring', summer:'summer', autumn:'autumn', winter:'winter' };
+const REGION = { americas:'Americas', europe:'Europe', asia:'Asia', africa:'Africa', mideast:'Middle East', oceania:'Oceania' };
+const TRIP = { weekend:'a weekend', week:'about a week', long:'two weeks+' };
+const CROWD = { hidden:'off-the-beaten-path', mix:'a mix', iconic:'bucket-list icons' };
+const TAG = { beaches:'Beaches', wellness:'Spa & wellness', diving:'Diving & snorkelling', islands:'Island-hopping', surfing:'Surf & water sports', hiking:'Hiking & trekking', skiing:'Skiing & snow', safari:'Safari', roadtrip:'Road trips', wildlife:'Wildlife', mountains:'Mountains', forests:'Forests & falls', reefs:'Reefs & islands', museums:'Museums & art', history:'Ancient history', architecture:'Architecture', festivals:'Festivals & events', streetfood:'Street food', foodie:'Fine dining', wine:'Wine & vineyards', nightlife:'Nightlife', shopping:'Shopping' };
+
+// sub-interests offered per chosen vibe (adaptive page 3)
+const SUB = {
+  beach:      [['beaches','🏖️ Lively beaches'],['wellness','🧖 Spa & relaxation'],['diving','🤿 Snorkel & dive'],['islands','⛵ Island-hopping'],['surfing','🏄 Surf']],
+  adventure:  [['hiking','🥾 Hiking & trekking'],['skiing','🎿 Skiing & snow'],['surfing','🌊 Water sports'],['safari','🦁 Safari & wildlife'],['roadtrip','🚗 Road trips']],
+  culture:    [['museums','🖼️ Museums & art'],['history','🏺 Ancient history'],['architecture','🏛️ Architecture'],['festivals','🎉 Festivals']],
+  food:       [['streetfood','🥡 Street food'],['foodie','🍽️ Fine dining'],['wine','🍷 Wine & vineyards']],
+  nightlife:  [['nightlife','🌃 Nightlife & bars'],['festivals','🎪 Events & festivals'],['shopping','🛍️ Shopping']],
+  nature:     [['wildlife','🐘 Wildlife'],['mountains','⛰️ Mountains'],['forests','🌲 Forests & waterfalls'],['reefs','🐠 Reefs & islands']],
+};
+
+// ---------- answers ----------
+const answers = { companions:null, trip:null, season:null, vibes:[], fine:[], climate:null, budget:null, crowd:null, region:'anywhere' };
+
+// ---------- destinations ----------
+// cl warm|mild|cold · cost 1-3 · crowd 1 hidden…3 iconic · trip suitable lengths
+const D = [
+ // Americas
+ {n:'Cancún',c:'Mexico',fl:'🇲🇽',rg:'americas',cl:'warm',cost:2,vibes:['beach','nightlife'],tags:['beaches','diving','nightlife'],good:['couple','friends','family'],seasons:['winter','spring'],months:'Dec–Apr',bud:'$70–150',h:190,kw:'cancun,beach',crowd:3,trip:['weekend','week'],blurb:'Caribbean beaches, cenotes and Maya ruins.'},
+ {n:'Tulum',c:'Mexico',fl:'🇲🇽',rg:'americas',cl:'warm',cost:2,vibes:['beach','nature'],tags:['beaches','wellness','diving','history'],good:['couple','friends'],seasons:['winter','spring'],months:'Nov–Mar',bud:'$70–160',h:175,kw:'tulum,beach',crowd:2,trip:['weekend','week'],blurb:'Bohemian beach town with cliffside ruins.'},
+ {n:'Mexico City',c:'Mexico',fl:'🇲🇽',rg:'americas',cl:'mild',cost:1,vibes:['culture','food','nightlife'],tags:['museums','streetfood','history','nightlife'],good:['solo','couple','friends'],seasons:['spring','autumn'],months:'Mar–May / Sep–Nov',bud:'$45–110',h:355,kw:'mexico,city',crowd:2,trip:['weekend','week'],blurb:'Street tacos, murals and world-class museums.'},
+ {n:'Banff',c:'Canada',fl:'🇨🇦',rg:'americas',cl:'cold',cost:2,vibes:['nature','adventure'],tags:['hiking','mountains','skiing','wildlife'],good:['couple','family','friends'],seasons:['summer','winter'],months:'Jun–Sep / Dec–Mar',bud:'$90–180',h:205,kw:'banff,mountains',crowd:3,trip:['week','long'],blurb:'Turquoise lakes and the Canadian Rockies.'},
+ {n:'Vancouver',c:'Canada',fl:'🇨🇦',rg:'americas',cl:'mild',cost:2,vibes:['nature','food','nightlife'],tags:['mountains','foodie','forests'],good:['couple','friends','solo'],seasons:['summer','autumn'],months:'Jun–Sep',bud:'$100–190',h:200,kw:'vancouver,canada',crowd:2,trip:['weekend','week'],blurb:'Sea-to-sky city between ocean and mountains.'},
+ {n:'Quebec City',c:'Canada',fl:'🇨🇦',rg:'americas',cl:'cold',cost:2,vibes:['culture','food'],tags:['history','architecture','foodie'],good:['couple','family'],seasons:['winter','autumn'],months:'Dec–Mar / Sep–Oct',bud:'$90–170',h:230,kw:'quebec,city',crowd:2,trip:['weekend','week'],blurb:'Cobblestoned old town with French-Canadian charm.'},
+ {n:'Rio de Janeiro',c:'Brazil',fl:'🇧🇷',rg:'americas',cl:'warm',cost:2,vibes:['beach','nightlife','culture'],tags:['beaches','nightlife','festivals'],good:['couple','friends'],seasons:['winter','summer'],months:'Dec–Mar',bud:'$50–120',h:140,kw:'rio,beach',crowd:3,trip:['week','long'],blurb:'Iconic beaches, samba and Sugarloaf views.'},
+ {n:'Buenos Aires',c:'Argentina',fl:'🇦🇷',rg:'americas',cl:'mild',cost:1,vibes:['culture','food','nightlife'],tags:['nightlife','foodie','wine','architecture'],good:['couple','friends','solo'],seasons:['spring','autumn'],months:'Sep–Nov / Mar–May',bud:'$45–110',h:260,kw:'buenos,aires',crowd:2,trip:['week','long'],blurb:'Tango, steak and grand European boulevards.'},
+ {n:'Machu Picchu',c:'Peru',fl:'🇵🇪',rg:'americas',cl:'mild',cost:1,vibes:['adventure','culture','nature'],tags:['hiking','history','mountains'],good:['solo','friends','couple'],seasons:['autumn','winter'],months:'May–Sep',bud:'$40–90',h:120,kw:'machu,picchu',crowd:3,trip:['week','long'],blurb:'Inca citadels high in the Andes.'},
+ {n:'Cartagena',c:'Colombia',fl:'🇨🇴',rg:'americas',cl:'warm',cost:1,vibes:['beach','culture','nightlife'],tags:['beaches','history','nightlife','streetfood'],good:['couple','friends'],seasons:['winter','spring'],months:'Dec–Apr',bud:'$45–110',h:30,kw:'cartagena,colombia',crowd:2,trip:['weekend','week'],blurb:'Walled Caribbean city bursting with colour.'},
+ {n:'La Fortuna',c:'Costa Rica',fl:'🇨🇷',rg:'americas',cl:'warm',cost:2,vibes:['nature','adventure'],tags:['forests','wildlife','hiking'],good:['couple','family','friends'],seasons:['winter','spring'],months:'Dec–Apr',bud:'$60–120',h:130,kw:'costa,rica,rainforest',crowd:2,trip:['week','long'],blurb:'Volcanoes, hot springs and cloud-forest wildlife.'},
+ {n:'Patagonia',c:'Argentina',fl:'🇦🇷',rg:'americas',cl:'cold',cost:2,vibes:['adventure','nature'],tags:['hiking','mountains','wildlife'],good:['solo','friends','couple'],seasons:['winter','summer'],months:'Nov–Mar',bud:'$70–140',h:200,kw:'patagonia,mountains',crowd:1,trip:['long'],blurb:'Glaciers, granite peaks and end-of-the-world treks.'},
+ {n:'Galápagos',c:'Ecuador',fl:'🇪🇨',rg:'americas',cl:'warm',cost:3,vibes:['nature','adventure'],tags:['wildlife','diving','reefs'],good:['couple','family','friends'],seasons:['summer','winter'],months:'Jun–Sep / Dec–Feb',bud:'$200–450',h:165,kw:'galapagos,wildlife',crowd:1,trip:['week','long'],blurb:'Up-close wildlife on volcanic islands.'},
+ {n:'Havana',c:'Cuba',fl:'🇨🇺',rg:'americas',cl:'warm',cost:1,vibes:['culture','nightlife'],tags:['history','nightlife','architecture'],good:['couple','friends','solo'],seasons:['winter','spring'],months:'Dec–Apr',bud:'$40–90',h:35,kw:'havana,cuba',crowd:2,trip:['weekend','week'],blurb:'Vintage cars, live music and colonial streets.'},
+ {n:'Kauai',c:'USA',fl:'🇺🇸',rg:'americas',cl:'warm',cost:3,vibes:['beach','nature','adventure'],tags:['beaches','hiking','surfing','forests'],good:['couple','family','friends'],seasons:['spring','summer','autumn'],months:'Apr–Oct',bud:'$150–300',h:150,kw:'kauai,hawaii',crowd:2,trip:['week','long'],blurb:'Emerald cliffs, waterfalls and quiet beaches.'},
+ {n:'New York City',c:'USA',fl:'🇺🇸',rg:'americas',cl:'mild',cost:3,vibes:['nightlife','culture','food'],tags:['museums','nightlife','foodie','shopping'],good:['solo','couple','friends'],seasons:['spring','autumn','winter'],months:'Apr–Jun / Sep–Dec',bud:'$150–300',h:220,kw:'new,york,city',crowd:3,trip:['weekend','week'],blurb:'Museums to Broadway in the city that never sleeps.'},
+ {n:'Yellowstone',c:'USA',fl:'🇺🇸',rg:'americas',cl:'cold',cost:2,vibes:['nature','adventure'],tags:['wildlife','hiking','forests','roadtrip'],good:['family','couple','friends'],seasons:['summer','autumn'],months:'May–Sep',bud:'$90–170',h:45,kw:'yellowstone,park',crowd:3,trip:['week','long'],blurb:'Geysers, canyons and roaming bison.'},
+ {n:'Nashville',c:'USA',fl:'🇺🇸',rg:'americas',cl:'mild',cost:2,vibes:['nightlife','food'],tags:['nightlife','festivals','foodie'],good:['friends','couple'],seasons:['spring','autumn'],months:'Apr–Jun / Sep–Oct',bud:'$90–180',h:15,kw:'nashville,music',crowd:2,trip:['weekend'],blurb:'Live music on every corner and Southern eats.'},
+ {n:'Aruba',c:'Aruba',fl:'🇦🇼',rg:'americas',cl:'warm',cost:2,vibes:['beach'],tags:['beaches','diving','surfing'],good:['couple','family','friends'],seasons:['winter','spring'],months:'Jan–Jun',bud:'$100–200',h:195,kw:'aruba,beach',crowd:2,trip:['week'],blurb:'White sand, turquoise water and year-round sun.'},
+ {n:'Barbados',c:'Barbados',fl:'🇧🇧',rg:'americas',cl:'warm',cost:2,vibes:['beach','food'],tags:['beaches','surfing','foodie'],good:['couple','friends','family'],seasons:['winter','spring'],months:'Dec–May',bud:'$80–170',h:180,kw:'barbados,beach',crowd:2,trip:['week'],blurb:'Rum, flying fish and world-class surf breaks.'},
+ {n:'St Lucia',c:'St Lucia',fl:'🇱🇨',rg:'americas',cl:'warm',cost:3,vibes:['beach','nature','adventure'],tags:['beaches','hiking','wellness','diving'],good:['couple','friends'],seasons:['winter','spring'],months:'Dec–Apr',bud:'$120–250',h:160,kw:'st,lucia,pitons',crowd:2,trip:['week'],blurb:'Volcanic Pitons, rainforest hikes and secluded coves.'},
+ {n:'Medellín',c:'Colombia',fl:'🇨🇴',rg:'americas',cl:'mild',cost:1,vibes:['culture','nightlife','food'],tags:['nightlife','streetfood','architecture'],good:['solo','friends','couple'],seasons:['winter','spring'],months:'Dec–Mar',bud:'$40–90',h:110,kw:'medellin,colombia',crowd:1,trip:['week','long'],blurb:'Spring-like year-round with innovation and nightlife.'},
+ {n:'Santiago',c:'Chile',fl:'🇨🇱',rg:'americas',cl:'mild',cost:2,vibes:['food','culture','adventure'],tags:['wine','foodie','mountains','hiking'],good:['couple','solo','friends'],seasons:['spring','autumn'],months:'Sep–Nov / Mar–May',bud:'$60–130',h:250,kw:'santiago,chile',crowd:2,trip:['week','long'],blurb:'Wine country, Andean peaks and vibrant food.'},
+ // Europe
+ {n:'Paris',c:'France',fl:'🇫🇷',rg:'europe',cl:'mild',cost:3,vibes:['culture','food','nightlife'],tags:['museums','foodie','architecture','shopping'],good:['couple','solo','friends'],seasons:['spring','autumn'],months:'Apr–Jun / Sep–Oct',bud:'$120–250',h:250,kw:'paris,eiffel',crowd:3,trip:['weekend','week'],blurb:'Art, cafés and the most romantic streets.'},
+ {n:'Rome',c:'Italy',fl:'🇮🇹',rg:'europe',cl:'mild',cost:2,vibes:['culture','food'],tags:['history','architecture','foodie'],good:['couple','family','friends'],seasons:['spring','autumn'],months:'Apr–Jun / Sep–Oct',bud:'$90–180',h:20,kw:'rome,colosseum',crowd:3,trip:['weekend','week'],blurb:'Ancient ruins, piazzas and unforgettable pasta.'},
+ {n:'Tuscany',c:'Italy',fl:'🇮🇹',rg:'europe',cl:'mild',cost:2,vibes:['food','nature','culture'],tags:['wine','foodie','roadtrip','history'],good:['couple','family'],seasons:['spring','summer','autumn'],months:'May–Oct',bud:'$90–190',h:80,kw:'tuscany,vineyard',crowd:2,trip:['week','long'],blurb:'Rolling vineyards, hill towns and long lunches.'},
+ {n:'Santorini',c:'Greece',fl:'🇬🇷',rg:'europe',cl:'warm',cost:3,vibes:['beach','food'],tags:['beaches','wellness','foodie'],good:['couple','friends'],seasons:['spring','summer'],months:'May–Sep',bud:'$120–240',h:205,kw:'santorini,greece',crowd:3,trip:['weekend','week'],blurb:'White-washed cliffs over a blue Aegean caldera.'},
+ {n:'Barcelona',c:'Spain',fl:'🇪🇸',rg:'europe',cl:'mild',cost:2,vibes:['nightlife','beach','food','culture'],tags:['architecture','beaches','nightlife','foodie'],good:['friends','couple','solo'],seasons:['spring','summer','autumn'],months:'May–Sep',bud:'$80–170',h:30,kw:'barcelona,gaudi',crowd:3,trip:['weekend','week'],blurb:'Gaudí architecture, tapas and city beaches.'},
+ {n:'Seville',c:'Spain',fl:'🇪🇸',rg:'europe',cl:'warm',cost:1,vibes:['culture','food'],tags:['architecture','history','festivals','foodie'],good:['couple','friends','solo'],seasons:['spring','autumn'],months:'Mar–May / Sep–Oct',bud:'$60–130',h:35,kw:'seville,spain',crowd:2,trip:['weekend','week'],blurb:'Flamenco, Moorish palaces and orange trees.'},
+ {n:'Lisbon',c:'Portugal',fl:'🇵🇹',rg:'europe',cl:'mild',cost:1,vibes:['culture','food','beach'],tags:['history','foodie','beaches','architecture'],good:['solo','couple','friends'],seasons:['spring','summer','autumn'],months:'Apr–Oct',bud:'$60–130',h:40,kw:'lisbon,portugal',crowd:2,trip:['weekend','week'],blurb:'Tiled hills, trams and seafood by the sea.'},
+ {n:'Azores',c:'Portugal',fl:'🇵🇹',rg:'europe',cl:'mild',cost:2,vibes:['nature','adventure'],tags:['hiking','forests','wildlife','diving'],good:['couple','solo','friends'],seasons:['summer','spring'],months:'May–Sep',bud:'$70–140',h:145,kw:'azores,island',crowd:1,trip:['week','long'],blurb:'Green volcanic islands and whale-watching.'},
+ {n:'Iceland',c:'Iceland',fl:'🇮🇸',rg:'europe',cl:'cold',cost:3,vibes:['nature','adventure'],tags:['hiking','forests','roadtrip','wildlife'],good:['couple','friends','solo'],seasons:['summer','winter'],months:'Jun–Aug / Nov–Mar',bud:'$130–250',h:195,kw:'iceland,waterfall',crowd:2,trip:['week','long'],blurb:'Waterfalls, volcanoes and northern lights.'},
+ {n:'Norway Fjords',c:'Norway',fl:'🇳🇴',rg:'europe',cl:'cold',cost:3,vibes:['nature','adventure'],tags:['hiking','mountains','roadtrip','forests'],good:['couple','family','friends'],seasons:['summer'],months:'Jun–Aug',bud:'$130–250',h:210,kw:'norway,fjord',crowd:2,trip:['week','long'],blurb:'Deep fjords, cliffs and midnight sun.'},
+ {n:'Amsterdam',c:'Netherlands',fl:'🇳🇱',rg:'europe',cl:'mild',cost:2,vibes:['nightlife','culture'],tags:['museums','nightlife','architecture'],good:['friends','couple','solo'],seasons:['spring','summer'],months:'Apr–Sep',bud:'$100–190',h:25,kw:'amsterdam,canal',crowd:3,trip:['weekend','week'],blurb:'Canals, great museums and bike-friendly lanes.'},
+ {n:'Swiss Alps',c:'Switzerland',fl:'🇨🇭',rg:'europe',cl:'cold',cost:3,vibes:['adventure','nature'],tags:['skiing','hiking','mountains'],good:['couple','family','friends'],seasons:['summer','winter'],months:'Jun–Sep / Dec–Mar',bud:'$150–280',h:210,kw:'swiss,alps',crowd:2,trip:['week','long'],blurb:'Alpine peaks, glacier trains and ski slopes.'},
+ {n:'Prague',c:'Czechia',fl:'🇨🇿',rg:'europe',cl:'mild',cost:1,vibes:['culture','nightlife'],tags:['history','architecture','nightlife'],good:['friends','couple','solo'],seasons:['spring','autumn'],months:'Apr–Jun / Sep–Oct',bud:'$55–120',h:260,kw:'prague,czech',crowd:2,trip:['weekend','week'],blurb:'Fairy-tale old town and lively beer halls.'},
+ {n:'Budapest',c:'Hungary',fl:'🇭🇺',rg:'europe',cl:'mild',cost:1,vibes:['culture','nightlife'],tags:['history','wellness','nightlife','architecture'],good:['friends','couple','solo'],seasons:['spring','autumn'],months:'Apr–Jun / Sep–Oct',bud:'$50–110',h:300,kw:'budapest,hungary',crowd:2,trip:['weekend','week'],blurb:'Thermal baths, ruin bars and Danube views.'},
+ {n:'Vienna',c:'Austria',fl:'🇦🇹',rg:'europe',cl:'mild',cost:2,vibes:['culture','food'],tags:['museums','architecture','foodie'],good:['couple','family','solo'],seasons:['spring','autumn','winter'],months:'Apr–Oct / Dec',bud:'$90–170',h:340,kw:'vienna,austria',crowd:2,trip:['weekend','week'],blurb:'Imperial palaces, coffee houses and classical music.'},
+ {n:'Edinburgh',c:'Scotland',fl:'🏴',rg:'europe',cl:'cold',cost:2,vibes:['culture','adventure'],tags:['history','festivals','hiking'],good:['couple','friends','solo'],seasons:['summer','autumn'],months:'May–Sep',bud:'$90–170',h:230,kw:'edinburgh,castle',crowd:2,trip:['weekend','week'],blurb:'Medieval castle, festivals and Highland day trips.'},
+ {n:'Dubrovnik',c:'Croatia',fl:'🇭🇷',rg:'europe',cl:'warm',cost:2,vibes:['beach','culture'],tags:['history','beaches','architecture'],good:['couple','friends','family'],seasons:['spring','summer','autumn'],months:'May–Oct',bud:'$80–170',h:200,kw:'dubrovnik,croatia',crowd:3,trip:['weekend','week'],blurb:'Walled Adriatic city over sparkling sea.'},
+ {n:'Lake Bled',c:'Slovenia',fl:'🇸🇮',rg:'europe',cl:'mild',cost:1,vibes:['nature','adventure'],tags:['hiking','mountains','forests'],good:['couple','family','solo'],seasons:['summer','spring','autumn'],months:'May–Sep',bud:'$60–130',h:150,kw:'lake,bled',crowd:2,trip:['weekend','week'],blurb:'Island church on an alpine lake.'},
+ {n:'Tbilisi',c:'Georgia',fl:'🇬🇪',rg:'europe',cl:'mild',cost:1,vibes:['culture','food'],tags:['history','wine','streetfood','architecture'],good:['solo','couple','friends'],seasons:['spring','autumn'],months:'Apr–Jun / Sep–Oct',bud:'$35–90',h:20,kw:'tbilisi,georgia',crowd:1,trip:['weekend','week'],blurb:'Old-town lanes, wine country and warm hospitality.'},
+ {n:'Copenhagen',c:'Denmark',fl:'🇩🇰',rg:'europe',cl:'cold',cost:3,vibes:['food','culture','nightlife'],tags:['foodie','architecture','nightlife'],good:['couple','friends','solo'],seasons:['summer'],months:'Jun–Aug',bud:'$120–230',h:210,kw:'copenhagen,denmark',crowd:2,trip:['weekend','week'],blurb:'Design, cycling and New Nordic cuisine.'},
+ {n:'Stockholm',c:'Sweden',fl:'🇸🇪',rg:'europe',cl:'cold',cost:3,vibes:['culture','food','nightlife'],tags:['museums','architecture','foodie','nightlife'],good:['couple','friends','solo'],seasons:['summer'],months:'Jun–Aug',bud:'$120–230',h:280,kw:'stockholm,sweden',crowd:2,trip:['weekend','week'],blurb:'Islands, design and a cutting-edge food scene.'},
+ {n:'Finnish Lapland',c:'Finland',fl:'🇫🇮',rg:'europe',cl:'cold',cost:3,vibes:['nature','adventure'],tags:['skiing','wildlife','forests'],good:['couple','family','friends'],seasons:['winter'],months:'Dec–Mar',bud:'$130–260',h:45,kw:'lapland,finland',crowd:1,trip:['week'],blurb:'Northern lights, husky safaris and snow-covered silence.'},
+ // Asia
+ {n:'Kyoto',c:'Japan',fl:'🇯🇵',rg:'asia',cl:'mild',cost:2,vibes:['culture','food','nature'],tags:['history','architecture','foodie','forests'],good:['solo','couple','family'],seasons:['spring','autumn'],months:'Mar–Apr / Oct–Nov',bud:'$80–160',h:350,kw:'kyoto,temple',crowd:3,trip:['week','long'],blurb:'Temples, bamboo groves and cherry blossoms.'},
+ {n:'Tokyo',c:'Japan',fl:'🇯🇵',rg:'asia',cl:'mild',cost:2,vibes:['nightlife','food','culture'],tags:['nightlife','streetfood','shopping','museums'],good:['solo','couple','friends'],seasons:['spring','autumn'],months:'Mar–May / Oct–Nov',bud:'$90–180',h:300,kw:'tokyo,japan',crowd:3,trip:['week','long'],blurb:'Neon streets, sushi counters and endless energy.'},
+ {n:'Bali',c:'Indonesia',fl:'🇮🇩',rg:'asia',cl:'warm',cost:1,vibes:['beach','nature','culture'],tags:['beaches','wellness','surfing','forests'],good:['couple','solo','friends'],seasons:['spring','summer'],months:'Apr–Oct',bud:'$35–90',h:150,kw:'bali,rice,terrace',crowd:3,trip:['week','long'],blurb:'Rice terraces, surf breaks and temple sunsets.'},
+ {n:'Bangkok',c:'Thailand',fl:'🇹🇭',rg:'asia',cl:'warm',cost:1,vibes:['nightlife','food','culture'],tags:['streetfood','nightlife','history','shopping'],good:['solo','friends','couple'],seasons:['winter'],months:'Nov–Feb',bud:'$35–85',h:15,kw:'bangkok,temple',crowd:3,trip:['weekend','week'],blurb:'Street food, glittering temples and buzzing markets.'},
+ {n:'Chiang Mai',c:'Thailand',fl:'🇹🇭',rg:'asia',cl:'warm',cost:1,vibes:['culture','nature','food'],tags:['history','forests','streetfood','wildlife'],good:['solo','couple','family'],seasons:['winter'],months:'Nov–Feb',bud:'$30–75',h:100,kw:'chiang,mai',crowd:2,trip:['week','long'],blurb:'Temples, night bazaars and jungle elephants.'},
+ {n:'Ha Long Bay',c:'Vietnam',fl:'🇻🇳',rg:'asia',cl:'warm',cost:1,vibes:['nature','culture','food'],tags:['islands','forests','streetfood'],good:['couple','friends','solo'],seasons:['spring','autumn'],months:'Mar–May / Sep–Nov',bud:'$35–90',h:170,kw:'halong,bay',crowd:3,trip:['week','long'],blurb:'Emerald waters and thousands of limestone karsts.'},
+ {n:'Maldives',c:'Maldives',fl:'🇲🇻',rg:'asia',cl:'warm',cost:3,vibes:['beach'],tags:['beaches','wellness','diving','reefs'],good:['couple'],seasons:['winter','spring'],months:'Nov–Apr',bud:'$250–600',h:185,kw:'maldives,overwater',crowd:2,trip:['week','long'],blurb:'Overwater villas above turquoise lagoons.'},
+ {n:'Palawan',c:'Philippines',fl:'🇵🇭',rg:'asia',cl:'warm',cost:1,vibes:['beach','nature'],tags:['islands','beaches','diving','reefs'],good:['couple','friends'],seasons:['winter','spring'],months:'Dec–May',bud:'$40–100',h:180,kw:'palawan,island',crowd:1,trip:['week','long'],blurb:'Hidden lagoons and island-hopping paradise.'},
+ {n:'Singapore',c:'Singapore',fl:'🇸🇬',rg:'asia',cl:'warm',cost:3,vibes:['food','nightlife','culture'],tags:['foodie','streetfood','shopping','architecture'],good:['family','couple','solo'],seasons:['spring','summer','autumn','winter'],months:'Year-round',bud:'$110–220',h:320,kw:'singapore,marina',crowd:3,trip:['weekend','week'],blurb:'Futuristic gardens, hawker food and spotless streets.'},
+ {n:'Jaipur',c:'India',fl:'🇮🇳',rg:'asia',cl:'warm',cost:1,vibes:['culture'],tags:['history','architecture','shopping'],good:['solo','couple','friends'],seasons:['winter'],months:'Nov–Feb',bud:'$30–80',h:355,kw:'jaipur,palace',crowd:3,trip:['week','long'],blurb:'Pink City palaces, forts and vivid bazaars.'},
+ {n:'Kerala',c:'India',fl:'🇮🇳',rg:'asia',cl:'warm',cost:1,vibes:['nature','culture'],tags:['forests','wildlife','wellness'],good:['couple','family','solo'],seasons:['winter'],months:'Nov–Mar',bud:'$30–85',h:135,kw:'kerala,backwater',crowd:1,trip:['week','long'],blurb:'Backwaters, tea hills and ayurvedic calm.'},
+ {n:'Seoul',c:'South Korea',fl:'🇰🇷',rg:'asia',cl:'mild',cost:2,vibes:['nightlife','food','culture'],tags:['streetfood','nightlife','shopping','history'],good:['solo','couple','friends'],seasons:['spring','autumn'],months:'Apr–Jun / Sep–Nov',bud:'$70–150',h:280,kw:'seoul,korea',crowd:3,trip:['weekend','week'],blurb:'Palaces meet K-pop, night markets and café culture.'},
+ {n:'Sri Lanka',c:'Sri Lanka',fl:'🇱🇰',rg:'asia',cl:'warm',cost:1,vibes:['nature','beach','culture'],tags:['wildlife','beaches','surfing','history'],good:['couple','solo','family'],seasons:['winter','spring'],months:'Dec–Apr',bud:'$35–90',h:120,kw:'sri,lanka',crowd:1,trip:['week','long'],blurb:'Safaris, tea country, temples and surf.'},
+ {n:'Nepal',c:'Nepal',fl:'🇳🇵',rg:'asia',cl:'cold',cost:1,vibes:['adventure','nature','culture'],tags:['hiking','mountains','history'],good:['solo','friends','couple'],seasons:['autumn','spring'],months:'Oct–Nov / Mar–May',bud:'$30–80',h:210,kw:'nepal,himalaya',crowd:2,trip:['long'],blurb:'Himalayan treks and Kathmandu’s temples.'},
+ {n:'Hong Kong',c:'Hong Kong',fl:'🇭🇰',rg:'asia',cl:'warm',cost:2,vibes:['food','nightlife','culture'],tags:['streetfood','shopping','nightlife'],good:['couple','friends','solo'],seasons:['autumn','spring'],months:'Oct–Dec / Mar–Apr',bud:'$80–170',h:15,kw:'hong,kong',crowd:3,trip:['weekend','week'],blurb:'Skyline, dim sum and mountains meeting sea.'},
+ {n:'Taipei',c:'Taiwan',fl:'🇹🇼',rg:'asia',cl:'warm',cost:1,vibes:['food','culture','nature'],tags:['streetfood','wellness','forests'],good:['solo','couple','friends'],seasons:['autumn','spring'],months:'Oct–Nov / Mar–Apr',bud:'$45–100',h:150,kw:'taipei,taiwan',crowd:2,trip:['weekend','week'],blurb:'Night markets, hot springs and green mountains.'},
+ // Africa
+ {n:'Marrakech',c:'Morocco',fl:'🇲🇦',rg:'africa',cl:'warm',cost:1,vibes:['culture','food'],tags:['history','streetfood','shopping','architecture'],good:['couple','friends','solo'],seasons:['spring','autumn'],months:'Mar–May / Sep–Nov',bud:'$40–100',h:25,kw:'marrakech,morocco',crowd:3,trip:['weekend','week'],blurb:'Souks, riads and a maze of a medina.'},
+ {n:'Serengeti',c:'Tanzania',fl:'🇹🇿',rg:'africa',cl:'warm',cost:3,vibes:['nature','adventure'],tags:['safari','wildlife'],good:['couple','family','friends'],seasons:['summer','autumn'],months:'Jun–Oct',bud:'$200–500',h:45,kw:'serengeti,safari',crowd:2,trip:['week','long'],blurb:'Big-five safaris and the great migration.'},
+ {n:'Cape Town',c:'South Africa',fl:'🇿🇦',rg:'africa',cl:'mild',cost:2,vibes:['nature','adventure','food'],tags:['hiking','wine','beaches','wildlife'],good:['couple','friends','solo'],seasons:['winter','summer'],months:'Nov–Mar',bud:'$70–150',h:210,kw:'cape,town',crowd:2,trip:['week','long'],blurb:'Table Mountain, wine lands and coastal drives.'},
+ {n:'Zanzibar',c:'Tanzania',fl:'🇹🇿',rg:'africa',cl:'warm',cost:2,vibes:['beach'],tags:['beaches','diving','history'],good:['couple','friends'],seasons:['summer','winter'],months:'Jun–Oct / Dec–Feb',bud:'$60–140',h:180,kw:'zanzibar,beach',crowd:2,trip:['week','long'],blurb:'Spice-island beaches and Stone Town history.'},
+ {n:'Namibia',c:'Namibia',fl:'🇳🇦',rg:'africa',cl:'warm',cost:2,vibes:['nature','adventure'],tags:['safari','wildlife','roadtrip','hiking'],good:['couple','friends','family'],seasons:['winter','spring'],months:'May–Oct',bud:'$80–170',h:35,kw:'namibia,desert',crowd:1,trip:['long'],blurb:'Red dunes, wildlife and epic self-drives.'},
+ {n:'Cairo',c:'Egypt',fl:'🇪🇬',rg:'africa',cl:'warm',cost:1,vibes:['culture'],tags:['history','architecture'],good:['family','couple','friends'],seasons:['autumn','winter'],months:'Oct–Apr',bud:'$40–100',h:40,kw:'cairo,pyramids',crowd:3,trip:['week','long'],blurb:'Pyramids, the Nile and millennia of history.'},
+ {n:'Masai Mara',c:'Kenya',fl:'🇰🇪',rg:'africa',cl:'warm',cost:3,vibes:['nature','adventure'],tags:['safari','wildlife'],good:['couple','family','friends'],seasons:['summer','autumn'],months:'Jul–Oct',bud:'$180–400',h:35,kw:'masai,mara,safari',crowd:2,trip:['week','long'],blurb:'Big-cat country and the great wildebeest crossing.'},
+ {n:'Madagascar',c:'Madagascar',fl:'🇲🇬',rg:'africa',cl:'warm',cost:2,vibes:['nature','adventure'],tags:['wildlife','forests','beaches','hiking'],good:['couple','friends','solo'],seasons:['spring','autumn'],months:'Apr–May / Sep–Nov',bud:'$50–120',h:120,kw:'madagascar,lemur',crowd:1,trip:['long'],blurb:'Lemurs, baobabs and landscapes like nowhere else.'},
+ // Middle East
+ {n:'Dubai',c:'UAE',fl:'🇦🇪',rg:'mideast',cl:'warm',cost:3,vibes:['nightlife','beach'],tags:['shopping','nightlife','beaches'],good:['family','couple','friends'],seasons:['autumn','winter'],months:'Nov–Mar',bud:'$130–260',h:38,kw:'dubai,skyline',crowd:3,trip:['weekend','week'],blurb:'Skyscrapers, desert safaris and luxury malls.'},
+ {n:'Petra',c:'Jordan',fl:'🇯🇴',rg:'mideast',cl:'warm',cost:2,vibes:['adventure','culture','nature'],tags:['history','hiking','roadtrip'],good:['couple','friends','solo'],seasons:['spring','autumn'],months:'Mar–May / Sep–Nov',bud:'$70–150',h:20,kw:'petra,jordan',crowd:2,trip:['week','long'],blurb:'Rose-red rock city and the Wadi Rum desert.'},
+ {n:'Istanbul',c:'Turkey',fl:'🇹🇷',rg:'mideast',cl:'mild',cost:1,vibes:['culture','food','nightlife'],tags:['history','streetfood','architecture','shopping'],good:['couple','solo','friends'],seasons:['spring','autumn'],months:'Apr–Jun / Sep–Nov',bud:'$50–120',h:15,kw:'istanbul,turkey',crowd:3,trip:['weekend','week'],blurb:'Where Europe meets Asia — mosques, bazaars, ferries.'},
+ {n:'Oman',c:'Oman',fl:'🇴🇲',rg:'mideast',cl:'warm',cost:2,vibes:['adventure','nature','culture'],tags:['roadtrip','hiking','history','beaches'],good:['couple','family','friends'],seasons:['winter'],months:'Nov–Mar',bud:'$80–160',h:30,kw:'oman,desert',crowd:1,trip:['week','long'],blurb:'Wadis, forts and empty desert coastlines.'},
+ {n:'Tel Aviv',c:'Israel',fl:'🇮🇱',rg:'mideast',cl:'warm',cost:2,vibes:['beach','nightlife','food'],tags:['beaches','nightlife','streetfood'],good:['friends','couple','solo'],seasons:['spring','autumn'],months:'Apr–Jun / Sep–Oct',bud:'$90–180',h:190,kw:'tel,aviv',crowd:2,trip:['weekend','week'],blurb:'Mediterranean beaches and a nonstop food-and-bar scene.'},
+ // Oceania
+ {n:'Sydney',c:'Australia',fl:'🇦🇺',rg:'oceania',cl:'mild',cost:3,vibes:['beach','nightlife','food'],tags:['beaches','foodie','nightlife'],good:['couple','family','friends'],seasons:['spring','autumn','summer'],months:'Sep–Apr',bud:'$120–240',h:200,kw:'sydney,opera',crowd:3,trip:['week','long'],blurb:'Harbour icons, surf beaches and buzzing brunch.'},
+ {n:'Melbourne',c:'Australia',fl:'🇦🇺',rg:'oceania',cl:'mild',cost:3,vibes:['food','culture','nightlife'],tags:['foodie','museums','nightlife','wine'],good:['couple','friends','solo'],seasons:['spring','autumn'],months:'Sep–Nov / Mar–May',bud:'$110–220',h:280,kw:'melbourne,australia',crowd:2,trip:['week','long'],blurb:'Laneway cafés, art and a legendary food scene.'},
+ {n:'Queenstown',c:'New Zealand',fl:'🇳🇿',rg:'oceania',cl:'cold',cost:2,vibes:['adventure','nature'],tags:['skiing','hiking','mountains','surfing'],good:['couple','friends','solo'],seasons:['summer','winter'],months:'Dec–Feb / Jun–Aug',bud:'$90–180',h:205,kw:'queenstown,newzealand',crowd:2,trip:['week','long'],blurb:'Adventure capital: bungy, ski fields and fjords.'},
+ {n:'Bora Bora',c:'French Polynesia',fl:'🇵🇫',rg:'oceania',cl:'warm',cost:3,vibes:['beach'],tags:['beaches','wellness','diving','reefs'],good:['couple'],seasons:['spring','summer'],months:'May–Oct',bud:'$300–700',h:185,kw:'bora,bora',crowd:2,trip:['week','long'],blurb:'Overwater bungalows and a turquoise lagoon.'},
+ {n:'Great Barrier Reef',c:'Australia',fl:'🇦🇺',rg:'oceania',cl:'warm',cost:2,vibes:['nature','adventure','beach'],tags:['reefs','diving','beaches','wildlife'],good:['couple','family','friends'],seasons:['winter','spring'],months:'Jun–Oct',bud:'$100–200',h:180,kw:'great,barrier,reef',crowd:3,trip:['week','long'],blurb:'Snorkel and dive the world’s largest coral reef.'},
+ {n:'Fiji',c:'Fiji',fl:'🇫🇯',rg:'oceania',cl:'warm',cost:2,vibes:['beach','nature'],tags:['beaches','diving','islands','reefs'],good:['couple','family','friends'],seasons:['winter','spring'],months:'May–Oct',bud:'$90–200',h:175,kw:'fiji,island',crowd:1,trip:['week','long'],blurb:'Soft-coral diving and castaway island resorts.'},
+ {n:'Tasmania',c:'Australia',fl:'🇦🇺',rg:'oceania',cl:'mild',cost:2,vibes:['nature','adventure','food'],tags:['hiking','wildlife','forests','wine'],good:['couple','friends','solo'],seasons:['summer','autumn'],months:'Dec–Apr',bud:'$90–180',h:130,kw:'tasmania,wilderness',crowd:1,trip:['week','long'],blurb:'Wild coastlines, gourmet farms and rare wildlife.'},
+];
+
+// ---------- wizard config ----------
+const STEP_TITLES = ['Basics','Interests','Details','Practical'];
+let step = 0;
+
+// ---------- render ----------
+function renderProgress(){
+  $('#progBar').style.width = ((step+1)/4*100) + '%';
+  $('#progSteps').innerHTML = STEP_TITLES.map((t,i) =>
+    `<span class="${i===step?'on':(i<step?'done':'')}">${i<step?'✓ ':''}${t}</span>`).join('');
+}
+function chip(q,v,label){ return `<button type="button" class="chip" aria-pressed="false" data-q="${q}" data-v="${v}">${label}</button>`; }
+
+function renderStep(){
+  renderProgress();
+  const b = $('#stepBody');
+  if (step === 0){
+    b.innerHTML = `
+      <h2>Let’s start with the basics</h2>
+      <p class="sub">Who’s travelling and roughly when.</p>
+      <div class="q"><div class="qlabel">Who’s going?</div><div class="chips">
+        ${[['solo','✈️ Solo'],['couple','💑 Couple'],['family','👨‍👩‍👧 Family'],['friends','👥 Friends']].map(([v,l])=>chip('companions',v,l)).join('')}
+      </div></div>
+      <div class="q"><div class="qlabel">How long is the trip?</div><div class="chips">
+        ${[['weekend','🎒 A weekend'],['week','🗓️ About a week'],['long','🌏 Two weeks+']].map(([v,l])=>chip('trip',v,l)).join('')}
+      </div></div>
+      <div class="q"><div class="qlabel">When will you travel?</div><div class="chips">
+        ${[['spring','🌱 Spring'],['summer','🌞 Summer'],['autumn','🍂 Autumn'],['winter','⛄ Winter'],['flexible','🗓️ Flexible']].map(([v,l])=>chip('season',v,l)).join('')}
+      </div></div>`;
+  } else if (step === 1){
+    b.innerHTML = `
+      <h2>What are you in the mood for?</h2>
+      <p class="sub">Pick 1–3. The next page adapts to what you choose here.</p>
+      <div class="q"><div class="chips">
+        ${Object.entries(VIBE).map(([v,l])=>chip('vibes',v, (({beach:'🏖️',adventure:'🥾',culture:'🏛️',food:'🍜',nightlife:'🌆',nature:'🦋'})[v])+' '+l)).join('')}
+      </div></div>`;
+  } else if (step === 2){
+    // adaptive from vibes
+    const groups = answers.vibes.map(v => `
+      <div class="q"><div class="qgroup">${VIBE[v]}</div><div class="chips">
+        ${SUB[v].map(([tag,l])=>chip('fine',tag,l)).join('')}
+      </div></div>`).join('');
+    b.innerHTML = `
+      <h2>Let’s get specific</h2>
+      <p class="sub">Based on your vibes, pick anything that appeals (optional — skip freely).</p>
+      ${groups || '<p class="sub">Pick a vibe on the previous step to see tailored options.</p>'}`;
+  } else {
+    b.innerHTML = `
+      <h2>A few practical preferences</h2>
+      <p class="sub">These fine-tune your matches.</p>
+      <div class="q"><div class="qlabel">Preferred climate?</div><div class="chips">
+        ${[['warm','☀️ Warm'],['mild','🌤️ Mild'],['cold','❄️ Cold'],['any','🤷 Any']].map(([v,l])=>chip('climate',v,l)).join('')}
+      </div></div>
+      <div class="q"><div class="qlabel">Budget style?</div><div class="chips">
+        ${[['1','💵 Budget'],['2','💳 Mid-range'],['3','💎 Luxury']].map(([v,l])=>chip('budget',v,l)).join('')}
+      </div></div>
+      <div class="q"><div class="qlabel">Crowds?</div><div class="chips">
+        ${[['hidden','🕵️ Off the beaten path'],['mix','🙂 A mix'],['iconic','⭐ Bucket-list icons']].map(([v,l])=>chip('crowd',v,l)).join('')}
+      </div></div>
+      <div class="q"><div class="qlabel">Any region in mind?</div><div class="chips">
+        ${[['anywhere','🌍 Anywhere'],['americas','🌎 Americas'],['europe','🏰 Europe'],['asia','🏯 Asia'],['africa','🦁 Africa'],['mideast','🕌 Middle East'],['oceania','🏝️ Oceania']].map(([v,l])=>chip('region',v,l)).join('')}
+      </div></div>`;
+  }
+  syncChips();
+  $('#backBtn').disabled = step === 0;
+  $('#nextBtn').textContent = step === 3 ? '✈️ See my matches' : 'Next →';
+  $('#wizNote').textContent = '';
+}
+function syncChips(){
+  document.querySelectorAll('#stepBody .chip').forEach(ch => {
+    const q = ch.dataset.q, v = ch.dataset.v;
+    const on = Array.isArray(answers[q]) ? answers[q].includes(v) : String(answers[q]) === v;
+    ch.setAttribute('aria-pressed', String(on));
+  });
+}
+
+$('#stepBody').addEventListener('click', (e) => {
+  const ch = e.target.closest('.chip'); if (!ch) return;
+  const q = ch.dataset.q, v = ch.dataset.v;
+  let note = '';
+  if (q === 'vibes'){
+    const i = answers.vibes.indexOf(v);
+    if (i >= 0){ answers.vibes.splice(i,1); answers.fine = answers.fine.filter(t => stillValidFine(t)); }
+    else { if (answers.vibes.length >= 3){ const dropped = VIBE[answers.vibes.shift()]; note = `Swapped out "${dropped}" (max 3).`; } answers.vibes.push(v); }
+  } else if (q === 'fine'){
+    const i = answers.fine.indexOf(v); if (i>=0) answers.fine.splice(i,1); else answers.fine.push(v);
+  } else {
+    answers[q] = (answers[q] === v) ? (q==='region'?'anywhere':null) : v;
+  }
+  $('#wizNote').textContent = note;
+  syncChips();
+});
+function stillValidFine(tag){ return answers.vibes.some(v => SUB[v].some(([t]) => t === tag)); }
+
+$('#nextBtn').addEventListener('click', () => {
+  if (step === 1 && answers.vibes.length === 0){ $('#wizNote').textContent = 'Pick at least one vibe.'; return; }
+  if (step < 3){ step++; renderStep(); window.scrollTo({top:0,behavior:'smooth'}); }
+  else showResults();
+});
+$('#backBtn').addEventListener('click', () => { if (step>0){ step--; renderStep(); window.scrollTo({top:0,behavior:'smooth'}); } });
+
+// ---------- scoring ----------
+function scoreDest(d){
+  let score = 0, max = 0; const reasons = [];
+  answers.vibes.forEach(v => { max += 3; if (d.vibes.includes(v)){ score += 3; reasons.push(VIBE[v]); } });
+  answers.fine.forEach(t => { max += 2; if (d.tags.includes(t)){ score += 2; reasons.push(TAG[t]); } });
+  if (answers.climate && answers.climate!=='any'){ max += 2; if (d.cl===answers.climate){ score += 2; reasons.push(CLIMATE[answers.climate]); } }
+  if (answers.budget){ max += 2; const diff=Math.abs(d.cost-(+answers.budget)); score += diff===0?2:diff===1?1:0; if (diff===0) reasons.push(BUDGET[answers.budget]+' budget'); }
+  if (answers.season && answers.season!=='flexible'){ max += 2; if (d.seasons.includes(answers.season)){ score += 2; reasons.push('Great in '+SEASON[answers.season]); } }
+  if (answers.companions){ max += 1.5; if (d.good.includes(answers.companions)){ score += 1.5; reasons.push('Good for '+COMP[answers.companions]); } }
+  if (answers.trip){ max += 1.5; if (d.trip.includes(answers.trip)){ score += 1.5; reasons.push('Fits '+TRIP[answers.trip]); } }
+  if (answers.crowd && answers.crowd!=='mix'){ max += 1.5; const want = answers.crowd==='iconic'?3:1; const dist=Math.abs(d.crowd-want); score += dist===0?1.5:dist===1?0.75:0; if (dist===0) reasons.push(answers.crowd==='iconic'?'Iconic spot':'Hidden gem'); }
+  const pct = max>0 ? Math.round(score/max*100) : 60;
+  return { score, pct, reasons };
+}
+
+let ranked = [];
+const excluded = new Set();
+let showCount = 6;
+let budgetTiers = new Set([1, 2, 3]); // $ tiers currently shown (display filter only)
+
+function computeRanked(){
+  let pool = D.slice();
+  if (answers.region && answers.region!=='anywhere') pool = pool.filter(d => d.rg===answers.region);
+  pool = pool.filter(d => !excluded.has(d.n));
+  ranked = pool.map(d => ({ d, ...scoreDest(d) }));
+  sortRanked();
+}
+function sortRanked(){
+  const s = $('#sortSel').value;
+  if (s === 'budget') ranked.sort((a,b)=> a.d.cost-b.d.cost || b.score-a.score);
+  else if (s === 'az') ranked.sort((a,b)=> a.d.n.localeCompare(b.d.n));
+  else ranked.sort((a,b)=> b.score-a.score || b.pct-a.pct);
+}
+
+// ---------- results ----------
+function imgUrl(d,i){ return `https://loremflickr.com/640/400/${encodeURIComponent(d.kw)}?lock=${i+1}`; }
+function mapsUrl(d){ return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.n+' '+d.c)}`; }
+function moreUrl(d){ return `https://www.google.com/search?q=${encodeURIComponent('travel guide '+d.n+' '+d.c)}`; }
+
+function renderCards(){
+  const cards = $('#cards'); cards.innerHTML = '';
+  // display-only budget filter: never recomputes scores, never leaves an empty state
+  let view = ranked.filter(r => budgetTiers.has(r.d.cost));
+  const fallback = view.length === 0 && ranked.length > 0;
+  if (fallback) view = ranked;
+  $('#budgetNote').classList.toggle('hide', !fallback);
+  view.slice(0, showCount).forEach((r, i) => {
+    const d = r.d;
+    const el = document.createElement('article'); el.className = 'rcard'; el.dataset.cost = d.cost;
+    const why = r.reasons.slice(0,4).map(x=>`<span>${x}</span>`).join('');
+    el.innerHTML = `
+      <div class="photo" style="--h:${d.h}">
+        <span class="flag">${d.fl}</span>
+        <img alt="${d.n}, ${d.c}" loading="lazy" src="${imgUrl(d,i)}">
+        <span class="rank">#${i+1}</span>
+        <span class="match">${r.pct}% match</span>
+        <button class="kill" title="Not this one" data-kill="${d.n}">✕</button>
+      </div>
+      <div class="rbody">
+        <h3>${d.n} <span class="country">${d.c}</span></h3>
+        <p class="blurb">${d.blurb}</p>
+        ${why?`<div class="why">${why}</div>`:''}
+        <div class="meta">📅 Best: ${d.months} &nbsp;·&nbsp; 💰 ~${d.bud}/day</div>
+        <div class="rlinks"><a href="${mapsUrl(d)}" target="_blank" rel="noopener">🗺️ Map</a><a href="${moreUrl(d)}" target="_blank" rel="noopener">🔎 Learn more</a></div>
+      </div>`;
+    el.querySelector('img').addEventListener('error', (ev) => ev.target.remove());
+    cards.appendChild(el);
+  });
+  $('#moreBtn').classList.toggle('hide', showCount >= view.length);
+}
+
+function showResults(fromShare = false){
+  excluded.clear(); showCount = 6;
+  budgetTiers = new Set([1, 2, 3]); syncBudgetChips();
+  computeRanked();
+  const summary = [answers.vibes.map(v=>VIBE[v]).join(' + '), answers.region!=='anywhere'?REGION[answers.region]:null].filter(Boolean).join(' · ');
+  $('#resultsTitle').textContent = summary ? `Your matches — ${summary}` : 'Your top matches';
+  $('#sharedNote').classList.toggle('hide', !fromShare);
+  renderCards();
+  $('#wizardPanel').classList.add('hide');
+  $('#resultsPanel').classList.remove('hide');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+$('#cards').addEventListener('click', (e) => {
+  const k = e.target.closest('[data-kill]'); if (!k) return;
+  excluded.add(k.dataset.kill); computeRanked();
+  if (showCount > ranked.length) showCount = Math.max(6, ranked.length);
+  renderCards();
+});
+$('#sortSel').addEventListener('change', () => { sortRanked(); renderCards(); });
+$('#moreBtn').addEventListener('click', () => { showCount += 6; renderCards(); });
+
+// ---------- budget display filter ----------
+function syncBudgetChips(){
+  document.querySelectorAll('#budgetFilter .chip').forEach(ch =>
+    ch.setAttribute('aria-pressed', String(budgetTiers.has(+ch.dataset.tier))));
+}
+$('#budgetFilter').addEventListener('click', (e) => {
+  const ch = e.target.closest('.chip'); if (!ch) return;
+  const tier = +ch.dataset.tier;
+  if (budgetTiers.has(tier)){
+    if (budgetTiers.size === 1) return; // keep at least one tier on — no empty state
+    budgetTiers.delete(tier);
+  } else budgetTiers.add(tier);
+  syncBudgetChips();
+  renderCards();
+});
+
+function resetAnswers(){
+  answers.companions = null; answers.trip = null; answers.season = null;
+  answers.vibes = []; answers.fine = []; answers.climate = null;
+  answers.budget = null; answers.crowd = null; answers.region = 'anywhere';
+}
+$('#retakeBtn').addEventListener('click', () => {
+  step = 0;
+  resetAnswers();
+  excluded.clear();
+  clearHash(); // so a reload after retake starts fresh, not from the shared link
+  renderStep();
+  $('#resultsPanel').classList.add('hide'); $('#wizardPanel').classList.remove('hide');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+// ---------- share link ----------
+function b64urlEncode(str){
+  let bin = ''; new TextEncoder().encode(str).forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64urlDecode(s){
+  let b = s.replace(/-/g,'+').replace(/_/g,'/');
+  while (b.length % 4) b += '=';
+  return new TextDecoder().decode(Uint8Array.from(atob(b), c => c.charCodeAt(0)));
+}
+function encodeAnswers(){
+  const out = {};
+  for (const [k, v] of Object.entries(answers)){
+    if (v === null) continue;
+    if (Array.isArray(v)){ if (v.length) out[k] = v; continue; }
+    if (k === 'region' && v === 'anywhere') continue; // default — omit to keep the link short
+    out[k] = v;
+  }
+  return b64urlEncode(JSON.stringify(out));
+}
+function applyShared(o){
+  const pick = (v, ok) => (typeof v === 'string' && ok.includes(v)) ? v : null;
+  const list = (v, ok) => Array.isArray(v) ? [...new Set(v.filter(x => typeof x === 'string' && ok.includes(x)))] : [];
+  answers.companions = pick(o.companions, Object.keys(COMP));
+  answers.trip = pick(o.trip, Object.keys(TRIP));
+  answers.season = pick(o.season, [...Object.keys(SEASON), 'flexible']);
+  answers.vibes = list(o.vibes, Object.keys(VIBE)).slice(0, 3);
+  answers.fine = list(o.fine, Object.keys(TAG)).filter(t => stillValidFine(t));
+  answers.climate = pick(o.climate, [...Object.keys(CLIMATE), 'any']);
+  answers.budget = pick(String(o.budget ?? ''), ['1','2','3']);
+  answers.crowd = pick(o.crowd, Object.keys(CROWD));
+  answers.region = pick(o.region, Object.keys(REGION)) || 'anywhere';
+  return answers.vibes.length > 0; // same minimum the wizard enforces
+}
+function clearHash(){ if (location.hash) history.replaceState(null, '', location.pathname + location.search); }
+function tryLoadShared(){
+  const m = /[#&]a=([^&]*)/.exec(location.hash);
+  if (!m) return false;
+  try {
+    const o = JSON.parse(b64urlDecode(m[1]));
+    if (!o || typeof o !== 'object' || Array.isArray(o) || !applyShared(o)) throw new Error('bad payload');
+    return true;
+  } catch {
+    resetAnswers(); clearHash(); // malformed — drop it and start the wizard normally
+    return false;
+  }
+}
+function fallbackCopy(text){
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy'); ta.remove();
+    return ok;
+  } catch { return false; }
+}
+$('#shareBtn').addEventListener('click', () => {
+  const url = location.href.split('#')[0] + '#a=' + encodeAnswers();
+  const btn = $('#shareBtn');
+  const flash = (ok) => {
+    btn.textContent = ok ? '✓ Copied' : 'Copy failed';
+    btn.classList.toggle('copied', ok);
+    setTimeout(() => { btn.textContent = '🔗 Share result'; btn.classList.remove('copied'); }, 1200);
+  };
+  try { navigator.clipboard.writeText(url).then(() => flash(true), () => flash(fallbackCopy(url))); }
+  catch { flash(fallbackCopy(url)); }
+});
+
+// ---------- theme ----------
+const root = document.documentElement;
+const saved = localStorage.getItem('vs-theme');
+if (saved) root.setAttribute('data-theme', saved);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur==='dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next); localStorage.setItem('vs-theme', next);
+});
+
+// ---------- boot ----------
+if (tryLoadShared()) showResults(true);
+else renderStep();
+</script>
+</body>
+</html>

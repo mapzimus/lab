@@ -11,38 +11,62 @@
   <meta property="og:description" content="A daily sweep of the geospatial world: news, tools, releases, and data.">
   <meta property="og:url" content="https://mapzimus.com/geo-radar/">
   <meta name="twitter:card" content="summary">
-  <meta name="theme-color" content="#14161c">
+  <meta name="theme-color" content="#121721">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/radar/radar.css">
+  <script src="/theme.js"></script>
   <script src="/geo-radar/geo-radar.js" defer></script>
 </head>
 <body data-view="geo-radar">
+<div class="sheet">
   <a class="skip-link" href="#radar">Skip to radar</a>
   <header class="site-header">
     <a class="brand" href="/" aria-label="Mapzimus home">
       <span class="brand-mark" aria-hidden="true">MZ</span>
-      <span>Mapzimus</span>
+      <span class="brand-name">Mapzimus</span>
     </a>
-    <nav aria-label="Primary navigation">
-      <a href="/lab/">Lab</a>
+    <nav class="site-nav" aria-label="Primary navigation">
       <a href="/tools/">Tools</a>
       <a href="/maps/">Maps</a>
-      <a href="/field-notes/">Field Notes</a>
       <a href="/games/">Games</a>
+      <a href="/lab/">Lab</a>
+      <a href="/field-notes/">Notes</a>
       <a href="/radars/" aria-current="page">Radars</a>
       <a href="/skills/">Skills</a>
       <a href="/links/">Links</a>
       <a href="/about/">About</a>
-      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Portfolio ↗</a>
     </nav>
+    <details class="menu">
+      <summary aria-label="Open menu">Menu</summary>
+      <div class="menu-panel">
+        <a href="/tools/">Tools</a>
+        <a href="/maps/">Maps</a>
+        <a href="/games/">Games</a>
+        <a href="/lab/">Lab</a>
+        <a href="/field-notes/">Field Notes</a>
+        <a href="/radars/" aria-current="page">Radars</a>
+        <a href="/skills/">Skills</a>
+        <a href="/links/">Links</a>
+        <a href="/about/">About</a>
+        <a href="https://maxwellhowegis.com">Portfolio ↗</a>
+      </div>
+    </details>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme">
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+    </button>
   </header>
 
   <main>
-    <section class="hero radar-hero">
-      <div class="eyebrow">Fresh every day</div>
-      <h1>Geospatial radar.</h1>
-      <p>A daily sweep of the geospatial world: mapping news and unusual maps, new QGIS plugins, releases of the libraries that matter, fresh geodata, hot GIS questions, and the OSM ecosystem.</p>
+    <section class="hero">
+      <span class="coord coord-ne" aria-hidden="true">42°31′ N</span>
+      <span class="coord coord-sw" aria-hidden="true">70°54′ W · SALEM, MASS.</span>
+      <div class="eyebrow">Updated daily</div>
+      <h1>Geospatial radar</h1>
+      <p>A daily sweep of the geospatial world: mapping news, new QGIS plugins, releases of the libraries that matter, fresh geodata, active GIS questions, and the OSM ecosystem.</p>
       <div class="trust-row">
         <span id="radarDate">Loading…</span>
         <span id="radarCounts" hidden></span>
@@ -51,7 +75,7 @@
 
     <section class="catalog" id="radar" aria-labelledby="radarHeading">
       <div class="section-heading">
-        <div><span class="eyebrow">Today's sweep</span><h2 id="radarHeading">What's moving in geo</h2></div>
+        <div><span class="eyebrow">Today</span><h2 id="radarHeading">What's moving in geo</h2></div>
         <p>News first, then tools and releases, then data and community.</p>
       </div>
       <div class="catalog-controls radar-controls">
@@ -71,8 +95,9 @@
   </main>
 
   <footer>
-    <p>Mapzimus is the creative lab of Maxwell Howe. Radar data refreshes daily via GitHub Actions and hourly at the edge.</p>
-    <p class="footer-note">Sources: Maps Mania · Geography Realm · Geospatial World · QGIS plugins · GitHub releases · GIS Stack Exchange · NASA Earthdata · Data.gov · weeklyOSM</p>
+    <p>Mapzimus is the lab of Maxwell Howe. Radar data refreshes daily via GitHub Actions and hourly at the edge.</p>
+    <p class="footer-note">SOURCES: MAPS MANIA · GEOGRAPHY REALM · GEOSPATIAL WORLD · QGIS PLUGINS · GITHUB RELEASES · GIS STACK EXCHANGE · NASA EARTHDATA · DATA.GOV · WEEKLYOSM</p>
   </footer>
+</div>
 </body>
 </html>

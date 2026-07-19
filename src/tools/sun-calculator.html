@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sun Calculator</title>
+<meta name="description" content="Sunrise, sunset, twilight times and live sun position for any place and date. Runs in your browser — only the optional place search calls OpenStreetMap.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --band-civil: rgba(37,99,235,.07);
+    --band-naut:  rgba(30,64,175,.14);
+    --band-astro: rgba(30,58,138,.22);
+    --band-night: rgba(23,37,84,.30);
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --band-civil: rgba(0,0,0,.16);
+    --band-naut:  rgba(0,0,0,.30);
+    --band-astro: rgba(0,0,0,.44);
+    --band-night: rgba(0,0,0,.58);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --band-civil: rgba(0,0,0,.16);
+      --band-naut:  rgba(0,0,0,.30);
+      --band-astro: rgba(0,0,0,.44);
+      --band-night: rgba(0,0,0,.58);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { border-color: var(--ok); color: var(--ok); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; }
+  .panel h2 { margin: 0 0 12px; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .panel-head h2 { margin: 0; }
+  .tz-badge { font-family: var(--mono); font-size: .75rem; color: var(--muted); background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px; }
+
+  .topgrid { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(0,1fr); gap: 16px; align-items: stretch; margin-bottom: 16px; }
+  @media (max-width: 820px) { .topgrid { grid-template-columns: 1fr; } }
+
+  label.small, .small-lbl { display: block; font-size: .72rem; color: var(--muted); margin-bottom: 4px; }
+  input, select {
+    width: 100%; font-family: var(--mono); font-size: .92rem;
+    background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  }
+  input:focus, select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  select { font-family: var(--sans); }
+  input[type="date"] { font-family: var(--sans); }
+
+  .search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .search-row input { flex: 1; font-family: var(--sans); }
+  .search-row .btn { flex: none; padding: 8px 12px; }
+  .search-results { list-style: none; margin: 0 0 10px; padding: 0; }
+  .search-results li { padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 4px; cursor: pointer; font-size: .85rem; background: var(--surface); }
+  .search-results li:hover { border-color: var(--accent); color: var(--accent); }
+  .hide { display: none !important; }
+
+  .latlng-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .note.err { color: var(--danger); font-size: .8rem; min-height: 1.1em; margin: 0 0 8px; }
+
+  #map { height: 250px; border-radius: 10px; border: 1px solid var(--border); }
+  .map-fallback { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; height: 250px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .88rem; text-align: center; padding: 20px; }
+  .leaflet-container { font-family: var(--sans); background: var(--surface-2); }
+
+  .date-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .date-row input { flex: 1; min-width: 0; }
+  .date-row .btn { flex: none; padding: 8px 11px; }
+  .tz-row { margin-bottom: 4px; }
+  .hint { color: var(--muted); font-size: .78rem; margin: 6px 0 12px; }
+
+  .slider-row { margin-top: 4px; }
+  input[type="range"] { width: 100%; padding: 0; background: transparent; border: none; accent-color: var(--accent); height: 28px; }
+  .pos-readout { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-top: 8px; font-size: .9rem; }
+  .pos-readout .t { font-family: var(--mono); }
+  .pos-vals { display: flex; gap: 18px; margin-top: 4px; flex-wrap: wrap; }
+  .pos-vals b { font-family: var(--mono); font-weight: 600; }
+
+  .keycards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .kc { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; min-width: 0; }
+  .kc .klbl { font-size: .7rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+  .kc .kval { font-family: var(--mono); font-size: 1.3rem; margin-top: 4px; overflow-wrap: break-word; }
+  .kc .kval.na { font-family: var(--sans); font-size: .84rem; color: var(--muted); line-height: 1.35; }
+  .subgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
+  .sc { border: 1px dashed var(--border); border-radius: 10px; padding: 9px 12px; min-width: 0; }
+  .sc .klbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+  .sc .kval { font-family: var(--mono); font-size: 1rem; margin-top: 2px; }
+  .sc .kval.na { font-family: var(--sans); font-size: .78rem; color: var(--muted); line-height: 1.3; }
+  @media (max-width: 720px) {
+    .keycards, .subgrid { grid-template-columns: repeat(2, 1fr); }
+    .date-row { flex-wrap: wrap; }
+  }
+
+  .path-panel { margin-top: 16px; }
+  #sunCanvas { display: block; width: 100%; height: 260px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Sun Calculator</h1>
+      <p>Pick a place and a date to see sunrise, sunset, twilight, golden hour and where the sun sits in the sky at any moment. Everything is computed in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="topgrid">
+    <!-- ---------- Location ---------- -->
+    <section class="panel">
+      <h2>Location</h2>
+      <div class="search-row">
+        <input id="placeSearch" type="text" placeholder="Search a place name (uses OpenStreetMap)…" aria-label="Search for a place name">
+        <button class="btn" id="placeSearchBtn" type="button" title="Search">🔍</button>
+        <button class="btn" id="locateMe" type="button" title="Use your device location">📍 Locate me</button>
+      </div>
+      <ul class="search-results hide" id="searchResults"></ul>
+      <div class="latlng-row">
+        <div>
+          <label class="small" for="lat">Latitude</label>
+          <input id="lat" inputmode="decimal" autocomplete="off" placeholder="39.7392">
+        </div>
+        <div>
+          <label class="small" for="lng">Longitude</label>
+          <input id="lng" inputmode="decimal" autocomplete="off" placeholder="-104.9903">
+        </div>
+      </div>
+      <p class="note err" id="locErr"></p>
+      <div id="map" aria-label="Map. Click to set the location."></div>
+    </section>
+
+    <!-- ---------- Date & time ---------- -->
+    <section class="panel">
+      <h2>Date &amp; time</h2>
+      <div class="date-row">
+        <button class="btn" id="prevDay" type="button" aria-label="Previous day">◀</button>
+        <input id="dateInput" type="date" aria-label="Date">
+        <button class="btn" id="nextDay" type="button" aria-label="Next day">▶</button>
+        <button class="btn" id="todayBtn" type="button">Today</button>
+      </div>
+      <div class="tz-row">
+        <label class="small" for="tzSelect">Time zone offset for displayed times</label>
+        <select id="tzSelect" aria-label="UTC offset for displayed times"></select>
+      </div>
+      <p class="hint" id="tzHint"></p>
+      <div class="slider-row">
+        <label class="small" for="timeSlider">Time of day (drag to move the sun)</label>
+        <input id="timeSlider" type="range" min="0" max="1440" step="5" value="720" aria-label="Time of day">
+      </div>
+      <div class="pos-readout" id="posReadout" aria-live="polite">
+        <div>Sun at <span class="t" id="posTime">12:00</span> <span class="t" id="posTz"></span></div>
+        <div class="pos-vals">
+          <span>Altitude <b id="posAlt">–</b></span>
+          <span>Azimuth <b id="posAz">–</b></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ---------- Results ---------- -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Sun times</h2>
+      <span class="tz-badge" id="tzBadge" title="All times below use this UTC offset"></span>
+      <button class="btn" id="copyTimes" type="button" title="Copy all times as text">⧉ Copy times</button>
+    </div>
+    <div class="keycards">
+      <div class="kc"><div class="klbl">Sunrise</div><div class="kval" id="vSunrise">–</div></div>
+      <div class="kc"><div class="klbl">Sunset</div><div class="kval" id="vSunset">–</div></div>
+      <div class="kc"><div class="klbl">Solar noon</div><div class="kval" id="vNoon">–</div></div>
+      <div class="kc"><div class="klbl">Day length</div><div class="kval" id="vDayLen">–</div></div>
+    </div>
+    <div class="subgrid">
+      <div class="sc"><div class="klbl">Civil twilight begins</div><div class="kval" id="vCivilB">–</div></div>
+      <div class="sc"><div class="klbl">Civil twilight ends</div><div class="kval" id="vCivilE">–</div></div>
+      <div class="sc"><div class="klbl">Nautical twilight begins</div><div class="kval" id="vNautB">–</div></div>
+      <div class="sc"><div class="klbl">Nautical twilight ends</div><div class="kval" id="vNautE">–</div></div>
+      <div class="sc"><div class="klbl">Astronomical twilight begins</div><div class="kval" id="vAstroB">–</div></div>
+      <div class="sc"><div class="klbl">Astronomical twilight ends</div><div class="kval" id="vAstroE">–</div></div>
+      <div class="sc"><div class="klbl">Golden hour ends (morning)</div><div class="kval" id="vGoldE">–</div></div>
+      <div class="sc"><div class="klbl">Golden hour begins (evening)</div><div class="kval" id="vGoldB">–</div></div>
+    </div>
+  </section>
+
+  <!-- ---------- Sun path ---------- -->
+  <section class="panel path-panel">
+    <div class="panel-head">
+      <h2>Sun path over the day</h2>
+      <span class="tz-badge" id="tzBadge2"></span>
+    </div>
+    <canvas id="sunCanvas" height="260" aria-label="Chart of the sun's altitude over the 24-hour day"></canvas>
+  </section>
+
+  <footer class="app">
+    Calculations follow NOAA's solar equations — accurate to within a minute or two.
+    Place search queries OpenStreetMap Nominatim; everything else stays in your browser. · a <strong>max</strong> tool
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Sun Calculator — standalone, client-side.
+   Solar math implemented inline from NOAA's solar calculation
+   spreadsheet formulas (Julian century → declination + equation
+   of time → hour angles → event times, alt/az).
+   Only dependency: Leaflet 1.9.4 (background-loaded below).
+   ============================================================ */
+'use strict';
+const $ = (id) => document.getElementById(id);
+const RAD = Math.PI / 180, DEG = 180 / Math.PI;
+
+/* ---------------- NOAA solar math ---------------- */
+// Sun declination (deg) and equation of time (minutes) for a Julian Day.
+function solarParams(jd) {
+  const T = (jd - 2451545.0) / 36525.0;                          // Julian century
+  const L0 = (((280.46646 + T * (36000.76983 + T * 0.0003032)) % 360) + 360) % 360; // geometric mean longitude
+  const M = 357.52911 + T * (35999.05029 - 0.0001537 * T);       // geometric mean anomaly
+  const e = 0.016708634 - T * (0.000042037 + 0.0000001267 * T);  // orbital eccentricity
+  const C = Math.sin(M * RAD) * (1.914602 - T * (0.004817 + 0.000014 * T))
+          + Math.sin(2 * M * RAD) * (0.019993 - 0.000101 * T)
+          + Math.sin(3 * M * RAD) * 0.000289;                    // equation of center
+  const trueLong = L0 + C;                                       // true longitude
+  const omega = 125.04 - 1934.136 * T;
+  const appLong = trueLong - 0.00569 - 0.00478 * Math.sin(omega * RAD); // apparent longitude
+  const meanObliq = 23 + (26 + (21.448 - T * (46.815 + T * (0.00059 - T * 0.001813))) / 60) / 60;
+  const obliq = meanObliq + 0.00256 * Math.cos(omega * RAD);     // corrected obliquity
+  const dec = Math.asin(Math.sin(obliq * RAD) * Math.sin(appLong * RAD)) * DEG; // declination
+  const y = Math.tan((obliq / 2) * RAD) ** 2;
+  const eqTime = 4 * DEG * (
+      y * Math.sin(2 * L0 * RAD)
+    - 2 * e * Math.sin(M * RAD)
+    + 4 * e * y * Math.sin(M * RAD) * Math.cos(2 * L0 * RAD)
+    - 0.5 * y * y * Math.sin(4 * L0 * RAD)
+    - 1.25 * e * e * Math.sin(2 * M * RAD));                     // minutes
+  return { dec, eqTime };
+}
+
+// NOAA atmospheric refraction correction (deg) for a true altitude (deg).
+function refractionCorr(alt) {
+  if (alt > 85) return 0;
+  const te = Math.tan(alt * RAD);
+  let r;
+  if (alt > 5) r = 58.1 / te - 0.07 / (te ** 3) + 0.000086 / (te ** 5);
+  else if (alt > -0.575) r = 1735 + alt * (-518.2 + alt * (103.4 + alt * (-12.79 + alt * 0.711)));
+  else r = -20.774 / te;
+  return r / 3600;
+}
+
+const clampLat = (lat) => Math.max(-89.99, Math.min(89.99, lat));
+
+// All event times for the given UTC date (jd0 = JD at 00:00 UTC).
+// Times are minutes from 00:00 UTC (may run slightly past the day's edges).
+// status: 'ok' | 'below' (sun never gets above the event altitude)
+//               | 'above' (sun never gets below it).
+function computeEvents(jd0, latIn, lng) {
+  const lat = clampLat(latIn);
+  let noon = 720 - 4 * lng;                                  // first guess, minutes UTC
+  for (let i = 0; i < 3; i++) noon = 720 - 4 * lng - solarParams(jd0 + noon / 1440).eqTime;
+
+  function crossing(zenith, morning) {
+    let t = noon;
+    for (let i = 0; i < 3; i++) {                            // refine dec/eqTime at the event time
+      const p = solarParams(jd0 + t / 1440);
+      const cosH = (Math.cos(zenith * RAD) - Math.sin(lat * RAD) * Math.sin(p.dec * RAD))
+                 / (Math.cos(lat * RAD) * Math.cos(p.dec * RAD));
+      if (cosH > 1) return { status: 'below' };
+      if (cosH < -1) return { status: 'above' };
+      const ha4 = Math.acos(cosH) * DEG * 4;                 // hour angle in minutes
+      t = 720 - 4 * lng - p.eqTime + (morning ? -ha4 : ha4);
+    }
+    return { status: 'ok', utcMin: t };
+  }
+
+  return {
+    noon:    { status: 'ok', utcMin: noon },
+    sunrise: crossing(90.833, true),  sunset: crossing(90.833, false),
+    civilB:  crossing(96, true),      civilE: crossing(96, false),
+    nautB:   crossing(102, true),     nautE:  crossing(102, false),
+    astroB:  crossing(108, true),     astroE: crossing(108, false),
+    goldE:   crossing(84, true),      goldB:  crossing(84, false),
+  };
+}
+
+// Sun altitude & azimuth (deg) at an absolute instant (ms since epoch).
+function sunPosition(ms, latIn, lng) {
+  const lat = clampLat(latIn);
+  const jd = ms / 86400000 + 2440587.5;
+  const p = solarParams(jd);
+  const days = jd - 2440587.5;
+  const minutesUTC = (days - Math.floor(days)) * 1440;
+  let tst = (minutesUTC + p.eqTime + 4 * lng) % 1440;        // true solar time
+  if (tst < 0) tst += 1440;
+  const ha = tst / 4 - 180;                                  // hour angle, deg
+  const sinAlt = Math.sin(lat * RAD) * Math.sin(p.dec * RAD)
+               + Math.cos(lat * RAD) * Math.cos(p.dec * RAD) * Math.cos(ha * RAD);
+  const alt = Math.asin(Math.max(-1, Math.min(1, sinAlt))) * DEG;
+  let az = Math.atan2(Math.sin(ha * RAD),
+      Math.cos(ha * RAD) * Math.sin(lat * RAD) - Math.tan(p.dec * RAD) * Math.cos(lat * RAD)) * DEG + 180;
+  az = ((az % 360) + 360) % 360;
+  return { alt, altRefr: alt + refractionCorr(alt), az };
+}
+
+const COMPASS = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+const compassPoint = (az) => COMPASS[Math.round(az / 22.5) % 16];
+
+/* ---------------- state ---------------- */
+const LOC_KEY = 'max-sun-loc';
+const state = {
+  lat: 39.7392, lng: -104.9903,       // Denver, Colorado (default)
+  dateStr: '',                         // YYYY-MM-DD
+  offsetMin: -new Date().getTimezoneOffset(),
+  sliderMin: 720,
+};
+let events = null;
+let map = null, marker = null, updating = false;
+
+function localTodayStr() {
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+}
+function jd0OfDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return Date.UTC(y, m - 1, d) / 86400000 + 2440587.5;
+}
+function dayStartUTCms() {  // midnight of the chosen date in the SELECTED offset clock
+  const [y, m, d] = state.dateStr.split('-').map(Number);
+  return Date.UTC(y, m - 1, d) - state.offsetMin * 60000;
+}
+
+/* ---------------- formatting ---------------- */
+function fmtOffset(min) {
+  const s = min < 0 ? '-' : '+';
+  const a = Math.abs(min);
+  return `UTC${s}${String(Math.floor(a / 60)).padStart(2, '0')}:${String(a % 60).padStart(2, '0')}`;
+}
+function fmtHM(min) {
+  min = Math.round(min);
+  const h = Math.floor(min / 60), m = min % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+// UTC event minutes -> "HH:MM" in the selected offset (with day marker if it spills over)
+function fmtEventTime(utcMin) {
+  let t = Math.round(utcMin) + state.offsetMin;
+  let d = 0;
+  while (t < 0) { t += 1440; d--; }
+  while (t >= 1440) { t -= 1440; d++; }
+  return fmtHM(t) + (d === 0 ? '' : (d > 0 ? ` (+${d}d)` : ` (${d}d)`));
+}
+function polarMsg(key, status) {
+  if (key === 'sun') {
+    return status === 'below' ? 'Sun never rises on this date' : 'Sun never sets on this date';
+  }
+  const deg = { civil: '-6°', naut: '-12°', astro: '-18°', gold: '6°' }[key];
+  return status === 'below' ? `Sun stays below ${deg} all day` : `Sun stays above ${deg} all day`;
+}
+
+/* ---------------- rendering ---------------- */
+function setEventCell(id, ev, key) {
+  const el = $(id);
+  if (ev.status === 'ok') { el.textContent = fmtEventTime(ev.utcMin); el.classList.remove('na'); }
+  else { el.textContent = polarMsg(key, ev.status); el.classList.add('na'); }
+}
+
+function recompute() {
+  events = computeEvents(jd0OfDate(state.dateStr), state.lat, state.lng);
+
+  setEventCell('vSunrise', events.sunrise, 'sun');
+  setEventCell('vSunset', events.sunset, 'sun');
+  setEventCell('vNoon', events.noon, 'sun');
+  setEventCell('vCivilB', events.civilB, 'civil');
+  setEventCell('vCivilE', events.civilE, 'civil');
+  setEventCell('vNautB', events.nautB, 'naut');
+  setEventCell('vNautE', events.nautE, 'naut');
+  setEventCell('vAstroB', events.astroB, 'astro');
+  setEventCell('vAstroE', events.astroE, 'astro');
+  setEventCell('vGoldE', events.goldE, 'gold');
+  setEventCell('vGoldB', events.goldB, 'gold');
+
+  const dl = $('vDayLen');
+  dl.classList.remove('na');
+  if (events.sunrise.status === 'ok' && events.sunset.status === 'ok') {
+    const mins = Math.round(events.sunset.utcMin - events.sunrise.utcMin);
+    dl.textContent = `${Math.floor(mins / 60)}h ${String(mins % 60).padStart(2, '0')}m`;
+  } else if (events.sunrise.status === 'above') {
+    dl.textContent = '24h 00m';
+  } else {
+    dl.textContent = '0h 00m';
+  }
+
+  const off = fmtOffset(state.offsetMin);
+  $('tzBadge').textContent = `all times ${off}`;
+  $('tzBadge2').textContent = `x-axis in ${off}`;
+  $('tzHint').textContent = `Times shown in ${off}. If the location is far from you, pick its offset.`;
+  $('posTz').textContent = off;
+
+  renderPosition();
+  drawPath();
+  publishDebugState();
+}
+
+function renderPosition() {
+  const ms = dayStartUTCms() + state.sliderMin * 60000;
+  const pos = sunPosition(ms, state.lat, state.lng);
+  $('posTime').textContent = fmtHM(state.sliderMin);
+  $('posAlt').textContent = `${pos.altRefr.toFixed(1)}°`;
+  $('posAz').textContent = `${pos.az.toFixed(1)}° (${compassPoint(pos.az)})`;
+  return pos;
+}
+
+/* ---------------- sun path canvas ---------------- */
+function drawPath() {
+  const cv = $('sunCanvas');
+  const cssW = cv.clientWidth || 600, cssH = 260;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(cssW * dpr);
+  cv.height = Math.round(cssH * dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+
+  const cs = getComputedStyle(document.documentElement);
+  const tok = (n) => cs.getPropertyValue(n).trim();
+  const padL = 36, padR = 14, padT = 16, padB = 26;
+  const iw = cssW - padL - padR, ih = cssH - padT - padB;
+  const X = (min) => padL + (min / 1440) * iw;
+  const Y = (alt) => padT + ((90 - alt) / 180) * ih;
+
+  // altitude samples across the local (selected-offset) day, every 5 min
+  const start = dayStartUTCms();
+  const N = 288;
+  const samples = [];
+  for (let i = 0; i <= N; i++) {
+    const min = i * 5;
+    samples.push({ min, alt: sunPosition(start + min * 60000, state.lat, state.lng).altRefr });
+  }
+
+  // twilight/night bands (by sun altitude at each moment)
+  const bandCol = [null, tok('--band-civil'), tok('--band-naut'), tok('--band-astro'), tok('--band-night')];
+  const bandOf = (alt) => alt >= -0.833 ? 0 : alt >= -6 ? 1 : alt >= -12 ? 2 : alt >= -18 ? 3 : 4;
+  let runStart = 0, runBand = bandOf(samples[0].alt);
+  const flush = (endIdx) => {
+    if (runBand > 0) {
+      ctx.fillStyle = bandCol[runBand];
+      const x0 = X(samples[runStart].min), x1 = X(samples[endIdx].min);
+      ctx.fillRect(x0, padT, x1 - x0, ih);
+    }
+  };
+  for (let i = 1; i <= N; i++) {
+    const b = bandOf(samples[i].alt);
+    if (b !== runBand) { flush(i); runStart = i; runBand = b; }
+  }
+  flush(N);
+
+  // grid: ±45° faint dashed, horizon emphasized
+  ctx.strokeStyle = tok('--border');
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 4]);
+  [45, -45].forEach(a => { ctx.beginPath(); ctx.moveTo(padL, Y(a)); ctx.lineTo(cssW - padR, Y(a)); ctx.stroke(); });
+  ctx.setLineDash([]);
+  ctx.strokeStyle = tok('--muted');
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(padL, Y(0)); ctx.lineTo(cssW - padR, Y(0)); ctx.stroke();
+
+  // axis labels
+  ctx.fillStyle = tok('--muted');
+  ctx.font = '10px ' + tok('--sans');
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  [[90, '+90°'], [45, '+45°'], [0, '0°'], [-45, '-45°'], [-90, '-90°']].forEach(([a, s]) => ctx.fillText(s, padL - 5, Y(a)));
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (let h = 0; h <= 24; h += 6) ctx.fillText(`${String(h).padStart(2, '0')}:00`, X(h * 60), cssH - padB + 6);
+
+  // altitude curve
+  ctx.strokeStyle = tok('--accent');
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  samples.forEach((s, i) => { const x = X(s.min), y = Y(s.alt); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+  ctx.stroke();
+
+  // sunrise / sunset markers
+  ctx.font = '11px ' + tok('--sans');
+  ctx.textBaseline = 'bottom';
+  const mark = (ev, arrow) => {
+    if (!ev || ev.status !== 'ok') return;
+    const lm = ev.utcMin + state.offsetMin;
+    if (lm < 0 || lm > 1440) return;
+    const x = X(lm);
+    ctx.fillStyle = tok('--text');
+    ctx.beginPath(); ctx.arc(x, Y(0), 3, 0, Math.PI * 2); ctx.fill();
+    ctx.textAlign = x < padL + 40 ? 'left' : (x > cssW - padR - 40 ? 'right' : 'center');
+    ctx.fillText(`${arrow} ${fmtHM(((Math.round(ev.utcMin) + state.offsetMin) % 1440 + 1440) % 1440)}`, x, Y(0) - 7);
+  };
+  if (events) { mark(events.sunrise, '↑'); mark(events.sunset, '↓'); }
+
+  // slider-time sun dot
+  const pos = sunPosition(dayStartUTCms() + state.sliderMin * 60000, state.lat, state.lng);
+  const sx = X(state.sliderMin), sy = Y(pos.altRefr);
+  ctx.strokeStyle = tok('--border');
+  ctx.lineWidth = 1;
+  ctx.setLineDash([2, 3]);
+  ctx.beginPath(); ctx.moveTo(sx, padT); ctx.lineTo(sx, padT + ih); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = tok('--accent');
+  ctx.beginPath(); ctx.arc(sx, sy, 5.5, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = tok('--surface');
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(sx, sy, 5.5, 0, Math.PI * 2); ctx.stroke();
+
+  drawPath.lastDot = { x: sx, y: sy };
+}
+
+// tiny inspectable state (used by tests; harmless in normal use)
+function publishDebugState() {
+  const pos = sunPosition(dayStartUTCms() + state.sliderMin * 60000, state.lat, state.lng);
+  window.__sun = { state: { ...state }, events, pos, dot: drawPath.lastDot };
+}
+
+/* ---------------- location handling ---------------- */
+function saveLoc() {
+  try { localStorage.setItem(LOC_KEY, JSON.stringify({ lat: state.lat, lng: state.lng })); } catch (e) { /* ignore */ }
+}
+function setLocation(lat, lng, source) {
+  if (!isFinite(lat) || !isFinite(lng)) return false;
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return false;
+  state.lat = lat; state.lng = lng;
+  updating = true;
+  if (source !== 'inputs') { $('lat').value = lat.toFixed(4); $('lng').value = lng.toFixed(4); }
+  if (map && source !== 'map') { marker.setLatLng([lat, lng]); map.panTo([lat, lng]); }
+  if (map && source === 'map') marker.setLatLng([lat, lng]);
+  updating = false;
+  $('locErr').textContent = '';
+  saveLoc();
+  recompute();
+  return true;
+}
+
+['lat', 'lng'].forEach(id => $(id).addEventListener('input', () => {
+  if (updating) return;
+  const lat = parseFloat($('lat').value), lng = parseFloat($('lng').value);
+  if (!isFinite(lat) || !isFinite(lng)) return;
+  if (!setLocation(lat, lng, 'inputs')) $('locErr').textContent = 'Latitude must be -90..90, longitude -180..180.';
+}));
+
+/* ---------------- date & offset controls ---------------- */
+function setDate(dateStr) {
+  state.dateStr = dateStr;
+  $('dateInput').value = dateStr;
+  recompute();
+}
+$('dateInput').addEventListener('change', () => {
+  const v = $('dateInput').value;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) setDate(v);
+});
+function stepDay(delta) {
+  const [y, m, d] = state.dateStr.split('-').map(Number);
+  const nd = new Date(Date.UTC(y, m - 1, d) + delta * 86400000);
+  setDate(nd.toISOString().slice(0, 10));
+}
+$('prevDay').addEventListener('click', () => stepDay(-1));
+$('nextDay').addEventListener('click', () => stepDay(1));
+$('todayBtn').addEventListener('click', () => setDate(localTodayStr()));
+
+// UTC offsets: whole hours -12..+14 plus real-world 30/45-minute zones
+const OFFSETS = [-720,-660,-600,-570,-540,-480,-420,-360,-300,-240,-210,-180,-120,-60,0,
+  60,120,180,210,240,270,300,330,345,360,390,420,480,525,540,570,600,630,660,720,765,780,840];
+function buildTzSelect() {
+  const sel = $('tzSelect');
+  const list = OFFSETS.includes(state.offsetMin)
+    ? OFFSETS : [...OFFSETS, state.offsetMin].sort((a, b) => a - b);
+  list.forEach(min => {
+    const o = document.createElement('option');
+    o.value = min;
+    o.textContent = fmtOffset(min) + (min === -new Date().getTimezoneOffset() ? ' (your browser)' : '');
+    sel.appendChild(o);
+  });
+  sel.value = state.offsetMin;
+}
+$('tzSelect').addEventListener('change', () => {
+  state.offsetMin = parseInt($('tzSelect').value, 10);
+  recompute();
+});
+
+/* ---------------- time slider ---------------- */
+$('timeSlider').addEventListener('input', () => {
+  state.sliderMin = parseInt($('timeSlider').value, 10);
+  renderPosition();
+  drawPath();
+  publishDebugState();
+});
+
+/* ---------------- copy times ---------------- */
+function timesText() {
+  const off = fmtOffset(state.offsetMin);
+  const line = (label, ev, key) =>
+    `${label.padEnd(30)}${ev.status === 'ok' ? fmtEventTime(ev.utcMin) : polarMsg(key, ev.status)}`;
+  const out = [
+    `Sun times for ${state.lat.toFixed(4)}, ${state.lng.toFixed(4)} on ${state.dateStr} (times in ${off})`,
+    line('Astronomical twilight begins', events.astroB, 'astro'),
+    line('Nautical twilight begins', events.nautB, 'naut'),
+    line('Civil twilight begins', events.civilB, 'civil'),
+    line('Sunrise', events.sunrise, 'sun'),
+    line('Golden hour ends', events.goldE, 'gold'),
+    line('Solar noon', events.noon, 'sun'),
+    line('Golden hour begins', events.goldB, 'gold'),
+    line('Sunset', events.sunset, 'sun'),
+    line('Civil twilight ends', events.civilE, 'civil'),
+    line('Nautical twilight ends', events.nautE, 'naut'),
+    line('Astronomical twilight ends', events.astroE, 'astro'),
+    `${'Day length'.padEnd(30)}${$('vDayLen').textContent}`,
+  ];
+  return out.join('\n');
+}
+$('copyTimes').addEventListener('click', async () => {
+  const btn = $('copyTimes');
+  try {
+    await navigator.clipboard.writeText(timesText());
+    const old = btn.textContent;
+    btn.classList.add('copied'); btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1200);
+  } catch (e) { /* clipboard blocked; ignore */ }
+});
+
+/* ---------------- locate me ---------------- */
+$('locateMe').addEventListener('click', () => {
+  if (!navigator.geolocation) { $('locErr').textContent = 'Geolocation is not supported by your browser.'; return; }
+  const btn = $('locateMe');
+  btn.textContent = '⏳ Locating…'; btn.disabled = true;
+  const done = () => { btn.textContent = '📍 Locate me'; btn.disabled = false; };
+  navigator.geolocation.getCurrentPosition(
+    (pos) => { setLocation(pos.coords.latitude, pos.coords.longitude, null); if (map) map.setView([state.lat, state.lng], 10); done(); },
+    () => { $('locErr').textContent = 'Location access denied or unavailable.'; done(); },
+    { enableHighAccuracy: false, timeout: 8000 }
+  );
+});
+
+/* ---------------- place search (Nominatim) ---------------- */
+async function searchPlace() {
+  const q = $('placeSearch').value.trim();
+  if (!q) return;
+  $('placeSearchBtn').textContent = '⏳';
+  try {
+    const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(q)}`);
+    const data = await resp.json();
+    const ul = $('searchResults');
+    ul.innerHTML = ''; ul.classList.remove('hide');
+    if (!data.length) { ul.innerHTML = '<li style="cursor:default;color:var(--muted)">No results found</li>'; }
+    else data.forEach(r => {
+      const li = document.createElement('li');
+      li.textContent = r.display_name;
+      li.addEventListener('click', () => {
+        setLocation(parseFloat(r.lat), parseFloat(r.lon), null);
+        if (map) map.setView([state.lat, state.lng], Math.max(map.getZoom(), 9));
+        ul.classList.add('hide');
+        $('placeSearch').value = r.display_name;
+      });
+      ul.appendChild(li);
+    });
+  } catch (e) { $('locErr').textContent = 'Search failed — check your connection.'; }
+  $('placeSearchBtn').textContent = '🔍';
+}
+$('placeSearchBtn').addEventListener('click', searchPlace);
+$('placeSearch').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchPlace(); });
+
+/* ---------------- Leaflet: background load with fallback ---------------- */
+function initMap() {
+  if (map || !window.L || !$('map')) return;
+  map = L.map('map', { worldCopyJump: true }).setView([state.lat, state.lng], 8);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  marker = L.marker([state.lat, state.lng], { draggable: true }).addTo(map);
+  marker.on('drag', (e) => { const p = e.target.getLatLng(); setLocation(p.lat, ((p.lng + 540) % 360) - 180, 'map'); });
+  map.on('click', (e) => { setLocation(e.latlng.lat, ((e.latlng.lng + 540) % 360) - 180, 'map'); });
+}
+function mapFallback() {
+  if (map || !$('map')) return;
+  const el = document.createElement('div');
+  el.className = 'map-fallback';
+  el.innerHTML = 'Map unavailable — the Leaflet library didn\'t load.<br>Type coordinates or search a place instead; all sun math still works.';
+  $('map').replaceWith(el);
+}
+(function loadLeaflet() {
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+  css.crossOrigin = '';
+  document.head.appendChild(css);
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+  s.crossOrigin = '';
+  s.onload = initMap;
+  s.onerror = mapFallback;
+  document.head.appendChild(s);
+  setTimeout(() => { if (!window.L) mapFallback(); }, 8000);
+})();
+
+/* ---------------- theme toggle ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+// canvas colors depend on the theme — redraw after any theme change
+document.getElementById('themeBtn').addEventListener('click', () => drawPath());
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => drawPath());
+window.addEventListener('resize', () => drawPath());
+
+/* ---------------- boot ---------------- */
+(function boot() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(LOC_KEY) || 'null');
+    if (saved && isFinite(saved.lat) && isFinite(saved.lng)
+        && saved.lat >= -90 && saved.lat <= 90 && saved.lng >= -180 && saved.lng <= 180) {
+      state.lat = +saved.lat; state.lng = +saved.lng;
+    }
+  } catch (e) { /* corrupted storage — keep the default */ }
+
+  state.dateStr = localTodayStr();
+  const now = new Date();
+  state.sliderMin = Math.min(1440, Math.round((now.getHours() * 60 + now.getMinutes()) / 5) * 5);
+
+  $('lat').value = state.lat.toFixed(4);
+  $('lng').value = state.lng.toFixed(4);
+  $('dateInput').value = state.dateStr;
+  $('timeSlider').value = state.sliderMin;
+  buildTzSelect();
+  recompute();
+})();
+</script>
+</body>
+</html>

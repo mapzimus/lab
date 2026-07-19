@@ -4,7 +4,12 @@
     "title": "Train Route Atlas",
     "description": "Twelve legendary train routes — high-speed, scenic, night, and classic — draped over an interactive 3D globe with specs, filters, and popups, all client-side.",
     "category": "maps",
-    "tags": ["MapLibre", "globe", "GeoJSON", "railways"],
+    "tags": [
+      "MapLibre",
+      "globe",
+      "GeoJSON",
+      "railways"
+    ],
     "url": "https://mapzimus.com/lab/train-routes/",
     "status": "live",
     "updated": "2026-07"
@@ -14,8 +19,12 @@
     "title": "Geopuesto Playground",
     "description": "Spherical-geometry experiments for great circles, equidistant points, polyhedra, and curve analysis on a globe.",
     "category": "experiments",
-    "tags": ["geometry", "Leaflet", "research sandbox"],
-    "url": "https://maxwellhowegis.com/geopuesto/playground/",
+    "tags": [
+      "geometry",
+      "Leaflet",
+      "research sandbox"
+    ],
+    "url": "https://mapzimus.com/geopuesto/playground/",
     "status": "live",
     "updated": "2026-07"
   },
@@ -24,8 +33,12 @@
     "title": "U.S. Fantasy Transit Network",
     "description": "A generated four-tier North American transit network connecting Census places at continental, regional, metro, and commuter scales.",
     "category": "maps",
-    "tags": ["Python", "Leaflet", "fantasy transit"],
-    "url": "https://maxwellhowegis.com/transit/",
+    "tags": [
+      "Python",
+      "Leaflet",
+      "fantasy transit"
+    ],
+    "url": "https://mapzimus.com/transit/",
     "status": "live",
     "updated": "2026-07"
   },
@@ -34,8 +47,12 @@
     "title": "Concord Civil War",
     "description": "An alternate-history scrollytelling map that divides Concord, New Hampshire along the Merrimack River.",
     "category": "experiments",
-    "tags": ["MapLibre", "scrollytelling", "alternate history"],
-    "url": "https://mapzimus.github.io/concord-war/",
+    "tags": [
+      "MapLibre",
+      "scrollytelling",
+      "alternate history"
+    ],
+    "url": "https://mapzimus.com/concord-war/",
     "status": "live",
     "updated": "2026-07"
   },
@@ -44,18 +61,39 @@
     "title": "Bug Wars",
     "description": "A compact browser strategy game about building an insect colony and surviving rival swarms.",
     "category": "play",
-    "tags": ["strategy", "browser game"],
-    "url": "https://maxwellhowegis.com/bugwars/",
+    "tags": [
+      "strategy",
+      "browser game"
+    ],
+    "url": "https://mapzimus.com/games/bugwars/",
     "status": "live",
     "updated": "2026-07"
   },
   {
     "slug": "flip-game",
     "title": "Flip Game",
-    "description": "A small logic game built around flipping neighboring cells and finding the shortest path to a solved board.",
+    "description": "A bottle-flip physics game — time your flick, land the bottle, chain streaks across increasingly absurd targets.",
     "category": "play",
-    "tags": ["logic", "browser game"],
-    "url": "https://github.com/mapzimus/flipgame",
+    "tags": [
+      "physics",
+      "browser game",
+      "PWA"
+    ],
+    "url": "https://mapzimus.com/games/flip/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "grog-flip",
+    "title": "Grog Flip",
+    "description": "The pirate-parrot cousin of Flip Game, built for the Whydah unit — flip Grog's tankard and stick the landing.",
+    "category": "play",
+    "tags": [
+      "physics",
+      "browser game",
+      "Whydah"
+    ],
+    "url": "https://mapzimus.com/games/grog-flip/",
     "status": "live",
     "updated": "2026-07"
   },
@@ -64,9 +102,71 @@
     "title": "True Scale",
     "description": "A map experiment for comparing the apparent and actual size of places across latitudes.",
     "category": "maps",
-    "tags": ["projection", "MapLibre", "scale"],
-    "url": "https://maxwellhowegis.com/truescale/",
+    "tags": [
+      "projection",
+      "MapLibre",
+      "scale"
+    ],
+    "url": "https://mapzimus.com/truescale/",
     "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "whydah-voyage",
+    "title": "Whydah Voyage",
+    "description": "A project-based learning dashboard for a 5-week middle-school unit on the Whydah Gally — the 1717 pirate ship wrecked off Cape Cod — with maps, a navigator, handouts, and daily pages.",
+    "category": "teaching",
+    "tags": [
+      "PBL",
+      "pirates",
+      "maps",
+      "curriculum"
+    ],
+    "url": "https://mapzimus.com/whydah/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "tappymaps",
+    "title": "Tappymaps Arcade",
+    "description": "Tap-to-color US state and county maps plus a shelf of geography arcade games — locate, recall, duel, and daily draft modes.",
+    "category": "play",
+    "tags": [
+      "geography",
+      "games",
+      "maps"
+    ],
+    "url": "https://mapzimus.com/tappymaps/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "mcas-dashboard",
+    "title": "MCAS Item Dashboard",
+    "description": "An interactive catalog of released MCAS math items — browse by year, standard, and difficulty, with item images and figures.",
+    "category": "teaching",
+    "tags": [
+      "MCAS",
+      "math",
+      "assessment",
+      "data"
+    ],
+    "url": "https://mapzimus.com/mcas/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "savvas-extraction",
+    "title": "Savvas Curriculum Extraction",
+    "description": "Work-in-progress viewer for the Savvas curriculum extraction — course, topic, and section structure as it comes out of the parser.",
+    "category": "teaching",
+    "tags": [
+      "curriculum",
+      "extraction",
+      "WIP"
+    ],
+    "url": "https://mapzimus.com/savvas/",
+    "status": "in-progress",
     "updated": "2026-07"
   },
   {
@@ -74,9 +174,43 @@
     "title": "Predicting Tomorrow's Housing Crisis",
     "description": "An interactive tract explorer for a predictive GIS suitability model — housing stress, homelessness pressure, and supportive-housing suitability across 1,613 Massachusetts census tracts, computed in open-source Python.",
     "category": "maps",
-    "tags": ["Python", "geopandas", "MapLibre", "suitability model", "housing"],
+    "tags": [
+      "Python",
+      "geopandas",
+      "MapLibre",
+      "suitability model",
+      "housing"
+    ],
     "url": "https://mapzimus.com/lab/housing-crisis/",
     "status": "in-progress",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "interstate-challenge",
+    "title": "Sequential Interstate Challenge",
+    "description": "Drive every two-digit Interstate end to end — an optimized order and orientation cuts connector drive time 86% versus strict numerical order, on an interactive A-vs-B map.",
+    "category": "maps",
+    "tags": [
+      "route optimization",
+      "MapLibre",
+      "OSRM"
+    ],
+    "url": "https://maxwellhowegis.com/interstate-challenge/",
+    "status": "live",
+    "updated": "2026-07"
+  },
+  {
+    "slug": "mapzimus-board",
+    "title": "Mapzimus Board",
+    "description": "The lab's idea engine — a live board that scores roughly 20,000 candidate map ideas by predicted virality with a weighted seven-dimension V-Score.",
+    "category": "experiments",
+    "tags": [
+      "idea scoring",
+      "vanilla JS",
+      "Python"
+    ],
+    "url": "https://mapzimus.github.io/mapzimus-board/",
+    "status": "live",
     "updated": "2026-07"
   }
 ]
