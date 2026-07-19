@@ -35,7 +35,9 @@ function decodeText(value) {
 const knownCategories = new Set(["maps", "data", "design", "teaching", "math", "fun", "play", "experiments"]);
 const requiredFields = ["slug", "title", "description", "category", "url"];
 
-/** First-party routes for projects that are snapshotted under vendor/apps/. */
+/** First-party routes for projects hosted on-site (snapshotted under vendor/
+    apps/ or copied under src/). Projects with a canonical home elsewhere are
+    marked `external: true` in projects.json instead and link straight there. */
 const hostedProjectRoutes = {
   "geopuesto-playground": "/geopuesto/playground/",
   "us-fantasy-transit": "/transit/",
@@ -46,12 +48,8 @@ const hostedProjectRoutes = {
   "whydah-voyage": "/whydah-voyage/",
   "black-sam": "/black-sam/",
   "true-scale": "/true-scale/",
-  "interstate-challenge": "/interstate-challenge/",
-  "mapzimus-board": "/mapzimus-board/",
   "train-route-atlas": "/lab/train-routes/",
   "predicting-housing-crisis": "/lab/housing-crisis/",
-  "tappymaps": "/tappymaps/",
-  "mcas-dashboard": "/mcas/",
   "savvas-extraction": "/savvas/",
 };
 
@@ -66,8 +64,6 @@ const appRoutes = {
   "whydah-voyage": "whydah-voyage",
   "black-sam": "black-sam",
   "true-scale": "true-scale",
-  "interstate-challenge": "interstate-challenge",
-  "mapzimus-board": "mapzimus-board",
 };
 
 const tools = loadCatalog("tools.json");
