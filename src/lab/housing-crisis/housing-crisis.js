@@ -5,16 +5,17 @@
    scores (0-100, statewide) computed by github.com/mapzimus/predicting-housing-crisis. */
 
 const METRICS = {
+  // Ramps run dark -> bright so "bright = high" reads correctly on the dark map.
   HSI: {
     label: "Housing Stress Index",
-    ramp: ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"],
+    ramp: ["#1b0c41", "#7d2482", "#c43c4e", "#f8850f", "#fcffa4"],
     note: "Cost burden (40%) + availability (25%) + decade trajectory (20%) + " +
       "economic precarity (15%), percentile-scored statewide from ACS 2019–2023 " +
       "and 2009–2013.",
   },
   HPP: {
     label: "Homelessness Pressure — proxy",
-    ramp: ["#f5eddc", "#e7a284", "#cf5a68", "#93325f", "#3c0f4c"],
+    ramp: ["#3c0f4c", "#93325f", "#cf5a68", "#e7a284", "#f5eddc"],
     note: "A proxy composite of literature-based correlates (severe rent burden, " +
       "poverty, overcrowding, rent growth, vulnerability, market tightness) — NOT " +
       "observed homelessness, which is counted only at Continuum-of-Care level.",
@@ -28,7 +29,7 @@ const METRICS = {
   },
 };
 
-const NO_DATA = "#d9d9d9";
+const NO_DATA = "#3f434c";
 const BREAKS = [20, 40, 60, 80];
 const MA_BOUNDS = [[-73.60, 41.15], [-69.85, 42.95]];
 
@@ -92,7 +93,11 @@ function init() {
         id: "osm",
         type: "raster",
         source: "osm",
-        paint: { "raster-saturation": -0.9, "raster-opacity": 0.85 },
+        paint: {
+          "raster-saturation": -0.9,
+          "raster-opacity": 0.85,
+          "raster-brightness-max": 0.4,
+        },
       }],
     },
     bounds: MA_BOUNDS,
@@ -117,13 +122,13 @@ function init() {
       id: "tracts-line",
       type: "line",
       source: "tracts",
-      paint: { "line-color": "#ffffff", "line-width": 0.4, "line-opacity": 0.55 },
+      paint: { "line-color": "#14161c", "line-width": 0.4, "line-opacity": 0.6 },
     });
     map.addLayer({
       id: "tracts-highlight",
       type: "line",
       source: "tracts",
-      paint: { "line-color": "#171a20", "line-width": 2 },
+      paint: { "line-color": "#f0ecdf", "line-width": 2 },
       filter: ["==", ["get", "GEOID"], ""],
     });
 
