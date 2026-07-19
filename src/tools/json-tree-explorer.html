@@ -1,0 +1,1086 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JSON Tree Explorer</title>
+<meta name="description" content="Paste JSON and explore it as a collapsible tree — search keys and values, copy any path, extract values, and pluck lists. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  /* extra tokens (light + dark) */
+  :root {
+    --veil:rgba(37,99,235,.07); --mark:#ffe067; --mark-ink:#3a2f00;
+    --c-str:#0a7d46; --c-num:#2563eb; --c-bool:#8a5cff; --c-null:#61707f; --c-key:#b1440e;
+    --b-object:#8a5cff; --b-array:#2563eb; --b-string:#0a7d46; --b-number:#0f7f9e; --b-boolean:#c0392b; --b-null:#61707f;
+  }
+  :root[data-theme="dark"] {
+    --veil:rgba(79,134,255,.14); --mark:#ffd84d; --mark-ink:#241c00;
+    --c-str:#4fd08a; --c-num:#79a6ff; --c-bool:#c3a0ff; --c-null:#96a2b1; --c-key:#f0a568;
+    --b-object:#c3a0ff; --b-array:#79a6ff; --b-string:#4fd08a; --b-number:#5fd0e6; --b-boolean:#ff8a80; --b-null:#96a2b1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --veil:rgba(79,134,255,.14); --mark:#ffd84d; --mark-ink:#241c00;
+      --c-str:#4fd08a; --c-num:#79a6ff; --c-bool:#c3a0ff; --c-null:#96a2b1; --c-key:#f0a568;
+      --b-object:#c3a0ff; --b-array:#79a6ff; --b-string:#4fd08a; --b-number:#5fd0e6; --b-boolean:#ff8a80; --b-null:#96a2b1;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 68ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.sm { padding: 5px 11px; font-size: .8rem; }
+  .btn.copied { color: var(--ok) !important; border-color: var(--ok) !important; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin-bottom: 16px; }
+  .lbl { color: var(--muted); font-size: .8rem; }
+  .spacer { flex: 1; }
+  .chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  label.opt { font-size: .85rem; color: var(--text); display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
+  input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
+  select, input[type="text"], input[type="search"], input[type="number"] { font-family: var(--sans); font-size: .85rem; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 9px; }
+  input[type="number"] { width: 62px; }
+  select:focus, textarea:focus, input:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  .btn:focus-visible, .chip:focus-visible, .theme-toggle:focus-visible, .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  code.mono { font-family: var(--mono); }
+
+  .grid { display: grid; grid-template-columns: minmax(320px, 1fr) 1.25fr; gap: 16px; align-items: start; margin-bottom: 16px; }
+  .panehead { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; flex-wrap: wrap; }
+  .cap { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  textarea { font-family: var(--mono); font-size: .82rem; line-height: 1.5; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; width: 100%; min-height: 320px; resize: vertical; white-space: pre; overflow: auto; }
+  textarea.ro { background: var(--surface); }
+  .note { color: var(--muted); font-size: .8rem; min-height: 1.15em; margin-top: 7px; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+
+  /* tree */
+  .searchbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .searchbar input[type="search"] { flex: 1; min-width: 140px; }
+  .matchcount { font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .treewrap { border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); overflow: auto; max-height: 62vh; min-height: 260px; padding: 6px 4px; }
+  .tree { font-family: var(--mono); font-size: .82rem; line-height: 1.5; }
+  .tree .empty { color: var(--muted); padding: 24px 14px; font-family: var(--sans); text-align: center; }
+  .node { }
+  .row { display: flex; align-items: center; gap: 6px; padding: 1px 6px 1px 2px; border-radius: 6px; white-space: nowrap; }
+  .row:hover { background: var(--surface); }
+  .row.sel { background: var(--veil); box-shadow: inset 0 0 0 1px var(--accent); }
+  .row.current { box-shadow: inset 0 0 0 2px var(--accent); }
+  .is-match > .row .key, .is-match > .row .preview { font-weight: 600; }
+  .tw { flex: none; width: 15px; text-align: center; cursor: pointer; color: var(--muted); user-select: none; font-size: .7rem; }
+  .tw.leaf { visibility: hidden; cursor: default; }
+  .tw:hover { color: var(--accent); }
+  .key { color: var(--c-key); }
+  .colon { color: var(--muted); margin-left: -3px; }
+  .badge { flex: none; font-size: .64rem; letter-spacing: .03em; text-transform: uppercase; padding: 1px 6px; border-radius: 999px; border: 1px solid currentColor; opacity: .9; }
+  .badge-object { color: var(--b-object); } .badge-array { color: var(--b-array); }
+  .badge-string { color: var(--b-string); } .badge-number { color: var(--b-number); }
+  .badge-boolean { color: var(--b-boolean); } .badge-null { color: var(--b-null); }
+  .count { color: var(--muted); }
+  .preview { overflow: hidden; text-overflow: ellipsis; max-width: 46ch; }
+  .preview.dim { color: var(--muted); opacity: .8; }
+  .preview.val-string { color: var(--c-str); } .preview.val-number { color: var(--c-num); }
+  .preview.val-boolean { color: var(--c-bool); } .preview.val-null { color: var(--c-null); font-style: italic; }
+  .children { margin-left: 15px; border-left: 1px solid var(--border); }
+  mark { background: var(--mark); color: var(--mark-ink); border-radius: 2px; padding: 0 1px; }
+  .rowacts { display: inline-flex; gap: 4px; margin-left: 4px; }
+  .rowbtn { opacity: 0; border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 6px; font-size: .68rem; padding: 0 6px; cursor: pointer; font-family: var(--sans); }
+  .row:hover .rowbtn { opacity: 1; }
+  .rowbtn:hover { color: var(--accent); border-color: var(--accent); }
+  .rowbtn.copied { color: var(--ok); border-color: var(--ok); opacity: 1; }
+  .morebtn { margin: 2px 0 2px 18px; border: 1px dashed var(--border); background: transparent; color: var(--accent); border-radius: 6px; font-size: .74rem; padding: 2px 10px; cursor: pointer; font-family: var(--sans); }
+  .morebtn:hover { border-color: var(--accent); }
+
+  /* selected-path readout */
+  .pathbox { margin-top: 10px; display: grid; gap: 8px; }
+  .pathrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .pathrow .tag { font-size: .7rem; color: var(--muted); min-width: 78px; }
+  .pathrow code { flex: 1; min-width: 120px; font-family: var(--mono); font-size: .8rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; padding: 5px 9px; overflow-x: auto; white-space: pre; }
+
+  /* lower tabs */
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 14px; flex-wrap: wrap; }
+  .tab { border: none; background: transparent; color: var(--muted); padding: 9px 14px; cursor: pointer; font-size: .88rem; font-family: var(--sans); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tabpane { display: none; }
+  .tabpane.active { display: block; }
+  .field { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .field input[type="text"] { flex: 1; min-width: 160px; font-family: var(--mono); }
+  .result-val { font-family: var(--mono); font-size: .82rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow: auto; min-height: 2.4em; }
+  .statgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+  .stat .n { font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .k { font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .typebars { margin-top: 12px; display: grid; gap: 6px; }
+  .typebar { display: grid; grid-template-columns: 70px 1fr 60px; align-items: center; gap: 8px; font-size: .8rem; }
+  .typebar .bar { height: 10px; background: var(--accent); border-radius: 4px; min-width: 2px; }
+  .shape { margin-top: 12px; font-size: .85rem; color: var(--muted); }
+  .shape code { font-family: var(--mono); color: var(--text); }
+
+  body.drag::after {
+    content: "Drop a .json / .jsonl file to load it";
+    position: fixed; inset: 10px; z-index: 50; display: grid; place-items: center;
+    font-size: 1.05rem; font-weight: 600; color: var(--accent);
+    background: var(--veil); border: 2.5px dashed var(--accent); border-radius: 16px; pointer-events: none;
+  }
+  .hide { display: none !important; }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    textarea { min-height: 220px; }
+    .treewrap { max-height: 50vh; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>JSON Tree Explorer</h1>
+      <p>Paste JSON, browse it as a collapsible tree, search keys and values, copy the path to anything, and pluck lists out of arrays. Everything stays in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <section class="panel toolbar" aria-label="Input options">
+    <span class="lbl" id="exLbl">Start with:</span>
+    <button type="button" class="chip" id="exBtn" aria-describedby="exLbl">Try an example</button>
+    <label class="opt"><input type="checkbox" id="jsonlToggle"> JSON Lines (one object per line)</label>
+    <span class="spacer"></span>
+    <span class="note" id="parseStatus" style="margin-top:0" role="status"></span>
+  </section>
+
+  <div class="grid">
+    <!-- LEFT: input + output actions -->
+    <section class="panel">
+      <div class="panehead">
+        <span class="cap">JSON input</span>
+        <span class="spacer"></span>
+        <button type="button" class="btn sm" id="clearBtn">Clear</button>
+      </div>
+      <textarea id="input" spellcheck="false" wrap="off" aria-label="JSON input" placeholder='Paste JSON here…
+
+{
+  "hello": "world",
+  "items": [1, 2, 3]
+}'></textarea>
+      <div class="note err hide" id="parseErr" role="alert"></div>
+      <div class="panehead" style="margin-top:12px">
+        <span class="cap">Output</span>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <button type="button" class="btn sm" id="copyPretty">⧉ Copy pretty</button>
+        <button type="button" class="btn sm" id="copyMin">⧉ Copy minified</button>
+        <button type="button" class="btn sm primary" id="dlBtn">⬇ Download</button>
+        <button type="button" class="btn sm" id="shareBtn" title="Copy a link that reloads this JSON (small inputs only)">🔗 Copy link</button>
+      </div>
+      <div class="note" id="outNote">Tip: drop a .json or .jsonl file anywhere on this page to load it.</div>
+    </section>
+
+    <!-- RIGHT: tree -->
+    <section class="panel">
+      <div class="searchbar">
+        <input type="search" id="searchInput" placeholder="Search keys &amp; values…" aria-label="Search the tree">
+        <select id="searchScope" aria-label="Search scope">
+          <option value="both">Keys &amp; values</option>
+          <option value="keys">Keys only</option>
+          <option value="values">Values only</option>
+        </select>
+        <label class="opt"><input type="checkbox" id="searchRegex"> Regex</label>
+        <button type="button" class="btn sm" id="prevMatch" aria-label="Previous match" disabled>‹</button>
+        <button type="button" class="btn sm" id="nextMatch" aria-label="Next match" disabled>›</button>
+        <span class="matchcount" id="matchCount"></span>
+      </div>
+      <div class="searchbar" style="margin-bottom:8px">
+        <button type="button" class="btn sm" id="expandAll">Expand all</button>
+        <button type="button" class="btn sm" id="collapseAll">Collapse all</button>
+        <span class="lbl">Open to depth</span>
+        <input type="number" id="depthInput" min="1" max="30" value="2" aria-label="Expand to depth">
+        <button type="button" class="btn sm" id="applyDepth">Go</button>
+        <span class="spacer"></span>
+      </div>
+      <div class="treewrap"><div class="tree" id="tree" role="tree"><div class="empty">Paste or load JSON to explore it here.</div></div></div>
+      <div class="note" id="treeNote"></div>
+
+      <div class="pathbox hide" id="pathBox">
+        <div class="pathrow"><span class="tag">Path</span><code id="pDot"></code><button type="button" class="btn sm" id="copyDot">Copy</button></div>
+        <div class="pathrow"><span class="tag">JSONPath</span><code id="pJson"></code><button type="button" class="btn sm" id="copyJsonPath">Copy</button></div>
+        <div class="pathrow"><span class="tag">Value</span><code id="pVal"></code><button type="button" class="btn sm" id="copyPVal">Copy</button></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- LOWER TABS -->
+  <section class="panel">
+    <div class="tabs" role="tablist" aria-label="Tools">
+      <button class="tab" role="tab" aria-selected="true" data-pane="extract">Extract &amp; pluck</button>
+      <button class="tab" role="tab" aria-selected="false" data-pane="stats">Statistics</button>
+      <button class="tab" role="tab" aria-selected="false" data-pane="flatten">Flatten to paths</button>
+    </div>
+
+    <div class="tabpane active" id="pane-extract" role="tabpanel">
+      <p class="note" style="margin-top:0">Enter a path such as <code class="mono">store.name</code>, <code class="mono">items[0]</code>, or a pluck like <code class="mono">store.inventory.books[].title</code> (use <code class="mono">[]</code> to loop over an array).</p>
+      <div class="field">
+        <input type="text" id="pathExpr" placeholder="e.g. store.inventory.books[].title" aria-label="Path expression">
+        <button type="button" class="btn primary" id="runPath">Get value</button>
+      </div>
+      <div class="note err hide" id="extractErr" role="alert"></div>
+      <div id="extractSingle">
+        <div class="result-val" id="extractResult">The value at your path shows here.</div>
+        <div class="field" style="margin-top:8px"><button type="button" class="btn sm" id="copyExtract">⧉ Copy value</button></div>
+      </div>
+      <div id="pluckWrap" class="hide">
+        <div class="note ok" id="pluckCount" style="margin-top:0"></div>
+        <div class="result-val" id="pluckResult"></div>
+        <div class="field" style="margin-top:8px">
+          <button type="button" class="btn sm" id="pluckLines">⧉ Copy as lines</button>
+          <button type="button" class="btn sm" id="pluckJson">⧉ Copy as JSON</button>
+          <button type="button" class="btn sm" id="pluckCsv">⧉ Copy as CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabpane" id="pane-stats" role="tabpanel">
+      <div class="statgrid" id="statGrid"></div>
+      <div class="typebars" id="typeBars"></div>
+      <div class="shape" id="shapeSummary"></div>
+    </div>
+
+    <div class="tabpane" id="pane-flatten" role="tabpanel">
+      <p class="note" style="margin-top:0">Every leaf value as a <code class="mono">path = value</code> line.</p>
+      <div class="field"><button type="button" class="btn sm" id="copyFlatten">⧉ Copy all</button><span class="note" id="flattenNote" style="margin:0"></span></div>
+      <textarea id="flattenOut" class="ro" readonly spellcheck="false" wrap="off" aria-label="Flattened paths" style="min-height:240px"></textarea>
+    </div>
+  </section>
+
+  <footer class="app">Everything runs in your browser — nothing you paste is uploaded · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+(function () {
+'use strict';
+const $ = (s) => document.querySelector(s);
+
+/* ---------- element refs ---------- */
+const input = $('#input'), parseErr = $('#parseErr'), parseStatus = $('#parseStatus');
+const jsonlToggle = $('#jsonlToggle');
+const treeEl = $('#tree'), treeNote = $('#treeNote');
+const searchInput = $('#searchInput'), searchScope = $('#searchScope'), searchRegex = $('#searchRegex');
+const matchCount = $('#matchCount'), prevMatch = $('#prevMatch'), nextMatch = $('#nextMatch');
+const pathBox = $('#pathBox'), pDot = $('#pDot'), pJson = $('#pJson'), pVal = $('#pVal');
+const depthInput = $('#depthInput');
+const extractErr = $('#extractErr'), extractResult = $('#extractResult');
+const extractSingle = $('#extractSingle'), pluckWrap = $('#pluckWrap'), pluckResult = $('#pluckResult'), pluckCount = $('#pluckCount');
+
+/* ---------- state ---------- */
+let ROOT_DATA;            // parsed value (undefined = no valid data)
+let rootNodeEl = null;    // top DOM node
+let selectedNode = null;
+let renderedCount = 0, budgetHit = false;
+let matches = [], matchIdx = -1, matchSet = null;
+let activeQuery = null, activeRegex = null, activeCI = '';   // for highlighting
+let lastPluck = null;     // {values} from last pluck
+let debounceTimer = 0;
+let statsDirty = true, flattenDirty = true;
+
+const CHILD_CAP = 1000;      // children rendered per batch
+const NODE_BUDGET = 4000;    // max nodes auto-rendered by expand passes
+const MATCH_LIMIT = 5000;
+const STATS_LIMIT = 1500000;
+const FLATTEN_LIMIT = 60000;
+const SHARE_MAX = 6000;      // max input chars for a share link
+
+/* ---------- helpers ---------- */
+function typeOf(v) {
+  if (v === null) return 'null';
+  if (Array.isArray(v)) return 'array';
+  return typeof v; // object, string, number, boolean
+}
+function isContainer(v) { return v !== null && typeof v === 'object'; }
+function range(n) { const a = new Array(n); for (let i = 0; i < n; i++) a[i] = i; return a; }
+const fmt = (n) => n.toLocaleString('en-US');
+
+function segToPathKey(arr) { return JSON.stringify(arr); }
+
+/* dot/bracket + JSONPath renderers */
+const IDENT = /^[A-Za-z_$][\w$]*$/;
+function dotPath(arr) {
+  let s = '';
+  for (const seg of arr) {
+    if (typeof seg === 'number') s += '[' + seg + ']';
+    else if (IDENT.test(seg)) s += (s ? '.' : '') + seg;
+    else s += '[' + JSON.stringify(seg) + ']';
+  }
+  return s || '(root)';
+}
+function jsonPath(arr) {
+  let s = '$';
+  for (const seg of arr) {
+    if (typeof seg === 'number') s += '[' + seg + ']';
+    else if (IDENT.test(seg)) s += '.' + seg;
+    else s += "['" + String(seg).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "']";
+  }
+  return s;
+}
+
+/* preview text */
+function previewScalar(v) {
+  const t = typeOf(v);
+  if (t === 'string') { const s = JSON.stringify(v); return s.length > 64 ? s.slice(0, 63) + '…"' : s; }
+  if (t === 'null') return 'null';
+  return String(v);
+}
+function shortVal(v) {
+  const t = typeOf(v);
+  if (t === 'string') { const s = JSON.stringify(v); return s.length > 18 ? s.slice(0, 17) + '…"' : s; }
+  if (t === 'array') return v.length ? '[…]' : '[]';
+  if (t === 'object') return Object.keys(v).length ? '{…}' : '{}';
+  if (t === 'null') return 'null';
+  return String(v);
+}
+function containerSummary(v) {
+  if (Array.isArray(v)) {
+    if (!v.length) return 'empty';
+    return v.slice(0, 4).map(shortVal).join(', ') + (v.length > 4 ? ', …' : '');
+  }
+  const ks = Object.keys(v);
+  if (!ks.length) return 'empty';
+  return ks.slice(0, 5).join(', ') + (ks.length > 5 ? ', …' : '');
+}
+
+/* ---------- highlighted text insertion (XSS-safe: textContent only) ---------- */
+function findRanges(text) {
+  const ranges = [];
+  if (!activeQuery) return ranges;
+  if (activeRegex) {
+    let re;
+    try { re = new RegExp(activeRegex.source, activeRegex.flags.includes('g') ? activeRegex.flags : activeRegex.flags + 'g'); }
+    catch (e) { return ranges; }
+    let m, guard = 0;
+    while ((m = re.exec(text)) && guard++ < 2000) {
+      if (m[0] === '') { re.lastIndex++; continue; }
+      ranges.push([m.index, m.index + m[0].length]);
+    }
+  } else {
+    const hay = text.toLowerCase(), needle = activeCI;
+    if (!needle) return ranges;
+    let i = 0;
+    while (true) { const j = hay.indexOf(needle, i); if (j === -1) break; ranges.push([j, j + needle.length]); i = j + needle.length; }
+  }
+  return ranges;
+}
+function putText(el, text) {
+  el.textContent = '';
+  const ranges = activeQuery ? findRanges(text) : [];
+  if (!ranges.length) { el.textContent = text; return; }
+  let last = 0;
+  for (const [s, e] of ranges) {
+    if (s < last) continue;
+    if (s > last) el.appendChild(document.createTextNode(text.slice(last, s)));
+    const mk = document.createElement('mark'); mk.textContent = text.slice(s, e); el.appendChild(mk);
+    last = e;
+  }
+  if (last < text.length) el.appendChild(document.createTextNode(text.slice(last)));
+}
+
+/* ---------- node creation ---------- */
+function makeNode(seg, value, pathArr, isRoot) {
+  renderedCount++;
+  const node = document.createElement('div');
+  node.className = 'node';
+  node.setAttribute('role', 'treeitem');
+  node.__value = value; node.__path = pathArr; node.__seg = seg;
+  node.__loaded = false; node.__open = false;
+  const container = isContainer(value);
+  if (matchSet && matchSet.has(segToPathKey(pathArr))) node.classList.add('is-match');
+
+  const row = document.createElement('div'); row.className = 'row';
+
+  const tw = document.createElement('span');
+  tw.className = 'tw' + (container ? '' : ' leaf');
+  tw.textContent = container ? '▶' : '•';
+  row.appendChild(tw);
+
+  const k = document.createElement('span'); k.className = 'key';
+  if (isRoot) k.textContent = '$';
+  else putText(k, typeof seg === 'number' ? String(seg) : seg);
+  row.appendChild(k);
+  const colon = document.createElement('span'); colon.className = 'colon'; colon.textContent = ':'; row.appendChild(colon);
+
+  const t = typeOf(value);
+  const badge = document.createElement('span'); badge.className = 'badge badge-' + t; badge.textContent = t; row.appendChild(badge);
+
+  if (container) {
+    const c = document.createElement('span'); c.className = 'count';
+    c.textContent = Array.isArray(value) ? '[' + value.length + ']' : '{' + Object.keys(value).length + '}';
+    row.appendChild(c);
+    const p = document.createElement('span'); p.className = 'preview dim'; p.textContent = containerSummary(value); row.appendChild(p);
+  } else {
+    const p = document.createElement('span'); p.className = 'preview val-' + t; putText(p, previewScalar(value)); row.appendChild(p);
+  }
+
+  const acts = document.createElement('span'); acts.className = 'rowacts';
+  const bP = document.createElement('button'); bP.className = 'rowbtn'; bP.type = 'button'; bP.dataset.act = 'path'; bP.textContent = 'path'; bP.title = 'Copy path';
+  const bV = document.createElement('button'); bV.className = 'rowbtn'; bV.type = 'button'; bV.dataset.act = 'value'; bV.textContent = 'value'; bV.title = 'Copy value';
+  acts.appendChild(bP); acts.appendChild(bV); row.appendChild(acts);
+
+  node.appendChild(row);
+  const children = document.createElement('div'); children.className = 'children'; children.style.display = 'none';
+  node.__children = children; node.appendChild(children);
+  return node;
+}
+
+function childNodeEls(el) {
+  const out = [];
+  for (const c of el.__children.children) if (c.classList.contains('node')) out.push(c);
+  return out;
+}
+function ensureLoaded(node) {
+  if (node.__loaded) return;
+  node.__loaded = true;
+  const v = node.__value;
+  node.__childKeys = Array.isArray(v) ? range(v.length) : Object.keys(v);
+  node.__rendered = 0;
+  renderBatch(node);
+}
+function renderBatch(node) {
+  const cont = node.__children;
+  const old = cont.querySelector(':scope > .morebtn'); if (old) old.remove();
+  const keys = node.__childKeys, start = node.__rendered;
+  const end = Math.min(keys.length, start + CHILD_CAP);
+  for (let i = start; i < end; i++) {
+    const seg = keys[i];
+    const child = makeNode(seg, node.__value[seg], node.__path.concat(seg), false);
+    cont.appendChild(child);
+  }
+  node.__rendered = end;
+  if (end < keys.length) {
+    const b = document.createElement('button'); b.className = 'morebtn'; b.type = 'button';
+    b.textContent = 'Show ' + fmt(Math.min(CHILD_CAP, keys.length - end)) + ' more of ' + fmt(keys.length) + '…';
+    b.__node = node;
+    cont.appendChild(b);
+  }
+}
+function expandNode(el) {
+  if (!isContainer(el.__value)) return;
+  ensureLoaded(el);
+  el.__open = true;
+  el.__children.style.display = '';
+  const tw = el.querySelector(':scope > .row > .tw'); tw.textContent = '▼';
+}
+function collapseNode(el) {
+  if (!isContainer(el.__value)) return;
+  el.__open = false;
+  el.__children.style.display = 'none';
+  const tw = el.querySelector(':scope > .row > .tw'); tw.textContent = '▶';
+}
+function toggleNode(el) {
+  if (!isContainer(el.__value)) return;
+  if (el.__open) collapseNode(el); else expandNode(el);
+}
+function openTo(el, remaining) {
+  if (remaining <= 0 || !isContainer(el.__value)) return;
+  if (renderedCount > NODE_BUDGET) { budgetHit = true; return; }
+  expandNode(el);
+  for (const child of childNodeEls(el)) {
+    if (renderedCount > NODE_BUDGET) { budgetHit = true; break; }
+    openTo(child, remaining - 1);
+  }
+}
+
+function buildTree(openDepth) {
+  treeEl.innerHTML = '';
+  renderedCount = 0; budgetHit = false;
+  selectedNode = null; pathBox.classList.add('hide');
+  if (ROOT_DATA === undefined) {
+    const e = document.createElement('div'); e.className = 'empty'; e.textContent = 'Paste or load JSON to explore it here.';
+    treeEl.appendChild(e); rootNodeEl = null; treeNote.textContent = ''; return;
+  }
+  const root = makeNode(null, ROOT_DATA, [], true);
+  treeEl.appendChild(root); rootNodeEl = root;
+  openTo(root, openDepth);
+  updateTreeNote();
+}
+function updateTreeNote() {
+  let s = fmt(renderedCount) + ' node' + (renderedCount === 1 ? '' : 's') + ' rendered';
+  if (budgetHit) s += ' · reached the render cap — expand individual branches to load deeper nodes';
+  treeNote.textContent = s;
+}
+
+/* expand to a specific path (renders ancestors as needed) */
+function expandToPath(arr) {
+  if (!rootNodeEl) return null;
+  let el = rootNodeEl;
+  expandNode(el);
+  for (const seg of arr) {
+    ensureLoaded(el);
+    if (el.__childKeys) {
+      const idx = el.__childKeys.indexOf(seg);
+      if (idx === -1) return null;
+      let guard = 0;
+      while (el.__rendered <= idx && guard++ < 100000) renderBatch(el);
+    }
+    expandNode(el);
+    let child = null;
+    for (const c of childNodeEls(el)) if (c.__seg === seg) { child = c; break; }
+    if (!child) return null;
+    el = child;
+  }
+  return el;
+}
+
+/* ---------- selection ---------- */
+function selectNode(el) {
+  if (selectedNode) selectedNode.querySelector(':scope > .row').classList.remove('sel');
+  selectedNode = el;
+  const row = el.querySelector(':scope > .row'); row.classList.add('sel');
+  pDot.textContent = dotPath(el.__path);
+  pJson.textContent = jsonPath(el.__path);
+  const full = JSON.stringify(el.__value, null, 2);
+  pVal.textContent = full == null ? String(el.__value) : (full.length > 400 ? full.slice(0, 399) + '…' : full);
+  pVal.__full = full == null ? String(el.__value) : full;
+  pathBox.classList.remove('hide');
+}
+
+/* ---------- tree event delegation ---------- */
+treeEl.addEventListener('click', (e) => {
+  const more = e.target.closest('.morebtn');
+  if (more) { renderBatch(more.__node); updateTreeNote(); return; }
+  const node = e.target.closest('.node');
+  if (!node) return;
+  if (e.target.closest('.tw')) { toggleNode(node); return; }
+  const btn = e.target.closest('.rowbtn');
+  if (btn) {
+    if (btn.dataset.act === 'path') flashCopy(btn, dotPath(node.__path));
+    else { const s = JSON.stringify(node.__value, null, 2); flashCopy(btn, s == null ? String(node.__value) : s); }
+    return;
+  }
+  selectNode(node);
+});
+
+/* ---------- clipboard ---------- */
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch (e) {
+    try {
+      const ta = document.createElement('textarea'); ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta);
+      ta.focus(); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok;
+    } catch (e2) { return false; }
+  }
+}
+function flashCopy(btn, text, label) {
+  copyText(text).then((ok) => {
+    if (!ok) return;
+    const orig = label != null ? label : btn.textContent;
+    const wasCopiedClass = btn.classList.contains('copied');
+    btn.textContent = '✓'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; if (!wasCopiedClass) btn.classList.remove('copied'); }, 1200);
+  });
+}
+function flashBtn(btn, text, doneLabel) {
+  copyText(text).then((ok) => {
+    if (!ok) { btn.textContent = 'Copy failed'; setTimeout(() => btn.textContent = doneLabel, 1500); return; }
+    const orig = btn.textContent; btn.textContent = '✓ Copied'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1200);
+  });
+}
+
+/* ---------- parse ---------- */
+function jsonErrorInfo(msg, text) {
+  const out = { msg: msg };
+  let pos = -1;
+  const mPos = msg.match(/position\s+(\d+)/i);
+  if (mPos) pos = parseInt(mPos[1], 10);
+  const mLC = msg.match(/line\s+(\d+)\s+column\s+(\d+)/i);
+  if (mLC) { out.line = parseInt(mLC[1], 10); out.col = parseInt(mLC[2], 10); return out; }
+  if (pos >= 0) {
+    pos = Math.min(pos, text.length);
+    let line = 1, col = 1;
+    for (let i = 0; i < pos; i++) { if (text.charCodeAt(i) === 10) { line++; col = 1; } else col++; }
+    out.line = line; out.col = col;
+  }
+  return out;
+}
+function parseInput(text) {
+  const clean = text.charCodeAt(0) === 0xFEFF ? text.slice(1) : text;
+  if (jsonlToggle.checked) {
+    const lines = clean.split(/\r?\n/);
+    const arr = [];
+    for (let i = 0; i < lines.length; i++) {
+      const ln = lines[i];
+      if (!ln.trim()) continue;
+      try { arr.push(JSON.parse(ln)); }
+      catch (e) { return { ok: false, error: 'Line ' + (i + 1) + ': ' + String(e && e.message || e) }; }
+    }
+    if (!arr.length) return { ok: false, error: 'No non-empty lines to parse.' };
+    return { ok: true, data: arr };
+  }
+  try { return { ok: true, data: JSON.parse(clean) }; }
+  catch (e) {
+    const info = jsonErrorInfo(String(e && e.message || e), clean);
+    let m = 'Invalid JSON — ' + info.msg;
+    if (info.line) m += ' (line ' + info.line + ', column ' + info.col + ')';
+    return { ok: false, error: m };
+  }
+}
+
+function reparse(rebuild) {
+  const text = input.value;
+  if (!text.trim()) {
+    ROOT_DATA = undefined; parseErr.classList.add('hide'); parseStatus.textContent = '';
+    parseStatus.classList.remove('err');
+    buildTree(2); clearSearch(); statsDirty = flattenDirty = true; refreshActiveTab(); return;
+  }
+  const res = parseInput(text);
+  if (!res.ok) {
+    parseErr.textContent = res.error; parseErr.classList.remove('hide');
+    parseStatus.textContent = 'Parse error'; parseStatus.classList.add('err');
+    // keep last good tree; do not crash
+    return;
+  }
+  parseErr.classList.add('hide');
+  parseStatus.classList.remove('err');
+  ROOT_DATA = res.data;
+  const t = typeOf(ROOT_DATA);
+  parseStatus.textContent = 'Valid JSON · top level: ' + t + (t === 'array' ? ' of ' + fmt(ROOT_DATA.length) : t === 'object' ? ' with ' + fmt(Object.keys(ROOT_DATA).length) + ' keys' : '');
+  statsDirty = flattenDirty = true;
+  const depth = Math.max(1, parseInt(depthInput.value, 10) || 2);
+  // preserve an active search across edits
+  if (searchInput.value.trim()) runSearch();
+  else { buildTree(depth); clearSearch(); }
+  refreshActiveTab();
+}
+function reparseDebounced() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => reparse(true), 280); }
+
+/* ---------- search ---------- */
+function setupMatcher(q) {
+  activeQuery = q;
+  if (searchRegex.checked) {
+    try { activeRegex = new RegExp(q, 'i'); activeCI = ''; }
+    catch (e) { activeRegex = null; activeCI = ''; return false; }
+  } else { activeRegex = null; activeCI = q.toLowerCase(); }
+  return true;
+}
+function testMatch(text) {
+  if (activeRegex) return activeRegex.test(text);
+  return text.toLowerCase().indexOf(activeCI) !== -1;
+}
+function scalarSearchText(v) { return v === null ? 'null' : String(v); }
+function traverseSearch(v, path, scope) {
+  if (matches.length >= MATCH_LIMIT) return;
+  if (path.length) {
+    const seg = path[path.length - 1];
+    let hit = false;
+    if (scope !== 'values' && testMatch(typeof seg === 'number' ? String(seg) : seg)) hit = true;
+    if (!hit && scope !== 'keys') {
+      const t = typeOf(v);
+      if (t !== 'object' && t !== 'array' && testMatch(scalarSearchText(v))) hit = true;
+    }
+    if (hit) matches.push(path.slice());
+  }
+  if (Array.isArray(v)) { for (let i = 0; i < v.length && matches.length < MATCH_LIMIT; i++) traverseSearch(v[i], path.concat(i), scope); }
+  else if (v && typeof v === 'object') { const ks = Object.keys(v); for (let i = 0; i < ks.length && matches.length < MATCH_LIMIT; i++) traverseSearch(v[ks[i]], path.concat(ks[i]), scope); }
+}
+function clearSearch() {
+  matches = []; matchIdx = -1; matchSet = null; activeQuery = null; activeRegex = null; activeCI = '';
+  matchCount.textContent = ''; prevMatch.disabled = nextMatch.disabled = true;
+}
+function runSearch() {
+  const q = searchInput.value;
+  if (!q || ROOT_DATA === undefined) {
+    clearSearch();
+    const depth = Math.max(1, parseInt(depthInput.value, 10) || 2);
+    buildTree(depth); return;
+  }
+  if (!setupMatcher(q)) { matchCount.textContent = 'bad regex'; matchCount.style.color = 'var(--danger)'; return; }
+  matchCount.style.color = '';
+  matches = [];
+  traverseSearch(ROOT_DATA, [], searchScope.value);
+  matchSet = new Set(matches.map(segToPathKey));
+  buildTree(1);
+  const cap = Math.min(matches.length, 400);
+  for (let i = 0; i < cap; i++) { if (renderedCount > NODE_BUDGET) { budgetHit = true; break; } expandToPath(matches[i]); }
+  updateTreeNote();
+  matchIdx = matches.length ? 0 : -1;
+  if (matchIdx === 0) gotoMatch(0);
+  updateMatchUI();
+}
+function updateMatchUI() {
+  if (!activeQuery) { matchCount.textContent = ''; prevMatch.disabled = nextMatch.disabled = true; return; }
+  if (!matches.length) { matchCount.textContent = 'no matches'; prevMatch.disabled = nextMatch.disabled = true; return; }
+  const capped = matches.length >= MATCH_LIMIT ? '+' : '';
+  matchCount.textContent = (matchIdx + 1) + ' / ' + matches.length + capped + ' match' + (matches.length === 1 ? '' : 'es');
+  prevMatch.disabled = nextMatch.disabled = matches.length < 2;
+}
+function gotoMatch(i) {
+  if (!matches.length) return;
+  matchIdx = (i + matches.length) % matches.length;
+  const el = expandToPath(matches[matchIdx]);
+  updateTreeNote();
+  document.querySelectorAll('.row.current').forEach((r) => r.classList.remove('current'));
+  if (el) {
+    const row = el.querySelector(':scope > .row'); row.classList.add('current');
+    selectNode(el);
+    row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+  updateMatchUI();
+}
+
+/* ---------- extract / pluck ---------- */
+function parsePathExpr(str) {
+  const tokens = []; let i = 0; const n = str.length;
+  if (str[0] === '$') i = 1;
+  while (i < n) {
+    const c = str[i];
+    if (c === '.') { i++; continue; }
+    if (c === '[') {
+      const close = str.indexOf(']', i);
+      if (close === -1) throw new Error('Unclosed "[" in path.');
+      let inner = str.slice(i + 1, close).trim();
+      i = close + 1;
+      if (inner === '') { tokens.push({ type: 'wild' }); continue; }
+      if ((inner[0] === '"' && inner[inner.length - 1] === '"') || (inner[0] === "'" && inner[inner.length - 1] === "'")) {
+        tokens.push({ type: 'key', key: inner.slice(1, -1) }); continue;
+      }
+      if (/^-?\d+$/.test(inner)) { tokens.push({ type: 'index', index: parseInt(inner, 10) }); continue; }
+      tokens.push({ type: 'key', key: inner }); continue;
+    }
+    let j = i;
+    while (j < n && str[j] !== '.' && str[j] !== '[') j++;
+    const word = str.slice(i, j);
+    if (word) tokens.push({ type: 'key', key: word });
+    i = j;
+  }
+  return tokens;
+}
+function resolvePath(node, tokens, idx) {
+  if (idx === tokens.length) return [node];
+  const t = tokens[idx];
+  if (t.type === 'wild') {
+    if (!Array.isArray(node)) throw new Error('[] needs an array but found ' + typeOf(node) + '.');
+    let out = [];
+    for (const el of node) out = out.concat(resolvePath(el, tokens, idx + 1));
+    return out;
+  }
+  if (node === null || typeof node !== 'object') throw new Error('Cannot read "' + (t.type === 'index' ? t.index : t.key) + '" from a ' + typeOf(node) + '.');
+  if (t.type === 'index') {
+    const arr = Array.isArray(node) ? node : node;
+    if (!(t.index in Object(arr))) throw new Error('No index [' + t.index + '] here.');
+    return resolvePath(arr[t.index], tokens, idx + 1);
+  }
+  if (!Object.prototype.hasOwnProperty.call(node, t.key)) throw new Error('No key "' + t.key + '" here.');
+  return resolvePath(node[t.key], tokens, idx + 1);
+}
+function runExtract() {
+  extractErr.classList.add('hide');
+  const expr = $('#pathExpr').value.trim();
+  if (ROOT_DATA === undefined) { extractErr.textContent = 'Load some valid JSON first.'; extractErr.classList.remove('hide'); return; }
+  if (!expr) { extractErr.textContent = 'Enter a path.'; extractErr.classList.remove('hide'); return; }
+  let tokens;
+  try { tokens = parsePathExpr(expr); } catch (e) { extractErr.textContent = e.message; extractErr.classList.remove('hide'); return; }
+  const hasWild = tokens.some((t) => t.type === 'wild');
+  let values;
+  try { values = resolvePath(ROOT_DATA, tokens, 0); }
+  catch (e) { extractErr.textContent = e.message; extractErr.classList.remove('hide'); extractSingle.classList.add('hide'); pluckWrap.classList.add('hide'); return; }
+  if (hasWild) {
+    lastPluck = values;
+    extractSingle.classList.add('hide'); pluckWrap.classList.remove('hide');
+    pluckCount.textContent = fmt(values.length) + ' value' + (values.length === 1 ? '' : 's') + ' plucked';
+    const preview = values.slice(0, 500).map((v) => JSON.stringify(v)).join('\n');
+    pluckResult.textContent = preview + (values.length > 500 ? '\n… (' + fmt(values.length - 500) + ' more — copy to get all)' : '');
+  } else {
+    lastPluck = null;
+    pluckWrap.classList.add('hide'); extractSingle.classList.remove('hide');
+    const v = values[0];
+    const s = JSON.stringify(v, null, 2);
+    extractResult.textContent = s == null ? String(v) : s;
+    extractResult.__full = s == null ? String(v) : s;
+  }
+}
+function pluckLines() { return lastPluck.map((v) => (typeof v === 'string' ? v : JSON.stringify(v))).join('\n'); }
+function pluckJson() { return JSON.stringify(lastPluck, null, 2); }
+function pluckCsv() {
+  const q = (s) => (/[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s);
+  const rows = lastPluck.map((v) => q(typeof v === 'string' ? v : (v === null ? '' : (typeof v === 'object' ? JSON.stringify(v) : String(v)))));
+  return 'value\n' + rows.join('\n');
+}
+
+/* ---------- stats ---------- */
+function computeStats() {
+  const counts = { object: 0, array: 0, string: 0, number: 0, boolean: 0, null: 0 };
+  let nodes = 0, maxDepth = 0, capped = false;
+  const stack = [{ v: ROOT_DATA, d: 0 }];
+  while (stack.length) {
+    if (nodes >= STATS_LIMIT) { capped = true; break; }
+    const { v, d } = stack.pop();
+    nodes++; if (d > maxDepth) maxDepth = d;
+    const t = typeOf(v); counts[t]++;
+    if (t === 'array') { for (let i = v.length - 1; i >= 0; i--) stack.push({ v: v[i], d: d + 1 }); }
+    else if (t === 'object') { const ks = Object.keys(v); for (let i = ks.length - 1; i >= 0; i--) stack.push({ v: v[ks[i]], d: d + 1 }); }
+  }
+  return { counts, nodes, maxDepth, capped };
+}
+function shapeSummaryText() {
+  const t = typeOf(ROOT_DATA);
+  if (t === 'object') {
+    const ks = Object.keys(ROOT_DATA);
+    return 'Root is an object with ' + fmt(ks.length) + ' key' + (ks.length === 1 ? '' : 's') + (ks.length ? ': ' + ks.slice(0, 12).join(', ') + (ks.length > 12 ? ', …' : '') : '') + '.';
+  }
+  if (t === 'array') {
+    const len = ROOT_DATA.length;
+    const kinds = new Set(ROOT_DATA.slice(0, 1000).map(typeOf));
+    let homog = kinds.size === 1 ? [...kinds][0] : 'mixed';
+    return 'Root is an array of ' + fmt(len) + ' item' + (len === 1 ? '' : 's') + ' (' + homog + ').';
+  }
+  return 'Root is a ' + t + ' value.';
+}
+function renderStats() {
+  if (ROOT_DATA === undefined) {
+    $('#statGrid').innerHTML = ''; $('#typeBars').innerHTML = '';
+    $('#shapeSummary').textContent = 'Load JSON to see statistics.'; statsDirty = false; return;
+  }
+  const s = computeStats();
+  const grid = $('#statGrid'); grid.textContent = '';
+  const tiles = [['Total nodes', fmt(s.nodes) + (s.capped ? '+' : '')], ['Max depth', fmt(s.maxDepth)], ['Objects', fmt(s.counts.object)], ['Arrays', fmt(s.counts.array)]];
+  for (const [k, v] of tiles) {
+    const d = document.createElement('div'); d.className = 'stat';
+    const n = document.createElement('div'); n.className = 'n'; n.textContent = v;
+    const kk = document.createElement('div'); kk.className = 'k'; kk.textContent = k;
+    d.appendChild(n); d.appendChild(kk); grid.appendChild(d);
+  }
+  const bars = $('#typeBars'); bars.textContent = '';
+  const order = ['object', 'array', 'string', 'number', 'boolean', 'null'];
+  const max = Math.max(1, ...order.map((k) => s.counts[k]));
+  for (const k of order) {
+    const c = s.counts[k];
+    const rowEl = document.createElement('div'); rowEl.className = 'typebar';
+    const lab = document.createElement('span'); lab.textContent = k;
+    const barWrap = document.createElement('div');
+    const bar = document.createElement('div'); bar.className = 'bar'; bar.style.width = (c / max * 100).toFixed(1) + '%';
+    bar.style.background = 'var(--b-' + k + ')';
+    barWrap.appendChild(bar);
+    const num = document.createElement('span'); num.style.textAlign = 'right'; num.style.fontVariantNumeric = 'tabular-nums'; num.textContent = fmt(c);
+    rowEl.appendChild(lab); rowEl.appendChild(barWrap); rowEl.appendChild(num); bars.appendChild(rowEl);
+  }
+  $('#shapeSummary').innerHTML = '';
+  const strong = document.createElement('code'); strong.textContent = shapeSummaryText();
+  $('#shapeSummary').appendChild(strong);
+  if (s.capped) { const w = document.createElement('div'); w.className = 'note'; w.textContent = 'Counting stopped at ' + fmt(STATS_LIMIT) + ' nodes.'; $('#shapeSummary').appendChild(w); }
+  statsDirty = false;
+}
+
+/* ---------- flatten ---------- */
+function renderFlatten() {
+  const out = $('#flattenOut'), note = $('#flattenNote');
+  if (ROOT_DATA === undefined) { out.value = ''; note.textContent = ''; flattenDirty = false; return; }
+  const lines = []; let capped = false;
+  const stack = [{ v: ROOT_DATA, p: [] }];
+  // iterative pre-order, preserving order via reversed child push
+  function pushChildren(v, p) {
+    if (Array.isArray(v)) { for (let i = v.length - 1; i >= 0; i--) stack.push({ v: v[i], p: p.concat(i) }); }
+    else { const ks = Object.keys(v); for (let i = ks.length - 1; i >= 0; i--) stack.push({ v: v[ks[i]], p: p.concat(ks[i]) }); }
+  }
+  while (stack.length) {
+    if (lines.length >= FLATTEN_LIMIT) { capped = true; break; }
+    const { v, p } = stack.pop();
+    const t = typeOf(v);
+    if (t === 'object' && Object.keys(v).length) { pushChildren(v, p); continue; }
+    if (t === 'array' && v.length) { pushChildren(v, p); continue; }
+    let repr;
+    if (t === 'object') repr = '{}'; else if (t === 'array') repr = '[]'; else repr = JSON.stringify(v);
+    lines.push((p.length ? dotPath(p) : '(root)') + ' = ' + repr);
+  }
+  out.value = lines.join('\n');
+  note.textContent = fmt(lines.length) + ' leaf line' + (lines.length === 1 ? '' : 's') + (capped ? ' (capped at ' + fmt(FLATTEN_LIMIT) + ')' : '');
+  flattenDirty = false;
+}
+
+/* ---------- tabs ---------- */
+function refreshActiveTab() {
+  const active = document.querySelector('.tab[aria-selected="true"]');
+  if (!active) return;
+  if (active.dataset.pane === 'stats' && statsDirty) renderStats();
+  if (active.dataset.pane === 'flatten' && flattenDirty) renderFlatten();
+}
+document.querySelector('.tabs').addEventListener('click', (e) => {
+  const tab = e.target.closest('.tab'); if (!tab) return;
+  document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+  document.querySelectorAll('.tabpane').forEach((p) => p.classList.toggle('active', p.id === 'pane-' + tab.dataset.pane));
+  refreshActiveTab();
+});
+
+/* ---------- output actions ---------- */
+$('#copyPretty').addEventListener('click', (e) => {
+  if (ROOT_DATA === undefined) return; flashBtn(e.currentTarget, JSON.stringify(ROOT_DATA, null, 2), '⧉ Copy pretty');
+});
+$('#copyMin').addEventListener('click', (e) => {
+  if (ROOT_DATA === undefined) return; flashBtn(e.currentTarget, JSON.stringify(ROOT_DATA), '⧉ Copy minified');
+});
+$('#dlBtn').addEventListener('click', () => {
+  if (ROOT_DATA === undefined) return;
+  const blob = new Blob([JSON.stringify(ROOT_DATA, null, 2)], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'data.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+});
+$('#shareBtn').addEventListener('click', (e) => {
+  const btn = e.currentTarget, note = $('#outNote');
+  const text = input.value;
+  if (!text.trim()) { note.textContent = 'Nothing to share yet.'; return; }
+  if (text.length > SHARE_MAX) { note.textContent = 'Input is too large for a share link (' + fmt(text.length) + ' chars > ' + fmt(SHARE_MAX) + '). Use Download instead.'; note.className = 'note err'; return; }
+  note.className = 'note';
+  const hash = '#j=' + (jsonlToggle.checked ? '1' : '0') + '&d=' + encodeURIComponent(text);
+  const url = location.origin + location.pathname + hash;
+  try { history.replaceState(null, '', hash); } catch (e2) {}
+  flashBtn(btn, url, '🔗 Copy link');
+  note.textContent = 'Shareable link copied — it reloads this exact JSON.';
+});
+
+/* ---------- path box copy ---------- */
+$('#copyDot').addEventListener('click', (e) => flashBtn(e.currentTarget, pDot.textContent, 'Copy'));
+$('#copyJsonPath').addEventListener('click', (e) => flashBtn(e.currentTarget, pJson.textContent, 'Copy'));
+$('#copyPVal').addEventListener('click', (e) => flashBtn(e.currentTarget, pVal.__full || pVal.textContent, 'Copy'));
+
+/* ---------- extract wiring ---------- */
+$('#runPath').addEventListener('click', runExtract);
+$('#pathExpr').addEventListener('keydown', (e) => { if (e.key === 'Enter') runExtract(); });
+$('#copyExtract').addEventListener('click', (e) => flashBtn(e.currentTarget, extractResult.__full || extractResult.textContent, '⧉ Copy value'));
+$('#pluckLines').addEventListener('click', (e) => { if (lastPluck) flashBtn(e.currentTarget, pluckLines(), '⧉ Copy as lines'); });
+$('#pluckJson').addEventListener('click', (e) => { if (lastPluck) flashBtn(e.currentTarget, pluckJson(), '⧉ Copy as JSON'); });
+$('#pluckCsv').addEventListener('click', (e) => { if (lastPluck) flashBtn(e.currentTarget, pluckCsv(), '⧉ Copy as CSV'); });
+$('#copyFlatten').addEventListener('click', (e) => flashBtn(e.currentTarget, $('#flattenOut').value, '⧉ Copy all'));
+
+/* ---------- tree controls ---------- */
+$('#expandAll').addEventListener('click', () => { if (ROOT_DATA === undefined) return; if (activeQuery) { matchSet = null; activeQuery = null; } buildTree(Infinity); });
+$('#collapseAll').addEventListener('click', () => { if (ROOT_DATA === undefined) return; buildTree(1); });
+$('#applyDepth').addEventListener('click', () => { if (ROOT_DATA === undefined) return; const d = Math.max(1, Math.min(30, parseInt(depthInput.value, 10) || 2)); depthInput.value = d; if (activeQuery) { matchSet = null; activeQuery = null; searchInput.value = ''; clearSearch(); } buildTree(d); });
+
+/* ---------- search wiring ---------- */
+let searchTimer = 0;
+function searchDebounced() { clearTimeout(searchTimer); searchTimer = setTimeout(runSearch, 220); }
+searchInput.addEventListener('input', searchDebounced);
+searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); if (e.shiftKey) gotoMatch(matchIdx - 1); else gotoMatch(matchIdx + 1); } });
+searchScope.addEventListener('change', runSearch);
+searchRegex.addEventListener('change', runSearch);
+nextMatch.addEventListener('click', () => gotoMatch(matchIdx + 1));
+prevMatch.addEventListener('click', () => gotoMatch(matchIdx - 1));
+
+/* ---------- input wiring ---------- */
+input.addEventListener('input', reparseDebounced);
+jsonlToggle.addEventListener('change', () => reparse(true));
+$('#clearBtn').addEventListener('click', () => {
+  if (input.value.length > 800 && !confirm('Clear the input?')) return;
+  input.value = ''; reparse(true);
+});
+
+/* ---------- example ---------- */
+const EXAMPLE = {
+  store: {
+    name: 'Corner Books', open: true, established: 1998,
+    location: { city: 'Portland', coords: [45.52, -122.68], zip: null },
+    departments: [
+      { id: 'fic', title: 'Fiction', staff: 4, featured: ['Dune', '1984'] },
+      { id: 'sci', title: 'Science', staff: 2, featured: [] }
+    ],
+    inventory: {
+      books: [
+        { isbn: '978-0441172719', title: 'Dune', price: 12.99, inStock: true, tags: ['scifi', 'classic'] },
+        { isbn: '978-0451524935', title: '1984', price: 9.5, inStock: false, tags: ['dystopia'] },
+        { isbn: '978-0261102217', title: 'The Hobbit', price: 14.25, inStock: true, tags: ['fantasy', 'classic'] }
+      ],
+      totalValue: 36.74
+    }
+  },
+  meta: { generated: '2026-07-14', version: 3, notes: null, contributors: ['ada', 'grace'] }
+};
+$('#exBtn').addEventListener('click', () => {
+  if (input.value.length > 800 && !confirm('Replace your current input with the example?')) return;
+  jsonlToggle.checked = false;
+  input.value = JSON.stringify(EXAMPLE, null, 2);
+  $('#pathExpr').value = 'store.inventory.books[].title';
+  reparse(true);
+});
+
+/* ---------- drag & drop ---------- */
+function hasFile(e) { const t = e.dataTransfer && e.dataTransfer.types; return !!t && Array.prototype.indexOf.call(t, 'Files') !== -1; }
+let dragDepth = 0;
+window.addEventListener('dragenter', (e) => { if (!hasFile(e)) return; e.preventDefault(); dragDepth++; document.body.classList.add('drag'); });
+window.addEventListener('dragover', (e) => { if (hasFile(e)) e.preventDefault(); });
+window.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove('drag'); } });
+window.addEventListener('drop', (e) => {
+  e.preventDefault(); dragDepth = 0; document.body.classList.remove('drag');
+  const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if (!f) return;
+  if (f.size > 40 * 1024 * 1024) { parseErr.textContent = 'That file is over 40 MB — too large for this in-browser tool.'; parseErr.classList.remove('hide'); return; }
+  f.text().then((text) => {
+    jsonlToggle.checked = /\.jsonl$/i.test(f.name) || /\.ndjson$/i.test(f.name);
+    input.value = text; reparse(true);
+  }).catch(() => { parseErr.textContent = 'Could not read that file.'; parseErr.classList.remove('hide'); });
+});
+
+/* ---------- boot: restore from hash ---------- */
+(function boot() {
+  const h = location.hash;
+  if (h && h.indexOf('d=') !== -1) {
+    try {
+      const params = new URLSearchParams(h.slice(1));
+      const d = params.get('d');
+      if (d != null) { input.value = d; jsonlToggle.checked = params.get('j') === '1'; }
+    } catch (e) {}
+  }
+  reparse(true);
+})();
+
+/* ---------- theme ---------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+})();
+</script>
+</body>
+</html>

@@ -1,22 +1,22 @@
-.skill-list { max-width: 860px; padding: 60px 0 30px; }
-.skill-card { border: 1px solid var(--ink); background: var(--card); box-shadow: 6px 6px 0 var(--ink); padding: 24px 28px; margin-bottom: 22px; }
+.skill-list { max-width: 860px; padding: clamp(40px, 6vw, 64px) 0 30px; }
+.skill-card { border: 1px solid var(--line); border-top: 3px double var(--c-experiments); background: var(--card); padding: 24px 28px; margin-bottom: 22px; }
 .skill-card .card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
-.skill-card h2 { margin: 0; font-size: clamp(1.3rem, 2.5vw, 1.7rem); letter-spacing: -.02em; }
-.skill-card .tagline { color: var(--purple); font: 700 11px var(--mono); text-transform: uppercase; letter-spacing: .1em; }
-.skill-card .meta { color: var(--muted); font: 500 12px var(--mono); }
+.skill-card h2 { margin: 0; font-size: clamp(1.3rem, 2.5vw, 1.7rem); }
+.skill-card .tagline { color: var(--c-experiments); font: 600 11px var(--mono); text-transform: uppercase; letter-spacing: 0.1em; }
+.skill-card .meta { color: var(--muted); font: 400 12px var(--mono); }
 .skill-card > p { margin: 10px 0 12px; }
 .skill-card ul { margin: 0 0 16px; padding-left: 20px; }
-.skill-card li { margin-bottom: 4px; font-size: .92rem; }
-.skill-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.download-button { display: inline-block; padding: 10px 18px; border: 1px solid var(--ink); background: var(--acid); box-shadow: 3px 3px 0 var(--ink); text-decoration: none; font: 700 13px var(--mono); }
-.download-button:hover { background: var(--cyan); }
-.source-link { font: 600 12px var(--mono); color: var(--purple); }
+.skill-card li { margin-bottom: 4px; font-size: 0.92rem; }
+.skill-actions { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.download-button { display: inline-block; padding: 10px 18px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); text-decoration: none; font: 600 12.5px var(--mono); }
+.download-button:hover { background: var(--accent); border-color: var(--accent); }
+.source-link { font: 600 12px var(--mono); color: var(--muted); }
+.source-link:hover { color: var(--ink); }
 .install-guide { max-width: 860px; padding: 10px 0 90px; }
 .install-guide h2 { font-size: clamp(1.3rem, 2.5vw, 1.8rem); margin: 0 0 14px; }
 .install-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 @media (max-width: 700px) { .install-cols { grid-template-columns: 1fr; } }
 .install-cols > div { border: 1px solid var(--line); background: var(--card); padding: 16px 20px; }
 .install-cols h3 { margin: 0 0 6px; font-size: 1rem; }
-.install-cols p { margin: 0; font-size: .92rem; }
-.install-note { color: var(--muted); font-size: .88rem; margin-top: 14px; }
-.empty { color: var(--muted); }
+.install-cols p { margin: 0; font-size: 0.92rem; }
+.install-note { color: var(--muted); font-size: 0.88rem; margin-top: 14px; }

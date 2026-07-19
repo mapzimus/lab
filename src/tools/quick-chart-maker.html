@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick Chart Maker</title>
+<meta name="description" content="Paste or type data and get a clean, exportable chart — bar, line, pie, doughnut or scatter. Fully client-side, nothing is uploaded.">
+<style>
+  /* ---- Theme tokens: swap these to rebrand per site ---- */
+  :root {
+    --bg:        #f6f7f9;
+    --surface:   #ffffff;
+    --surface-2: #f0f2f5;
+    --border:    #d9dee5;
+    --text:      #1c2530;
+    --muted:     #61707f;
+    --accent:    #2563eb;
+    --accent-ink:#ffffff;
+    --danger:    #c0392b;
+    --ok:        #1a7f4b;
+    --radius:    12px;
+    --shadow:    0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    /* chart chrome */
+    --chart-surface: #ffffff;
+    --grid:  #e6e8ec;
+    --axis:  #c3c2b7;
+
+    /* validated categorical palette (dataviz reference, light) */
+    --s1:#2a78d6; --s2:#1baf7a; --s3:#eda100; --s4:#008300;
+    --s5:#4a3aa7; --s6:#e34948; --s7:#e87ba4; --s8:#eb6834;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --chart-surface:#171b22; --grid:#2b323d; --axis:#383835;
+    --s1:#3987e5; --s2:#199e70; --s3:#c98500; --s4:#008300;
+    --s5:#9085e9; --s6:#e66767; --s7:#d55181; --s8:#d95926;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --chart-surface:#171b22; --grid:#2b323d; --axis:#383835;
+      --s1:#3987e5; --s2:#199e70; --s3:#c98500; --s4:#008300;
+      --s5:#9085e9; --s6:#e66767; --s7:#d55181; --s8:#d95926;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 62ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; align-items: center; }
+  .examples .lbl { color: var(--muted); font-size: .8rem; margin-right: 2px; }
+  .examples button { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; }
+  .examples button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .grid { display: grid; grid-template-columns: minmax(0,420px) minmax(0,1fr); gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .grid { grid-template-columns: minmax(0,1fr); } }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+
+  .block { margin-bottom: 16px; }
+  .block:last-child { margin-bottom: 0; }
+  .block > .cap { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 8px; display: flow-root; }
+
+  /* segmented control */
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 4px; }
+  .seg button { border: none; background: transparent; color: var(--text); padding: 7px 12px; border-radius: 7px; cursor: pointer; font-size: .85rem; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+  .opts { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+  .opts label { font-size: .85rem; color: var(--text); display: inline-flex; align-items: center; gap: 6px; }
+  .opts input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+  .opts.hide { display: none; }
+  input[type="text"], textarea, select { font-family: var(--sans); font-size: .9rem; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; width: 100%; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 8px 12px; font-size: .84rem; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+
+  /* data table */
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+  table.data { border-collapse: collapse; width: 100%; font-size: .85rem; }
+  table.data th, table.data td { border: 1px solid var(--border); padding: 0; }
+  table.data input { border: none; border-radius: 0; background: transparent; width: 100%; min-width: 78px; padding: 7px 8px; }
+  table.data thead input { font-weight: 600; }
+  table.data .rmcol, table.data .rmrow { color: var(--muted); background: var(--surface-2); border: none; cursor: pointer; width: 26px; height: 26px; font-size: 1rem; line-height: 1; }
+  table.data .rmcol:hover, table.data .rmrow:hover { color: var(--danger); }
+  table.data td.corner, table.data th.corner { background: var(--surface-2); }
+  .tbl-actions { display: flex; gap: 8px; margin-top: 8px; }
+  textarea#raw { min-height: 220px; font-family: var(--mono); font-size: .82rem; white-space: pre; }
+  .hide { display: none !important; }
+
+  .chart-card { display: flex; flex-direction: column; gap: 12px; }
+  .chart-box { position: relative; height: 460px; background: var(--chart-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; }
+  @media (max-width: 900px) { .chart-box { height: 340px; } }
+  .export-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .export-row .spacer { flex: 1; }
+  .note { color: var(--muted); font-size: .8rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+
+  footer.app { margin-top: 20px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Quick Chart Maker</h1>
+      <p>Type or paste your data, pick a chart type, and export a PNG. Everything runs in your browser — nothing is uploaded.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="examples" id="examples">
+    <span class="lbl">Load example:</span>
+    <button data-ex="revenue">Monthly revenue</button>
+    <button data-ex="population">World population by continent</button>
+    <button data-ex="heightweight">Height vs weight</button>
+    <button data-ex="steps">Weekly steps</button>
+  </div>
+
+  <div class="grid">
+    <!-- ---- Controls ---- -->
+    <section class="panel">
+      <div class="block">
+        <div class="cap">Chart type</div>
+        <div class="seg" id="typeSeg" role="group" aria-label="Chart type">
+          <button data-type="bar" aria-pressed="true">Bar</button>
+          <button data-type="line" aria-pressed="false">Line</button>
+          <button data-type="pie" aria-pressed="false">Pie</button>
+          <button data-type="doughnut" aria-pressed="false">Doughnut</button>
+          <button data-type="scatter" aria-pressed="false">Scatter</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="cap">Options</div>
+        <div class="opts" id="optsCommon">
+          <label style="flex:1 1 100%"><span>Title</span>
+            <input type="text" id="optTitle" placeholder="Chart title (optional)"></label>
+          <label><input type="checkbox" id="optLegend" checked> Legend</label>
+        </div>
+        <div class="opts hide" id="optsBar" style="margin-top:10px">
+          <label><input type="checkbox" id="optHorizontal"> Horizontal</label>
+          <label><input type="checkbox" id="optStacked"> Stacked</label>
+        </div>
+        <div class="opts hide" id="optsLine" style="margin-top:10px">
+          <label><input type="checkbox" id="optFill"> Fill area</label>
+          <label><input type="checkbox" id="optSmooth" checked> Smooth</label>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="cap">Data
+          <span style="float:right; text-transform:none; letter-spacing:0; font-weight:400">
+            <span class="seg" style="padding:2px">
+              <button type="button" id="viewTable" aria-pressed="true" style="padding:4px 10px">Table</button>
+              <button type="button" id="viewRaw" aria-pressed="false" style="padding:4px 10px">Raw text</button>
+            </span>
+          </span>
+        </div>
+
+        <div id="tableView">
+          <div class="tbl-wrap"><table class="data" id="dataTable"></table></div>
+          <div class="tbl-actions">
+            <button class="btn" id="addRow">+ Row</button>
+            <button class="btn" id="addCol">+ Column</button>
+            <button class="btn" id="clearData">Clear</button>
+          </div>
+        </div>
+
+        <div id="rawView" class="hide">
+          <textarea id="raw" spellcheck="false" aria-label="Raw CSV or TSV data"></textarea>
+          <div class="note">First row = headers. First column = labels (or X for scatter); other columns are numeric series. Comma or tab separated.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- Chart ---- -->
+    <section class="panel chart-card">
+      <div class="chart-box"><canvas id="chart"></canvas></div>
+      <div class="export-row">
+        <button class="btn primary" id="downloadPng">⬇ Download PNG</button>
+        <button class="btn" id="copyPng">⧉ Copy image</button>
+        <label class="note" style="display:inline-flex;align-items:center;gap:6px;margin-left:4px">
+          Size
+          <select id="pngScale" style="width:auto">
+            <option value="1">1×</option>
+            <option value="2" selected>2×</option>
+            <option value="3">3×</option>
+          </select>
+        </label>
+        <label class="note" style="display:inline-flex;align-items:center;gap:6px">
+          Background
+          <select id="pngBg" style="width:auto">
+            <option value="surface">Theme</option>
+            <option value="white">White</option>
+            <option value="transparent">Transparent</option>
+          </select>
+        </label>
+        <span class="spacer"></span>
+        <span class="note" id="status"></span>
+      </div>
+    </section>
+  </div>
+
+  <footer class="app">Built with Chart.js · a <strong>max</strong> tool</footer>
+</div>
+
+<script type="module">
+/* ============================================================
+   Quick Chart Maker — standalone, client-side.
+   Dep: Chart.js (UMD), loaded in the BACKGROUND so a slow/blocked
+   CDN can never stop the data editor from working.
+   ============================================================ */
+const $ = (s) => document.querySelector(s);
+const PALETTE_VARS = ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'];
+let renderTimer = 0;
+function renderDebounced(){ clearTimeout(renderTimer); renderTimer = setTimeout(render, 120); }
+
+let Chart = null, chart = null, chartReady = false;
+
+// ---- state ----
+const state = {
+  type: 'bar',
+  title: '',
+  legend: true,
+  horizontal: false,
+  stacked: false,
+  fill: false,
+  smooth: true,
+  view: 'table',
+  data: null, // { headers:[...], rows:[[...]] }
+};
+
+// ---------- sample datasets ----------
+// Each sample carries a suitable chart type and a fitting title.
+const SAMPLES = {
+  revenue: {
+    type:'bar', title:'Monthly revenue by product',
+    headers:['Month','Product A','Product B','Product C'],
+    rows:[['Jan',12400,8300,4100],['Feb',13050,8650,4480],['Mar',14800,9020,5210],['Apr',14150,9480,5900],
+          ['May',15600,9950,6480],['Jun',16900,10300,7150],['Jul',17450,10820,7820],['Aug',16780,11250,8400],
+          ['Sep',18200,11900,9150],['Oct',19500,12400,9880],['Nov',21300,13100,10640],['Dec',24100,14200,11900]],
+  },
+  population: {
+    type:'pie', title:'World population by continent',
+    headers:['Continent','Population (millions)'],
+    rows:[['Asia',4778],['Africa',1494],['Europe',745],['North America',604],['South America',439],['Oceania',46]],
+  },
+  heightweight: {
+    type:'scatter', title:'Height vs weight',
+    headers:['Height (cm)','Weight (kg)'],
+    rows:[[150,50],[153,54],[156,53],[158,58],[160,59],[162,61],[164,60],[166,65],[168,66],[170,68],
+          [172,70],[174,73],[176,74],[178,77],[180,79],[182,82],[184,84],[186,88],[188,90],[191,94]],
+  },
+  steps: {
+    type:'bar', title:'Steps this week',
+    headers:['Day','Steps'],
+    rows:[['Mon',7245],['Tue',8410],['Wed',6980],['Thu',9105],['Fri',7830],['Sat',12440],['Sun',10215]],
+  },
+};
+
+// ---------- helpers ----------
+function num(v){ if (v === '' || v == null) return null; const n = parseFloat(String(v).trim()); return Number.isFinite(n) ? n : null; }
+// thousands separators for numeric values only (12345.6 -> "12,345.6"); anything else passes through
+function fmtNum(v){ return (typeof v === 'number' && Number.isFinite(v)) ? v.toLocaleString(undefined, { maximumFractionDigits: 4 }) : v; }
+function themeColors(){
+  const cs = getComputedStyle(document.documentElement);
+  const g = (k) => cs.getPropertyValue(k).trim();
+  return {
+    ink: g('--text'), muted: g('--muted'), grid: g('--grid'), axis: g('--axis'),
+    surface: g('--chart-surface'),
+    palette: PALETTE_VARS.map(g),
+  };
+}
+function hexToRgba(hex, a){
+  const m = hex.replace('#',''); const f = m.length === 3 ? m.split('').map(c=>c+c).join('') : m;
+  const n = parseInt(f,16); return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+
+// ---------- CSV/TSV <-> model ----------
+function parseDelimited(text){
+  const lines = text.replace(/\r\n?/g,'\n').split('\n').filter(l => l.trim() !== '');
+  if (!lines.length) return { headers:['X'], rows:[] };
+  const delim = lines[0].includes('\t') ? '\t' : ',';
+  const parseLine = (line) => {
+    const out = []; let cur = '', q = false;
+    for (let i=0;i<line.length;i++){
+      const c = line[i];
+      if (q){ if (c === '"'){ if (line[i+1] === '"'){ cur+='"'; i++; } else q=false; } else cur+=c; }
+      else { if (c === '"') q=true; else if (c === delim){ out.push(cur); cur=''; } else cur+=c; }
+    }
+    out.push(cur); return out.map(s=>s.trim());
+  };
+  const headers = parseLine(lines[0]);
+  const rows = lines.slice(1).map(parseLine).map(r => { while (r.length < headers.length) r.push(''); return r.slice(0, headers.length); });
+  return { headers, rows };
+}
+function toCSV(model){
+  const esc = (v) => { const s = String(v ?? ''); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+  return [model.headers.map(esc).join(','), ...model.rows.map(r => r.map(esc).join(','))].join('\n');
+}
+
+// ---------- table view ----------
+function renderTable(){
+  const t = $('#dataTable'); const m = state.data;
+  const thead = '<thead><tr><th class="corner"></th>' +
+    m.headers.map((h,c) => `<th><input data-h="${c}" value="${escAttr(h)}"></th>`).join('') +
+    '<th class="corner"></th></tr>' +
+    '<tr><th class="corner"></th>' +
+    m.headers.map((_,c) => `<th><button class="rmcol" data-rmcol="${c}" title="Remove column">×</button></th>`).join('') +
+    '<th class="corner"></th></tr></thead>';
+  const tbody = '<tbody>' + m.rows.map((row,r) =>
+    '<tr>' +
+    `<td class="corner"><button class="rmrow" data-rmrow="${r}" title="Remove row">×</button></td>` +
+    row.map((v,c) => `<td><input data-r="${r}" data-c="${c}" value="${escAttr(v)}"></td>`).join('') +
+    '<td class="corner"></td></tr>').join('') + '</tbody>';
+  t.innerHTML = thead + tbody;
+}
+function escAttr(v){ return String(v ?? '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+// ---------- build Chart.js config ----------
+function buildConfig(){
+  const c = themeColors(); const m = state.data;
+  const isScatter = state.type === 'scatter';
+  const isPie = state.type === 'pie' || state.type === 'doughnut';
+  const labels = m.rows.map(r => r[0]);
+
+  let datasets = [];
+  if (isScatter){
+    // first two numeric columns => x, y
+    const numCols = m.headers.map((_,i)=>i).filter(i => m.rows.some(r => num(r[i]) != null));
+    const [xi, yi] = [numCols[0] ?? 0, numCols[1] ?? 1];
+    datasets = [{
+      label: `${m.headers[yi]||'y'} vs ${m.headers[xi]||'x'}`,
+      data: m.rows.map(r => ({ x:num(r[xi]), y:num(r[yi]) })).filter(p => p.x!=null && p.y!=null),
+      backgroundColor: c.palette[0], borderColor: c.palette[0], pointRadius: 5, pointHoverRadius: 7,
+    }];
+  } else if (isPie){
+    const col = 1 < m.headers.length ? 1 : 0;
+    datasets = [{
+      label: m.headers[col] || 'Value',
+      data: m.rows.map(r => num(r[col]) ?? 0),
+      backgroundColor: m.rows.map((_,i) => c.palette[i % 8]),
+      borderColor: c.surface, borderWidth: 2,
+    }];
+  } else {
+    for (let col=1; col<m.headers.length; col++){
+      const color = c.palette[(col-1) % 8];
+      datasets.push({
+        label: m.headers[col] || `Series ${col}`,
+        data: m.rows.map(r => num(r[col])),
+        backgroundColor: state.type === 'line' ? (state.fill ? hexToRgba(color,.18) : color) : color,
+        borderColor: color, borderWidth: state.type === 'line' ? 2 : 1,
+        borderRadius: state.type === 'bar' ? 4 : 0,
+        fill: state.type === 'line' ? state.fill : undefined,
+        tension: state.type === 'line' ? (state.smooth ? 0.35 : 0) : undefined,
+        pointRadius: state.type === 'line' ? 3 : undefined,
+      });
+    }
+  }
+
+  // thousands separators on the numeric (value) axes only — category labels stay untouched
+  const horiz = state.type === 'bar' && state.horizontal;
+  const numTicks = () => ({ color:c.muted, callback:(v) => fmtNum(v) });
+  const catTicks = () => ({ color:c.muted });
+  const scales = (isPie) ? {} : (isScatter ? {
+    x: { type:'linear', position:'bottom', grid:{color:c.grid}, ticks:numTicks(), title:{display:!!m.headers[0],text:m.headers[0],color:c.muted} },
+    y: { grid:{color:c.grid}, ticks:numTicks() },
+  } : {
+    x: { stacked: state.stacked, grid:{color:c.grid,display:!state.horizontal}, ticks: horiz ? numTicks() : catTicks() },
+    y: { stacked: state.stacked, grid:{color:c.grid,display:state.horizontal}, ticks: horiz ? catTicks() : numTicks(), beginAtZero:true },
+  });
+
+  return {
+    type: isScatter ? 'scatter' : (isPie ? state.type : state.type),
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      indexAxis: horiz ? 'y' : 'x',
+      color: c.ink,
+      plugins: {
+        legend: { display: state.legend && (isPie || datasets.length > 1 || isScatter), labels: { color: c.ink } },
+        title: { display: !!state.title, text: state.title, color: c.ink, font:{size:15} },
+        tooltip: { enabled: true, callbacks: {
+          label(ctx){
+            const name = ctx.dataset.label ? ctx.dataset.label + ': ' : '';
+            if (isScatter) return `${name}(${fmtNum(ctx.parsed.x)}, ${fmtNum(ctx.parsed.y)})`;
+            if (isPie) return `${ctx.label}: ${fmtNum(ctx.parsed)}`;
+            const v = horiz ? ctx.parsed.x : ctx.parsed.y;
+            return name + fmtNum(v ?? '');
+          },
+        } },
+      },
+      scales,
+    },
+  };
+}
+
+// ---------- render ----------
+function render(){
+  if (!chartReady) return;
+  const cfg = buildConfig();
+  if (chart) chart.destroy();
+  chart = new Chart($('#chart'), cfg);
+}
+
+// ---------- sync from inputs ----------
+function syncRawFromModel(){ $('#raw').value = toCSV(state.data); }
+function setData(model, opts){
+  state.data = { headers: model.headers.slice(), rows: model.rows.map(r=>r.slice()) };
+  if (state.view === 'table') renderTable(); else syncRawFromModel();
+  if (!opts || opts.render !== false) render();
+}
+
+// ================= wiring =================
+// chart type
+$('#typeSeg').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-type]'); if (!b) return;
+  state.type = b.dataset.type;
+  [...$('#typeSeg').children].forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  $('#optsBar').classList.toggle('hide', state.type !== 'bar');
+  $('#optsLine').classList.toggle('hide', state.type !== 'line');
+  render();
+});
+// options
+$('#optTitle').addEventListener('input', e => { state.title = e.target.value; renderDebounced(); });
+$('#optLegend').addEventListener('change', e => { state.legend = e.target.checked; render(); });
+$('#optHorizontal').addEventListener('change', e => { state.horizontal = e.target.checked; render(); });
+$('#optStacked').addEventListener('change', e => { state.stacked = e.target.checked; render(); });
+$('#optFill').addEventListener('change', e => { state.fill = e.target.checked; render(); });
+$('#optSmooth').addEventListener('change', e => { state.smooth = e.target.checked; render(); });
+
+// data view toggle
+function setView(v){
+  state.view = v;
+  $('#viewTable').setAttribute('aria-pressed', String(v==='table'));
+  $('#viewRaw').setAttribute('aria-pressed', String(v==='raw'));
+  $('#tableView').classList.toggle('hide', v!=='table');
+  $('#rawView').classList.toggle('hide', v!=='raw');
+  if (v === 'table') renderTable(); else syncRawFromModel();
+}
+$('#viewTable').addEventListener('click', () => setView('table'));
+$('#viewRaw').addEventListener('click', () => setView('raw'));
+
+// table edits (event delegation)
+$('#dataTable').addEventListener('input', (e) => {
+  const el = e.target;
+  if (el.dataset.h != null) { state.data.headers[+el.dataset.h] = el.value; renderDebounced(); }
+  else if (el.dataset.r != null) { state.data.rows[+el.dataset.r][+el.dataset.c] = el.value; renderDebounced(); }
+});
+$('#dataTable').addEventListener('click', (e) => {
+  const rc = e.target.dataset.rmcol, rr = e.target.dataset.rmrow;
+  if (rc != null && state.data.headers.length > 1) {
+    const c = +rc; state.data.headers.splice(c,1); state.data.rows.forEach(r => r.splice(c,1)); renderTable(); render();
+  } else if (rr != null && state.data.rows.length > 1) {
+    state.data.rows.splice(+rr,1); renderTable(); render();
+  }
+});
+$('#addRow').addEventListener('click', () => {
+  state.data.rows.push(state.data.headers.map((_,i) => i===0 ? 'New' : '')); renderTable(); render();
+});
+$('#addCol').addEventListener('click', () => {
+  state.data.headers.push('Series ' + state.data.headers.length);
+  state.data.rows.forEach(r => r.push('')); renderTable(); render();
+});
+$('#clearData').addEventListener('click', () => {
+  if (!confirm('Clear all data? This cannot be undone.')) return;
+  setData({ headers:['Label','Value'], rows:[['A',''],['B',''],['C','']] });
+  markPristine();
+});
+
+// raw text edits
+$('#raw').addEventListener('input', (e) => {
+  const parsed = parseDelimited(e.target.value);
+  const hasNumeric = parsed.rows.some(r => r.some(v => num(v) != null));
+  state.data = parsed;
+  if (e.target.value.trim() && parsed.rows.length === 0) flash('Could not parse any data rows — check your formatting', true);
+  else if (e.target.value.trim() && !hasNumeric && parsed.rows.length > 0) flash('No numeric values found — ensure data columns contain numbers', true);
+  else renderDebounced();
+});
+
+// examples — confirm before replacing only if the user has changed the data
+let pristineCSV = '';
+function markPristine(){ pristineCSV = toCSV(state.data); }
+function applySample(s){
+  state.type = s.type;
+  [...$('#typeSeg').children].forEach(x => x.setAttribute('aria-pressed', String(x.dataset.type === s.type)));
+  $('#optsBar').classList.toggle('hide', s.type !== 'bar');
+  $('#optsLine').classList.toggle('hide', s.type !== 'line');
+  state.title = s.title; $('#optTitle').value = s.title;
+  setData({ headers: s.headers, rows: s.rows });
+  markPristine();
+}
+$('#examples').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-ex]'); if (!b) return;
+  if (toCSV(state.data) !== pristineCSV && !confirm('Replace your current data with this example? This cannot be undone.')) return;
+  applySample(SAMPLES[b.dataset.ex]);
+});
+
+// ---------- export ----------
+// Re-render the chart into a hidden canvas at the chosen scale (same CSS size,
+// devicePixelRatio = scale) so the export is genuinely sharp, not an upscale.
+function exportCanvas(){
+  if (!chart) return null;
+  const scale = Math.max(1, parseInt($('#pngScale').value, 10) || 2);
+  const w = chart.width, h = chart.height; // CSS-pixel size of the live chart
+  const host = document.createElement('div');
+  host.style.cssText = `position:fixed;left:-10000px;top:0;width:${w}px;height:${h}px;pointer-events:none;`;
+  const off = document.createElement('canvas');
+  off.width = w; off.height = h;
+  host.appendChild(off); document.body.appendChild(host);
+  let exp = null;
+  try {
+    const cfg = buildConfig();
+    cfg.options.responsive = false;
+    cfg.options.animation = false;
+    cfg.options.devicePixelRatio = scale;
+    exp = new Chart(off, cfg); // draws synchronously (animation off); backing store = w×scale
+    const out = document.createElement('canvas');
+    out.width = off.width; out.height = off.height;
+    const ctx = out.getContext('2d');
+    const bg = $('#pngBg').value;
+    if (bg !== 'transparent') { ctx.fillStyle = bg === 'white' ? '#ffffff' : themeColors().surface; ctx.fillRect(0,0,out.width,out.height); }
+    ctx.drawImage(off, 0, 0);
+    return out;
+  } finally {
+    if (exp) exp.destroy();
+    host.remove();
+  }
+}
+function fileName(){ return (state.title || 'chart').replace(/[^\w.-]+/g,'-').replace(/^-+|-+$/g,'').toLowerCase() || 'chart'; }
+function flash(msg, isErr){ const s = $('#status'); s.textContent = msg; s.classList.toggle('err', !!isErr); if (msg) setTimeout(()=>{ if (s.textContent===msg) s.textContent=''; }, 2200); }
+
+$('#downloadPng').addEventListener('click', () => {
+  const cv = exportCanvas(); if (!cv) return flash('Nothing to export yet', true);
+  const a = document.createElement('a'); a.href = cv.toDataURL('image/png'); a.download = fileName() + '.png'; a.click();
+  flash('PNG downloaded');
+});
+const copyBtn = $('#copyPng');
+if (!(navigator.clipboard && window.ClipboardItem)) copyBtn.classList.add('hide'); // unsupported → hide entirely
+copyBtn.addEventListener('click', async () => {
+  const cv = exportCanvas(); if (!cv) return flash('Nothing to export yet', true);
+  try {
+    await new Promise((res,rej) => cv.toBlob(b => b ? navigator.clipboard.write([new ClipboardItem({'image/png':b})]).then(res,rej) : rej(new Error('toBlob failed')), 'image/png'));
+    const orig = copyBtn.textContent;
+    copyBtn.textContent = '✓ Copied'; copyBtn.classList.add('copied');
+    setTimeout(() => { copyBtn.textContent = orig; copyBtn.classList.remove('copied'); }, 1200);
+  } catch (e) { flash('Copy failed — your browser blocked it. Use Download instead.', true); }
+});
+
+// ---------- theme ----------
+const root = document.documentElement;
+const saved = localStorage.getItem('qcm-theme');
+if (saved) root.setAttribute('data-theme', saved);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('qcm-theme', next);
+  render(); // repaint chart with themed colors
+});
+
+// ---------- boot ----------
+applySample(SAMPLES.revenue); // render() no-ops until Chart.js lands
+setView('table');
+
+// load Chart.js in the background (non-blocking)
+(function loadChart(){
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.js';
+  s.integrity = 'sha256-OFBlarvcMZFB5ujOjqzeJiL8dnww4g2BcEryvzFZ+S0=';
+  s.crossOrigin = 'anonymous';
+  s.onload = () => { Chart = window.Chart; chartReady = true; render(); };
+  s.onerror = () => flash('Chart library failed to load (check your connection)', true);
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>

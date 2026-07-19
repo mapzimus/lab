@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Favicon Generator</title>
+<meta name="description" content="Turn an emoji, a letter or two, or any image into a complete favicon set — favicon.ico, PNGs, apple-touch-icon, and web manifest. Fully client-side.">
+<style>
+  /* ---- Theme tokens ---- */
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  /* checkerboard token */
+  :root { --check: rgba(17,24,32,.10); }
+  :root[data-theme="dark"] { --check: rgba(231,236,242,.09); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --check: rgba(231,236,242,.09); }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); filter: none; }
+  .btn.primary:disabled:hover { color: var(--accent-ink); border-color: var(--accent); }
+  .btn.copied { border-color: var(--ok); color: var(--ok); }
+  .btn.copyerr { border-color: var(--danger); color: var(--danger); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  /* ---- pill tabs ---- */
+  .tabs { display: inline-flex; gap: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px; margin-bottom: 14px; }
+  .tab { border: none; background: transparent; color: var(--muted); font-family: var(--sans); font-size: .9rem; padding: 8px 20px; border-radius: 999px; cursor: pointer; }
+  .tab:hover { color: var(--text); }
+  .tab[aria-selected="true"] { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: var(--shadow); }
+  .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- sections / options ---- */
+  .section { margin: 0 0 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px 16px; }
+  .section h2 { font-size: .95rem; margin: 0 0 12px; letter-spacing: -0.01em; }
+  .opt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px 22px; }
+  .opt { min-width: 0; }
+  .optlabel { display: block; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+  .hint { color: var(--muted); font-size: .78rem; margin: 6px 0 0; }
+  .note { color: var(--muted); font-size: .82rem; margin: 8px 2px; }
+  .note.err { color: var(--danger); }
+  .note[hidden] { display: none; }
+  select, input[type="text"] { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 10px; font-size: .9rem; font-family: var(--sans); width: 100%; max-width: 250px; }
+  input[type="color"] { border: 1px solid var(--border); background: var(--surface); border-radius: 9px; padding: 2px; width: 52px; height: 36px; cursor: pointer; }
+  input[type="range"] { width: 100%; max-width: 250px; margin: 8px 0 2px; accent-color: var(--accent); display: block; }
+  .colorrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .rangeval { font-family: var(--mono); font-size: .8rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 0 6px; color: var(--text); }
+  .chk { display: inline-flex; align-items: center; gap: 7px; font-size: .86rem; cursor: pointer; }
+  .chk input { accent-color: var(--accent); }
+
+  /* big emoji input */
+  #emojiInput { font-size: 1.7rem; text-align: center; width: 96px; max-width: 96px; padding: 6px 8px; }
+  .emoji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; margin-top: 4px; }
+  .emoji-grid button { font-size: 1.35rem; line-height: 1; padding: 7px 0; border: 1px solid var(--border); background: var(--surface); border-radius: 9px; cursor: pointer; }
+  .emoji-grid button:hover, .emoji-grid button:focus-visible { border-color: var(--accent); background: var(--surface-2); }
+  .emoji-grid button[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  #textInput { font-size: 1.35rem; text-align: center; width: 96px; max-width: 96px; font-weight: 700; }
+
+  /* image dropzone */
+  .dropzone { border: 2px dashed var(--border); border-radius: 10px; background: var(--surface-2); padding: 22px 16px; text-align: center; cursor: pointer; transition: border-color .15s; }
+  .dropzone:hover, .dropzone:focus-within, .dropzone.over { border-color: var(--accent); }
+  .dropzone p { margin: 0 0 10px; color: var(--muted); font-size: .88rem; }
+  .imginfo { display: flex; align-items: center; gap: 10px; font-size: .85rem; color: var(--muted); flex-wrap: wrap; margin-top: 10px; }
+  .imginfo img { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+  .imginfo[hidden] { display: none; }
+
+  /* ---- previews ---- */
+  .pv-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+  .pv-cell { text-align: center; }
+  .pv-box { width: 84px; height: 84px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 10px;
+    background-color: var(--surface-2);
+    background-image: conic-gradient(var(--check) 25%, transparent 0 50%, var(--check) 0 75%, transparent 0);
+    background-size: 14px 14px; }
+  .pv-cell figcaption { font-size: .74rem; color: var(--muted); font-family: var(--mono); margin-top: 5px; }
+  .pv-cell figure { margin: 0; }
+  .mocks { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 16px; align-items: stretch; }
+  .mock-tabbar { flex: 1; min-width: 220px; max-width: 340px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 10px 0; }
+  .mock-tab { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: 9px 9px 0 0; padding: 7px 12px; font-size: .8rem; max-width: 230px; }
+  .mock-tab .t-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mock-tab .t-x { color: var(--muted); }
+  .mock-tab canvas { width: 16px; height: 16px; flex: none; }
+  .mock-caption { font-size: .74rem; color: var(--muted); margin: 8px 2px 6px; }
+  .mock-ios { min-width: 130px; border-radius: 10px; border: 1px solid var(--border); background: linear-gradient(135deg, #3b5bd9, #7c3aed 60%, #db2777); padding: 16px 22px 10px; text-align: center; }
+  .mock-ios canvas { width: 60px; height: 60px; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+  .mock-ios .ios-label { color: #fff; font-size: .72rem; margin-top: 6px; text-shadow: 0 1px 2px rgba(0,0,0,.4); }
+
+  /* ---- files ---- */
+  .files { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .file { display: flex; align-items: center; gap: 10px; border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; background: var(--surface-2); }
+  .file .f-ico { font-size: 1.15rem; flex: none; }
+  .file .f-body { flex: 1; min-width: 0; }
+  .file .f-name { display: block; font-family: var(--mono); font-size: .8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file .f-size { display: block; color: var(--muted); font-size: .72rem; font-family: var(--mono); }
+  .file .btn { padding: 6px 10px; font-size: .8rem; flex: none; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+  #snippet { width: 100%; min-height: 128px; resize: vertical; font-family: var(--mono); font-size: .8rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); color: var(--text); padding: 10px 12px; line-height: 1.5; white-space: pre; }
+  .snip-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 0 0 8px; }
+  .snip-head h2 { margin: 0; }
+
+  @media (max-width: 720px) {
+    header.app { flex-wrap: wrap; }
+    .tabs { width: 100%; justify-content: stretch; }
+    .tab { flex: 1; padding: 8px 6px; text-align: center; }
+    .pv-row { gap: 10px; }
+    .pv-box { width: 72px; height: 72px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Favicon Generator</h1>
+      <p>Turn an emoji, a letter or two, or any image into a complete favicon set — a real multi-size favicon.ico, PNGs for every device, and the web manifest to go with them. Nothing leaves your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Icon source">
+    <button class="tab" role="tab" id="tabEmoji" aria-selected="true" aria-controls="panelEmoji" type="button">Emoji</button>
+    <button class="tab" role="tab" id="tabText" aria-selected="false" aria-controls="panelText" tabindex="-1" type="button">Text</button>
+    <button class="tab" role="tab" id="tabImage" aria-selected="false" aria-controls="panelImage" tabindex="-1" type="button">Image</button>
+  </div>
+
+  <!-- ============ Emoji panel ============ -->
+  <section class="section" id="panelEmoji" role="tabpanel" aria-labelledby="tabEmoji">
+    <div class="opt-grid">
+      <div class="opt">
+        <label class="optlabel" for="emojiInput">Your emoji</label>
+        <input type="text" id="emojiInput" value="🚀" autocomplete="off" spellcheck="false">
+        <p class="hint">Type or paste any emoji — it's drawn big and centered.</p>
+        <p class="note err" id="emojiNote" hidden></p>
+      </div>
+      <div class="opt" style="grid-column: span 2; min-width: 210px;">
+        <span class="optlabel" id="emojiGridLabel">Popular picks</span>
+        <div class="emoji-grid" id="emojiGrid" role="group" aria-labelledby="emojiGridLabel"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Text panel ============ -->
+  <section class="section" id="panelText" role="tabpanel" aria-labelledby="tabText" hidden>
+    <div class="opt-grid">
+      <div class="opt">
+        <label class="optlabel" for="textInput">Letters (1–2)</label>
+        <input type="text" id="textInput" value="M" autocomplete="off" spellcheck="false">
+        <p class="note err" id="textNote" hidden></p>
+      </div>
+      <div class="opt">
+        <label class="optlabel" for="fontSel">Font</label>
+        <select id="fontSel">
+          <option value="system">System sans</option>
+          <option value="serif">Serif</option>
+          <option value="mono">Monospace</option>
+          <option value="rounded">Rounded</option>
+        </select>
+      </div>
+      <div class="opt">
+        <label class="optlabel" for="weightSel">Weight</label>
+        <select id="weightSel">
+          <option value="400">Regular (400)</option>
+          <option value="600">Semibold (600)</option>
+          <option value="800" selected>Extra bold (800)</option>
+        </select>
+      </div>
+      <div class="opt">
+        <span class="optlabel">Colors</span>
+        <div class="colorrow">
+          <label class="chk" for="textColor">Text <input type="color" id="textColor" value="#ffffff" aria-label="Text color"></label>
+          <label class="chk" for="bgColor">Background <input type="color" id="bgColor" value="#2563eb" aria-label="Background color"></label>
+        </div>
+      </div>
+      <div class="opt">
+        <label class="optlabel" for="bgStyle">Background style</label>
+        <select id="bgStyle">
+          <option value="solid">Solid color</option>
+          <option value="gradient">Subtle gradient</option>
+        </select>
+        <p class="hint">Gradient blends into a darker shade of your color.</p>
+      </div>
+      <div class="opt">
+        <label class="optlabel" for="textRound">Corner rounding <output class="rangeval" id="textRoundVal" for="textRound">0%</output></label>
+        <input type="range" id="textRound" min="0" max="50" step="1" value="0">
+        <p class="hint">50% makes a circle. Not applied to the iOS icon — Apple rounds it for you.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Image panel ============ -->
+  <section class="section" id="panelImage" role="tabpanel" aria-labelledby="tabImage" hidden>
+    <div class="opt-grid">
+      <div class="opt" style="grid-column: span 2;">
+        <span class="optlabel">Source image</span>
+        <div class="dropzone" id="imgDrop" tabindex="0" role="button" aria-label="Drop an image here or press Enter to choose one">
+          <input type="file" id="imgInput" accept="image/*" class="visually-hidden" aria-label="Choose an image">
+          <p>Drop an image here, or</p>
+          <button class="btn primary" id="imgBrowseBtn" type="button">📂 Choose image</button>
+        </div>
+        <div class="imginfo" id="imgInfo" hidden>
+          <img id="imgThumb" alt="">
+          <span id="imgMeta"></span>
+          <button class="btn" id="imgClearBtn" type="button">🗑 Remove</button>
+        </div>
+        <p class="hint">Non-square images are automatically center-cropped to a square.</p>
+        <p class="note err" id="imgNote" hidden></p>
+      </div>
+      <div class="opt">
+        <label class="optlabel" for="imgRound">Corner rounding <output class="rangeval" id="imgRoundVal" for="imgRound">0%</output></label>
+        <input type="range" id="imgRound" min="0" max="50" step="1" value="0">
+      </div>
+      <div class="opt">
+        <span class="optlabel">Background fill</span>
+        <div class="colorrow">
+          <label class="chk"><input type="checkbox" id="imgFill"> Fill behind image</label>
+          <input type="color" id="imgFillColor" value="#ffffff" aria-label="Background fill color">
+        </div>
+        <p class="hint">Useful when your image has transparent areas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Previews ============ -->
+  <section class="section" aria-label="Icon previews">
+    <h2>Preview at every size</h2>
+    <div class="pv-row" id="pvRow"></div>
+    <div class="mocks">
+      <div class="mock-tabbar">
+        <div class="mock-tab">
+          <canvas id="tabMockCv" width="16" height="16" aria-label="Icon in a browser tab"></canvas>
+          <span class="t-title">Your site — welcome</span>
+          <span class="t-x" aria-hidden="true">×</span>
+        </div>
+        <p class="mock-caption">How it looks in a browser tab (16 px)</p>
+      </div>
+      <div>
+        <div class="mock-ios">
+          <canvas id="iosMockCv" width="180" height="180" aria-label="Icon on an iOS home screen"></canvas>
+          <div class="ios-label">Your app</div>
+        </div>
+        <p class="mock-caption">iOS home screen (apple-touch-icon, 180 px)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Files ============ -->
+  <section class="section" aria-label="Generated files">
+    <h2>Your favicon set</h2>
+    <div class="files" id="filesGrid"></div>
+    <div class="actions">
+      <button class="btn primary" id="downloadAllBtn" type="button" title="Downloads all 7 files — your browser may ask to allow multiple downloads">⬇ Download all 7 files</button>
+      <span class="note" id="dlNote" aria-live="polite" style="margin:0">Your browser may ask permission for multiple downloads — that's normal.</span>
+    </div>
+  </section>
+
+  <section class="section" aria-label="HTML snippet">
+    <div class="snip-head">
+      <h2>Paste this in your &lt;head&gt;</h2>
+      <button class="btn" id="copySnippetBtn" type="button">📋 Copy snippet</button>
+    </div>
+    <textarea id="snippet" readonly aria-label="HTML snippet to paste into your page head" spellcheck="false"></textarea>
+    <p class="hint">Put the downloaded files in your site's root folder (next to index.html).</p>
+  </section>
+
+  <footer class="app">Everything is generated locally in your browser — nothing is uploaded · a <strong>max</strong> tool</footer>
+</div>
+
+<script type="module">
+/* ============================================================
+   Favicon Generator — standalone, client-side, zero deps.
+   ============================================================ */
+const $ = (s) => document.querySelector(s);
+
+const SIZES = [16, 32, 48, 180, 192, 512];
+const PV_DISPLAY = { 16: 16, 32: 32, 48: 48, 180: 56, 192: 60, 512: 64 };
+const FILE_DEFS = [
+  { name: 'favicon.ico',            ico: '🧿', hint: '16+32+48 in one file' },
+  { name: 'favicon-16.png',         ico: '🖼️', hint: '' },
+  { name: 'favicon-32.png',         ico: '🖼️', hint: '' },
+  { name: 'apple-touch-icon.png',   ico: '🍎', hint: '180×180, opaque' },
+  { name: 'android-chrome-192.png', ico: '🤖', hint: '' },
+  { name: 'android-chrome-512.png', ico: '🤖', hint: '' },
+  { name: 'site.webmanifest',       ico: '📄', hint: 'web app manifest' },
+];
+const FONT_STACKS = {
+  system: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  serif: 'Georgia, "Times New Roman", serif',
+  mono: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+  rounded: 'ui-rounded, system-ui, sans-serif',
+};
+const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+const POPULAR_EMOJI = ['🚀','⚡','🔥','⭐','🌙','☀️','🌈','🌍','❤️','✨','🎉','🎨','🎯','🎮','🧠','💡','💻','📈','📚','🔒','🔔','🛠️','🧪','🍀'];
+
+const state = {
+  mode: 'emoji',
+  emoji: '🚀',
+  text: 'M', font: 'system', weight: '800', textColor: '#ffffff', bgColor: '#2563eb', bgStyle: 'solid', textRound: 0,
+  image: null, imageName: '', imgRound: 0, imgFill: false, imgFillColor: '#ffffff',
+};
+
+const files = new Map();   // filename -> Blob
+let filesReady = false;
+let renderTok = 0;
+
+/* ---------- small utils ---------- */
+function fmtBytes(n){
+  if (!Number.isFinite(n)) return '—';
+  if (n < 1024) return n + ' B';
+  return (n / 1024).toFixed(1) + ' KB';
+}
+function setNote(el, msg, isErr = true){
+  el.textContent = msg || '';
+  el.classList.toggle('err', !!isErr);
+  el.hidden = !msg;
+}
+function hexToRgb(hex){
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  const n = m ? parseInt(m[1], 16) : 0;
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function rgbToHex(r, g, b){
+  return '#' + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
+}
+function darken(hex, amt){
+  const [r, g, b] = hexToRgb(hex);
+  return rgbToHex(r * (1 - amt), g * (1 - amt), b * (1 - amt));
+}
+function roundPath(ctx, x, y, w, h, r){
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function graphemes(s){
+  try {
+    return [...new Intl.Segmenter('en', { granularity: 'grapheme' }).segment(s)].map(x => x.segment);
+  } catch (e) {
+    return Array.from(s);
+  }
+}
+
+/* ============================================================
+   Drawing — one function renders the icon into any canvas.
+   `apple` = true renders the apple-touch-icon variant:
+   always fully OPAQUE (iOS dislikes transparency) and never
+   corner-rounded (iOS applies its own mask).
+   ============================================================ */
+function drawTile(cv, size, apple){
+  cv.width = size;                    // exact pixel size, DPR-independent
+  cv.height = size;
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, size, size);
+
+  if (state.mode === 'emoji'){
+    if (apple){ ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, size, size); }
+    const ch = state.emoji || '🚀';
+    ctx.font = `${Math.max(1, Math.round(size * 0.8))}px ${EMOJI_FONT}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#111111';
+    ctx.fillText(ch, size / 2, size / 2 + size * 0.05);
+    return true;
+  }
+
+  if (state.mode === 'text'){
+    const r = apple ? 0 : size * (state.textRound / 100);
+    ctx.save();
+    if (r > 0){ roundPath(ctx, 0, 0, size, size, r); ctx.clip(); }
+    if (state.bgStyle === 'gradient'){
+      const g = ctx.createLinearGradient(0, 0, size, size);
+      g.addColorStop(0, state.bgColor);
+      g.addColorStop(1, darken(state.bgColor, 0.38));
+      ctx.fillStyle = g;
+    } else {
+      ctx.fillStyle = state.bgColor;
+    }
+    ctx.fillRect(0, 0, size, size);
+    const txt = state.text;
+    if (txt){
+      const fam = FONT_STACKS[state.font] || FONT_STACKS.system;
+      let px = size * 0.62;
+      ctx.font = `${state.weight} ${px}px ${fam}`;
+      const w = ctx.measureText(txt).width;
+      const maxW = size * 0.76;
+      if (w > maxW){
+        px = px * maxW / w;
+        ctx.font = `${state.weight} ${px}px ${fam}`;
+      }
+      const m = ctx.measureText(txt);
+      const asc = m.actualBoundingBoxAscent ?? px * 0.72;
+      const desc = m.actualBoundingBoxDescent ?? px * 0.05;
+      ctx.fillStyle = state.textColor;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(txt, size / 2, size / 2 + (asc - desc) / 2);
+    }
+    ctx.restore();
+    return true;
+  }
+
+  // image mode
+  if (!state.image) return false;
+  const r = apple ? 0 : size * (state.imgRound / 100);
+  ctx.save();
+  if (r > 0){ roundPath(ctx, 0, 0, size, size, r); ctx.clip(); }
+  if (apple || state.imgFill){
+    ctx.fillStyle = state.imgFill ? state.imgFillColor : '#ffffff';
+    ctx.fillRect(0, 0, size, size);
+  }
+  const iw = state.image.width, ih = state.image.height;
+  const side = Math.min(iw, ih);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(state.image, (iw - side) / 2, (ih - side) / 2, side, side, 0, 0, size, size);
+  ctx.restore();
+  return true;
+}
+
+/* ============================================================
+   ICO writer — a real multi-image .ico per the ICO spec.
+   Layout: 6-byte ICONDIR + count×16-byte ICONDIRENTRY +
+   concatenated image blobs. PNG-format entries are valid
+   since Windows Vista, so we embed each size's PNG bytes.
+   All integers little-endian.
+   ============================================================ */
+function buildIco(entries /* [{size, bytes:Uint8Array}] */){
+  const count = entries.length;
+  const headerSize = 6 + 16 * count;
+  const total = headerSize + entries.reduce((s, e) => s + e.bytes.length, 0);
+  const buf = new ArrayBuffer(total);
+  const dv = new DataView(buf);
+  const u8 = new Uint8Array(buf);
+  // ICONDIR
+  dv.setUint16(0, 0, true);      // reserved, must be 0
+  dv.setUint16(2, 1, true);      // type: 1 = icon
+  dv.setUint16(4, count, true);  // image count
+  let offset = headerSize;
+  entries.forEach((e, i) => {
+    const o = 6 + i * 16;        // ICONDIRENTRY
+    u8[o]     = e.size >= 256 ? 0 : e.size;  // width  (0 means 256)
+    u8[o + 1] = e.size >= 256 ? 0 : e.size;  // height (0 means 256)
+    u8[o + 2] = 0;                            // palette color count
+    u8[o + 3] = 0;                            // reserved
+    dv.setUint16(o + 4, 1, true);             // color planes
+    dv.setUint16(o + 6, 32, true);            // bits per pixel
+    dv.setUint32(o + 8, e.bytes.length, true);// bytes in resource
+    dv.setUint32(o + 12, offset, true);       // offset of image data
+    u8.set(e.bytes, offset);
+    offset += e.bytes.length;
+  });
+  return new Blob([buf], { type: 'image/x-icon' });
+}
+
+/* ---------- theme color (for the manifest) ---------- */
+function themeColor(){
+  if (state.mode === 'text') return state.bgColor;
+  // average the opaque pixels of the 32px render
+  const cv = pvCanvas[32];
+  try {
+    const d = cv.getContext('2d').getImageData(0, 0, 32, 32).data;
+    let r = 0, g = 0, b = 0, n = 0;
+    for (let i = 0; i < d.length; i += 4){
+      if (d[i + 3] > 200){ r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
+    }
+    if (!n) return '#ffffff';
+    return rgbToHex(r / n, g / n, b / n);
+  } catch (e) {
+    return '#ffffff';
+  }
+}
+
+function manifestJson(){
+  return JSON.stringify({
+    name: '',
+    short_name: '',
+    icons: [
+      { src: '/android-chrome-192.png', sizes: '192x192', type: 'image/png' },
+      { src: '/android-chrome-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    theme_color: themeColor(),
+    background_color: themeColor(),
+    display: 'standalone',
+  }, null, 2) + '\n';
+}
+
+const SNIPPET = [
+  '<link rel="icon" href="/favicon.ico" sizes="any">',
+  '<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">',
+  '<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">',
+  '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
+  '<link rel="manifest" href="/site.webmanifest">',
+].join('\n');
+
+/* ============================================================
+   Preview DOM
+   ============================================================ */
+const pvCanvas = {};   // size -> canvas element in the preview row
+const pvRow = $('#pvRow');
+for (const size of SIZES){
+  const cell = document.createElement('div');
+  cell.className = 'pv-cell';
+  cell.innerHTML = `<figure><div class="pv-box"></div><figcaption>${size}×${size}</figcaption></figure>`;
+  const cv = document.createElement('canvas');
+  cv.width = size; cv.height = size;
+  cv.style.width = PV_DISPLAY[size] + 'px';
+  cv.style.height = PV_DISPLAY[size] + 'px';
+  cv.setAttribute('aria-label', `Icon preview at ${size} by ${size} pixels`);
+  cell.querySelector('.pv-box').appendChild(cv);
+  pvRow.appendChild(cell);
+  pvCanvas[size] = cv;
+}
+const appleCv = document.createElement('canvas');  // offscreen 180 apple variant
+const tabMockCv = $('#tabMockCv');
+const iosMockCv = $('#iosMockCv');
+
+/* ---------- files DOM ---------- */
+const filesGrid = $('#filesGrid');
+const sizeEls = new Map();
+for (const def of FILE_DEFS){
+  const row = document.createElement('div');
+  row.className = 'file';
+  row.innerHTML = `
+    <span class="f-ico" aria-hidden="true">${def.ico}</span>
+    <span class="f-body">
+      <span class="f-name"></span>
+      <span class="f-size">—</span>
+    </span>
+    <button class="btn" type="button" data-file="${def.name}">⬇</button>`;
+  row.querySelector('.f-name').textContent = def.name;
+  row.querySelector('.f-name').title = def.hint || def.name;
+  row.querySelector('button').setAttribute('aria-label', 'Download ' + def.name);
+  filesGrid.appendChild(row);
+  sizeEls.set(def.name, row.querySelector('.f-size'));
+}
+
+/* ============================================================
+   Render pipeline (debounced)
+   ============================================================ */
+const pngBlob = (cv) => new Promise((resolve, reject) =>
+  cv.toBlob(b => b ? resolve(b) : reject(new Error('PNG encode failed')), 'image/png'));
+
+async function rebuild(){
+  const tok = ++renderTok;
+  let ok = true;
+  for (const size of SIZES) ok = drawTile(pvCanvas[size], size, false) && ok;
+  drawTile(appleCv, 180, true);
+  drawTile(tabMockCv, 16, false);
+  drawTile(iosMockCv, 180, true);
+
+  if (!ok){
+    filesReady = false;
+    files.clear();
+    for (const el of sizeEls.values()) el.textContent = '—';
+    $('#downloadAllBtn').disabled = true;
+    filesGrid.querySelectorAll('button').forEach(b => { b.disabled = true; });
+    $('#snippet').value = SNIPPET;
+    return;
+  }
+
+  try {
+    const [b16, b32, b48, b192, b512, bApple] = await Promise.all([
+      pngBlob(pvCanvas[16]), pngBlob(pvCanvas[32]), pngBlob(pvCanvas[48]),
+      pngBlob(pvCanvas[192]), pngBlob(pvCanvas[512]), pngBlob(appleCv),
+    ]);
+    if (tok !== renderTok) return;   // a newer render superseded this one
+    const [a16, a32, a48] = await Promise.all([b16, b32, b48].map(b => b.arrayBuffer()));
+    if (tok !== renderTok) return;
+
+    const ico = buildIco([
+      { size: 16, bytes: new Uint8Array(a16) },
+      { size: 32, bytes: new Uint8Array(a32) },
+      { size: 48, bytes: new Uint8Array(a48) },
+    ]);
+    files.set('favicon.ico', ico);
+    files.set('favicon-16.png', b16);
+    files.set('favicon-32.png', b32);
+    files.set('apple-touch-icon.png', bApple);
+    files.set('android-chrome-192.png', b192);
+    files.set('android-chrome-512.png', b512);
+    files.set('site.webmanifest', new Blob([manifestJson()], { type: 'application/manifest+json' }));
+
+    for (const [name, blob] of files) sizeEls.get(name).textContent = fmtBytes(blob.size);
+    filesReady = true;
+    $('#downloadAllBtn').disabled = false;
+    filesGrid.querySelectorAll('button').forEach(b => { b.disabled = false; });
+    $('#snippet').value = SNIPPET;
+  } catch (e) {
+    filesReady = false;
+    setNote($('#dlNote'), 'Something went wrong while generating the files — try changing a setting.', true);
+  }
+}
+
+let debounceT = 0;
+function scheduleRender(){
+  clearTimeout(debounceT);
+  debounceT = setTimeout(rebuild, 150);
+}
+
+/* ============================================================
+   Downloads
+   ============================================================ */
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+function downloadBlob(name, blob){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+filesGrid.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-file]');
+  if (!btn || !filesReady) return;
+  const blob = files.get(btn.dataset.file);
+  if (blob) downloadBlob(btn.dataset.file, blob);
+});
+$('#downloadAllBtn').addEventListener('click', async () => {
+  if (!filesReady) return;
+  for (const def of FILE_DEFS){
+    const blob = files.get(def.name);
+    if (blob) downloadBlob(def.name, blob);
+    await sleep(150);
+  }
+});
+
+/* ---------- copy snippet ---------- */
+function flashBtn(b, txt, err){
+  if (!b.dataset.orig) b.dataset.orig = b.textContent;
+  b.textContent = txt;
+  b.classList.add(err ? 'copyerr' : 'copied');
+  setTimeout(() => { b.textContent = b.dataset.orig; b.classList.remove('copied', 'copyerr'); }, 1200);
+}
+$('#copySnippetBtn').addEventListener('click', async () => {
+  const btn = $('#copySnippetBtn');
+  const text = $('#snippet').value;
+  try {
+    await navigator.clipboard.writeText(text);
+    flashBtn(btn, '✓ Copied');
+  } catch (e) {
+    try {  // fallback for browsers/contexts without the async clipboard API
+      $('#snippet').select();
+      const ok = document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      flashBtn(btn, ok ? '✓ Copied' : 'Copy failed', !ok);
+    } catch (e2) {
+      flashBtn(btn, 'Copy failed', true);
+    }
+  }
+});
+
+/* ============================================================
+   Tabs
+   ============================================================ */
+const TABS = [['emoji', 'tabEmoji', 'panelEmoji'], ['text', 'tabText', 'panelText'], ['image', 'tabImage', 'panelImage']];
+function selectTab(key, focus){
+  if (!TABS.some(t => t[0] === key)) key = 'emoji';
+  state.mode = key;
+  TABS.forEach(([k, tid, pid]) => {
+    const on = k === key;
+    const t = document.getElementById(tid);
+    t.setAttribute('aria-selected', String(on));
+    t.tabIndex = on ? 0 : -1;
+    document.getElementById(pid).hidden = !on;
+  });
+  if (focus) document.getElementById(TABS.find(t => t[0] === key)[1]).focus();
+  scheduleRender();
+}
+TABS.forEach(([k, tid]) => document.getElementById(tid).addEventListener('click', () => selectTab(k)));
+document.querySelector('.tabs').addEventListener('keydown', (e) => {
+  const idx = TABS.findIndex(t => t[0] === state.mode);
+  let next = null;
+  if (e.key === 'ArrowRight') next = (idx + 1) % TABS.length;
+  else if (e.key === 'ArrowLeft') next = (idx + TABS.length - 1) % TABS.length;
+  else if (e.key === 'Home') next = 0;
+  else if (e.key === 'End') next = TABS.length - 1;
+  if (next !== null){ e.preventDefault(); selectTab(TABS[next][0], true); }
+});
+
+/* ============================================================
+   Emoji tab
+   ============================================================ */
+const emojiInput = $('#emojiInput');
+const emojiGrid = $('#emojiGrid');
+for (const em of POPULAR_EMOJI){
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.textContent = em;
+  b.setAttribute('aria-label', 'Use emoji ' + em);
+  b.setAttribute('aria-pressed', String(em === state.emoji));
+  b.addEventListener('click', () => {
+    emojiInput.value = em;
+    state.emoji = em;
+    setNote($('#emojiNote'), '');
+    emojiGrid.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x.textContent === em)));
+    scheduleRender();
+  });
+  emojiGrid.appendChild(b);
+}
+emojiInput.addEventListener('input', () => {
+  const raw = emojiInput.value.trim();
+  const gs = graphemes(raw);
+  if (!raw){
+    state.emoji = '🚀';
+    setNote($('#emojiNote'), 'Nothing entered — showing the default 🚀.');
+  } else if (gs.length > 1){
+    state.emoji = gs[0];
+    setNote($('#emojiNote'), `Only one emoji fits — using "${gs[0]}".`);
+  } else {
+    state.emoji = raw;
+    setNote($('#emojiNote'), '');
+  }
+  emojiGrid.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x.textContent === state.emoji)));
+  scheduleRender();
+});
+
+/* ============================================================
+   Text tab
+   ============================================================ */
+$('#textInput').addEventListener('input', () => {
+  const el = $('#textInput');
+  const gs = graphemes(el.value);
+  if (gs.length > 2){
+    el.value = gs.slice(0, 2).join('');
+    setNote($('#textNote'), 'Only 1–2 characters fit on a favicon — extra characters were trimmed.');
+  } else if (!gs.length){
+    setNote($('#textNote'), 'Add 1–2 characters (an initial works great).');
+  } else {
+    setNote($('#textNote'), '');
+  }
+  state.text = el.value;
+  scheduleRender();
+});
+$('#fontSel').addEventListener('change', () => { state.font = $('#fontSel').value; scheduleRender(); });
+$('#weightSel').addEventListener('change', () => { state.weight = $('#weightSel').value; scheduleRender(); });
+$('#textColor').addEventListener('input', () => { state.textColor = $('#textColor').value; scheduleRender(); });
+$('#bgColor').addEventListener('input', () => { state.bgColor = $('#bgColor').value; scheduleRender(); });
+$('#bgStyle').addEventListener('change', () => { state.bgStyle = $('#bgStyle').value; scheduleRender(); });
+$('#textRound').addEventListener('input', () => {
+  state.textRound = parseInt($('#textRound').value, 10) || 0;
+  $('#textRoundVal').textContent = state.textRound + '%';
+  scheduleRender();
+});
+
+/* ============================================================
+   Image tab
+   ============================================================ */
+const imgDrop = $('#imgDrop'), imgInput = $('#imgInput');
+
+async function loadImageFile(file){
+  if (!file) return;
+  if (!(file.type ? file.type.startsWith('image/') : /\.(png|jpe?g|webp|gif|bmp|avif|svgz?)$/i.test(file.name || ''))){
+    setNote($('#imgNote'), `"${file.name || 'That file'}" doesn't look like an image.`);
+    return;
+  }
+  try {
+    let src, w, h;
+    try {
+      const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+      src = bmp; w = bmp.width; h = bmp.height;
+    } catch (e) {
+      const url = URL.createObjectURL(file);
+      const img = await new Promise((resolve, reject) => {
+        const im = new Image();
+        im.onload = () => resolve(im);
+        im.onerror = () => reject(new Error('decode failed'));
+        im.src = url;
+      });
+      src = img; w = img.naturalWidth; h = img.naturalHeight;
+    }
+    if (!w || !h) throw new Error('empty image');
+    if (state.image && state.image.close) { try { state.image.close(); } catch (e) {} }
+    state.image = src;
+    state.imageName = file.name || 'image';
+    // thumb + meta
+    const tc = document.createElement('canvas');
+    const ts = Math.min(1, 88 / Math.max(w, h));
+    tc.width = Math.max(1, Math.round(w * ts));
+    tc.height = Math.max(1, Math.round(h * ts));
+    tc.getContext('2d').drawImage(src, 0, 0, tc.width, tc.height);
+    $('#imgThumb').src = tc.toDataURL('image/png');
+    $('#imgMeta').textContent = `${state.imageName} · ${w}×${h}${w !== h ? ' → center-cropped to ' + Math.min(w, h) + '×' + Math.min(w, h) : ''}`;
+    $('#imgInfo').hidden = false;
+    setNote($('#imgNote'), '');
+    scheduleRender();
+  } catch (e) {
+    setNote($('#imgNote'), "Couldn't read that image — try a PNG, JPEG, or WebP.");
+  }
+}
+
+$('#imgBrowseBtn').addEventListener('click', (e) => { e.stopPropagation(); imgInput.click(); });
+imgDrop.addEventListener('click', () => imgInput.click());
+imgDrop.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); imgInput.click(); } });
+imgInput.addEventListener('change', (e) => { loadImageFile(e.target.files[0]); e.target.value = ''; });
+['dragenter', 'dragover'].forEach(ev => imgDrop.addEventListener(ev, (e) => { e.preventDefault(); imgDrop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => imgDrop.addEventListener(ev, (e) => { e.preventDefault(); imgDrop.classList.remove('over'); }));
+imgDrop.addEventListener('drop', (e) => {
+  if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) loadImageFile(e.dataTransfer.files[0]);
+});
+$('#imgClearBtn').addEventListener('click', () => {
+  if (state.image && state.image.close) { try { state.image.close(); } catch (e) {} }
+  state.image = null;
+  state.imageName = '';
+  $('#imgInfo').hidden = true;
+  setNote($('#imgNote'), 'Add an image to generate your favicon set.');
+  scheduleRender();
+});
+$('#imgRound').addEventListener('input', () => {
+  state.imgRound = parseInt($('#imgRound').value, 10) || 0;
+  $('#imgRoundVal').textContent = state.imgRound + '%';
+  scheduleRender();
+});
+$('#imgFill').addEventListener('change', () => { state.imgFill = $('#imgFill').checked; scheduleRender(); });
+$('#imgFillColor').addEventListener('input', () => { state.imgFillColor = $('#imgFillColor').value; scheduleRender(); });
+
+/* ---------- boot ---------- */
+$('#snippet').value = SNIPPET;
+rebuild();
+
+/* ---------- theme ---------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

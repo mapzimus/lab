@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radius &amp; Buffer Tool</title>
+<meta name="description" content="Drop a pin, draw accurate distance rings around it, and export them as GeoJSON. Runs in your browser; only the map tiles and optional place search use the network.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.25fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; }
+  .panel + .panel { margin-top: 16px; }
+  .panel h2 { margin: 0 0 10px; font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+  label { font-size: .78rem; color: var(--muted); display: block; margin-bottom: 3px; }
+  input, select {
+    width: 100%; font-family: var(--mono); font-size: .92rem;
+    background: var(--surface-2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  }
+  select { font-family: var(--sans); }
+  input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+
+  .center-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .search-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .search-row input { flex: 1 1 160px; font-family: var(--sans); }
+  .search-row .btn { flex: none; }
+  .search-results { list-style: none; margin: 8px 0 0; padding: 0; }
+  .search-results li { padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 4px; cursor: pointer; font-size: .86rem; background: var(--surface); }
+  .search-results li:hover { border-color: var(--accent); color: var(--accent); }
+  .hide { display: none !important; }
+
+  .add-row { display: grid; grid-template-columns: minmax(0,1fr) 88px 108px auto; gap: 8px; align-items: end; }
+  @media (max-width: 480px) { .add-row { grid-template-columns: 1fr 1fr; } }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 5px 12px; font-size: .8rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .note { font-size: .8rem; color: var(--muted); margin: 8px 0 0; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+
+  ul.rings { list-style: none; margin: 12px 0 0; padding: 0; }
+  ul.rings li { display: flex; align-items: center; gap: 10px; padding: 8px 4px; border-top: 1px solid var(--border); font-size: .88rem; }
+  .ring-dot { flex: none; width: 13px; height: 13px; border-radius: 50%; border: 2px solid rgba(0,0,0,.15); }
+  .ring-label { font-weight: 600; min-width: 62px; font-variant-numeric: tabular-nums; }
+  .ring-meta { color: var(--muted); font-size: .8rem; flex: 1; min-width: 0; }
+  .ring-remove { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 7px; width: 28px; height: 28px; cursor: pointer; font-size: .85rem; line-height: 1; }
+  .ring-remove:hover { color: var(--danger); border-color: var(--danger); }
+  .rings-empty { color: var(--muted); font-size: .85rem; padding: 10px 2px 2px; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+  #map { height: 560px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
+  @media (max-width: 860px){ #map { height: 380px; } }
+  .leaflet-container { font-family: var(--sans); background: var(--surface-2); }
+  .map-fallback { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); height: 560px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .92rem; text-align: center; padding: 24px; }
+  @media (max-width: 860px){ .map-fallback { height: 380px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Radius &amp; Buffer Tool</h1>
+      <p>Drop a pin anywhere, draw true-to-the-Earth distance rings around it, and export them as GeoJSON. Click the map or drag the marker to move the center — every ring follows.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="grid">
+    <div>
+      <!-- Center point -->
+      <section class="panel">
+        <h2>Center point</h2>
+        <div class="center-grid">
+          <div>
+            <label for="lat">Latitude</label>
+            <input id="lat" inputmode="decimal" autocomplete="off" placeholder="39.7392">
+          </div>
+          <div>
+            <label for="lng">Longitude</label>
+            <input id="lng" inputmode="decimal" autocomplete="off" placeholder="-104.9903">
+          </div>
+        </div>
+        <div class="search-row">
+          <input id="placeSearch" type="text" placeholder="Search for a place name…" aria-label="Search for a place name">
+          <button class="btn" id="placeSearchBtn" type="button" title="Search (uses OpenStreetMap Nominatim)">🔍 Search</button>
+          <button class="btn" id="locateMe" type="button" title="Use my device location">📍 Locate me</button>
+        </div>
+        <ul class="search-results hide" id="searchResults"></ul>
+        <p class="note" id="centerNote"></p>
+      </section>
+
+      <!-- Rings -->
+      <section class="panel">
+        <h2>Rings</h2>
+        <div class="add-row">
+          <div>
+            <label for="ringDist">Distance</label>
+            <input id="ringDist" inputmode="decimal" autocomplete="off" placeholder="10" value="10">
+          </div>
+          <div>
+            <label for="ringUnit">Unit</label>
+            <select id="ringUnit" aria-label="Distance unit">
+              <option value="km" selected>km</option>
+              <option value="mi">mi</option>
+              <option value="m">m</option>
+              <option value="nmi">nmi</option>
+            </select>
+          </div>
+          <div>
+            <label for="ringColor">Color</label>
+            <select id="ringColor" aria-label="Ring color">
+              <option value="blue" selected>Blue</option>
+              <option value="red">Red</option>
+              <option value="green">Green</option>
+              <option value="orange">Orange</option>
+              <option value="purple">Purple</option>
+            </select>
+          </div>
+          <button class="btn primary" id="addRing" type="button">＋ Add ring</button>
+        </div>
+        <div class="chips" aria-label="Quick add rings">
+          <button class="chip" type="button" data-km="1">1 km</button>
+          <button class="chip" type="button" data-km="5">5 km</button>
+          <button class="chip" type="button" data-km="10">10 km</button>
+          <button class="chip" type="button" data-km="25">25 km</button>
+          <button class="chip" type="button" data-km="100">100 km</button>
+        </div>
+        <p class="note" id="ringNote"></p>
+        <ul class="rings" id="ringList"></ul>
+        <div class="actions">
+          <button class="btn" id="fitView" type="button" title="Zoom the map so every ring is visible">🔭 Fit view</button>
+          <button class="btn" id="downloadGeo" type="button">⬇ Download GeoJSON</button>
+          <button class="btn" id="copyGeo" type="button">⧉ Copy GeoJSON</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Map -->
+    <section>
+      <div id="map" aria-label="Map. Click to set the center point, or drag the marker."></div>
+    </section>
+  </div>
+
+  <footer class="app">
+    Rings are true geodesic circles — accurate even at thousands of km, unlike flat circles. Rings crossing the poles may render oddly on the flat map. Share this exact setup with the URL. · a <strong>max</strong> tool
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Radius & Buffer Tool — standalone, client-side.
+   Only dependency: Leaflet 1.9.4 (background-loaded below).
+   Geodesic math implemented inline on a sphere, R = 6371008.8 m.
+   ============================================================ */
+'use strict';
+
+const $ = (id) => document.getElementById(id);
+const RAD = Math.PI / 180, DEG = 180 / Math.PI;
+const R = 6371008.8;                 // mean Earth radius (m)
+const MAX_RADIUS_M = 20000000;       // ~half Earth circumference
+const MAX_RINGS = 8;
+const N_POINTS = 128;
+
+const UNITS = { km: 1000, mi: 1609.344, m: 1, nmi: 1852 };
+const COLORS = { blue: '#2563eb', red: '#e0452f', green: '#189a55', orange: '#e8880c', purple: '#8b45c9' };
+
+/* ---------------- state ---------------- */
+const state = {
+  lat: 39.7392, lng: -104.9903,      // Denver
+  rings: []                          // { m, unit, color }  (color = preset name)
+};
+
+/* ---------------- geodesic math ----------------
+   Direct problem on a sphere: destination point given start point,
+   initial bearing and distance (standard spherical formulas).      */
+function destPoint(lat, lng, bearingDeg, distM) {
+  const d = distM / R;                       // angular distance
+  const th = bearingDeg * RAD;
+  const p1 = lat * RAD, l1 = lng * RAD;
+  const sinP2 = Math.sin(p1) * Math.cos(d) + Math.cos(p1) * Math.sin(d) * Math.cos(th);
+  const p2 = Math.asin(Math.max(-1, Math.min(1, sinP2)));
+  const y = Math.sin(th) * Math.sin(d) * Math.cos(p1);
+  const x = Math.cos(d) - Math.sin(p1) * sinP2;
+  const l2 = l1 + Math.atan2(y, x);
+  return [p2 * DEG, l2 * DEG];
+}
+
+/* Compute the ring polygon: N_POINTS vertices, longitudes UNWRAPPED so the
+   polygon stays continuous across the antimeridian (Leaflet handles lngs
+   beyond ±180). If the ring encloses exactly one pole, its longitudes wind
+   a full 360° — we close the polygon over that pole so it renders sensibly
+   instead of throwing or self-intersecting.                                 */
+function ringVertices(lat, lng, rm) {
+  const pts = [];
+  let prevLng = null;
+  for (let i = 0; i < N_POINTS; i++) {
+    const b = (i * 360) / N_POINTS;
+    let [la, lo] = destPoint(lat, lng, b, rm);
+    if (prevLng !== null) {                 // unwrap: keep |Δlng| < 180
+      while (lo - prevLng > 180) lo -= 360;
+      while (lo - prevLng < -180) lo += 360;
+    }
+    prevLng = lo;
+    pts.push([la, lo]);
+  }
+  // does the ring enclose exactly one pole? (then longitudes wound ±360)
+  const distNorth = R * (90 - lat) * RAD;
+  const distSouth = R * (90 + lat) * RAD;
+  const enclosesNorth = rm > distNorth, enclosesSouth = rm > distSouth;
+  const polar = enclosesNorth !== enclosesSouth;
+  if (polar) {
+    const poleLat = enclosesNorth ? 89.99 : -89.99;
+    // pts[0] and the wrap-around end differ by ~360° of longitude; bridge
+    // over the pole so the polygon closes without crossing itself.
+    const firstLng = pts[0][1];
+    // continue the unwrap for the implicit closing edge back to pts[0]:
+    let closeLng = firstLng;
+    while (closeLng - pts[pts.length - 1][1] > 180) closeLng -= 360;
+    while (closeLng - pts[pts.length - 1][1] < -180) closeLng += 360;
+    pts.push([poleLat, closeLng], [poleLat, firstLng]);
+  }
+  return { pts, polar };
+}
+
+/* ---------------- formatting ---------------- */
+function fmtNum(v, maxDec) {
+  const dec = v >= 1000 ? 0 : v >= 100 ? 1 : (maxDec == null ? 2 : maxDec);
+  return v.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: dec });
+}
+function ringLabel(ring) {
+  const val = ring.m / UNITS[ring.unit];
+  return `${fmtNum(val)} ${ring.unit}`;
+}
+// area & circumference, in units friendly to the ring's own unit
+function ringStats(ring) {
+  const useMiles = ring.unit === 'mi' || ring.unit === 'nmi';
+  const ru = ring.m / (useMiles ? UNITS.mi : UNITS.km);     // radius in mi or km
+  const area = Math.PI * ru * ru;
+  const circ = 2 * Math.PI * ru;
+  const u = useMiles ? 'mi' : 'km';
+  return { areaTxt: `${fmtNum(area, 1)} ${u}²`, circTxt: `${fmtNum(circ, 1)} ${u}`, areaKm2: Math.PI * Math.pow(ring.m / 1000, 2), circKm: 2 * Math.PI * ring.m / 1000 };
+}
+
+/* ---------------- map (Leaflet, background-loaded) ---------------- */
+let map = null, marker = null;
+let ringLayers = [];                    // parallel to state.rings
+
+function initMap() {
+  map = L.map('map', { worldCopyJump: false }).setView([state.lat, state.lng], 9);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  marker = L.marker([state.lat, state.lng], { draggable: true, title: 'Center point (drag me)' }).addTo(map);
+  let dragTimer = null;
+  marker.on('drag', (e) => {
+    const p = e.target.getLatLng();
+    state.lat = clampLat(p.lat); state.lng = normLng(p.lng);
+    clearTimeout(dragTimer);
+    dragTimer = setTimeout(() => render('map'), 60);      // debounced live update
+  });
+  marker.on('dragend', () => { clearTimeout(dragTimer); render('map'); });
+  map.on('click', (e) => {
+    state.lat = clampLat(e.latlng.lat); state.lng = normLng(e.latlng.lng);
+    render('map');
+  });
+  redrawRings();
+}
+
+function redrawRings() {
+  if (!map) return;
+  ringLayers.forEach(l => map.removeLayer(l));
+  ringLayers = [];
+  state.rings.forEach(ring => {
+    const { pts } = ringVertices(state.lat, state.lng, ring.m);
+    const hex = COLORS[ring.color] || COLORS.blue;
+    const poly = L.polygon(pts, { color: hex, weight: 2, fillColor: hex, fillOpacity: 0.07 });
+    poly.bindTooltip(`${ringLabel(ring)} radius`, { sticky: true });
+    poly.addTo(map);
+    ringLayers.push(poly);
+  });
+}
+
+function fitView() {
+  if (!map) return;
+  if (!ringLayers.length) { map.setView([state.lat, state.lng], Math.max(map.getZoom(), 9)); return; }
+  let bounds = null;
+  ringLayers.forEach(l => { bounds = bounds ? bounds.extend(l.getBounds()) : l.getBounds(); });
+  map.fitBounds(bounds.pad(0.06));
+}
+
+/* ---------------- rendering ---------------- */
+let updating = false;
+function render(source) {
+  updating = true;
+  if (source !== 'inputs') {
+    $('lat').value = state.lat.toFixed(6);
+    $('lng').value = state.lng.toFixed(6);
+  }
+  if (map && source !== 'map') marker.setLatLng([state.lat, state.lng]);
+  redrawRings();
+  renderList();
+  syncHash();
+  updating = false;
+}
+
+function renderList() {
+  const ul = $('ringList');
+  ul.innerHTML = '';
+  if (!state.rings.length) {
+    const d = document.createElement('div');
+    d.className = 'rings-empty';
+    d.textContent = 'No rings yet — add one above, or tap a quick chip.';
+    ul.appendChild(d);
+    return;
+  }
+  state.rings.forEach((ring, i) => {
+    const stats = ringStats(ring);
+    const li = document.createElement('li');
+    li.dataset.radiusM = String(ring.m);
+    li.dataset.areaKm2 = stats.areaKm2.toFixed(3);
+    li.dataset.circKm = stats.circKm.toFixed(3);
+    const dot = document.createElement('span');
+    dot.className = 'ring-dot';
+    dot.style.background = COLORS[ring.color] || COLORS.blue;
+    const lbl = document.createElement('span');
+    lbl.className = 'ring-label';
+    lbl.textContent = ringLabel(ring);
+    const meta = document.createElement('span');
+    meta.className = 'ring-meta';
+    meta.textContent = `area ${stats.areaTxt} · around ${stats.circTxt}`;
+    const rm = document.createElement('button');
+    rm.className = 'ring-remove';
+    rm.type = 'button';
+    rm.textContent = '✕';
+    rm.setAttribute('aria-label', `Remove ${ringLabel(ring)} ring`);
+    rm.addEventListener('click', () => { state.rings.splice(i, 1); setRingNote(''); render(null); });
+    li.append(dot, lbl, meta, rm);
+    ul.appendChild(li);
+  });
+}
+
+function setRingNote(msg, isErr) {
+  const el = $('ringNote');
+  el.textContent = msg;
+  el.classList.toggle('err', !!isErr);
+}
+
+/* ---------------- add rings ---------------- */
+function addRing(m, unit, color) {
+  if (!isFinite(m) || m <= 0) { setRingNote('Enter a distance greater than zero.', true); return false; }
+  if (m > MAX_RADIUS_M) { setRingNote('Maximum radius is 20,000 km (halfway around the Earth).', true); return false; }
+  if (state.rings.length >= MAX_RINGS) { setRingNote(`Maximum of ${MAX_RINGS} rings — remove one to add another.`, true); return false; }
+  state.rings.push({ m, unit, color });
+  state.rings.sort((a, b) => a.m - b.m);
+  setRingNote('');
+  render(null);
+  return true;
+}
+
+$('addRing').addEventListener('click', () => {
+  const v = parseFloat($('ringDist').value);
+  addRing(v * (UNITS[$('ringUnit').value] || 1000), $('ringUnit').value, $('ringColor').value);
+});
+$('ringDist').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('addRing').click(); });
+
+document.querySelectorAll('.chip[data-km]').forEach(chip => {
+  chip.addEventListener('click', () => addRing(parseFloat(chip.dataset.km) * 1000, 'km', $('ringColor').value));
+});
+
+$('fitView').addEventListener('click', fitView);
+
+/* ---------------- center inputs ---------------- */
+function clampLat(v) { return Math.max(-90, Math.min(90, v)); }
+function normLng(v) { return ((v + 540) % 360) - 180; }
+
+function onCoordInput() {
+  if (updating) return;
+  const la = parseFloat($('lat').value), lo = parseFloat($('lng').value);
+  $('centerNote').classList.remove('err');
+  $('centerNote').textContent = '';
+  if (!isFinite(la) || !isFinite(lo)) return;
+  if (la < -90 || la > 90 || lo < -180 || lo > 180) {
+    $('centerNote').classList.add('err');
+    $('centerNote').textContent = 'Latitude must be −90…90 and longitude −180…180.';
+    return;
+  }
+  state.lat = la; state.lng = lo;
+  render('inputs');
+}
+$('lat').addEventListener('input', onCoordInput);
+$('lng').addEventListener('input', onCoordInput);
+
+/* ---------------- locate me ---------------- */
+$('locateMe').addEventListener('click', () => {
+  const note = $('centerNote');
+  note.classList.remove('err'); note.textContent = '';
+  if (!navigator.geolocation) { note.classList.add('err'); note.textContent = 'Geolocation is not supported by your browser.'; return; }
+  $('locateMe').disabled = true; $('locateMe').textContent = '⏳ Locating…';
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      state.lat = clampLat(pos.coords.latitude); state.lng = normLng(pos.coords.longitude);
+      render(null);
+      if (map) map.setView([state.lat, state.lng], Math.max(map.getZoom(), 11));
+      $('locateMe').disabled = false; $('locateMe').textContent = '📍 Locate me';
+    },
+    () => {
+      note.classList.add('err'); note.textContent = 'Location access denied or unavailable.';
+      $('locateMe').disabled = false; $('locateMe').textContent = '📍 Locate me';
+    },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+});
+
+/* ---------------- place search (OpenStreetMap Nominatim) ---------------- */
+async function searchPlace() {
+  const q = $('placeSearch').value.trim(); if (!q) return;
+  const note = $('centerNote');
+  note.classList.remove('err'); note.textContent = '';
+  $('placeSearchBtn').disabled = true;
+  try {
+    const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(q)}`);
+    const data = await resp.json();
+    const ul = $('searchResults'); ul.innerHTML = ''; ul.classList.remove('hide');
+    if (!data.length) { ul.innerHTML = '<li style="cursor:default;color:var(--muted)">No results found</li>'; }
+    else data.forEach(r => {
+      const li = document.createElement('li');
+      li.textContent = r.display_name;
+      li.addEventListener('click', () => {
+        state.lat = clampLat(parseFloat(r.lat)); state.lng = normLng(parseFloat(r.lon));
+        render(null);
+        if (map) map.setView([state.lat, state.lng], Math.max(map.getZoom(), 9));
+        ul.classList.add('hide');
+        $('placeSearch').value = r.display_name;
+      });
+      ul.appendChild(li);
+    });
+  } catch (e) {
+    note.classList.add('err'); note.textContent = 'Search failed — check your connection.';
+  }
+  $('placeSearchBtn').disabled = false;
+}
+$('placeSearchBtn').addEventListener('click', searchPlace);
+$('placeSearch').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchPlace(); });
+
+/* ---------------- GeoJSON export ---------------- */
+function buildGeoJSON() {
+  const round6 = (v) => Math.round(v * 1e6) / 1e6;
+  const features = [{
+    type: 'Feature',
+    properties: { name: 'Center' },
+    geometry: { type: 'Point', coordinates: [round6(state.lng), round6(state.lat)] }
+  }];
+  state.rings.forEach(ring => {
+    const { pts } = ringVertices(state.lat, state.lng, ring.m);
+    const coords = pts.map(([la, lo]) => [round6(lo), round6(la)]);
+    coords.push([...coords[0]]);                          // close the ring
+    features.push({
+      type: 'Feature',
+      properties: { radius_m: Math.round(ring.m * 100) / 100, label: ringLabel(ring), color: COLORS[ring.color] || COLORS.blue },
+      geometry: { type: 'Polygon', coordinates: [coords] }
+    });
+  });
+  return { type: 'FeatureCollection', features };
+}
+
+$('downloadGeo').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(buildGeoJSON(), null, 2)], { type: 'application/geo+json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'radius-rings.geojson';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+
+$('copyGeo').addEventListener('click', async () => {
+  const btn = $('copyGeo');
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(buildGeoJSON(), null, 2));
+    const old = btn.textContent;
+    btn.classList.add('copied'); btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1200);
+  } catch (e) { /* clipboard blocked; ignore */ }
+});
+
+/* ---------------- shareable URL hash ----------------
+   #lat,lng;r1_m,color[,unit];r2_m,color[,unit]…                        */
+function syncHash() {
+  const parts = [`${state.lat.toFixed(6)},${state.lng.toFixed(6)}`];
+  state.rings.forEach(r => parts.push(`${Math.round(r.m)},${r.color},${r.unit}`));
+  history.replaceState(null, '', '#' + parts.join(';'));
+}
+
+function restoreHash() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (!h) return false;
+  const parts = h.split(';');
+  const cm = parts[0].match(/^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/);
+  if (!cm) return false;
+  const la = parseFloat(cm[1]), lo = parseFloat(cm[2]);
+  if (!isFinite(la) || !isFinite(lo) || la < -90 || la > 90 || lo < -180 || lo > 180) return false;
+  state.lat = la; state.lng = lo;
+  state.rings = [];
+  for (const p of parts.slice(1)) {
+    const t = p.split(',');
+    const m = parseFloat(t[0]);
+    if (!isFinite(m) || m <= 0 || m > MAX_RADIUS_M) continue;
+    const color = COLORS[t[1]] ? t[1] : 'blue';
+    const unit = UNITS[t[2]] ? t[2] : (m < 1000 ? 'm' : 'km');
+    if (state.rings.length < MAX_RINGS) state.rings.push({ m, unit, color });
+  }
+  state.rings.sort((a, b) => a.m - b.m);
+  return true;
+}
+
+/* ---------------- Leaflet 1.9.4, pinned + SRI, loaded in the BACKGROUND
+   so a slow or blocked CDN never freezes the tool. Everything except the
+   map itself works without it. ---------------- */
+(function loadLeaflet() {
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+  css.crossOrigin = '';
+  document.head.appendChild(css);
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+  s.crossOrigin = '';
+  s.onload = () => { if (window.L) { initMap(); render(null); } };
+  s.onerror = () => {
+    const el = document.createElement('div');
+    el.className = 'map-fallback';
+    el.id = 'map';
+    el.innerHTML = 'Map unavailable — the Leaflet library didn\'t load.<br>Ring math, the list and GeoJSON export still work.';
+    $('map').replaceWith(el);
+  };
+  document.head.appendChild(s);
+})();
+
+/* ---------------- boot ---------------- */
+if (!restoreHash()) {
+  state.rings = [{ m: 10000, unit: 'km', color: 'blue' }];   // example ring so the page is alive
+}
+render(null);
+
+// tiny hook for automated tests; harmless in normal use
+window.__rbt = {
+  state,
+  getMap: () => map,
+  getMarker: () => marker,
+  getRingLayers: () => ringLayers,
+  buildGeoJSON,
+  ringVertices
+};
+
+/* ---------------- theme toggle ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

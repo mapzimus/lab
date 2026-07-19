@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 18 · Build Day 2: Peer Review and Polish · Navigating Piracy</title>
+<meta name="description" content="Day 18 student missions: a crewmate reviews your work, you fix what they found, you build the Showcase room, and one last cipher.">
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<script src="day-config.js" defer></script>
+<style>
+  :root{
+    --ink:#12222B; --ink2:#1C3743; --parch:#F3E8CE; --parch2:#EAD9B4;
+    --brass:#A9781F; --brassl:#D8B25A; --ox:#8C2C1E; --inktx:#2B2114; --muted:#6E5B3C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--parch); color:var(--inktx); font-family:"Segoe UI",system-ui,-apple-system,sans-serif; line-height:1.5;}
+  .hero{background:var(--ink); color:var(--parch); padding:2.2em 1em 1.8em; text-align:center;}
+  .hero .kicker{color:var(--brassl); font-weight:700; letter-spacing:.25em; font-size:.85em; text-transform:uppercase;}
+  .hero h1{font-family:Georgia,"Times New Roman",serif; font-size:clamp(1.9em,5vw,3em); margin:.25em 0 .2em;}
+  .hero .sub{color:#C7BCA0; font-style:italic; font-size:1.05em;}
+  .wrap{max-width:880px; margin:0 auto; padding:1.2em 1em 3em;}
+  .mission{background:var(--parch2); border:1.5px solid var(--brass); border-radius:10px; padding:1.2em 1.3em 1.3em; margin:1.3em 0; box-shadow:2px 3px 10px rgba(42,29,15,.14);}
+  .mission-top{display:flex; align-items:baseline; gap:.7em; flex-wrap:wrap;}
+  .mnum{background:var(--ox); color:var(--parch); font-family:Georgia,serif; font-weight:700; font-size:1.25em; border-radius:50%; width:1.9em; height:1.9em; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .mission h2{font-family:Georgia,serif; font-size:1.45em; color:var(--inktx);}
+  .meta{color:var(--ox); font-weight:700; font-size:.92em; margin:.15em 0 .6em;}
+  .mission p{margin:.5em 0;}
+  .btn{display:inline-block; background:var(--brass); color:#FBF4E2; font-weight:700; font-size:1.06em; text-decoration:none; padding:.85em 1.25em; border-radius:8px; margin:.45em .45em .2em 0; border:2px solid #8a6119;}
+  .btn:hover,.btn:focus{background:#8a6119; outline:3px solid var(--ox);}
+  .btn.alt{background:var(--ink2); border-color:var(--ink);}
+  .btn.alt:hover,.btn.alt:focus{background:var(--ink);}
+  .log{background:#FBF4E2; border:1.5px dashed var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .log b{color:var(--ox);}
+  .hunt{margin:.5em 0 .3em 1.2em;}
+  .hunt li{margin:.35em 0;}
+  .bonus{font-style:italic; color:var(--muted); margin-top:.6em;}
+  .vocab{display:flex; gap:.6em; justify-content:center; flex-wrap:wrap; margin:1em 0;}
+  .chip{background:var(--ink); color:var(--brassl); font-family:Georgia,serif; font-weight:700; padding:.45em 1.1em; border-radius:999px; letter-spacing:.06em;}
+  .foot{background:var(--ink); color:#C7BCA0; text-align:center; padding:1.6em 1em 2em; font-size:.95em;}
+  .foot a{color:var(--brassl);}
+  .divider{text-align:center; color:var(--ox); font-size:1.3em; margin:1.6em 0 .2em; font-family:Georgia,serif; font-weight:700;}
+  .note{font-size:.9em; color:var(--muted); font-style:italic;}
+  .card-fields{background:#FBF4E2; border:1.5px solid var(--brass); border-radius:8px; padding:.8em 1em; margin:.6em 0;}
+  .card-fields div{padding:.28em 0; border-bottom:1px dashed var(--parch2); font-weight:700; color:var(--ink2);}
+  .card-fields div:last-child{border-bottom:none;}
+  .card-fields span{color:var(--muted); font-weight:400; font-style:italic;}
+  .race{background:#FBF4E2; border:2px solid var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .race b{color:var(--ox);}
+  .cipher{background:var(--ink); color:var(--brassl); border-radius:8px; padding:.9em 1em; margin:.7em 0; text-align:center; font-family:"Courier New",monospace; font-weight:700; font-size:1.25em; letter-spacing:.12em; line-height:1.6;}
+  @media (max-width:520px){ .mission{padding:1em .9em;} .btn{display:block; text-align:center; margin-right:0;} }
+</style>
+</head>
+<body>
+<div id="today-banner"></div>
+
+<header class="hero">
+  <div class="kicker">Day 18 · Week 5 · Showcase Week</div>
+  <h1>Build Day 2</h1>
+  <div class="sub">Peer review and polish. Tomorrow this room fills with real people. Today a crewmate helps you see your own work.</div>
+</header>
+
+<main class="wrap">
+
+  <section class="mission" id="m0">
+    <div class="mission-top"><span class="mnum">0</span><h2>Rig your sheet</h2></div>
+    <div class="meta">2 minutes · solo · paper + pencil · project out of your folder</div>
+    <p>One sheet, folded like a book. Cover: <b>your name, "Day 18," the date.</b> Then:</p>
+    <div class="card-fields">
+      <div>Page 1: THE REVIEW <span>your partner's words land here, exact</span></div>
+      <div>Page 2: MY REVISION PLAN <span>your fix list. Captain's Log goes at the bottom later.</span></div>
+      <div>Back cover: MY COURSE <span>tomorrow's opener and your last fix</span></div>
+    </div>
+    <p class="note">This sheet is your Voyage Journal entry for today. A review you can hold in your hand. Keep your partner's exact words. You will want them.</p>
+  </section>
+
+  <section class="mission" id="cipher">
+    <div class="mission-top"><span class="mnum">?</span><h2>The Last Cipher</h2></div>
+    <div class="meta">at the door · with your crew · the league finale</div>
+    <p>One final message. Whoever leaves these saved the meanest slide for the end.</p>
+    <div class="cipher">RIREL&nbsp;&nbsp;ZNC&nbsp;&nbsp;VF&nbsp;&nbsp;N&nbsp;&nbsp;FGBEL<br>GRYY&nbsp;&nbsp;LBHEF</div>
+    <p><b>The only clue:</b> the slide is exactly HALF the alphabet.</p>
+    <div class="race"><b>THE STAKES:</b> double points. 10 to the first crew, 4 to the second. And every crew that cracks it before the room build learns tomorrow's closing line a day early. Those crews LEAD the whole room in saying it tomorrow.</div>
+    <p class="note">Crack it? Keep it quiet. Bring it to your teacher, written. The line stays secret until the whole room says it tomorrow.</p>
+  </section>
+
+  <section class="mission" id="m1">
+    <div class="mission-top"><span class="mnum">1</span><h2>The Review</h2></div>
+    <div class="meta">~35 minutes · pairs your teacher posts · both partners get both turns</div>
+    <p>Mapmakers never shipped a chart alone. A second navigator checked it first. Today you are each other's second navigator.</p>
+    <p>Your partner is not your best friend. On purpose. Your partner builds in a different format than you. Fresh eyes catch what yours skip.</p>
+    <div class="card-fields">
+      <div>Step 1: SHOW <span>maker walks the partner through the work, like they are a visitor tomorrow. Two minutes. Then quiet.</span></div>
+      <div>Step 2: "I noticed..." <span>reviewer names one exact thing that already works. Point at it.</span></div>
+      <div>Step 3: "I wonder..." <span>ONE question a visitor might ask. Just one.</span></div>
+      <div>Step 4: "What if..." <span>ONE change that would make the work stronger. Just one.</span></div>
+      <div>Step 5: WRITE + THANKS <span>maker writes the question and the suggestion, word for word. Then says thank you.</span></div>
+      <div>Step 6: SWAP <span>trade roles. Same steps, other direction.</span></div>
+    </div>
+    <div class="race"><b>REVIEWER'S CODE:</b> one question, one suggestion. Not five. Choosing is the skill. Talk about the work, not the person. Makers: no defending. Write it down. You rule on it in the next block, not now.</div>
+    <div class="log"><b>LOG IT:</b> THE REVIEW page holds your partner's "I wonder..." and "What if...", word for word. Their name signed under it. A real survey gets signed.</div>
+  </section>
+
+  <section class="mission" id="m2">
+    <div class="mission-top"><span class="mnum">2</span><h2>Fix Their Thing First</h2></div>
+    <div class="meta">~35 minutes · solo, performers with their cast · Chromebook only if your format needs one</div>
+    <p>You hold a real note from a real reviewer. Captains act on the survey before they sail. One rule runs this whole block:</p>
+    <div class="race"><b>THE PRIORITY RULE:</b> fix the thing your partner named FIRST. Not the thing you feel like fixing. Feelings pick the easy fix. Your reviewer pointed at the real one.</div>
+    <ol class="hunt">
+      <li>MY REVISION PLAN page. <b>Line 1 is your partner's "What if..."</b> Add two or three more fixes under it, biggest first.</li>
+      <li>Work top to bottom. Cross each line off. A crossed line is proof you moved.</li>
+      <li><b>Performers:</b> your fix is rehearsal. Two full runs, start to finish, at real volume. No stopping mid-run. Fix between runs.</li>
+      <li>Want the captain's eyes on something? Put your name on the <b>CAPTAIN'S TABLE</b> list on the board. Keep working. I come to you.</li>
+    </ol>
+    <a class="btn" href="whydah-dashboard.html#final-project" target="_blank" rel="noopener">What finished looks like →</a>
+    <div class="log"><b>LOG IT:</b> line 1 crossed off before anything else. Whole list done early? Add one polish line. Bigger title. Cleaner edges. Smoother words.</div>
+    <p class="bonus">Fast finishers: walk your own station like a stranger. Stand where the visitor will stand. Say your opener out loud. Does the first glance tell them who and what?</p>
+  </section>
+
+  <section class="mission" id="m3">
+    <div class="mission-top"><span class="mnum">3</span><h2>Set the Stage</h2></div>
+    <div class="meta">10 minutes · every hand · crew assignments on the board</div>
+    <p>Tomorrow's room does not build itself. Ten minutes. Move like a crew docking a ship.</p>
+    <div class="card-fields">
+      <div>STATION CREW <span>tables into stations, one per project, walking room between them</span></div>
+      <div>CARD CREW <span>a table card at every station: project title, your name, your person's name. Readable from three steps away.</span></div>
+      <div>JOURNAL CREW <span>one table by the door for the Voyage Journals, a few opened to strong pages</span></div>
+    </div>
+    <p>Last move, everyone: set <b>your own station</b>. Work displayed. Card placed. Chair out of the walkway.</p>
+    <p class="note">Leave it ready tonight. Tomorrow morning you straighten. You do not build.</p>
+  </section>
+
+  <div class="divider">✦</div>
+
+  <section class="mission" id="reflect">
+    <div class="mission-top"><span class="mnum">✦</span><h2>The Question</h2></div>
+    <div class="meta">2 minutes · think it, then write one line under your plan</div>
+    <p><b>What did your partner see in your work that you couldn't see yourself?</b></p>
+    <p class="note">That is what peer review is for. Nobody sees their own map whole.</p>
+  </section>
+
+  <section class="mission" id="log">
+    <div class="mission-top"><span class="mnum">★</span><h2>Captain's Log</h2></div>
+    <div class="meta">4 minutes · solo · in your captain's voice</div>
+    <p>The night before landfall. The whole voyage sits behind you.</p>
+    <div class="log"><b>LOG IT:</b> bottom of MY REVISION PLAN. What is your captain proud of tonight? What still worries them about tomorrow? Two or three sentences. Date it like a sailor: "5 August 2026."</div>
+  </section>
+
+  <section class="mission" id="close">
+    <div class="mission-top"><span class="mnum">★</span><h2>Chart Your Course</h2></div>
+    <div class="meta">3 minutes · solo · back cover, MY COURSE</div>
+    <p>Tomorrow you do not wander. You steer. Two lines:</p>
+    <ol class="hunt">
+      <li><b>MY OPENER:</b> the first sentence you say when a visitor stops at your station. Write it. Say it out loud once.</li>
+      <li><b>MY LAST FIX:</b> one small thing you do tomorrow morning if there is time. One. Not three.</li>
+    </ol>
+    <p class="note">The Showcase is tomorrow. You are not hoping you are ready. This list is how you know you are.</p>
+  </section>
+
+  <section class="mission" id="tomorrow">
+    <div class="mission-top"><span class="mnum">⚓</span><h2>Tomorrow, So Nobody Is Surprised</h2></div>
+    <div class="meta">read together · the run of show in five lines</div>
+    <div class="card-fields">
+      <div>1. We straighten stations and run one last check. <span>your MY COURSE list is the checklist</span></div>
+      <div>2. The doors open. Families, LEAP staff, museum guests. <span>you stand at your station with your work</span></div>
+      <div>3. Visitors come to YOU. Opener first, then show your work. <span>their questions are compliments. Answer them.</span></div>
+      <div>4. Performances get called up one at a time. The whole room watches. <span>then back to stations</span></div>
+      <div>5. We close with one line, said together. <span>the crews that cracked the last cipher lead it</span></div>
+    </div>
+    <p class="note">No grades tomorrow. No points. Real people looking at real work you built. That is the whole game.</p>
+  </section>
+
+  <div class="vocab">
+    <span class="chip">peer review</span><span class="chip">revision</span><span class="chip">protocol</span><span class="chip">run of show</span>
+  </div>
+  <p style="text-align:center; font-size:.92em; color:var(--muted); max-width:660px; margin:0 auto;">
+    <b>peer review</b> = a crewmate checks your work before the world sees it ·
+    <b>revision</b> = seeing your work again and making it stronger ·
+    <b>protocol</b> = steps everyone agrees to follow the same way ·
+    <b>run of show</b> = the order of what happens at a live event
+  </p>
+
+</main>
+
+<footer class="foot">
+  <p><b>Tomorrow:</b> the Showcase. Thursday, August 6. You built something real. Now you show it.</p>
+  <p style="margin-top:.6em;"><a href="whydah-dashboard.html#overview">⚓ Back to the ship's logbook (dashboard)</a></p>
+</footer>
+
+</body>
+</html>

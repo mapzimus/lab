@@ -4,59 +4,82 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Radars · Mapzimus</title>
-  <meta name="description" content="Daily scraping trackers from the Mapzimus lab: dashboards that sweep the web for trends worth knowing about.">
+  <meta name="description" content="Daily automated digests from the Mapzimus lab: a dev radar and a geospatial radar, each scanning part of the web and ranking what's new.">
   <link rel="canonical" href="https://mapzimus.com/radars/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Radars · Mapzimus">
-  <meta property="og:description" content="Daily scraping trackers from the Mapzimus lab.">
+  <meta property="og:description" content="Daily automated digests: dev and geospatial.">
   <meta property="og:url" content="https://mapzimus.com/radars/">
   <meta name="twitter:card" content="summary">
-  <meta name="theme-color" content="#f4f0e7">
+  <meta name="theme-color" content="#121721">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
-  <script src="/radars/radars.js" defer></script>
+  <script src="/theme.js"></script>
 </head>
 <body data-view="radars">
+<div class="sheet">
   <a class="skip-link" href="#radars">Skip to radars</a>
   <header class="site-header">
     <a class="brand" href="/" aria-label="Mapzimus home">
       <span class="brand-mark" aria-hidden="true">MZ</span>
-      <span>Mapzimus</span>
+      <span class="brand-name">Mapzimus</span>
     </a>
-    <nav aria-label="Primary navigation">
-      <a href="/lab/">Lab</a>
+    <nav class="site-nav" aria-label="Primary navigation">
       <a href="/tools/">Tools</a>
       <a href="/maps/">Maps</a>
-      <a href="/field-notes/">Field Notes</a>
       <a href="/games/">Games</a>
+      <a href="/lab/">Lab</a>
+      <a href="/field-notes/">Notes</a>
       <a href="/radars/" aria-current="page">Radars</a>
       <a href="/skills/">Skills</a>
       <a href="/links/">Links</a>
       <a href="/about/">About</a>
-      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Portfolio ↗</a>
     </nav>
+    <details class="menu">
+      <summary aria-label="Open menu">Menu</summary>
+      <div class="menu-panel">
+        <a href="/tools/">Tools</a>
+        <a href="/maps/">Maps</a>
+        <a href="/games/">Games</a>
+        <a href="/lab/">Lab</a>
+        <a href="/field-notes/">Field Notes</a>
+        <a href="/radars/" aria-current="page">Radars</a>
+        <a href="/skills/">Skills</a>
+        <a href="/links/">Links</a>
+        <a href="/about/">About</a>
+        <a href="https://maxwellhowegis.com">Portfolio ↗</a>
+      </div>
+    </details>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme">
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+    </button>
   </header>
 
   <main>
-    <section class="hero radar-hero">
-      <div class="eyebrow">Always sweeping</div>
-      <h1>The radars.</h1>
-      <p>Daily scraping trackers, each one a dashboard that sweeps part of the web and ranks what it finds for this lab. More radars join the array as they get built.</p>
+    <section class="hero">
+      <span class="coord coord-ne" aria-hidden="true">42°31′ N</span>
+      <span class="coord coord-sw" aria-hidden="true">70°54′ W · SALEM, MASS.</span>
+      <div class="eyebrow">Updated daily</div>
+      <h1>Radars</h1>
+      <p>Automated daily digests. Each radar scans part of the web and ranks what's new against what this lab cares about — maps, GIS, data tools, teaching, and games.</p>
     </section>
 
     <section class="featured" id="radars" aria-labelledby="radarsHeading">
       <div class="section-heading">
-        <div><span class="eyebrow">The array</span><h2 id="radarsHeading">Active radars</h2></div>
-        <p>Fresh data daily via GitHub Actions, hourly at the edge.</p>
+        <div><span class="eyebrow">Live now</span><h2 id="radarsHeading">Two radars</h2></div>
+        <p>Data refreshes daily via GitHub Actions and hourly at the edge.</p>
       </div>
-      <div class="featured-grid" id="radarsGrid"></div>
+      <div class="featured-grid">{{RADAR_CARDS}}</div>
     </section>
   </main>
 
   <footer>
-    <p>Mapzimus is the creative lab of Maxwell Howe.</p>
-    <p class="footer-note">Each radar refreshes itself. You just look at it.</p>
+    <p>Mapzimus is the lab of Maxwell Howe — browser tools, maps, and games, all free.<br>Professional GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
+    <p class="footer-note">MAPZIMUS QUADRANGLE · STATIC SITE · NO TRACKING</p>
   </footer>
-
+</div>
 </body>
 </html>

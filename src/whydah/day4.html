@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 4 · Adopt a Ship · Navigating Piracy</title>
+<meta name="description" content="Day 4 student missions: adopt a real ship, launch your Captain's Log, and map the triangle trade.">
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<script src="day-config.js" defer></script>
+<style>
+  :root{
+    --ink:#12222B; --ink2:#1C3743; --parch:#F3E8CE; --parch2:#EAD9B4;
+    --brass:#A9781F; --brassl:#D8B25A; --ox:#8C2C1E; --inktx:#2B2114; --muted:#6E5B3C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--parch); color:var(--inktx); font-family:"Segoe UI",system-ui,-apple-system,sans-serif; line-height:1.5;}
+  .hero{background:var(--ink); color:var(--parch); padding:2.2em 1em 1.8em; text-align:center;}
+  .hero .kicker{color:var(--brassl); font-weight:700; letter-spacing:.25em; font-size:.85em; text-transform:uppercase;}
+  .hero h1{font-family:Georgia,"Times New Roman",serif; font-size:clamp(1.9em,5vw,3em); margin:.25em 0 .2em;}
+  .hero .sub{color:#C7BCA0; font-style:italic; font-size:1.05em;}
+  .wrap{max-width:880px; margin:0 auto; padding:1.2em 1em 3em;}
+  .mission{background:var(--parch2); border:1.5px solid var(--brass); border-radius:10px; padding:1.2em 1.3em 1.3em; margin:1.3em 0; box-shadow:2px 3px 10px rgba(42,29,15,.14);}
+  .mission-top{display:flex; align-items:baseline; gap:.7em; flex-wrap:wrap;}
+  .mnum{background:var(--ox); color:var(--parch); font-family:Georgia,serif; font-weight:700; font-size:1.25em; border-radius:50%; width:1.9em; height:1.9em; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .mission h2{font-family:Georgia,serif; font-size:1.45em; color:var(--inktx);}
+  .meta{color:var(--ox); font-weight:700; font-size:.92em; margin:.15em 0 .6em;}
+  .mission p{margin:.5em 0;}
+  .btn{display:inline-block; background:var(--brass); color:#FBF4E2; font-weight:700; font-size:1.06em; text-decoration:none; padding:.85em 1.25em; border-radius:8px; margin:.45em .45em .2em 0; border:2px solid #8a6119;}
+  .btn:hover,.btn:focus{background:#8a6119; outline:3px solid var(--ox);}
+  .btn.alt{background:var(--ink2); border-color:var(--ink);}
+  .btn.alt:hover,.btn.alt:focus{background:var(--ink);}
+  .log{background:#FBF4E2; border:1.5px dashed var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .log b{color:var(--ox);}
+  .hunt{margin:.5em 0 .3em 1.2em;}
+  .hunt li{margin:.35em 0;}
+  .bonus{font-style:italic; color:var(--muted); margin-top:.6em;}
+  .vocab{display:flex; gap:.6em; justify-content:center; flex-wrap:wrap; margin:1em 0;}
+  .chip{background:var(--ink); color:var(--brassl); font-family:Georgia,serif; font-weight:700; padding:.45em 1.1em; border-radius:999px; letter-spacing:.06em;}
+  .foot{background:var(--ink); color:#C7BCA0; text-align:center; padding:1.6em 1em 2em; font-size:.95em;}
+  .foot a{color:var(--brassl);}
+  .divider{text-align:center; color:var(--ox); font-size:1.3em; margin:1.6em 0 .2em; font-family:Georgia,serif; font-weight:700;}
+  .note{font-size:.9em; color:var(--muted); font-style:italic;}
+  .card-fields{background:#FBF4E2; border:1.5px solid var(--brass); border-radius:8px; padding:.8em 1em; margin:.6em 0;}
+  .card-fields div{padding:.28em 0; border-bottom:1px dashed var(--parch2); font-weight:700; color:var(--ink2);}
+  .card-fields div:last-child{border-bottom:none;}
+  .card-fields span{color:var(--muted); font-weight:400; font-style:italic;}
+  .race{background:#FBF4E2; border:2px solid var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .race b{color:var(--ox);}
+  @media (max-width:520px){ .mission{padding:1em .9em;} .btn{display:block; text-align:center; margin-right:0;} }
+</style>
+</head>
+<body>
+<div id="today-banner"></div>
+
+<header class="hero">
+  <div class="kicker">Day 4 · Week 2 · The Atlantic Machine</div>
+  <h1>Adopt a Ship</h1>
+  <div class="sub">A real ship, at sea right now. Yours. Starting today, you keep its log.</div>
+</header>
+
+<main class="wrap">
+
+  <section class="mission" id="m0">
+    <div class="mission-top"><span class="mnum">0</span><h2>Rig your Logbook sheet</h2></div>
+    <div class="meta">2 minutes · solo · paper + pencil</div>
+    <p>One sheet, folded like a book. Cover: <b>your name, "Day 4," the date.</b> Then set up three pages inside:</p>
+    <div class="card-fields">
+      <div>Page 1: CAPTAIN'S LOG <span>your adopted ship starts its story here</span></div>
+      <div>Page 2: THE TRIANGLE <span>you'll draw the Atlantic and its three legs</span></div>
+      <div>Back cover: MY COURSE <span>your final project tracker. It rides with you every day now.</span></div>
+    </div>
+    <p class="note">From today until the Showcase, every class ends with your Captain's Log and your Course. That's how sailors did it. One page a day, every day, no matter what.</p>
+  </section>
+
+  <section class="mission" id="m1">
+    <div class="mission-top"><span class="mnum">1</span><h2>Adopt Your Ship</h2></div>
+    <div class="meta">~12 minutes · with your first mate · one Chromebook per pair, but EACH of you adopts your own ship</div>
+    <p>Right now, this minute, thousands of real ships are crossing the ocean. You can see every one of them. Pick yours.</p>
+    <a class="btn" href="whydah-dashboard.html#salem" target="_blank" rel="noopener">Open the live harbor view →</a>
+    <a class="btn alt" href="https://www.marinetraffic.com/en/ais/home/centerx:-50/centery:38/zoom:4" target="_blank" rel="noopener">Or the whole Atlantic →</a>
+    <ol class="hunt">
+      <li>Start in <b>our harbor</b>. Pan around Salem and Boston. Every arrow and dot is a real vessel.</li>
+      <li>Click ships until one feels right. That's <b>your ship</b> for the rest of the unit.</li>
+      <li>Write on your CAPTAIN'S LOG page: <b>ship name · type · flag · where it's headed.</b></li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> Your first Captain's Log entry. Two or three sentences <b>in the captain's voice</b>. Where are you? What's your cargo? What are you worried about? Date it like a real log: "13 July 2026."</div>
+    <div class="race"><b>SHIP BINGO:</b> first crew to find all four wins points. A tanker. A cargo ship. A ship sailing to another continent. A ship with a name that makes you smile. Shout when you have all four.</div>
+  </section>
+
+  <section class="mission" id="m2">
+    <div class="mission-top"><span class="mnum">2</span><h2>Draw the Triangle</h2></div>
+    <div class="meta">~12 minutes · pairs · paper (map sheet if you got one, freehand is fine)</div>
+    <p>Ships in 1717 didn't sail wherever they wanted. Wind decided. Near the equator the <b>trade winds</b> blow west. Up north the westerlies blow east. Together they spin the Atlantic like a giant slow wheel called the <b>gyre</b>. Sailors rode it like a conveyor belt.</p>
+    <p>That wheel forced a route with three legs. On your TRIANGLE page, draw the Atlantic: Europe top right, Africa bottom right, the Americas on the left. Then draw and label the legs:</p>
+    <ol class="hunt">
+      <li><b>Leg 1:</b> London south to West Africa. Cargo: trade goods and money.</li>
+      <li><b>Leg 2:</b> West Africa west to the Caribbean. Cargo: <b>enslaved people.</b> The Whydah was built for this leg. She carried 367 human beings. She is named for the slave port of Ouidah.</li>
+      <li><b>Leg 3:</b> The Caribbean north and east, home to Europe. Cargo: sugar, silver, profit.</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> Label every leg with its cargo. All three. Leg 2's cargo was people. Write that word on your map. A map that skips it is lying by leaving out.</div>
+    <p class="bonus">Yesterday's callback: whose eyes is YOUR triangle map drawn from? The merchant counting profit sees one map. A person chained below deck sees another. Hold that thought for tomorrow.</p>
+  </section>
+
+  <section class="mission" id="m3">
+    <div class="mission-top"><span class="mnum">3</span><h2>The Machine, Then and Now</h2></div>
+    <div class="meta">~10 minutes · pairs</div>
+    <p>Now zoom out. The whole world's shipping, live.</p>
+    <a class="btn" href="whydah-dashboard.html#maps-geo" target="_blank" rel="noopener">Open the global live map →</a>
+    <ol class="hunt">
+      <li>Where do ships bunch up today? Look at the Atlantic. Look at the narrow squeezes.</li>
+      <li>Put your paper triangle next to the screen. Is the ocean still a machine with set routes? What changed? What didn't?</li>
+      <li>Your adopted ship is part of this machine. Whose stuff is it carrying? Who gets paid?</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> One sentence, two halves: "In 1717, ______ benefited when a ship crossed the Atlantic. Today, ______ benefits." Be specific. "People" is too easy.</div>
+    <p class="bonus">Fast finishers: sketch "Routes of My Life" on scrap paper. Five places that made you, connected by lines. It becomes raw material for a story map project. Or earn game time: <a href="navigator/" target="_blank" rel="noopener">Navigator</a> awaits.</p>
+  </section>
+
+  <div class="divider">✦</div>
+
+  <section class="mission" id="close">
+    <div class="mission-top"><span class="mnum">★</span><h2>Chart Your Course</h2></div>
+    <div class="meta">3 minutes · solo · every single day from now on</div>
+    <p>Back cover, MY COURSE. Two short lists:</p>
+    <ol class="hunt">
+      <li><b>My top 3 people.</b> Whose eyes might you tell this story through? (Browse the People tab if you're stuck.)</li>
+      <li><b>My top 3 ways to tell it.</b> Map, comic, song, performance, newspaper, exhibit... (The full menu lives in Your Project HQ.)</li>
+    </ol>
+    <a class="btn alt" href="whydah-dashboard.html#final-project" target="_blank" rel="noopener">Your Project HQ →</a>
+    <p class="note">Pitch Day is Thursday, July 30. Every day your lists get sharper. By next week: top 2. That's how a real project gets chosen: not one big decision, lots of small ones.</p>
+  </section>
+
+  <div class="vocab">
+    <span class="chip">triangle trade</span><span class="chip">gyre</span><span class="chip">trade winds</span><span class="chip">empire</span>
+  </div>
+  <p style="text-align:center; font-size:.92em; color:var(--muted); max-width:660px; margin:0 auto;">
+    <b>triangle trade</b> = the three-leg Atlantic route that moved goods, money, and enslaved people ·
+    <b>gyre</b> = the giant slow wheel of ocean currents · <b>trade winds</b> = steady winds that blow toward the west near the equator ·
+    <b>empire</b> = one country ruling lands and people far away
+  </p>
+
+</main>
+
+<footer class="foot">
+  <p><b>Tomorrow:</b> two stories, one ship. The people below deck, honored properly. Then the crew who flipped her. Come ready to listen, then to argue.</p>
+  <p style="margin-top:.6em;"><a href="whydah-dashboard.html#overview">⚓ Back to the ship's logbook (dashboard)</a></p>
+</footer>
+
+</body>
+</html>

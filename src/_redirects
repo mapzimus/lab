@@ -1,4 +1,5 @@
 https://www.mapzimus.com/* https://mapzimus.com/:splat 301
+<<<<<<< HEAD
 
 # Legacy GitHub Pages /max shelf → first-party tool routes
 /max/:slug.html /:slug/ 301
@@ -25,6 +26,12 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /bottle-flip/ /flip-game/ 301
 
 # Section aliases
+=======
+/max/* https://mapzimus.github.io/max/:splat 302
+/tool/:slug https://mapzimus.github.io/max/:slug.html 302
+/tools/maps/ /maps/ 301
+/tools/maps /maps 301
+>>>>>>> origin/main
 /play/ /games/ 301
 /play /games 301
 /experiments/ /lab/ 301

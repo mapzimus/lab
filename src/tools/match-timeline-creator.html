@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Match Timeline Creator</title>
+<meta name="description" content="Build a minute-by-minute soccer match summary infographic — goals, cards, subs, VAR drama plotted on a timeline with score progression and a momentum strip. Export PNG/SVG, copy a text report, share via link. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 66ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  a { color: var(--accent); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 12px; font-size: .84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.small { padding: 6px 10px; font-size: .8rem; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  select, input[type=text], input[type=date] { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 7px 9px; font-size: .84rem; font-family: var(--sans); }
+  label.fld { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); }
+  input[type=color] { width: 34px; height: 30px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 2px; cursor: pointer; }
+  input[type=checkbox] { accent-color: var(--accent); }
+  input:invalid { border-color: var(--danger); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 12px; margin-bottom: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .row + .row { margin-top: 8px; }
+  .grouplbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 2px; align-self: center; }
+  .sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 2px; }
+  .spacer { flex: 1; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .chip { border: 1px dashed var(--border); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); border-style: solid; }
+
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .seg button { border: none; background: var(--surface); color: var(--muted); padding: 7px 12px; font-size: .82rem; cursor: pointer; font-family: var(--sans); }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button.on { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+
+  .layout { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(0,.7fr); gap: 16px; align-items: start; }
+  @media (max-width: 980px) { .layout { grid-template-columns: minmax(0,1fr); } }
+
+  .svg-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow-x: auto; padding: 6px; }
+  .svg-wrap svg { display: block; width: 100%; height: auto; min-width: 640px; }
+
+  ul.evlist { list-style: none; margin: 0; padding: 0; max-height: 480px; overflow-y: auto; border: 1px solid var(--border); border-radius: 9px; }
+  ul.evlist li { display: flex; align-items: center; gap: 8px; padding: 7px 9px; border-top: 1px solid var(--border); font-size: .84rem; }
+  ul.evlist li:first-child { border-top: none; }
+  ul.evlist li.editing { outline: 2px solid var(--accent); outline-offset: -2px; }
+  ul.evlist .min { font-family: var(--mono); font-size: .78rem; color: var(--muted); min-width: 4.4ch; text-align: right; }
+  ul.evlist .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; border: 1px solid rgba(0,0,0,.2); }
+  ul.evlist .txt { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  ul.evlist .txt small { color: var(--muted); }
+  ul.evlist .mini { border: none; background: transparent; color: var(--muted); cursor: pointer; font-size: .95rem; padding: 2px 5px; border-radius: 5px; }
+  ul.evlist .mini:hover { background: var(--surface-2); color: var(--accent); }
+  ul.evlist .mini.rm:hover { color: var(--danger); }
+  .empty { color: var(--muted); font-size: .84rem; padding: 14px; text-align: center; }
+
+  h2.sec { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 8px; }
+
+  input#evMin { width: 64px; font-family: var(--mono); }
+  input#evPlayer, input#evPlayer2 { width: 130px; }
+  input#evNote { width: 160px; }
+  input#homeName, input#awayName { width: 130px; }
+  input#comp { width: 150px; } input#venue { width: 150px; } input#mdate { width: 130px; }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  @media (max-width: 720px){
+    .grouplbl { width: 100%; margin-bottom: 2px; }
+    .sep { display: none; }
+    input#evPlayer, input#evPlayer2, input#evNote { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Match Timeline Creator</h1>
+      <p>Log goals, cards, subs and drama minute by minute, and get a polished match-summary infographic: home events above the line, away below, running score at every goal, and an optional momentum strip. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="chips">
+    <button class="chip" id="sampleChip">⚽ Load sample thriller</button>
+    <button class="chip" id="clearChip">🧹 Clear all events</button>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <span class="grouplbl">Home</span>
+      <input type="text" id="homeName" value="Home FC" aria-label="Home team name" maxlength="30">
+      <input type="color" id="homeColor" value="#2b6cff" aria-label="Home team color">
+      <span class="grouplbl">Away</span>
+      <input type="text" id="awayName" value="Away United" aria-label="Away team name" maxlength="30">
+      <input type="color" id="awayColor" value="#e23b3b" aria-label="Away team color">
+      <div class="sep"></div>
+      <label class="fld"><input type="checkbox" id="etChk"> Extra time (+30')</label>
+      <label class="fld"><input type="checkbox" id="momChk" checked> Momentum strip</label>
+    </div>
+    <div class="row">
+      <span class="grouplbl">Optional</span>
+      <input type="text" id="comp" placeholder="Competition (e.g. Premier League)" aria-label="Competition" maxlength="50">
+      <input type="text" id="mdate" placeholder="Date" aria-label="Match date" maxlength="30">
+      <input type="text" id="venue" placeholder="Venue" aria-label="Venue" maxlength="50">
+      <div class="spacer"></div>
+      <span class="note" id="scoreNote"></span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="sec" id="entryTitle">Add event</h2>
+    <div class="row">
+      <label class="fld">Min <input type="text" id="evMin" placeholder="45+2" inputmode="numeric" aria-label="Minute (supports 45+2 notation)"></label>
+      <span class="seg" role="group" aria-label="Team">
+        <button type="button" id="teamHomeBtn" class="on">Home</button>
+        <button type="button" id="teamAwayBtn">Away</button>
+      </span>
+      <label class="fld">Type
+        <select id="evType" aria-label="Event type"></select>
+      </label>
+      <input type="text" id="evPlayer" placeholder="Player" aria-label="Player name" maxlength="40">
+      <input type="text" id="evPlayer2" placeholder="Player on" aria-label="Player coming on" maxlength="40" style="display:none">
+      <input type="text" id="evNote" placeholder="Note (e.g. assist: Messi)" aria-label="Optional note" maxlength="60">
+      <button class="btn primary" id="addBtn">＋ Add</button>
+      <button class="btn" id="cancelEditBtn" style="display:none">Cancel</button>
+    </div>
+    <div class="row"><span class="note" id="entryNote">Minute accepts stoppage notation like <b>45+2</b> or <b>90+5</b>. Press Enter in any field to add.</span></div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="panel">
+        <div class="row" style="margin-bottom:8px">
+          <h2 class="sec" style="margin:0">Infographic</h2>
+          <div class="spacer"></div>
+          <button class="btn small" id="pngBtn">🖼 PNG</button>
+          <button class="btn small" id="svgBtn">⬇ SVG</button>
+          <button class="btn small" id="reportBtn">⧉ Text report</button>
+          <button class="btn small" id="saveBtn">💾 JSON</button>
+          <button class="btn small" id="loadBtn">📂 Load</button>
+          <button class="btn small" id="shareBtn">🔗 Share link</button>
+          <input type="file" id="fileInput" accept=".json,application/json" style="display:none">
+        </div>
+        <div class="svg-wrap" id="svgWrap" aria-label="Match timeline infographic"></div>
+        <div class="row" style="margin-top:8px"><span class="note" id="status">Add events above, or load the sample to see how it works.</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="row" style="margin-bottom:8px">
+          <h2 class="sec" style="margin:0">Events (<span id="evCount">0</span>)</h2>
+          <div class="spacer"></div>
+          <button class="btn small" id="undoBtn" style="display:none">↩ Undo delete</button>
+        </div>
+        <ul class="evlist" id="evList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app">Part of the <a href="./index.html">mapzimus/max</a> toolbox · nothing is uploaded — all client-side</footer>
+</div>
+
+<script>
+'use strict';
+const $ = (s) => document.querySelector(s);
+
+// ---------- event type catalogue ----------
+const TYPES = [
+  { id:'goal',       label:'⚽ Goal',            icon:'⚽', report:'GOAL',           w: 3   },
+  { id:'owngoal',    label:'⚽ Own goal',        icon:'⚽', report:'OWN GOAL',       w: 0   },
+  { id:'pengoal',    label:'⚽ Penalty scored',  icon:'⚽', report:'PENALTY GOAL',   w: 3   },
+  { id:'penmiss',    label:'❌ Penalty missed',  icon:'❌', report:'PENALTY MISSED', w: 1   },
+  { id:'yellow',     label:'🟨 Yellow card',     icon:'🟨', report:'YELLOW CARD',    w: -0.5},
+  { id:'secondyellow',label:'🟨 Second yellow',  icon:'🟨', report:'SECOND YELLOW (OFF)', w: -1.5 },
+  { id:'red',        label:'🟥 Red card',        icon:'🟥', report:'RED CARD',       w: -1.5},
+  { id:'sub',        label:'🔄 Substitution',    icon:'🔄', report:'SUB',            w: 0   },
+  { id:'injury',     label:'✚ Injury',           icon:'✚',  report:'INJURY',         w: 0   },
+  { id:'var',        label:'📺 VAR check',       icon:'📺', report:'VAR CHECK',      w: 0   },
+  { id:'chance',     label:'⭐ Chance / key moment', icon:'⭐', report:'CHANCE',     w: 1   },
+];
+const TYPE = Object.fromEntries(TYPES.map(t => [t.id, t]));
+$('#evType').innerHTML = TYPES.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
+
+// ---------- state ----------
+const state = {
+  home: { name: 'Home FC', color: '#2b6cff' },
+  away: { name: 'Away United', color: '#e23b3b' },
+  comp: '', date: '', venue: '',
+  et: false, momentum: true,
+  events: [],   // { id, min, stop, team:'home'|'away', type, player, player2, note }
+};
+let idSeq = 1;
+let editingId = null;
+let entryTeam = 'home';
+const undoStack = [];
+
+// ---------- helpers ----------
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function matchEnd(){ return state.et ? 120 : 90; }
+
+// "45+2" -> {min:45, stop:2}; "67" -> {min:67, stop:0}; null on failure
+function parseMinute(str){
+  const m = /^\s*(\d{1,3})\s*(?:\+\s*(\d{1,2}))?\s*'?\s*$/.exec(String(str || ''));
+  if (!m) return null;
+  const min = +m[1], stop = m[2] ? +m[2] : 0;
+  if (min > matchEnd()) return null;
+  if (stop > 0 && ![45, 90, 105, 120].includes(min)) return null; // stoppage only at period ends
+  if (min === 105 && stop > 0 && !state.et) return null;
+  return { min, stop };
+}
+function fmtMinute(e){ return e.stop > 0 ? `${e.min}+${e.stop}'` : `${e.min}'`; }
+function sortKey(e){ return e.min * 100 + Math.min(e.stop, 99); }
+function sortedEvents(){ return state.events.slice().sort((a, b) => sortKey(a) - sortKey(b) || a.id - b.id); }
+
+// score after (and including) a given event index in sorted order; pass -1 for 0-0, Infinity for final
+function scoreThrough(sorted, uptoIdx){
+  let h = 0, a = 0;
+  sorted.forEach((e, i) => {
+    if (i > uptoIdx) return;
+    if (e.type === 'goal' || e.type === 'pengoal') { e.team === 'home' ? h++ : a++; }
+    else if (e.type === 'owngoal') { e.team === 'home' ? a++ : h++; } // OG credited to opposition
+  });
+  return [h, a];
+}
+function finalScore(){ return scoreThrough(sortedEvents(), Infinity); }
+function isGoalType(t){ return t === 'goal' || t === 'pengoal' || t === 'owngoal'; }
+
+// ---------- timeline geometry ----------
+// Segments: play periods + fixed-width stoppage zones at each period end.
+function buildSegments(){
+  const segs = [
+    { kind:'play', a:0,  b:45,  w:45 },
+    { kind:'stop', at:45,  w:6 },
+    { kind:'play', a:45, b:90,  w:45 },
+    { kind:'stop', at:90,  w:6 },
+  ];
+  if (state.et){
+    segs.push({ kind:'play', a:90,  b:105, w:15 },
+              { kind:'stop', at:105, w:4 },
+              { kind:'play', a:105, b:120, w:15 },
+              { kind:'stop', at:120, w:6 });
+  }
+  return segs;
+}
+function segLayout(x0, usable){
+  const segs = buildSegments();
+  const totalW = segs.reduce((s, g) => s + g.w, 0);
+  let x = x0;
+  segs.forEach(g => { g.x = x; g.px = g.w / totalW * usable; x += g.px; });
+  return segs;
+}
+function minuteX(segs, min, stop){
+  if (stop > 0){
+    const z = segs.find(g => g.kind === 'stop' && g.at === min);
+    if (z) return z.x + Math.min(stop, 8) / 8 * (z.px - 4) + 2;
+  }
+  // find play segment; period-end minutes belong to the segment they close
+  let seg = segs.find(g => g.kind === 'play' && min >= g.a && min <= g.b && !(min === g.a && g.a !== 0));
+  if (!seg) seg = segs.find(g => g.kind === 'play' && min >= g.a && min <= g.b);
+  if (!seg) seg = segs.filter(g => g.kind === 'play').pop();
+  const t = Math.max(0, Math.min(1, (min - seg.a) / (seg.b - seg.a)));
+  return seg.x + t * seg.px;
+}
+
+// greedy vertical stagger: returns lane index per event id for one side
+function assignLanes(evs, minGap){
+  const lanes = []; // last occupied x per lane
+  const out = {};
+  evs.forEach(e => {
+    let lane = lanes.findIndex(lx => e._x - lx >= minGap);
+    if (lane === -1) { lane = lanes.length; lanes.push(e._x); }
+    else lanes[lane] = e._x;
+    out[e.id] = lane;
+  });
+  return { laneOf: out, count: Math.max(1, lanes.length) };
+}
+
+// ---------- theme colors for the SVG (concrete values, so exports work) ----------
+function themeColors(){
+  const cs = getComputedStyle(document.documentElement);
+  const v = (n, fb) => (cs.getPropertyValue(n) || fb).trim() || fb;
+  return {
+    bg: v('--surface', '#ffffff'), line: v('--border', '#d9dee5'),
+    text: v('--text', '#1c2530'), muted: v('--muted', '#61707f'),
+    soft: v('--surface-2', '#f0f2f5'),
+  };
+}
+function hexToRgb(hex){
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+  if (!m) return [100, 100, 100];
+  const n = parseInt(m[1], 16);
+  return [n >> 16 & 255, n >> 8 & 255, n & 255];
+}
+function rgba(hex, a){ const [r, g, b] = hexToRgb(hex); return `rgba(${r},${g},${b},${a})`; }
+function textOn(hex){ const [r, g, b] = hexToRgb(hex); return (0.299 * r + 0.587 * g + 0.114 * b) > 150 ? '#111111' : '#ffffff'; }
+
+// ---------- SVG builder ----------
+const MONO = 'ui-monospace, Consolas, Menlo, monospace';
+const SANS = 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif';
+
+function buildSVG(){
+  const C = themeColors();
+  const W = 1000, padL = 40, padR = 30;
+  const usable = W - padL - padR;
+  const segs = segLayout(padL, usable);
+  const sorted = sortedEvents();
+  const laneH = 56, minGap = 68;
+
+  sorted.forEach(e => { e._x = minuteX(segs, e.min, e.stop); });
+  const homeEvs = sorted.filter(e => e.team === 'home');
+  const awayEvs = sorted.filter(e => e.team === 'away');
+  const hL = assignLanes(homeEvs, minGap);
+  const aL = assignLanes(awayEvs, minGap);
+
+  const headerH = 96;
+  const momH = state.momentum ? 16 : 0;
+  const axisY = headerH + 30 + hL.count * laneH;
+  const footerY = axisY + 24 + momH + aL.count * laneH;
+  const H = footerY + 44;
+  const [fh, fa] = finalScore();
+
+  const parts = [];
+  parts.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="${SANS}">`);
+  parts.push(`<rect x="0" y="0" width="${W}" height="${H}" rx="10" fill="${C.bg}"/>`);
+  parts.push(`<rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="10" fill="none" stroke="${C.line}"/>`);
+
+  // ----- header scoreboard lockup -----
+  const hName = state.home.name || 'Home', aName = state.away.name || 'Away';
+  parts.push(`<rect x="30" y="26" width="8" height="40" rx="3" fill="${state.home.color}"/>`);
+  parts.push(`<text x="48" y="52" font-size="24" font-weight="700" fill="${C.text}">${esc(hName)}</text>`);
+  parts.push(`<rect x="${W - 38}" y="26" width="8" height="40" rx="3" fill="${state.away.color}"/>`);
+  parts.push(`<text x="${W - 48}" y="52" font-size="24" font-weight="700" fill="${C.text}" text-anchor="end">${esc(aName)}</text>`);
+  // center score pill
+  parts.push(`<rect x="${W / 2 - 62}" y="20" width="124" height="48" rx="12" fill="${C.soft}" stroke="${C.line}"/>`);
+  parts.push(`<text x="${W / 2}" y="54" font-size="30" font-weight="800" fill="${C.text}" text-anchor="middle" font-family="${MONO}">${fh}–${fa}</text>`);
+  parts.push(`<text x="${W / 2}" y="82" font-size="11" letter-spacing="2" fill="${C.muted}" text-anchor="middle">${state.et ? 'AFTER EXTRA TIME' : 'FULL TIME'}</text>`);
+
+  // ----- axis -----
+  parts.push(`<line x1="${padL}" y1="${axisY}" x2="${W - padR}" y2="${axisY}" stroke="${C.text}" stroke-width="2.5" stroke-linecap="round"/>`);
+  // stoppage shading + play segment baselines
+  segs.forEach(g => {
+    if (g.kind === 'stop'){
+      parts.push(`<rect x="${g.x}" y="${axisY - 9}" width="${g.px}" height="18" rx="4" fill="${rgba('#888888', 0.14)}"/>`);
+      parts.push(`<text x="${g.x + g.px / 2}" y="${axisY + 26}" font-size="9" fill="${C.muted}" text-anchor="middle" font-family="${MONO}">${g.at}+</text>`);
+    }
+  });
+  // ticks
+  const ticks = state.et ? [0, 15, 30, 45, 60, 75, 90, 105, 120] : [0, 15, 30, 45, 60, 75, 90];
+  ticks.forEach(t => {
+    const x = minuteX(segs, t, 0);
+    const major = (t === 45 || t === 90 || t === 120 || t === 0);
+    parts.push(`<line x1="${x}" y1="${axisY - (major ? 9 : 5)}" x2="${x}" y2="${axisY + (major ? 9 : 5)}" stroke="${C.muted}" stroke-width="${major ? 2 : 1}"/>`);
+    let lbl = t + "'";
+    if (t === 45) lbl = "HT"; else if (t === 90) lbl = state.et ? "90'" : "FT"; else if (t === 120) lbl = "FT";
+    parts.push(`<text x="${x}" y="${axisY + 26}" font-size="10" font-weight="${major ? 700 : 400}" fill="${C.muted}" text-anchor="middle" font-family="${MONO}">${lbl}</text>`);
+  });
+
+  // ----- momentum strip -----
+  if (state.momentum){
+    const momY = axisY + 32;
+    const bucketMax = matchEnd();
+    for (let b0 = 0; b0 < bucketMax; b0 += 15){
+      const b1 = b0 + 15;
+      let net = 0;
+      sorted.forEach(e => {
+        const em = e.min + (e.stop > 0 ? 0.5 : 0);
+        if (em <= b0 || em > b1) { if (!(b0 === 0 && em === 0)) return; }
+        const w = TYPE[e.type].w;
+        if (w === 0) return;
+        // positive weights favor the acting team; card weights (negative) favor the opposition
+        const favorsHome = (e.team === 'home') === (w > 0);
+        net += favorsHome ? Math.abs(w) : -Math.abs(w);
+      });
+      const x0 = minuteX(segs, b0, 0), x1 = minuteX(segs, b1, 0);
+      let fill = rgba('#888888', 0.15);
+      if (net > 0.01) fill = rgba(state.home.color, Math.min(0.9, 0.3 + net * 0.18));
+      else if (net < -0.01) fill = rgba(state.away.color, Math.min(0.9, 0.3 - net * 0.18));
+      parts.push(`<rect x="${x0 + 1}" y="${momY}" width="${Math.max(1, x1 - x0 - 2)}" height="8" rx="3" fill="${fill}"/>`);
+    }
+    parts.push(`<text x="${padL}" y="${momY + 20}" font-size="8.5" letter-spacing="1" fill="${C.muted}">MOMENTUM</text>`);
+  }
+
+  // ----- event markers -----
+  function drawEvent(e, side){
+    const L = side === 'home' ? hL : aL;
+    const lane = L.laneOf[e.id];
+    const dir = side === 'home' ? -1 : 1;
+    const baseOff = 36 + (side === 'home' ? 0 : (state.momentum ? 22 : 6));
+    const cy = axisY + dir * (baseOff + lane * laneH);
+    const x = e._x;
+    const col = state[side].color;
+    const t = TYPE[e.type];
+    const g = [];
+    g.push(`<line x1="${x}" y1="${axisY + dir * 5}" x2="${x}" y2="${cy - dir * 15}" stroke="${rgba(col, 0.5)}" stroke-width="1.5" stroke-dasharray="${lane > 0 ? '3 3' : 'none'}"/>`);
+    g.push(`<circle cx="${x}" cy="${axisY}" r="3.4" fill="${col}"/>`);
+    const goalish = isGoalType(e.type);
+    g.push(`<circle cx="${x}" cy="${cy}" r="14" fill="${C.bg}" stroke="${col}" stroke-width="${goalish ? 3 : 2}"/>`);
+    g.push(`<text x="${x}" y="${cy + 4.5}" font-size="13" text-anchor="middle">${t.icon}</text>`);
+    if (e.type === 'secondyellow') g.push(`<circle cx="${x + 11}" cy="${cy - 10}" r="6" fill="#d33" /><text x="${x + 11}" y="${cy - 7}" font-size="8" font-weight="700" fill="#fff" text-anchor="middle">2</text>`);
+    if (e.type === 'owngoal') g.push(`<text x="${x + 15}" y="${cy - 8}" font-size="8" font-weight="800" fill="${C.muted}">OG</text>`);
+    if (e.type === 'pengoal' || e.type === 'penmiss') g.push(`<text x="${x + 15}" y="${cy - 8}" font-size="8" font-weight="800" fill="${C.muted}">P</text>`);
+    // minute + player labels stacked away from the axis
+    const l1 = cy - dir * 22, l2 = cy - dir * 33;
+    const minTxt = `<text x="${x}" y="${(side === 'home' ? l1 : l1 + 7)}" font-size="9.5" font-weight="700" fill="${C.text}" text-anchor="middle" font-family="${MONO}">${fmtMinute(e)}</text>`;
+    let nameStr = e.player || '';
+    if (e.type === 'sub'){ nameStr = (e.player2 ? '↑' + e.player2 : '') + (e.player ? ' ↓' + e.player : ''); nameStr = nameStr.trim(); }
+    const nameTxt = nameStr ? `<text x="${x}" y="${(side === 'home' ? l2 : l2 + 7)}" font-size="9" fill="${C.muted}" text-anchor="middle">${esc(nameStr.length > 20 ? nameStr.slice(0, 19) + '…' : nameStr)}</text>` : '';
+    g.push(minTxt, nameTxt);
+    // running score badge at goals
+    if (goalish){
+      const idx = sorted.indexOf(e);
+      const [sh, sa] = scoreThrough(sorted, idx);
+      const bw = 36, bx = Math.min(W - padR - bw, x + 17);
+      g.push(`<rect x="${bx}" y="${cy - 8}" width="${bw}" height="16" rx="8" fill="${col}"/>`);
+      g.push(`<text x="${bx + bw / 2}" y="${cy + 3.8}" font-size="9.5" font-weight="800" fill="${textOn(col)}" text-anchor="middle" font-family="${MONO}">${sh}–${sa}</text>`);
+    }
+    return g.join('');
+  }
+  homeEvs.forEach(e => parts.push(drawEvent(e, 'home')));
+  awayEvs.forEach(e => parts.push(drawEvent(e, 'away')));
+
+  if (!sorted.length){
+    parts.push(`<text x="${W / 2}" y="${axisY - 40}" font-size="13" fill="${C.muted}" text-anchor="middle">No events yet — add some above or load the sample thriller.</text>`);
+  }
+
+  // ----- footer -----
+  const meta = [state.comp, state.date, state.venue].filter(Boolean).join('  ·  ');
+  parts.push(`<line x1="30" y1="${H - 34}" x2="${W - 30}" y2="${H - 34}" stroke="${C.line}"/>`);
+  parts.push(`<text x="${W / 2}" y="${H - 15}" font-size="11" fill="${C.muted}" text-anchor="middle">${esc(meta || 'Match Timeline — made with mapzimus/max')}</text>`);
+  parts.push('</svg>');
+  return { xml: parts.join('\n'), w: W, h: H };
+}
+
+// ---------- rendering ----------
+function renderSVG(){
+  $('#svgWrap').innerHTML = buildSVG().xml;
+  const [h, a] = finalScore();
+  $('#scoreNote').textContent = `Score (auto): ${state.home.name || 'Home'} ${h}–${a} ${state.away.name || 'Away'}`;
+}
+function renderList(){
+  const list = $('#evList');
+  const sorted = sortedEvents();
+  $('#evCount').textContent = sorted.length;
+  if (!sorted.length){ list.innerHTML = '<li class="empty">No events yet.</li>'; return; }
+  list.innerHTML = sorted.map(e => {
+    const t = TYPE[e.type];
+    const col = state[e.team].color;
+    let who = esc(e.player || '');
+    if (e.type === 'sub') who = `${esc(e.player2 || '?')} on, ${esc(e.player || '?')} off`;
+    const note = e.note ? ` <small>(${esc(e.note)})</small>` : '';
+    return `<li data-id="${e.id}" class="${e.id === editingId ? 'editing' : ''}">
+      <span class="min">${fmtMinute(e)}</span>
+      <span class="dot" style="background:${col}"></span>
+      <span class="txt">${t.icon} <b>${esc(t.report)}</b>${who ? ' — ' + who : ''}${note}</span>
+      <button class="mini ed" title="Edit" aria-label="Edit event">✎</button>
+      <button class="mini rm" title="Delete" aria-label="Delete event">✕</button>
+    </li>`;
+  }).join('');
+}
+function renderAll(){ renderList(); renderSVG(); syncHash(); }
+
+// ---------- event entry ----------
+function setTeam(t){
+  entryTeam = t;
+  $('#teamHomeBtn').classList.toggle('on', t === 'home');
+  $('#teamAwayBtn').classList.toggle('on', t === 'away');
+}
+$('#teamHomeBtn').addEventListener('click', () => setTeam('home'));
+$('#teamAwayBtn').addEventListener('click', () => setTeam('away'));
+$('#evType').addEventListener('change', () => {
+  const isSub = $('#evType').value === 'sub';
+  $('#evPlayer2').style.display = isSub ? '' : 'none';
+  $('#evPlayer').placeholder = isSub ? 'Player off' : 'Player';
+});
+
+function clearEntry(){
+  $('#evMin').value = ''; $('#evPlayer').value = ''; $('#evPlayer2').value = ''; $('#evNote').value = '';
+  editingId = null;
+  $('#entryTitle').textContent = 'Add event';
+  $('#addBtn').innerHTML = '＋ Add';
+  $('#cancelEditBtn').style.display = 'none';
+}
+$('#cancelEditBtn').addEventListener('click', () => { clearEntry(); renderList(); });
+
+function submitEntry(){
+  const parsed = parseMinute($('#evMin').value);
+  if (!parsed){
+    entryFlash(`Invalid minute. Use 0–${matchEnd()} or stoppage like 45+2 / 90+5${state.et ? ' / 105+1 / 120+3' : ''}. Stoppage only exists at period ends.`, 'err');
+    $('#evMin').focus();
+    return;
+  }
+  const ev = {
+    id: editingId != null ? editingId : idSeq++,
+    min: parsed.min, stop: parsed.stop,
+    team: entryTeam, type: $('#evType').value,
+    player: $('#evPlayer').value.trim(),
+    player2: $('#evType').value === 'sub' ? $('#evPlayer2').value.trim() : '',
+    note: $('#evNote').value.trim(),
+  };
+  if (editingId != null){
+    const i = state.events.findIndex(e => e.id === editingId);
+    if (i > -1) state.events[i] = ev; else state.events.push(ev);
+    entryFlash(`Updated ${fmtMinute(ev)} ${TYPE[ev.type].report}.`, 'ok');
+  } else {
+    state.events.push(ev);
+    entryFlash(`Added ${fmtMinute(ev)} ${TYPE[ev.type].report}.`, 'ok');
+  }
+  clearEntry();
+  renderAll();
+  $('#evMin').focus();
+}
+$('#addBtn').addEventListener('click', submitEntry);
+['evMin', 'evPlayer', 'evPlayer2', 'evNote'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') submitEntry(); });
+});
+
+$('#evList').addEventListener('click', (e) => {
+  const li = e.target.closest('li[data-id]');
+  if (!li) return;
+  const id = +li.dataset.id;
+  const ev = state.events.find(x => x.id === id);
+  if (!ev) return;
+  if (e.target.classList.contains('rm')){
+    undoStack.push(ev);
+    state.events = state.events.filter(x => x.id !== id);
+    if (editingId === id) clearEntry();
+    $('#undoBtn').style.display = '';
+    renderAll();
+    flash(`Deleted ${fmtMinute(ev)} ${TYPE[ev.type].report} — Undo available.`, 'ok');
+  } else if (e.target.classList.contains('ed')){
+    editingId = id;
+    $('#evMin').value = ev.stop > 0 ? `${ev.min}+${ev.stop}` : String(ev.min);
+    setTeam(ev.team);
+    $('#evType').value = ev.type;
+    $('#evType').dispatchEvent(new Event('change'));
+    $('#evPlayer').value = ev.player; $('#evPlayer2').value = ev.player2 || ''; $('#evNote').value = ev.note || '';
+    $('#entryTitle').textContent = 'Edit event';
+    $('#addBtn').innerHTML = '✓ Update';
+    $('#cancelEditBtn').style.display = '';
+    renderList();
+    $('#evMin').focus();
+  }
+});
+$('#undoBtn').addEventListener('click', () => {
+  const ev = undoStack.pop();
+  if (ev){ state.events.push(ev); renderAll(); flash(`Restored ${fmtMinute(ev)} ${TYPE[ev.type].report}.`, 'ok'); }
+  if (!undoStack.length) $('#undoBtn').style.display = 'none';
+});
+
+// ---------- setup bindings ----------
+function bindSetup(){
+  $('#homeName').addEventListener('input', () => { state.home.name = $('#homeName').value; renderAll(); });
+  $('#awayName').addEventListener('input', () => { state.away.name = $('#awayName').value; renderAll(); });
+  $('#homeColor').addEventListener('input', () => { state.home.color = $('#homeColor').value; renderAll(); });
+  $('#awayColor').addEventListener('input', () => { state.away.color = $('#awayColor').value; renderAll(); });
+  $('#comp').addEventListener('input', () => { state.comp = $('#comp').value; renderAll(); });
+  $('#mdate').addEventListener('input', () => { state.date = $('#mdate').value; renderAll(); });
+  $('#venue').addEventListener('input', () => { state.venue = $('#venue').value; renderAll(); });
+  $('#momChk').addEventListener('change', () => { state.momentum = $('#momChk').checked; renderAll(); });
+  $('#etChk').addEventListener('change', () => {
+    if (!$('#etChk').checked && state.events.some(e => e.min > 90)){
+      if (!confirm('Some events are after 90\'. Turning extra time off will hide beyond-90 minutes from the timeline (events are kept). Continue?')){
+        $('#etChk').checked = true; return;
+      }
+    }
+    state.et = $('#etChk').checked; renderAll();
+  });
+}
+function syncSetupInputs(){
+  $('#homeName').value = state.home.name; $('#awayName').value = state.away.name;
+  $('#homeColor').value = state.home.color; $('#awayColor').value = state.away.color;
+  $('#comp').value = state.comp; $('#mdate').value = state.date; $('#venue').value = state.venue;
+  $('#etChk').checked = state.et; $('#momChk').checked = state.momentum;
+}
+
+// ---------- exports ----------
+function downloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+function slug(){ return `${(state.home.name || 'home')}-${(state.away.name || 'away')}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'match'; }
+
+$('#svgBtn').addEventListener('click', (e) => {
+  const { xml } = buildSVG();
+  downloadBlob(new Blob([xml], { type: 'image/svg+xml' }), `match-timeline-${slug()}.svg`);
+  flashBtn(e.currentTarget); flash('SVG downloaded.', 'ok');
+});
+
+$('#pngBtn').addEventListener('click', (e) => {
+  const btn = e.currentTarget;
+  try {
+    const { xml, w, h } = buildSVG();
+    const svgBlob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = w * 2; canvas.height = h * 2;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(2, 2);
+        ctx.drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        canvas.toBlob((blob) => {
+          if (!blob){ flash('PNG export failed in this browser — try the SVG export.', 'err'); return; }
+          downloadBlob(blob, `match-timeline-${slug()}.png`);
+          flashBtn(btn); flash('PNG downloaded (2× resolution).', 'ok');
+        }, 'image/png');
+      } catch (err){ flash('PNG export failed: ' + err.message, 'err'); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); flash('PNG export failed — the SVG could not be rasterized. Try the SVG export.', 'err'); };
+    img.src = url;
+  } catch (err){ flash('PNG export failed: ' + err.message, 'err'); }
+});
+
+function buildReport(){
+  const sorted = sortedEvents();
+  const [fh, fa] = finalScore();
+  const lines = [];
+  lines.push(`${state.home.name || 'Home'} ${fh}–${fa} ${state.away.name || 'Away'}${state.et ? ' (a.e.t.)' : ''}`);
+  const meta = [state.comp, state.date, state.venue].filter(Boolean).join(' · ');
+  if (meta) lines.push(meta);
+  lines.push('');
+  sorted.forEach((ev, i) => {
+    const t = TYPE[ev.type];
+    let who = ev.player || '';
+    if (ev.type === 'sub') who = `${ev.player2 || '?'} ON, ${ev.player || '?'} OFF`;
+    let line = `${fmtMinute(ev).replace("'", '')}' ${t.icon} ${t.report}`;
+    const teamName = state[ev.team].name || ev.team;
+    line += ` (${teamName})`;
+    if (who) line += ` — ${who}`;
+    if (ev.note) line += ` (${ev.note})`;
+    if (isGoalType(ev.type)){
+      const [sh, sa] = scoreThrough(sorted, i);
+      line += ` ${sh}–${sa}`;
+    }
+    lines.push(line);
+  });
+  if (!sorted.length) lines.push('(no events)');
+  return lines.join('\n');
+}
+$('#reportBtn').addEventListener('click', async (e) => {
+  try { await navigator.clipboard.writeText(buildReport()); flashBtn(e.currentTarget); flash('Text match report copied to clipboard.', 'ok'); }
+  catch (err){ flash('Copy failed — clipboard not available in this context.', 'err'); }
+});
+
+// ---------- save / load JSON ----------
+function serialize(){
+  return {
+    v: 1, home: state.home, away: state.away,
+    comp: state.comp, date: state.date, venue: state.venue,
+    et: state.et, momentum: state.momentum,
+    events: state.events.map(({ min, stop, team, type, player, player2, note }) => ({ min, stop, team, type, player, player2, note })),
+  };
+}
+function hydrate(obj){
+  if (!obj || obj.v !== 1 || !Array.isArray(obj.events)) return false;
+  state.home = { name: String(obj.home && obj.home.name || 'Home'), color: /^#[0-9a-f]{6}$/i.test(obj.home && obj.home.color) ? obj.home.color : '#2b6cff' };
+  state.away = { name: String(obj.away && obj.away.name || 'Away'), color: /^#[0-9a-f]{6}$/i.test(obj.away && obj.away.color) ? obj.away.color : '#e23b3b' };
+  state.comp = String(obj.comp || ''); state.date = String(obj.date || ''); state.venue = String(obj.venue || '');
+  state.et = !!obj.et; state.momentum = obj.momentum !== false;
+  state.events = obj.events
+    .filter(e => e && TYPE[e.type] && (e.team === 'home' || e.team === 'away') && Number.isFinite(+e.min))
+    .map(e => ({ id: idSeq++, min: Math.max(0, Math.min(120, Math.round(+e.min))), stop: Math.max(0, Math.min(15, Math.round(+e.stop || 0))), team: e.team, type: e.type, player: String(e.player || '').slice(0, 40), player2: String(e.player2 || '').slice(0, 40), note: String(e.note || '').slice(0, 60) }));
+  return true;
+}
+$('#saveBtn').addEventListener('click', (e) => {
+  downloadBlob(new Blob([JSON.stringify(serialize(), null, 2)], { type: 'application/json' }), `match-${slug()}.json`);
+  flashBtn(e.currentTarget); flash('Match saved as JSON.', 'ok');
+});
+$('#loadBtn').addEventListener('click', () => $('#fileInput').click());
+$('#fileInput').addEventListener('change', () => {
+  const f = $('#fileInput').files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      if (!hydrate(JSON.parse(reader.result))) throw new Error('not a Match Timeline file');
+      syncSetupInputs(); clearEntry(); renderAll();
+      flash(`Loaded "${f.name}" — ${state.events.length} events.`, 'ok');
+    } catch (err){ flash('Could not load file: ' + err.message, 'err'); }
+    $('#fileInput').value = '';
+  };
+  reader.onerror = () => { flash('Could not read the file.', 'err'); $('#fileInput').value = ''; };
+  reader.readAsText(f);
+});
+
+// ---------- share via URL hash ----------
+function encodeState(){
+  const obj = serialize();
+  // compact events into arrays to keep the URL short
+  obj.e = obj.events.map(e => [e.min, e.stop, e.team === 'home' ? 0 : 1, TYPES.findIndex(t => t.id === e.type), e.player, e.player2 || '', e.note || '']);
+  delete obj.events;
+  return 's=' + btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodeState(hash){
+  const m = /^#?s=([A-Za-z0-9\-_]+)$/.exec(hash);
+  if (!m) return false;
+  let b64 = m[1].replace(/-/g, '+').replace(/_/g, '/');
+  while (b64.length % 4) b64 += '=';
+  const obj = JSON.parse(decodeURIComponent(escape(atob(b64))));
+  if (obj && Array.isArray(obj.e)){
+    obj.events = obj.e.map(a => ({ min: a[0], stop: a[1], team: a[2] === 0 ? 'home' : 'away', type: (TYPES[a[3]] || TYPES[0]).id, player: a[4], player2: a[5], note: a[6] }));
+  }
+  return hydrate(obj);
+}
+let hashTimer = null;
+function syncHash(){
+  clearTimeout(hashTimer);
+  hashTimer = setTimeout(() => {
+    try {
+      const enc = encodeState();
+      if (enc.length < 6000) history.replaceState(null, '', '#' + enc);
+    } catch (e){}
+  }, 150);
+}
+$('#shareBtn').addEventListener('click', async (e) => {
+  try {
+    const enc = encodeState();
+    if (enc.length >= 6000){ flash('This match is too big for a share link — use Save JSON instead.', 'err'); return; }
+    history.replaceState(null, '', '#' + enc);
+    await navigator.clipboard.writeText(location.href);
+    flashBtn(e.currentTarget); flash('Shareable link copied.', 'ok');
+  } catch (err){ flash('Link is in the address bar — clipboard copy failed.', 'err'); }
+});
+
+// ---------- sample ----------
+function loadSample(){
+  hydrate({
+    v: 1,
+    home: { name: 'Arsenal', color: '#ef0107' },
+    away: { name: 'Liverpool', color: '#00b2a9' },
+    comp: 'Premier League', date: 'Sat 17 May 2026', venue: 'Emirates Stadium',
+    et: false, momentum: true,
+    events: [
+      { min: 12, stop: 0, team: 'home', type: 'goal',   player: 'Saka',        note: 'assist: Ødegaard' },
+      { min: 23, stop: 0, team: 'home', type: 'yellow', player: 'Rice',        note: 'tactical foul' },
+      { min: 34, stop: 0, team: 'away', type: 'goal',   player: 'Salah',       note: 'counter-attack' },
+      { min: 41, stop: 0, team: 'home', type: 'chance', player: 'Martinelli',  note: 'volley off the bar' },
+      { min: 45, stop: 2, team: 'away', type: 'goal',   player: 'Van Dijk',    note: 'header from corner' },
+      { min: 52, stop: 0, team: 'home', type: 'sub',    player: 'Martinelli',  player2: 'Trossard' },
+      { min: 58, stop: 0, team: 'home', type: 'var',    player: '',            note: 'penalty check — given' },
+      { min: 60, stop: 0, team: 'home', type: 'pengoal',player: 'Saka',        note: 'sent keeper wrong way' },
+      { min: 66, stop: 0, team: 'away', type: 'injury', player: 'Alisson',     note: 'treated, plays on' },
+      { min: 71, stop: 0, team: 'away', type: 'yellow', player: 'Mac Allister' },
+      { min: 74, stop: 0, team: 'away', type: 'sub',    player: 'Gakpo',       player2: 'Núñez' },
+      { min: 79, stop: 0, team: 'away', type: 'penmiss',player: 'Salah',       note: 'saved by Raya' },
+      { min: 84, stop: 0, team: 'away', type: 'secondyellow', player: 'Mac Allister', note: 'down to 10' },
+      { min: 88, stop: 0, team: 'home', type: 'chance', player: 'Havertz',     note: 'cleared off the line' },
+      { min: 90, stop: 4, team: 'home', type: 'goal',   player: 'Havertz',     note: 'stoppage-time winner' },
+    ],
+  });
+  syncSetupInputs(); clearEntry(); renderAll();
+  flash('Sample thriller loaded — a 3–2 with VAR drama and a 90+4\' winner.', 'ok');
+}
+$('#sampleChip').addEventListener('click', () => {
+  if (state.events.length && !confirm('Replace the current match with the sample? This cannot be undone.')) return;
+  loadSample();
+});
+$('#clearChip').addEventListener('click', () => {
+  if (state.events.length && !confirm('Delete all events? Team names and settings are kept.')) return;
+  state.events = []; clearEntry(); renderAll();
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e){}
+  flash('All events cleared.', 'ok');
+});
+
+// ---------- status flashes ----------
+let flashTimer = null;
+function flash(msg, kind){
+  const s = $('#status'); s.textContent = msg; s.className = 'note' + (kind ? ' ' + kind : '');
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => { s.textContent = ''; s.className = 'note'; }, 3200);
+}
+let entryTimer = null;
+function entryFlash(msg, kind){
+  const s = $('#entryNote'); s.innerHTML = esc(msg); s.className = 'note' + (kind ? ' ' + kind : '');
+  clearTimeout(entryTimer);
+  entryTimer = setTimeout(() => { s.innerHTML = 'Minute accepts stoppage notation like <b>45+2</b> or <b>90+5</b>. Press Enter in any field to add.'; s.className = 'note'; }, 3600);
+}
+function flashBtn(btn){ if (!btn) return; btn.classList.add('copied'); setTimeout(() => btn.classList.remove('copied'), 1200); }
+
+// ---------- theme ----------
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next); localStorage.setItem('max-theme', next);
+  renderSVG();
+});
+
+// ---------- boot ----------
+function boot(){
+  bindSetup();
+  let loaded = false;
+  if (location.hash.length > 1){
+    try { loaded = decodeState(location.hash); } catch (e){ loaded = false; }
+    if (location.hash.length > 1 && !loaded) flash('Could not read the shared link — starting fresh.', 'err');
+  }
+  if (loaded){ syncSetupInputs(); renderAll(); }
+  else loadSample();
+}
+boot();
+
+// test / automation hooks
+window.mtc = {
+  state, parseMinute, sortedEvents, finalScore, buildSVG, buildReport,
+  encodeState, decodeState, loadSample, serialize, hydrate,
+  addEvent(min, team, type, player, opts){
+    const p = parseMinute(min);
+    if (!p) return false;
+    state.events.push(Object.assign({ id: idSeq++, min: p.min, stop: p.stop, team, type, player: player || '', player2: '', note: '' }, opts || {}));
+    renderAll();
+    return true;
+  },
+};
+</script>
+</body>
+</html>

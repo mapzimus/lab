@@ -1,0 +1,1195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coordinate Grid Generator</title>
+<meta name="description" content="Generate customizable lat/long graticule, UTM and MGRS grid overlays on a real map, style them, and export as GeoJSON or SVG. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 12px; font-size: .84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.small { padding: 6px 10px; font-size: .8rem; }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  select, input[type=text], input[type=number] { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 7px 9px; font-size: .84rem; font-family: var(--sans); }
+  input[type=number] { font-family: var(--mono); }
+  label.fld { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); }
+  input[type=color] { width: 34px; height: 30px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 2px; cursor: pointer; }
+  input[type=range] { accent-color: var(--accent); width: 82px; }
+  input[type=checkbox] { accent-color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 12px; margin-bottom: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .row + .row { margin-top: 8px; }
+  .grouplbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 2px; align-self: center; }
+  .sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 2px; }
+  .spacer { flex: 1; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .chip { border: 1px dashed var(--border); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); border-style: solid; }
+
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+
+  .layout { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 16px; align-items: start; }
+  @media (max-width: 980px) { .layout { grid-template-columns: minmax(0,1fr); } }
+
+  #map { height: 560px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); background: var(--surface-2); }
+  @media (max-width: 980px){ #map { height: 420px; } }
+  #map.boxdraw { cursor: crosshair; touch-action: none; }
+  #map.boxdraw .leaflet-interactive, #map.boxdraw .leaflet-grab { cursor: crosshair !important; }
+  .leaflet-container { font-family: var(--sans); background: var(--surface-2); }
+  .map-fallback { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); height: 560px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .92rem; text-align: center; padding: 24px; }
+  @media (max-width: 980px){ .map-fallback { height: 420px; } }
+
+  .grid-lbl { pointer-events: none; }
+  .grid-lbl span { display: inline-block; white-space: nowrap; font-family: var(--mono); font-weight: 600; line-height: 1.1;
+    text-shadow: 0 0 3px var(--bg), 0 0 3px var(--bg), 0 0 4px var(--bg), 0 0 4px var(--bg); }
+
+  .extent-fields { display: grid; grid-template-columns: repeat(4, minmax(66px, 1fr)); gap: 6px; }
+  .extent-fields .field { display: flex; flex-direction: column; gap: 2px; }
+  .extent-fields label { font-size: .7rem; color: var(--muted); }
+  .extent-fields input { width: 100%; padding: 6px 7px; font-size: .8rem; }
+
+  details.about { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 14px; margin-bottom: 12px; font-size: .86rem; }
+  details.about summary { cursor: pointer; font-weight: 600; }
+  details.about .body { margin-top: 8px; color: var(--muted); }
+  details.about code { font-family: var(--mono); font-size: .82em; background: var(--surface-2); padding: 1px 5px; border-radius: 5px; color: var(--text); }
+  details.about ul { margin: 6px 0; padding-left: 20px; }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  footer.app code { font-family: var(--mono); background: var(--surface-2); padding: 1px 5px; border-radius: 5px; }
+  a { color: var(--accent); }
+  @media (max-width: 720px){
+    .grouplbl { width: 100%; margin-bottom: 2px; }
+    .sep { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Coordinate Grid Generator</h1>
+      <p>Draw a customizable lat/long graticule, UTM grid or MGRS grid over a real map, tune the styling, then export the exact grid as GeoJSON or a standalone SVG for map layouts. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="chips" id="samples" aria-label="Sample views">
+    <button class="chip" data-s="boston">Load sample — Boston 1 km UTM</button>
+    <button class="chip" data-s="world">World 10° graticule</button>
+    <button class="chip" data-s="denver">MGRS 100 km squares (Denver)</button>
+    <button class="chip" data-s="london">Zone boundary (London, 30/31)</button>
+    <button class="chip" data-s="svalbard">Polar edge case (Svalbard)</button>
+  </div>
+
+  <details class="about">
+    <summary>About the three grid types (click to expand)</summary>
+    <div class="body">
+      <ul>
+        <li><strong>Lat/Long graticule</strong> — plain lines of latitude and longitude at a fixed interval in decimal degrees. Every 5th line is treated as a <em>major</em> line. Labels can show decimal degrees or degrees/minutes/seconds.</li>
+        <li><strong>UTM grid</strong> — square kilometre grid in the Universal Transverse Mercator projection. Because each 6°-wide UTM zone has its own projection, the grid is generated per zone and the dashed <em>zone boundaries</em> appear wherever two zones meet in view. UTM is only defined between <code>80°S</code> and <code>84°N</code> — the grid is clamped there.</li>
+        <li><strong>MGRS grid</strong> — the military grid: 6°×8° <em>grid zone designators</em> (like <code>19T</code>), lettered <em>100 km squares</em> (like <code>CG</code>), and 10 km / 1 km subdivisions when zoomed in. The Norway (32V) and Svalbard (31X–37X) zone-width exceptions are drawn.</li>
+      </ul>
+      <p>The grid regenerates for whatever is on screen. Turn on <strong>Fix extent</strong> to lock a bounding box instead — exports then cover exactly that box no matter where you pan. UTM math is the standard WGS84 series expansion (same code as the Coordinate Converter tool); MGRS letters use the AA lettering scheme.</p>
+    </div>
+  </details>
+
+  <div class="layout">
+    <div>
+      <section class="panel">
+        <div class="row">
+          <span class="grouplbl">Grid</span>
+          <label class="fld">Type
+            <select id="gridType">
+              <option value="grat">Lat/Long graticule</option>
+              <option value="utm">UTM grid</option>
+              <option value="mgrs">MGRS grid</option>
+            </select>
+          </label>
+          <label class="fld" id="gratIntWrap">Interval
+            <select id="gratInt">
+              <option value="auto">Auto (by zoom)</option>
+              <option value="30">30°</option><option value="10">10°</option>
+              <option value="5">5°</option><option value="1">1°</option>
+              <option value="0.5">0.5°</option><option value="0.25">0.25°</option>
+              <option value="0.1">0.1°</option><option value="0.05">0.05°</option>
+              <option value="0.01">0.01°</option>
+            </select>
+          </label>
+          <label class="fld" id="utmSpWrap" hidden>Spacing
+            <select id="utmSp">
+              <option value="auto">Auto (by zoom)</option>
+              <option value="100000">100 km</option>
+              <option value="10000">10 km</option>
+              <option value="1000">1 km</option>
+            </select>
+          </label>
+          <label class="fld" id="mgrsSpWrap" hidden>Detail
+            <select id="mgrsSp">
+              <option value="auto">Auto (by zoom)</option>
+              <option value="gzd">Zones only</option>
+              <option value="100000">100 km squares</option>
+              <option value="10000">10 km</option>
+              <option value="1000">1 km</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <span class="grouplbl">Labels</span>
+          <label class="fld"><input type="checkbox" id="lblOn" checked> show</label>
+          <label class="fld" id="fmtWrap">Format
+            <select id="lblFmt"><option value="dd">DD</option><option value="dms">DMS</option></select>
+          </label>
+          <label class="fld">Color <input type="color" id="lblColor" value="#33415c"></label>
+          <label class="fld">Size <input type="range" id="lblSize" min="8" max="18" step="1" value="11"> <span id="lblSizeVal" class="note" style="min-width:3ch">11</span></label>
+        </div>
+        <div class="row">
+          <span class="grouplbl">Major</span>
+          <label class="fld">Color <input type="color" id="majColor" value="#2563eb"></label>
+          <label class="fld">Weight <input type="range" id="majW" min="0.5" max="5" step="0.1" value="1.6"></label>
+          <label class="fld">Opacity <input type="range" id="majO" min="0.1" max="1" step="0.05" value="0.85"></label>
+          <label class="fld">Dash
+            <select id="majD"><option value="">solid</option><option value="6 4">dashed</option><option value="1.5 4">dotted</option></select>
+          </label>
+        </div>
+        <div class="row">
+          <span class="grouplbl">Minor</span>
+          <label class="fld">Color <input type="color" id="minColor" value="#7a8aa0"></label>
+          <label class="fld">Weight <input type="range" id="minW" min="0.3" max="4" step="0.1" value="0.8"></label>
+          <label class="fld">Opacity <input type="range" id="minO" min="0.1" max="1" step="0.05" value="0.5"></label>
+          <label class="fld">Dash
+            <select id="minD"><option value="">solid</option><option value="6 4">dashed</option><option value="1.5 4">dotted</option></select>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="row">
+          <span class="grouplbl">Extent</span>
+          <label class="fld"><input type="checkbox" id="fixOn"> Fix extent</label>
+          <button class="btn small" id="useView" type="button">Use current view</button>
+          <button class="btn small" id="drawBox" type="button">✏️ Draw box</button>
+          <span class="spacer"></span>
+          <button class="btn small" id="clearFix" type="button">Clear</button>
+        </div>
+        <div class="row">
+          <div class="extent-fields" style="flex:1">
+            <div class="field"><label for="fxW">West</label><input id="fxW" type="number" step="any" placeholder="-71.12"></div>
+            <div class="field"><label for="fxS">South</label><input id="fxS" type="number" step="any" placeholder="42.31"></div>
+            <div class="field"><label for="fxE">East</label><input id="fxE" type="number" step="any" placeholder="-71.00"></div>
+            <div class="field"><label for="fxN">North</label><input id="fxN" type="number" step="any" placeholder="42.40"></div>
+          </div>
+        </div>
+        <div class="row"><p class="note" id="extNote">Grid follows the current map view. Fix an extent to lock what exports cover.</p></div>
+      </section>
+
+      <section class="panel">
+        <div class="row">
+          <span class="grouplbl">Export</span>
+          <button class="btn primary" id="expGeo" type="button">⬇ GeoJSON</button>
+          <button class="btn" id="expSvg" type="button">⬇ SVG</button>
+          <button class="btn" id="copySum" type="button">⧉ Copy summary</button>
+        </div>
+        <div class="row"><p class="note" id="status"></p></div>
+      </section>
+    </div>
+
+    <section>
+      <div id="map" aria-label="Map with grid overlay"></div>
+    </section>
+  </div>
+
+  <footer class="app">
+    Pan and zoom — the grid redraws itself. The URL <code>#hash</code> stores your view and grid settings, so the link is shareable. Nothing is uploaded.
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   Coordinate Grid Generator — standalone, client-side.
+   Only dependency: Leaflet 1.9.4 (background-loaded at the bottom
+   so a slow CDN can never block first paint).
+   UTM math reused from coordinate-converter.html (WGS84 series).
+   ============================================================ */
+'use strict';
+const $ = (id) => document.getElementById(id);
+
+/* ---------------- WGS84 / UTM math (from coordinate-converter.html) ---------------- */
+const A = 6378137.0;               // semi-major axis
+const F = 1 / 298.257223563;       // flattening
+const K0 = 0.9996;
+const E2 = F * (2 - F);            // first eccentricity squared
+const EP2 = E2 / (1 - E2);
+const RAD = Math.PI / 180, DEG = 180 / Math.PI;
+
+function normLng(l) { return ((l + 540) % 360) - 180; }
+// bring lon into the same 360° world copy as ref (for antimeridian work)
+function unwrapTo(lon, ref) { return lon + Math.round((ref - lon) / 360) * 360; }
+
+function lonToZone(lat, lon) {
+  lon = normLng(lon);
+  let zone = Math.floor((lon + 180) / 6) + 1;
+  if (zone > 60) zone = 60;
+  // Norway / Svalbard exceptions
+  if (lat >= 56 && lat < 64 && lon >= 3 && lon < 12) zone = 32;
+  if (lat >= 72 && lat < 84) {
+    if (lon >= 0 && lon < 9)  zone = 31;
+    else if (lon >= 9  && lon < 21) zone = 33;
+    else if (lon >= 21 && lon < 33) zone = 35;
+    else if (lon >= 33 && lon < 42) zone = 37;
+  }
+  return zone;
+}
+
+// lat/lon (deg) -> {zone, hemi, easting, northing}. Optional forceZone keeps the
+// projection in one zone even for points just past its edge (needed for grids).
+function llToUTM(lat, lon, forceZone) {
+  const zone = forceZone || lonToZone(lat, normLng(lon));
+  const lon0 = ((zone - 1) * 6 - 180 + 3) * RAD;
+  const phi = lat * RAD;
+  let lam = normLng(lon) * RAD;
+  // keep the longitude difference small around the antimeridian
+  if (lam - lon0 > Math.PI) lam -= 2 * Math.PI;
+  if (lam - lon0 < -Math.PI) lam += 2 * Math.PI;
+  const sinP = Math.sin(phi), cosP = Math.cos(phi), tanP = Math.tan(phi);
+  const N = A / Math.sqrt(1 - E2 * sinP * sinP);
+  const T = tanP * tanP;
+  const C = EP2 * cosP * cosP;
+  const Aa = cosP * (lam - lon0);
+  const M = A * (
+      (1 - E2 / 4 - 3 * E2 * E2 / 64 - 5 * E2 ** 3 / 256) * phi
+    - (3 * E2 / 8 + 3 * E2 * E2 / 32 + 45 * E2 ** 3 / 1024) * Math.sin(2 * phi)
+    + (15 * E2 * E2 / 256 + 45 * E2 ** 3 / 1024) * Math.sin(4 * phi)
+    - (35 * E2 ** 3 / 3072) * Math.sin(6 * phi));
+  const easting = K0 * N * (Aa + (1 - T + C) * Aa ** 3 / 6
+    + (5 - 18 * T + T * T + 72 * C - 58 * EP2) * Aa ** 5 / 120) + 500000;
+  let northing = K0 * (M + N * tanP * (Aa * Aa / 2
+    + (5 - T + 9 * C + 4 * C * C) * Aa ** 4 / 24
+    + (61 - 58 * T + T * T + 600 * C - 330 * EP2) * Aa ** 6 / 720));
+  const hemi = lat >= 0 ? 'N' : 'S';
+  if (lat < 0) northing += 10000000;
+  return { zone, hemi, easting, northing };
+}
+
+// {zone, hemi, easting, northing} -> {lat, lon} (deg)
+function utmToLL(zone, hemi, easting, northing) {
+  const x = easting - 500000;
+  let y = northing;
+  if (hemi === 'S') y -= 10000000;
+  const lon0 = ((zone - 1) * 6 - 180 + 3) * RAD;
+  const M = y / K0;
+  const mu = M / (A * (1 - E2 / 4 - 3 * E2 * E2 / 64 - 5 * E2 ** 3 / 256));
+  const e1 = (1 - Math.sqrt(1 - E2)) / (1 + Math.sqrt(1 - E2));
+  const phi1 = mu
+    + (3 * e1 / 2 - 27 * e1 ** 3 / 32) * Math.sin(2 * mu)
+    + (21 * e1 * e1 / 16 - 55 * e1 ** 4 / 32) * Math.sin(4 * mu)
+    + (151 * e1 ** 3 / 96) * Math.sin(6 * mu)
+    + (1097 * e1 ** 4 / 512) * Math.sin(8 * mu);
+  const sinP = Math.sin(phi1), cosP = Math.cos(phi1), tanP = Math.tan(phi1);
+  const C1 = EP2 * cosP * cosP;
+  const T1 = tanP * tanP;
+  const N1 = A / Math.sqrt(1 - E2 * sinP * sinP);
+  const R1 = A * (1 - E2) / Math.pow(1 - E2 * sinP * sinP, 1.5);
+  const D = x / (N1 * K0);
+  const lat = phi1 - (N1 * tanP / R1) * (D * D / 2
+    - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * EP2) * D ** 4 / 24
+    + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * EP2 - 3 * C1 * C1) * D ** 6 / 720);
+  const lon = lon0 + (D - (1 + 2 * T1 + C1) * D ** 3 / 6
+    + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * EP2 + 24 * T1 * T1) * D ** 5 / 120) / cosP;
+  return { lat: lat * DEG, lon: lon * DEG };
+}
+
+/* ---------------- MGRS lettering (AA scheme, matches the mgrs npm lib) ---------------- */
+const MGRS_COLS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';   // 24, no I/O
+const MGRS_ROWS = 'ABCDEFGHJKLMNPQRSTUV';        // 20, no I/O
+const BAND_LETTERS = 'CDEFGHJKLMNPQRSTUVWX';     // -80..72 in 8° steps, X = 72..84
+
+function e100kLetters(zone, easting, northing) {
+  const colIdx = ((zone - 1) % 3) * 8 + (Math.floor(easting / 100000) - 1);
+  let rowIdx = Math.floor(northing / 100000) % 20;
+  if (zone % 2 === 0) rowIdx = (rowIdx + 5) % 20;
+  const col = MGRS_COLS[((colIdx % 24) + 24) % 24];
+  const row = MGRS_ROWS[((rowIdx % 20) + 20) % 20];
+  return col + row;
+}
+function latBand(lat) {
+  if (lat >= 72 && lat <= 84) return 'X';
+  if (lat < -80 || lat > 84) return '';
+  return BAND_LETTERS[Math.min(19, Math.floor((lat + 80) / 8))];
+}
+
+/* ---------------- geometry helpers ---------------- */
+// Liang–Barsky clip of segment a->b ([lat,lng]) to rect (unwrapped lngs)
+function clipSeg(a, b, w, s, e, n) {
+  let t0 = 0, t1 = 1;
+  const dx = b[1] - a[1], dy = b[0] - a[0];
+  const p = [-dx, dx, -dy, dy];
+  const q = [a[1] - w, e - a[1], a[0] - s, n - a[0]];
+  for (let i = 0; i < 4; i++) {
+    if (Math.abs(p[i]) < 1e-12) { if (q[i] < 0) return null; }
+    else {
+      const r = q[i] / p[i];
+      if (p[i] < 0) { if (r > t1) return null; if (r > t0) t0 = r; }
+      else { if (r < t0) return null; if (r < t1) t1 = r; }
+    }
+  }
+  return [[a[0] + dy * t0, a[1] + dx * t0], [a[0] + dy * t1, a[1] + dx * t1]];
+}
+// clip a polyline to a rect; returns array of polylines (may be split)
+function clipPoly(pts, w, s, e, n) {
+  const out = [];
+  let cur = null;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const seg = clipSeg(pts[i], pts[i + 1], w, s, e, n);
+    if (!seg) { cur = null; continue; }
+    if (cur && Math.abs(cur[cur.length - 1][0] - seg[0][0]) < 1e-9 && Math.abs(cur[cur.length - 1][1] - seg[0][1]) < 1e-9) {
+      cur.push(seg[1]);
+    } else {
+      cur = [seg[0], seg[1]];
+      out.push(cur);
+    }
+  }
+  return out.filter(p => p.length >= 2);
+}
+
+/* ================= App state ================= */
+const state = {
+  type: 'grat',
+  gratInt: 'auto',
+  utmSp: 'auto',
+  mgrsSp: 'auto',
+  labels: true,
+  fmt: 'dd',
+  maj: { color: '#2563eb', w: 1.6, o: 0.85, dash: '' },
+  min: { color: '#7a8aa0', w: 0.8, o: 0.5, dash: '' },
+  lab: { color: '#33415c', size: 11 },
+  fixed: false,
+  fb: null,                 // {w,s,e,n} unwrapped, w < e
+  lastBuild: null,          // cache of last generated grid (for exports)
+};
+const MAX_LINES = 4000, MAX_LABELS = 450;
+const GRAT_STEPS = [30, 10, 5, 1, 0.5, 0.25, 0.1, 0.05, 0.01];
+let map = null, gridLayer = null, fixRect = null;
+
+/* ---------------- extent ---------------- */
+function viewExtent() {
+  if (!map) return { w: -75, s: 40, e: -69, n: 44 };
+  const b = map.getBounds();
+  return { w: b.getWest(), s: Math.max(-85, b.getSouth()), e: b.getEast(), n: Math.min(85, b.getNorth()) };
+}
+function activeExtent() {
+  return (state.fixed && state.fb) ? state.fb : viewExtent();
+}
+function curZoom() { return map ? map.getZoom() : 12; }
+
+/* ---------------- auto intervals ---------------- */
+function autoGratInterval(z) {
+  if (z <= 2) return 30;
+  if (z <= 3) return 10;
+  if (z <= 4) return 5;
+  if (z <= 6) return 1;
+  if (z <= 7) return 0.5;
+  if (z <= 8) return 0.25;
+  if (z <= 10) return 0.1;
+  if (z <= 12) return 0.05;
+  return 0.01;
+}
+function autoUtmSpacing(z) { return z >= 12 ? 1000 : (z >= 9 ? 10000 : 100000); }
+function autoMgrsSpacing(z) { return z >= 13 ? 1000 : (z >= 10 ? 10000 : (z >= 6 ? 100000 : 0)); } // 0 = GZD only
+
+function gratInterval() { return state.gratInt === 'auto' ? autoGratInterval(curZoom()) : parseFloat(state.gratInt); }
+function utmSpacing() { return state.utmSp === 'auto' ? autoUtmSpacing(curZoom()) : parseInt(state.utmSp, 10); }
+function mgrsSpacing() {
+  if (state.mgrsSp === 'auto') return autoMgrsSpacing(curZoom());
+  if (state.mgrsSp === 'gzd') return 0;
+  return parseInt(state.mgrsSp, 10);
+}
+
+/* ---------------- label formatting ---------------- */
+function fmtDeg(v, isLat) {
+  const disp = isLat ? v : normLng(v);
+  const hemi = disp < 0 ? (isLat ? 'S' : 'W') : (isLat ? 'N' : 'E');
+  const a = Math.abs(disp);
+  if (state.fmt === 'dd') {
+    const t = parseFloat(a.toFixed(5));
+    return a === 0 ? '0°' : `${t}°${hemi}`;
+  }
+  let d = Math.floor(a);
+  let mf = (a - d) * 60;
+  let m = Math.floor(mf);
+  let s = Math.round((mf - m) * 60 * 10) / 10;
+  if (s >= 60) { s -= 60; m++; }
+  if (m >= 60) { m -= 60; d++; }
+  let out = `${d}°`;
+  if (m || s) out += `${String(m).padStart(2, '0')}′`;
+  if (s) out += `${s % 1 ? s.toFixed(1) : s}″`;
+  return a === 0 ? '0°' : out + hemi;
+}
+function fmtKm(v) { return (v / 1000).toLocaleString('en-US'); }
+
+/* ================= Grid builders =================
+   Each returns { lines: [{pts, cls, type, value, label}], labels: [{lat,lng,text,cls,size?}], meta:{} }
+   pts are [lat, unwrappedLng] pairs; cls is 'maj' | 'min' | 'zone'. */
+
+function buildGraticule(ext, interval) {
+  const lines = [], labels = [];
+  const isMajor = v => Math.abs(v / (interval * 5) - Math.round(v / (interval * 5))) < 1e-6;
+  const latInset = (ext.n - ext.s) * 0.015, lngInset = (ext.e - ext.w) * 0.012;
+  const s = Math.max(-90, ext.s), n = Math.min(90, ext.n);
+  // meridians
+  const m0 = Math.ceil(ext.w / interval - 1e-9), m1 = Math.floor(ext.e / interval + 1e-9);
+  const nMer = m1 - m0 + 1, labelEvery = nMer > 40 ? 5 : 1;
+  for (let i = m0; i <= m1; i++) {
+    const v = +(i * interval).toFixed(8);
+    const maj = isMajor(v);
+    lines.push({ pts: [[s, v], [n, v]], cls: maj ? 'maj' : 'min', type: 'meridian', value: normLng(v), label: fmtDeg(v, false) });
+    if ((maj || labelEvery === 1) && (i - m0) % labelEvery === 0)
+      labels.push({ lat: n - latInset, lng: v, text: fmtDeg(v, false), cls: maj ? 'maj' : 'min' });
+  }
+  // parallels
+  const p0 = Math.ceil(s / interval - 1e-9), p1 = Math.floor(n / interval + 1e-9);
+  const nPar = p1 - p0 + 1, labelEvery2 = nPar > 40 ? 5 : 1;
+  for (let i = p0; i <= p1; i++) {
+    const v = +(i * interval).toFixed(8);
+    const maj = isMajor(v);
+    lines.push({ pts: [[v, ext.w], [v, ext.e]], cls: maj ? 'maj' : 'min', type: 'parallel', value: v, label: fmtDeg(v, true) });
+    if ((maj || labelEvery2 === 1) && (i - p0) % labelEvery2 === 0)
+      labels.push({ lat: v, lng: ext.w + lngInset, text: fmtDeg(v, true), cls: maj ? 'maj' : 'min' });
+  }
+  return { lines, labels, meta: { interval, meridians: nMer, parallels: Math.max(0, nPar), unit: '°' } };
+}
+
+// UTM min/max easting+northing over a lat/lng rect, by sampling its perimeter
+function utmRangeForRect(zone, w, s, e, n) {
+  let minE = Infinity, maxE = -Infinity, minN = Infinity, maxN = -Infinity, hemi = s >= 0 ? 'N' : 'S';
+  const K = 8;
+  const consider = (lat, lon) => {
+    const u = llToUTM(lat, lon, zone);
+    if (u.easting < minE) minE = u.easting;
+    if (u.easting > maxE) maxE = u.easting;
+    if (u.northing < minN) minN = u.northing;
+    if (u.northing > maxN) maxN = u.northing;
+  };
+  for (let i = 0; i <= K; i++) {
+    const lat = s + (n - s) * i / K, lon = w + (e - w) * i / K;
+    consider(lat, w); consider(lat, e); consider(s, lon); consider(n, lon);
+  }
+  return { minE, maxE, minN, maxN, hemi };
+}
+
+// generate one UTM grid line (constant easting or northing), sampled + clipped
+function utmGridLine(zone, hemi, which, value, from, to, rect, lngRef) {
+  const steps = Math.min(120, Math.max(2, Math.ceil((to - from) / 25000)));
+  const pts = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = from + (to - from) * i / steps;
+    const ll = which === 'E' ? utmToLL(zone, hemi, value, t) : utmToLL(zone, hemi, t, value);
+    pts.push([ll.lat, unwrapTo(ll.lon, lngRef)]);
+  }
+  return clipPoly(pts, rect.w, rect.s, rect.e, rect.n);
+}
+
+// lay UTM lines for one zone-chunk × hemisphere part; pushes into out
+function utmLinesForPart(out, zone, part, sp, majEvery, lngRef, labelsOn) {
+  const { minE, maxE, minN, maxN, hemi } = utmRangeForRect(zone, part.w, part.s, part.e, part.n);
+  if (!isFinite(minE)) return;
+  const e0 = Math.floor(minE / sp) * sp, e1 = Math.ceil(maxE / sp) * sp;
+  const n0 = Math.floor(minN / sp) * sp, n1 = Math.ceil(maxN / sp) * sp;
+  if ((e1 - e0) / sp + (n1 - n0) / sp > 2600) { out.overflow = true; return; }
+  for (let ev = e0; ev <= e1; ev += sp) {
+    const maj = ev % (sp * majEvery) === 0;
+    for (const seg of utmGridLine(zone, hemi, 'E', ev, n0, n1, part, lngRef)) {
+      out.lines.push({ pts: seg, cls: maj ? 'maj' : 'min', type: 'utm-easting', value: ev, label: `${fmtKm(ev)}E`, zone });
+      if (labelsOn && (maj || sp >= 100000)) {
+        const p = seg[0][0] < seg[seg.length - 1][0] ? seg[0] : seg[seg.length - 1]; // south end
+        out.labels.push({ lat: p[0], lng: p[1], text: fmtKm(ev), cls: maj ? 'maj' : 'min' });
+      }
+    }
+  }
+  for (let nv = n0; nv <= n1; nv += sp) {
+    const maj = nv % (sp * majEvery) === 0;
+    for (const seg of utmGridLine(zone, hemi, 'N', nv, e0, e1, part, lngRef)) {
+      out.lines.push({ pts: seg, cls: maj ? 'maj' : 'min', type: 'utm-northing', value: nv, label: `${fmtKm(nv)}N`, zone });
+      if (labelsOn && (maj || sp >= 100000)) {
+        const p = seg[0][1] < seg[seg.length - 1][1] ? seg[0] : seg[seg.length - 1]; // west end
+        out.labels.push({ lat: p[0], lng: p[1], text: fmtKm(nv), cls: maj ? 'maj' : 'min' });
+      }
+    }
+  }
+}
+
+// split extent into standard 6° zone chunks (unwrapped lngs preserved)
+function zoneChunks(ext) {
+  const chunks = [];
+  const start = Math.floor(ext.w / 6) * 6;
+  for (let lon = start; lon < ext.e; lon += 6) {
+    const zw = Math.max(lon, ext.w), ze = Math.min(lon + 6, ext.e);
+    if (ze - zw < 1e-9) continue;
+    let zone = Math.floor((normLng(lon + 3) + 180) / 6) + 1;
+    if (zone > 60) zone = 60;
+    chunks.push({ zone, zw, ze, bw: lon, be: lon + 6 });
+  }
+  return chunks;
+}
+
+function buildUTM(ext, sp) {
+  const out = { lines: [], labels: [], overflow: false };
+  const clampedN = Math.min(ext.n, 84), clampedS = Math.max(ext.s, -80);
+  const clamped = (ext.n > 84 || ext.s < -80);
+  const meta = { spacing: sp, clamped, zones: new Set(), unit: 'km' };
+  if (clampedN <= clampedS) return { lines: [], labels: [], meta };
+  const lngRef = (ext.w + ext.e) / 2;
+  const chunks = zoneChunks(ext);
+  for (const c of chunks) {
+    meta.zones.add(c.zone);
+    // hemisphere split (false northing differs)
+    const parts = [];
+    if (clampedN > 0) parts.push({ w: c.zw, e: c.ze, s: Math.max(clampedS, 0), n: clampedN });
+    if (clampedS < 0) parts.push({ w: c.zw, e: c.ze, s: clampedS, n: Math.min(clampedN, 0) });
+    for (const part of parts) {
+      if (part.n - part.s < 1e-9) continue;
+      utmLinesForPart(out, c.zone, part, sp, 10, lngRef, state.labels);
+      if (out.overflow) return { lines: [], labels: [], meta: Object.assign(meta, { overflow: true }) };
+    }
+    // zone boundary meridians (dashed)
+    if (c.bw >= ext.w - 1e-9 && c.bw > ext.w + 1e-9) {
+      out.lines.push({ pts: [[clampedS, c.bw], [clampedN, c.bw]], cls: 'zone', type: 'zone-boundary', value: normLng(c.bw), label: `UTM zone boundary ${normLng(c.bw)}°` });
+      if (state.labels) {
+        const zL = Math.floor((normLng(c.bw - 3) + 180) / 6) + 1;
+        out.labels.push({ lat: clampedN - (clampedN - clampedS) * 0.04, lng: c.bw, text: `${zL}|${c.zone}`, cls: 'zone' });
+      }
+    }
+  }
+  meta.lines = out.lines.length;
+  return { lines: out.lines, labels: out.labels, meta };
+}
+
+/* ---------------- MGRS ---------------- */
+// GZD longitude boundaries inside [w,e] for one latitude band, honoring
+// the Norway (32V) and Svalbard (31X..37X) exceptions.
+function gzdBoundaries(band, w, e) {
+  const res = [];
+  for (let lon = Math.ceil(w / 6) * 6; lon <= e; lon += 6) {
+    const nl = normLng(lon);
+    if (band === 'V' && nl === 6) continue;                    // 31/32 boundary moved to 3°E
+    if (band === 'X' && [6, 12, 18, 24, 30, 36].includes(nl)) continue; // widened Svalbard zones
+    res.push(lon);
+  }
+  const extras = band === 'V' ? [3] : (band === 'X' ? [9, 21, 33] : []);
+  for (const x of extras) {
+    for (let k = Math.ceil((w - x) / 360); x + 360 * k <= e; k++) {
+      if (x + 360 * k >= w) res.push(x + 360 * k);
+    }
+  }
+  return res.sort((a, b) => a - b);
+}
+
+const BAND_EDGES = (() => { const a = []; for (let l = -80; l <= 72; l += 8) a.push(l); a.push(84); return a; })();
+
+function buildMGRS(ext, sp) {
+  const lines = [], labels = [];
+  const clampedN = Math.min(ext.n, 84), clampedS = Math.max(ext.s, -80);
+  const clamped = (ext.n > 84 || ext.s < -80);
+  const meta = { spacing: sp, clamped, zones: new Set(), squares: 0, unit: 'km' };
+  if (clampedN <= clampedS) return { lines, labels, meta };
+  const lngRef = (ext.w + ext.e) / 2;
+
+  // ---- GZD parallels ----
+  for (const lat of BAND_EDGES) {
+    if (lat > clampedS && lat < clampedN + 1e-9 && lat >= clampedS - 1e-9) {
+      if (lat < clampedS || lat > clampedN) continue;
+      lines.push({ pts: [[lat, ext.w], [lat, ext.e]], cls: 'zone', type: 'gzd-parallel', value: lat, label: fmtDeg(lat, true) });
+    }
+  }
+  // ---- bands intersecting extent ----
+  const bands = [];
+  for (let i = 0; i < BAND_EDGES.length - 1; i++) {
+    const b0 = BAND_EDGES[i], b1 = BAND_EDGES[i + 1];
+    if (b1 > clampedS && b0 < clampedN) bands.push({ s: Math.max(b0, clampedS), n: Math.min(b1, clampedN), letter: BAND_LETTERS[i], full: [b0, b1] });
+  }
+  const out = { lines, labels, overflow: false };
+  for (const band of bands) {
+    const bounds = gzdBoundaries(band.letter, ext.w - 12, ext.e + 12); // ±12: X-band zones are up to 12° wide
+    // meridian segments for this band
+    for (const lon of bounds) {
+      if (lon > ext.w + 1e-9 && lon < ext.e - 1e-9)
+        lines.push({ pts: [[band.s, lon], [band.n, lon]], cls: 'zone', type: 'gzd-meridian', value: normLng(lon), label: fmtDeg(lon, false) });
+    }
+    // cells between consecutive boundaries
+    for (let i = 0; i < bounds.length - 1; i++) {
+      const cw = Math.max(bounds[i], ext.w), ce = Math.min(bounds[i + 1], ext.e);
+      if (ce - cw < 1e-9) continue;
+      const midLon = (bounds[i] + bounds[i + 1]) / 2;
+      const zone = lonToZone((band.full[0] + band.full[1]) / 2, midLon);
+      meta.zones.add(zone);
+      // GZD label at visible-cell centre
+      if (state.labels) labels.push({ lat: (band.s + band.n) / 2, lng: (cw + ce) / 2, text: `${zone}${band.letter}`, cls: 'gzd' });
+      if (!sp) continue;
+      const cell = { w: cw, s: band.s, e: ce, n: band.n };
+      // grid lines within the cell — always draw 100 km net; finer if requested
+      utmLinesForPart(out, zone, cell, sp, sp === 100000 ? 1e9 : (100000 / sp), lngRef, state.labels && sp < 100000);
+      if (out.overflow) return { lines: [], labels: [], meta: Object.assign(meta, { overflow: true }) };
+      // 100 km square letter labels
+      if (state.labels) {
+        const r = utmRangeForRect(zone, cell.w, cell.s, cell.e, cell.n);
+        const eA = Math.floor(r.minE / 100000) * 100000, eB = Math.ceil(r.maxE / 100000) * 100000;
+        const nA = Math.floor(r.minN / 100000) * 100000, nB = Math.ceil(r.maxN / 100000) * 100000;
+        if ((eB - eA) / 100000 * (nB - nA) / 100000 <= 400) {
+          for (let ev = eA; ev < eB; ev += 100000) {
+            for (let nv = nA; nv < nB; nv += 100000) {
+              const ll = utmToLL(zone, r.hemi, ev + 50000, nv + 50000);
+              const lon = unwrapTo(ll.lon, lngRef);
+              if (ll.lat > cell.s && ll.lat < cell.n && lon > cell.w && lon < cell.e) {
+                labels.push({ lat: ll.lat, lng: lon, text: e100kLetters(zone, ev + 50000, nv + 50000), cls: 'sq' });
+                meta.squares++;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  meta.lines = lines.length;
+  return { lines, labels, meta };
+}
+
+/* ================= Build + render ================= */
+function buildGrid(ext) {
+  if (state.type === 'grat') return buildGraticule(ext, gratInterval());
+  if (state.type === 'utm') return buildUTM(ext, utmSpacing());
+  return buildMGRS(ext, mgrsSpacing());
+}
+
+function styleFor(cls) {
+  if (cls === 'zone') return { color: state.maj.color, weight: Math.min(5, state.maj.w + 0.6), opacity: state.maj.o, dashArray: '8 5' };
+  const s = cls === 'maj' ? state.maj : state.min;
+  return { color: s.color, weight: s.w, opacity: s.o, dashArray: s.dash || null };
+}
+
+function labelIcon(l) {
+  const base = state.lab.size;
+  let size = base, weight = 600, op = 1;
+  if (l.cls === 'gzd') { size = base + 5; weight = 700; op = .85; }
+  else if (l.cls === 'sq') { size = base + 2; weight = 700; op = .8; }
+  else if (l.cls === 'min') { op = .75; }
+  const html = `<span style="color:${state.lab.color};font-size:${size}px;font-weight:${weight};opacity:${op}">${l.text}</span>`;
+  return L.divIcon({ className: 'grid-lbl', html, iconSize: null, iconAnchor: [0, 0] });
+}
+
+let statusErr = false;
+function setStatus(msg, err) {
+  const el = $('status');
+  el.textContent = msg;
+  el.classList.toggle('err', !!err);
+  statusErr = !!err;
+}
+
+function regen() {
+  if (!map || !gridLayer) return;
+  const ext = activeExtent();
+  let built;
+  try { built = buildGrid(ext); }
+  catch (err) { console.warn('grid build failed', err); setStatus('Could not build the grid for this view — try a different extent.', true); return; }
+  state.lastBuild = { built, ext, type: state.type };
+  gridLayer.clearLayers();
+
+  if (built.meta.overflow || built.lines.length > MAX_LINES) {
+    setStatus('Grid too dense for this extent — zoom in or pick a coarser interval.', true);
+    updateSummaryNote(built, ext, true);
+    return;
+  }
+  for (const ln of built.lines) gridLayer.addLayer(L.polyline(ln.pts, Object.assign({ interactive: false }, styleFor(ln.cls))));
+  if (state.labels) {
+    const labs = built.labels.slice(0, MAX_LABELS);
+    for (const l of labs) gridLayer.addLayer(L.marker([l.lat, l.lng], { icon: labelIcon(l), interactive: false, keyboard: false }));
+  }
+  updateSummaryNote(built, ext, false);
+}
+
+function intervalText(built) {
+  if (state.type === 'grat') return `${built.meta.interval}° interval`;
+  const sp = built.meta.spacing;
+  if (state.type === 'mgrs' && !sp) return 'grid zones only';
+  return `${sp / 1000} km spacing`;
+}
+function updateSummaryNote(built, ext, overflowed) {
+  const bits = [];
+  if (!overflowed) {
+    bits.push(`${built.lines.length} line${built.lines.length === 1 ? '' : 's'}`);
+    bits.push(intervalText(built));
+    if (built.meta.zones && built.meta.zones.size) {
+      const z = [...built.meta.zones].sort((a, b) => a - b);
+      bits.push(`zone${z.length > 1 ? 's' : ''} ${z.length > 2 ? z[0] + '–' + z[z.length - 1] : z.join(', ')}`);
+    }
+    if (built.meta.squares) bits.push(`${built.meta.squares} × 100 km squares`);
+  }
+  if (built.meta.clamped) bits.push('clamped to 80°S–84°N (UTM/MGRS limit)');
+  if (state.fixed) bits.push('fixed extent');
+  if (!statusErr || !overflowed) setStatus(bits.join(' · '), overflowed ? true : false);
+  if (overflowed) setStatus('Grid too dense for this extent — zoom in or pick a coarser interval.' + (built.meta.clamped ? ' (Also clamped to 80°S–84°N.)' : ''), true);
+}
+
+/* ================= Exports ================= */
+function exportBuild() {
+  // always regenerate for the export extent so it is current
+  const ext = activeExtent();
+  return { built: buildGrid(ext), ext };
+}
+
+function splitAntimeridian(pts) {
+  // pts: [lat, unwrapped lng] -> arrays of [lng(-180..180), lat] GeoJSON coords
+  const out = [];
+  let cur = [];
+  let prev = null;
+  for (const p of pts) {
+    const lng = normLng(p[1]);
+    if (prev !== null && Math.abs(lng - prev) > 180) { if (cur.length > 1) out.push(cur); cur = []; }
+    cur.push([+lng.toFixed(8), +p[0].toFixed(8)]);
+    prev = lng;
+  }
+  if (cur.length > 1) out.push(cur);
+  return out;
+}
+
+function buildGeoJSON() {
+  const { built, ext } = exportBuild();
+  const features = [];
+  for (const ln of built.lines) {
+    for (const coords of splitAntimeridian(ln.pts)) {
+      features.push({
+        type: 'Feature',
+        properties: { type: ln.type, class: ln.cls, value: ln.value, label: ln.label || null },
+        geometry: { type: 'LineString', coordinates: coords }
+      });
+    }
+  }
+  return {
+    type: 'FeatureCollection',
+    properties: {
+      generator: 'Coordinate Grid Generator', grid: state.type,
+      interval: intervalText(built),
+      extent: [normLng(ext.w), ext.s, normLng(ext.e), ext.n]
+    },
+    features
+  };
+}
+
+function download(name, textContent, mime) {
+  const blob = new Blob([textContent], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+function buildSVG() {
+  const { built, ext } = exportBuild();
+  const W = 1000;
+  const equirect = state.type === 'grat';
+  let project, H;
+  if (equirect) {
+    const k = W / (ext.e - ext.w);
+    H = Math.max(40, Math.round((ext.n - ext.s) * k));
+    project = (lat, lng) => [(lng - ext.w) * k, (ext.n - lat) * k];
+  } else {
+    // project everything in the UTM zone of the extent centre (straight grid there)
+    const cz = lonToZone((ext.s + ext.n) / 2, (ext.w + ext.e) / 2);
+    const r = utmRangeForRect(cz, ext.w, Math.max(ext.s, -80), ext.e, Math.min(ext.n, 84));
+    const k = W / Math.max(1, r.maxE - r.minE);
+    H = Math.max(40, Math.round((r.maxN - r.minN) * k));
+    project = (lat, lng) => {
+      const u = llToUTM(lat, lng, cz);
+      let n = u.northing;
+      if (r.hemi === 'N' && u.hemi === 'S') n -= 10000000;   // keep continuous across equator
+      if (r.hemi === 'S' && u.hemi === 'N') n += 10000000;
+      return [(u.easting - r.minE) * k, (r.maxN - n) * k];
+    };
+  }
+  const cls = { maj: state.maj, min: state.min };
+  const parts = [];
+  parts.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Menlo, Consolas, monospace">`);
+  parts.push(`<!-- ${esc(state.type)} grid · ${esc(intervalText(built))} · extent W${normLng(ext.w).toFixed(5)} S${ext.s.toFixed(5)} E${normLng(ext.e).toFixed(5)} N${ext.n.toFixed(5)} ${equirect ? '· equirectangular (plate carrée)' : '· transverse Mercator (UTM zone of centre)'} -->`);
+  parts.push(`<rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="#888" stroke-width="0.5"/>`);
+  for (const ln of built.lines) {
+    const st = ln.cls === 'zone'
+      ? { color: state.maj.color, w: Math.min(5, state.maj.w + 0.6), o: state.maj.o, dash: '8 5' }
+      : { color: cls[ln.cls].color, w: cls[ln.cls].w, o: cls[ln.cls].o, dash: cls[ln.cls].dash };
+    const d = ln.pts.map((p, i) => {
+      const [x, y] = project(p[0], p[1]);
+      return `${i ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`;
+    }).join(' ');
+    parts.push(`<path d="${d}" fill="none" stroke="${st.color}" stroke-width="${st.w}" stroke-opacity="${st.o}"${st.dash ? ` stroke-dasharray="${st.dash}"` : ''}/>`);
+  }
+  if (state.labels) {
+    for (const l of built.labels.slice(0, MAX_LABELS)) {
+      const [x, y] = project(l.lat, l.lng);
+      if (x < -20 || x > W + 20 || y < -20 || y > H + 20) continue;
+      const size = l.cls === 'gzd' ? state.lab.size + 5 : (l.cls === 'sq' ? state.lab.size + 2 : state.lab.size);
+      const anchor = (l.cls === 'gzd' || l.cls === 'sq') ? 'middle' : 'start';
+      parts.push(`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${size}" fill="${state.lab.color}" text-anchor="${anchor}" font-weight="600">${esc(l.text)}</text>`);
+    }
+  }
+  parts.push('</svg>');
+  return parts.join('\n');
+}
+
+function summaryText() {
+  const { built, ext } = exportBuild();
+  const names = { grat: 'Lat/Long graticule', utm: 'UTM grid', mgrs: 'MGRS grid' };
+  const lines = [
+    `${names[state.type]} — ${intervalText(built)}`,
+    `Extent: W ${normLng(ext.w).toFixed(5)}, S ${ext.s.toFixed(5)}, E ${normLng(ext.e).toFixed(5)}, N ${ext.n.toFixed(5)}${state.fixed ? ' (fixed)' : ' (current view)'}`,
+    `Lines: ${built.lines.length}`
+  ];
+  if (built.meta.zones && built.meta.zones.size) lines.push(`UTM zone(s): ${[...built.meta.zones].sort((a, b) => a - b).join(', ')}`);
+  if (built.meta.squares) lines.push(`100 km squares labeled: ${built.meta.squares}`);
+  if (built.meta.clamped) lines.push('Note: clamped to 80°S–84°N (UTM/MGRS validity limit).');
+  return lines.join('\n');
+}
+
+$('expGeo').addEventListener('click', () => {
+  try { download('coordinate-grid.geojson', JSON.stringify(buildGeoJSON(), null, 1), 'application/geo+json'); }
+  catch (err) { console.warn(err); setStatus('GeoJSON export failed for this extent.', true); }
+});
+$('expSvg').addEventListener('click', () => {
+  try { download('coordinate-grid.svg', buildSVG(), 'image/svg+xml'); }
+  catch (err) { console.warn(err); setStatus('SVG export failed for this extent.', true); }
+});
+$('copySum').addEventListener('click', async () => {
+  const btn = $('copySum');
+  try {
+    await navigator.clipboard.writeText(summaryText());
+    const old = btn.textContent;
+    btn.classList.add('copied'); btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = old; }, 1100);
+  } catch (err) { setStatus('Clipboard blocked by the browser — summary not copied.', true); }
+});
+
+/* ================= Controls wiring ================= */
+function refreshControlVisibility() {
+  $('gratIntWrap').hidden = state.type !== 'grat';
+  $('utmSpWrap').hidden = state.type !== 'utm';
+  $('mgrsSpWrap').hidden = state.type !== 'mgrs';
+  $('fmtWrap').style.display = state.type === 'grat' ? '' : 'none';
+}
+$('gridType').addEventListener('change', () => { state.type = $('gridType').value; refreshControlVisibility(); regen(); writeHash(); });
+$('gratInt').addEventListener('change', () => { state.gratInt = $('gratInt').value; regen(); writeHash(); });
+$('utmSp').addEventListener('change', () => { state.utmSp = $('utmSp').value; regen(); writeHash(); });
+$('mgrsSp').addEventListener('change', () => { state.mgrsSp = $('mgrsSp').value; regen(); writeHash(); });
+$('lblOn').addEventListener('change', () => { state.labels = $('lblOn').checked; regen(); writeHash(); });
+$('lblFmt').addEventListener('change', () => { state.fmt = $('lblFmt').value; regen(); writeHash(); });
+$('lblColor').addEventListener('input', () => { state.lab.color = $('lblColor').value; regen(); writeHash(); });
+$('lblSize').addEventListener('input', () => { state.lab.size = +$('lblSize').value; $('lblSizeVal').textContent = state.lab.size; regen(); writeHash(); });
+function wireStyle(prefix, target) {
+  $(prefix + 'Color').addEventListener('input', () => { target.color = $(prefix + 'Color').value; regen(); writeHash(); });
+  $(prefix + 'W').addEventListener('input', () => { target.w = +$(prefix + 'W').value; regen(); writeHash(); });
+  $(prefix + 'O').addEventListener('input', () => { target.o = +$(prefix + 'O').value; regen(); writeHash(); });
+  $(prefix + 'D').addEventListener('change', () => { target.dash = $(prefix + 'D').value; regen(); writeHash(); });
+}
+wireStyle('maj', state.maj);
+wireStyle('min', state.min);
+
+/* ---------------- fixed extent ---------------- */
+function readFixInputs() {
+  const w = parseFloat($('fxW').value), s = parseFloat($('fxS').value);
+  let e = parseFloat($('fxE').value); const n = parseFloat($('fxN').value);
+  if (![w, s, e, n].every(isFinite)) return null;
+  if (s < -90 || n > 90 || s >= n) return null;
+  if (e <= w) e += 360;             // typed W > E means the box crosses the antimeridian
+  if (e - w > 360) return null;
+  return { w, s, e, n };
+}
+function fillFixInputs(fb) {
+  $('fxW').value = +normLng(fb.w).toFixed(5);
+  $('fxS').value = +fb.s.toFixed(5);
+  $('fxE').value = +normLng(fb.e).toFixed(5);
+  $('fxN').value = +fb.n.toFixed(5);
+}
+function updateFixRect() {
+  if (fixRect) { gridLayerSafeRemove(fixRect); fixRect = null; }
+  if (map && state.fixed && state.fb) {
+    fixRect = L.rectangle([[state.fb.s, state.fb.w], [state.fb.n, state.fb.e]],
+      { color: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#2563eb', weight: 1.5, dashArray: '4 4', fill: false, interactive: false });
+    fixRect.addTo(map);
+  }
+  $('extNote').textContent = state.fixed && state.fb
+    ? 'Extent locked — pan freely; the grid and exports stay inside the dashed box.'
+    : 'Grid follows the current map view. Fix an extent to lock what exports cover.';
+}
+function gridLayerSafeRemove(layer) { try { map && map.removeLayer(layer); } catch (err) { /* already gone */ } }
+
+function applyFixed(on) {
+  state.fixed = on;
+  $('fixOn').checked = on;
+  if (on && !state.fb) {
+    const fromInputs = readFixInputs();
+    state.fb = fromInputs || viewExtent();
+    fillFixInputs(state.fb);
+  }
+  updateFixRect(); regen(); writeHash();
+}
+$('fixOn').addEventListener('change', () => applyFixed($('fixOn').checked));
+$('useView').addEventListener('click', () => { state.fb = viewExtent(); fillFixInputs(state.fb); applyFixed(true); });
+$('clearFix').addEventListener('click', () => { state.fb = null; ['fxW', 'fxS', 'fxE', 'fxN'].forEach(id => $(id).value = ''); applyFixed(false); });
+['fxW', 'fxS', 'fxE', 'fxN'].forEach(id => $(id).addEventListener('change', () => {
+  const fb = readFixInputs();
+  if (!fb) { if ($('fxW').value || $('fxS').value) setStatus('Extent needs W,S,E,N with South < North (−90..90).', true); return; }
+  state.fb = fb; applyFixed(true);
+}));
+
+/* draw-a-box mode (pointer events → works with mouse and touch) */
+let drawing = false, drawStart = null, drawRect = null;
+$('drawBox').addEventListener('click', () => {
+  if (!map) return;
+  drawing = !drawing;
+  $('drawBox').classList.toggle('active', drawing);
+  $('map').classList.toggle('boxdraw', drawing);
+  if (drawing) { map.dragging.disable(); setStatus('Drag on the map to draw the extent box. Press Esc to cancel.'); }
+  else { map.dragging.enable(); drawCleanup(); regen(); }
+});
+function drawCleanup() {
+  drawStart = null;
+  if (drawRect) { gridLayerSafeRemove(drawRect); drawRect = null; }
+}
+function endDrawMode() {
+  drawing = false;
+  $('drawBox').classList.remove('active');
+  $('map').classList.remove('boxdraw');
+  if (map) map.dragging.enable();
+  drawCleanup();
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawing) { endDrawMode(); regen(); } });
+function wireDraw() {
+  const el = map.getContainer();
+  el.addEventListener('pointerdown', (e) => {
+    if (!drawing) return;
+    e.preventDefault();
+    el.setPointerCapture && el.setPointerCapture(e.pointerId);
+    drawStart = map.mouseEventToLatLng(e);
+  });
+  el.addEventListener('pointermove', (e) => {
+    if (!drawing || !drawStart) return;
+    const p = map.mouseEventToLatLng(e);
+    const b = [[Math.min(drawStart.lat, p.lat), Math.min(drawStart.lng, p.lng)], [Math.max(drawStart.lat, p.lat), Math.max(drawStart.lng, p.lng)]];
+    if (!drawRect) drawRect = L.rectangle(b, { color: '#e2503c', weight: 1.5, dashArray: '4 4', fill: false, interactive: false }).addTo(map);
+    else drawRect.setBounds(b);
+  });
+  el.addEventListener('pointerup', (e) => {
+    if (!drawing || !drawStart) return;
+    const p = map.mouseEventToLatLng(e);
+    const fb = {
+      w: Math.min(drawStart.lng, p.lng), e: Math.max(drawStart.lng, p.lng),
+      s: Math.max(-85, Math.min(drawStart.lat, p.lat)), n: Math.min(85, Math.max(drawStart.lat, p.lat))
+    };
+    endDrawMode();
+    if (fb.e - fb.w < 1e-6 || fb.n - fb.s < 1e-6) { setStatus('Box too small — drag a larger rectangle.', true); regen(); return; }
+    state.fb = fb; fillFixInputs(fb); applyFixed(true);
+  });
+}
+
+/* ---------------- samples ---------------- */
+const SAMPLES = {
+  boston:   { c: [42.3601, -71.0589], z: 13, type: 'utm',  note: 'Boston at 1 km UTM grid (zone 19N).' },
+  world:    { c: [22, 0],             z: 2,  type: 'grat', note: 'World graticule at 10°.' },
+  denver:   { c: [39.5, -105.5],      z: 7,  type: 'mgrs', note: 'MGRS 100 km squares around Denver (13S).' },
+  london:   { c: [51.5, 0.0],         z: 10, type: 'utm',  note: 'UTM zone boundary 30/31 runs through Greenwich.' },
+  svalbard: { c: [78.5, 16],          z: 6,  type: 'mgrs', note: 'Svalbard — widened X-band zones; UTM/MGRS stop at 84°N.' },
+};
+$('samples').addEventListener('click', (ev) => {
+  const b = ev.target.closest('button[data-s]'); if (!b) return;
+  const smp = SAMPLES[b.dataset.s]; if (!smp) return;
+  state.type = smp.type; $('gridType').value = smp.type;
+  state.gratInt = 'auto'; $('gratInt').value = 'auto';
+  state.utmSp = 'auto'; $('utmSp').value = 'auto';
+  state.mgrsSp = 'auto'; $('mgrsSp').value = 'auto';
+  refreshControlVisibility();
+  if (map) map.setView(smp.c, smp.z);
+  setStatus(smp.note);
+  regen(); writeHash();
+});
+
+/* ---------------- shareable URL hash ---------------- */
+let hashTimer = null;
+function writeHash() {
+  clearTimeout(hashTimer);
+  hashTimer = setTimeout(() => {
+    if (!map) return;
+    const c = map.getCenter();
+    const obj = {
+      v: 1, c: [+c.lat.toFixed(5), +normLng(c.lng).toFixed(5)], z: map.getZoom(),
+      t: state.type, gi: state.gratInt, us: state.utmSp, ms: state.mgrsSp,
+      lb: state.labels ? 1 : 0, fm: state.fmt,
+      M: [state.maj.color, state.maj.w, state.maj.o, state.maj.dash],
+      m: [state.min.color, state.min.w, state.min.o, state.min.dash],
+      L: [state.lab.color, state.lab.size],
+      fx: state.fixed ? 1 : 0,
+      fb: state.fb ? [+state.fb.w.toFixed(5), +state.fb.s.toFixed(5), +state.fb.e.toFixed(5), +state.fb.n.toFixed(5)] : null
+    };
+    try {
+      const enc = btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+      history.replaceState(null, '', '#s=' + enc);
+    } catch (err) { /* hash write blocked; ignore */ }
+  }, 400);
+}
+function readHash() {
+  const m = location.hash.match(/#s=(.+)$/);
+  if (!m) return null;
+  try {
+    const obj = JSON.parse(decodeURIComponent(escape(atob(m[1]))));
+    if (!obj || obj.v !== 1) return null;
+    return obj;
+  } catch (err) { return null; }
+}
+function applyHash(h) {
+  const setStyle = (t, a) => { if (Array.isArray(a)) { t.color = String(a[0] || t.color); t.w = +a[1] || t.w; t.o = +a[2] || t.o; t.dash = typeof a[3] === 'string' ? a[3] : t.dash; } };
+  if (['grat', 'utm', 'mgrs'].includes(h.t)) state.type = h.t;
+  if (h.gi != null) state.gratInt = String(h.gi);
+  if (h.us != null) state.utmSp = String(h.us);
+  if (h.ms != null) state.mgrsSp = String(h.ms);
+  state.labels = h.lb !== 0;
+  if (h.fm === 'dms') state.fmt = 'dms';
+  setStyle(state.maj, h.M); setStyle(state.min, h.m);
+  if (Array.isArray(h.L)) { state.lab.color = String(h.L[0] || state.lab.color); state.lab.size = Math.min(18, Math.max(8, +h.L[1] || 11)); }
+  if (h.fx === 1 && Array.isArray(h.fb) && h.fb.length === 4 && h.fb.every(v => isFinite(v))) {
+    state.fixed = true;
+    state.fb = { w: +h.fb[0], s: +h.fb[1], e: +h.fb[2], n: +h.fb[3] };
+    if (state.fb.e <= state.fb.w) state.fb.e += 360;
+  }
+}
+function syncControlsFromState() {
+  $('gridType').value = state.type;
+  $('gratInt').value = GRAT_STEPS.includes(parseFloat(state.gratInt)) ? state.gratInt : 'auto';
+  $('utmSp').value = ['100000', '10000', '1000'].includes(state.utmSp) ? state.utmSp : 'auto';
+  $('mgrsSp').value = ['gzd', '100000', '10000', '1000'].includes(state.mgrsSp) ? state.mgrsSp : 'auto';
+  $('lblOn').checked = state.labels;
+  $('lblFmt').value = state.fmt;
+  $('lblColor').value = state.lab.color; $('lblSize').value = state.lab.size; $('lblSizeVal').textContent = state.lab.size;
+  $('majColor').value = state.maj.color; $('majW').value = state.maj.w; $('majO').value = state.maj.o; $('majD').value = state.maj.dash;
+  $('minColor').value = state.min.color; $('minW').value = state.min.w; $('minO').value = state.min.o; $('minD').value = state.min.dash;
+  $('fixOn').checked = state.fixed;
+  if (state.fb) fillFixInputs(state.fb);
+  refreshControlVisibility();
+}
+
+/* ---------------- theme toggle (shared max-theme key) ---------------- */
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+
+/* ---------------- Leaflet: background load with fallback ---------------- */
+let regenTimer = null;
+function initMap() {
+  if (map || !window.L || !$('map')) return;
+  const h = readHash();
+  let center = [42.3601, -71.0589], zoom = 13;
+  if (h) { applyHash(h); if (Array.isArray(h.c) && isFinite(h.c[0]) && isFinite(h.c[1])) center = [h.c[0], h.c[1]]; if (isFinite(h.z)) zoom = h.z; }
+  else { state.type = 'utm'; }   // default demo: Boston 1 km UTM grid
+  syncControlsFromState();
+
+  map = L.map('map', { worldCopyJump: false, zoomControl: true }).setView(center, zoom);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  gridLayer = L.layerGroup().addTo(map);
+  wireDraw();
+  updateFixRect();
+  map.on('moveend zoomend', () => {
+    clearTimeout(regenTimer);
+    regenTimer = setTimeout(() => { regen(); writeHash(); }, 220);
+  });
+  regen();
+  writeHash();
+}
+function mapFallback() {
+  if (map || !$('map')) return;
+  const el = document.createElement('div');
+  el.className = 'map-fallback';
+  el.id = 'map';
+  el.innerHTML = 'Map unavailable — the Leaflet library didn\'t load.<br>Check your connection and reload to use the grid generator.';
+  $('map').replaceWith(el);
+  setStatus('Leaflet failed to load — the map and grid are unavailable offline.', true);
+}
+(function loadLeaflet() {
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+  css.crossOrigin = '';
+  document.head.appendChild(css);
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+  s.crossOrigin = '';
+  s.onload = initMap;
+  s.onerror = mapFallback;
+  document.head.appendChild(s);
+  setTimeout(() => { if (!window.L) mapFallback(); }, 8000);
+})();
+
+/* ---------------- test hooks ---------------- */
+window.cgg = {
+  state,
+  llToUTM, utmToLL, lonToZone, e100kLetters, latBand,
+  buildGraticule, buildUTM, buildMGRS, buildGrid,
+  buildGeoJSON, buildSVG, summaryText,
+  clipPoly, clipSeg, gzdBoundaries,
+  regen, activeExtent,
+};
+</script>
+</body>
+</html>

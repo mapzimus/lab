@@ -70,7 +70,18 @@ const appRoutes = {
 const tools = loadCatalog("tools.json");
 const projects = loadCatalog("projects.json");
 const featuredSlugs = loadCatalog("featured.json");
+<<<<<<< HEAD
 const sourceCatalog = [...tools, ...projects];
+=======
+const fieldNotes = loadCatalog("field-notes.json");
+const linkGroups = loadCatalog("links.json");
+// Source drives the section split: single-page tools vs bigger projects.
+const catalog = [
+  ...tools.map((item) => ({ ...item, source: "tools" })),
+  ...projects.map((item) => ({ ...item, source: "projects" })),
+];
+
+>>>>>>> origin/main
 const problems = [];
 const seenSlugs = new Set();
 
@@ -83,12 +94,18 @@ for (const item of sourceCatalog) {
     if (seenSlugs.has(item.slug)) problems.push(`${label}: duplicate slug`);
     seenSlugs.add(item.slug);
   }
+<<<<<<< HEAD
   if (item.category && !knownCategories.has(item.category)) {
     problems.push(`${label}: unknown category "${item.category}"`);
   }
   if (item.url && !/^https:\/\//.test(item.url)) {
     problems.push(`${label}: source url is not https`);
   }
+=======
+  if (item.category && !knownCategories.has(item.category)) problems.push(`${label}: unknown category "${item.category}"`);
+  if (item.url && !/^https:\/\//.test(item.url)) problems.push(`${label}: url is not https`);
+  if (/&(amp|lt|gt|quot|#\d+);/.test(`${item.title} ${item.description}`)) problems.push(`${label}: title/description contains an HTML entity; store plain text`);
+>>>>>>> origin/main
 }
 for (const slug of featuredSlugs) {
   if (!seenSlugs.has(slug)) problems.push(`featured.json: "${slug}" is not in the catalog`);
@@ -137,6 +154,70 @@ const catalogRefresh = new Date(Date.UTC(refreshYear, refreshMonth - 1)).toLocal
   timeZone: "UTC",
 });
 
+// ---- Rendering helpers (card markup mirrors app.js, which re-renders the
+// same structures client-side for search/filter/favorites) ----
+
+const categoryLabels = {
+  maps: "Maps & GIS",
+  data: "Data",
+  design: "Design & Media",
+  teaching: "Teaching",
+  math: "Math",
+  fun: "Fun & Learning",
+  play: "Games",
+  experiments: "Experiments",
+};
+// One home per item: map things → Maps, playable things → Games, utility
+// tools → Tools. Lab is source-based (all projects + anything unfinished).
+const viewCategories = {
+  home: null,
+  tools: ["data", "design", "teaching", "math", "fun"],
+  maps: ["maps"],
+  games: ["play"],
+};
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function card(item, { featured = false, star = true } = {}) {
+  const tags = (item.tags || []).slice(0, 3).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("");
+  const status = item.status || "live";
+  return `<article class="card${featured ? " featured" : ""}" data-slug="${escapeHtml(item.slug)}" data-category="${escapeHtml(item.category)}">
+      ${star ? `<button class="star" type="button" aria-label="Add to favorites" aria-pressed="false">☆</button>` : ""}
+      <a class="card-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">
+        <div class="card-meta"><span class="cat-tick" aria-hidden="true"></span><span class="card-type">${escapeHtml(categoryLabels[item.category] || item.category)}</span><span class="card-icon" aria-hidden="true">${escapeHtml(item.icon || "")}</span></div>
+        <h3>${escapeHtml(item.title)}</h3>
+        <p class="card-copy">${escapeHtml(item.description)}</p>
+        ${featured ? "" : `<div class="card-tags">${tags}</div>`}
+        <div class="card-foot">${status === "live" ? "<span></span>" : `<span class="status">${escapeHtml(status)}</span>`}<span class="open-cue">Open ↗</span></div>
+      </a>
+    </article>`;
+}
+
+function itemsForView(view, category) {
+  return catalog.filter((item) => {
+    if (view === "lab") {
+      if (item.source !== "projects" && (item.status || "live") === "live") return false;
+    } else {
+      if (view === "tools" && item.source !== "tools") return false;
+      const allowed = viewCategories[view];
+      if (allowed && !allowed.includes(item.category)) return false;
+    }
+    return !category || item.category === category;
+  });
+}
+
+function filtersHtml(view, activeCategory) {
+  const categories = [...new Set(itemsForView(view, "").map((item) => item.category))];
+  if (categories.length < 2) return "";
+  return [`<button class="filter" type="button" data-category="" aria-pressed="${!activeCategory}">All</button>`]
+    .concat(categories.map((c) => `<button class="filter" type="button" data-category="${c}" aria-pressed="${activeCategory === c}">${escapeHtml(categoryLabels[c] || c)}</button>`))
+    .join("");
+}
+
+// ---- Pages ----
+
 if (fs.existsSync(output)) fs.rmSync(assertInsideRoot(output), { recursive: true, force: true });
 fs.mkdirSync(output, { recursive: true });
 fs.cpSync(source, output, { recursive: true });
@@ -157,7 +238,6 @@ fs.writeFileSync(
 
 const template = fs.readFileSync(path.join(source, "_template.html"), "utf8");
 const toolCategories = {
-  maps: ["Map tools", "Converters, viewers, geocoders, and other client-side GIS utilities."],
   data: ["Data tools", "CSV wrangling, charts, converters, and small data utilities."],
   design: ["Design tools", "Color, layout, media, and design helpers."],
   teaching: ["Teaching tools", "Classroom helpers and interactive teaching aids."],
@@ -165,46 +245,70 @@ const toolCategories = {
   fun: ["Fun & learning", "Playful tools and learning experiments."],
 };
 
+const utilityCount = itemsForView("tools", "").length;
+const mapCount = itemsForView("maps", "").length;
+const projectCount = itemsForView("lab", "").length;
+
 const pages = {
   home: {
     path: "index.html",
-    title: "Mapzimus · Tools, maps, games, and experiments",
-    description: "A creative lab of browser tools, unusual maps, games, and experiments by Maxwell Howe.",
+    title: "Mapzimus · Browser tools, maps, and games by Maxwell Howe",
+    description: `${toolCount} free browser tools for maps, data, teaching, and math — plus games and experiments. No accounts, no installs.`,
     canonical: "https://mapzimus.com/",
-    heading: "Useful tools. Strange maps. Small experiments.",
-    intro: "Mapzimus is where I put the things worth building that do not need to behave like portfolio pieces.",
+    eyebrow: "The lab of Maxwell Howe",
+    heading: "Useful tools. Maps. Small games.",
+    intro: `Everything I build for fun and everyday use, in one place: ${toolCount} browser tools for maps, data, teaching, and math, plus games and experiments. It all runs right in your browser.`,
+    catalogHeading: "The whole catalog",
   },
   lab: {
     path: "lab/index.html",
-    title: "The Lab · Mapzimus",
-    description: "Works in progress and experiments from the Mapzimus lab.",
+    title: "Lab · Mapzimus",
+    description: `The ${projectCount} projects of the Mapzimus lab: map apps, games, and experiments, including works in progress.`,
     canonical: "https://mapzimus.com/lab/",
-    heading: "Fresh from the workbench.",
-    intro: "Things in active development: experiments, prototypes, and ideas that are useful before they are polished.",
+    eyebrow: "The lab",
+    heading: "Projects and experiments",
+    intro: `The ${projectCount} bigger builds: map apps, games, and experiments — everything beyond the single-page tools, including works in progress.`,
+    catalogHeading: "All projects",
   },
   tools: {
     path: "tools/index.html",
     title: "Browser tools · Mapzimus",
-    description: `A searchable catalog of ${toolCount} standalone browser tools for maps, data, design, teaching, and math.`,
+    description: `A searchable catalog of ${utilityCount} standalone browser tools for data, design, teaching, and math.`,
     canonical: "https://mapzimus.com/tools/",
+<<<<<<< HEAD
     heading: "Tools that get out of the way.",
     intro: "Every tool I have made, organized by type. Most run entirely in the browser — and every one is hosted here.",
+=======
+    eyebrow: "The tool catalog",
+    heading: "Every tool, one page each",
+    intro: `${utilityCount} standalone browser tools for data, design, teaching, math, and fun. Each is a single page that loads fast and does one job. Map tools have their own shelf under Maps.`,
+    catalogHeading: "All tools",
+>>>>>>> origin/main
   },
   maps: {
     path: "maps/index.html",
     title: "Maps · Mapzimus",
-    description: "Map projects and client-side GIS tools from the Mapzimus creative lab.",
+    description: `All ${mapCount} map tools and map projects from Mapzimus: converters, GIS utilities, projection experiments, transit networks, and atlases.`,
     canonical: "https://mapzimus.com/maps/",
-    heading: "Maps, minus the dress code.",
-    intro: "Every map project — useful GIS utilities next to projection experiments, fantasy networks, and portfolio work.",
+    eyebrow: "Maps & GIS",
+    heading: "Everything maps",
+    intro: `All ${mapCount} map things in one place — converters and GIS utilities alongside projection experiments, transit networks, and atlases.`,
+    catalogHeading: "All maps",
   },
   games: {
     path: "games/index.html",
     title: "Games · Mapzimus",
-    description: "Every browser game and playful learning experiment from Mapzimus.",
+    description: "Free browser games from Mapzimus — strategy and logic, no downloads.",
     canonical: "https://mapzimus.com/games/",
+<<<<<<< HEAD
     heading: "Things made to be played.",
     intro: "Strategy games, logic puzzles, bottle flips, and the Whydah voyage games — all running on this site.",
+=======
+    eyebrow: "Playable",
+    heading: "Games",
+    intro: "Actual games, made to be played — free in the browser, nothing to download.",
+    catalogHeading: "All games",
+>>>>>>> origin/main
   },
 };
 
@@ -216,28 +320,47 @@ for (const [category, [label, blurb]] of Object.entries(toolCategories)) {
     title: `${label} · Mapzimus`,
     description: blurb,
     canonical: `https://mapzimus.com/tools/${category}/`,
-    heading: label + ".",
+    eyebrow: "Tool category",
+    heading: label,
     intro: blurb,
+    catalogHeading: label,
   };
 }
 
-for (const [view, page] of Object.entries(pages)) {
-  const html = template
-    .replaceAll("{{VIEW}}", page.view || view)
+const navKeys = { tools: "NAV_TOOLS", maps: "NAV_MAPS", games: "NAV_GAMES", lab: "NAV_LAB" };
+
+for (const [key, page] of Object.entries(pages)) {
+  const view = page.view || key;
+  const items = itemsForView(view, page.category || "");
+  const featuredItems = key === "home"
+    ? featuredSlugs.map((slug) => catalog.find((item) => item.slug === slug)).filter(Boolean)
+    : [];
+  let html = template
+    .replaceAll("{{VIEW}}", view)
     .replaceAll("{{CATEGORY}}", page.category || "")
-    .replaceAll("{{FEATURED_ATTR}}", view === "home" ? "" : " hidden")
+    .replaceAll("{{FEATURED_ATTR}}", key === "home" ? "" : " hidden")
     .replaceAll("{{TOOL_COUNT}}", String(toolCount))
     .replaceAll("{{CATALOG_REFRESH}}", catalogRefresh)
     .replaceAll("{{TITLE}}", page.title)
     .replaceAll("{{DESCRIPTION}}", page.description)
     .replaceAll("{{CANONICAL}}", page.canonical)
+    .replaceAll("{{EYEBROW}}", page.eyebrow)
     .replaceAll("{{HEADING}}", page.heading)
-    .replaceAll("{{INTRO}}", page.intro);
+    .replaceAll("{{INTRO}}", page.intro)
+    .replaceAll("{{CATALOG_HEADING}}", page.catalogHeading)
+    .replaceAll("{{RESULT_COUNT}}", `${items.length} ${items.length === 1 ? "item" : "items"}`)
+    .replaceAll("{{FILTERS}}", filtersHtml(view, page.category || ""))
+    .replaceAll("{{FEATURED_CARDS}}", featuredItems.map((item) => card(item, { featured: true })).join("\n"))
+    .replaceAll("{{CATALOG_CARDS}}", items.map((item) => card(item)).join("\n"));
+  for (const [navView, navKey] of Object.entries(navKeys)) {
+    html = html.replaceAll(`{{${navKey}}}`, view === navView ? ' aria-current="page"' : "");
+  }
   const target = path.join(output, page.path);
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.writeFileSync(target, html, "utf8");
 }
 
+<<<<<<< HEAD
 requirePath(hostedToolSource, "vendor/tools");
 const placeholderTemplate = `<!doctype html>
 <html lang="en">
@@ -290,6 +413,70 @@ for (const [sourceName, route] of Object.entries(appRoutes)) {
   const appSource = requirePath(path.join(vendor, "apps", sourceName), `vendor/apps/${sourceName}`);
   fs.cpSync(appSource, path.join(output, route), { recursive: true });
 }
+=======
+// ---- Static pages that carry pre-rendered blocks ----
+
+function fillStatic(relPath, replacements) {
+  const target = path.join(output, relPath);
+  let html = fs.readFileSync(target, "utf8");
+  for (const [token, value] of Object.entries(replacements)) {
+    html = html.replaceAll(`{{${token}}}`, value);
+  }
+  fs.writeFileSync(target, html, "utf8");
+}
+
+const miniCards = featuredSlugs
+  .map((slug) => catalog.find((item) => item.slug === slug))
+  .filter(Boolean)
+  .map((item) => card(item, { featured: true, star: false }))
+  .join("\n");
+fillStatic("about/index.html", { MINI_CARDS: miniCards, TOOL_COUNT: String(toolCount) });
+
+const linksHtml = linkGroups.map((group) => `<section class="link-group">
+  <h2>${escapeHtml(group.group)}</h2>
+  ${group.links.map((link) => `<a class="link-row" href="${escapeHtml(link.url)}"><h3>${escapeHtml(link.title)}</h3><p class="card-copy">${escapeHtml(link.note)}</p></a>`).join("\n  ")}
+</section>`).join("\n");
+fillStatic("links/index.html", { LINK_GROUPS: linksHtml });
+
+const radars = loadCatalog("radars.json");
+const radarCards = radars.map((radar) => `<article class="card featured" data-category="experiments">
+      <a class="card-link" href="${escapeHtml(radar.url)}">
+        <div class="card-meta"><span class="cat-tick" aria-hidden="true"></span><span class="card-type">Daily digest</span><span class="card-icon" aria-hidden="true">${escapeHtml(radar.icon || "")}</span></div>
+        <h3>${escapeHtml(radar.title)}</h3>
+        <p class="card-copy">${escapeHtml(radar.description)}</p>
+        <div class="card-foot"><span></span><span class="open-cue">Open →</span></div>
+      </a>
+    </article>`).join("\n");
+fillStatic("radars/index.html", { RADAR_CARDS: radarCards });
+
+const publishedNotes = fieldNotes.filter((note) => note.status === "published");
+const notesHtml = publishedNotes.map((note) => `<article class="note">
+  <div class="note-meta"><time datetime="${escapeHtml(note.date)}">${escapeHtml(note.date)}</time>${(note.tags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>
+  <h2>${escapeHtml(note.title)}</h2>
+  ${note.body.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n  ")}
+</article>`).join("\n");
+fillStatic("field-notes/index.html", { NOTES: notesHtml || `<p class="empty">No notes yet.</p>` });
+
+const skills = loadCatalog("skills.json");
+const skillCards = skills.map((skill) => `<article class="skill-card">
+  <div class="card-top">
+    <div>
+      <span class="tagline">${escapeHtml(skill.tagline)}</span>
+      <h2>${escapeHtml(skill.title)}</h2>
+    </div>
+    <span class="meta">v${escapeHtml(skill.version)} · ${escapeHtml(skill.updated)} · ${escapeHtml(skill.sizeKb)} KB</span>
+  </div>
+  <p>${escapeHtml(skill.description)}</p>
+  <ul>${skill.teaches.map((t) => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
+  <div class="skill-actions">
+    <a class="download-button" href="${escapeHtml(skill.file)}" download>Download ${escapeHtml(skill.slug)}.skill</a>
+    <a class="source-link" href="${escapeHtml(skill.source)}">Read the source ↗</a>
+  </div>
+</article>`).join("\n");
+fillStatic("skills/index.html", { SKILL_CARDS: skillCards });
+
+// ---- Sitemap ----
+>>>>>>> origin/main
 
 const staticPages = ["field-notes", "radars", "radar", "geo-radar", "skills", "links", "about"];
 const sitemapUrls = [
@@ -299,6 +486,7 @@ const sitemapUrls = [
 ];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...new Set(sitemapUrls)].map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n`;
 fs.writeFileSync(path.join(output, "sitemap.xml"), sitemap, "utf8");
+<<<<<<< HEAD
 
 const missingTools = publicTools.filter((item) => !item.hosted).map((item) => item.slug);
 console.log(
@@ -306,3 +494,6 @@ console.log(
     (missingTools.length ? ` (${missingTools.length} placeholders: ${missingTools.join(", ")})` : "") +
     `, and ${Object.keys(appRoutes).length} hosted apps in dist/.`,
 );
+=======
+console.log(`Built ${Object.keys(pages).length + 3} Mapzimus pages in dist/ (${catalog.length} catalog items pre-rendered).`);
+>>>>>>> origin/main

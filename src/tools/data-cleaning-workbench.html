@@ -1,0 +1,1197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Cleaning Workbench</title>
+<meta name="description" content="Recipe-based CSV cleaner: build an ordered stack of transformation steps (trim, casing, find & replace, split/merge, dedupe, date & number normalization) with live before/after preview, then export the cleaned CSV, a plain-English change log, and the reusable recipe. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --chg:#fff3c4; --chg-ink:#7a5b00; --newcol:#e3efe8;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --chg:#4a3d10; --chg-ink:#ffd76e; --newcol:#1c3328;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --chg:#4a3d10; --chg-ink:#ffd76e; --newcol:#1c3328;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 12px; font-size: .84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.small { padding: 6px 10px; font-size: .8rem; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  select, input[type=text], input[type=number], textarea { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 7px 9px; font-size: .84rem; font-family: var(--sans); }
+  textarea { font-family: var(--mono); font-size: .78rem; width: 100%; resize: vertical; }
+  input[type=checkbox], input[type=radio] { accent-color: var(--accent); }
+  label.fld { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 12px; margin-bottom: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .row + .row { margin-top: 8px; }
+  .grouplbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 2px; align-self: center; }
+  .sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 2px; }
+  .spacer { flex: 1; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .chip { border: 1px dashed var(--border); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); border-style: solid; }
+
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+
+  .drop { border: 2px dashed var(--border); border-radius: var(--radius); padding: 14px; text-align: center; color: var(--muted); font-size: .84rem; cursor: pointer; transition: border-color .15s; }
+  .drop.over { border-color: var(--accent); color: var(--accent); }
+
+  .layout { display: grid; grid-template-columns: minmax(0,.42fr) minmax(0,.58fr); gap: 16px; align-items: start; }
+  @media (max-width: 980px) { .layout { grid-template-columns: minmax(0,1fr); } }
+
+  /* ---- summary strip ---- */
+  .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 10px; margin-bottom: 12px; }
+  .stat-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; }
+  .stat-card .lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 2px; }
+  .stat-card .val { font-size: 1.15rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* ---- recipe cards ---- */
+  .recipe-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; min-height: 24px; }
+  .step-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow); padding: 8px 10px; }
+  .step-card.off { opacity: .55; }
+  .step-card.dragging { opacity: .4; }
+  .step-card.dragover { border-color: var(--accent); }
+  .step-head { display: flex; align-items: center; gap: 6px; }
+  .step-head .num { font-family: var(--mono); font-size: .72rem; color: var(--muted); min-width: 18px; }
+  .step-head .ttl { font-weight: 600; font-size: .85rem; flex: 1; }
+  .step-head .handle { cursor: grab; color: var(--muted); font-size: .9rem; user-select: none; touch-action: none; padding: 0 2px; }
+  .icon-btn { border: 1px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 7px; padding: 2px 7px; font-size: .78rem; cursor: pointer; line-height: 1.4; }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .icon-btn.del:hover { border-color: var(--danger); color: var(--danger); }
+  .step-summary { font-size: .76rem; color: var(--muted); margin: 4px 0 0 24px; }
+  .step-summary b { color: var(--text); }
+  .step-count { color: var(--ok); font-weight: 600; }
+  .step-body { margin: 8px 0 2px 24px; display: flex; flex-direction: column; gap: 6px; }
+  .step-body .frow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: .8rem; color: var(--muted); }
+  .step-body select, .step-body input[type=text], .step-body input[type=number] { padding: 4px 7px; font-size: .8rem; max-width: 100%; }
+  .step-body input[type=number] { width: 64px; }
+  .colpick { display: flex; flex-wrap: wrap; gap: 4px; }
+  .colpick label { border: 1px solid var(--border); border-radius: 999px; padding: 2px 9px; font-size: .74rem; color: var(--muted); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; background: var(--surface); }
+  .colpick label.on { border-color: var(--accent); color: var(--accent); background: var(--surface-2); }
+  .colpick input { display: none; }
+  .reorder-list { display: flex; flex-direction: column; gap: 3px; }
+  .reorder-list .ritem { display: flex; align-items: center; gap: 6px; font-size: .78rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; padding: 2px 6px; }
+  .reorder-list .ritem span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ---- preview table ---- */
+  .tbl-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 8px; max-height: 560px; }
+  table.data { border-collapse: collapse; width: 100%; font-size: .78rem; font-family: var(--mono); }
+  table.data th, table.data td { border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); padding: 4px 8px; text-align: left; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+  table.data thead th { background: var(--surface-2); font-family: var(--sans); font-size: .68rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); position: sticky; top: 0; z-index: 2; }
+  table.data td.rn, table.data th.rn { color: var(--muted); font-size: .68rem; text-align: right; background: var(--surface-2); position: sticky; left: 0; z-index: 1; }
+  table.data thead th.rn { z-index: 3; }
+  table.data td.chg { background: var(--chg); color: var(--chg-ink); }
+  table.data td.blank { color: var(--muted); font-style: italic; }
+  .colbadge { display: inline-block; font-size: .6rem; border-radius: 999px; padding: 0 6px; margin-left: 5px; vertical-align: 1px; font-weight: 700; }
+  .colbadge.b-chg { background: var(--chg); color: var(--chg-ink); }
+  .colbadge.b-new { background: var(--newcol); color: var(--ok); }
+
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .seg button { border: none; background: var(--surface); color: var(--muted); padding: 6px 12px; font-size: .8rem; cursor: pointer; }
+  .seg button.on { background: var(--accent); color: var(--accent-ink); }
+  .seg button:not(.on):hover { color: var(--accent); }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  @media (max-width: 720px){ .grouplbl { width: 100%; margin-bottom: 2px; } .sep { display: none; } }
+  @media (max-width: 420px){ .step-body, .step-summary { margin-left: 8px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Data Cleaning Workbench</h1>
+      <p>An "OpenRefine Lite": load a messy CSV, stack up an ordered recipe of cleaning steps — trim, casing, find &amp; replace, split/merge, dedupe, date &amp; number normalization — and watch the live before/after preview. Export the cleaned CSV, a plain-English change log, or the recipe itself to reuse on another file. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="chips">
+    <button class="chip" id="sampleBtn" type="button">Load sample: messy customer list</button>
+    <button class="chip" id="sampleRecipeBtn" type="button">Load sample + suggested recipe</button>
+    <button class="chip" id="clearBtn" type="button">Clear everything</button>
+  </div>
+
+  <div class="panel" id="loadPanel">
+    <div class="row">
+      <span class="grouplbl">Load data</span>
+      <button class="btn small" id="fileBtn" type="button">Choose CSV file…</button>
+      <input type="file" id="fileInput" accept=".csv,.tsv,.txt,text/csv,text/plain" hidden>
+      <label class="fld">Delimiter
+        <select id="delimSel">
+          <option value="auto">Auto-detect</option>
+          <option value=",">Comma</option>
+          <option value="&#9;">Tab</option>
+          <option value=";">Semicolon</option>
+          <option value="|">Pipe</option>
+        </select>
+      </label>
+      <span class="spacer"></span>
+      <span class="note" id="loadStatus"></span>
+    </div>
+    <div class="row">
+      <div class="drop" id="dropZone" style="flex:1">Drop a CSV here, or paste it below and press <b>Parse pasted text</b></div>
+    </div>
+    <div class="row">
+      <textarea id="pasteBox" rows="3" placeholder="name,email,price&#10;Ada Lovelace,ada@example.com,&quot;$1,234.56&quot;" spellcheck="false"></textarea>
+    </div>
+    <div class="row">
+      <button class="btn small" id="parseBtn" type="button">Parse pasted text</button>
+      <span class="note" id="parseNote"></span>
+    </div>
+  </div>
+
+  <div class="stat-cards" id="statCards" hidden>
+    <div class="stat-card"><div class="lbl">Rows in</div><div class="val" id="stRowsIn">0</div></div>
+    <div class="stat-card"><div class="lbl">Rows out</div><div class="val" id="stRowsOut">0</div></div>
+    <div class="stat-card"><div class="lbl">Cells changed</div><div class="val" id="stCells">0</div></div>
+    <div class="stat-card"><div class="lbl">Duplicates removed</div><div class="val" id="stDupes">0</div></div>
+    <div class="stat-card"><div class="lbl">Empty rows removed</div><div class="val" id="stEmpty">0</div></div>
+    <div class="stat-card"><div class="lbl">Active steps</div><div class="val" id="stSteps">0</div></div>
+  </div>
+
+  <div class="layout" id="mainLayout" hidden>
+    <div>
+      <div class="panel">
+        <div class="row">
+          <span class="grouplbl">Recipe</span>
+          <select id="stepTypeSel"></select>
+          <button class="btn small primary" id="addStepBtn" type="button">+ Add step</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="recipe-list" id="recipeList" style="flex:1"></div>
+        </div>
+        <div class="row" id="emptyRecipeNote">
+          <span class="note">No steps yet — the preview shows your data untouched. Add a step above, or use "Load sample + suggested recipe" to see how it works. Steps run top to bottom; drag or use ▲▼ to reorder, the checkbox to toggle, ✕ to remove (that is your undo — the pipeline always recomputes from the original).</span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="row">
+          <span class="grouplbl">Export</span>
+          <button class="btn small primary" id="dlCsvBtn" type="button">⬇ Cleaned CSV</button>
+          <button class="btn small" id="dlLogBtn" type="button">⬇ Change log (.txt)</button>
+          <button class="btn small" id="copyLogBtn" type="button">Copy log</button>
+        </div>
+        <div class="row">
+          <span class="grouplbl">Recipe file</span>
+          <button class="btn small" id="dlRecipeBtn" type="button">⬇ Export recipe (.json)</button>
+          <button class="btn small" id="importRecipeBtn" type="button">Import recipe…</button>
+          <input type="file" id="recipeFileInput" accept=".json,application/json" hidden>
+        </div>
+        <div class="row"><span class="note" id="exportNote"></span></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="row">
+          <span class="grouplbl">Preview</span>
+          <div class="seg" id="baSeg">
+            <button type="button" data-v="before">Before</button>
+            <button type="button" data-v="after" class="on">After</button>
+          </div>
+          <span class="spacer"></span>
+          <span class="note" id="previewNote"></span>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <div class="tbl-wrap" style="flex:1"><table class="data" id="previewTable"></table></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app">Part of the <a href="./index.html">mapzimus/max</a> toolbox · nothing leaves your browser</footer>
+</div>
+
+<script>
+'use strict';
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const escAttr = (s) => esc(s).replace(/"/g, '&quot;');
+const fmtInt = (n) => n.toLocaleString();
+const PREVIEW_ROWS = 200;
+
+// ---------------- state ----------------
+const state = {
+  original: null,          // { headers:[], rows:[[]] }  — never mutated by steps
+  fileName: 'data.csv',
+  recipe: [],              // [{ id, type, enabled, params }]
+  result: null,            // last pipeline output (see applyRecipe)
+  view: 'after',
+};
+let stepIdSeq = 1;
+
+// ---------------- CSV parse (RFC 4180 quote-aware, same approach as csv-explorer) ----------------
+function parseRows(text, delim) {
+  const rows = [];
+  let row = [], field = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; } else q = false;
+      } else field += ch;
+    } else if (ch === '"' && field === '') {
+      q = true;
+    } else if (ch === delim) {
+      row.push(field); field = '';
+    } else if (ch === '\n') {
+      row.push(field); rows.push(row); row = []; field = '';
+    } else if (ch === '\r') {
+      if (text[i + 1] === '\n') i++;
+      row.push(field); rows.push(row); row = []; field = '';
+    } else field += ch;
+  }
+  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+function detectDelimiter(text) {
+  const sample = text.slice(0, 65536);
+  let best = ',', bestScore = 0;
+  for (const d of [',', '\t', ';', '|']) {
+    const rs = parseRows(sample, d).slice(0, 30);
+    if (!rs.length) continue;
+    const first = rs[0].length;
+    if (first < 2) continue;
+    let consistent = 0;
+    for (const r of rs) if (r.length === first) consistent++;
+    const score = first * (consistent / rs.length);
+    if (score > bestScore) { bestScore = score; best = d; }
+  }
+  return best;
+}
+function buildModel(text, delim) {
+  const raw = parseRows(text, delim);
+  if (!raw.length) return null;
+  let width = 0;
+  for (const r of raw) if (r.length > width) width = r.length;
+  if (!width) return null;
+  const headers = raw[0].slice();
+  while (headers.length < width) headers.push('');
+  const named = headers.map((h, i) => h.trim() === '' ? 'Column ' + (i + 1) : h.trim());
+  // de-dupe header names so steps can reference columns unambiguously
+  const seen = Object.create(null);
+  for (let i = 0; i < named.length; i++) {
+    let n = named[i];
+    if (seen[n] != null) { let k = 2; while (seen[n + ' (' + k + ')'] != null) k++; n = n + ' (' + k + ')'; }
+    seen[n] = i; named[i] = n;
+  }
+  const rows = raw.slice(1).map(r => {
+    if (r.length === width) return r;
+    const c = r.slice();
+    while (c.length < width) c.push('');
+    return c;
+  });
+  return { headers: named, rows };
+}
+function csvEscape(v) {
+  const s = String(v);
+  return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function toCSV(headers, rows) {
+  const out = [headers.map(csvEscape).join(',')];
+  for (const r of rows) out.push(r.map(csvEscape).join(','));
+  return out.join('\r\n');
+}
+
+// ---------------- step definitions ----------------
+// Each def: label, make() default params, describe(step)=plain English, options(step)=HTML, wire(step, root),
+// apply(step, data) mutates data {headers, rows, srcIdx, colOrigin} and returns {cells|rows, kind}
+const toTitle = (s) => s.toLowerCase().replace(/(^|[\s\-_/("'])([a-z])/g, (m, a, b) => a + b.toUpperCase());
+const toSentence = (s) => { const t = s.toLowerCase(); const i = t.search(/[a-z]/); return i < 0 ? t : t.slice(0, i) + t[i].toUpperCase() + t.slice(i + 1); };
+
+function colIdx(data, name) { return data.headers.indexOf(name); }
+function targetCols(data, names) {
+  if (!names || !names.length) return data.headers.map((_, i) => i);
+  const out = [];
+  for (const n of names) { const i = colIdx(data, n); if (i >= 0) out.push(i); }
+  return out;
+}
+function colListLabel(names) { return (!names || !names.length) ? 'all columns' : names.map(n => '“' + n + '”').join(', '); }
+
+// value-transform helper: applies fn to chosen columns, counts changes
+function transformCells(data, names, fn) {
+  const cols = targetCols(data, names);
+  let changed = 0;
+  const rows = data.rows;
+  for (let r = 0; r < rows.length; r++) {
+    const row = rows[r];
+    for (const c of cols) {
+      const v = row[c], nv = fn(v, r, c);
+      if (nv !== v) { row[c] = nv; changed++; }
+    }
+  }
+  return changed;
+}
+
+const MONTHS = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, sept:9, oct:10, nov:11, dec:12 };
+function normDate(raw) {
+  const s = String(raw).trim();
+  if (s === '') return raw;
+  const pad = (n) => String(n).padStart(2, '0');
+  const mk = (y, m, d) => {
+    y = +y; m = +m; d = +d;
+    if (y < 100) y += (y >= 70 ? 1900 : 2000);
+    if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) return null;
+    return y + '-' + pad(m) + '-' + pad(d);
+  };
+  let m;
+  // ISO already (optionally with time) → keep date part
+  if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})([T ].*)?$/))) return mk(m[1], m[2], m[3]) || raw;
+  // YYYY/MM/DD or YYYY.MM.DD
+  if ((m = s.match(/^(\d{4})[\/.](\d{1,2})[\/.](\d{1,2})$/))) return mk(m[1], m[2], m[3]) || raw;
+  // M/D/YYYY, D-M-YYYY, M.D.YY — assume US month-first, flip if first part > 12
+  if ((m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/))) {
+    let a = +m[1], b = +m[2];
+    if (a > 12 && b <= 12) { const t = a; a = b; b = t; }
+    return mk(m[3], a, b) || raw;
+  }
+  // "March 5, 2024" / "Mar 5 2024"
+  if ((m = s.match(/^([A-Za-z]{3,9})\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{2,4})$/))) {
+    const mo = MONTHS[m[1].slice(0, 3).toLowerCase()];
+    if (mo) return mk(m[3], mo, m[2]) || raw;
+  }
+  // "5 March 2024" / "05-Mar-2024"
+  if ((m = s.match(/^(\d{1,2})(?:st|nd|rd|th)?[\s\-]([A-Za-z]{3,9})\.?[\s\-,]+?(\d{2,4})$/))) {
+    const mo = MONTHS[m[2].slice(0, 3).toLowerCase()];
+    if (mo) return mk(m[3], mo, m[1]) || raw;
+  }
+  return raw;
+}
+function normNumber(raw, decimals) {
+  const s = String(raw).trim();
+  if (s === '') return raw;
+  let t = s.replace(/[$€£¥₹\s]/g, '');
+  let neg = false;
+  if (/^\(.*\)$/.test(t)) { neg = true; t = t.slice(1, -1); }   // (1,234.56) accounting negatives
+  t = t.replace(/,/g, '');
+  if (!/^[+-]?\d*\.?\d+$/.test(t)) return raw;
+  let n = parseFloat(t);
+  if (!Number.isFinite(n)) return raw;
+  if (neg) n = -n;
+  return decimals === '' || decimals == null ? String(n) : n.toFixed(Math.max(0, Math.min(8, +decimals || 0)));
+}
+
+// --- reusable option fragments ---
+function colPickHTML(step, data, key, single) {
+  const chosen = step.params[key] || [];
+  if (single) {
+    const cur = step.params[key];
+    return '<select data-k="' + key + '">' + data.headers.map(h =>
+      '<option value="' + escAttr(h) + '"' + (h === cur ? ' selected' : '') + '>' + esc(h) + '</option>').join('') + '</select>';
+  }
+  return '<div class="colpick" data-k="' + key + '">' + data.headers.map(h => {
+    const on = chosen.includes(h);
+    return '<label class="' + (on ? 'on' : '') + '"><input type="checkbox" value="' + escAttr(h) + '"' + (on ? ' checked' : '') + '>' + esc(h) + '</label>';
+  }).join('') + '</div>';
+}
+function txt(step, key, ph, size) {
+  return '<input type="text" data-k="' + key + '" value="' + escAttr(step.params[key] ?? '') + '" placeholder="' + escAttr(ph || '') + '"' + (size ? ' size="' + size + '"' : '') + ' spellcheck="false">';
+}
+function allColsNote() { return '<span class="note">Leave all unticked = every column.</span>'; }
+
+const STEP_DEFS = {
+  trim: {
+    label: 'Trim whitespace',
+    make: () => ({ cols: [] }),
+    describe: (s, n) => 'Trim leading/trailing whitespace (and collapse doubled spaces) in ' + colListLabel(s.params.cols) + '.',
+    options: (s, d) => '<div class="frow">Columns:</div>' + colPickHTML(s, d, 'cols') + allColsNote(),
+    apply: (s, d) => ({ kind: 'cells', n: transformCells(d, s.params.cols, v => v.trim().replace(/\s{2,}/g, ' ')) }),
+  },
+  casing: {
+    label: 'Standardize casing',
+    make: () => ({ cols: [], mode: 'title' }),
+    describe: (s) => {
+      const names = { upper: 'UPPERCASE', lower: 'lowercase', title: 'Title Case', sentence: 'Sentence case' };
+      return 'Convert ' + colListLabel(s.params.cols) + ' to ' + names[s.params.mode] + '.';
+    },
+    options: (s, d) => '<div class="frow">Mode: <select data-k="mode">' +
+      [['upper','UPPERCASE'],['lower','lowercase'],['title','Title Case'],['sentence','Sentence case']].map(([v,l]) =>
+        '<option value="' + v + '"' + (s.params.mode === v ? ' selected' : '') + '>' + l + '</option>').join('') +
+      '</select></div><div class="frow">Columns:</div>' + colPickHTML(s, d, 'cols') + allColsNote(),
+    apply: (s, d) => {
+      const fns = { upper: v => v.toUpperCase(), lower: v => v.toLowerCase(), title: toTitle, sentence: toSentence };
+      return { kind: 'cells', n: transformCells(d, s.params.cols, fns[s.params.mode] || (v => v)) };
+    },
+  },
+  replace: {
+    label: 'Find & replace',
+    make: () => ({ cols: [], find: '', replace: '', regex: false, caseSensitive: false }),
+    describe: (s) => {
+      if (s.params.find === '') return 'Find & replace (enter a search term).';
+      return 'Replace ' + (s.params.regex ? 'regex ' : '') + '“' + s.params.find + '” with “' + s.params.replace + '” in ' + colListLabel(s.params.cols) +
+        (s.params.caseSensitive ? ' (case-sensitive)' : '') + '.';
+    },
+    options: (s, d) => '<div class="frow">Find ' + txt(s, 'find', 'text or pattern', 14) + ' → ' + txt(s, 'replace', 'replacement', 12) + '</div>' +
+      '<div class="frow"><label class="fld"><input type="checkbox" data-k="regex"' + (s.params.regex ? ' checked' : '') + '> Regex</label>' +
+      '<label class="fld"><input type="checkbox" data-k="caseSensitive"' + (s.params.caseSensitive ? ' checked' : '') + '> Case-sensitive</label></div>' +
+      '<div class="frow">Columns:</div>' + colPickHTML(s, d, 'cols') + allColsNote(),
+    apply: (s, d) => {
+      const p = s.params;
+      if (p.find === '') return { kind: 'cells', n: 0 };
+      let re;
+      try {
+        const src = p.regex ? p.find : p.find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        re = new RegExp(src, 'g' + (p.caseSensitive ? '' : 'i'));
+      } catch (e) { s._err = 'Invalid regex: ' + e.message; return { kind: 'cells', n: 0 }; }
+      return { kind: 'cells', n: transformCells(d, p.cols, v => v.replace(re, p.replace)) };
+    },
+  },
+  split: {
+    label: 'Split column',
+    make: () => ({ col: null, delim: ',', n: 2 }),
+    describe: (s) => 'Split “' + (s.params.col || '?') + '” on “' + s.params.delim + '” into ' + s.params.n + ' columns.',
+    options: (s, d) => '<div class="frow">Column: ' + colPickHTML(s, d, 'col', true) + '</div>' +
+      '<div class="frow">Delimiter ' + txt(s, 'delim', ',', 4) + ' Into <input type="number" data-k="n" min="2" max="8" value="' + (+s.params.n || 2) + '"> columns</div>',
+    apply: (s, d) => {
+      const c = colIdx(d, s.params.col ?? '');
+      if (c < 0 || !s.params.delim) return { kind: 'rows', n: 0 };
+      const n = Math.max(2, Math.min(8, +s.params.n || 2));
+      const base = s.params.col;
+      const newNames = [];
+      for (let i = 1; i <= n; i++) {
+        let name = base + ' ' + i, k = 2;
+        while (d.headers.includes(name) || newNames.includes(name)) name = base + ' ' + i + ' (' + (k++) + ')';
+        newNames.push(name);
+      }
+      d.headers.splice(c, 1, ...newNames);
+      d.colOrigin.splice(c, 1, ...newNames.map(() => -1));
+      let affected = 0;
+      for (const row of d.rows) {
+        const parts = String(row[c]).split(s.params.delim);
+        if (parts.length > 1) affected++;
+        const cells = [];
+        for (let i = 0; i < n; i++) cells.push(((i === n - 1 ? parts.slice(i).join(s.params.delim) : parts[i]) ?? '').trim());
+        row.splice(c, 1, ...cells);
+      }
+      return { kind: 'rows', n: affected, word: 'row' , verb: 'split in' };
+    },
+  },
+  merge: {
+    label: 'Merge columns',
+    make: () => ({ cols: [], sep: ' ', name: 'merged', removeSrc: true }),
+    describe: (s) => 'Merge ' + colListLabel(s.params.cols.length ? s.params.cols : null) + ' into new column “' + s.params.name + '” joined by “' + s.params.sep + '”' + (s.params.removeSrc ? ', removing the originals' : '') + '.',
+    options: (s, d) => '<div class="frow">Join with ' + txt(s, 'sep', ' ', 4) + ' New name ' + txt(s, 'name', 'merged', 10) + '</div>' +
+      '<div class="frow"><label class="fld"><input type="checkbox" data-k="removeSrc"' + (s.params.removeSrc ? ' checked' : '') + '> Remove source columns</label></div>' +
+      '<div class="frow">Columns (in current order):</div>' + colPickHTML(s, d, 'cols'),
+    apply: (s, d) => {
+      const idxs = targetCols(d, s.params.cols.length ? s.params.cols : [' none ']);
+      if (s.params.cols.length < 2 || idxs.length < 2) return { kind: 'rows', n: 0 };
+      let name = s.params.name || 'merged'; let k = 2;
+      while (d.headers.includes(name)) name = (s.params.name || 'merged') + ' (' + (k++) + ')';
+      const at = idxs[0];
+      for (const row of d.rows) row.splice(at, 0, idxs.map(i => row[i]).join(s.params.sep));
+      d.headers.splice(at, 0, name);
+      d.colOrigin.splice(at, 0, -1);
+      if (s.params.removeSrc) {
+        const shifted = idxs.map(i => i >= at ? i + 1 : i).sort((a, b) => b - a);
+        for (const i of shifted) { d.headers.splice(i, 1); d.colOrigin.splice(i, 1); }
+        for (const row of d.rows) for (const i of shifted) row.splice(i, 1);
+      }
+      return { kind: 'rows', n: d.rows.length, word: 'row', verb: 'merged in' };
+    },
+  },
+  dedupe: {
+    label: 'Remove duplicate rows',
+    make: () => ({ cols: [] }),
+    describe: (s) => 'Remove duplicate rows, comparing ' + (s.params.cols.length ? 'key column' + (s.params.cols.length > 1 ? 's ' : ' ') + colListLabel(s.params.cols) : 'all columns') + ' (keeps the first occurrence).',
+    options: (s, d) => '<div class="frow">Key columns:</div>' + colPickHTML(s, d, 'cols') + allColsNote(),
+    apply: (s, d) => {
+      const cols = targetCols(d, s.params.cols);
+      const seen = new Set(); const keepR = []; const keepS = [];
+      for (let r = 0; r < d.rows.length; r++) {
+        const key = cols.map(c => d.rows[r][c]).join('');
+        if (seen.has(key)) continue;
+        seen.add(key); keepR.push(d.rows[r]); keepS.push(d.srcIdx[r]);
+      }
+      const removed = d.rows.length - keepR.length;
+      d.rows = keepR; d.srcIdx = keepS;
+      return { kind: 'dupes', n: removed };
+    },
+  },
+  rmempty: {
+    label: 'Remove empty rows',
+    make: () => ({}),
+    describe: () => 'Remove rows where every cell is blank (or only whitespace).',
+    options: () => '<span class="note">No options — removes fully blank rows.</span>',
+    apply: (s, d) => {
+      const keepR = [], keepS = [];
+      for (let r = 0; r < d.rows.length; r++) {
+        if (d.rows[r].some(v => String(v).trim() !== '')) { keepR.push(d.rows[r]); keepS.push(d.srcIdx[r]); }
+      }
+      const removed = d.rows.length - keepR.length;
+      d.rows = keepR; d.srcIdx = keepS;
+      return { kind: 'empty', n: removed };
+    },
+  },
+  rename: {
+    label: 'Rename column',
+    make: () => ({ col: null, name: '' }),
+    describe: (s) => 'Rename column “' + (s.params.col || '?') + '” to “' + (s.params.name || '?') + '”.',
+    options: (s, d) => '<div class="frow">Column: ' + colPickHTML(s, d, 'col', true) + ' → ' + txt(s, 'name', 'new name', 12) + '</div>',
+    apply: (s, d) => {
+      const c = colIdx(d, s.params.col ?? '');
+      if (c < 0 || !s.params.name.trim() || d.headers.includes(s.params.name.trim())) return { kind: 'rows', n: 0 };
+      d.headers[c] = s.params.name.trim();
+      return { kind: 'rows', n: 0, silent: true };
+    },
+  },
+  delcol: {
+    label: 'Delete columns',
+    make: () => ({ cols: [] }),
+    describe: (s) => 'Delete column' + (s.params.cols.length === 1 ? '' : 's') + ' ' + (s.params.cols.length ? colListLabel(s.params.cols) : '(pick at least one)') + '.',
+    options: (s, d) => '<div class="frow">Columns to delete:</div>' + colPickHTML(s, d, 'cols'),
+    apply: (s, d) => {
+      if (!s.params.cols.length) return { kind: 'rows', n: 0, silent: true };
+      const idxs = targetCols(d, s.params.cols).sort((a, b) => b - a);
+      for (const i of idxs) { d.headers.splice(i, 1); d.colOrigin.splice(i, 1); }
+      for (const row of d.rows) for (const i of idxs) row.splice(i, 1);
+      return { kind: 'rows', n: 0, silent: true };
+    },
+  },
+  reorder: {
+    label: 'Reorder columns',
+    make: () => ({ order: [] }),
+    describe: (s) => 'Reorder columns to: ' + (s.params.order.length ? s.params.order.join(' · ') : '(current order)') + '.',
+    options: (s, d) => {
+      const order = s.params.order.filter(n => d.headers.includes(n)).concat(d.headers.filter(h => !s.params.order.includes(h)));
+      return '<div class="reorder-list" data-k="order">' + order.map((h, i) =>
+        '<div class="ritem" data-name="' + escAttr(h) + '"><span>' + esc(h) + '</span>' +
+        '<button type="button" class="icon-btn" data-mv="-1" ' + (i === 0 ? 'disabled' : '') + '>▲</button>' +
+        '<button type="button" class="icon-btn" data-mv="1" ' + (i === order.length - 1 ? 'disabled' : '') + '>▼</button></div>').join('') + '</div>';
+    },
+    apply: (s, d) => {
+      if (!s.params.order.length) return { kind: 'rows', n: 0, silent: true };
+      const order = s.params.order.filter(n => d.headers.includes(n)).concat(d.headers.filter(h => !s.params.order.includes(h)));
+      const perm = order.map(n => d.headers.indexOf(n));
+      if (perm.every((p, i) => p === i)) return { kind: 'rows', n: 0, silent: true };
+      d.headers = perm.map(i => d.headers[i]);
+      d.colOrigin = perm.map(i => d.colOrigin[i]);
+      d.rows = d.rows.map(row => perm.map(i => row[i]));
+      return { kind: 'rows', n: 0, silent: true };
+    },
+  },
+  fill: {
+    label: 'Fill blanks',
+    make: () => ({ cols: [], mode: 'fixed', value: '' }),
+    describe: (s) => 'Fill blank cells in ' + colListLabel(s.params.cols) + (s.params.mode === 'down' ? ' by copying the value from the row above.' : ' with “' + s.params.value + '”.'),
+    options: (s, d) => '<div class="frow">Mode: <select data-k="mode">' +
+      '<option value="fixed"' + (s.params.mode === 'fixed' ? ' selected' : '') + '>Fixed value</option>' +
+      '<option value="down"' + (s.params.mode === 'down' ? ' selected' : '') + '>Copy from above (fill down)</option></select> ' +
+      (s.params.mode === 'fixed' ? txt(s, 'value', 'value', 10) : '') + '</div>' +
+      '<div class="frow">Columns:</div>' + colPickHTML(s, d, 'cols') + allColsNote(),
+    apply: (s, d) => {
+      const cols = targetCols(d, s.params.cols);
+      let changed = 0;
+      if (s.params.mode === 'down') {
+        for (const c of cols) {
+          let last = '';
+          for (let r = 0; r < d.rows.length; r++) {
+            const v = d.rows[r][c];
+            if (String(v).trim() === '') { if (last !== '') { d.rows[r][c] = last; changed++; } }
+            else last = v;
+          }
+        }
+      } else {
+        if (s.params.value === '') return { kind: 'cells', n: 0 };
+        for (const c of cols) for (const row of d.rows) if (String(row[c]).trim() === '') { row[c] = s.params.value; changed++; }
+      }
+      return { kind: 'cells', n: changed };
+    },
+  },
+  numnorm: {
+    label: 'Normalize numbers',
+    make: () => ({ cols: [], decimals: '2' }),
+    describe: (s) => 'Normalize numbers in ' + colListLabel(s.params.cols) + ' — strip currency symbols/commas' + (s.params.decimals !== '' ? ', ' + s.params.decimals + ' decimal place' + (s.params.decimals === '1' ? '' : 's') : '') + '.',
+    options: (s, d) => '<div class="frow">Decimals ' + txt(s, 'decimals', 'blank = keep', 6) + ' <span class="note">e.g. "$1,234.56" → 1234.56; "(500)" → -500</span></div>' +
+      '<div class="frow">Columns:</div>' + colPickHTML(s, d, 'cols') + allColsNote(),
+    apply: (s, d) => ({ kind: 'cells', n: transformCells(d, s.params.cols, v => normNumber(v, s.params.decimals.trim())) }),
+  },
+  datenorm: {
+    label: 'Normalize dates → ISO',
+    make: () => ({ cols: [] }),
+    describe: (s) => 'Detect common date formats in ' + colListLabel(s.params.cols) + ' and rewrite as ISO yyyy-mm-dd.',
+    options: (s, d) => '<div class="frow"><span class="note">Understands 3/5/24, 05-03-2024, 2024/03/05, "March 5, 2024", "5 Mar 2024", ISO timestamps. Unrecognized values are left as-is.</span></div>' +
+      '<div class="frow">Columns:</div>' + colPickHTML(s, d, 'cols') + allColsNote(),
+    apply: (s, d) => ({ kind: 'cells', n: transformCells(d, s.params.cols, v => normDate(v)) }),
+  },
+};
+const STEP_ORDER = ['trim', 'casing', 'replace', 'split', 'merge', 'dedupe', 'rmempty', 'rename', 'delcol', 'reorder', 'fill', 'numnorm', 'datenorm'];
+
+// ---------------- pipeline ----------------
+function applyRecipe() {
+  if (!state.original) { state.result = null; return; }
+  const o = state.original;
+  const data = {
+    headers: o.headers.slice(),
+    rows: o.rows.map(r => r.slice()),
+    srcIdx: o.rows.map((_, i) => i),                 // original row index per surviving row
+    colOrigin: o.headers.map((_, i) => i),           // original column index per output column (-1 = new)
+  };
+  let cells = 0, dupes = 0, empties = 0;
+  for (const step of state.recipe) {
+    step._cols = data.headers.slice();               // columns available to this step (for its option UI)
+    step._err = null;
+    step._count = null;
+    if (!step.enabled) continue;
+    const def = STEP_DEFS[step.type];
+    if (!def) continue;
+    let res;
+    try { res = def.apply(step, data); }
+    catch (e) { step._err = 'Step failed: ' + e.message; continue; }
+    step._count = res;
+    if (res.kind === 'cells') cells += res.n;
+    else if (res.kind === 'dupes') dupes += res.n;
+    else if (res.kind === 'empty') empties += res.n;
+  }
+  state.result = { headers: data.headers, rows: data.rows, srcIdx: data.srcIdx, colOrigin: data.colOrigin,
+    stats: { rowsIn: o.rows.length, rowsOut: data.rows.length, cells, dupes, empties } };
+}
+
+// ---------------- rendering ----------------
+function stepCountText(step) {
+  if (step._err) return null;
+  const c = step._count;
+  if (!c || c.silent) return step.enabled ? '' : '';
+  if (c.kind === 'cells') return fmtInt(c.n) + ' cell' + (c.n === 1 ? '' : 's') + ' changed';
+  if (c.kind === 'dupes') return fmtInt(c.n) + ' duplicate' + (c.n === 1 ? '' : 's') + ' removed';
+  if (c.kind === 'empty') return fmtInt(c.n) + ' empty row' + (c.n === 1 ? '' : 's') + ' removed';
+  if (c.kind === 'rows') return c.verb ? fmtInt(c.n) + ' ' + (c.word || 'row') + (c.n === 1 ? '' : 's') + ' ' + c.verb : '';
+  return '';
+}
+
+function renderRecipe() {
+  const list = $('#recipeList');
+  list.innerHTML = '';
+  $('#emptyRecipeNote').hidden = state.recipe.length > 0;
+  state.recipe.forEach((step, i) => {
+    const def = STEP_DEFS[step.type];
+    const card = document.createElement('div');
+    card.className = 'step-card' + (step.enabled ? '' : ' off');
+    card.dataset.id = step.id;
+    card.draggable = true;
+    const cnt = stepCountText(step);
+    card.innerHTML =
+      '<div class="step-head">' +
+        '<span class="handle" title="Drag to reorder">⠿</span>' +
+        '<span class="num">' + (i + 1) + '.</span>' +
+        '<label class="fld" title="Enable / disable (your undo)"><input type="checkbox" class="tog"' + (step.enabled ? ' checked' : '') + '></label>' +
+        '<span class="ttl">' + esc(def.label) + '</span>' +
+        '<button type="button" class="icon-btn mvup" title="Move up"' + (i === 0 ? ' disabled' : '') + '>▲</button>' +
+        '<button type="button" class="icon-btn mvdn" title="Move down"' + (i === state.recipe.length - 1 ? ' disabled' : '') + '>▼</button>' +
+        '<button type="button" class="icon-btn opt" title="Show / hide options">' + (step._open ? '▾' : '⚙') + '</button>' +
+        '<button type="button" class="icon-btn del" title="Remove step">✕</button>' +
+      '</div>' +
+      '<div class="step-summary">' + esc(def.describe(step)) +
+        (cnt ? ' <span class="step-count">· ' + esc(cnt) + '</span>' : '') +
+        (step._err ? ' <span class="note err">· ' + esc(step._err) + '</span>' : '') +
+      '</div>' +
+      (step._open ? '<div class="step-body">' + def.options(step, { headers: step._cols || (state.original ? state.original.headers : []) }) + '</div>' : '');
+    wireCard(card, step);
+    list.appendChild(card);
+  });
+}
+
+function wireCard(card, step) {
+  card.querySelector('.tog').addEventListener('change', (e) => { step.enabled = e.target.checked; recompute(true); });
+  card.querySelector('.del').addEventListener('click', () => {
+    state.recipe = state.recipe.filter(s => s !== step);
+    recompute(true);
+  });
+  card.querySelector('.mvup').addEventListener('click', () => moveStep(step, -1));
+  card.querySelector('.mvdn').addEventListener('click', () => moveStep(step, 1));
+  card.querySelector('.opt').addEventListener('click', () => { step._open = !step._open; renderRecipe(); });
+
+  // drag reorder
+  card.addEventListener('dragstart', (e) => { dragId = step.id; card.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', String(step.id)); } catch (_) {} });
+  card.addEventListener('dragend', () => { dragId = null; card.classList.remove('dragging'); document.querySelectorAll('.step-card.dragover').forEach(c => c.classList.remove('dragover')); });
+  card.addEventListener('dragover', (e) => { if (dragId != null && dragId !== step.id) { e.preventDefault(); card.classList.add('dragover'); } });
+  card.addEventListener('dragleave', () => card.classList.remove('dragover'));
+  card.addEventListener('drop', (e) => {
+    e.preventDefault(); card.classList.remove('dragover');
+    if (dragId == null || dragId === step.id) return;
+    const from = state.recipe.findIndex(s => s.id === dragId);
+    const to = state.recipe.findIndex(s => s === step);
+    if (from < 0 || to < 0) return;
+    const [moved] = state.recipe.splice(from, 1);
+    state.recipe.splice(to, 0, moved);
+    recompute(true);
+  });
+
+  const body = card.querySelector('.step-body');
+  if (!body) return;
+  // simple inputs / selects
+  body.querySelectorAll('select[data-k], input[type=text][data-k], input[type=number][data-k]').forEach(el => {
+    const k = el.dataset.k;
+    const ev = el.tagName === 'SELECT' ? 'change' : 'input';
+    el.addEventListener(ev, () => {
+      step.params[k] = el.type === 'number' ? el.value : el.value;
+      if (step.type === 'fill' && k === 'mode') { renderRecipe(); recompute(false); return; }
+      recompute(false);
+    });
+  });
+  // checkboxes bound to boolean params
+  body.querySelectorAll('input[type=checkbox][data-k]').forEach(el => {
+    el.addEventListener('change', () => { step.params[el.dataset.k] = el.checked; recompute(false); });
+  });
+  // column multi-pick chips
+  body.querySelectorAll('.colpick[data-k]').forEach(pick => {
+    pick.addEventListener('change', () => {
+      const vals = [...pick.querySelectorAll('input:checked')].map(i => i.value);
+      // preserve pick ORDER for merge (order clicked): append new, drop removed
+      const prev = step.params[pick.dataset.k] || [];
+      const kept = prev.filter(v => vals.includes(v));
+      for (const v of vals) if (!kept.includes(v)) kept.push(v);
+      step.params[pick.dataset.k] = kept;
+      pick.querySelectorAll('label').forEach(l => l.classList.toggle('on', l.querySelector('input').checked));
+      recompute(false);
+    });
+  });
+  // reorder list
+  body.querySelectorAll('.reorder-list [data-mv]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.ritem');
+      const listEl = btn.closest('.reorder-list');
+      const names = [...listEl.querySelectorAll('.ritem')].map(el => el.dataset.name);
+      const i = names.indexOf(item.dataset.name);
+      const j = i + (+btn.dataset.mv);
+      if (j < 0 || j >= names.length) return;
+      [names[i], names[j]] = [names[j], names[i]];
+      step.params.order = names;
+      renderRecipe(); recompute(false);
+    });
+  });
+}
+let dragId = null;
+
+function moveStep(step, dir) {
+  const i = state.recipe.indexOf(step);
+  const j = i + dir;
+  if (j < 0 || j >= state.recipe.length) return;
+  [state.recipe[i], state.recipe[j]] = [state.recipe[j], state.recipe[i]];
+  recompute(true);
+}
+
+function renderStats() {
+  const r = state.result;
+  $('#statCards').hidden = !r;
+  if (!r) return;
+  $('#stRowsIn').textContent = fmtInt(r.stats.rowsIn);
+  $('#stRowsOut').textContent = fmtInt(r.stats.rowsOut);
+  $('#stCells').textContent = fmtInt(r.stats.cells);
+  $('#stDupes').textContent = fmtInt(r.stats.dupes);
+  $('#stEmpty').textContent = fmtInt(r.stats.empties);
+  $('#stSteps').textContent = fmtInt(state.recipe.filter(s => s.enabled).length) + ' / ' + fmtInt(state.recipe.length);
+}
+
+function renderPreview() {
+  const tbl = $('#previewTable');
+  const r = state.result, o = state.original;
+  if (!o) { tbl.innerHTML = ''; return; }
+  const showBefore = state.view === 'before';
+  const headers = showBefore ? o.headers : r.headers;
+  const rows = showBefore ? o.rows : r.rows;
+  const n = Math.min(rows.length, PREVIEW_ROWS);
+
+  // per-column badges (after view only): new / changed
+  let colClass = [], colBadge = [];
+  if (!showBefore) {
+    const lim = Math.min(r.rows.length, 2000);   // sample for badge detection, cheap
+    colBadge = r.headers.map((_, c) => {
+      const oc = r.colOrigin[c];
+      if (oc < 0) return 'new';
+      for (let i = 0; i < lim; i++) {
+        const s = r.srcIdx[i];
+        if (s >= 0 && r.rows[i][c] !== o.rows[s][oc]) return 'chg';
+      }
+      return '';
+    });
+  }
+
+  let html = '<thead><tr><th class="rn">#</th>' + headers.map((h, c) => {
+    const b = colBadge[c];
+    return '<th>' + esc(h) + (b === 'new' ? '<span class="colbadge b-new">new</span>' : b === 'chg' ? '<span class="colbadge b-chg">edited</span>' : '') + '</th>';
+  }).join('') + '</tr></thead><tbody>';
+
+  for (let i = 0; i < n; i++) {
+    const row = rows[i];
+    const src = showBefore ? i : r.srcIdx[i];
+    html += '<tr><td class="rn">' + ((showBefore ? i : src) + 1) + '</td>';
+    for (let c = 0; c < headers.length; c++) {
+      const v = row[c] ?? '';
+      let cls = '';
+      if (!showBefore) {
+        const oc = r.colOrigin[c];
+        if (oc >= 0 && src >= 0 && v !== o.rows[src][oc]) cls = ' class="chg" title="was: ' + escAttr(o.rows[src][oc]) + '"';
+      }
+      html += v === '' ? '<td class="blank">·</td>' : '<td' + cls + '>' + esc(v) + '</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  tbl.innerHTML = html;
+  const total = rows.length;
+  $('#previewNote').textContent = total > PREVIEW_ROWS
+    ? 'Showing first ' + fmtInt(PREVIEW_ROWS) + ' of ' + fmtInt(total) + ' rows' + (showBefore ? ' (original)' : '')
+    : fmtInt(total) + ' row' + (total === 1 ? '' : 's') + (showBefore ? ' (original)' : '');
+}
+
+function renderAll() { renderStats(); renderRecipe(); renderPreview(); }
+
+// ---------------- recompute (debounced) ----------------
+let computeTimer = null;
+function recompute(structural) {
+  clearTimeout(computeTimer);
+  computeTimer = setTimeout(() => {
+    applyRecipe();
+    updateHash();
+    if (structural) renderAll();
+    else { renderStats(); renderPreview(); updateCardMeta(); }
+  }, structural ? 0 : 220);
+  if (structural) { /* immediate-ish for structural ops */ }
+}
+function updateCardMeta() {
+  // refresh summaries + counts without rebuilding cards (keeps typing focus)
+  document.querySelectorAll('.step-card').forEach(card => {
+    const step = state.recipe.find(s => String(s.id) === card.dataset.id);
+    if (!step) return;
+    const def = STEP_DEFS[step.type];
+    const cnt = stepCountText(step);
+    const sum = card.querySelector('.step-summary');
+    if (sum) sum.innerHTML = esc(def.describe(step)) +
+      (cnt ? ' <span class="step-count">· ' + esc(cnt) + '</span>' : '') +
+      (step._err ? ' <span class="note err">· ' + esc(step._err) + '</span>' : '');
+  });
+}
+
+// ---------------- change log ----------------
+function buildChangeLog() {
+  const r = state.result;
+  const lines = [];
+  lines.push('DATA CLEANING CHANGE LOG');
+  lines.push('Source file: ' + state.fileName);
+  lines.push('Generated: ' + new Date().toISOString().slice(0, 19).replace('T', ' '));
+  lines.push('');
+  const active = state.recipe.filter(s => s.enabled);
+  if (!active.length) lines.push('(no active steps — data passed through unchanged)');
+  let n = 0;
+  for (const step of active) {
+    const def = STEP_DEFS[step.type];
+    n++;
+    let line = n + '. ' + def.describe(step);
+    const cnt = stepCountText(step);
+    if (cnt) line += '  [' + cnt + ']';
+    if (step._err) line += '  [SKIPPED: ' + step._err + ']';
+    lines.push(line);
+  }
+  lines.push('');
+  if (r) {
+    lines.push('Totals: ' + fmtInt(r.stats.rowsIn) + ' rows in → ' + fmtInt(r.stats.rowsOut) + ' rows out · ' +
+      fmtInt(r.stats.cells) + ' cells changed · ' + fmtInt(r.stats.dupes) + ' duplicates removed · ' +
+      fmtInt(r.stats.empties) + ' empty rows removed');
+  }
+  lines.push('');
+  lines.push('Recipe built with Data Cleaning Workbench (mapzimus/max) — fully client-side.');
+  return lines.join('\n');
+}
+
+// ---------------- recipe JSON + URL hash ----------------
+function recipeJSON() {
+  return JSON.stringify({ tool: 'data-cleaning-workbench', version: 1,
+    steps: state.recipe.map(s => ({ type: s.type, enabled: s.enabled, params: s.params })) }, null, 2);
+}
+function loadRecipeObj(obj) {
+  if (!obj || !Array.isArray(obj.steps)) throw new Error('Not a workbench recipe (missing "steps" array).');
+  const steps = [];
+  for (const raw of obj.steps) {
+    const def = STEP_DEFS[raw.type];
+    if (!def) throw new Error('Unknown step type: ' + raw.type);
+    const params = Object.assign(def.make(), raw.params || {});
+    steps.push({ id: stepIdSeq++, type: raw.type, enabled: raw.enabled !== false, params, _open: false });
+  }
+  state.recipe = steps;
+}
+function updateHash() {
+  try {
+    if (!state.recipe.length) { history.replaceState(null, '', location.pathname + location.search); return; }
+    const compact = JSON.stringify({ v: 1, s: state.recipe.map(s => [s.type, s.enabled ? 1 : 0, s.params]) });
+    const b64 = btoa(unescape(encodeURIComponent(compact))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    if (b64.length < 4000) history.replaceState(null, '', '#r=' + b64);
+  } catch (e) { /* hash sharing is best-effort */ }
+}
+function loadHash() {
+  if (!location.hash.startsWith('#r=')) return false;
+  try {
+    let b64 = location.hash.slice(3).replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const obj = JSON.parse(decodeURIComponent(escape(atob(b64))));
+    if (!obj || !Array.isArray(obj.s)) return false;
+    loadRecipeObj({ steps: obj.s.map(([type, en, params]) => ({ type, enabled: !!en, params })) });
+    return true;
+  } catch (e) { return false; }
+}
+
+// ---------------- data loading ----------------
+function loadText(text, name) {
+  const sel = $('#delimSel').value;
+  const delim = sel === 'auto' ? detectDelimiter(text) : sel;
+  const model = buildModel(text, delim);
+  if (!model || !model.headers.length) {
+    $('#loadStatus').textContent = 'Could not parse that as delimited text.'; $('#loadStatus').className = 'note err';
+    return false;
+  }
+  state.original = model;
+  state.fileName = name || 'pasted.csv';
+  $('#loadStatus').textContent = 'Loaded ' + state.fileName + ': ' + fmtInt(model.rows.length) + ' rows × ' + model.headers.length + ' columns' + (sel === 'auto' ? ' (' + ({',':'comma','\t':'tab',';':'semicolon','|':'pipe'})[delim] + ')' : '');
+  $('#loadStatus').className = 'note ok';
+  $('#mainLayout').hidden = false;
+  recompute(true);
+  return true;
+}
+function readFile(file) {
+  if (!file) return;
+  if (file.size > 60 * 1024 * 1024) { $('#loadStatus').textContent = 'File too large (60 MB limit).'; $('#loadStatus').className = 'note err'; return; }
+  const rd = new FileReader();
+  rd.onload = () => loadText(String(rd.result), file.name);
+  rd.onerror = () => { $('#loadStatus').textContent = 'Could not read that file.'; $('#loadStatus').className = 'note err'; };
+  rd.readAsText(file);
+}
+
+// ---------------- sample data ----------------
+const SAMPLE_CSV = [
+  'customer_name,email,city,signup_date,plan,monthly_price,notes',
+  '  ada lovelace ,ADA.LOVELACE@example.com,london,1843-12-10,Pro,"$1,234.56",first customer',
+  'GRACE HOPPER,grace@example.com,  New York,12/9/1906,pro,$89.00,',
+  'alan turing,alan.t@example.com,london,June 23 1912,Basic,"$1,050.00",prefers email',
+  'Katherine  Johnson,kj@example.com,Hampton,8/26/1918,PRO,$89,',
+  '  ada lovelace ,ADA.LOVELACE@example.com,london,1843-12-10,Pro,"$1,234.56",first customer',
+  'margaret hamilton,mh@example.com,PAOLI,August 17 1936,basic,$49.50,apollo team',
+  'DOROTHY VAUGHAN,dv@example.com,kansas city,9/20/1910,Basic,$49.5,',
+  ',,,,,,',
+  'annie easley,annie@example.com,birmingham,4/23/1933,pro,"$1,199.99",',
+  'Radia Perlman,radia@example.com,  portsmouth  ,1/1/1951,Enterprise,"$2,500.00",spanning tree',
+  'katherine johnson,KJ@EXAMPLE.COM,hampton,1918-08-26,Pro,$89.00,duplicate acct?',
+  'hedy lamarr,hedy@example.com,vienna,November 9 1914,BASIC,$49.50,',
+  'GRACE HOPPER,grace@example.com,  New York,12/9/1906,pro,$89.00,',
+  'jean bartik,jb@example.com,alanthus grove,12/27/1924,basic,  $49.50 ,eniac',
+  'frances allen,fran@example.com,peru,8/4/1932,Pro,$89.00,compilers',
+  ',,,,,,',
+  'lynn conway,lynn@example.com,mount vernon,1/2/1938,enterprise,"$2,500",vlsi',
+  'ADELE GOLDBERG,adele@example.com,cleveland,July 22 1945,PRO,$89.00,smalltalk',
+  'carol shaw,carol@example.com,palo alto,1955/03/02,Basic,$49.50,atari',
+  'mary allen wilkes,maw@example.com,chicago,9/25/1937,basic,$49.50,linc',
+  'Sophie Wilson,sophie@example.com,leeds,June 1957,pro,$89.00,arm — month only',
+  'barbara liskov,bl@example.com,los angeles,11/7/1939,Enterprise,"$2,500.00",substitution',
+  'frances allen,fran@example.com,peru,8/4/1932,Pro,$89.00,compilers',
+  'karen sparck jones,ksj@example.com,huddersfield,8/26/1935,PRO,$89.00,idf',
+  'shafi goldwasser,,new york,1959-11-14,pro,$89.00,email missing',
+  'RUCHI SANGHVI,ruchi@example.com,pune,1/20/1982,Basic,$49.50,news feed',
+  'anita borg,anita@example.com,chicago,January 17 1949,basic,$49.50,systers',
+  'donna dubinsky,dd@example.com,bethesda,1955/07/26,enterprise,"$2,500.00",palm',
+  '  jean sammet,js@example.com,new york,3/23/1928,Pro,$89.00,cobol',
+  'thelma estrin,te@example.com,new york,2/21/1924,basic,$49.50,',
+  'susan kare,sk@example.com,ithaca,2/5/1954,PRO,$89.00,icons',
+  'RADIA PERLMAN,radia@example.com,portsmouth,1/1/1951,Enterprise,"$2,500.00",spanning tree',
+  'evelyn boyd granville,ebg@example.com,washington,May 1 1924,basic,$49.50,',
+  'erna hoover,erna@example.com,irvington,6/19/1926,pro,$89.00,switching',
+  ',,,,,,',
+  'mary kenneth keller,mkk@example.com,cleveland,12/17/1913,Basic,$49.50,first cs phd',
+  'elizabeth feinler,jake@example.com,wheeling,3/2/1931,pro,$89.00,arpanet',
+  'carla meninsky,cm@example.com,,5/=bad=/77,basic,$49.50,date is garbage',
+  'kateryna yushchenko,ky@example.com,chyhyryn,1919-06-08,PRO,$89.00,address programming',
+].join('\r\n');
+
+function makeStep(type, params) {
+  const def = STEP_DEFS[type];
+  return { id: stepIdSeq++, type, enabled: true, params: Object.assign(def.make(), params || {}), _open: false };
+}
+function loadSample(withRecipe) {
+  $('#pasteBox').value = '';
+  loadText(SAMPLE_CSV, 'sample-customers.csv');
+  state.recipe = withRecipe ? [
+    makeStep('rmempty'),
+    makeStep('trim'),
+    makeStep('casing', { cols: ['customer_name', 'city'], mode: 'title' }),
+    makeStep('casing', { cols: ['email'], mode: 'lower' }),
+    makeStep('casing', { cols: ['plan'], mode: 'title' }),
+    makeStep('dedupe'),
+    makeStep('numnorm', { cols: ['monthly_price'], decimals: '2' }),
+    makeStep('datenorm', { cols: ['signup_date'] }),
+  ] : [];
+  recompute(true);
+}
+
+// ---------------- downloads ----------------
+function download(name, text, mime) {
+  const blob = new Blob([text], { type: mime || 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+function baseName() { return state.fileName.replace(/\.[a-z0-9]+$/i, '') || 'data'; }
+function flashBtn(btn) { btn.classList.add('copied'); setTimeout(() => btn.classList.remove('copied'), 1200); }
+function exportNote(msg, kind) {
+  const el = $('#exportNote');
+  el.textContent = msg; el.className = 'note' + (kind ? ' ' + kind : '');
+  setTimeout(() => { if (el.textContent === msg) { el.textContent = ''; el.className = 'note'; } }, 3500);
+}
+
+// ---------------- wiring ----------------
+$('#sampleBtn').addEventListener('click', () => loadSample(false));
+$('#sampleRecipeBtn').addEventListener('click', () => loadSample(true));
+$('#clearBtn').addEventListener('click', () => {
+  state.original = null; state.recipe = []; state.result = null;
+  $('#pasteBox').value = ''; $('#mainLayout').hidden = true; $('#statCards').hidden = true;
+  $('#loadStatus').textContent = ''; $('#parseNote').textContent = '';
+  history.replaceState(null, '', location.pathname + location.search);
+});
+$('#fileBtn').addEventListener('click', () => $('#fileInput').click());
+$('#fileInput').addEventListener('change', (e) => { readFile(e.target.files[0]); e.target.value = ''; });
+$('#parseBtn').addEventListener('click', () => {
+  const t = $('#pasteBox').value;
+  if (!t.trim()) { $('#parseNote').textContent = 'Paste some CSV first.'; $('#parseNote').className = 'note err'; return; }
+  $('#parseNote').textContent = ''; $('#parseNote').className = 'note';
+  loadText(t, 'pasted.csv');
+});
+$('#delimSel').addEventListener('change', () => {
+  // re-parse whatever is in the paste box if that's the active source
+  const t = $('#pasteBox').value;
+  if (t.trim() && state.fileName === 'pasted.csv') loadText(t, 'pasted.csv');
+});
+const drop = $('#dropZone');
+drop.addEventListener('click', () => $('#fileInput').click());
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', (e) => { const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) readFile(f); });
+// also accept drops anywhere on the page
+window.addEventListener('dragover', (e) => e.preventDefault());
+window.addEventListener('drop', (e) => { e.preventDefault(); const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) readFile(f); });
+
+const typeSel = $('#stepTypeSel');
+typeSel.innerHTML = STEP_ORDER.map(t => '<option value="' + t + '">' + esc(STEP_DEFS[t].label) + '</option>').join('');
+$('#addStepBtn').addEventListener('click', () => {
+  const type = typeSel.value;
+  const step = makeStep(type);
+  // sensible defaults for single-col steps: first column
+  if (state.result && state.result.headers.length) {
+    if (type === 'split' || type === 'rename') step.params.col = state.result.headers[0];
+  }
+  step._open = true;
+  state.recipe.push(step);
+  recompute(true);
+});
+
+$('#baSeg').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-v]');
+  if (!btn) return;
+  state.view = btn.dataset.v;
+  $('#baSeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
+  renderPreview();
+});
+
+$('#dlCsvBtn').addEventListener('click', () => {
+  if (!state.result) return;
+  download(baseName() + '-cleaned.csv', toCSV(state.result.headers, state.result.rows), 'text/csv;charset=utf-8');
+  exportNote('Cleaned CSV downloaded.', 'ok');
+});
+$('#dlLogBtn').addEventListener('click', () => {
+  if (!state.result) return;
+  download(baseName() + '-changelog.txt', buildChangeLog());
+  exportNote('Change log downloaded.', 'ok');
+});
+$('#copyLogBtn').addEventListener('click', (e) => {
+  if (!state.result) return;
+  const text = buildChangeLog();
+  const done = () => { flashBtn(e.currentTarget || $('#copyLogBtn')); exportNote('Change log copied to clipboard.', 'ok'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, () => exportNote('Copy failed — use the download instead.', 'err'));
+  else exportNote('Clipboard unavailable — use the download instead.', 'err');
+});
+$('#dlRecipeBtn').addEventListener('click', () => {
+  download(baseName() + '-recipe.json', recipeJSON(), 'application/json');
+  exportNote('Recipe JSON downloaded — import it on another file to replay these steps.', 'ok');
+});
+$('#importRecipeBtn').addEventListener('click', () => $('#recipeFileInput').click());
+$('#recipeFileInput').addEventListener('change', (e) => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try { loadRecipeObj(JSON.parse(String(rd.result))); recompute(true); exportNote('Recipe imported: ' + state.recipe.length + ' steps.', 'ok'); }
+    catch (err) { exportNote('Could not import recipe: ' + err.message, 'err'); }
+  };
+  rd.onerror = () => exportNote('Could not read that file.', 'err');
+  rd.readAsText(f);
+});
+
+// ---- theme ----
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next); localStorage.setItem('max-theme', next);
+});
+
+// ---- boot ----
+const hadHashRecipe = loadHash();
+if (hadHashRecipe) {
+  loadSample(false);            // a shared recipe needs data to demo against; user can load their own
+  // keep the recipe from the hash (loadSample cleared it)
+  loadHash();
+  recompute(true);
+}
+
+// test / automation hooks
+window.dcw = {
+  state, STEP_DEFS, parseRows, buildModel, detectDelimiter, normDate, normNumber,
+  applyRecipe, loadText, loadSample, makeStep, recipeJSON, loadRecipeObj, buildChangeLog, toCSV,
+};
+</script>
+</body>
+</html>

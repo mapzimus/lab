@@ -1,0 +1,124 @@
+{
+ "type": "FeatureCollection",
+ "name": "flashpoints",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+  }
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "name": "Hannah Dustin Bridge",
+    "role": "north flank",
+    "kind": "crossing",
+    "note": "Contoocook/Merrimack confluence; far northern crossing"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -71.5906,
+     43.2881
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "name": "Exit 17 / Market Basket",
+    "role": "supply",
+    "kind": "supply",
+    "note": "northern supply prize, Penacook"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -71.57292,
+     43.29172
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "name": "Sewalls Falls Bridge",
+    "role": "crossing",
+    "kind": "crossing",
+    "note": "1915 municipal-redlist span, AADT 3,100 - fragile flank"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -71.56468,
+     43.27113
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "name": "Exit 16",
+    "role": "crossing",
+    "kind": "junction",
+    "note": "northern breakthrough point"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -71.53899,
+     43.23691
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "name": "Fort Eddy / TJ Maxx plaza",
+    "role": "east bank",
+    "kind": "strongpoint",
+    "note": "east-bank commercial seam by Everett Arena / Loudon Rd; river-assault crossing off downtown"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -71.5285,
+     43.212
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "name": "NHTI + McAuliffe-Shepard",
+    "role": "east",
+    "kind": "strongpoint",
+    "note": "NHTI / McAuliffe-Shepard campus, College Dr (east bank, north of Fort Eddy)"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -71.5318,
+     43.224
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "name": "Bow Junction (I-93/I-89)",
+    "role": "south gate",
+    "kind": "junction",
+    "note": "southern hinge / gateway interchange"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -71.528,
+     43.165
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Right Triangle Explorer</title>
+<meta name="description" content="Drag the legs of a right triangle and watch a² + b² = c² come alive with squares drawn on each side. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --sq-a:#2f6fdb; --sq-b:#1f8a5e; --sq-c:#7c3aed;
+    --grid-axis:#9aa4b2; --grid-line:#e4e8ee; --canvas-bg:#ffffff;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    --sq-a:#5b8fee; --sq-b:#34c98d; --sq-c:#a78bfa;
+    --grid-axis:#59626f; --grid-line:#232833; --canvas-bg:#12151b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --sq-a:#5b8fee; --sq-b:#34c98d; --sq-c:#a78bfa;
+      --grid-axis:#59626f; --grid-line:#232833; --canvas-bg:#12151b;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
+
+  canvas { display: block; width: 100%; height: auto; border-radius: 10px; touch-action: none; background: var(--canvas-bg); }
+  .hint { text-align: center; color: var(--muted); font-size: .82rem; margin: 8px 0 0; }
+  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 8px; font-size: .78rem; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+  .section-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; margin: 0 0 10px; }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .presets button { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 8px 14px; font-size: .85rem; font-weight: 700; color: var(--text); font-family: var(--sans); }
+  .presets button:hover { border-color: var(--accent); color: var(--accent); }
+  .presets button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .presets button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-2); color: var(--accent); }
+
+  .readouts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .ro { background: var(--surface-2); border-radius: 10px; padding: 12px 14px; }
+  .ro .rlab { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; margin-bottom: 3px; }
+  .ro .rval { font-size: 1.15rem; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+  .ro.wide { grid-column: 1 / -1; }
+  .ro.a .rval { color: var(--sq-a); }
+  .ro.b .rval { color: var(--sq-b); }
+  .ro.c .rval { color: var(--sq-c); }
+
+  .equation { font-size: 1rem; line-height: 1.6; background: var(--surface-2); border-radius: 10px; padding: 14px; font-variant-numeric: tabular-nums; }
+  .triple-note { margin-top: 10px; border-radius: 10px; padding: 10px 14px; font-size: .88rem; font-weight: 700; text-align: center; }
+  .triple-note.yes { background: rgba(26,127,75,.14); color: var(--ok); }
+  .triple-note.no { background: var(--surface-2); color: var(--muted); font-weight: 600; }
+
+  details.trig { margin-top: 0; }
+  details.trig summary { cursor: pointer; font-weight: 700; font-size: .85rem; color: var(--accent); padding: 4px 0; }
+  details.trig summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .trig-body { margin-top: 10px; }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  @media (max-width: 420px) { .readouts { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← max</a>
+      <h1>Right Triangle Explorer</h1>
+      <p>Drag the legs of a right triangle and watch the Pythagorean theorem play out visually — squares grow on each side as a² + b² = c².</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="card">
+    <canvas id="plot" width="640" height="480" aria-label="Right triangle with squares drawn on its three sides — drag the blue and green handles to change the leg lengths"></canvas>
+    <div class="hint">Drag the blue handle (leg a) or green handle (leg b) — watch the squares grow</div>
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--sq-a)"></span>square on a</span>
+      <span><span class="swatch" style="background:var(--sq-b)"></span>square on b</span>
+      <span><span class="swatch" style="background:var(--sq-c)"></span>square on c</span>
+    </div>
+    <div class="section-label" style="margin-top:16px;">Presets</div>
+    <div class="presets" id="presets">
+      <button type="button" data-a="3" data-b="4">3–4–5</button>
+      <button type="button" data-a="6" data-b="8">6–8–10</button>
+      <button type="button" data-a="5" data-b="12">5–12–13</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="readouts">
+      <div class="ro a"><div class="rlab">Leg a</div><div class="rval" id="r-a">—</div></div>
+      <div class="ro b"><div class="rlab">Leg b</div><div class="rval" id="r-b">—</div></div>
+      <div class="ro c"><div class="rlab">Hypotenuse c</div><div class="rval" id="r-c">—</div></div>
+      <div class="ro a"><div class="rlab">Area a²</div><div class="rval" id="r-aa">—</div></div>
+      <div class="ro b"><div class="rlab">Area b²</div><div class="rval" id="r-bb">—</div></div>
+      <div class="ro c"><div class="rlab">Area c²</div><div class="rval" id="r-cc">—</div></div>
+      <div class="ro wide">
+        <div class="rlab">Pythagorean theorem</div>
+        <div class="equation" id="r-eq">—</div>
+      </div>
+    </div>
+    <div class="triple-note" id="r-triple">—</div>
+  </div>
+
+  <div class="card">
+    <details class="trig">
+      <summary>Optional: angle &amp; trig ratios at vertex A</summary>
+      <div class="trig-body">
+        <div class="readouts">
+          <div class="ro"><div class="rlab">∠A (degrees)</div><div class="rval" id="r-angle">—</div></div>
+          <div class="ro"><div class="rlab">sin A = b/c</div><div class="rval" id="r-sin">—</div></div>
+          <div class="ro"><div class="rlab">cos A = a/c</div><div class="rval" id="r-cos">—</div></div>
+          <div class="ro"><div class="rlab">tan A = b/a</div><div class="rval" id="r-tan">—</div></div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <footer class="app">Nothing you enter here ever leaves your browser · a <strong>max</strong> tool</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var LKEY="max-pythagoras-legs";
+  var LEG_MIN=1, LEG_MAX=14, PAD=1.2;
+  var a=3, b=4;
+  try{var s=JSON.parse(localStorage.getItem(LKEY));
+    if(s&&isFinite(s.a)&&isFinite(s.b)){a=clampLeg(s.a);b=clampLeg(s.b);}
+  }catch(e){}
+
+  function clampLeg(v){v=Math.round(v);return Math.max(LEG_MIN,Math.min(LEG_MAX,v));}
+  function save(){try{localStorage.setItem(LKEY,JSON.stringify({a:a,b:b}));}catch(e){}}
+
+  var canvas=document.getElementById("plot"), ctx=canvas.getContext("2d");
+  var HANDLE_R=11;
+  var DRAG=null; // 'a' | 'b' | null
+
+  // current view bounds — tight-fit at rest, held stable during a drag gesture
+  var bounds=computeBounds(a,b);
+
+  function computeBounds(av,bv){
+    return {xMin:-bv-PAD, xMax:av+bv+PAD, yMin:-av-PAD, yMax:av+bv+PAD};
+  }
+
+  function fmt(n){
+    if(!isFinite(n)) return "—";
+    var r=Math.round(n*100)/100;
+    return (Object.is(r,-0)?0:r).toString();
+  }
+
+  function cssVar(name){
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function resize(){
+    var dpr=window.devicePixelRatio||1, W=canvas.clientWidth||640, H=Math.round(W*0.75);
+    canvas.width=W*dpr; canvas.height=H*dpr; canvas.style.height=H+"px";
+    ctx.setTransform(dpr,0,0,dpr,0,0); draw();
+  }
+
+  function transformFor(bd,W,H){
+    var dw=bd.xMax-bd.xMin, dh=bd.yMax-bd.yMin;
+    var scale=Math.min(W/dw,H/dh);
+    var drawW=dw*scale, drawH=dh*scale;
+    return {scale:scale, offX:(W-drawW)/2, offY:(H-drawH)/2, drawW:drawW, drawH:drawH};
+  }
+  function toScreen(mx,my,bd,t){
+    return {x:t.offX+(mx-bd.xMin)*t.scale, y:t.offY+t.drawH-(my-bd.yMin)*t.scale};
+  }
+  function toMath(sx,sy,bd,t){
+    return {x:(sx-t.offX)/t.scale+bd.xMin, y:bd.yMin+(t.drawH-(sy-t.offY))/t.scale};
+  }
+
+  function drawLabel(text,x,y,color){
+    ctx.font="bold 12px -apple-system,Arial,sans-serif";
+    var padX=6,padY=4,lineH=14;
+    var w=ctx.measureText(text).width;
+    ctx.fillStyle="rgba(255,255,255,.85)";
+    ctx.fillRect(x-w/2-padX, y-lineH/2-padY, w+padX*2, lineH+padY*2);
+    ctx.fillStyle=color; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText(text,x,y);
+  }
+
+  function draw(){
+    var dpr=window.devicePixelRatio||1, W=canvas.width/dpr, H=canvas.height/dpr;
+    var sqA=cssVar("--sq-a")||"#2f6fdb", sqB=cssVar("--sq-b")||"#1f8a5e", sqC=cssVar("--sq-c")||"#7c3aed";
+    var gridAxis=cssVar("--grid-axis")||"#9aa4b2", gridLine=cssVar("--grid-line")||"#e4e8ee";
+    var canvasBg=cssVar("--canvas-bg")||"#ffffff";
+    var inkColor=cssVar("--text")||"#1c2530";
+
+    ctx.clearRect(0,0,W,H); ctx.fillStyle=canvasBg; ctx.fillRect(0,0,W,H);
+
+    var t=transformFor(bounds,W,H);
+    function S(mx,my){return toScreen(mx,my,bounds,t);}
+
+    // grid
+    ctx.lineWidth=1; ctx.font="10px -apple-system,Arial,sans-serif";
+    var gxStart=Math.ceil(bounds.xMin), gxEnd=Math.floor(bounds.xMax);
+    var gyStart=Math.ceil(bounds.yMin), gyEnd=Math.floor(bounds.yMax);
+    for(var gx=gxStart;gx<=gxEnd;gx++){
+      var v=S(gx,0);
+      ctx.strokeStyle=gx===0?gridAxis:gridLine;
+      ctx.beginPath();ctx.moveTo(v.x,0);ctx.lineTo(v.x,H);ctx.stroke();
+    }
+    for(var gy=gyStart;gy<=gyEnd;gy++){
+      var v2=S(0,gy);
+      ctx.strokeStyle=gy===0?gridAxis:gridLine;
+      ctx.beginPath();ctx.moveTo(0,v2.y);ctx.lineTo(W,v2.y);ctx.stroke();
+    }
+    // bold axes
+    var o=S(0,0);
+    ctx.strokeStyle=gridAxis; ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(o.x,0);ctx.lineTo(o.x,H);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,o.y);ctx.lineTo(W,o.y);ctx.stroke();
+
+    var O={x:0,y:0}, A={x:a,y:0}, B={x:0,y:b};
+    var perp={x:b,y:a}; // hypotenuse rotated 90°, pointing away from origin (length = c automatically)
+    var C1={x:B.x+perp.x,y:B.y+perp.y}, C2={x:A.x+perp.x,y:A.y+perp.y};
+
+    var sqAPts=[O,A,{x:a,y:-a},{x:0,y:-a}];
+    var sqBPts=[O,B,{x:-b,y:b},{x:-b,y:0}];
+    var sqCPts=[A,B,C1,C2];
+    var tri=[O,A,B];
+
+    function fillPoly(pts,fill,stroke){
+      ctx.beginPath();
+      pts.forEach(function(p,i){var s=S(p.x,p.y); i===0?ctx.moveTo(s.x,s.y):ctx.lineTo(s.x,s.y);});
+      ctx.closePath();
+      if(fill){ctx.fillStyle=fill;ctx.fill();}
+      if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke();}
+    }
+
+    // triangle interior
+    fillPoly(tri,"rgba(124,58,237,.06)",null);
+
+    // three squares (signature visual)
+    fillPoly(sqAPts,hexToRgba(sqA,.22),sqA);
+    fillPoly(sqBPts,hexToRgba(sqB,.22),sqB);
+    fillPoly(sqCPts,hexToRgba(sqC,.24),sqC);
+
+    // right-angle marker at O, inside the triangle
+    var ms=Math.max(0.35,Math.min(a,b)*0.14);
+    ms=Math.min(ms,Math.min(a,b)*0.5);
+    fillPoly([{x:0,y:0},{x:ms,y:0},{x:ms,y:ms},{x:0,y:ms}],"rgba(0,0,0,0)",inkColor);
+
+    // triangle edges (bold) + hypotenuse
+    ctx.lineWidth=2.5;
+    ctx.strokeStyle=sqA; ctx.beginPath();var sO=S(O.x,O.y),sA=S(A.x,A.y);ctx.moveTo(sO.x,sO.y);ctx.lineTo(sA.x,sA.y);ctx.stroke();
+    ctx.strokeStyle=sqB; ctx.beginPath();var sB=S(B.x,B.y);ctx.moveTo(sO.x,sO.y);ctx.lineTo(sB.x,sB.y);ctx.stroke();
+    ctx.strokeStyle=sqC; ctx.beginPath();ctx.moveTo(sA.x,sA.y);ctx.lineTo(sB.x,sB.y);ctx.stroke();
+
+    // area labels at square centroids
+    var c=Math.sqrt(a*a+b*b);
+    var la=S(a/2,-a/2); drawLabel("a² = "+fmt(a*a), la.x, la.y, sqA);
+    var lb=S(-b/2,b/2); drawLabel("b² = "+fmt(b*b), lb.x, lb.y, sqB);
+    var lc=S((a+b)/2,(a+b)/2); drawLabel("c² = "+fmt(c*c), lc.x, lc.y, sqC);
+
+    // point handles
+    [{p:A,id:"A",color:sqA},{p:B,id:"B",color:sqB}].forEach(function(h){
+      var s=S(h.p.x,h.p.y);
+      ctx.fillStyle=h.color; ctx.beginPath(); ctx.arc(s.x,s.y,HANDLE_R,0,2*Math.PI); ctx.fill();
+      ctx.fillStyle="#fff"; ctx.font="bold 12px -apple-system,Arial,sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText(h.id,s.x,s.y);
+    });
+    // origin label
+    var so=S(0,0);
+    ctx.fillStyle=inkColor; ctx.font="bold 11px -apple-system,Arial,sans-serif"; ctx.textAlign="right"; ctx.textBaseline="top";
+    ctx.fillText("O",so.x-6,so.y+6);
+
+    updateReadouts(a,b,c);
+  }
+
+  function hexToRgba(hex,alpha){
+    hex=(hex||"").trim();
+    if(hex.charAt(0)!=="#") return hex; // already a color function / keyword
+    var h=hex.slice(1);
+    if(h.length===3) h=h.split("").map(function(c){return c+c;}).join("");
+    var r=parseInt(h.substring(0,2),16), g=parseInt(h.substring(2,4),16), bch=parseInt(h.substring(4,6),16);
+    return "rgba("+r+","+g+","+bch+","+alpha+")";
+  }
+
+  function updateReadouts(av,bv,cv){
+    var aa=av*av, bb=bv*bv, cc=aa+bb;
+    document.getElementById("r-a").textContent=av;
+    document.getElementById("r-b").textContent=bv;
+    document.getElementById("r-c").textContent=fmt(cv);
+    document.getElementById("r-aa").textContent=aa;
+    document.getElementById("r-bb").textContent=bb;
+    document.getElementById("r-cc").textContent=cc;
+    document.getElementById("r-eq").textContent=
+      "a² + b² = c²  →  "+aa+" + "+bb+" = "+cc+"  →  c = √"+cc+" = "+fmt(cv);
+
+    var isWhole=Math.abs(cv-Math.round(cv))<1e-9;
+    var tripleEl=document.getElementById("r-triple");
+    if(isWhole){
+      tripleEl.className="triple-note yes";
+      tripleEl.textContent="✓ c = "+Math.round(cv)+" is a whole number — ("+av+", "+bv+", "+Math.round(cv)+") is a Pythagorean triple!";
+    } else {
+      tripleEl.className="triple-note no";
+      tripleEl.textContent="c ≈ "+fmt(cv)+" is not a whole number here — try a preset for a perfect triple.";
+    }
+
+    var angA=Math.atan2(bv,av)*180/Math.PI;
+    document.getElementById("r-angle").textContent=fmt(angA)+"°";
+    document.getElementById("r-sin").textContent=fmt(bv/cv);
+    document.getElementById("r-cos").textContent=fmt(av/cv);
+    document.getElementById("r-tan").textContent=fmt(bv/av);
+
+    // reflect current values on preset buttons
+    document.querySelectorAll("#presets button").forEach(function(btn){
+      var pa=+btn.getAttribute("data-a"), pb=+btn.getAttribute("data-b");
+      btn.setAttribute("aria-pressed", (pa===av&&pb===bv) ? "true":"false");
+    });
+  }
+
+  // drag handling
+  function hitPoint(sx,sy){
+    var dpr=window.devicePixelRatio||1, W=canvas.width/dpr, H=canvas.height/dpr;
+    var t=transformFor(bounds,W,H);
+    var sA=toScreen(a,0,bounds,t), sB=toScreen(0,b,bounds,t);
+    if(Math.hypot(sx-sA.x,sy-sA.y)<HANDLE_R*1.8) return "a";
+    if(Math.hypot(sx-sB.x,sy-sB.y)<HANDLE_R*1.8) return "b";
+    return null;
+  }
+  function eventPos(e){
+    var r=canvas.getBoundingClientRect();
+    var src=e.touches?e.touches[0]:e;
+    return{sx:src.clientX-r.left, sy:src.clientY-r.top};
+  }
+  function onDown(e){
+    var pos=eventPos(e); DRAG=hitPoint(pos.sx,pos.sy);
+    if(DRAG){
+      e.preventDefault();
+      // freeze a generous view for the whole gesture so nothing clips mid-drag
+      bounds=computeBounds(DRAG==="a"?LEG_MAX:a, DRAG==="b"?LEG_MAX:b);
+      draw();
+    }
+  }
+  function onMove(e){
+    if(!DRAG) return; e.preventDefault();
+    var dpr=window.devicePixelRatio||1, W=canvas.width/dpr, H=canvas.height/dpr;
+    var t=transformFor(bounds,W,H);
+    var pos=eventPos(e);
+    var m=toMath(pos.sx,pos.sy,bounds,t);
+    if(DRAG==="a") a=clampLeg(m.x);
+    else b=clampLeg(m.y);
+    save(); draw();
+  }
+  function onUp(){
+    if(DRAG){ DRAG=null; bounds=computeBounds(a,b); save(); draw(); }
+  }
+
+  canvas.addEventListener("mousedown",onDown);
+  canvas.addEventListener("mousemove",onMove);
+  window.addEventListener("mouseup",onUp);
+  canvas.addEventListener("touchstart",onDown,{passive:false});
+  canvas.addEventListener("touchmove",onMove,{passive:false});
+  canvas.addEventListener("touchend",onUp);
+  window.addEventListener("resize",resize);
+
+  document.getElementById("presets").addEventListener("click",function(e){
+    var btn=e.target.closest("button"); if(!btn) return;
+    a=clampLeg(+btn.getAttribute("data-a"));
+    b=clampLeg(+btn.getAttribute("data-b"));
+    bounds=computeBounds(a,b);
+    save(); draw();
+  });
+
+  resize();
+
+  // re-draw when the theme changes so the canvas colors follow the toggle
+  new MutationObserver(draw).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+})();
+
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

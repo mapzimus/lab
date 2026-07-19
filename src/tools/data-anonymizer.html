@@ -1,0 +1,1117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Anonymizer</title>
+<meta name="description" content="Load a CSV, pick a masking strategy per column, get an anonymized CSV out — for sharing sample data without leaking real PII. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 9px 14px; font-size: .86rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn:disabled:hover { border-color: var(--border); color: var(--text); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.sm { padding: 5px 10px; font-size: .78rem; }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; margin-bottom: 16px; }
+  .note { color: var(--muted); font-size: .8rem; }
+  .note.err { color: var(--danger); }
+  .note.okc { color: var(--ok); }
+  .hide { display: none !important; }
+  body:not(.loaded) .needs-data { display: none; }
+  .spacer { flex: 1 1 auto; }
+  .cap { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+
+  input[type="text"], input[type="number"], input[type="search"], textarea, select { font-family: var(--sans); font-size: .85rem; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+  input[type="checkbox"] { accent-color: var(--accent); width: 15px; height: 15px; vertical-align: middle; }
+
+  /* ---- privacy banner ---- */
+  .privacy-banner { display: flex; align-items: flex-start; gap: 10px; background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--ok); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; font-size: .84rem; color: var(--text); }
+  .privacy-banner .pi { font-size: 1.1rem; line-height: 1.2; }
+  .privacy-banner strong { color: var(--ok); }
+
+  /* ---- input card (shared pattern) ---- */
+  #fileInput { display: none; }
+  #dropzone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 30px 16px; text-align: center; cursor: pointer; background: var(--surface-2); transition: border-color .15s, background .15s; }
+  #dropzone:hover, #dropzone:focus-visible, #dropzone.drag { border-color: var(--accent); }
+  #dropzone.drag { background: var(--surface); }
+  #dropzone .dz-icon { font-size: 1.7rem; line-height: 1; margin-bottom: 8px; color: var(--muted); }
+  #dropzone .dz-main { font-size: .95rem; }
+  #dropzone .dz-main .linky { color: var(--accent); text-decoration: underline; }
+  #dropzone .dz-sub { color: var(--muted); font-size: .8rem; margin-top: 4px; }
+  body.loaded #dropzone { padding: 12px 16px; }
+  body.loaded #dropzone .dz-icon, body.loaded #dropzone .dz-sub { display: none; }
+  .input-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 12px; }
+  .inline-lbl { display: inline-flex; align-items: center; gap: 7px; font-size: .84rem; color: var(--muted); white-space: nowrap; }
+  .inline-lbl input[type="text"], .inline-lbl input[type="number"] { width: 100px; }
+  #pasteBox { margin-top: 12px; }
+  #pasteBox summary { cursor: pointer; font-size: .86rem; color: var(--muted); }
+  #pasteBox summary:hover { color: var(--accent); }
+  #pasteBox textarea { width: 100%; min-height: 140px; margin-top: 10px; font-family: var(--mono); font-size: .8rem; white-space: pre; }
+
+  /* ---- stats strip ---- */
+  .strip { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .pill { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 5px 13px; font-size: .82rem; color: var(--muted); }
+  .pill strong { color: var(--text); font-weight: 600; }
+
+  /* ---- seed / global controls ---- */
+  .seed-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .seed-row input#seedInput { width: 160px; font-family: var(--mono); }
+  #applyNote { min-height: 1.1em; }
+
+  /* ---- column config table ---- */
+  .cfg-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+  table.cfg { border-collapse: separate; border-spacing: 0; width: 100%; font-size: .82rem; }
+  table.cfg th, table.cfg td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; text-align: left; }
+  table.cfg thead th { background: var(--surface-2); position: sticky; top: 0; font-size: .72rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  table.cfg tbody tr:last-child td { border-bottom: none; }
+  table.cfg tbody tr:hover td { background: var(--surface-2); }
+  .cfg-name { font-weight: 600; white-space: nowrap; }
+  .cfg-sub { color: var(--muted); font-size: .74rem; margin-top: 2px; }
+  .cfg-sample { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-family: var(--mono); font-size: .74rem; }
+  .cfg-strategy select { width: 100%; min-width: 160px; }
+  .cfg-params { min-width: 180px; }
+  .cfg-params .pf { display: inline-flex; align-items: center; gap: 5px; margin: 2px 6px 2px 0; font-size: .78rem; color: var(--muted); }
+  .cfg-params input[type="number"] { width: 66px; }
+  .cfg-params select { min-width: 140px; }
+  .cfg-risk { text-align: center; white-space: nowrap; }
+  .risk-flag { color: var(--danger); font-size: .78rem; cursor: help; }
+  .risk-ok { color: var(--muted); font-size: .78rem; }
+  .badge { font-size: .6rem; letter-spacing: .05em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-weight: 600; display: inline-block; }
+  .b-number { color: var(--accent); }
+  .b-date { color: var(--ok); }
+  .b-empty { color: var(--danger); }
+
+  /* ---- preview ---- */
+  .toggle-group { display: inline-flex; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .toggle-group button { border: none; background: var(--surface); color: var(--text); padding: 8px 14px; font-size: .84rem; cursor: pointer; }
+  .toggle-group button.active { background: var(--accent); color: var(--accent-ink); }
+  .toggle-group button + button { border-left: 1px solid var(--border); }
+  .grid-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .grid-wrap { max-height: 56vh; overflow: auto; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  table.datagrid { border-collapse: separate; border-spacing: 0; width: 100%; font-size: .82rem; font-variant-numeric: tabular-nums; }
+  .datagrid th, .datagrid td { padding: 6px 10px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); white-space: nowrap; max-width: 300px; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+  .datagrid th:last-child, .datagrid td:last-child { border-right: none; }
+  .datagrid thead th { position: sticky; top: 0; z-index: 3; background: var(--surface-2); }
+  .datagrid td { background: var(--surface); }
+  .datagrid .rownum, .datagrid .rownum-h { position: sticky; left: 0; color: var(--muted); font-family: var(--mono); font-size: .7rem; text-align: right; }
+  .datagrid .rownum { z-index: 1; }
+  .datagrid .rownum-h { z-index: 4; background: var(--surface-2); }
+  .datagrid tbody tr:hover td, .datagrid tbody tr:hover td.rownum { background: var(--surface-2); }
+  .datagrid td.cempty::after { content: "–"; color: var(--muted); opacity: .35; }
+  .hwarn { color: var(--danger); font-size: .75rem; margin-left: 4px; cursor: help; }
+
+  /* ---- k-anon panel ---- */
+  .kanon-list { margin: 8px 0 0; padding-left: 1.2em; font-size: .82rem; }
+  .kanon-list li { margin-bottom: 3px; }
+  .kanon-list .tv { font-family: var(--mono); }
+  .kanon-list .tc { color: var(--muted); margin-left: 8px; }
+
+  /* ---- export ---- */
+  .tb-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .tb-row + .tb-row { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
+  #logPreview { width: 100%; min-height: 110px; font-family: var(--mono); font-size: .76rem; white-space: pre; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-top: 10px; }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 16px 12px 40px; }
+    #dropzone { padding: 20px 12px; }
+    .inline-lbl input[type="text"], .inline-lbl input[type="number"] { width: 90px; }
+    .grid-wrap { max-height: 50vh; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Data Anonymizer</h1>
+      <p>Load a CSV, pick a masking strategy for each column, and export a shareable, anonymized copy — without a spreadsheet or a server.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <div class="privacy-banner">
+    <span class="pi" aria-hidden="true">🔒</span>
+    <span><strong>Nothing is uploaded.</strong> Your file is parsed, masked, and exported entirely inside this browser tab — it never touches a server. Close the tab and it's gone.</span>
+  </div>
+
+  <!-- ============ input ============ -->
+  <section class="panel" id="inputCard" aria-label="Load data">
+    <div id="dropzone" tabindex="0" role="button" aria-label="Drop a CSV file here, or press Enter to choose a file">
+      <div class="dz-icon" aria-hidden="true">⇪</div>
+      <div class="dz-main">Drop a <strong>.csv</strong> file here — or <span class="linky">choose a file</span></div>
+      <div class="dz-sub">Everything runs in your browser. Your data never leaves this page.</div>
+    </div>
+    <input type="file" id="fileInput" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain" aria-hidden="true" tabindex="-1">
+    <div class="input-row">
+      <button class="btn" id="exampleBtn" type="button">Try an example</button>
+      <label class="inline-lbl">Delimiter
+        <select id="delimSel">
+          <option value="auto" selected>Auto-detect</option>
+          <option value="comma">Comma ,</option>
+          <option value="semicolon">Semicolon ;</option>
+          <option value="tab">Tab</option>
+          <option value="pipe">Pipe |</option>
+        </select>
+      </label>
+      <span class="note" id="inputNote" role="status"></span>
+    </div>
+    <details id="pasteBox">
+      <summary>Or paste data as text</summary>
+      <textarea id="pasteArea" spellcheck="false" aria-label="Paste CSV text here" placeholder="name,email,age&#10;Ada Lovelace,ada@example.com,36&#10;Grace Hopper,grace@example.com,45"></textarea>
+      <div style="margin-top:8px"><button class="btn primary" id="loadPasteBtn" type="button">Load pasted text</button></div>
+    </details>
+  </section>
+
+  <!-- ============ stats strip ============ -->
+  <section class="strip needs-data" id="statsStrip" aria-label="Dataset summary">
+    <span class="pill" id="stName"></span>
+    <span class="pill"><strong id="stShape"></strong></span>
+    <span class="pill" id="stDelim"></span>
+  </section>
+
+  <!-- ============ seed + apply ============ -->
+  <section class="panel needs-data" id="seedCard" aria-label="Anonymization settings">
+    <div class="cap">Reproducibility</div>
+    <div class="seed-row">
+      <label class="inline-lbl">Seed <input type="text" id="seedInput" placeholder="(blank = random each time)" aria-label="Seed for reproducible randomization" title="Same seed + same data + same strategies = same output every time"></label>
+      <button class="btn primary" id="applyBtn" type="button">↻ Apply anonymization</button>
+      <button class="btn sm" id="resetAutoBtn" type="button" title="Reset every column back to its auto-suggested strategy">↺ Reset to suggested</button>
+      <span class="note" id="applyNote" role="status"></span>
+    </div>
+  </section>
+
+  <!-- ============ per-column strategy picker ============ -->
+  <section class="panel needs-data" id="cfgCard" aria-label="Per-column masking strategy">
+    <div class="cap">Columns &amp; masking strategy</div>
+    <div class="cfg-wrap">
+      <table class="cfg" id="cfgTable">
+        <thead>
+          <tr>
+            <th>Column</th>
+            <th>Sample values</th>
+            <th>Strategy</th>
+            <th>Options</th>
+            <th>Risk</th>
+          </tr>
+        </thead>
+        <tbody id="cfgBody"></tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:8px">Strategies were auto-suggested from column names and sample values — override any of them. ⚠ marks columns that look sensitive but are currently left unmasked.</p>
+  </section>
+
+  <!-- ============ preview ============ -->
+  <section class="panel needs-data" id="previewCard" aria-label="Preview">
+    <div class="grid-top">
+      <div class="toggle-group" role="group" aria-label="Preview mode">
+        <button type="button" id="tabOrig" data-mode="orig">Original</button>
+        <button type="button" id="tabAnon" data-mode="anon" class="active">Anonymized</button>
+      </div>
+      <span class="spacer"></span>
+      <span class="note" id="previewNote"></span>
+    </div>
+    <div class="grid-wrap" tabindex="0" aria-label="Data preview (scrollable)"><table class="datagrid" id="grid"></table></div>
+  </section>
+
+  <!-- ============ k-anonymity check ============ -->
+  <section class="panel needs-data" id="kanonCard" aria-label="Re-identification risk check">
+    <div class="cap">Rough re-identification check (k-anonymity-ish)</div>
+    <div id="kanonPanel"></div>
+  </section>
+
+  <!-- ============ export ============ -->
+  <section class="panel needs-data" id="exportCard" aria-label="Export">
+    <div class="tb-row">
+      <button class="btn primary" id="dlCsv" type="button">⬇ Download anonymized CSV</button>
+      <button class="btn" id="dlJson" type="button">⬇ Download JSON</button>
+      <button class="btn" id="copyCsv" type="button">⧉ Copy CSV</button>
+      <span class="spacer"></span>
+      <span class="note" id="exportNote"></span>
+    </div>
+    <div class="tb-row">
+      <button class="btn" id="dlLog" type="button">⬇ Download transformation log</button>
+      <span class="note">An auditable record of exactly which strategy (and settings) was applied to each column.</span>
+    </div>
+    <pre id="logPreview" aria-label="Transformation log preview"></pre>
+  </section>
+
+  <footer class="app">Everything above runs locally in your browser — nothing is uploaded. Fake data is for demos and testing only. · a <strong>max</strong> tool</footer>
+</div>
+
+<script type="module">
+/* ============================================================
+   Data Anonymizer — standalone, fully client-side, zero deps.
+   Parses a CSV, auto-suggests a masking strategy per column,
+   applies it in one pass per column (O(n) per column), and
+   exports the anonymized result. SubtleCrypto (SHA-256) is a
+   browser built-in, used only for the "Hash" strategy.
+   ============================================================ */
+const $ = (s) => document.querySelector(s);
+const MAX_RENDER = 200;
+const DELIM_CHARS = { comma: ',', semicolon: ';', tab: '\t', pipe: '|' };
+const DELIM_NAMES = { ',': 'comma', ';': 'semicolon', '\t': 'tab', '|': 'pipe' };
+
+// ---------- state ----------
+const S = {
+  loaded: false,
+  headers: [], rows: [], types: [],
+  srcText: '', srcName: '', srcSize: 0, delim: ',',
+  colConfig: [],       // per-column { subtype, strategy, params, sensitiveSubtype, auto:{...} }
+  anonRows: null,       // full anonymized matrix, same shape as rows
+  log: null,
+  kanon: null,
+  previewMode: 'anon',
+};
+
+// ---------- tiny helpers ----------
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const escAttr = (s) => esc(s).replace(/"/g, '&quot;');
+const fmtInt = (n) => n.toLocaleString();
+const plural = (n, word) => fmtInt(n) + ' ' + word + (n === 1 ? '' : 's');
+function fmtBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+  return (n / 1048576).toFixed(1) + ' MB';
+}
+function parseNum(v) {
+  const s = String(v).trim();
+  if (s === '') return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+function numOr(v, d) { const n = +v; return Number.isFinite(n) ? n : d; }
+const DATE_RE_ISO = /^\d{4}-\d{1,2}-\d{1,2}([T ]\d{1,2}:\d{2}(:\d{2}(\.\d+)?)?\s*(Z|[+-]\d{2}:?\d{2})?)?$/;
+const DATE_RE_SLASH = /^\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4}$/;
+const DATE_RE_YMD = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
+const isDateStr = (s) => DATE_RE_ISO.test(s) || DATE_RE_SLASH.test(s) || DATE_RE_YMD.test(s);
+const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// ---------- seeded PRNG (mulberry32, same recipe as data-generator.html) ----------
+function hashSeed(str) { let h = 1779033703 ^ str.length; for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; } return (h >>> 0); }
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function makeRng(seedStr, colIdx, colName, tag) {
+  const base = (seedStr && seedStr.trim()) ? seedStr.trim() : ('nondeterministic-' + Math.random());
+  return mulberry32(hashSeed(base + '::' + colIdx + '::' + colName + '::' + tag));
+}
+const ri = (rng, a, b) => Math.floor(rng() * (b - a + 1)) + a;
+const pick = (rng, arr) => arr[Math.floor(rng() * arr.length)];
+
+// ---------- quote-aware delimited-text parser (same recipe as csv-explorer.html) ----------
+function parseRows(text, delim) {
+  const rows = [];
+  let row = [], field = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; } else q = false;
+      } else field += ch;
+    } else if (ch === '"' && field === '') {
+      q = true;
+    } else if (ch === delim) {
+      row.push(field); field = '';
+    } else if (ch === '\n') {
+      row.push(field); rows.push(row); row = []; field = '';
+    } else if (ch === '\r') {
+      if (text[i + 1] === '\n') i++;
+      row.push(field); rows.push(row); row = []; field = '';
+    } else field += ch;
+  }
+  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+function buildModel(text, delim) {
+  const raw = parseRows(text, delim);
+  if (!raw.length) return { headers: [], rows: [] };
+  let width = 0;
+  for (const r of raw) if (r.length > width) width = r.length;
+  const headers = raw[0].slice();
+  while (headers.length < width) headers.push('');
+  const named = headers.map((h, i) => h.trim() === '' ? 'Column ' + (i + 1) : h);
+  const rows = raw.slice(1).map(r => {
+    if (r.length === width) return r;
+    const c = r.slice();
+    while (c.length < width) c.push('');
+    return c;
+  });
+  return { headers: named, rows };
+}
+function detectDelimiter(text) {
+  const sample = text.slice(0, 65536);
+  let best = ',', bestScore = 0;
+  for (const d of [',', '\t', ';', '|']) {
+    const rs = parseRows(sample, d).slice(0, 30);
+    if (!rs.length) continue;
+    const first = rs[0].length;
+    if (first < 2) continue;
+    let consistent = 0;
+    for (const r of rs) if (r.length === first) consistent++;
+    const score = first * (consistent / rs.length);
+    if (score > bestScore) { bestScore = score; best = d; }
+  }
+  return best;
+}
+
+// ---------- type sniffing (sampled, cheap) ----------
+function sniffTypes() {
+  S.types = S.headers.map((_, c) => {
+    let samples = 0, nums = 0, dates = 0;
+    for (let i = 0; i < S.rows.length; i++) {
+      const s = S.rows[i][c].trim();
+      if (s === '') continue;
+      samples++;
+      if (parseNum(s) != null) nums++;
+      else if (isDateStr(s)) dates++;
+      if (samples >= 2500) break;
+    }
+    if (!samples) return 'empty';
+    if (nums / samples >= 0.8) return 'number';
+    if (dates / samples >= 0.8) return 'date';
+    return 'text';
+  });
+}
+
+// ---------- fake-data pools (same style as data-generator.html) ----------
+const FIRST = ['James','Mary','John','Patricia','Robert','Jennifer','Michael','Linda','David','Elizabeth','William','Barbara','Richard','Susan','Joseph','Jessica','Thomas','Sarah','Charles','Karen','Aisha','Wei','Sofia','Omar','Yuki','Ingrid','Mateo','Priya','Kwame','Lena','Diego','Noor','Hana','Tariq','Freya','Kai','Amara','Nikolai','Zara','Bjorn'];
+const LAST = ['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Rodriguez','Martinez','Hernandez','Lopez','Gonzalez','Wilson','Anderson','Thomas','Taylor','Moore','Jackson','Martin','Nguyen','Kim','Patel','Okafor','Rossi','Novak','Haddad','Suzuki','Andersson','Costa','Ivanov','Mensah','Khan','Sato','Dubois','Silva','Cohen','Fischer','Reyes','Larsen'];
+const DOMAINS = ['example.com','mail.com','test.org','demo.net','inbox.io','acme.co','mailinator.com','sample.dev'];
+const COMPANY_STEMS = ['Apex','Nova','Vertex','Summit','Horizon','Cascade','Aurora','Zenith','Quantum','Stellar','Fusion','Catalyst','Beacon','Compass','Harbor','Evergreen','Ironwood','Clearwater','Silverline','Northwind'];
+const COMPANY_SUFFIXES = ['Labs','Group','Co','Industries','Systems','Studio','Works','Partners','& Sons'];
+const STREET_NAMES = ['Main','Oak','Maple','Cedar','Pine','Elm','Washington','Park','Lake','Hill','River','Sunset','Highland','Church','Walnut','Chestnut','Willow','Birch','Spring','Franklin'];
+const STREET_SUFFIXES = ['St','Ave','Rd','Blvd','Ln','Dr','Way','Ct'];
+
+function fakeValue(type, rng) {
+  switch (type) {
+    case 'firstName': return pick(rng, FIRST);
+    case 'lastName': return pick(rng, LAST);
+    case 'fullName': return pick(rng, FIRST) + ' ' + pick(rng, LAST);
+    case 'email': return (pick(rng, FIRST) + '.' + pick(rng, LAST) + (rng() < 0.4 ? ri(rng, 1, 99) : '')).toLowerCase().replace(/[^a-z0-9.]/g, '') + '@' + pick(rng, DOMAINS);
+    case 'phone': return `(${ri(rng, 200, 989)}) ${ri(rng, 200, 989)}-${String(ri(rng, 0, 9999)).padStart(4, '0')}`;
+    case 'company': return pick(rng, COMPANY_STEMS) + ' ' + pick(rng, COMPANY_SUFFIXES);
+    case 'address': return `${ri(rng, 1, 9999)} ${pick(rng, STREET_NAMES)} ${pick(rng, STREET_SUFFIXES)}`;
+    case 'generic': default: return 'anon-' + ri(rng, 100000, 999999);
+  }
+}
+
+// ---------- SHA-256 hashing (deduped + cached: same input -> same output, always) ----------
+const hashCache = new Map();
+async function sha256Hex(str) {
+  if (hashCache.has(str)) return hashCache.get(str);
+  const buf = new TextEncoder().encode(str);
+  const digest = await crypto.subtle.digest('SHA-256', buf);
+  const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+  const token = hex.slice(0, 12);
+  hashCache.set(str, token);
+  return token;
+}
+async function strategyHash(vals) {
+  const uniq = new Map();
+  for (const v of vals) { if (v.trim() !== '' && !uniq.has(v)) uniq.set(v, null); }
+  const keys = [...uniq.keys()];
+  const digests = await Promise.all(keys.map(k => sha256Hex(k)));
+  keys.forEach((k, i) => uniq.set(k, digests[i]));
+  return vals.map(v => v.trim() === '' ? '' : uniq.get(v));
+}
+
+// ---------- strategies ----------
+const STRATEGIES = {
+  asis:      { label: 'Leave as-is' },
+  shuffle:   { label: 'Shuffle (mix rows)' },
+  fake:      { label: 'Fake replace' },
+  hash:      { label: 'Hash (one-way)' },
+  redact:    { label: 'Redact / mask' },
+  noise:     { label: 'Numeric noise' },
+  dateshift: { label: 'Date shift' },
+  bucket:    { label: 'Generalize / bucket' },
+};
+
+function fillDefaultParams(strategy, params, subtype) {
+  const p = { ...params };
+  switch (strategy) {
+    case 'fake':
+      if (!p.fakeType) {
+        p.fakeType = subtype === 'email' ? 'email' : subtype === 'phone' ? 'phone'
+          : subtype === 'company' ? 'company' : subtype === 'address' ? 'address' : 'fullName';
+      }
+      break;
+    case 'redact':
+      if (!p.redactType) {
+        p.redactType = subtype === 'email' ? 'email' : subtype === 'phone' ? 'phone'
+          : subtype === 'ssn' ? 'ssn' : 'full';
+      }
+      break;
+    case 'noise': p.pct = numOr(p.pct, 10); p.round = !!p.round; break;
+    case 'dateshift': if (!p.mode) p.mode = 'shift'; p.rangeDays = numOr(p.rangeDays, 365); break;
+    case 'bucket': p.width = numOr(p.width, 10); p.threshold = numOr(p.threshold, 3); break;
+  }
+  return p;
+}
+
+function strategyShuffle(vals, seedStr, colIdx, colName) {
+  const n = vals.length;
+  const idx = new Array(n);
+  for (let i = 0; i < n; i++) idx[i] = i;
+  const rng = makeRng(seedStr, colIdx, colName, 'shuffle');
+  for (let i = n - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); const t = idx[i]; idx[i] = idx[j]; idx[j] = t; }
+  return idx.map(i => vals[i]);
+}
+function strategyFake(vals, seedStr, colIdx, colName, params) {
+  const rng = makeRng(seedStr, colIdx, colName, 'fake:' + params.fakeType);
+  return vals.map(v => v.trim() === '' ? '' : fakeValue(params.fakeType, rng));
+}
+function redactValue(v, type) {
+  switch (type) {
+    case 'email': {
+      const m = v.match(/^([^@]+)@(.+)$/);
+      if (!m) return '[REDACTED]';
+      const local = m[1], domain = m[2];
+      const parts = domain.split('.');
+      const tld = parts.length > 1 ? parts[parts.length - 1] : '***';
+      return local[0] + '***@***.' + tld;
+    }
+    case 'phone': { const d = v.replace(/\D/g, ''); return d.length < 4 ? '[REDACTED]' : '***-***-' + d.slice(-4); }
+    case 'ssn': { const d = v.replace(/\D/g, ''); return d.length < 4 ? '[REDACTED]' : '***-**-' + d.slice(-4); }
+    case 'creditcard': { const d = v.replace(/\D/g, ''); return d.length < 4 ? '[REDACTED]' : '**** **** **** ' + d.slice(-4); }
+    case 'partial': {
+      if (v.length <= 2) return '*'.repeat(v.length);
+      return v[0] + '*'.repeat(Math.max(1, v.length - 2)) + v[v.length - 1];
+    }
+    default: return '[REDACTED]';
+  }
+}
+function strategyRedact(vals, params) {
+  const type = params.redactType || 'full';
+  return vals.map(v => v.trim() === '' ? '' : redactValue(v, type));
+}
+function strategyNoise(vals, seedStr, colIdx, colName, params) {
+  const pct = Math.max(0, numOr(params.pct, 10));
+  const round = !!params.round;
+  const rng = makeRng(seedStr, colIdx, colName, 'noise');
+  return vals.map(v => {
+    const s = v.trim();
+    if (s === '') return v;
+    const num = parseNum(s);
+    if (num == null || pct === 0) return v;
+    const lo = Math.min(num * (1 - pct / 100), num * (1 + pct / 100));
+    const hi = Math.max(num * (1 - pct / 100), num * (1 + pct / 100));
+    const factor = 1 + (rng() * 2 - 1) * (pct / 100);
+    let nv = num * factor;
+    nv = round ? Math.round(nv) : Math.round(nv * 100) / 100;
+    nv = Math.min(hi, Math.max(lo, nv));   // clamp AFTER rounding, against the exact (unrounded) bound
+    return String(nv);
+  });
+}
+function parseDateFlexible(s) {
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return { y: +m[1], mo: +m[2], d: +m[3] };
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return { y: +m[3], mo: +m[1], d: +m[2] };
+  const t = Date.parse(s);
+  if (Number.isFinite(t)) { const dt = new Date(t); return { y: dt.getUTCFullYear(), mo: dt.getUTCMonth() + 1, d: dt.getUTCDate() }; }
+  return null;
+}
+function strategyDateShift(vals, seedStr, colIdx, colName, params) {
+  const mode = params.mode || 'shift';
+  if (mode === 'generalize') {
+    return vals.map(v => {
+      const s = v.trim(); if (s === '') return v;
+      const d = parseDateFlexible(s); if (!d) return v;
+      return `${d.y}-${String(d.mo).padStart(2, '0')}`;
+    });
+  }
+  const range = Math.max(1, numOr(params.rangeDays, 365));
+  const rng = makeRng(seedStr, colIdx, colName, 'dateshift');
+  const offset = Math.floor(rng() * (2 * range + 1)) - range;
+  return vals.map(v => {
+    const s = v.trim(); if (s === '') return v;
+    const d = parseDateFlexible(s); if (!d) return v;
+    const utc = Date.UTC(d.y, d.mo - 1, d.d) + offset * 86400000;
+    const nd = new Date(utc);
+    return `${nd.getUTCFullYear()}-${String(nd.getUTCMonth() + 1).padStart(2, '0')}-${String(nd.getUTCDate()).padStart(2, '0')}`;
+  });
+}
+function strategyBucket(vals, colType, params) {
+  if (colType === 'number') {
+    const width = Math.max(1, numOr(params.width, 10));
+    return vals.map(v => {
+      const s = v.trim(); if (s === '') return v;
+      const num = parseNum(s); if (num == null) return v;
+      const lo = Math.floor(num / width) * width;
+      const hi = lo + width - 1;
+      return `${lo}-${hi}`;
+    });
+  }
+  const threshold = Math.max(1, numOr(params.threshold, 3));
+  const freq = new Map();
+  for (const v of vals) { const t = v.trim(); if (t === '') continue; freq.set(t, (freq.get(t) || 0) + 1); }
+  return vals.map(v => {
+    const t = v.trim(); if (t === '') return v;
+    return (freq.get(t) || 0) < threshold ? 'Other' : v;
+  });
+}
+
+// ---------- column profiling / auto-suggest ----------
+const SUBTYPE_LABEL = {
+  email: 'looks like: email', phone: 'looks like: phone', ssn: 'looks like: SSN / national ID',
+  id: 'looks like: identifier', company: 'looks like: company', name: 'looks like: person name',
+  address: 'looks like: address', zip: 'looks like: postal code', money: 'looks like: salary / money',
+  age: 'looks like: age', freetext: 'looks like: free text', date: 'date column',
+  number: 'numeric column', text: '', generic: '',
+};
+function profileColumns() {
+  const n = S.rows.length;
+  const sampleCap = Math.min(n, 500);
+  S.colConfig = S.headers.map((h, c) => {
+    // normalize "full_name" / "full-name" / "full name" to the same thing for matching
+    const header = h.toLowerCase().trim().replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ');
+    let nonEmpty = 0, emailish = 0, phoneish = 0, ssnish = 0, sumLen = 0;
+    const freq = new Map();
+    for (let i = 0; i < sampleCap; i++) {
+      const v = S.rows[i][c].trim();
+      if (v === '') continue;
+      nonEmpty++; sumLen += v.length;
+      const digits = (v.match(/\d/g) || []).length;
+      if (/@/.test(v) && /\.[a-z]{2,}$/i.test(v)) emailish++;
+      // phone-shaped: has parens or a +country prefix, or exactly 10-11 digits — NOT the 9-digit SSN 3-2-4 pattern
+      if (/^[\d\s().+-]{7,}$/.test(v) && !/^\d{3}-?\d{2}-?\d{4}$/.test(v) && (digits === 10 || digits === 11 || /\(\d{2,4}\)/.test(v) || /^\+/.test(v))) phoneish++;
+      if (/^\d{3}-?\d{2}-?\d{4}$/.test(v)) ssnish++;
+      freq.set(v, (freq.get(v) || 0) + 1);
+    }
+    const avgLen = nonEmpty ? sumLen / nonEmpty : 0;
+    const uniqueRatio = nonEmpty ? freq.size / nonEmpty : 0;
+    const type = S.types[c];
+    let subtype = 'generic', strategy = 'asis', params = {}, sensitiveSubtype = false;
+
+    if (header.includes('email') || (nonEmpty && emailish / nonEmpty > 0.6)) {
+      subtype = 'email'; strategy = 'fake'; params = { fakeType: 'email' }; sensitiveSubtype = true;
+    } else if (/ssn|social ?security|passport|national ?id/.test(header) || (nonEmpty && ssnish / nonEmpty > 0.5)) {
+      subtype = 'ssn'; strategy = 'hash'; sensitiveSubtype = true;
+    } else if (/phone|tel|mobile|cell|fax/.test(header) || (nonEmpty && phoneish / nonEmpty > 0.6)) {
+      subtype = 'phone'; strategy = 'fake'; params = { fakeType: 'phone' }; sensitiveSubtype = true;
+    } else if (/(^id$|\bid$)/.test(header) && uniqueRatio > 0.9) {
+      subtype = 'id'; strategy = 'hash'; sensitiveSubtype = false;
+    } else if (/company|employer|organi[sz]ation|business/.test(header)) {
+      subtype = 'company'; strategy = 'fake'; params = { fakeType: 'company' }; sensitiveSubtype = true;
+    } else if (/full ?name|first ?name|last ?name|^name$|customer ?name|contact ?name|\bperson\b/.test(header)) {
+      let fakeType = 'fullName';
+      if (/first/.test(header)) fakeType = 'firstName'; else if (/last/.test(header)) fakeType = 'lastName';
+      subtype = 'name'; strategy = 'fake'; params = { fakeType }; sensitiveSubtype = true;
+    } else if (/address|street/.test(header)) {
+      subtype = 'address'; strategy = 'fake'; params = { fakeType: 'address' }; sensitiveSubtype = true;
+    } else if (/zip|postal/.test(header)) {
+      subtype = 'zip'; strategy = 'bucket'; params = { width: 100 }; sensitiveSubtype = true;
+    } else if (/salary|income|wage|revenue|compensation|\bpay\b/.test(header)) {
+      subtype = 'money'; strategy = 'noise'; params = { pct: 10, round: true }; sensitiveSubtype = true;
+    } else if (/^age$/.test(header)) {
+      subtype = 'age'; strategy = 'bucket'; params = { width: 10 }; sensitiveSubtype = false;
+    } else if (/note|comment|description|bio|remarks|feedback|message/.test(header) || avgLen > 40) {
+      subtype = 'freetext'; strategy = 'redact'; params = { redactType: 'full' }; sensitiveSubtype = true;
+    } else if (type === 'date') {
+      subtype = 'date'; strategy = 'dateshift'; params = { mode: 'shift', rangeDays: 365 }; sensitiveSubtype = false;
+    } else if (type === 'number') {
+      if (uniqueRatio > 0.4 && nonEmpty > 5) { subtype = 'number'; strategy = 'shuffle'; }
+      else { subtype = 'number'; strategy = 'asis'; }
+    } else {
+      subtype = 'text'; strategy = 'asis';
+    }
+
+    params = fillDefaultParams(strategy, params, subtype);
+    const cfg = { subtype, strategy, params, sensitiveSubtype };
+    cfg.auto = { subtype, strategy, params: { ...params }, sensitiveSubtype };
+    return cfg;
+  });
+}
+function isLiveRisky(c) { const cfg = S.colConfig[c]; return cfg.sensitiveSubtype && cfg.strategy === 'asis'; }
+
+// ---------- k-anonymity-ish sanity check ----------
+function computeKAnon(anonRows) {
+  const qCols = [];
+  S.headers.forEach((h, c) => {
+    const cfg = S.colConfig[c];
+    if (cfg.strategy === 'bucket') qCols.push(c);
+    else if (cfg.strategy === 'dateshift' && cfg.params.mode === 'generalize') qCols.push(c);
+  });
+  if (!qCols.length) return { qCols, combos: [], uniqueCount: 0, totalCombos: 0 };
+  const map = new Map();
+  for (let i = 0; i < anonRows.length; i++) {
+    const vals = qCols.map(c => anonRows[i][c]);
+    if (vals.every(v => v === '')) continue;   // ignore fully-blank rows (e.g. empty source rows)
+    const key = vals.join('');
+    let e = map.get(key);
+    if (!e) { e = { count: 0, sample: vals }; map.set(key, e); }
+    e.count++;
+  }
+  const combos = [...map.values()].sort((a, b) => a.count - b.count);
+  const uniqueCount = combos.filter(x => x.count <= 2).length;
+  return { qCols, combos, uniqueCount, totalCombos: combos.length };
+}
+
+// ---------- apply (async because of hashing) ----------
+let applyRunning = false, applyPending = false;
+async function scheduleApply() {
+  if (applyRunning) { applyPending = true; return; }
+  applyRunning = true;
+  await applyAnonymization();
+  applyRunning = false;
+  if (applyPending) { applyPending = false; scheduleApply(); }
+}
+async function applyAnonymization() {
+  if (!S.loaded) return;
+  applyNote('Applying…');
+  $('#applyBtn').disabled = true;
+  const seedStr = $('#seedInput').value;
+  const n = S.rows.length;
+  const colOutputs = new Array(S.headers.length);
+  for (let c = 0; c < S.headers.length; c++) {
+    const cfg = S.colConfig[c];
+    const original = new Array(n);
+    for (let i = 0; i < n; i++) original[i] = S.rows[i][c];
+    let out;
+    switch (cfg.strategy) {
+      case 'shuffle': out = strategyShuffle(original, seedStr, c, S.headers[c]); break;
+      case 'fake': out = strategyFake(original, seedStr, c, S.headers[c], cfg.params); break;
+      case 'hash': out = await strategyHash(original); break;
+      case 'redact': out = strategyRedact(original, cfg.params); break;
+      case 'noise': out = strategyNoise(original, seedStr, c, S.headers[c], cfg.params); break;
+      case 'dateshift': out = strategyDateShift(original, seedStr, c, S.headers[c], cfg.params); break;
+      case 'bucket': out = strategyBucket(original, S.types[c], cfg.params); break;
+      default: out = original; break;
+    }
+    colOutputs[c] = out;
+  }
+  const anonRows = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const row = new Array(S.headers.length);
+    for (let c = 0; c < S.headers.length; c++) row[c] = colOutputs[c][i];
+    anonRows[i] = row;
+  }
+  S.anonRows = anonRows;
+  S.kanon = computeKAnon(anonRows);
+  S.log = buildLogObject(seedStr);
+  $('#applyBtn').disabled = false;
+  applyNote('Applied ' + plural(S.headers.length, 'column') + ' across ' + plural(n, 'row') + '.', 'ok');
+  renderAfterApply();
+}
+function buildLogObject(seedStr) {
+  return {
+    tool: 'Data Anonymizer',
+    generatedAt: new Date().toISOString(),
+    sourceFile: S.srcName || '(pasted data)',
+    seed: (seedStr && seedStr.trim()) ? seedStr.trim() : null,
+    seedNote: (seedStr && seedStr.trim()) ? 'Re-running with this seed on the same input reproduces the same output.' : 'No seed set — randomized strategies are NOT reproducible across runs.',
+    rowCount: S.rows.length,
+    columnCount: S.headers.length,
+    columns: S.headers.map((h, c) => ({
+      column: h,
+      detectedAs: S.colConfig[c].subtype,
+      strategy: S.colConfig[c].strategy,
+      params: S.colConfig[c].params,
+      lookedSensitiveButLeftUnmasked: isLiveRisky(c),
+    })),
+  };
+}
+
+// ---------- rendering: input note / apply note ----------
+function inputNote(msg, isErr) { const el = $('#inputNote'); el.textContent = msg; el.className = 'note' + (isErr ? ' err' : ''); }
+function applyNote(msg, kind) { const el = $('#applyNote'); el.textContent = msg; el.className = 'note' + (kind === 'err' ? ' err' : kind === 'ok' ? ' okc' : ''); }
+
+function renderStrip() {
+  $('#stName').textContent = S.srcName || 'pasted data';
+  $('#stShape').textContent = plural(S.rows.length, 'row') + ' × ' + plural(S.headers.length, 'column');
+  $('#stDelim').textContent = (DELIM_NAMES[S.delim] || '?') + '-separated · ' + fmtBytes(S.srcSize);
+}
+
+// ---------- column config table ----------
+function fieldHtml(c, key, kind, value, label, extra) {
+  if (kind === 'num') return `<span class="pf">${label ? esc(label) + ' ' : ''}<input type="number" data-col="${c}" data-param="${key}" value="${escAttr(value)}" ${extra || ''}></span>`;
+  if (kind === 'bool') return `<label class="pf"><input type="checkbox" data-col="${c}" data-param="${key}" ${value ? 'checked' : ''}> ${esc(label)}</label>`;
+  return '';
+}
+function selectFieldHtml(c, key, value, options) {
+  return `<span class="pf"><select data-col="${c}" data-param="${key}">` +
+    options.map(([v, l]) => `<option value="${v}"${v === value ? ' selected' : ''}>${esc(l)}</option>`).join('') +
+    `</select></span>`;
+}
+function paramsHtml(c) {
+  const cfg = S.colConfig[c];
+  const p = cfg.params;
+  switch (cfg.strategy) {
+    case 'fake':
+      return selectFieldHtml(c, 'fakeType', p.fakeType, [
+        ['fullName', 'Full name'], ['firstName', 'First name'], ['lastName', 'Last name'],
+        ['email', 'Email'], ['phone', 'Phone'], ['company', 'Company'], ['address', 'Street address'], ['generic', 'Generic token'],
+      ]);
+    case 'redact':
+      return selectFieldHtml(c, 'redactType', p.redactType, [
+        ['full', 'Full mask [REDACTED]'], ['email', 'Partial — email'], ['phone', 'Partial — phone (last 4)'],
+        ['ssn', 'Partial — ID (last 4)'], ['creditcard', 'Partial — card (last 4)'], ['partial', 'Partial — keep ends'],
+      ]);
+    case 'noise':
+      return fieldHtml(c, 'pct', 'num', p.pct, '±', 'min="0" max="100" step="1" title="Noise range, percent"') + '%'
+        + fieldHtml(c, 'round', 'bool', p.round, 'round to whole numbers');
+    case 'dateshift': {
+      let h = selectFieldHtml(c, 'mode', p.mode, [['shift', 'Shift by random offset'], ['generalize', 'Generalize to year-month']]);
+      if (p.mode !== 'generalize') h += fieldHtml(c, 'rangeDays', 'num', p.rangeDays, 'max days', 'min="1" max="3650" title="Maximum shift, in days, either direction"');
+      return h;
+    }
+    case 'bucket':
+      if (S.types[c] === 'number') return fieldHtml(c, 'width', 'num', p.width, 'bucket width', 'min="1" title="Numbers are grouped into ranges of this width"');
+      return fieldHtml(c, 'threshold', 'num', p.threshold, 'min count', 'min="1" title="Values seen fewer times than this become “Other”"');
+    default:
+      return '<span class="note">—</span>';
+  }
+}
+function sampleValuesFor(c) {
+  const out = [];
+  for (let i = 0; i < S.rows.length && out.length < 3; i++) {
+    const v = S.rows[i][c].trim();
+    if (v !== '') out.push(v);
+  }
+  return out.join(' · ');
+}
+function renderColumnConfig() {
+  const body = $('#cfgBody');
+  let h = '';
+  for (let c = 0; c < S.headers.length; c++) {
+    const cfg = S.colConfig[c];
+    const t = S.types[c] || 'text';
+    const sub = SUBTYPE_LABEL[cfg.subtype] || '';
+    const risky = isLiveRisky(c);
+    h += '<tr>'
+      + `<td><div class="cfg-name">${esc(S.headers[c])} <span class="badge b-${t}">${t}</span></div>`
+      + (sub ? `<div class="cfg-sub">${esc(sub)}</div>` : '') + '</td>'
+      + `<td class="cfg-sample" title="${escAttr(sampleValuesFor(c))}">${esc(sampleValuesFor(c)) || '<span class=\"note\">(empty)</span>'}</td>`
+      + `<td class="cfg-strategy"><select data-col="${c}" data-strategy="1">` + Object.entries(STRATEGIES).map(([k, v]) => `<option value="${k}"${k === cfg.strategy ? ' selected' : ''}>${esc(v.label)}</option>`).join('') + '</select></td>'
+      + `<td class="cfg-params">${paramsHtml(c)}</td>`
+      + `<td class="cfg-risk">${risky ? '<span class="risk-flag" title="This column looks like it may contain personal data but is currently left unmasked.">⚠ exposed</span>' : '<span class="risk-ok">—</span>'}</td>`
+      + '</tr>';
+  }
+  body.innerHTML = h;
+}
+$('#cfgBody').addEventListener('change', (e) => {
+  const t = e.target;
+  const c = +t.dataset.col;
+  if (Number.isNaN(c)) return;
+  if (t.dataset.strategy != null) {
+    S.colConfig[c].strategy = t.value;
+    S.colConfig[c].params = fillDefaultParams(t.value, {}, S.colConfig[c].subtype);
+    renderColumnConfig();
+    scheduleApply();
+    return;
+  }
+  if (t.dataset.param != null) {
+    const key = t.dataset.param;
+    let val = t.type === 'checkbox' ? t.checked : t.value;
+    if (t.type === 'number') val = t.value === '' ? '' : +t.value;
+    S.colConfig[c].params[key] = val;
+    scheduleApply();
+  }
+});
+$('#resetAutoBtn').addEventListener('click', () => {
+  S.colConfig = S.colConfig.map(cfg => ({ subtype: cfg.auto.subtype, strategy: cfg.auto.strategy, params: { ...cfg.auto.params }, sensitiveSubtype: cfg.auto.sensitiveSubtype, auto: cfg.auto }));
+  renderColumnConfig();
+  scheduleApply();
+});
+
+// ---------- preview grid ----------
+function renderGrid() {
+  const mode = S.previewMode;
+  const data = mode === 'anon' ? S.anonRows : S.rows;
+  $('#tabOrig').classList.toggle('active', mode === 'orig');
+  $('#tabAnon').classList.toggle('active', mode === 'anon');
+  if (!data) { $('#grid').innerHTML = ''; $('#previewNote').textContent = ''; return; }
+  let h = '<thead><tr><th class="rownum-h">#</th>';
+  for (let c = 0; c < S.headers.length; c++) {
+    const t = S.types[c] || 'text';
+    const warn = (mode === 'anon' && isLiveRisky(c)) ? '<span class="hwarn" title="Looks sensitive, left unmasked">⚠</span>' : '';
+    h += `<th>${esc(S.headers[c])} <span class="badge b-${t}">${t}</span>${warn}</th>`;
+  }
+  h += '</tr></thead><tbody>';
+  const n = Math.min(data.length, MAX_RENDER);
+  for (let i = 0; i < n; i++) {
+    const r = data[i];
+    h += `<tr><td class="rownum">${i + 1}</td>`;
+    for (let c = 0; c < S.headers.length; c++) {
+      const v = r[c];
+      h += v === '' ? '<td class="cempty"></td>' : `<td>${esc(v)}</td>`;
+    }
+    h += '</tr>';
+  }
+  if (!n) h += `<tr><td class="cempty" colspan="${S.headers.length + 1}">No rows.</td></tr>`;
+  h += '</tbody>';
+  $('#grid').innerHTML = h;
+  $('#previewNote').textContent = data.length > MAX_RENDER
+    ? 'Showing first ' + fmtInt(MAX_RENDER) + ' of ' + fmtInt(data.length) + ' rows — the full dataset is included in exports.'
+    : 'Showing all ' + plural(data.length, 'row') + '.';
+}
+$('#tabOrig').addEventListener('click', () => { S.previewMode = 'orig'; renderGrid(); });
+$('#tabAnon').addEventListener('click', () => { S.previewMode = 'anon'; renderGrid(); });
+
+// ---------- k-anon panel ----------
+function renderKAnon() {
+  const panel = $('#kanonPanel');
+  const k = S.kanon;
+  if (!k || !k.qCols.length) {
+    panel.innerHTML = '<p class="note">Mark one or more columns as “Generalize / bucket” (or set a date column’s Date shift to “Generalize to year-month”) to run a rough re-identification check on those quasi-identifiers.</p>';
+    return;
+  }
+  const names = k.qCols.map(c => S.headers[c]).join(', ');
+  let html = `<p class="note">Checking combinations of: <strong>${esc(names)}</strong> — ${fmtInt(k.totalCombos)} distinct combination(s) across ${fmtInt(S.rows.length)} rows.</p>`;
+  if (k.uniqueCount) {
+    html += `<p class="note err">⚠ ${fmtInt(k.uniqueCount)} combination(s) are shared by only 1–2 rows — those rows may still be re-identifiable from these columns alone. This is an approximate check, not a guarantee.</p>`;
+    const worst = k.combos.filter(x => x.count <= 2).slice(0, 10);
+    html += '<ul class="kanon-list">' + worst.map(x => `<li><span class="tv">${x.sample.map(esc).join(' / ')}</span><span class="tc">× ${x.count}</span></li>`).join('') + '</ul>';
+    if (k.uniqueCount > 10) html += `<p class="note">…and ${fmtInt(k.uniqueCount - 10)} more.</p>`;
+  } else {
+    html += '<p class="note okc">✓ No combination is shared by fewer than 3 rows for these columns — a reasonable rough k ≥ 3.</p>';
+  }
+  panel.innerHTML = html;
+}
+
+// ---------- export ----------
+function csvTextOf(rows) {
+  const d = S.delim;
+  const needs = new RegExp('["\\n\\r' + (d === '\t' ? '\\t' : reEsc(d)) + ']');
+  const escF = (v) => needs.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+  const lines = [S.headers.map(escF).join(d)];
+  for (const r of rows) lines.push(r.map(escF).join(d));
+  return lines.join('\n');
+}
+function jsonTextOf(rows) {
+  const keys = [];
+  const seen = new Map();
+  S.headers.forEach((h, i) => {
+    let k = h.trim() || 'column_' + (i + 1);
+    if (seen.has(k)) { const n = seen.get(k) + 1; seen.set(k, n); k = k + '_' + n; } else seen.set(k, 1);
+    keys.push(k);
+  });
+  const arr = rows.map(r => { const o = {}; for (let i = 0; i < keys.length; i++) o[keys[i]] = r[i]; return o; });
+  return JSON.stringify(arr, null, rows.length > 2000 ? undefined : 2);
+}
+function download(name, text, mime) {
+  const blob = new Blob([text], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function baseName() { const n = (S.srcName || 'data').replace(/\.[^.]+$/, ''); return (n || 'data') + '-anonymized'; }
+function exportNote(msg, kind) { const el = $('#exportNote'); el.textContent = msg; el.className = 'note' + (kind === 'err' ? ' err' : ''); }
+
+$('#dlCsv').addEventListener('click', () => {
+  if (!S.anonRows) { exportNote('Nothing to export yet.', 'err'); return; }
+  download(baseName() + (S.delim === '\t' ? '.tsv' : '.csv'), csvTextOf(S.anonRows), 'text/csv;charset=utf-8');
+  exportNote('Downloaded anonymized CSV.');
+});
+$('#dlJson').addEventListener('click', () => {
+  if (!S.anonRows) { exportNote('Nothing to export yet.', 'err'); return; }
+  download(baseName() + '.json', jsonTextOf(S.anonRows), 'application/json;charset=utf-8');
+  exportNote('Downloaded anonymized JSON.');
+});
+$('#copyCsv').addEventListener('click', async () => {
+  if (!S.anonRows) { exportNote('Nothing to export yet.', 'err'); return; }
+  const btn = $('#copyCsv');
+  try {
+    await navigator.clipboard.writeText(csvTextOf(S.anonRows));
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1200);
+  } catch (err) {
+    exportNote('Copy failed — your browser blocked clipboard access. Use Download instead.', 'err');
+  }
+});
+$('#dlLog').addEventListener('click', () => {
+  if (!S.log) { exportNote('Nothing to export yet.', 'err'); return; }
+  download(baseName() + '-log.json', JSON.stringify(S.log, null, 2), 'application/json;charset=utf-8');
+  exportNote('Downloaded transformation log.');
+});
+function renderLogPreview() {
+  $('#logPreview').textContent = S.log ? JSON.stringify(S.log, null, 2) : '';
+}
+
+// ---------- top-level render orchestration ----------
+function renderAfterApply() {
+  renderColumnConfig();
+  renderGrid();
+  renderKAnon();
+  renderLogPreview();
+}
+
+// ---------- loading ----------
+function loadText(text, name, size) {
+  text = String(text).replace(/^﻿/, '');
+  if (!text.trim()) { inputNote('That looks empty — nothing to load.', true); return; }
+  const sel = $('#delimSel').value;
+  const delim = sel === 'auto' ? detectDelimiter(text) : DELIM_CHARS[sel];
+  const m = buildModel(text, delim);
+  if (!m.headers.length) { inputNote('Could not find any data in there.', true); return; }
+  S.srcText = text;
+  S.srcName = name || '';
+  S.srcSize = size != null ? size : new Blob([text]).size;
+  S.delim = delim;
+  S.headers = m.headers;
+  S.rows = m.rows;
+  S.anonRows = null; S.log = null; S.kanon = null;
+  S.previewMode = 'anon';
+  S.loaded = true;
+  document.body.classList.add('loaded');
+  inputNote('');
+  sniffTypes();
+  profileColumns();
+  renderStrip();
+  applyNote('Loaded ' + plural(m.rows.length, 'row') + ' × ' + plural(m.headers.length, 'column') + '. Auto-suggesting strategies…');
+  scheduleApply();
+}
+async function readFile(f) {
+  if (!f) return;
+  if (f.size > 50 * 1024 * 1024) { inputNote('That file is over 50 MB — too big for this in-browser tool.', true); return; }
+  try {
+    const text = await f.text();
+    loadText(text, f.name, f.size);
+  } catch (err) {
+    inputNote('Could not read that file: ' + err.message, true);
+  }
+}
+
+const dz = $('#dropzone'), fi = $('#fileInput');
+dz.addEventListener('click', () => fi.click());
+dz.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fi.click(); } });
+['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add('drag'); }));
+['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove('drag'); }));
+dz.addEventListener('drop', (e) => { readFile(e.dataTransfer.files && e.dataTransfer.files[0]); });
+fi.addEventListener('change', () => { readFile(fi.files[0]); fi.value = ''; });
+window.addEventListener('dragover', (e) => e.preventDefault());
+window.addEventListener('drop', (e) => e.preventDefault());
+
+$('#loadPasteBtn').addEventListener('click', () => {
+  if (S.loaded && !confirm('Replace your current data with the pasted text?')) return;
+  loadText($('#pasteArea').value, '');
+});
+$('#exampleBtn').addEventListener('click', () => {
+  if (S.loaded && !confirm('Replace your current data with the example dataset?')) return;
+  $('#delimSel').value = 'auto';
+  loadText(EXAMPLE_CSV, 'employee-directory-example.csv');
+});
+$('#delimSel').addEventListener('change', () => {
+  if (!S.loaded || !S.srcText) return;
+  if (!confirm('Re-parsing with a different delimiter reloads the original data and discards your column strategy choices. Continue?')) return;
+  loadText(S.srcText, S.srcName, S.srcSize);
+});
+
+$('#applyBtn').addEventListener('click', () => scheduleApply());
+$('#seedInput').addEventListener('change', () => scheduleApply());
+
+// ---------- example dataset ----------
+// A realistic-looking, slightly messy employee directory with obvious PII:
+// name, email, phone, SSN-like ID, address, salary, and free-text notes —
+// including one duplicate SSN across two rows, to demonstrate hash join-ability.
+const EXAMPLE_CSV = `employee_id,full_name,email,phone,ssn,street_address,city,salary,signup_date,age,notes
+EMP-1000,Robert Novak,robert.novak@hotmail.com,(791) 793-1350,126-71-6207,7567 Hill Ct,Kingston,156472,2024-05-17,51,
+EMP-1001,Joseph Rodriguez,joseph.rodriguez20@hotmail.com,(889) 932-8608,243-67-2659,9759 Birch Ave,Arlington,142813,2022-03-17,32,"Left voicemail, no response yet"
+EMP-1002,Charles Brown,charles.brown63@hotmail.com,(638) 789-4442,758-50-7373,2160 Cedar Ave,Riverton,84440,2023-12-26,62,"VIP customer, handle with care"
+EMP-1003,Ingrid Haddad,ingrid.haddad84@corpmail.net,(830) 718-8263,615-70-9129,8667 Hill St,Franklin,127996,2020-09-06,40,Called from cell (830) 718-8263 about a late shipment
+EMP-1004,Jessica Okafor,jessica.okafor@hotmail.com,(486) 812-0194,273-43-3108,5262 Walnut Rd,Arlington,57608,2024-04-19,39,Updated billing address last month
+EMP-1005,John Costa,john.costa60@yahoo.com,(456) 901-1142,458-73-1235,9150 Cedar Blvd,Oakland,55495,2022-07-16,52,
+EMP-1006,Susan Patel,susan.patel@outlook.com,(896) 979-3680,283-83-2531,7099 Main Blvd,Greenville,70086,2020-02-11,62,"Prefers email contact, ok to call after 5pm"
+EMP-1007,Sarah Jackson,sarah.jackson77@corpmail.net,(839) 578-9193,305-80-1731,7177 Lake St,Bristol,57792,2023-01-04,53,"  Left voicemail, no response yet  "
+EMP-1008,Michael Jones,michael.jones@yahoo.com,(580) 849-6012,884-62-7618,1984 Highland Blvd,Fairview,96015,2023-04-27,55,Requested callback re: invoice #5788
+EMP-1009,Aisha Smith,aisha.smith@yahoo.com,(628) 950-0890,604-59-1414,1923 Walnut Blvd,Franklin,163201,2023-03-21,33,"Prefers email contact, ok to call after 5pm"
+EMP-1010,Lena Johnson,lena.johnson94@hotmail.com,(953) 587-7043,654-31-8679,4277 Franklin Ct,Clinton,98704,2024-08-16,30,Updated billing address last month
+EMP-1011,Barbara Moore,barbara.moore@corpmail.net,(226) 908-4893,246-17-1333,6340 Church Ct,Greenville,50175,2019-07-27,41,Updated billing address last month
+EMP-1012,Robert Andersson,robert.andersson@corpmail.net,(402) 705-1013,256-21-8864,9083 Hill St,Bristol,60655,2020-07-10,65,"Left voicemail, no response yet"
+EMP-1013,John Moore,john.moore@workmail.co,(583) 487-9340,873-94-9980,7557 Walnut Dr,Madison,58438,2021-11-24,29,Requested callback re: invoice #5123
+EMP-1014,Kai Johnson,kai.johnson@workmail.co,(655) 586-9102,817-97-3056,4571 Main Way,Salem,47274,2019-02-24,61,Referred by a colleague
+EMP-1015,Elizabeth Rossi,elizabeth.rossi@hotmail.com,(644) 457-0953,695-73-7835,4999 Sunset Ave,Franklin,104288,2022-11-21,59,"Left voicemail, no response yet"
+EMP-1016,Kai Jackson,kai.jackson@corpmail.net,(513) 395-0665,313-90-6180,8178 Maple Ave,Arlington,126958,2023-04-06,57,"Prefers email contact, ok to call after 5pm"
+EMP-1017,David Thomas,david.thomas@hotmail.com,(378) 307-8743,263-57-6148,240 Highland Rd,Manchester,71043,2023-12-18,41,"VIP customer, handle with care"
+EMP-1018,Tariq Martin,tariq.martin@workmail.co,(561) 727-6261,797-94-8454,7738 Highland Dr,Oakland,134905,2024-04-15,63,Called from cell (561) 727-6261 about a late shipment
+EMP-1019,Susan Jackson,susan.jackson@yahoo.com,(549) 200-9261,299-22-8746,7560 Washington Way,Arlington,41128,2022-10-14,40,
+,,,,,,,,,,
+EMP-1020,Thomas Wilson,thomas.wilson@corpmail.net,(708) 429-8038,761-46-8261,9322 Park Ct,Madison,126182,2022-02-25,35,"VIP customer, handle with care"
+EMP-1021,Freya Jones,freya.jones@gmail.com,(424) 254-7428,801-32-3568,722 Franklin Ln,Kingston,78432,2024-02-25,56,Called from cell (424) 254-7428 about a late shipment
+EMP-1022,Elizabeth Nguyen,elizabeth.nguyen@workmail.co,(216) 436-3055,766-28-5141,9883 Highland Ln,Madison,159631,2024-11-24,25,"Spoke with spouse, will relay message"
+EMP-1023,Elizabeth Anderson,elizabeth.anderson72@outlook.com,(374) 609-4773,113-82-5800,3346 Chestnut Way,Salem,110067,2024-09-05,29,"VIP customer, handle with care"
+EMP-1024,Yuki Garcia,yuki.garcia60@workmail.co,(451) 934-8445,790-13-9706,3319 Walnut Way,Salem,170833,2022-08-15,57,"Spoke with spouse, will relay message"
+EMP-1025,James Taylor,james.taylor@gmail.com,(963) 963-9351,227-13-1139,3032 Birch Way,Greenville,167064,2023-06-24,28,Referred by a colleague
+EMP-1026,John Haddad,john.haddad@hotmail.com,(385) 562-8533,444-82-2521,2130 Elm Rd,Clinton,158324,2023-10-03,36,Referred by a colleague
+EMP-1027,Aisha Moore,aisha.moore@gmail.com,(764) 977-7798,478-47-6810,5240 Birch Ct,Manchester,47118,2023-10-15,50,
+EMP-1028,Richard Costa,richard.costa@yahoo.com,(292) 454-0878,204-85-2791,7220 Main Ln,Auburn,138684,2022-06-03,56,"Spoke with spouse, will relay message"
+EMP-1029,Patricia Kim,patricia.kim@corpmail.net,(531) 378-7652,807-85-6011,4508 Park Way,,45848,2022-09-27,35,"Spoke with spouse, will relay message"
+EMP-1030,Susan Gonzalez,susan.gonzalez@gmail.com,(866) 512-3608,808-51-2795,1113 River Ave,Madison,62181,2022-02-12,57,Called from cell (866) 512-3608 about a late shipment
+EMP-1031,John Moore,john.moore@workmail.co,(367) 367-7689,743-89-9540,5188 Chestnut Ln,Greenville,102980,2022-05-11,60,"Spoke with spouse, will relay message"
+EMP-1032,Charles Johnson,charles.johnson52@hotmail.com,(269) 876-3449,411-20-7371,2488 Birch Ct,Greenville,168242,2023-05-14,39,"Spoke with spouse, will relay message"
+EMP-1033,William Andersson,william.andersson@outlook.com,(894) 351-3882,141-47-3508,3491 Oak Ln,Oakland,93884,2023-08-06,57,Called from cell (894) 351-3882 about a late shipment
+EMP-1034,Sarah Taylor,sarah.taylor56@yahoo.com,(375) 309-0189,660-71-8974,4361 Sunset Dr,Georgetown,130907,2019-08-15,44,"VIP customer, handle with care"
+EMP-1035,Charles Johnson,charles.johnson31@hotmail.com,(710) 949-5867,256-21-8864,6329 Elm Ct,Madison,126088,2020-01-02,34,Requested callback re: invoice #5743
+EMP-1036,Susan Rodriguez,susan.rodriguez10@workmail.co,(234) 470-7479,371-92-3844,1325 Chestnut Way,Auburn,161867,2020-08-26,41,Requested callback re: invoice #1755
+EMP-1037,Omar Thomas,omar.thomas@hotmail.com,(282) 784-0142,602-62-1929,5648 Sunset Ln,Springfield,40685,2024-09-08,43,"Left voicemail, no response yet"
+EMP-1038,Aisha Jones,aisha.jones@workmail.co,(702) 772-2837,664-81-3739,2149 Washington Ct,Riverton,93789,2020-02-25,61,"Left voicemail, no response yet"
+EMP-1039,Linda Brown,linda.brown68@gmail.com,(318) 907-5347,194-19-3008,9914 Church Ave,Oakland,92424,2024-03-12,42,
+EMP-1040,Wei Brown,wei.brown@outlook.com,(738) 421-9583,389-98-1502,2951 Church Way,Franklin,170108,2019-09-26,51,"VIP customer, handle with care"
+EMP-1041,Kwame Andersson,kwame.andersson74@corpmail.net,(353) 277-9418,167-43-2087,5569 River Ct,Springfield,40689,2022-02-08,44,Referred by a colleague
+EMP-1042,Lena Haddad,lena.haddad@workmail.co,(270) 509-8973,449-10-8202,4 Birch Ct,Auburn,56474,2019-04-18,38,"Spoke with spouse, will relay message"
+EMP-1043,Joseph Jones,joseph.jones38@outlook.com,(728) 224-2760,242-69-8574,5836 Cedar Ln,Riverton,172261,2024-04-25,31,Called from cell (728) 224-2760 about a late shipment
+EMP-1044,William Nguyen,william.nguyen@yahoo.com,(337) 433-8334,567-18-1845,2899 Highland Ave,Fairview,145244,2023-10-06,39,"Left voicemail, no response yet"
+EMP-1045,Aisha Garcia,aisha.garcia@hotmail.com,(588) 904-7001,526-94-1209,8890 Sunset Ave,Auburn,114094,2022-04-21,43,"VIP customer, handle with care"
+EMP-1046,Sofia Andersson,sofia.andersson@yahoo.com,(544) 337-6281,198-91-6144,5589 Washington St,Oakland,98350,2023-02-10,62,"Left voicemail, no response yet"
+EMP-1047,Michael Kim,michael.kim@workmail.co,(263) 759-9741,179-61-2186,454 Willow Rd,Manchester,57214,2019-12-10,61,"Left voicemail, no response yet"`;
+
+// ---------- theme ----------
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  localStorage.setItem('max-theme', next);
+});
+</script>
+</body>
+</html>

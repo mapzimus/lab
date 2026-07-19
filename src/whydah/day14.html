@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day 14 · Salem Then and Now · Navigating Piracy</title>
+<meta name="description" content="Day 14 student missions: Salem then and now, the honest record, and the voyage hiding in your backpack. Trace one item across the world.">
+<script>/* canonical-host redirect */(function(){var h=location.hostname;if(/\.github\.io$/i.test(h)||/(^|\.)maxwellhowegis\.com$/i.test(h)){location.replace("https://whydahstory.com"+location.pathname.replace(/^\/(Whydah-Unit|whydah)(?=\/|$)/i,"")+location.search+location.hash);}})();</script>
+<script src="day-config.js" defer></script>
+<style>
+  :root{
+    --ink:#12222B; --ink2:#1C3743; --parch:#F3E8CE; --parch2:#EAD9B4;
+    --brass:#A9781F; --brassl:#D8B25A; --ox:#8C2C1E; --inktx:#2B2114; --muted:#6E5B3C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--parch); color:var(--inktx); font-family:"Segoe UI",system-ui,-apple-system,sans-serif; line-height:1.5;}
+  .hero{background:var(--ink); color:var(--parch); padding:2.2em 1em 1.8em; text-align:center;}
+  .hero .kicker{color:var(--brassl); font-weight:700; letter-spacing:.25em; font-size:.85em; text-transform:uppercase;}
+  .hero h1{font-family:Georgia,"Times New Roman",serif; font-size:clamp(1.9em,5vw,3em); margin:.25em 0 .2em;}
+  .hero .sub{color:#C7BCA0; font-style:italic; font-size:1.05em;}
+  .wrap{max-width:880px; margin:0 auto; padding:1.2em 1em 3em;}
+  .mission{background:var(--parch2); border:1.5px solid var(--brass); border-radius:10px; padding:1.2em 1.3em 1.3em; margin:1.3em 0; box-shadow:2px 3px 10px rgba(42,29,15,.14);}
+  .mission-top{display:flex; align-items:baseline; gap:.7em; flex-wrap:wrap;}
+  .mnum{background:var(--ox); color:var(--parch); font-family:Georgia,serif; font-weight:700; font-size:1.25em; border-radius:50%; width:1.9em; height:1.9em; display:inline-flex; align-items:center; justify-content:center; flex:0 0 auto;}
+  .mission h2{font-family:Georgia,serif; font-size:1.45em; color:var(--inktx);}
+  .meta{color:var(--ox); font-weight:700; font-size:.92em; margin:.15em 0 .6em;}
+  .mission p{margin:.5em 0;}
+  .btn{display:inline-block; background:var(--brass); color:#FBF4E2; font-weight:700; font-size:1.06em; text-decoration:none; padding:.85em 1.25em; border-radius:8px; margin:.45em .45em .2em 0; border:2px solid #8a6119;}
+  .btn:hover,.btn:focus{background:#8a6119; outline:3px solid var(--ox);}
+  .btn.alt{background:var(--ink2); border-color:var(--ink);}
+  .btn.alt:hover,.btn.alt:focus{background:var(--ink);}
+  .log{background:#FBF4E2; border:1.5px dashed var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .log b{color:var(--ox);}
+  .hunt{margin:.5em 0 .3em 1.2em;}
+  .hunt li{margin:.35em 0;}
+  .bonus{font-style:italic; color:var(--muted); margin-top:.6em;}
+  .vocab{display:flex; gap:.6em; justify-content:center; flex-wrap:wrap; margin:1em 0;}
+  .chip{background:var(--ink); color:var(--brassl); font-family:Georgia,serif; font-weight:700; padding:.45em 1.1em; border-radius:999px; letter-spacing:.06em;}
+  .foot{background:var(--ink); color:#C7BCA0; text-align:center; padding:1.6em 1em 2em; font-size:.95em;}
+  .foot a{color:var(--brassl);}
+  .divider{text-align:center; color:var(--ox); font-size:1.3em; margin:1.6em 0 .2em; font-family:Georgia,serif; font-weight:700;}
+  .note{font-size:.9em; color:var(--muted); font-style:italic;}
+  .card-fields{background:#FBF4E2; border:1.5px solid var(--brass); border-radius:8px; padding:.8em 1em; margin:.6em 0;}
+  .card-fields div{padding:.28em 0; border-bottom:1px dashed var(--parch2); font-weight:700; color:var(--ink2);}
+  .card-fields div:last-child{border-bottom:none;}
+  .card-fields span{color:var(--muted); font-weight:400; font-style:italic;}
+  .race{background:#FBF4E2; border:2px solid var(--ox); border-radius:8px; padding:.8em 1em; margin-top:.8em;}
+  .race b{color:var(--ox);}
+  @media (max-width:520px){ .mission{padding:1em .9em;} .btn{display:block; text-align:center; margin-right:0;} }
+</style>
+</head>
+<body>
+<div id="today-banner"></div>
+
+<header class="hero">
+  <div class="kicker">Day 14 · Week 4 · Modern Oceans</div>
+  <h1>Salem Then and Now</h1>
+  <div class="sub">The wharves still stand. The machine still runs. Today you find your own cargo in it.</div>
+</header>
+
+<main class="wrap">
+
+  <section class="mission" id="m0">
+    <div class="mission-top"><span class="mnum">0</span><h2>Rig your sheet</h2></div>
+    <div class="meta">2 minutes · solo · paper + pencil + one world map sheet</div>
+    <p>One sheet, folded like a book. Cover: <b>your name, "Day 14," the date.</b> Then:</p>
+    <div class="card-fields">
+      <div>Page 1: MY ITEM'S VOYAGE <span>item, where it was made, ship type, squeeze points</span></div>
+      <div>Page 2: THE ARTIFACT <span>this week's big write, plus tonight's Captain's Log</span></div>
+      <div>Back cover: MY COURSE <span>tonight your tracker locks. Pitch Day is tomorrow.</span></div>
+    </div>
+    <p class="note">Grab a world map sheet at the door too. It rides folded inside your book. None left? Draw the world rough on Page 1. Two blobs and a route line beat no map.</p>
+  </section>
+
+  <section class="mission" id="m1">
+    <div class="mission-top"><span class="mnum">1</span><h2>One Harbor, Two Centuries</h2></div>
+    <div class="meta">~8 minutes · with your first mate · one Chromebook per pair</div>
+    <p>Two weeks ago you stood on Derby Wharf. Built 1762. Almost half a mile of it. In the age of sail it was packed with masts, barrels, and rope. Cod and lumber went out. Sugar, molasses, and money came back.</p>
+    <p>Now look at the same water today.</p>
+    <a class="btn" href="whydah-dashboard.html#salem" target="_blank" rel="noopener">Open the live harbor view →</a>
+    <ol class="hunt">
+      <li>Zoom out, slowly, until <b>Boston</b> appears. Watch the traffic thicken.</li>
+      <li>Find a big cargo vessel heading in or out. Click it: type, flag, where it's bound.</li>
+      <li>Ask the question backwards: what would a sailor from the age of sail still recognize here? What would stop them cold?</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> Top of MY ITEM'S VOYAGE. Two lines. One thing that is the same after 300 years. One thing that changed.</div>
+  </section>
+
+  <section class="mission" id="m2">
+    <div class="mission-top"><span class="mnum">2</span><h2>The Record and the Rescue</h2></div>
+    <div class="meta">~8 minutes · pairs · a quiet mission, no race on this one</div>
+    <p>Salem got rich on the water. Cod and lumber sailed out to the Caribbean plantations. Sugar, molasses, and rum sailed back. Those plantations ran on the labor of enslaved people. That trade built the wharves you walked.</p>
+    <p>And the harder page of the ledger: after the Revolution, some Salem merchants sent slave ships of their own. The record survives. Named ships. Named owners. A historian who read those old papers called Salem the most active slave-trade port in Massachusetts in those years. That is our town's record. We read it straight, like historians.</p>
+    <p>Same waters, one more story. <b>Philip Ashton</b>, a young fisherman from Marblehead, the next town over. June 1722: pirates seize his fishing boat off Nova Scotia. Not Bellamy. A crueler captain named Ned Low. Ashton refuses to turn pirate. They hold him anyway. Months later he slips away on an island off Honduras and survives there <b>almost two years, alone</b>. In 1725 a ship out of Salem finds him and carries him home. His parents thought he was dead. He wrote the whole story down. You can still read it.</p>
+    <a class="btn alt" href="whydah-dashboard.html#salem" target="_blank" rel="noopener">The Salem tab: the record + Ashton →</a>
+    <ol class="hunt">
+      <li>Find <b>one named Salem ship</b> from the slave-trade record. Write its name.</li>
+      <li>Find <b>one Ashton fact</b> this page did not give you. Write it.</li>
+    </ol>
+    <div class="log"><b>LOG IT:</b> Two short lines on MY ITEM'S VOYAGE: "The record says ___." and "Ashton ___."</div>
+  </section>
+
+  <section class="mission" id="m3">
+    <div class="mission-top"><span class="mnum">3</span><h2>Trace One Item</h2></div>
+    <div class="meta">~40 minutes · solo · paper, a label, and the world map sheet</div>
+    <p>The machine from 1717 never shut down. It got bigger, faster, and harder to see. Proof? You are wearing some of its cargo right now.</p>
+    <ol class="hunt">
+      <li><b>Pick one thing you own or wear today.</b> Shoe, hoodie, backpack, water bottle, pencil case.</li>
+      <li><b>Find the label.</b> "Made in ___." Check the collar, the waistband, the shoe tongue, the bottle base. No label? Pick another item.</li>
+      <li><b>Map it.</b> On the world sheet: a dot where it was made. A dot on Salem. Now draw its probable route <b>by sea</b>. Almost everything heavy crosses by ship, not by plane.</li>
+      <li><b>Name the ship.</b> For almost everything you own: a <b>container ship</b>. Steel boxes, thousands of them per ship.</li>
+      <li><b>Name the squeeze points.</b> Yesterday's list: Suez, Malacca, Panama, the Red Sea. Made in East Asia? It likely rode through Malacca, then Suez, or across the Pacific and through Panama. Made in Europe? Straight across the Atlantic. Not sure? Check the live map and follow the traffic.</li>
+    </ol>
+    <p>Now hold your item and think about your triangle map from Day 4. Your object rode the same machine the Whydah did. Different engine. Same machine: set routes, narrow squeezes, somebody profits, somebody works out of sight.</p>
+    <div class="race"><b>LABEL HUNT:</b> first crew to log items made on <b>three different continents</b> wins 5 league points. Real labels only. Shout it when you have three.</div>
+    <div class="log"><b>LOG IT:</b> MY ITEM'S VOYAGE page: item · where it was made · ship type · squeeze points. Route drawn on the map sheet. Then the sentence that matters, two halves: "In 1717, ___. Today, ___." That sentence is your exit ticket.</div>
+    <p class="bonus">Fast finishers: trace a second item from a different continent. Or ask the harder question: who touched your item between the factory and you? List every pair of hands you can imagine.</p>
+  </section>
+
+  <div class="divider">✦</div>
+
+  <section class="mission" id="write">
+    <div class="mission-top"><span class="mnum">★</span><h2>The Artifact</h2></div>
+    <div class="meta">~10 minutes · solo · this week's big write. Finish tonight if the clock beats you.</div>
+    <p>You have met real artifacts in this unit. The bell that named the ship. The silver that paid the crew. A boy's shoe behind glass. Paper records called people cargo. Objects tell it differently.</p>
+    <div class="log"><b>WRITE IT:</b> "Pick one artifact you'd want to hold. What would it tell you the written record can't?" A real paragraph, on THE ARTIFACT page.</div>
+    <a class="btn alt" href="whydah-dashboard.html#artifacts" target="_blank" rel="noopener">Browse the artifacts →</a>
+  </section>
+
+  <section class="mission" id="log">
+    <div class="mission-top"><span class="mnum">★</span><h2>Captain's Log</h2></div>
+    <div class="meta">5 minutes · solo · in your captain's voice</div>
+    <p>Your adopted ship is out on the water right now, riding the same machine you just mapped.</p>
+    <div class="log"><b>LOG IT:</b> What is your ship carrying tonight? Whose stuff is it? Which squeeze point did it last pass, or which one is next? Two or three sentences in the captain's voice. Date it like a sailor: "29 July 2026." Bottom of THE ARTIFACT page.</div>
+  </section>
+
+  <section class="mission" id="close">
+    <div class="mission-top"><span class="mnum">★</span><h2>Chart Your Course: Dress Rehearsal</h2></div>
+    <div class="meta">5 minutes · with your first mate · back cover, MY COURSE</div>
+    <p>Tomorrow you stand up and claim your story. Today you lock it and say it once out loud.</p>
+    <ol class="hunt">
+      <li><b>Circle ONE person.</b> Locked.</li>
+      <li><b>Circle ONE format.</b> Locked.</li>
+      <li><b>Write your one-line pitch:</b> "I am telling ___'s story as a ___ because ___."</li>
+      <li><b>Say it to your first mate.</b> Out loud. Once. Like you mean it. Then hear theirs back.</li>
+    </ol>
+    <a class="btn alt" href="whydah-dashboard.html#final-project" target="_blank" rel="noopener">Your Project HQ →</a>
+    <p class="note">Pitch Day is tomorrow, Thursday, July 30. Nobody picks tomorrow. Tomorrow you claim. Tonight you sleep on a locked choice.</p>
+  </section>
+
+  <section class="mission" id="reflect">
+    <div class="mission-top"><span class="mnum">✦</span><h2>The Question</h2></div>
+    <div class="meta">On your way out · say it to your first mate</div>
+    <p><b>What's still happening today that started in 1717?</b></p>
+    <p class="note">You drew part of the answer on your map sheet. Say it in one sentence at the door.</p>
+  </section>
+
+  <div class="vocab">
+    <span class="chip">wharf</span><span class="chip">container</span><span class="chip">import</span><span class="chip">global trade</span>
+  </div>
+  <p style="text-align:center; font-size:.92em; color:var(--muted); max-width:660px; margin:0 auto;">
+    <b>wharf</b> = a platform built from shore into the harbor so ships can load and unload ·
+    <b>container</b> = the standard steel box that moves the world's cargo, thousands to a ship ·
+    <b>import</b> = goods carried into a country to be sold there ·
+    <b>global trade</b> = the system that moves goods between countries across the world's oceans
+  </p>
+
+</main>
+
+<footer class="foot">
+  <p><b>Tomorrow:</b> Pitch Day. You stand up, you claim your person and your format, and you say your line like a captain.</p>
+  <p style="margin-top:.6em;"><a href="whydah-dashboard.html#overview">⚓ Back to the ship's logbook (dashboard)</a></p>
+</footer>
+
+</body>
+</html>

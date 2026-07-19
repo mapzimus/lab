@@ -1,8 +1,14 @@
 # Mapzimus Lab
 
-Source for [mapzimus.com](https://mapzimus.com), the creative lab for Maxwell Howe's browser tools, games, unusual maps, and experiments.
+Source for [mapzimus.com](https://mapzimus.com), the creative lab for Maxwell Howe's browser tools, games, maps, and experiments.
 
+<<<<<<< HEAD
 Every catalog item that can run as static files is **hosted in this repo** and served as a first-party path on mapzimus.com. Snapshots live under `vendor/` (see `vendor/SOURCES.md`). The build copies them into `dist/` beside the front-door catalog.
+=======
+The initial release is a front door, not a forced migration. The existing tools remain live at `mapzimus.github.io/max/`; this site provides the curated catalog, search, filters, favorites, and stable category routes. Individual tools can move to `mapzimus.com/tools/{slug}/` later without breaking their original URLs.
+
+The design system ("Quadrangle") draws from USGS topographic map sheets: warm paper and night-chart dark themes, survey-legend category colors, a graticule hero, and self-hosted Archivo + IBM Plex Mono fonts in `src/fonts/` (SIL OFL; the CSP only allows same-origin assets). The build pre-renders every catalog card, filter row, link group, published field note, and radar card into the HTML, so the site is fully browsable without JavaScript — `app.js` adds search, filters, and favorites on top. Card markup lives in both `scripts/build.mjs` and `src/app.js`; keep the two `card()` functions in sync.
+>>>>>>> origin/main
 
 - Tools: `mapzimus.com/{slug}/` (e.g. `/coordinate-converter/`)
 - Games & maps: `/flip-game/`, `/grog-flip/`, `/whydah-voyage/`, `/black-sam/`, `/bug-wars/`, `/transit/`, `/geopuesto/`, …
