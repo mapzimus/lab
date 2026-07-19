@@ -1,8 +1,10 @@
 # Mapzimus Lab
 
-Source for [mapzimus.com](https://mapzimus.com), the creative lab for Maxwell Howe's browser tools, games, unusual maps, and experiments.
+Source for [mapzimus.com](https://mapzimus.com), the creative lab for Maxwell Howe's browser tools, games, maps, and experiments.
 
-The initial release is a front door, not a forced migration. The 65 existing tools remain live at `mapzimus.github.io/max/`; this site provides the curated catalog, search, filters, favorites, and stable category routes. Individual tools can move to `mapzimus.com/tools/{slug}/` later without breaking their original URLs.
+The initial release is a front door, not a forced migration. The existing tools remain live at `mapzimus.github.io/max/`; this site provides the curated catalog, search, filters, favorites, and stable category routes. Individual tools can move to `mapzimus.com/tools/{slug}/` later without breaking their original URLs.
+
+The design system ("Quadrangle") draws from USGS topographic map sheets: warm paper and night-chart dark themes, survey-legend category colors, a graticule hero, and self-hosted Archivo + IBM Plex Mono fonts in `src/fonts/` (SIL OFL; the CSP only allows same-origin assets). The build pre-renders every catalog card, filter row, link group, published field note, and radar card into the HTML, so the site is fully browsable without JavaScript — `app.js` adds search, filters, and favorites on top. Card markup lives in both `scripts/build.mjs` and `src/app.js`; keep the two `card()` functions in sync.
 
 The first staging scaffold used a `public/` directory and a directly deployed static-assets Worker. The production implementation now follows the ecosystem plan: one source in `src/`, a reproducible `dist/` build, Cloudflare Pages Git integration, and preview deployments for branches and pull requests.
 
