@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map Style Builder</title>
+<meta name="description" content="Design a map color theme on a synthetic sample city, then export it as a MapLibre GL style JSON, a Leaflet CSS-filter snippet, plain JSON tokens, or a PNG snapshot. Fully client-side.">
+<style>
+  :root {
+    --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --border:#d9dee5;
+    --text:#1c2530; --muted:#61707f; --accent:#2563eb; --accent-ink:#ffffff;
+    --danger:#c0392b; --ok:#1a7f4b; --radius:12px;
+    --shadow:0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+    --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+    --danger:#ff6b5e; --ok:#43c98b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0e1116; --surface:#171b22; --surface-2:#1f242d; --border:#2b323d;
+      --text:#e7ecf2; --muted:#96a2b1; --accent:#4f86ff; --accent-ink:#0e1116;
+      --danger:#ff6b5e; --ok:#43c98b;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  header.app { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+  header.app h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header.app p { margin: 0; color: var(--muted); font-size: .92rem; max-width: 64ch; }
+  .theme-toggle { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 8px 14px; cursor: pointer; font-size: .85rem; }
+  .theme-toggle:hover { background: var(--surface-2); }
+  .backlink { display: inline-block; color: var(--muted); text-decoration: none; font-size: .82rem; margin: 0 0 10px; }
+  .backlink:hover { color: var(--accent); }
+
+  .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 8px 12px; font-size: .84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.05); color: var(--accent-ink); }
+  .btn.copied { color: var(--ok); border-color: var(--ok); }
+  .btn.small { padding: 6px 10px; font-size: .8rem; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  select, input[type=text] { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 9px; padding: 7px 9px; font-size: .84rem; font-family: var(--sans); }
+  label.fld { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); }
+  input[type=color] { width: 34px; height: 28px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 2px; cursor: pointer; }
+  input[type=checkbox] { accent-color: var(--accent); }
+  input[type=range] { accent-color: var(--accent); }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 12px; margin-bottom: 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .row + .row { margin-top: 8px; }
+  .grouplbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-right: 2px; align-self: center; }
+  .sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 2px; }
+  .spacer { flex: 1; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .chip { border: 1px dashed var(--border); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 12px; font-size: .82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .chip:hover { border-color: var(--accent); color: var(--accent); border-style: solid; }
+  .chip .dots { display: inline-flex; gap: 2px; }
+  .chip .dots i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,.18); }
+
+  .note { color: var(--muted); font-size: .82rem; min-height: 1.1em; }
+  .note.err { color: var(--danger); }
+  .note.ok { color: var(--ok); }
+
+  .layout { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.35fr); gap: 16px; align-items: start; }
+  @media (max-width: 980px) { .layout { grid-template-columns: minmax(0,1fr); } .controls { order: 2; } .preview-col { order: 1; } }
+
+  .controls .cgroup { border-top: 1px dashed var(--border); padding: 8px 0 4px; }
+  .controls .cgroup:first-child { border-top: none; padding-top: 2px; }
+  .cg-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+  .cg-head .grouplbl { margin: 0; }
+  .cg-head label.fld { font-size: .74rem; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+  .swatch { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); }
+  .swatch code { font-family: var(--mono); font-size: .72rem; color: var(--text); background: var(--surface-2); padding: 1px 5px; border-radius: 5px; min-width: 62px; text-align: center; }
+  .globals label.fld { width: 100%; justify-content: space-between; }
+  .globals input[type=range] { flex: 1 1 auto; max-width: 200px; }
+  .globals select { max-width: 200px; flex: 1 1 auto; }
+  .globals .val { font-family: var(--mono); font-size: .74rem; min-width: 42px; text-align: right; color: var(--text); }
+
+  .board-wrap { position: relative; width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .board-wrap svg { display: block; width: 100%; height: auto; -webkit-user-select: none; user-select: none; }
+
+  .exports .btn { margin: 0; }
+  textarea.code { width: 100%; min-height: 150px; resize: vertical; border: 1px solid var(--border); border-radius: 9px; background: var(--surface-2); color: var(--text); font-family: var(--mono); font-size: .72rem; padding: 8px; white-space: pre; }
+
+  details.about { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 10px 14px; margin-bottom: 12px; font-size: .86rem; }
+  details.about summary { cursor: pointer; font-weight: 600; }
+  details.about .body { margin-top: 8px; color: var(--muted); }
+  details.about code { font-family: var(--mono); font-size: .82em; background: var(--surface-2); padding: 1px 5px; border-radius: 5px; color: var(--text); }
+  details.about ul { margin: 6px 0; padding-left: 20px; }
+
+  footer.app { margin-top: 22px; color: var(--muted); font-size: .8rem; text-align: center; }
+  a { color: var(--accent); }
+  @media (max-width: 720px){
+    .grouplbl { width: 100%; margin-bottom: 2px; }
+    .cg-head .grouplbl { width: auto; }
+    .sep { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div>
+      <a class="backlink" href="./index.html">← All tools</a>
+      <h1>Map Style Builder</h1>
+      <p>Design a map color theme on a synthetic harbor city — water, parks, road classes, buildings, labels — then export it as a MapLibre GL style, a Leaflet filter snippet, JSON tokens, or a PNG. Everything runs in your browser.</p>
+    </div>
+    <button class="theme-toggle" id="themeBtn" type="button" aria-label="Toggle color theme">🌗 Theme</button>
+  </header>
+
+  <details class="about">
+    <summary>About the exports (click to expand)</summary>
+    <div class="body">
+      <ul>
+        <li><strong>MapLibre GL style</strong> — the headline export: a valid <code>version: 8</code> style document with layers for background, water, parks, buildings, three road classes (each with a casing), boundaries, and labels with halos. Its <code>sources</code> block points at a <em>placeholder</em> OpenMapTiles-schema vector tile URL — swap in your own tile endpoint (MapTiler, self-hosted tileserver-gl, etc.) and it will render for real.</li>
+        <li><strong>Leaflet snippet</strong> — raster tiles can't be recolored per-layer, so this is a <em>CSS filter approximation</em>: it derives an invert/sepia/saturate/brightness chain from your land and water colors and applies it to standard OSM tiles, plus your UI colors for the page. Clearly imperfect, but a fast way to get "close enough" without vector tiles.</li>
+        <li><strong>JSON tokens</strong> — a plain <code>{ name: "#hex" }</code> map for use in any other tooling.</li>
+        <li><strong>PNG snapshot</strong> — the preview SVG rendered to a 1800×1240 canvas and downloaded.</li>
+      </ul>
+      <p>The preview city ("Port Meridian") is procedurally drawn inline SVG — no tiles, no network. The URL hash always carries your current theme, so the address bar is a shareable link.</p>
+    </div>
+  </details>
+
+  <div class="chips" id="presetChips" role="group" aria-label="Preset themes"></div>
+
+  <div class="layout">
+    <div class="controls">
+      <div class="panel" id="colorPanel"></div>
+      <div class="panel globals">
+        <div class="cg-head"><span class="grouplbl">Global</span></div>
+        <div class="row">
+          <label class="fld">Label font
+            <select id="fontSel" aria-label="Label font"></select>
+          </label>
+        </div>
+        <div class="row">
+          <label class="fld">Road width
+            <input type="range" id="roadScale" min="0.5" max="2" step="0.05" value="1">
+            <span class="val" id="roadScaleVal">1.00×</span>
+          </label>
+        </div>
+        <div class="row">
+          <label class="fld">Label size
+            <input type="range" id="labelScale" min="0.6" max="1.6" step="0.05" value="1">
+            <span class="val" id="labelScaleVal">1.00×</span>
+          </label>
+        </div>
+        <div class="row">
+          <button class="btn small" id="undoBtn" type="button" disabled>↶ Undo</button>
+          <button class="btn small" id="shareBtn" type="button">🔗 Copy share link</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-col">
+      <div class="board-wrap" id="boardWrap"></div>
+      <div class="panel exports" style="margin-top:12px">
+        <div class="row">
+          <span class="grouplbl">Export</span>
+          <button class="btn primary small" id="dlStyleBtn" type="button">⬇ MapLibre style.json</button>
+          <button class="btn small" id="cpStyleBtn" type="button">Copy style JSON</button>
+          <button class="btn small" id="dlLeafletBtn" type="button">⬇ Leaflet snippet</button>
+          <button class="btn small" id="dlTokensBtn" type="button">⬇ Tokens JSON</button>
+          <button class="btn small" id="dlPngBtn" type="button">⬇ PNG snapshot</button>
+        </div>
+        <div class="row">
+          <label class="fld"><input type="checkbox" id="showCode"> Show MapLibre JSON preview</label>
+        </div>
+        <div class="row" id="codeRow" style="display:none">
+          <textarea class="code" id="codeBox" readonly spellcheck="false" aria-label="MapLibre style JSON preview"></textarea>
+        </div>
+        <div class="row"><span class="note" id="status">Pick a preset chip or tweak any color — the city updates live.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app">Part of the max tools collection · nothing leaves your browser</footer>
+</div>
+
+<script>
+'use strict';
+const $ = (s, el) => (el || document).querySelector(s);
+const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+
+// ---------------------------------------------------------------- tokens ----
+const TOKENS = [
+  { key:'land',   label:'Land',            group:'Background / Land' },
+  { key:'water',  label:'Water',           group:'Water' },
+  { key:'park',   label:'Park fill',       group:'Parks / Green' },
+  { key:'bldg',   label:'Fill',            group:'Buildings' },
+  { key:'bldgln', label:'Outline',         group:'Buildings' },
+  { key:'mw',     label:'Motorway',        group:'Roads' },
+  { key:'mwc',    label:'Motorway casing', group:'Roads' },
+  { key:'mj',     label:'Major',           group:'Roads' },
+  { key:'mjc',    label:'Major casing',    group:'Roads' },
+  { key:'mn',     label:'Minor',           group:'Roads' },
+  { key:'mnc',    label:'Minor casing',    group:'Roads' },
+  { key:'bnd',    label:'Boundary',        group:'Boundaries' },
+  { key:'lbl',    label:'Text',            group:'Labels' },
+  { key:'halo',   label:'Halo',            group:'Labels' },
+  { key:'poi',    label:'Dot',             group:'POIs' },
+];
+// which layer-toggle each group maps to (Background has no toggle)
+const GROUP_TOGGLE = {
+  'Water':'tWater', 'Parks / Green':'tParks', 'Buildings':'tBldgs',
+  'Roads':'tRoads', 'Boundaries':'tBnd', 'Labels':'tLbls', 'POIs':'tPois',
+};
+const TOGGLE_KEYS = Object.values(GROUP_TOGGLE);
+
+const FONTS = [
+  { name:'Sans (system)',  css:'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', ml:['Noto Sans Regular'], mlIt:['Noto Sans Italic'], mlBold:['Noto Sans Bold'] },
+  { name:'Serif',          css:'Georgia, "Times New Roman", serif', ml:['Noto Serif Regular'], mlIt:['Noto Serif Italic'], mlBold:['Noto Serif Bold'] },
+  { name:'Mono',           css:'ui-monospace, "Cascadia Code", Consolas, "Roboto Mono", monospace', ml:['Noto Sans Mono Regular'], mlIt:['Noto Sans Mono Regular'], mlBold:['Noto Sans Mono Bold'] },
+  { name:'Geometric',      css:'"Trebuchet MS", Futura, "Century Gothic", Verdana, sans-serif', ml:['Metropolis Regular'], mlIt:['Metropolis Regular Italic'], mlBold:['Metropolis Semi Bold'] },
+];
+
+// ---------------------------------------------------------------- presets ----
+const PRESETS = {
+  'Light': {
+    land:'#f2efe9', water:'#a6cbe0', park:'#c5e3b4', bldg:'#dcd3c8', bldgln:'#c7bcae',
+    mw:'#f6b954', mwc:'#d68f22', mj:'#ffffff', mjc:'#c9c2b4', mn:'#faf8f3', mnc:'#d9d3c6',
+    bnd:'#9c7fb8', lbl:'#38414d', halo:'#f6f4ee', poi:'#b0523f',
+    font:0, rs:1, ls:1,
+  },
+  'Dark': {
+    land:'#141a21', water:'#0d2736', park:'#17281c', bldg:'#1e252e', bldgln:'#2a333e',
+    mw:'#c2903e', mwc:'#0b0e12', mj:'#3d4956', mjc:'#0b0e12', mn:'#2a323c', mnc:'#0b0e12',
+    bnd:'#7a68a2', lbl:'#ccd6e2', halo:'#141a21', poi:'#5aa8d8',
+    font:0, rs:1, ls:1,
+  },
+  'Toner': {
+    land:'#ffffff', water:'#111111', park:'#ebebeb', bldg:'#d4d4d4', bldgln:'#999999',
+    mw:'#1a1a1a', mwc:'#ffffff', mj:'#3d3d3d', mjc:'#ffffff', mn:'#6e6e6e', mnc:'#ffffff',
+    bnd:'#000000', lbl:'#000000', halo:'#ffffff', poi:'#000000',
+    font:0, rs:0.85, ls:1,
+  },
+  'Sepia': {
+    land:'#f4ecd8', water:'#c9b98d', park:'#ddd2ac', bldg:'#e3d6ba', bldgln:'#c6b391',
+    mw:'#b0763c', mwc:'#8a5a2b', mj:'#dcc79c', mjc:'#ab9264', mn:'#e9ddbf', mnc:'#c6b391',
+    bnd:'#7a5c3e', lbl:'#4a3b28', halo:'#f4ecd8', poi:'#8a5a2b',
+    font:1, rs:1, ls:1,
+  },
+  'Blueprint': {
+    land:'#143d72', water:'#0c2b52', park:'#1a4a83', bldg:'#1e5290', bldgln:'#7fb2e5',
+    mw:'#ffffff', mwc:'#9cc3ef', mj:'#cfe2f7', mjc:'#5f92c9', mn:'#7fa9d9', mnc:'#143d72',
+    bnd:'#ffffff', lbl:'#eaf3ff', halo:'#143d72', poi:'#ffffff',
+    font:2, rs:0.9, ls:1,
+  },
+  'Terrain': {
+    land:'#eef0e2', water:'#9fc1cc', park:'#b3d1a2', bldg:'#ded7c3', bldgln:'#c4bca6',
+    mw:'#e8a33d', mwc:'#c47f22', mj:'#ffffff', mjc:'#c9c2ab', mn:'#f8f5ea', mnc:'#d5cfba',
+    bnd:'#a2836b', lbl:'#4b4636', halo:'#f4f2e7', poi:'#4b7f52',
+    font:0, rs:1, ls:1,
+  },
+  'Neon': {
+    land:'#0a0a16', water:'#050510', park:'#0d1f19', bldg:'#15152c', bldgln:'#25254a',
+    mw:'#ff2fa0', mwc:'#570f3d', mj:'#2fd8ff', mjc:'#0d4a5c', mn:'#3c3c72', mnc:'#0a0a16',
+    bnd:'#f5e942', lbl:'#e6f7ff', halo:'#0a0a16', poi:'#39ff88',
+    font:3, rs:1.1, ls:1,
+  },
+};
+
+// ---------------------------------------------------------------- state ----
+function defaultState(){
+  const s = Object.assign({}, PRESETS.Light);
+  TOGGLE_KEYS.forEach(k => s[k] = true);
+  return s;
+}
+let state = defaultState();
+const undoStack = [];
+let pendingSnap = null;
+
+function snapshot(){ return JSON.parse(JSON.stringify(state)); }
+function pushUndo(snap){
+  undoStack.push(snap || snapshot());
+  if (undoStack.length > 40) undoStack.shift();
+  $('#undoBtn').disabled = false;
+}
+
+// ------------------------------------------------------- synthetic city ----
+// Seeded RNG so the city is identical on every load / in every export.
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+const VB = { w: 900, h: 620 };
+
+const COAST = 'M 660 -10 C 640 60, 690 120, 668 190 C 648 250, 700 300, 682 360 C 665 420, 720 470, 700 530 C 688 570, 706 600, 698 630 L 910 630 L 910 -10 Z';
+const ISLAND = 'M 782 268 C 806 252, 842 258, 850 284 C 858 310, 836 332, 806 330 C 776 328, 762 296, 782 268 Z';
+const RIVER = 'M -10 120 C 60 140, 110 100, 170 130 C 235 165, 235 235, 310 240 C 390 246, 420 200, 480 235 C 540 268, 540 330, 610 350 C 640 358, 655 372, 670 386';
+const PARKS = [
+  { d:'M 62 322 C 110 300, 190 306, 222 340 C 252 372, 236 428, 190 446 C 138 466, 66 442, 60 396 C 57 366, 55 340, 62 322 Z', label:'Elm Park', lx:145, ly:390 },
+  { d:'M 348 68 C 376 48, 432 50, 454 76 C 474 100, 458 130, 418 138 C 376 146, 336 116, 348 68 Z', label:null },
+  { d:'M 556 462 C 574 452, 596 456, 600 472 C 604 490, 588 500, 570 498 C 552 496, 546 474, 556 462 Z', label:null },
+];
+const PIERS = [
+  'M 668 288 h 46 v 8 h -46 Z',
+  'M 676 336 h 58 v 7 h -58 Z',
+  'M 692 470 h 40 v 8 h -40 Z',
+];
+const BOUNDARY = 'M -10 155 C 60 140, 100 82, 160 56 C 220 30, 262 26, 302 -10';
+
+const ROADS = {
+  mw: [ 'M -10 520 C 130 488, 210 502, 320 462 C 430 424, 470 320, 540 268 C 610 216, 622 120, 615 -10' ],
+  mj: [
+    'M 382 -10 C 378 150, 386 320, 381 630',                                  // Meridian St
+    'M -10 296 C 200 292, 430 298, 648 290',                                  // King Street
+    'M -10 438 C 150 433, 400 440, 668 434',                                  // Foundry Rd
+    'M 640 -10 C 622 80, 655 160, 634 240 C 618 310, 664 380, 648 450 C 636 520, 658 570, 652 630', // Harbor Ave
+  ],
+  mn: [
+    'M 125 -10 L 125 292', 'M 125 468 L 125 620',
+    'M 218 -10 L 218 292',
+    'M 262 300 L 262 620',
+    'M 305 -10 L 305 292',
+    'M 350 300 L 350 620',
+    'M 472 -10 L 472 292',
+    'M 438 300 L 438 620',
+    'M 524 300 L 524 620',
+    'M 552 -10 L 552 292',
+    'M 600 300 L 600 560',
+    'M -10 70 C 200 66, 420 70, 632 62',
+    'M -10 192 C 100 196, 180 190, 252 194',
+    'M 300 178 C 420 172, 540 176, 630 168',
+    'M -10 250 C 100 248, 180 252, 252 248',
+    'M 262 352 C 400 348, 520 352, 636 346',
+    'M 262 512 C 400 508, 520 514, 636 505',
+    'M 262 580 C 400 576, 520 582, 644 572',
+    'M 590 470 L 646 432',
+    'M 598 522 L 652 492',
+  ],
+};
+
+// building blocks: [x, y, w, h]
+const BLOCKS = [
+  [40,16,72,40],[138,16,68,40],[231,20,60,36],[318,16,50,36],[397,16,58,36],[485,22,54,32],[562,26,52,28],
+  [485,82,54,50],[565,82,48,48],
+  [40,205,72,38],[138,205,68,38],
+  [318,188,50,34],[397,186,58,36],[485,188,54,34],[565,186,44,34],
+  [272,306,68,40],[392,306,36,40],[448,306,66,40],[534,306,56,40],
+  [272,362,68,60],[392,362,36,60],[448,362,66,58],[534,362,56,54],[608,362,26,52],
+  [392,450,36,52],[448,450,66,50],[534,448,56,48],
+  [272,522,68,50],[392,522,36,50],[448,524,66,48],[534,522,56,46],
+  [272,590,68,24],[392,590,36,24],[448,592,66,20],
+  [40,542,72,56],[138,540,68,58],
+];
+
+const POIS = [ [92,232],[182,58],[292,208],[420,318],[500,472],[560,540],[624,398],[410,562],[350,202],[586,92],[142,388],[806,296] ];
+
+function genBuildings(){
+  const rnd = mulberry32(20260717);
+  const out = [];
+  for (const [bx, by, bw, bh] of BLOCKS){
+    const n = Math.max(2, Math.round((bw * bh) / 700) + Math.floor(rnd() * 2));
+    for (let i = 0; i < n; i++){
+      const w = Math.min(bw - 4, 10 + rnd() * 16);
+      const h = Math.min(bh - 4, 8 + rnd() * 12);
+      const x = bx + 2 + rnd() * Math.max(1, bw - w - 4);
+      const y = by + 2 + rnd() * Math.max(1, bh - h - 4);
+      if (rnd() < 0.28 && w > 14 && h > 12){
+        // L-shaped footprint: rectangle with one corner notched out
+        const nw = (w * (0.35 + rnd() * 0.25)).toFixed(1);
+        const nh = (h * (0.35 + rnd() * 0.25)).toFixed(1);
+        out.push(`<path class="bldg" d="M ${x.toFixed(1)} ${y.toFixed(1)} h ${w.toFixed(1)} v ${(h - nh).toFixed(1)} h ${-nw} v ${nh} h ${(-(w - nw)).toFixed(1)} Z"/>`);
+      } else {
+        out.push(`<rect class="bldg" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}"/>`);
+      }
+    }
+  }
+  return out.join('');
+}
+
+function roadLayer(cls, casing){
+  const suffix = casing ? 'c' : '';
+  return ROADS[cls].map(d => `<path class="rd ${cls}${suffix}" d="${d}"/>`).join('');
+}
+
+function buildCitySVG(){
+  return `<svg id="mapsvg" viewBox="0 0 ${VB.w} ${VB.h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Synthetic sample city map preview">
+<style>
+  #mapsvg { background: var(--m-land); }
+  #mapsvg .landbase { fill: var(--m-land); }
+  #mapsvg .water { fill: var(--m-water); }
+  #mapsvg .riv { stroke: var(--m-water); fill: none; stroke-width: 15; stroke-linecap: round; }
+  #mapsvg .pier { fill: var(--m-land); }
+  #mapsvg .park { fill: var(--m-park); }
+  #mapsvg .bldg { fill: var(--m-bldg); stroke: var(--m-bldgln); stroke-width: .6; }
+  #mapsvg .rd { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  #mapsvg .mnc { stroke: var(--m-mnc); stroke-width: var(--w-mnc); }
+  #mapsvg .mjc { stroke: var(--m-mjc); stroke-width: var(--w-mjc); }
+  #mapsvg .mwc { stroke: var(--m-mwc); stroke-width: var(--w-mwc); }
+  #mapsvg .mn  { stroke: var(--m-mn);  stroke-width: var(--w-mn); }
+  #mapsvg .mj  { stroke: var(--m-mj);  stroke-width: var(--w-mj); }
+  #mapsvg .mw  { stroke: var(--m-mw);  stroke-width: var(--w-mw); }
+  #mapsvg .bnd { stroke: var(--m-bnd); fill: none; stroke-width: 1.8; stroke-dasharray: 7 5; stroke-linecap: round; }
+  #mapsvg .poi { fill: var(--m-poi); stroke: var(--m-halo); stroke-width: 1; }
+  #mapsvg text { fill: var(--m-lbl); stroke: var(--m-halo); stroke-width: var(--w-halo); paint-order: stroke; stroke-linejoin: round; font-family: var(--m-font); }
+  #mapsvg .t-city { font-size: var(--f-city); font-weight: 700; letter-spacing: .18em; text-anchor: middle; }
+  #mapsvg .t-hood { font-size: var(--f-hood); font-weight: 600; letter-spacing: .14em; text-anchor: middle; opacity: .78; }
+  #mapsvg .t-street { font-size: var(--f-street); letter-spacing: .04em; }
+  #mapsvg .t-water { font-size: var(--f-water); font-style: italic; letter-spacing: .22em; }
+  #mapsvg .t-small { font-size: var(--f-small); font-style: italic; letter-spacing: .06em; }
+  #mapsvg .t-park { font-size: var(--f-small); font-style: italic; text-anchor: middle; opacity: .9; }
+</style>
+<defs>
+  <path id="pKing" d="${ROADS.mj[1]}"/>
+  <path id="pMeridian" d="${ROADS.mj[0]}"/>
+  <path id="pFoundry" d="${ROADS.mj[2]}"/>
+  <path id="pHarbor" d="${ROADS.mj[3]}"/>
+  <path id="pExpy" d="${ROADS.mw[0]}"/>
+  <path id="pRiver" d="${RIVER}"/>
+  <path id="pBay" d="M 726 430 C 768 340, 782 240, 762 140"/>
+  <path id="pCopper" d="${ROADS.mn[13]}"/>
+</defs>
+<rect class="landbase" x="-10" y="-10" width="${VB.w + 20}" height="${VB.h + 20}"/>
+<g id="gWater">
+  <path class="water" d="${COAST}"/>
+  <path class="riv" d="${RIVER}"/>
+  <path class="pier" d="${ISLAND}"/>
+  ${PIERS.map(d => `<path class="pier" d="${d}"/>`).join('')}
+</g>
+<g id="gParks">${PARKS.map(p => `<path class="park" d="${p.d}"/>`).join('')}</g>
+<g id="gBldgs">${genBuildings()}</g>
+<g id="gRoads">
+  <g>${roadLayer('mn', true)}${roadLayer('mj', true)}${roadLayer('mw', true)}</g>
+  <g>${roadLayer('mn', false)}${roadLayer('mj', false)}${roadLayer('mw', false)}</g>
+</g>
+<g id="gBnd"><path class="bnd" d="${BOUNDARY}"/></g>
+<g id="gPois">${POIS.map(([x, y]) => `<circle class="poi" cx="${x}" cy="${y}" r="3"/>`).join('')}</g>
+<g id="gLbls">
+  <text class="t-city" x="308" y="332">PORT MERIDIAN</text>
+  <text class="t-hood" x="588" y="454">OLD HARBOR</text>
+  <text class="t-street"><textPath href="#pKing" startOffset="10%">King Street</textPath></text>
+  <text class="t-street"><textPath href="#pMeridian" startOffset="62%">Meridian St</textPath></text>
+  <text class="t-street"><textPath href="#pHarbor" startOffset="28%">Harbor Ave</textPath></text>
+  <text class="t-street"><textPath href="#pFoundry" startOffset="16%">Foundry Rd</textPath></text>
+  <text class="t-street"><textPath href="#pExpy" startOffset="10%">MERIDIAN EXPY</textPath></text>
+  <text class="t-street"><textPath href="#pCopper" startOffset="34%">Copper Row</textPath></text>
+  <text class="t-water"><textPath href="#pBay" startOffset="12%">Meridian Bay</textPath></text>
+  <text class="t-small"><textPath href="#pRiver" startOffset="24%">Alder River</textPath></text>
+  <text class="t-park" x="${PARKS[0].lx}" y="${PARKS[0].ly}">Elm Park</text>
+</g>
+</svg>`;
+}
+
+// ------------------------------------------------------------- rendering ----
+const GROUP_EL = { tWater:'#gWater', tParks:'#gParks', tBldgs:'#gBldgs', tRoads:'#gRoads', tBnd:'#gBnd', tLbls:'#gLbls', tPois:'#gPois' };
+let mapsvg = null;
+
+function applyStyle(){
+  if (!mapsvg) return;
+  const s = mapsvg.style;
+  for (const t of TOKENS) s.setProperty('--m-' + t.key, state[t.key]);
+  s.setProperty('--m-font', FONTS[state.font].css);
+  const rs = state.rs, ls = state.ls;
+  const widths = { mwc: 11, mw: 7, mjc: 8.5, mj: 5.5, mnc: 4.6, mn: 3 };
+  for (const k in widths) s.setProperty('--w-' + k, (widths[k] * rs).toFixed(2) + 'px');
+  s.setProperty('--w-halo', (3 * ls).toFixed(2) + 'px');
+  const fonts = { city: 21, hood: 10.5, street: 9, water: 15, small: 10 };
+  for (const k in fonts) s.setProperty('--f-' + k, (fonts[k] * ls).toFixed(2) + 'px');
+  for (const tk in GROUP_EL){
+    const g = $(GROUP_EL[tk], mapsvg);
+    if (g) g.style.display = state[tk] ? '' : 'none';
+  }
+}
+
+function syncControls(){
+  for (const t of TOKENS){
+    const inp = $('#c-' + t.key);
+    if (inp){ inp.value = state[t.key]; $('#hex-' + t.key).textContent = state[t.key]; }
+  }
+  for (const tk of TOGGLE_KEYS){ const c = $('#' + tk); if (c) c.checked = !!state[tk]; }
+  $('#fontSel').value = String(state.font);
+  $('#roadScale').value = state.rs; $('#roadScaleVal').textContent = state.rs.toFixed(2) + '×';
+  $('#labelScale').value = state.ls; $('#labelScaleVal').textContent = state.ls.toFixed(2) + '×';
+}
+
+function render(){
+  applyStyle();
+  syncControls();
+  if ($('#showCode').checked) $('#codeBox').value = JSON.stringify(mkStyle(), null, 2);
+  syncHash();
+}
+
+// --------------------------------------------------------- controls build ----
+function buildControls(){
+  const panel = $('#colorPanel');
+  const groups = [];
+  for (const t of TOKENS){
+    let g = groups.find(g => g.name === t.group);
+    if (!g){ g = { name: t.group, tokens: [] }; groups.push(g); }
+    g.tokens.push(t);
+  }
+  panel.innerHTML = groups.map(g => {
+    const tk = GROUP_TOGGLE[g.name];
+    const toggle = tk ? `<label class="fld"><input type="checkbox" id="${tk}" checked> show</label>` : '';
+    const sw = g.tokens.map(t =>
+      `<span class="swatch"><input type="color" id="c-${t.key}" value="${state[t.key]}" aria-label="${g.name} — ${t.label}"> ${t.label} <code id="hex-${t.key}">${state[t.key]}</code></span>`
+    ).join('');
+    return `<div class="cgroup"><div class="cg-head"><span class="grouplbl">${g.name}</span>${toggle}</div><div class="swatches">${sw}</div></div>`;
+  }).join('');
+
+  for (const t of TOKENS){
+    const inp = $('#c-' + t.key);
+    inp.addEventListener('pointerdown', () => { pendingSnap = snapshot(); });
+    inp.addEventListener('focus', () => { if (!pendingSnap) pendingSnap = snapshot(); });
+    inp.addEventListener('input', () => { state[t.key] = inp.value; $('#hex-' + t.key).textContent = inp.value; applyStyle(); syncHash(); });
+    inp.addEventListener('change', () => { if (pendingSnap){ pushUndo(pendingSnap); pendingSnap = null; } render(); });
+  }
+  for (const tk of TOGGLE_KEYS){
+    $('#' + tk).addEventListener('change', (e) => { state[tk] = e.target.checked; render(); });
+  }
+
+  $('#fontSel').innerHTML = FONTS.map((f, i) => `<option value="${i}">${f.name}</option>`).join('');
+  $('#fontSel').addEventListener('change', (e) => { pushUndo(); state.font = +e.target.value || 0; render(); });
+  const slider = (id, key) => {
+    const el = $('#' + id);
+    el.addEventListener('pointerdown', () => { pendingSnap = snapshot(); });
+    el.addEventListener('input', () => { state[key] = +el.value; applyStyle(); $('#' + id + 'Val').textContent = state[key].toFixed(2) + '×'; });
+    el.addEventListener('change', () => { if (pendingSnap){ pushUndo(pendingSnap); pendingSnap = null; } render(); });
+  };
+  slider('roadScale', 'rs');
+  slider('labelScale', 'ls');
+}
+
+function buildPresetChips(){
+  $('#presetChips').innerHTML = Object.keys(PRESETS).map(name => {
+    const p = PRESETS[name];
+    const dots = [p.land, p.water, p.mw, p.lbl].map(c => `<i style="background:${c}"></i>`).join('');
+    return `<button class="chip" type="button" data-preset="${name}"><span class="dots">${dots}</span>${name}</button>`;
+  }).join('');
+  $$('#presetChips .chip').forEach(ch => ch.addEventListener('click', () => applyPreset(ch.dataset.preset)));
+}
+
+function applyPreset(name){
+  const p = PRESETS[name];
+  if (!p){ flash('Unknown preset: ' + name, 'err'); return; }
+  pushUndo();
+  Object.assign(state, JSON.parse(JSON.stringify(p)));
+  render();
+  flash(name + ' preset applied — every control stays editable', 'ok');
+}
+
+$('#undoBtn').addEventListener('click', () => {
+  if (!undoStack.length) return;
+  state = undoStack.pop();
+  $('#undoBtn').disabled = undoStack.length === 0;
+  render();
+  flash('Undid last change', 'ok');
+});
+
+// ------------------------------------------------------------ color utils ----
+function hexToHsl(hex){
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+  if (!m) return { h: 0, s: 0, l: 50 };
+  const n = parseInt(m[1], 16);
+  const r = (n >> 16 & 255) / 255, g = (n >> 8 & 255) / 255, b = (n & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0; const l = (max + min) / 2;
+  if (max !== min){
+    const d = max - min;
+    s = l > .5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+    else if (max === g) h = ((b - r) / d + 2) * 60;
+    else h = ((r - g) / d + 4) * 60;
+  }
+  return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+// ------------------------------------------------------ MapLibre export ----
+function mkStyle(){
+  const F = FONTS[state.font];
+  const rs = state.rs, ls = state.ls;
+  const rw = (z0w, z18w) => ['interpolate', ['exponential', 1.4], ['zoom'], 6, +(z0w * rs).toFixed(2), 18, +(z18w * rs).toFixed(2)];
+  const cls = {
+    minor: ['minor', 'service', 'street'],
+    major: ['primary', 'secondary', 'tertiary', 'trunk'],
+    motorway: ['motorway'],
+  };
+  const roadFilter = (list) => ['all', ['==', ['geometry-type'], 'LineString'], ['match', ['get', 'class'], list, true, false]];
+  const layers = [
+    { id: 'background', type: 'background', paint: { 'background-color': state.land } },
+    { id: 'park', type: 'fill', source: 'openmaptiles', 'source-layer': 'park', paint: { 'fill-color': state.park, 'fill-opacity': 0.95 } },
+    { id: 'water', type: 'fill', source: 'openmaptiles', 'source-layer': 'water', paint: { 'fill-color': state.water } },
+    { id: 'waterway', type: 'line', source: 'openmaptiles', 'source-layer': 'waterway', paint: { 'line-color': state.water, 'line-width': ['interpolate', ['exponential', 1.3], ['zoom'], 8, 1, 18, 8] } },
+    { id: 'building', type: 'fill', source: 'openmaptiles', 'source-layer': 'building', minzoom: 13, paint: { 'fill-color': state.bldg, 'fill-outline-color': state.bldgln } },
+    { id: 'road-minor-casing', type: 'line', source: 'openmaptiles', 'source-layer': 'transportation', filter: roadFilter(cls.minor), layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': state.mnc, 'line-width': rw(1.4, 14) } },
+    { id: 'road-major-casing', type: 'line', source: 'openmaptiles', 'source-layer': 'transportation', filter: roadFilter(cls.major), layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': state.mjc, 'line-width': rw(2.2, 22) } },
+    { id: 'road-motorway-casing', type: 'line', source: 'openmaptiles', 'source-layer': 'transportation', filter: roadFilter(cls.motorway), layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': state.mwc, 'line-width': rw(3, 28) } },
+    { id: 'road-minor', type: 'line', source: 'openmaptiles', 'source-layer': 'transportation', filter: roadFilter(cls.minor), layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': state.mn, 'line-width': rw(0.8, 10) } },
+    { id: 'road-major', type: 'line', source: 'openmaptiles', 'source-layer': 'transportation', filter: roadFilter(cls.major), layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': state.mj, 'line-width': rw(1.4, 16) } },
+    { id: 'road-motorway', type: 'line', source: 'openmaptiles', 'source-layer': 'transportation', filter: roadFilter(cls.motorway), layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': state.mw, 'line-width': rw(2, 20) } },
+    { id: 'boundary', type: 'line', source: 'openmaptiles', 'source-layer': 'boundary', filter: ['<=', ['get', 'admin_level'], 4], paint: { 'line-color': state.bnd, 'line-width': 1.4, 'line-dasharray': [3, 2] } },
+    { id: 'poi', type: 'circle', source: 'openmaptiles', 'source-layer': 'poi', minzoom: 14, paint: { 'circle-color': state.poi, 'circle-radius': 3.5, 'circle-stroke-color': state.halo, 'circle-stroke-width': 1 } },
+    { id: 'road-label', type: 'symbol', source: 'openmaptiles', 'source-layer': 'transportation_name', layout: { 'symbol-placement': 'line', 'text-field': ['get', 'name'], 'text-font': F.ml, 'text-size': +(11 * ls).toFixed(1) }, paint: { 'text-color': state.lbl, 'text-halo-color': state.halo, 'text-halo-width': +(1.4 * ls).toFixed(2) } },
+    { id: 'water-label', type: 'symbol', source: 'openmaptiles', 'source-layer': 'water_name', layout: { 'text-field': ['get', 'name'], 'text-font': F.mlIt, 'text-size': +(13 * ls).toFixed(1), 'text-letter-spacing': 0.2 }, paint: { 'text-color': state.lbl, 'text-halo-color': state.halo, 'text-halo-width': +(1.2 * ls).toFixed(2) } },
+    { id: 'place-label', type: 'symbol', source: 'openmaptiles', 'source-layer': 'place', filter: ['match', ['get', 'class'], ['city', 'town'], true, false], layout: { 'text-field': ['get', 'name'], 'text-font': F.mlBold, 'text-size': +(16 * ls).toFixed(1), 'text-transform': 'uppercase', 'text-letter-spacing': 0.12 }, paint: { 'text-color': state.lbl, 'text-halo-color': state.halo, 'text-halo-width': +(1.6 * ls).toFixed(2) } },
+  ];
+  return {
+    version: 8,
+    name: 'Map Style Builder theme',
+    metadata: { generator: 'Map Style Builder (max tools)', note: 'sources.openmaptiles.url is a PLACEHOLDER — point it at a real OpenMapTiles-schema TileJSON endpoint (MapTiler, tileserver-gl, etc.) and it will render.' },
+    glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
+    sources: { openmaptiles: { type: 'vector', url: 'https://example.com/openmaptiles/tiles.json' } },
+    layers,
+  };
+}
+
+// ------------------------------------------------------- Leaflet export ----
+function tileFilter(){
+  const land = hexToHsl(state.land), water = hexToHsl(state.water);
+  const parts = [];
+  const dark = land.l < 45;
+  if (dark) parts.push('invert(1)', 'hue-rotate(180deg)');
+  const gray = land.s < 10 && water.s < 12;
+  if (gray) parts.push('grayscale(1)');
+  else if (!dark && land.h >= 25 && land.h <= 60 && land.s >= 15) parts.push('sepia(.5)');
+  const targetL = dark ? 100 - land.l : land.l;         // OSM raster tiles average ~92% lightness
+  parts.push('brightness(' + clamp(targetL / 92, 0.5, 1.35).toFixed(2) + ')');
+  parts.push('contrast(1.05)');
+  if (!gray) parts.push('saturate(' + clamp(water.s / 55, 0.25, 1.7).toFixed(2) + ')');
+  return parts.join(' ');
+}
+function mkLeaflet(){
+  return `/* Map Style Builder — Leaflet theme snippet
+ * NOTE: raster tiles cannot be restyled per-layer, so this is a CSS-FILTER
+ * APPROXIMATION of the theme, derived from the chosen land + water colors.
+ * For faithful colors, use the MapLibre GL style export with vector tiles. */
+
+/* --- CSS --- */
+const css = \`
+  .msb-themed-tiles { filter: ${tileFilter()}; }
+  .msb-map { background: ${state.land}; }
+  .msb-map .leaflet-control-attribution { background: ${state.land}cc; color: ${state.lbl}; }
+  .msb-map .leaflet-control-attribution a { color: ${state.lbl}; }
+\`;
+document.head.appendChild(Object.assign(document.createElement('style'), { textContent: css }));
+
+/* --- JS --- */
+const map = L.map('map', { center: [42.36, -71.06], zoom: 13 });
+map.getContainer().classList.add('msb-map');
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  className: 'msb-themed-tiles',
+  attribution: '&copy; OpenStreetMap contributors',
+}).addTo(map);
+
+/* Theme tokens, if you want to style markers/popups to match: */
+const theme = ${JSON.stringify(tokensObj(), null, 2)};
+`;
+}
+
+// ----------------------------------------------------------- tokens/PNG ----
+function tokensObj(){
+  const o = { name: 'map-style-builder-theme' };
+  for (const t of TOKENS) o[t.key] = state[t.key];
+  o.fontStack = FONTS[state.font].css;
+  o.roadWidthScale = state.rs;
+  o.labelSizeScale = state.ls;
+  return o;
+}
+
+function downloadBlob(text, filename, type){
+  try {
+    const blob = text instanceof Blob ? text : new Blob([text], { type: type || 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    return true;
+  } catch (e){ flash('Download failed: ' + e.message, 'err'); return false; }
+}
+
+function exportPNG(){
+  try {
+    const clone = mapsvg.cloneNode(true);
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    clone.setAttribute('width', VB.w * 2); clone.setAttribute('height', VB.h * 2);
+    clone.style.cssText = mapsvg.style.cssText; // carry the CSS variables along
+    const xml = new XMLSerializer().serializeToString(clone);
+    const svgBlob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = VB.w * 2; canvas.height = VB.h * 2;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = state.land; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(url);
+        canvas.toBlob((blob) => {
+          if (blob){ downloadBlob(blob, 'map-theme-preview.png'); flash('PNG snapshot downloaded (1800×1240)', 'ok'); }
+          else flash('PNG encoding failed', 'err');
+        }, 'image/png');
+      } catch (e){ URL.revokeObjectURL(url); flash('PNG render failed: ' + e.message, 'err'); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); flash('PNG render failed — SVG could not be rasterized', 'err'); };
+    img.src = url;
+  } catch (e){ flash('PNG export failed: ' + e.message, 'err'); }
+}
+
+async function copyText(text, btn, okMsg){
+  try { await navigator.clipboard.writeText(text); flashBtn(btn); flash(okMsg, 'ok'); }
+  catch (e){ flash('Copy failed — clipboard not available in this context', 'err'); }
+}
+
+$('#dlStyleBtn').addEventListener('click', () => { if (downloadBlob(JSON.stringify(mkStyle(), null, 2), 'style.json', 'application/json')) flash('MapLibre style.json downloaded — swap in your tile URL and it renders', 'ok'); });
+$('#cpStyleBtn').addEventListener('click', (e) => copyText(JSON.stringify(mkStyle(), null, 2), e.currentTarget, 'MapLibre style JSON copied'));
+$('#dlLeafletBtn').addEventListener('click', () => { if (downloadBlob(mkLeaflet(), 'leaflet-theme-snippet.js', 'text/javascript')) flash('Leaflet snippet downloaded (labeled approximation)', 'ok'); });
+$('#dlTokensBtn').addEventListener('click', () => { if (downloadBlob(JSON.stringify(tokensObj(), null, 2), 'map-theme-tokens.json', 'application/json')) flash('Theme tokens downloaded', 'ok'); });
+$('#dlPngBtn').addEventListener('click', exportPNG);
+
+$('#showCode').addEventListener('change', () => {
+  const on = $('#showCode').checked;
+  $('#codeRow').style.display = on ? '' : 'none';
+  if (on) $('#codeBox').value = JSON.stringify(mkStyle(), null, 2);
+});
+
+// -------------------------------------------------------------- URL hash ----
+function encodeState(){
+  try { return 's=' + btoa(unescape(encodeURIComponent(JSON.stringify(state)))); }
+  catch (e){ return ''; }
+}
+function decodeState(str){
+  if (str.startsWith('s=')) str = str.slice(2);
+  const obj = JSON.parse(decodeURIComponent(escape(atob(str))));
+  if (!obj || typeof obj !== 'object' || !/^#[0-9a-f]{6}$/i.test(obj.land || '')) return false;
+  const next = defaultState();
+  for (const t of TOKENS) if (/^#[0-9a-f]{6}$/i.test(obj[t.key] || '')) next[t.key] = obj[t.key].toLowerCase();
+  next.font = clamp(parseInt(obj.font, 10) || 0, 0, FONTS.length - 1);
+  next.rs = clamp(parseFloat(obj.rs) || 1, 0.5, 2);
+  next.ls = clamp(parseFloat(obj.ls) || 1, 0.6, 1.6);
+  for (const tk of TOGGLE_KEYS) next[tk] = obj[tk] !== false;
+  state = next;
+  return true;
+}
+let hashTimer = null;
+function syncHash(){
+  clearTimeout(hashTimer);
+  hashTimer = setTimeout(() => { try { history.replaceState(null, '', '#' + encodeState()); } catch (e){} }, 150);
+}
+$('#shareBtn').addEventListener('click', (e) => {
+  try { history.replaceState(null, '', '#' + encodeState()); } catch (err){}
+  copyText(location.href, e.currentTarget, 'Shareable link copied');
+});
+
+// ------------------------------------------------------------- status/UI ----
+let flashTimer = null;
+function flash(msg, kind){
+  const s = $('#status');
+  s.textContent = msg; s.className = 'note' + (kind ? ' ' + kind : '');
+  clearTimeout(flashTimer);
+  if (msg) flashTimer = setTimeout(() => { s.textContent = 'Pick a preset chip or tweak any color — the city updates live.'; s.className = 'note'; }, 3200);
+}
+function flashBtn(btn){ if (!btn) return; btn.classList.add('copied'); setTimeout(() => btn.classList.remove('copied'), 1200); }
+
+// ---------------------------------------------------------------- theme ----
+const root = document.documentElement;
+const savedTheme = localStorage.getItem('max-theme');
+if (savedTheme) root.setAttribute('data-theme', savedTheme);
+$('#themeBtn').addEventListener('click', () => {
+  const cur = root.getAttribute('data-theme');
+  const isDark = cur ? cur === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = isDark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem('max-theme', next); } catch (e){}
+});
+
+// ----------------------------------------------------------------- boot ----
+function boot(){
+  $('#boardWrap').innerHTML = buildCitySVG();
+  mapsvg = $('#mapsvg');
+  buildPresetChips();
+  let loaded = false;
+  if (location.hash.length > 1){
+    try { loaded = decodeState(location.hash.slice(1)); }
+    catch (e){ loaded = false; flash('Could not read the theme in this link — starting from the Light preset', 'err'); }
+  }
+  buildControls();
+  render();
+  if (!loaded) flash('Light preset loaded as the sample — click any chip to try another look', 'ok');
+}
+boot();
+
+// test / automation hooks
+window.msb = {
+  state: () => state,
+  presets: PRESETS,
+  applyPreset, render,
+  mkStyle, mkLeaflet, tokensObj, tileFilter,
+  encodeState, decodeState,
+  undoDepth: () => undoStack.length,
+};
+</script>
+</body>
+</html>
