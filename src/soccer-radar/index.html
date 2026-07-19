@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Soccer Radar · Mapzimus</title>
+  <meta name="description" content="Soccer news, transfers, and live scores in one daily sweep.">
+  <link rel="canonical" href="https://mapzimus.com/soccer-radar/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Soccer Radar · Mapzimus">
+  <meta property="og:description" content="Soccer news, transfers, and live scores in one daily sweep.">
+  <meta property="og:url" content="https://mapzimus.com/soccer-radar/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#f4f0e7">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/radar/radar.css">
+  <script src="/soccer-radar/soccer-radar.js" defer></script>
+  <script src="/radar-common.js" defer></script>
+</head>
+<body data-view="soccer-radar">
+  <a class="skip-link" href="#radar">Skip to radar</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Mapzimus home">
+      <span class="brand-mark" aria-hidden="true">MZ</span>
+      <span>Mapzimus</span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="/lab/">Lab</a>
+      <a href="/tools/">Tools</a>
+      <a href="/maps/">Maps</a>
+      <a href="/field-notes/">Field Notes</a>
+      <a href="/games/">Games</a>
+      <a href="/radars/" aria-current="page">Radars</a>
+      <a href="/skills/">Skills</a>
+      <a href="/links/">Links</a>
+      <a href="/about/">About</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Professional GIS ↗</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero radar-hero">
+      <div class="eyebrow">Matchday, every day</div>
+      <h1>Soccer radar.</h1>
+      <p>News, transfer chatter, and scores from the Premier League, La Liga, MLS, and the Champions League.</p>
+      <div class="trust-row">
+        <span id="radarDate">Loading…</span>
+        <span id="radarCounts" hidden></span>
+      </div>
+    </section>
+
+    <section class="catalog" id="radar" aria-labelledby="radarHeading">
+      <div class="section-heading">
+        <div><span class="eyebrow">Today's sweep</span><h2 id="radarHeading">What's moving</h2></div>
+        <p>Sources: BBC Sport · The Guardian · ESPN</p>
+      </div>
+      <div class="catalog-controls radar-controls">
+        <div class="filters" role="group" aria-label="Filter sources" id="radarFilters">
+          <button class="filter" data-source="all" aria-pressed="true">All</button>
+          <button class="filter" data-source="scores" aria-pressed="false">Scores</button>
+          <button class="filter" data-source="transfers" aria-pressed="false">Transfers</button>
+          <button class="filter" data-source="news" aria-pressed="false">News</button>
+        </div>
+      </div>
+      <div id="radarSections">
+        <p class="empty" id="radarEmpty">Loading today's radar…</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Mapzimus is the creative lab of Maxwell Howe. Radar data refreshes at the edge throughout the day.</p>
+    <p class="footer-note">Sources: BBC Sport · The Guardian · ESPN</p>
+  </footer>
+</body>
+</html>

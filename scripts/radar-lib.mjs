@@ -445,6 +445,154 @@ export async function sweepGeo(today, githubToken) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Soccer radar: news + transfers (RSS), scores + ESPN news (public JSON API).
+// ---------------------------------------------------------------------------
+const SOCCER_LEAGUES = [
+  ["eng.1", "Premier League"],
+  ["esp.1", "La Liga"],
+  ["usa.1", "MLS"],
+  ["uefa.champions", "Champions League"],
+];
+
+async function collectScores() {
+  const results = await Promise.all(SOCCER_LEAGUES.map(async ([code, league]) => {
+    try {
+      const data = await getJSON(`https://site.api.espn.com/apis/site/v2/sports/soccer/${code}/scoreboard`);
+      return (data.events ?? []).map((e) => {
+        const comp = e.competitions?.[0];
+        const [home, away] = comp?.competitors ?? [];
+        return {
+          league,
+          title: e.shortName ?? e.name,
+          url: `https://www.espn.com/soccer/match/_/gameId/${e.id}`,
+          status: comp?.status?.type?.shortDetail ?? "",
+          score: home && away ? `${home.team?.abbreviation ?? ""} ${home.score ?? ""}–${away.score ?? ""} ${away.team?.abbreviation ?? ""}` : "",
+        };
+      });
+    } catch {
+      return [];
+    }
+  }));
+  return results.flat().slice(0, 18);
+}
+
+async function collectEspnSoccerNews() {
+  try {
+    const data = await getJSON("https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/news");
+    return (data.articles ?? []).slice(0, 10).map((a) => ({
+      title: cleanText(a.headline ?? "", 120),
+      url: a.links?.web?.href ?? "",
+      desc: cleanText(a.description ?? ""),
+    })).filter((a) => a.url);
+  } catch {
+    return [];
+  }
+}
+
+const TRANSFER_RE = /\b(transfer|sign(s|ing|ed)?|bid|fee|loan|move to|swoop|deal|contract talks|release clause|gossip)\b/i;
+
+export async function sweepSoccer(today) {
+  const [bbc, guardian, espn, scores] = await Promise.all([
+    collectRSS("https://feeds.bbci.co.uk/sport/football/rss.xml", 20),
+    collectRSS("https://www.theguardian.com/football/rss", 20),
+    collectEspnSoccerNews(),
+    collectScores(),
+  ]);
+  const news = [...bbc, ...guardian, ...espn];
+  const isTransfer = (i) => TRANSFER_RE.test(`${i.title} ${i.desc}`);
+  return {
+    generatedAt: today,
+    scores,
+    transfers: news.filter(isTransfer).slice(0, 12),
+    news: news.filter((i) => !isTransfer(i)).slice(0, 15),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Stocks radar: trending tickers and movers. Signals, not financial advice.
+// ---------------------------------------------------------------------------
+async function collectYahooTrending() {
+  try {
+    const data = await getJSON("https://query1.finance.yahoo.com/v1/finance/trending/US?count=15");
+    return (data.finance?.result?.[0]?.quotes ?? []).map((q) => q.symbol).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+async function collectStocktwits() {
+  try {
+    const data = await getJSON("https://api.stocktwits.com/api/2/trending/symbols.json");
+    return (data.symbols ?? []).map((s) => ({ symbol: s.symbol, title: s.title })).slice(0, 15);
+  } catch {
+    return [];
+  }
+}
+
+async function quote(symbol) {
+  try {
+    const data = await getJSON(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=1d&interval=1d`);
+    const meta = data.chart?.result?.[0]?.meta;
+    if (!meta) return null;
+    const price = meta.regularMarketPrice;
+    const prev = meta.chartPreviousClose ?? meta.previousClose;
+    return {
+      symbol,
+      name: meta.longName ?? meta.shortName ?? symbol,
+      price,
+      changePct: price && prev ? ((price - prev) / prev) * 100 : null,
+      url: `https://finance.yahoo.com/quote/${encodeURIComponent(symbol)}`,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function sweepStocks(today) {
+  const [trendingSymbols, stocktwits] = await Promise.all([collectYahooTrending(), collectStocktwits()]);
+  const seen = new Set();
+  const ordered = [];
+  for (const s of [...trendingSymbols, ...stocktwits.map((t) => t.symbol)]) {
+    if (s && !seen.has(s) && !/\.[A-Z]+$/.test(s)) { seen.add(s); ordered.push(s); }
+    if (ordered.length >= 16) break;
+  }
+  const quotes = (await Promise.all(ordered.map(quote))).filter(Boolean);
+  const stName = new Map(stocktwits.map((t) => [t.symbol, t.title]));
+  for (const q of quotes) if (!q.name || q.name === q.symbol) q.name = stName.get(q.symbol) ?? q.symbol;
+  return {
+    generatedAt: today,
+    disclaimer: "Trend signals from public data — not financial advice.",
+    trending: quotes,
+    gainers: [...quotes].filter((q) => q.changePct != null).sort((a, b) => b.changePct - a.changePct).slice(0, 8),
+    social: stocktwits.slice(0, 10).map((t) => ({
+      title: `${t.symbol} — ${t.title}`,
+      url: `https://stocktwits.com/symbol/${encodeURIComponent(t.symbol)}`,
+    })),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Politics radar: progressive news and accountability journalism (RSS).
+// ---------------------------------------------------------------------------
+const POLITICS_FEEDS = [
+  ["guardian", "The Guardian — US politics", "https://www.theguardian.com/us-news/us-politics/rss"],
+  ["motherjones", "Mother Jones", "https://www.motherjones.com/feed/"],
+  ["nation", "The Nation", "https://www.thenation.com/feed/?post_type=article"],
+  ["propublica", "ProPublica", "https://www.propublica.org/feeds/propublica/main"],
+  ["intercept", "The Intercept", "https://theintercept.com/feed/?rss"],
+  ["commondreams", "Common Dreams", "https://www.commondreams.org/feeds/news.rss"],
+];
+
+export async function sweepPolitics(today) {
+  const feeds = await Promise.all(POLITICS_FEEDS.map(async ([key, label, url]) => ({
+    key,
+    label,
+    items: await collectRSS(url, 6),
+  })));
+  return { generatedAt: today, feeds: feeds.filter((f) => f.items.length) };
+}
+
 // Fetch a one-line caption for a Hugging Face item from its card README:
 // first meaningful prose line after the YAML frontmatter, markdown stripped.
 async function hfCaption(kind, id) {

@@ -70,6 +70,22 @@ falling back to the committed baseline JSON if the live sweep fails:
 - [mapzimus.com/geo-radar/](https://mapzimus.com/geo-radar/) — **Geospatial
   Radar** (`/api/geo-radar`, `src/data/geo-radar.json`): Maps Mania,
   Geography Realm, Geospatial World, new QGIS plugins, geospatial library
-  releases, GIS Stack Exchange, NASA Earthdata, Data.gov, weeklyOSM. Optionally
+  releases, GIS Stack Exchange, NASA Earthdata, Data.gov, weeklyOSM.
+- [mapzimus.com/soccer-radar/](https://mapzimus.com/soccer-radar/) — **Soccer
+  Radar**: scores (ESPN public API for the Premier League, La Liga, MLS,
+  Champions League), transfer talk, and news (BBC Sport, The Guardian, ESPN).
+- [mapzimus.com/stocks-radar/](https://mapzimus.com/stocks-radar/) — **Stocks
+  Radar**: trending tickers, movers, and social buzz (Yahoo Finance,
+  Stocktwits). Signals, not financial advice.
+- [mapzimus.com/politics-radar/](https://mapzimus.com/politics-radar/) —
+  **Politics Radar**: the progressive press (Guardian US politics, Mother
+  Jones, The Nation, ProPublica, The Intercept, Common Dreams).
+
+All five endpoints are served by one dynamic Pages Function
+(`functions/api/[radar].js`); dashboards share `src/radar-common.js` and each
+defines its sections in `src/<slug>/<slug>.js`. New radars: add a sweep in
+`scripts/radar-lib.mjs`, register it in the function's `SWEEPS` map and
+`scripts/radar.mjs`, add a page + config, and list it in
+`src/data/radars.json`. Optionally
 set a `GITHUB_TOKEN` secret on the Pages project so edge GitHub searches
 avoid the unauthenticated per-IP rate limit.

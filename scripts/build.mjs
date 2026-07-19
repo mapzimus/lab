@@ -139,7 +139,7 @@ for (const [view, page] of Object.entries(pages)) {
   fs.writeFileSync(target, html, "utf8");
 }
 
-const staticPages = ["field-notes", "radars", "radar", "geo-radar", "skills", "links", "about"];
+const staticPages = ["field-notes", "radars", "radar", "geo-radar", "soccer-radar", "stocks-radar", "politics-radar", "skills", "links", "about"];
 const urls = [...Object.values(pages).map((page) => page.canonical), ...staticPages.map((s) => `https://mapzimus.com/${s}/`)];
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n`;
 fs.writeFileSync(path.join(output, "sitemap.xml"), sitemap, "utf8");
