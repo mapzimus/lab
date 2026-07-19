@@ -68,21 +68,6 @@
       return `<span class="tag">${escapeHtml(tag)}</span>`;
     }).join("");
     const favorite = state.favorites.has(item.slug);
-<<<<<<< HEAD
-    const cardClass = featured ? "featured-card" : "catalog-card";
-    const external = item.external || /^https?:\/\//i.test(item.url || "");
-    const targetAttrs = external ? ' target="_blank" rel="noopener"' : "";
-    const openLabel = external ? "Open ↗" : "Open";
-    return `<article class="${cardClass}" data-slug="${escapeHtml(item.slug)}">
-      <button class="star" type="button" aria-label="${favorite ? "Remove from" : "Add to"} favorites" aria-pressed="${favorite}">${favorite ? "★" : "☆"}</button>
-      <a class="card-link" href="${escapeHtml(item.url)}"${targetAttrs} data-open-slug="${escapeHtml(item.slug)}">
-        <div class="card-icon" aria-hidden="true">${escapeHtml(item.icon || "↗")}</div>
-        <div class="card-type">${escapeHtml(categoryLabels[item.category] || item.category)}</div>
-        <h3>${escapeHtml(item.title)}</h3>
-        <p class="card-copy">${escapeHtml(item.description)}</p>
-        ${featured ? "" : `<div class="tags">${tags}</div>`}
-        <div class="card-footer"><span class="status">${escapeHtml(item.status || "live")}</span><span>${openLabel}</span></div>
-=======
     const status = item.status || "live";
     return `<article class="card${featured ? " featured" : ""}" data-slug="${escapeHtml(item.slug)}" data-category="${escapeHtml(item.category)}">
       <button class="star" type="button" aria-label="${favorite ? "Remove from" : "Add to"} favorites" aria-pressed="${favorite}">${favorite ? "★" : "☆"}</button>
@@ -92,7 +77,6 @@
         <p class="card-copy">${escapeHtml(item.description)}</p>
         ${featured ? "" : `<div class="card-tags">${tags}</div>`}
         <div class="card-foot">${status === "live" ? "<span></span>" : `<span class="status">${escapeHtml(status)}</span>`}<span class="open-cue">Open ↗</span></div>
->>>>>>> origin/main
       </a>
     </article>`;
   }
@@ -203,13 +187,7 @@
     renderFeatured();
     renderCatalog();
   }).catch(function () {
-<<<<<<< HEAD
-    resultCount.textContent = "Catalog unavailable";
-    emptyState.hidden = false;
-    emptyState.textContent = "The catalog could not be loaded. Try refreshing, or browse /tools/ directly.";
-=======
     // The pre-rendered cards are still on the page; only live search/filtering is lost.
     resultCount.textContent = "Search is unavailable right now";
->>>>>>> origin/main
   });
 })();

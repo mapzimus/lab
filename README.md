@@ -2,13 +2,11 @@
 
 Source for [mapzimus.com](https://mapzimus.com), the creative lab for Maxwell Howe's browser tools, games, maps, and experiments.
 
-<<<<<<< HEAD
 Every catalog item that can run as static files is **hosted in this repo** and served as a first-party path on mapzimus.com. Snapshots live under `vendor/` (see `vendor/SOURCES.md`). The build copies them into `dist/` beside the front-door catalog.
-=======
+
 The initial release is a front door, not a forced migration. The existing tools remain live at `mapzimus.github.io/max/`; this site provides the curated catalog, search, filters, favorites, and stable category routes. Individual tools can move to `mapzimus.com/tools/{slug}/` later without breaking their original URLs.
 
 The design system ("Quadrangle") draws from USGS topographic map sheets: warm paper and night-chart dark themes, survey-legend category colors, a graticule hero, and self-hosted Archivo + IBM Plex Mono fonts in `src/fonts/` (SIL OFL; the CSP only allows same-origin assets). The build pre-renders every catalog card, filter row, link group, published field note, and radar card into the HTML, so the site is fully browsable without JavaScript — `app.js` adds search, filters, and favorites on top. Card markup lives in both `scripts/build.mjs` and `src/app.js`; keep the two `card()` functions in sync.
->>>>>>> origin/main
 
 - Tools: `mapzimus.com/{slug}/` (e.g. `/coordinate-converter/`)
 - Games & maps: `/flip-game/`, `/grog-flip/`, `/whydah-voyage/`, `/black-sam/`, `/bug-wars/`, `/transit/`, `/geopuesto/`, …
@@ -87,6 +85,22 @@ falling back to the committed baseline JSON if the live sweep fails:
 - [mapzimus.com/geo-radar/](https://mapzimus.com/geo-radar/) — **Geospatial
   Radar** (`/api/geo-radar`, `src/data/geo-radar.json`): Maps Mania,
   Geography Realm, Geospatial World, new QGIS plugins, geospatial library
-  releases, GIS Stack Exchange, NASA Earthdata, Data.gov, weeklyOSM. Optionally
+  releases, GIS Stack Exchange, NASA Earthdata, Data.gov, weeklyOSM.
+- [mapzimus.com/soccer-radar/](https://mapzimus.com/soccer-radar/) — **Soccer
+  Radar**: scores (ESPN public API for the Premier League, La Liga, MLS,
+  Champions League), transfer talk, and news (BBC Sport, The Guardian, ESPN).
+- [mapzimus.com/stocks-radar/](https://mapzimus.com/stocks-radar/) — **Stocks
+  Radar**: trending tickers, movers, and social buzz (Yahoo Finance,
+  Stocktwits). Signals, not financial advice.
+- [mapzimus.com/politics-radar/](https://mapzimus.com/politics-radar/) —
+  **Politics Radar**: the progressive press (Guardian US politics, Mother
+  Jones, The Nation, ProPublica, The Intercept, Common Dreams).
+
+All five endpoints are served by one dynamic Pages Function
+(`functions/api/[radar].js`); dashboards share `src/radar-common.js` and each
+defines its sections in `src/<slug>/<slug>.js`. New radars: add a sweep in
+`scripts/radar-lib.mjs`, register it in the function's `SWEEPS` map and
+`scripts/radar.mjs`, add a page + config, and list it in
+`src/data/radars.json`. Optionally
 set a `GITHUB_TOKEN` secret on the Pages project so edge GitHub searches
 avoid the unauthenticated per-IP rate limit.

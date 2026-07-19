@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Politics Radar · Mapzimus</title>
+  <meta name="description" content="A daily sweep of progressive news and accountability journalism.">
+  <link rel="canonical" href="https://mapzimus.com/politics-radar/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Politics Radar · Mapzimus">
+  <meta property="og:description" content="A daily sweep of progressive news and accountability journalism.">
+  <meta property="og:url" content="https://mapzimus.com/politics-radar/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#121721">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/radar/radar.css">
+  <script src="/theme.js"></script>
+  <script src="/politics-radar/politics-radar.js" defer></script>
+  <script src="/radar-common.js" defer></script>
+</head>
+<body data-view="politics-radar">
+<div class="sheet">
+  <a class="skip-link" href="#radar">Skip to radar</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Mapzimus home">
+      <span class="brand-mark" aria-hidden="true">MZ</span>
+      <span class="brand-name">Mapzimus</span>
+    </a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="/tools/">Tools</a>
+      <a href="/maps/">Maps</a>
+      <a href="/games/">Games</a>
+      <a href="/lab/">Lab</a>
+      <a href="/field-notes/">Notes</a>
+      <a href="/radars/" aria-current="page">Radars</a>
+      <a href="/skills/">Skills</a>
+      <a href="/links/">Links</a>
+      <a href="/about/">About</a>
+      <a class="professional-link" href="https://maxwellhowegis.com">Portfolio ↗</a>
+    </nav>
+    <details class="menu">
+      <summary aria-label="Open menu">Menu</summary>
+      <div class="menu-panel">
+        <a href="/tools/">Tools</a>
+        <a href="/maps/">Maps</a>
+        <a href="/games/">Games</a>
+        <a href="/lab/">Lab</a>
+        <a href="/field-notes/">Field Notes</a>
+        <a href="/radars/" aria-current="page">Radars</a>
+        <a href="/skills/">Skills</a>
+        <a href="/links/">Links</a>
+        <a href="/about/">About</a>
+        <a href="https://maxwellhowegis.com">Portfolio ↗</a>
+      </div>
+    </details>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch color theme">
+      <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <span class="coord coord-ne" aria-hidden="true">42°31′ N</span>
+      <span class="coord coord-sw" aria-hidden="true">70°54′ W · SALEM, MASS.</span>
+      <div class="eyebrow">The progressive press</div>
+      <h1>Politics radar</h1>
+      <p>The day's reporting from the progressive press and accountability newsrooms, one outlet per shelf.</p>
+      <div class="trust-row">
+        <span id="radarDate">Loading…</span>
+        <span id="radarCounts" hidden></span>
+      </div>
+    </section>
+
+    <section class="catalog" id="radar" aria-labelledby="radarHeading">
+      <div class="section-heading">
+        <div><span class="eyebrow">Today</span><h2 id="radarHeading">What's moving</h2></div>
+        <p>Sources: The Guardian · Mother Jones · The Nation · ProPublica · The Intercept · Common Dreams</p>
+      </div>
+      <div class="catalog-controls radar-controls">
+        <div class="filters" role="group" aria-label="Filter sources" id="radarFilters">
+          <button class="filter" data-source="all" aria-pressed="true">All</button>
+          <button class="filter" data-source="news" aria-pressed="false">All outlets</button>
+        </div>
+      </div>
+      <div id="radarSections">
+        <p class="empty" id="radarEmpty">Loading today's radar…</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Mapzimus is the lab of Maxwell Howe. Radar data refreshes daily via GitHub Actions and hourly at the edge.</p>
+    <p class="footer-note">SOURCES: THE GUARDIAN · MOTHER JONES · THE NATION · PROPUBLICA · THE INTERCEPT · COMMON DREAMS</p>
+  </footer>
+</div>
+</body>
+</html>

@@ -13,7 +13,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { sweep, sweepGeo } from "./radar-lib.mjs";
+import { sweep, sweepGeo, sweepSoccer, sweepStocks, sweepPolitics } from "./radar-lib.mjs";
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = path.join(ROOT, "radar");
@@ -44,12 +44,15 @@ const renderOSM = (o) => `- [${o.title}](${o.url})`;
 const renderTitled = (i) => `- [${i.title}](${i.url})${i.desc ? ` — ${i.desc}` : ""}`;
 
 async function main() {
-  const [data, geo] = await Promise.all([
+  const [data, geo, soccer, stocks, politics] = await Promise.all([
     sweep(today, process.env.GITHUB_TOKEN, {
       username: process.env.KAGGLE_USERNAME,
       key: process.env.KAGGLE_KEY,
     }),
     sweepGeo(today, process.env.GITHUB_TOKEN),
+    sweepSoccer(today),
+    sweepStocks(today),
+    sweepPolitics(today),
   ]);
   const { github: gh, huggingface: hf, hackernews: hn, papers } = data;
 
@@ -95,6 +98,9 @@ async function main() {
   await writeFile(path.join(OUT_DIR, "geo-latest.md"), geoMd);
   await writeFile(path.join(ROOT, "src", "data", "radar.json"), JSON.stringify(data, null, 2) + "\n");
   await writeFile(path.join(ROOT, "src", "data", "geo-radar.json"), JSON.stringify(geo, null, 2) + "\n");
+  await writeFile(path.join(ROOT, "src", "data", "soccer-radar.json"), JSON.stringify(soccer, null, 2) + "\n");
+  await writeFile(path.join(ROOT, "src", "data", "stocks-radar.json"), JSON.stringify(stocks, null, 2) + "\n");
+  await writeFile(path.join(ROOT, "src", "data", "politics-radar.json"), JSON.stringify(politics, null, 2) + "\n");
   const relevantHF = hf.models.length + hf.datasets.length + hf.spaces.length;
   console.log(`Wrote radar/${today}.md (${gh.relevant.length + gh.general.length} repos, ${relevantHF} relevant HF items)`);
 }
