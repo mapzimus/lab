@@ -97,8 +97,27 @@
     ).join('');
   }
 
+  // ── Skins (flippable editions: bottle, parrot, …) ───────────────────────────
+  // A fully-themed port (e.g. the parrot site) sets window.FLIP_FORCE_SKIN to
+  // force one edition and hide the picker. Otherwise players choose per-row once
+  // an edition is unlocked (see Records.unlockSkin).
+  const FORCE_SKIN = (typeof window !== 'undefined' && window.FLIP_FORCE_SKIN) || null;
+
+  function availableSkins() {
+    const all = window.Skins ? Skins.list() : [{ id: 'bottle', name: 'Bottle', emoji: '🍾' }];
+    return all.filter(s => s.id === 'bottle' || Records.isSkinUnlocked(s.id));
+  }
+  function skinChoiceHtml(sel) {
+    const list = availableSkins();
+    if (FORCE_SKIN || list.length < 2) return '';   // nothing to choose yet
+    return '<div class="skin-picker">' + list.map(s =>
+      `<button type="button" class="skin-choice${s.id === sel ? ' selected' : ''}" data-skin="${s.id}">${s.emoji} ${s.name}</button>`
+    ).join('') + '</div>';
+  }
+
   function rowHtml(i, def) {
-    return `<div class="player-input-row" data-flavor="${def.flavor}" data-ai="${def.ai ? 1 : 0}">
+    const skin = def.skin || 'bottle';
+    return `<div class="player-input-row" data-flavor="${def.flavor}" data-ai="${def.ai ? 1 : 0}" data-skin="${skin}">
       <div class="prow-top">
         <span class="player-num" style="color:${FLAVORS[def.flavor].color}">P${i + 1}</span>
         <input type="text" placeholder="${escapeHtml(FLAVORS[def.flavor].name)}" maxlength="14" value="${escapeHtml(def.name)}">
@@ -106,6 +125,7 @@
         ${i >= 2 ? '<button type="button" class="remove-player-btn" title="Remove">✕</button>' : ''}
       </div>
       <div class="flavor-picker">${swatchesHtml(def.flavor)}</div>
+      ${skinChoiceHtml(skin)}
     </div>`;
   }
 
@@ -114,6 +134,7 @@
       name: row.querySelector('input').value,
       flavor: parseInt(row.dataset.flavor) || 0,
       ai: row.dataset.ai === '1',
+      skin: row.dataset.skin || 'bottle',
     }));
   }
 
@@ -158,6 +179,14 @@
       ai.classList.toggle('cpu', !on);
       return;
     }
+    const sk = e.target.closest('.skin-choice');
+    if (sk) {
+      const row = sk.closest('.player-input-row');
+      row.dataset.skin = sk.dataset.skin;
+      row.querySelectorAll('.skin-choice').forEach(s => s.classList.remove('selected'));
+      sk.classList.add('selected');
+      return;
+    }
     const rm = e.target.closest('.remove-player-btn');
     if (rm && playerCount > 2) {
       const defs = readRows();
@@ -173,6 +202,7 @@
       name: (r.name || '').trim() || FLAVORS[r.flavor].name,
       color: FLAVORS[r.flavor].color,
       isAI: r.ai,
+      skin: FORCE_SKIN || r.skin || 'bottle',
     }));
   }
   function chosenDifficulty() {
@@ -224,7 +254,8 @@
   // ── Practice (solo, no lives) ───────────────────────────────────────────────
   practiceBtn.addEventListener('click', () => {
     const r0 = readRows()[0] || { name: 'You', flavor: 0 };
-    const def = { name: (r0.name || '').trim() || 'You', color: FLAVORS[r0.flavor].color, isAI: false };
+    const def = { name: (r0.name || '').trim() || 'You', color: FLAVORS[r0.flavor].color, isAI: false,
+                  skin: FORCE_SKIN || r0.skin || 'bottle' };
     Sound.unlock();
     enterImmersive();
     setupScreen.classList.add('hidden');
@@ -243,12 +274,14 @@
     gameScreen.classList.remove('hidden');
     if (game.practice) {
       startGame(
-        [{ name: game.players[0].name, color: game.players[0].color, isAI: false }],
+        [{ name: game.players[0].name, color: game.players[0].color, isAI: false,
+           skin: FORCE_SKIN || game.players[0].skin || 'bottle' }],
         1,
         { practice: true, startingLives: game.startingLives }
       );
     } else {
-      const defs = game.players.map(p => ({ name: p.name, color: p.color, isAI: p.isAI }));
+      const defs = game.players.map(p => ({ name: p.name, color: p.color, isAI: p.isAI,
+                                            skin: FORCE_SKIN || p.skin || 'bottle' }));
       // Winner starts the next game (by index — robust to duplicate names).
       startGame(defs, game.direction, {
         difficulty: game.difficulty,
@@ -335,6 +368,7 @@
     passScreen.classList.add('hidden');
     Renderer.init(canvas);
     Renderer.setReduceMotion(reduceMotionActive());
+    if (window.Skins) Skins.preload(defs.map(d => d.color));   // warm skin sprites
     resize();   // sets DPR transform + renderer logical dims (must run after init)
     Physics.init(window.innerWidth, window.innerHeight, stageBottomInset());  // logical coords
 
@@ -448,6 +482,7 @@
       showGlow,
       isOnFire:    !!(game.onFirePlayer),
       liquidColor: game.currentPlayer()?.color,
+      skin:        game.currentPlayer()?.skin,
       intense:     intenseTurn,
       suddenDeath: game.inSuddenDeath(),
       awaitingFlick: game.state === GAME_STATES.TURN_START || game.state === GAME_STATES.ON_FIRE,
@@ -645,6 +680,16 @@
     elimTimer = setTimeout(() => game.advanceTurn(), 1800 / gameSpeed());
   }
 
+  // Lightweight toast (self-creating so it needs no markup). Used for unlocks.
+  function showToast(msg) {
+    let t = document.getElementById('skin-toast');
+    if (!t) { t = document.createElement('div'); t.id = 'skin-toast'; document.body.appendChild(t); }
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
   function onGameOver() {
     clearTimers();   // no stray advanceTurn/AI flick fires after the game ends
     Sound.setSuddenDeath(false);
@@ -656,6 +701,12 @@
     winnerNameEl.textContent = active.length ? active[0].name : '???';
     Records.recordWin(active.length ? active[0].name : null);
     if (recordsPanel) recordsPanel.innerHTML = Records.renderHtml();
+    // First win unlocks the Parrot edition on this device; the per-player skin
+    // picker then appears in setup. Re-render setup rows so it shows next time.
+    if (active.length && window.Skins && Records.unlockSkin('parrot')) {
+      showToast('🦜 Parrots unlocked! Pick them per player in setup.');
+      try { renderFrom(readRows()); } catch (_) {}
+    }
     Sound.play('win');
     Input.disable();
 

@@ -156,6 +156,53 @@ html, body {
   transform: scale(1.15);
 }
 
+/* ── Skin picker (bottle / parrot / …) — appears once an edition is unlocked ── */
+.skin-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding-left: 42px;
+  margin-top: 7px;
+}
+.skin-choice {
+  padding: 4px 11px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.06);
+  color: #e8eef5;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.12s, background 0.12s;
+}
+.skin-choice:hover { transform: scale(1.06); }
+.skin-choice.selected {
+  border-color: #ffd166;
+  background: rgba(255,209,102,0.16);
+  box-shadow: 0 0 8px rgba(255,209,102,0.35);
+}
+
+/* ── Unlock toast ── */
+#skin-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translate(-50%, 24px);
+  background: linear-gradient(135deg, #12314c, #0b1a2b);
+  color: #ffe6a8;
+  border: 1px solid #e7c877;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s, transform 0.35s;
+  z-index: 9999;
+}
+#skin-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
 .remove-player-btn {
   background: rgba(255,82,82,0.15);
   border: none;

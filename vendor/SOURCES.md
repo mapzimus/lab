@@ -7,8 +7,7 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/{tool-slug}/` (65 tools) | `mapzimus/max` via `mapzimus.github.io/max/` | Snapshot from the public GitHub Pages shelf. Eleven newer catalog entries await the private `max` PR and ship as placeholders until then. |
 | `/geopuesto/` and `/geopuesto/playground/` | `mapzimus/geopuesto` | |
 | `/bug-wars/` | `mapzimus/bug-wars` | |
-| `/flip-game/` | `mapzimus/flipgame` | Bottle Game — bottle-flip party game (PWA). |
-| `/parrot-flip/` | `mapzimus/flipgame` (`parrot-flip/`) | Parrot Flip — pirate-parrot flip game, hand-drawn SVG macaws. Replaces the retired Grog Flip. |
+| `/flip-game/` | `mapzimus/flipgame` | Bottle Game — bottle-flip party game (PWA). Parrots are an unlockable skin inside it (win a game to unlock). The old standalone `/parrot-flip/` and `/grog-flip/` routes now redirect here; the full always-parrot port lives only on whydahstory.com. |
 | `/whydah-voyage/` | `mapzimus/Whydah-Unit` (`navigator/`) | Whydah's Voyage / First Sail. Host-bounce redirect to whydahstory.com removed so the game stays on mapzimus.com. |
 | `/black-sam/` | `mapzimus/Whydah-Unit` (`black-sam/`) | |
 | `/true-scale/` | `mapzimus/true-scale` | |

@@ -9,6 +9,7 @@ const Records = (() => {
     totalFlips: 0,
     longestOnFire: 0,   // most bonus makes in one ON FIRE run
     mostWins: {},       // name -> win count
+    unlockedSkins: ['bottle'],  // flippable editions earned on this device
   };
   let data = load();
 
@@ -57,5 +58,20 @@ const Records = (() => {
   }
   function reset() { data = clone(DEFAULTS); save(); }
 
-  return { recordFlip, recordWin, renderHtml, reset };
+  // ── Unlockable skins ──────────────────────────────────────────────────────
+  function unlockedSkins() {
+    if (!Array.isArray(data.unlockedSkins)) data.unlockedSkins = ['bottle'];
+    if (!data.unlockedSkins.includes('bottle')) data.unlockedSkins.unshift('bottle');
+    return data.unlockedSkins.slice();
+  }
+  function isSkinUnlocked(id) { return unlockedSkins().includes(id); }
+  // Returns true only if this call is what newly unlocked it (for the reveal).
+  function unlockSkin(id) {
+    if (isSkinUnlocked(id)) return false;
+    data.unlockedSkins = unlockedSkins().concat(id);
+    save();
+    return true;
+  }
+
+  return { recordFlip, recordWin, renderHtml, reset, unlockedSkins, isSkinUnlocked, unlockSkin };
 })();
