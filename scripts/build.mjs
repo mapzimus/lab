@@ -50,7 +50,6 @@ const hostedProjectRoutes = {
   "true-scale": "/true-scale/",
   "train-route-atlas": "/lab/train-routes/",
   "predicting-housing-crisis": "/lab/housing-crisis/",
-  "savvas-extraction": "/savvas/",
 };
 
 /** vendor/apps/<dir> → public route */
@@ -199,6 +198,39 @@ function filtersHtml(view, activeCategory) {
     .join("");
 }
 
+// Canonical order for grouped subsections.
+const catOrder = ["maps", "data", "design", "teaching", "math", "fun", "play", "experiments"];
+
+/** Split a view's items into labelled groups so a long list reads as a few
+    scannable shelves instead of one wall. Maps splits tools vs projects;
+    everything else groups by category. */
+function groupsForView(view) {
+  const items = itemsForView(view, "");
+  if (view === "maps") {
+    return [
+      { key: "map-tools", label: "Map tools", items: items.filter((i) => i.source === "tools") },
+      { key: "map-projects", label: "Map projects", items: items.filter((i) => i.source === "projects") },
+    ].filter((g) => g.items.length);
+  }
+  return catOrder
+    .map((cat) => ({ key: cat, label: categoryLabels[cat] || cat, items: items.filter((i) => i.category === cat) }))
+    .filter((g) => g.items.length);
+}
+
+function groupedBrowseHtml(view) {
+  const groups = groupsForView(view);
+  if (groups.length <= 1) {
+    const items = groups[0] ? groups[0].items : [];
+    return `<div class="catalog-grid">${items.map((item) => card(item)).join("\n")}</div>`;
+  }
+  return groups
+    .map((g) => `<section class="cat-group" data-group="${escapeHtml(g.key)}">
+      <div class="group-head"><h3>${escapeHtml(g.label)}</h3><span class="group-count">${g.items.length}</span></div>
+      <div class="catalog-grid">${g.items.map((item) => card(item)).join("\n")}</div>
+    </section>`)
+    .join("\n");
+}
+
 // ---- Pages ----
 
 if (fs.existsSync(output)) fs.rmSync(assertInsideRoot(output), { recursive: true, force: true });
@@ -230,7 +262,26 @@ const toolCategories = {
 
 const utilityCount = itemsForView("tools", "").length;
 const mapCount = itemsForView("maps", "").length;
+const gamesCount = itemsForView("games", "").length;
 const projectCount = itemsForView("lab", "").length;
+
+/** Home "browse by section" cards — four doors instead of the whole catalog. */
+function sectionCardsHtml() {
+  const sections = [
+    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Single-page browser utilities for data, design, teaching, and math." },
+    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "GIS converters and viewers, plus projection experiments and transit maps." },
+    { href: "/games/", label: "Games", category: "play", n: gamesCount, desc: "Strategy and logic games, free in the browser." },
+    { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "The bigger projects, apps, and works in progress." },
+  ];
+  return sections
+    .map((s) => `<a class="section-card" href="${s.href}" data-category="${s.category}">
+      <div class="card-meta"><span class="cat-tick" aria-hidden="true"></span><span class="card-type">${s.n} ${s.n === 1 ? "item" : "items"}</span></div>
+      <h3>${escapeHtml(s.label)}</h3>
+      <p class="card-copy">${escapeHtml(s.desc)}</p>
+      <div class="card-foot"><span></span><span class="open-cue">Browse →</span></div>
+    </a>`)
+    .join("\n");
+}
 
 const pages = {
   home: {
@@ -241,7 +292,7 @@ const pages = {
     eyebrow: "The lab of Maxwell Howe",
     heading: "Useful tools. Maps. Small games.",
     intro: `Everything I build for fun and everyday use, in one place: ${toolCount} browser tools for maps, data, teaching, and math, plus games and experiments. It all runs right in your browser.`,
-    catalogHeading: "The whole catalog",
+    catalogHeading: "Browse by section",
   },
   lab: {
     path: "lab/index.html",
@@ -305,13 +356,22 @@ const navKeys = { tools: "NAV_TOOLS", maps: "NAV_MAPS", games: "NAV_GAMES", lab:
 for (const [key, page] of Object.entries(pages)) {
   const view = page.view || key;
   const items = itemsForView(view, page.category || "");
-  const featuredItems = key === "home"
+  const isHome = key === "home";
+  const featuredItems = isHome
     ? featuredSlugs.map((slug) => catalog.find((item) => item.slug === slug)).filter(Boolean)
     : [];
+  // Home browses via section cards; a single-category page shows a flat grid;
+  // the main section pages browse via grouped shelves.
+  const browseHtml = isHome
+    ? `<div class="section-cards">${sectionCardsHtml()}</div>`
+    : page.category
+      ? `<div class="catalog-grid">${itemsForView(view, page.category).map((item) => card(item)).join("\n")}</div>`
+      : groupedBrowseHtml(view);
+  const browseClass = isHome ? "browse browse-home" : "browse";
   let html = template
     .replaceAll("{{VIEW}}", view)
     .replaceAll("{{CATEGORY}}", page.category || "")
-    .replaceAll("{{FEATURED_ATTR}}", key === "home" ? "" : " hidden")
+    .replaceAll("{{FEATURED_ATTR}}", isHome ? "" : " hidden")
     .replaceAll("{{TOOL_COUNT}}", String(toolCount))
     .replaceAll("{{CATALOG_REFRESH}}", catalogRefresh)
     .replaceAll("{{TITLE}}", page.title)
@@ -321,10 +381,11 @@ for (const [key, page] of Object.entries(pages)) {
     .replaceAll("{{HEADING}}", page.heading)
     .replaceAll("{{INTRO}}", page.intro)
     .replaceAll("{{CATALOG_HEADING}}", page.catalogHeading)
-    .replaceAll("{{RESULT_COUNT}}", `${items.length} ${items.length === 1 ? "item" : "items"}`)
-    .replaceAll("{{FILTERS}}", filtersHtml(view, page.category || ""))
-    .replaceAll("{{FEATURED_CARDS}}", featuredItems.map((item) => card(item, { featured: true })).join("\n"))
-    .replaceAll("{{CATALOG_CARDS}}", items.map((item) => card(item)).join("\n"));
+    .replaceAll("{{RESULT_COUNT}}", isHome ? "" : `${items.length} ${items.length === 1 ? "item" : "items"}`)
+    .replaceAll("{{FILTERS}}", isHome ? "" : filtersHtml(view, page.category || ""))
+    .replaceAll("{{BROWSE_CLASS}}", browseClass)
+    .replaceAll("{{BROWSE}}", browseHtml)
+    .replaceAll("{{FEATURED_CARDS}}", featuredItems.map((item) => card(item, { featured: true })).join("\n"));
   for (const [navView, navKey] of Object.entries(navKeys)) {
     html = html.replaceAll(`{{${navKey}}}`, view === navView ? ' aria-current="page"' : "");
   }
