@@ -135,7 +135,7 @@ const Renderer = (() => {
   // ── Bottle ─────────────────────────────────────────────────────────────────
   // Wide squat Gatorade bottle: 74px body, short neck, wide orange cap, blue fill.
   // Local coords centered at bottle.position (physics CG, ~40px above visual base).
-  function drawBottle(bottle, liquid, isOnFire, liquidColor, groundY) {
+  function drawBottle(bottle, liquid, isOnFire, liquidColor, groundY, skin) {
     const { x, y } = projectBottleCenter(bottle, groundY);
     const angle  = bottle.angle;
     const fillCol = hexToRgba(liquidColor || '#0b86ff', 0.92);
@@ -157,6 +157,14 @@ const Renderer = (() => {
     ctx.translate(x, y);
     ctx.rotate(angle);
     ctx.scale(BOTTLE_DRAW_SCALE, BOTTLE_DRAW_SCALE);
+
+    // Skin dispatch: a non-bottle edition paints the object in the same local
+    // frame (origin = CG, ground plane ≈ +39) and we're done. See js/skins.js.
+    if (skin && skin !== 'bottle' && window.Skins && window.Skins.hasDraw(skin)) {
+      window.Skins.draw(ctx, skin, { color: liquidColor, slosh: liquid.slosh });
+      ctx.restore();
+      return;
+    }
 
     // Reusable body outline (wide, flat-bottomed Gatorade shape, y=-72..+43)
     const traceBody = () => { ctx.beginPath(); ctx.roundRect(-37, -72, 74, 115, 10); };
@@ -415,7 +423,7 @@ const Renderer = (() => {
   // ── Main frame ─────────────────────────────────────────────────────────────
   function frame(dt, state) {
     const { bottle, liquid, drag, groundY, result, resultAlpha, showGlow, isOnFire,
-            liquidColor, intense, suddenDeath, awaitingFlick, stake } = state;
+            liquidColor, intense, suddenDeath, awaitingFlick, stake, skin } = state;
     clock += dt;
     updateParticles(dt);
 
@@ -423,7 +431,7 @@ const Renderer = (() => {
     drawWalls(groundY);
     drawFlickIndicator(drag, bottle, groundY);
     if (showGlow) drawLandingGlow(bottle, groundY);
-    drawBottle(bottle, liquid, isOnFire, liquidColor, groundY);
+    drawBottle(bottle, liquid, isOnFire, liquidColor, groundY, skin);
     drawParticles();
     drawStake(stake);
     drawIntense(intense, suddenDeath, awaitingFlick);

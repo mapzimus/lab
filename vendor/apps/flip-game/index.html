@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Bottle Game">
 
-  <link rel="stylesheet" href="css/style.css?v=22">
+  <link rel="stylesheet" href="css/style.css?v=23">
 </head>
 <body>
 
@@ -106,15 +106,16 @@
   <!-- ?v= forces the browser to refetch on each release (dev server sends no
        cache headers). Bump alongside the service-worker CACHE_NAME. -->
   <script src="js/vendor/matter.min.js"></script>
-  <script src="js/polyfills.js?v=22"></script>
-  <script src="js/game.js?v=22"></script>
-  <script src="js/physics.js?v=22"></script>
-  <script src="js/input.js?v=22"></script>
-  <script src="js/renderer.js?v=22"></script>
-  <script src="js/audio.js?v=22"></script>
-  <script src="js/settings.js?v=22"></script>
-  <script src="js/records.js?v=22"></script>
-  <script src="js/main.js?v=22"></script>
+  <script src="js/polyfills.js?v=23"></script>
+  <script src="js/game.js?v=23"></script>
+  <script src="js/physics.js?v=23"></script>
+  <script src="js/input.js?v=23"></script>
+  <script src="js/renderer.js?v=23"></script>
+  <script src="js/audio.js?v=23"></script>
+  <script src="js/settings.js?v=23"></script>
+  <script src="js/records.js?v=23"></script>
+  <script src="js/skins.js?v=23"></script>
+  <script src="js/main.js?v=23"></script>
   <script>
     window.onerror = (msg, src, line) => {
       const el = document.getElementById('err-overlay') || (() => {

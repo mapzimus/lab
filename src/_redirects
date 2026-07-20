@@ -19,18 +19,22 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /whydah/navigator/* /whydah-voyage/:splat 301
 /navigator /whydah-voyage/ 301
 /navigator/ /whydah-voyage/ 301
-/grog-flip /parrot-flip/ 301
-/grog-flip/* /parrot-flip/:splat 301
+# Parrots are now an unlockable skin inside the Bottle Game (full parrot port
+# lives only on whydahstory.com), so every flip-game alias points at /flip-game/.
+/parrot-flip /flip-game/ 301
+/parrot-flip/* /flip-game/:splat 301
+/grog-flip /flip-game/ 301
+/grog-flip/* /flip-game/:splat 301
 /bottle-flip /flip-game/ 301
 /bottle-flip/ /flip-game/ 301
 /bottle-game /flip-game/ 301
 /bottle-game/ /flip-game/ 301
 
-# Retired /games/<slug> snapshots → canonical first-party routes
+# Retired /games/<slug> snapshots → canonical first-party route
 /games/flip /flip-game/ 301
 /games/flip/* /flip-game/:splat 301
-/games/grog-flip /parrot-flip/ 301
-/games/grog-flip/* /parrot-flip/:splat 301
+/games/grog-flip /flip-game/ 301
+/games/grog-flip/* /flip-game/:splat 301
 
 # Retired on-site snapshots → canonical homes (see external:true in projects.json)
 /mcas https://lehsmath.com/tools/mcas/ 301

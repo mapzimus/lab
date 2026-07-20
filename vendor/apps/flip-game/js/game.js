@@ -64,6 +64,7 @@ const game = {
       name: d.name,
       color: d.color || '#0b86ff',
       isAI: !!d.isAI,
+      skin: d.skin || 'bottle',   // which flippable edition this player throws
       lives: this.startingLives,
       streak: 0,
       isHeatingUp: false,
