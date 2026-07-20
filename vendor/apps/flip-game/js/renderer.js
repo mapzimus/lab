@@ -1,49 +1,13 @@
 // renderer.js — canvas draw loop
 
-// roundRect polyfill — older Android System WebViews (the bundled offline APK
-// target) lack CanvasRenderingContext2D.roundRect; without this the draw loop
-// throws and the canvas renders blank. Manual arc/line fallback.
-if (typeof CanvasRenderingContext2D !== 'undefined' &&
-    !CanvasRenderingContext2D.prototype.roundRect) {
-  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-    let radii = typeof r === 'number' ? [r, r, r, r]
-              : (Array.isArray(r) ? r : [0, 0, 0, 0]);
-    if (radii.length === 1) radii = [radii[0], radii[0], radii[0], radii[0]];
-    if (radii.length === 2) radii = [radii[0], radii[1], radii[0], radii[1]];
-    let [tl, tr, br, bl] = radii;
-    const max = Math.min(Math.abs(w), Math.abs(h)) / 2;     // clamp oversized radii
-    tl = Math.min(tl, max); tr = Math.min(tr, max);
-    br = Math.min(br, max); bl = Math.min(bl, max);
-    this.moveTo(x + tl, y);
-    this.arcTo(x + w, y,     x + w, y + h, tr);
-    this.arcTo(x + w, y + h, x,     y + h, br);
-    this.arcTo(x,     y + h, x,     y,     bl);
-    this.arcTo(x,     y,     x + w, y,     tl);
-    this.closePath();
-    return this;
-  };
-}
-
 const Renderer = (() => {
   let canvas, ctx, W, H;
   const particles = [];
-
-  // Screen shake (decaying): amp in px, decays to 0 over shakeDecay px/s.
-  let shakeAmp = 0, shakeDecay = 0;
-  let reduceMotion = false;             // set via setReduceMotion()
+  let reduceMotion = false;   // when on, suppress non-essential motion (particles, shake, pulses)
+  const BOTTLE_DRAW_SCALE = 1.15;
+  const FLIGHT_LIFT = 0.18;
 
   function setReduceMotion(v) { reduceMotion = !!v; }
-
-  // Celebration burst (MAKE) / shake (MISS). Called once per result by main.js.
-  function kick(type, opts = {}) {
-    if (type === 'MAKE') {
-      const { x, y, color } = opts;
-      spawnSplash(x, y - 30, reduceMotion ? 8 : 26, color || '#69f0ae');
-    } else if (type === 'MISS') {
-      if (reduceMotion) return;
-      shakeAmp = 12; shakeDecay = 12 / 0.22;   // ~220ms to zero
-    }
-  }
 
   function init(cvs) {
     canvas = cvs;
@@ -53,6 +17,21 @@ const Renderer = (() => {
   }
 
   function resize(w, h) { W = w; H = h; }
+
+  function projectPoint(x, y, groundY) {
+    const airborne = Math.max(0, groundY - y - 55);
+    return { x, y: y - airborne * FLIGHT_LIFT };
+  }
+
+  function projectBottleCenter(bottle, groundY) {
+    const p = projectPoint(bottle.position.x, bottle.position.y, groundY);
+    return {
+      x: p.x,
+      y: p.y - (BOTTLE_DRAW_SCALE - 1) * 43,
+    };
+  }
+
+  function bottleDrawScale() { return BOTTLE_DRAW_SCALE; }
 
   // ── Color helpers (per-player liquid flavor) ────────────────────────────────
   function hexToRgba(hex, a) {
@@ -156,27 +135,28 @@ const Renderer = (() => {
   // ── Bottle ─────────────────────────────────────────────────────────────────
   // Wide squat Gatorade bottle: 74px body, short neck, wide orange cap, blue fill.
   // Local coords centered at bottle.position (physics CG, ~40px above visual base).
-  function drawBottle(bottle, liquid, isOnFire, liquidColor) {
-    const { x, y } = bottle.position;
+  function drawBottle(bottle, liquid, isOnFire, liquidColor, groundY) {
+    const { x, y } = projectBottleCenter(bottle, groundY);
     const angle  = bottle.angle;
     const fillCol = hexToRgba(liquidColor || '#0b86ff', 0.92);
     const meniscusCol = lighten(liquidColor || '#0b86ff', 110, 0.9);
 
     // ON FIRE glow
     if (isOnFire) {
-      const glow = ctx.createRadialGradient(x, y, 10, x, y, 95);
+      const glow = ctx.createRadialGradient(x, y, 10, x, y, 95 * BOTTLE_DRAW_SCALE);
       glow.addColorStop(0, 'rgba(255,100,0,0.30)');
       glow.addColorStop(1, 'rgba(255,60,0,0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(x, y, 95, 0, Math.PI * 2);
+      ctx.arc(x, y, 95 * BOTTLE_DRAW_SCALE, 0, Math.PI * 2);
       ctx.fill();
-      spawnFire(x, y - 100);
+      if (!reduceMotion) spawnFire(x, y - 100 * BOTTLE_DRAW_SCALE);
     }
 
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle);
+    ctx.scale(BOTTLE_DRAW_SCALE, BOTTLE_DRAW_SCALE);
 
     // Reusable body outline (wide, flat-bottomed Gatorade shape, y=-72..+43)
     const traceBody = () => { ctx.beginPath(); ctx.roundRect(-37, -72, 74, 115, 10); };
@@ -280,8 +260,8 @@ const Renderer = (() => {
     ctx.restore();
 
     // Blue splash on hard slosh
-    if (Math.abs(liquid.vel) > 1.6) {
-      spawnSplash(x, y - 30, 2, 'rgba(0, 170, 255, 0.85)');
+    if (!reduceMotion && Math.abs(liquid.vel) > 1.6) {
+      spawnSplash(x, y - 30 * BOTTLE_DRAW_SCALE, 2, 'rgba(0, 170, 255, 0.85)');
     }
   }
 
@@ -300,7 +280,7 @@ const Renderer = (() => {
   // ── Flick indicator ─────────────────────────────────────────────────────────
   // Points FROM the bottle in the direction you're flicking (the way it'll go),
   // length grows with flick strength. Reads as "throw this way", not "pull back".
-  function drawFlickIndicator(drag, bottle) {
+  function drawFlickIndicator(drag, bottle, groundY) {
     if (!drag || !bottle) return;
     const dx  = drag.curX - drag.startX;   // flick direction = throw direction
     const dy  = drag.curY - drag.startY;
@@ -310,7 +290,8 @@ const Renderer = (() => {
     const strength = Math.min(len / 220, 1);
     const ux = dx / len, uy = dy / len;
     const reach = 28 + strength * 64;                 // 28..92px
-    const ox = bottle.position.x, oy = bottle.position.y - 40;
+    const p = projectBottleCenter(bottle, groundY);
+    const ox = p.x, oy = p.y - 40 * BOTTLE_DRAW_SCALE;
     const ex = ox + ux * reach, ey = oy + uy * reach;
     const color = `hsl(${190 - strength * 150}, 95%, 62%)`; // cyan → hot orange
 
@@ -353,49 +334,105 @@ const Renderer = (() => {
 
   // ── Result text ────────────────────────────────────────────────────────────
   function drawResult(text, color, alpha) {
-    // Pop: scale overshoots to ~1.18 as it appears, settles back to 1.0.
-    const pop = reduceMotion ? 1 : 1 + 0.18 * Math.sin(Math.min(alpha, 1) * Math.PI);
     ctx.save();
     ctx.globalAlpha   = alpha;
     ctx.fillStyle     = color;
+    ctx.font          = 'bold 76px system-ui, sans-serif';
     ctx.textAlign     = 'center';
     ctx.textBaseline  = 'middle';
     ctx.shadowColor   = color;
     ctx.shadowBlur    = 36;
-    ctx.translate(W / 2, H / 2 - 60);
-    ctx.scale(pop, pop);
-    ctx.font          = 'bold 76px system-ui, sans-serif';
-    ctx.fillText(text, 0, 0);
+    ctx.fillText(text, W / 2, H / 2 - 60);
+    ctx.restore();
+  }
+
+  // ── "Make it or break it" intense overlay + sudden-death tag ─────────────────
+  let clock = 0;
+  function drawIntense(intense, suddenDeath, awaitingFlick) {
+    if (suddenDeath) {
+      const fs = Math.round(Math.min(W, H) * 0.032);
+      ctx.save();
+      ctx.globalAlpha = reduceMotion ? 0.85 : 0.6 + 0.4 * (0.5 + 0.5 * Math.sin(clock * 5));
+      ctx.fillStyle = '#ff3b3b';
+      ctx.font = `bold ${fs}px system-ui, sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 16;
+      ctx.fillText('⚡ SUDDEN DEATH ⚡', W / 2, 10);
+      ctx.restore();
+    }
+    if (!intense) return;
+    const pulse = reduceMotion ? 0.6 : 0.5 + 0.5 * Math.sin(clock * 6);
+    // Pulsing red vignette — darkens the edges, "time stands still" mood.
+    const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.18, W / 2, H / 2, Math.max(W, H) * 0.72);
+    g.addColorStop(0, 'rgba(110,0,0,0)');
+    g.addColorStop(1, `rgba(${90 + Math.round(70 * pulse)},0,0,${0.42 + 0.22 * pulse})`);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    if (awaitingFlick) {
+      const fs = Math.min(H * 0.115, W * 0.14);
+      ctx.save();
+      ctx.globalAlpha = 0.82 + 0.18 * pulse;
+      ctx.fillStyle = '#ff2e2e';
+      ctx.font = `900 ${fs}px system-ui, sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 34;
+      ctx.fillText('MAKE IT', W / 2, H * 0.26);
+      ctx.fillText('OR BREAK IT', W / 2, H * 0.26 + fs * 1.05);
+      ctx.restore();
+    }
+  }
+
+  // ── Stake display — lives at risk, grows bigger + scarier as it climbs ───────
+  function drawStake(stake) {
+    if (!stake || stake < 1) return;
+    const s = Math.min(stake, 12);
+    const danger = Math.min(1, (stake - 1) / 7);          // 0 at 1 → 1 at 8+
+    const fs = Math.min(W, H) * (0.075 + s * 0.017);      // grows with stake
+    const pulse = reduceMotion ? 1 : 1 + (0.04 + danger * 0.06) * Math.sin(clock * (5 + danger * 7));
+    const g = Math.round(190 * (1 - danger));             // amber → red
+    const col = `rgb(255,${g},40)`;
+    const shake = (!reduceMotion && danger > 0.45) ? (danger - 0.45) * 14 : 0;
+    const ox = shake ? Math.sin(clock * 41) * shake : 0;
+    const oy = shake ? Math.cos(clock * 37) * shake : 0;
+
+    ctx.save();
+    ctx.translate(W / 2 + ox, H * 0.165 + oy);
+    ctx.scale(pulse, pulse);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = col;
+    ctx.shadowColor = col;
+    ctx.shadowBlur = 14 + danger * 46;
+    ctx.font = `900 ${fs}px system-ui, sans-serif`;
+    ctx.fillText(String(stake), 0, 0);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = `rgba(255,${g + 30},80,0.92)`;
+    ctx.font = `800 ${fs * 0.19}px system-ui, sans-serif`;
+    ctx.fillText(stake === 1 ? 'LIFE ON THE LINE' : 'LIVES ON THE LINE', 0, fs * 0.62);
     ctx.restore();
   }
 
   // ── Main frame ─────────────────────────────────────────────────────────────
   function frame(dt, state) {
-    const { bottle, liquid, drag, groundY, result, resultAlpha, showGlow, isOnFire, liquidColor } = state;
+    const { bottle, liquid, drag, groundY, result, resultAlpha, showGlow, isOnFire,
+            liquidColor, intense, suddenDeath, awaitingFlick, stake } = state;
+    clock += dt;
     updateParticles(dt);
-
-    let sx = 0, sy = 0;
-    if (shakeAmp > 0.2) {
-      sx = (Math.random() - 0.5) * 2 * shakeAmp;
-      sy = (Math.random() - 0.5) * 2 * shakeAmp;
-      shakeAmp = Math.max(0, shakeAmp - shakeDecay * dt);
-    }
-    ctx.save();
-    ctx.translate(sx, sy);
 
     drawBackground(groundY, isOnFire);
     drawWalls(groundY);
-    drawFlickIndicator(drag, bottle);
+    drawFlickIndicator(drag, bottle, groundY);
     if (showGlow) drawLandingGlow(bottle, groundY);
-    drawBottle(bottle, liquid, isOnFire, liquidColor);
+    drawBottle(bottle, liquid, isOnFire, liquidColor, groundY);
     drawParticles();
+    drawStake(stake);
+    drawIntense(intense, suddenDeath, awaitingFlick);
 
     if (result) {
       const color = result === 'MAKE' ? '#69f0ae' : '#ff5252';
       drawResult(result === 'MAKE' ? 'MAKE!' : 'MISS', color, resultAlpha);
     }
-    ctx.restore();
   }
 
-  return { init, resize, frame, kick, setReduceMotion };
+  return { init, resize, frame, setReduceMotion, projectPoint, projectBottleCenter, bottleDrawScale };
 })();

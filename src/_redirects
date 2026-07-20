@@ -19,10 +19,18 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /whydah/navigator/* /whydah-voyage/:splat 301
 /navigator /whydah-voyage/ 301
 /navigator/ /whydah-voyage/ 301
-/parrot-flip /grog-flip/ 301
-/parrot-flip/ /grog-flip/ 301
+/grog-flip /parrot-flip/ 301
+/grog-flip/* /parrot-flip/:splat 301
 /bottle-flip /flip-game/ 301
 /bottle-flip/ /flip-game/ 301
+/bottle-game /flip-game/ 301
+/bottle-game/ /flip-game/ 301
+
+# Retired /games/<slug> snapshots → canonical first-party routes
+/games/flip /flip-game/ 301
+/games/flip/* /flip-game/:splat 301
+/games/grog-flip /parrot-flip/ 301
+/games/grog-flip/* /parrot-flip/:splat 301
 
 # Retired on-site snapshots → canonical homes (see external:true in projects.json)
 /mcas https://lehsmath.com/tools/mcas/ 301

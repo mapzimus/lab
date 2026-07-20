@@ -8,6 +8,7 @@ const Physics = (() => {
   let angleWin = [];   // sliding window of recent angles (settle detection)
   let totalRotation = 0, hasFlipped = false, launchAngle = 0, hasLanded = false;
   let lastLandingInfo = null;
+  let lastFlickInfo = null;
   let canvasW;
   let groundY;
 
@@ -219,6 +220,7 @@ const Physics = (() => {
     launchAngle    = 0;
     hasLanded      = false;
     lastLandingInfo = null;
+    lastFlickInfo    = null;
     liquid.reset();
 
     bottle = createBottle();
@@ -235,6 +237,7 @@ const Physics = (() => {
   function applyFlick(vx, vy) {
     const upSpeed = Math.max(0, -vy);                  // upward flick speed (px/s)
     const power   = Math.min(upSpeed / POWER_SPEED, 1.0); // 0..1 flick strength
+    lastFlickInfo = { upSpeed, power, vx, vy };
 
     // Small randomness so the same flick isn't a guaranteed make — a centered
     // flick still usually lands, but a marginal one becomes a coin flip.
@@ -283,6 +286,7 @@ const Physics = (() => {
   function getLiquid()  { return liquid; }
   function getGroundY() { return groundY; }
   function getLastLandingInfo() { return lastLandingInfo; }
+  function getLastFlickInfo()   { return lastFlickInfo; }
 
-  return { init, reflow, step, resetBottle, applyFlick, checkLanding, getBottle, getLiquid, getGroundY, getLastLandingInfo };
+  return { init, reflow, step, resetBottle, applyFlick, checkLanding, getBottle, getLiquid, getGroundY, getLastLandingInfo, getLastFlickInfo };
 })();
