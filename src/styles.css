@@ -168,6 +168,26 @@ section.catalog { border-top: 1px solid var(--line); }
 
 .featured-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
 .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(272px, 1fr)); gap: 14px; }
+[hidden] { display: none !important; }
+
+/* ---- Grouped browse shelves (Tools / Maps / Lab) ---- */
+.cat-group { margin-bottom: clamp(30px, 4vw, 46px); }
+.cat-group:last-child { margin-bottom: 0; }
+.group-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; padding-bottom: 9px; border-bottom: 1px solid var(--line); }
+.group-head h3 { font-size: clamp(1.15rem, 2vw, 1.5rem); font-stretch: 82%; font-weight: 680; letter-spacing: -0.01em; }
+.group-count { font: 600 12px var(--mono); color: var(--muted); }
+
+/* ---- Home: browse-by-section doors ---- */
+.section-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.section-card { --cat: var(--muted); position: relative; display: flex; flex-direction: column; min-height: 200px; padding: 24px; background: var(--card); border: 1px solid var(--line); border-top: 3px double var(--cat); text-decoration: none; transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease; }
+.section-card:hover { transform: translateY(-2px); border-color: var(--ink); box-shadow: var(--shadow); }
+.section-card[data-category="maps"] { --cat: var(--c-maps); }
+.section-card[data-category="data"] { --cat: var(--c-data); }
+.section-card[data-category="play"] { --cat: var(--c-play); }
+.section-card[data-category="experiments"] { --cat: var(--c-experiments); }
+.section-card h3 { font-size: 1.6rem; font-stretch: 82%; font-weight: 720; margin-bottom: 8px; }
+.section-card .card-copy { flex: 1; margin-bottom: 16px; }
+.section-card:hover h3 { text-decoration: underline; text-decoration-color: var(--cat); text-decoration-thickness: 2px; text-underline-offset: 4px; }
 
 /* ---- Cards ---- */
 /* Category color arrives through --cat, set by data-category below. */
@@ -245,12 +265,14 @@ footer a:hover { color: var(--ink); }
 @media (max-width: 1300px) { .sheet { border-inline: 0; } }
 @media (max-width: 980px) {
   .featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .section-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .catalog-controls { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
   .site-nav { display: none; }
   .menu { display: block; }
   .featured-grid { grid-template-columns: 1fr; }
+  .section-cards { grid-template-columns: 1fr; }
   .section-heading { flex-direction: column; align-items: flex-start; gap: 8px; }
   footer { flex-direction: column; }
   .footer-note { text-align: left; }

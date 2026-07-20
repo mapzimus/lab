@@ -87,11 +87,12 @@
         <p id="resultCount" aria-live="polite">{{RESULT_COUNT}}</p>
       </div>
       <div class="catalog-controls">
-        <label class="search-field"><span class="visually-hidden">Search the catalog</span><input id="searchInput" type="search" placeholder="Search by name, tag, or what it does…" autocomplete="off"><kbd>/</kbd></label>
+        <label class="search-field"><span class="visually-hidden">Search the catalog</span><input id="searchInput" type="search" placeholder="Search everything by name, tag, or what it does…" autocomplete="off"><kbd>/</kbd></label>
         <div class="filters" id="filters" role="group" aria-label="Filter by category">{{FILTERS}}</div>
         <button class="quiet-button" id="favoritesButton" type="button" aria-pressed="false">★ Favorites</button>
       </div>
-      <div class="catalog-grid" id="catalogGrid">{{CATALOG_CARDS}}</div>
+      <div class="{{BROWSE_CLASS}}" id="browse">{{BROWSE}}</div>
+      <div class="catalog-grid" id="catalogGrid" hidden></div>
       <div class="empty" id="emptyState" hidden>No matches. Try a shorter search or a different category.</div>
       <noscript><div class="empty">Search and filters need JavaScript, but every card above is a plain link — everything still works.</div></noscript>
     </section>

@@ -12,8 +12,8 @@
     play: "Games",
     experiments: "Experiments",
   };
-  // Keep in sync with the same table in scripts/build.mjs, which pre-renders
-  // the initial grids so the catalog works without JavaScript.
+  // Keep in sync with the same tables in scripts/build.mjs, which pre-renders
+  // the browse shelves so the catalog works without JavaScript.
   const viewCategories = {
     home: null,
     tools: ["data", "design", "teaching", "math", "fun"],
@@ -41,6 +41,7 @@
 
   const featuredSection = document.getElementById("featuredSection");
   const featuredGrid = document.getElementById("featuredGrid");
+  const browse = document.getElementById("browse");
   const catalogGrid = document.getElementById("catalogGrid");
   const filters = document.getElementById("filters");
   const resultCount = document.getElementById("resultCount");
@@ -100,23 +101,37 @@
     });
   }
 
-  function renderCatalog() {
+  // Browse mode = the pre-rendered shelves (or home section cards). Results
+  // mode = a flat grid, shown once the visitor searches, filters, or opens
+  // favorites. This keeps the default page calm and only fans out on demand.
+  function resultsActive() {
+    return state.query !== "" || state.category !== "" || state.favoritesOnly;
+  }
+
+  function render() {
+    const results = resultsActive();
+    if (browse) browse.hidden = results;
+    catalogGrid.hidden = !results;
+    if (!results) {
+      resultCount.textContent = "";
+      emptyState.hidden = true;
+      return;
+    }
     const items = filteredItems();
     catalogGrid.innerHTML = items.map(function (item) { return card(item, false); }).join("");
-    resultCount.textContent = `${items.length} ${items.length === 1 ? "item" : "items"}`;
+    resultCount.textContent = `${items.length} ${items.length === 1 ? "result" : "results"}`;
     emptyState.hidden = items.length !== 0;
   }
 
-  function renderFilters() {
-    const categories = [...new Set(state.items.filter(allowedByView).map(function (item) { return item.category; }))];
-    if (categories.length < 2) {
-      filters.innerHTML = "";
-      return;
-    }
-    filters.innerHTML = [`<button class="filter" type="button" data-category="" aria-pressed="${state.category === ""}">All</button>`]
-      .concat(categories.map(function (category) {
-        return `<button class="filter" type="button" data-category="${escapeHtml(category)}" aria-pressed="${state.category === category}">${escapeHtml(categoryLabels[category] || category)}</button>`;
-      })).join("");
+  // Reflect saved favorites on the server-rendered stars without re-rendering.
+  function syncStars() {
+    document.querySelectorAll("[data-slug] > .star").forEach(function (star) {
+      const slug = star.closest("[data-slug]").dataset.slug;
+      const on = state.favorites.has(slug);
+      star.setAttribute("aria-pressed", String(on));
+      star.setAttribute("aria-label", (on ? "Remove from" : "Add to") + " favorites");
+      star.textContent = on ? "★" : "☆";
+    });
   }
 
   function renderFeatured() {
@@ -130,12 +145,13 @@
   document.addEventListener("click", function (event) {
     const star = event.target.closest(".star");
     if (star) {
+      event.preventDefault();
       const slug = star.closest("[data-slug]").dataset.slug;
       if (state.favorites.has(slug)) state.favorites.delete(slug);
       else state.favorites.add(slug);
       saveFavorites();
-      renderFeatured();
-      renderCatalog();
+      syncStars();
+      if (resultsActive()) render();
       return;
     }
 
@@ -145,20 +161,20 @@
       filters.querySelectorAll(".filter").forEach(function (button) {
         button.setAttribute("aria-pressed", String(button === filter));
       });
-      renderCatalog();
+      render();
     }
   });
 
   searchInput.addEventListener("input", function () {
     state.query = searchInput.value.trim();
-    renderCatalog();
+    render();
   });
 
   searchInput.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && searchInput.value) {
       searchInput.value = "";
       state.query = "";
-      renderCatalog();
+      render();
     }
   });
 
@@ -171,23 +187,24 @@
   favoritesButton.addEventListener("click", function () {
     state.favoritesOnly = !state.favoritesOnly;
     favoritesButton.setAttribute("aria-pressed", String(state.favoritesOnly));
-    renderCatalog();
+    render();
   });
 
-  Promise.all([
-    fetch("/data/tools.json").then(function (response) { return response.json(); }),
-    fetch("/data/projects.json").then(function (response) { return response.json(); }),
-    fetch("/data/featured.json").then(function (response) { return response.json(); }),
-  ]).then(function (collections) {
-    state.featuredSlugs = collections.pop();
-    // Tag the source; the Tools and Lab views split on it (matches build.mjs).
-    state.items = collections[0].map(function (item) { return { ...item, source: "tools" }; })
-      .concat(collections[1].map(function (item) { return { ...item, source: "projects" }; }));
-    renderFilters();
-    renderFeatured();
-    renderCatalog();
-  }).catch(function () {
-    // The pre-rendered cards are still on the page; only live search/filtering is lost.
-    resultCount.textContent = "Search is unavailable right now";
-  });
+  fetch("/data/catalog.json")
+    .then(function (response) { return response.json(); })
+    .then(function (items) {
+      state.items = items;
+      return fetch("/data/featured.json").then(function (r) { return r.json(); });
+    })
+    .then(function (featuredSlugs) {
+      state.featuredSlugs = featuredSlugs;
+      renderFeatured();
+      syncStars();
+      // A single-category page (e.g. /tools/data/) starts already filtered.
+      if (resultsActive()) render();
+    })
+    .catch(function () {
+      // The pre-rendered shelves are still on the page; only live search is lost.
+      if (resultCount) resultCount.textContent = "Search is unavailable right now";
+    });
 })();
