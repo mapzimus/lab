@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Flip Game</title>
+  <title>Bottle Game</title>
 
   <!-- PWA: installable, offline-capable app -->
   <link rel="manifest" href="manifest.json">
@@ -13,19 +13,19 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Flip Game">
+  <meta name="apple-mobile-web-app-title" content="Bottle Game">
 
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=22">
 </head>
 <body>
 
   <!-- ── Setup ───────────────────────────────────────── -->
   <div id="setup-screen" class="screen hidden">
     <div class="setup-card">
-      <h1><span class="emoji">🍾</span> Flip Game</h1>
+      <h1>Bottle Game</h1>
 
       <div>
-        <div class="section-label">Players — pick a name &amp; flavor (🧑 tap for CPU)</div>
+        <div class="section-label">Players — pick a name &amp; flavor (tap Human/CPU to switch)</div>
         <div id="player-inputs"><!-- rendered by main.js --></div>
         <button id="add-player-btn">+ Add Player</button>
       </div>
@@ -48,17 +48,19 @@
       </div>
 
       <div>
-        <div class="section-label">Feel</div>
-        <div class="direction-options">
-          <label><input type="radio" name="feel" value="forgiving"> 🟢 Forgiving</label>
-          <label><input type="radio" name="feel" value="standard" checked> 🟡 Standard</label>
-          <label><input type="radio" name="feel" value="pro"> 🔴 Pro</label>
+        <div class="section-label">Starting lives</div>
+        <div class="preset-options lives-options">
+          <label><input type="radio" name="starting-lives" value="3"> 3</label>
+          <label><input type="radio" name="starting-lives" value="5"> 5</label>
+          <label><input type="radio" name="starting-lives" value="10" checked> 10</label>
+          <label><input type="radio" name="starting-lives" value="20"> 20</label>
+          <label><input type="radio" name="starting-lives" value="100"> 100</label>
         </div>
-        <label class="checkbox-row"><input type="checkbox" id="flick-feedback-toggle"> Show flick feedback</label>
       </div>
 
       <button id="start-btn">Start Game</button>
       <button id="practice-btn">🎯 Practice (solo)</button>
+      <div id="records-panel"></div>
     </div>
   </div>
 
@@ -67,62 +69,52 @@
     <canvas id="game-canvas"></canvas>
     <div id="hud">
       <div id="top-bar">
+        <button id="menu-btn" aria-label="Main menu">☰</button>
         <span id="turn-banner"></span>
-        <span id="top-right">
-          <button id="mute-btn" class="hud-btn" title="Mute / unmute">🔊</button>
-          <span id="point-count"></span>
-        </span>
+        <button id="mute-btn" aria-label="Mute">🔊</button>
+        <span id="point-count"></span>
       </div>
+      <div id="turn-timer"><div id="turn-timer-fill"></div></div>
       <div id="streak-banner"></div>
     </div>
-    <div id="flip-hint">Flick UP — harder = more spin. Land it upright!</div>
-    <div id="practice-meter" class="hidden">
-      <div class="pm-track"><div class="pm-band"></div><div class="pm-marker"></div></div>
-      <div class="pm-label">flick strength — green zone ≈ one clean flip</div>
-    </div>
+    <div id="flip-hint">Flick up to flip!</div>
     <div id="player-list"></div>
-    <div id="handoff-overlay" class="hidden">
-      <div class="handoff-card">
-        <div class="handoff-label">Pass to</div>
-        <div id="handoff-name" class="handoff-name"></div>
-        <div class="handoff-tap">Tap anywhere to flip</div>
-      </div>
-    </div>
   </div>
 
-  <!-- ── First-launch tutorial ────────────────────────── -->
-  <div id="tutorial-overlay" class="screen hidden">
-    <div class="setup-card tutorial-card">
-      <h2>How to flip</h2>
-      <ul class="tut-list">
-        <li><b>Flick up</b> from the bottle to toss it.</li>
-        <li><b>Harder flick = more spin.</b> Find the snap that lands one clean turn.</li>
-        <li><b>Lean left/right</b> to change which way it tumbles.</li>
-        <li>Land it <b>upright</b> for a MAKE.</li>
-      </ul>
-      <button id="tutorial-done-btn">Got it</button>
+  <!-- ── Pass-and-play handoff ────────────────────────── -->
+  <div id="pass-screen" class="screen hidden">
+    <div id="pass-card" class="pass-card">
+      <div class="pass-label">PASS TO</div>
+      <div id="pass-name"></div>
+      <button id="pass-go-btn">Tap to flip ▶</button>
     </div>
   </div>
 
   <!-- ── Game Over ────────────────────────────────────── -->
   <div id="game-over" class="screen hidden">
-    <canvas id="confetti-canvas"></canvas>
     <div class="game-over-card">
       <div style="font-size:3rem">🏆</div>
       <h2>Winner</h2>
       <div id="winner-name"></div>
-      <div id="match-summary"></div>
+      <div id="scoreboard"></div>
+      <div id="game-stats"></div>
       <button id="play-again-btn">Play Again</button>
+      <button id="home-btn">Main Menu</button>
     </div>
   </div>
 
+  <!-- ?v= forces the browser to refetch on each release (dev server sends no
+       cache headers). Bump alongside the service-worker CACHE_NAME. -->
   <script src="js/vendor/matter.min.js"></script>
-  <script src="js/game.js"></script>
-  <script src="js/physics.js"></script>
-  <script src="js/input.js"></script>
-  <script src="js/renderer.js"></script>
-  <script src="js/audio.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/polyfills.js?v=22"></script>
+  <script src="js/game.js?v=22"></script>
+  <script src="js/physics.js?v=22"></script>
+  <script src="js/input.js?v=22"></script>
+  <script src="js/renderer.js?v=22"></script>
+  <script src="js/audio.js?v=22"></script>
+  <script src="js/settings.js?v=22"></script>
+  <script src="js/records.js?v=22"></script>
+  <script src="js/main.js?v=22"></script>
   <script>
     window.onerror = (msg, src, line) => {
       const el = document.getElementById('err-overlay') || (() => {
