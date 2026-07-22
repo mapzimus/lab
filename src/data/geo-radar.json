@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-07-21",
+  "generatedAt": "2026-07-22",
   "news": {
     "mapsmania": [
+      {
+        "title": "How Close is Everything You Need?",
+        "url": "http://googlemapsmania.blogspot.com/2026/07/how-close-is-everything-you-need.html",
+        "desc": "One of the biggest challenges when moving home is deciding which compromise you are prepared to make."
+      },
       {
         "title": "The 5 Best 3D Subway Maps",
         "url": "http://googlemapsmania.blogspot.com/2026/07/the-5-best-3d-subway-maps.html",
@@ -36,11 +41,6 @@
         "title": "Fly the Real World Flight Sim",
         "url": "http://googlemapsmania.blogspot.com/2026/07/fly-real-world-flight-sim.html",
         "desc": "TripGeo Air is an impressive new browser-based flight simulator that lets you fly over a photorealistic 3D model of the real world.What makes TripGeo Air par…"
-      },
-      {
-        "title": "The World's Greatest Train Journeys",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/the-worlds-greatest-train-journeys.html",
-        "desc": "If you've ever looked at a railway map and wondered which routes are truly worth travelling, then TrainRouter has the answer."
       }
     ],
     "georealm": [
@@ -77,6 +77,16 @@
     ],
     "geoworld": [
       {
+        "title": "Strengthening Sovereignty, Economy, and Society",
+        "url": "https://geospatialworld.net/prime/interviews/strengthening-sovereignty-economy-and-society/",
+        "desc": "Sovereignty: National Autonomy, Strategic Resilience, and Governance Models How should nations redefine geospatial and space sovereignty in an era of increas…"
+      },
+      {
+        "title": "Mapping Urban Heat Islands in Ahemedabad",
+        "url": "https://geospatialworld.net/videos/mapping-urban-heat-islands-ahmedabad/",
+        "desc": "Even though the conversations on climate change have muted due to the geopolitical situation, trade disruptions, greater defence and intelligence spending, a…"
+      },
+      {
         "title": "HD Mapping and VPS: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence | GWF 2026",
         "url": "https://geospatialworld.net/videos/hd-mapping-vps-geospatial-platforms-gwf-2026/",
         "desc": "Plenary Session 5: High-Definition Mapping and Visual Positioning Systems: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence |…"
@@ -95,54 +105,60 @@
         "title": "Spatial Computing and Digital Twins: Augmenting Space and Geospatial Value Chain | GWF 2026",
         "url": "https://geospatialworld.net/videos/spatial-computing-digital-twins-gwf-2026-plenary/",
         "desc": "Plenary Session 2 | Geospatial World Forum 2026 | Amsterdam, April 28 – May 1 Moderated by Ananyaa Narain, VP – Consulting, Geospatial World, this plenary se…"
-      },
-      {
-        "title": "IPGF 2026: Inaugural Session Reiterates the Importance of Strategic Sovereignty Through Informational Sovereignty",
-        "url": "https://geospatialworld.net/news/press-release/ipgf-2026-inaugural-session-reiterates-the-importance-of-strategic-sovereignty-through-informational-sovereignty/",
-        "desc": "The inaugural session of the Indo Pacific GeoIntelligence Forum 2026 commenced with a welcome address by Lt Gen AKS Chandele, PVSM, AVSM, PhD (Retd) Presiden…"
-      },
-      {
-        "title": "Geospatial Sovereignty, Spatial Justice & Africa’s Future | Mzwanele Nyhontso | GWF 2026",
-        "url": "https://geospatialworld.net/videos/mzwanele-nyhontso-geospatial-sovereignty-spatial-justice-gwf-2026/",
-        "desc": "At Geospatial World Forum 2026, Mzwanele Nyhontso, Minister of Land Reforms & Rural Development, Republic of South Africa, delivers a keynote on geospatial s…"
       }
     ]
   },
   "qgis": [
     {
-      "title": "OccHab GeoNature",
-      "url": "https://plugins.qgis.org/plugins/occhab/"
+      "title": "Parametric Process",
+      "url": "https://plugins.qgis.org/plugins/parametric_process/"
     },
     {
-      "title": "PRA Divider",
-      "url": "https://plugins.qgis.org/plugins/PRADivider/"
+      "title": "Advanced Profile Tool",
+      "url": "https://plugins.qgis.org/plugins/advanced_profile_tool/"
     },
     {
-      "title": "QuickMapCompare",
-      "url": "https://plugins.qgis.org/plugins/quick_map_compare/"
+      "title": "ABCoord",
+      "url": "https://plugins.qgis.org/plugins/abcoord/"
     },
     {
-      "title": "Flood Simulation Studio",
-      "url": "https://plugins.qgis.org/plugins/qgis_flood_simulation_studio/"
+      "title": "USGS 3DEP Downloader",
+      "url": "https://plugins.qgis.org/plugins/USGS3DEPDownloader/"
     },
     {
-      "title": "QGIS-FME Flow Connector",
-      "url": "https://plugins.qgis.org/plugins/qgisfmeflowconnector/"
+      "title": "Podaris",
+      "url": "https://plugins.qgis.org/plugins/podaris/"
     },
     {
-      "title": "Jeomatik NCZ Reader",
-      "url": "https://plugins.qgis.org/plugins/NCZReader/"
+      "title": "GEE LULC Toolkit",
+      "url": "https://plugins.qgis.org/plugins/gee_lulc_toolkit/"
     },
     {
-      "title": "GEAQUA Capture Zones",
-      "url": "https://plugins.qgis.org/plugins/GEAQUA_Capture_Zones/"
+      "title": "Network Topology",
+      "url": "https://plugins.qgis.org/plugins/network_topology/"
     },
     {
-      "title": "PeruSpatial Hub",
-      "url": "https://plugins.qgis.org/plugins/peruspatial_hub/"
+      "title": "Vectorel Digitizer Pro QGIS3",
+      "url": "https://plugins.qgis.org/plugins/Vectorel_Digitizer_Pro_QGIS3/"
     }
   ],
   "releases": [
+    {
+      "repo": "duckdb/duckdb",
+      "title": "duckdb v1.5.5",
+      "url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.5",
+      "desc": "This is a bug fix release for various issues discovered after we released v1.5.4.",
+      "publishedAt": "2026-07-22",
+      "isFresh": true
+    },
+    {
+      "repo": "OSGeo/gdal",
+      "title": "gdal v3.13.2",
+      "url": "https://github.com/OSGeo/gdal/releases/tag/v3.13.2",
+      "desc": "Bug fix release. See release notes: https://github.com/OSGeo/gdal/blob/v3.13.2/NEWS.md",
+      "publishedAt": "2026-07-22",
+      "isFresh": true
+    },
     {
       "repo": "visgl/deck.gl",
       "title": "deck.gl v9.3.7",
@@ -158,22 +174,6 @@
       "desc": "https://github.com/qgis/QGIS/compare/final-3_44_11%5E...final-3_44_12",
       "publishedAt": "2026-07-03",
       "isFresh": true
-    },
-    {
-      "repo": "duckdb/duckdb",
-      "title": "duckdb v1.5.4",
-      "url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.4",
-      "desc": "This is a bug fix release for various issues discovered after we released v1.5.3.",
-      "publishedAt": "2026-06-17",
-      "isFresh": false
-    },
-    {
-      "repo": "OSGeo/gdal",
-      "title": "gdal v3.13.1",
-      "url": "https://github.com/OSGeo/gdal/releases/tag/v3.13.1",
-      "desc": "Bug fix release. See release notes: https://github.com/OSGeo/gdal/blob/v3.13.1/NEWS.md",
-      "publishedAt": "2026-06-05",
-      "isFresh": false
     },
     {
       "repo": "maplibre/maplibre-gl-js",
@@ -210,15 +210,21 @@
   ],
   "gisse": [
     {
-      "title": "Spline interpolation is ignoring barriers",
-      "url": "https://gis.stackexchange.com/questions/501168/spline-interpolation-is-ignoring-barriers",
+      "title": "Global background shrinks to a line when using Build Globe view",
+      "url": "https://gis.stackexchange.com/questions/501174/global-background-shrinks-to-a-line-when-using-build-globe-view",
       "score": 0,
       "answers": 0
     },
     {
-      "title": "How can I make a Sensitivity Map?",
-      "url": "https://gis.stackexchange.com/questions/501170/how-can-i-make-a-sensitivity-map",
-      "score": -3,
+      "title": "How do I show features that are only needed for an assigned task in field maps?",
+      "url": "https://gis.stackexchange.com/questions/501173/how-do-i-show-features-that-are-only-needed-for-an-assigned-task-in-field-maps",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "QFieldSync Python error on packing for QField",
+      "url": "https://gis.stackexchange.com/questions/501172/qfieldsync-python-error-on-packing-for-qfield",
+      "score": 0,
       "answers": 0
     },
     {
@@ -228,9 +234,21 @@
       "answers": 1
     },
     {
+      "title": "Spline interpolation is ignoring barriers",
+      "url": "https://gis.stackexchange.com/questions/501168/spline-interpolation-is-ignoring-barriers",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "start QGIS with specific CRS and background map",
       "url": "https://gis.stackexchange.com/questions/501163/start-qgis-with-specific-crs-and-background-map",
       "score": -2,
+      "answers": 0
+    },
+    {
+      "title": "How can I make a Sensitivity Map?",
+      "url": "https://gis.stackexchange.com/questions/501170/how-can-i-make-a-sensitivity-map",
+      "score": -3,
       "answers": 0
     },
     {
@@ -250,50 +268,14 @@
       "url": "https://gis.stackexchange.com/questions/501142/display-of-osm-buildings-when-zoomed-out-at-higher-scale-using-an-esri-vector-ti",
       "score": 0,
       "answers": 0
-    },
-    {
-      "title": "Convert AutoCAD (.dwg) file to GIS",
-      "url": "https://gis.stackexchange.com/questions/501148/convert-autocad-dwg-file-to-gis",
-      "score": 0,
-      "answers": 1
-    },
-    {
-      "title": "Simplest way to show an image and get the mouse click coordinates",
-      "url": "https://gis.stackexchange.com/questions/501143/simplest-way-to-show-an-image-and-get-the-mouse-click-coordinates",
-      "score": -4,
-      "answers": 1
-    },
-    {
-      "title": "Improving GPS accuracy and repeatability in European beech and broadleaved forest",
-      "url": "https://gis.stackexchange.com/questions/501152/improving-gps-accuracy-and-repeatability-in-european-beech-and-broadleaved-fores",
-      "score": 2,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "First ISCCP Regional Experiment (FIRE) Arctic Cloud Experiment (ACE) AMPR Brightness Temperature Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_ACE_AMPR",
-      "desc": "This data consists of data provided by the Advanced Microwave Precipitation Radiometer (AMPR) flown onboard the ER2 aircraft during the FIRE ACE field campai…",
+      "title": "STAQS Ground Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=STAQS_Ground_Data",
+      "desc": "STAQS_Ground_Data is the ground site data collected during the Synergistic TEMPO Air Quality Science (STAQS) mission.",
       "org": "LARC_CLOUD"
-    },
-    {
-      "title": "First ISCCP Regional Experiment (FIRE) Arctic Cloud Experiment (ACE) CV580 Aircraft G-Meter Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_ACE_UWCV580_GMETER",
-      "desc": "This data set consists of light scattering measurements provided by the 4-channel nephelometer g-meter instrument flown onboard the University of Washington'…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "First ISCCP Regional Experiment (FIRE) Arctic Cloud Experiment (ACE) Solar Spectral Flux Radiometer (SSFR)",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_ACE_SHIP_SSFR",
-      "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "HyTES L1 Geolocation, Facility Instrument Collection",
-      "url": "https://search.earthdata.nasa.gov/search?q=HyTES_L1_Geolocation_2459",
-      "desc": "This dataset contains Level 1 (L1) per-pixel geolocation information from the Hyperspectral Thermal Emission Spectrometer (HyTES) instrument.",
-      "org": "ORNL_CLOUD"
     },
     {
       "title": "UAVSAR_POLSAR_STOKES",
@@ -329,6 +311,24 @@
       "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
       "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
+      "desc": "UAVSAR PolSAR Scene Projected",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_METADATA",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
+      "desc": "UAVSAR PolSAR Scene Metadata",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_KMZ",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
+      "desc": "UAVSAR PolSAR Scene KMZ",
       "org": "ASF"
     }
   ],
