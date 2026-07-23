@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-07-22",
+  "generatedAt": "2026-07-23",
   "news": {
     "mapsmania": [
+      {
+        "title": "Can You Date the Map? - Daily Challenge",
+        "url": "http://googlemapsmania.blogspot.com/2026/07/can-you-date-map-daily-challenge.html",
+        "desc": "Randall Munroe's famous xkcd comic Map Age Guide distilled two centuries of global geopolitics into a wonderfully simple flowchart for dating maps."
+      },
       {
         "title": "How Close is Everything You Need?",
         "url": "http://googlemapsmania.blogspot.com/2026/07/how-close-is-everything-you-need.html",
@@ -36,11 +41,6 @@
         "title": "This is Still Not Normal",
         "url": "http://googlemapsmania.blogspot.com/2026/07/this-is-still-not-normal.html",
         "desc": "Last month I posted a review of Klimadashboard's European Heat Tracker, which visualizes how many people across Europe are exposed to extreme heat in real time."
-      },
-      {
-        "title": "Fly the Real World Flight Sim",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/fly-real-world-flight-sim.html",
-        "desc": "TripGeo Air is an impressive new browser-based flight simulator that lets you fly over a photorealistic 3D model of the real world.What makes TripGeo Air par…"
       }
     ],
     "georealm": [
@@ -79,7 +79,7 @@
       {
         "title": "Strengthening Sovereignty, Economy, and Society",
         "url": "https://geospatialworld.net/prime/interviews/strengthening-sovereignty-economy-and-society/",
-        "desc": "Sovereignty: National Autonomy, Strategic Resilience, and Governance Models How should nations redefine geospatial and space sovereignty in an era of increas…"
+        "desc": "How should nations redefine geospatial and space sovereignty in an era of increasing dependence on global platforms, foreign satellite constellations, and in…"
       },
       {
         "title": "Mapping Urban Heat Islands in Ahemedabad",
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
+      "title": "quickdraw tools",
+      "url": "https://plugins.qgis.org/plugins/quickdrawtools/"
+    },
+    {
+      "title": "Observearthtesting",
+      "url": "https://plugins.qgis.org/plugins/Observearthtesting/"
+    },
+    {
+      "title": "Flash Features",
+      "url": "https://plugins.qgis.org/plugins/flash_features/"
+    },
+    {
+      "title": "Raster Statistics Along Line",
+      "url": "https://plugins.qgis.org/plugins/raster_statistics_along_line/"
+    },
+    {
+      "title": "Zapisz projekt do GPKG (warstwy i style)",
+      "url": "https://plugins.qgis.org/plugins/zapisz_projekt_gpkg/"
+    },
+    {
       "title": "Parametric Process",
       "url": "https://plugins.qgis.org/plugins/parametric_process/"
     },
     {
+      "title": "Observearth",
+      "url": "https://plugins.qgis.org/plugins/observearth/"
+    },
+    {
       "title": "Advanced Profile Tool",
       "url": "https://plugins.qgis.org/plugins/advanced_profile_tool/"
-    },
-    {
-      "title": "ABCoord",
-      "url": "https://plugins.qgis.org/plugins/abcoord/"
-    },
-    {
-      "title": "USGS 3DEP Downloader",
-      "url": "https://plugins.qgis.org/plugins/USGS3DEPDownloader/"
-    },
-    {
-      "title": "Podaris",
-      "url": "https://plugins.qgis.org/plugins/podaris/"
-    },
-    {
-      "title": "GEE LULC Toolkit",
-      "url": "https://plugins.qgis.org/plugins/gee_lulc_toolkit/"
-    },
-    {
-      "title": "Network Topology",
-      "url": "https://plugins.qgis.org/plugins/network_topology/"
-    },
-    {
-      "title": "Vectorel Digitizer Pro QGIS3",
-      "url": "https://plugins.qgis.org/plugins/Vectorel_Digitizer_Pro_QGIS3/"
     }
   ],
   "releases": [
@@ -160,6 +160,14 @@
       "isFresh": true
     },
     {
+      "repo": "maplibre/maplibre-gl-js",
+      "title": "maplibre-gl-js v6.0.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.0.0",
+      "desc": "The following incorporates all the pre-releases for version 6 changes.",
+      "publishedAt": "2026-07-22",
+      "isFresh": true
+    },
+    {
       "repo": "visgl/deck.gl",
       "title": "deck.gl v9.3.7",
       "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.7",
@@ -174,14 +182,6 @@
       "desc": "https://github.com/qgis/QGIS/compare/final-3_44_11%5E...final-3_44_12",
       "publishedAt": "2026-07-03",
       "isFresh": true
-    },
-    {
-      "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v5.24.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v5.24.0",
-      "desc": "### ✨ Features and improvements - GPU performance optimization: Render halo and glyph in a single pass (-40% Time Reduction) ([#7436](https://github.com/mapl…",
-      "publishedAt": "2026-04-23",
-      "isFresh": false
     },
     {
       "repo": "Turfjs/turf",
@@ -210,8 +210,14 @@
   ],
   "gisse": [
     {
-      "title": "Global background shrinks to a line when using Build Globe view",
-      "url": "https://gis.stackexchange.com/questions/501174/global-background-shrinks-to-a-line-when-using-build-globe-view",
+      "title": "Looking for a Victoria SA2 GeoJSON",
+      "url": "https://gis.stackexchange.com/questions/501179/looking-for-a-victoria-sa2-geojson",
+      "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "How can I get the contours of a pit to fully display in QGIS?",
+      "url": "https://gis.stackexchange.com/questions/501176/how-can-i-get-the-contours-of-a-pit-to-fully-display-in-qgis",
       "score": 0,
       "answers": 0
     },
@@ -219,6 +225,18 @@
       "title": "How do I show features that are only needed for an assigned task in field maps?",
       "url": "https://gis.stackexchange.com/questions/501173/how-do-i-show-features-that-are-only-needed-for-an-assigned-task-in-field-maps",
       "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Global background shrinks to a line when using Build Globe view",
+      "url": "https://gis.stackexchange.com/questions/501174/global-background-shrinks-to-a-line-when-using-build-globe-view",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "QGIS 4.2 embedded Python version and upgrade timeline for security compliance",
+      "url": "https://gis.stackexchange.com/questions/501162/qgis-4-2-embedded-python-version-and-upgrade-timeline-for-security-compliance",
+      "score": 1,
       "answers": 0
     },
     {
@@ -234,27 +252,15 @@
       "answers": 1
     },
     {
-      "title": "Spline interpolation is ignoring barriers",
-      "url": "https://gis.stackexchange.com/questions/501168/spline-interpolation-is-ignoring-barriers",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "start QGIS with specific CRS and background map",
       "url": "https://gis.stackexchange.com/questions/501163/start-qgis-with-specific-crs-and-background-map",
       "score": -2,
       "answers": 0
     },
     {
-      "title": "How can I make a Sensitivity Map?",
-      "url": "https://gis.stackexchange.com/questions/501170/how-can-i-make-a-sensitivity-map",
-      "score": -3,
-      "answers": 0
-    },
-    {
-      "title": "QGIS 4.2 embedded Python version and upgrade timeline for security compliance",
-      "url": "https://gis.stackexchange.com/questions/501162/qgis-4-2-embedded-python-version-and-upgrade-timeline-for-security-compliance",
-      "score": 1,
+      "title": "Spline interpolation is ignoring barriers",
+      "url": "https://gis.stackexchange.com/questions/501168/spline-interpolation-is-ignoring-barriers",
+      "score": 0,
       "answers": 0
     },
     {
@@ -262,74 +268,68 @@
       "url": "https://gis.stackexchange.com/questions/501160/valid-range-of-modis-ndvi-product",
       "score": 0,
       "answers": 0
-    },
-    {
-      "title": "Display of OSM buildings when zoomed out at higher scale using an Esri vector tile service in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501142/display-of-osm-buildings-when-zoomed-out-at-higher-scale-using-an-esri-vector-ti",
-      "score": 0,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "STAQS Ground Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=STAQS_Ground_Data",
-      "desc": "STAQS_Ground_Data is the ground site data collected during the Synergistic TEMPO Air Quality Science (STAQS) mission.",
+      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) MAGE Oceanus Meteorological Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_MAGE_OCN_MET",
+      "desc": "The First ISCCP Regional Experiments (FIRE) have been designed to improve data products and cloud/radiation parameterizations used in general circulation mod…",
       "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_STOKES",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
-      "desc": "UAVSAR PolSAR Scene Stokes",
-      "org": "ASF"
+      "title": "ICESat-2 Calibration/Validation LVIS L3A Sea Ice Freeboard V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=IS2LVIS3ACV",
+      "desc": "This data set provides high-resolution sea ice freeboard estimates derived from airborne measurements collected over the Arctic Ocean.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "UAVSAR_POLSAR_SLOPE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
-      "desc": "UAVSAR PolSAR Scene Slope",
-      "org": "ASF"
+      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) NASA ER-2 Cloud Lidar System Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_ER2_LIDAR",
+      "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_PAULI",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
-      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
-      "org": "ASF"
+      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) PSU Valdivia Ceilometer Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_PSU_CEIL_VAL",
+      "desc": "The First ISCCP Regional Experiments (FIRE) have been designed to improve data products and cloud/radiation parameterizations used in general circulation mod…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
-      "desc": "UAVSAR PolSAR Scene Complex",
-      "org": "ASF"
+      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) University of Washington C-131A 1Hz Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_UW_GERB_1HZ",
+      "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
-      "org": "ASF"
+      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) University of Washington C-131A 10Hz Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_UW_GERB_10HZ",
+      "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
-      "org": "ASF"
+      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) University of Washington C-131A Discrete Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_UW_DSCRT",
+      "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
-      "desc": "UAVSAR PolSAR Scene Projected",
-      "org": "ASF"
+      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) University of Washington C-131A Aircraft Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_UW_C131A",
+      "desc": "The First ISCCP Regional Experiments (FIRE) have been designed to improve data products and cloud/radiation parameterizations used in general circulation mod…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_METADATA",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
-      "desc": "UAVSAR PolSAR Scene Metadata",
-      "org": "ASF"
+      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) SOFIA ARAT Fokker F27 Aircraft Flight Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_SOF_ARAT_FLT",
+      "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_KMZ",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
-      "desc": "UAVSAR PolSAR Scene KMZ",
-      "org": "ASF"
+      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) PSU Microwave Radiometer Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_PSU_H2OVAP",
+      "desc": "The First ISCCP Regional Experiments (FIRE) have been designed to improve data products and cloud/radiation parameterizations used in general circulation mod…",
+      "org": "LARC_CLOUD"
     }
   ],
   "datagov": [
