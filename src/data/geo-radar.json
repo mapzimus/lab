@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-07-23",
+  "generatedAt": "2026-07-24",
   "news": {
     "mapsmania": [
+      {
+        "title": "Free Map Tiles for Everyone",
+        "url": "http://googlemapsmania.blogspot.com/2026/07/free-map-tiles-for-everyone.html",
+        "desc": "Free Map Tiles Providers:OpenFreeMapVersaTilesMaptoolkit.orgOne of the biggest barriers to building web maps has always been the cost and complexity of map t…"
+      },
       {
         "title": "Can You Date the Map? - Daily Challenge",
         "url": "http://googlemapsmania.blogspot.com/2026/07/can-you-date-map-daily-challenge.html",
@@ -36,14 +41,14 @@
         "title": "Where's Downtown?",
         "url": "http://googlemapsmania.blogspot.com/2026/07/wheres-downtown.html",
         "desc": "Where is Downtown? is an interactive map surveying tool designed to crowdsource the boundaries of \"downtown\" for any city."
-      },
-      {
-        "title": "This is Still Not Normal",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/this-is-still-not-normal.html",
-        "desc": "Last month I posted a review of Klimadashboard's European Heat Tracker, which visualizes how many people across Europe are exposed to extreme heat in real time."
       }
     ],
     "georealm": [
+      {
+        "title": "Alaska’s Coastline is Longer Than All the Other 49 States Combined",
+        "url": "https://www.geographyrealm.com/alaskas-coastline-is-longer-than-all-the-other-49-states-combined/",
+        "desc": "Alaska has the longest U.S."
+      },
       {
         "title": "Geography Facts about the World’s Continents",
         "url": "https://www.geographyrealm.com/continents/",
@@ -68,11 +73,6 @@
         "title": "States in Order of Admission to the United States of America",
         "url": "https://www.geographyrealm.com/states-in-order-of-admission-to-the-united-states-of-america/",
         "desc": "From Delaware to Hawaii, discover when each state entered the Union and the geographic features that make every state unique."
-      },
-      {
-        "title": "How to Create a Radial Flow Map Using QGIS",
-        "url": "https://www.geographyrealm.com/radial-flow-map-qgis/",
-        "desc": "Learn how to create a radial flow map in QGIS using U.S."
       }
     ],
     "geoworld": [
@@ -210,6 +210,18 @@
   ],
   "gisse": [
     {
+      "title": "How to optimize large gpkg files on QGIS",
+      "url": "https://gis.stackexchange.com/questions/501183/how-to-optimize-large-gpkg-files-on-qgis",
+      "score": 2,
+      "answers": 1
+    },
+    {
+      "title": "How many countries can be hit by great circles from any point in the U.S.",
+      "url": "https://gis.stackexchange.com/questions/501182/how-many-countries-can-be-hit-by-great-circles-from-any-point-in-the-u-s-but-no",
+      "score": -1,
+      "answers": 0
+    },
+    {
       "title": "Looking for a Victoria SA2 GeoJSON",
       "url": "https://gis.stackexchange.com/questions/501179/looking-for-a-victoria-sa2-geojson",
       "score": 1,
@@ -240,12 +252,6 @@
       "answers": 0
     },
     {
-      "title": "QFieldSync Python error on packing for QField",
-      "url": "https://gis.stackexchange.com/questions/501172/qfieldsync-python-error-on-packing-for-qfield",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "QGIS: Scaling adjust road thickness on different scales of the imported ArcGIS basemap vector tile service using QGIS symbol layers",
       "url": "https://gis.stackexchange.com/questions/501164/qgis-scaling-adjust-road-thickness-on-different-scales-of-the-imported-arcgis-b",
       "score": 1,
@@ -258,78 +264,72 @@
       "answers": 0
     },
     {
-      "title": "Spline interpolation is ignoring barriers",
-      "url": "https://gis.stackexchange.com/questions/501168/spline-interpolation-is-ignoring-barriers",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Valid range of MODIS NDVI product",
-      "url": "https://gis.stackexchange.com/questions/501160/valid-range-of-modis-ndvi-product",
+      "title": "QFieldSync Python error on packing for QField",
+      "url": "https://gis.stackexchange.com/questions/501172/qfieldsync-python-error-on-packing-for-qfield",
       "score": 0,
       "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) MAGE Oceanus Meteorological Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_MAGE_OCN_MET",
-      "desc": "The First ISCCP Regional Experiments (FIRE) have been designed to improve data products and cloud/radiation parameterizations used in general circulation mod…",
-      "org": "LARC_CLOUD"
+      "title": "CARDAMOM Carbon-Water-Energy Reanalysis v1100.1, 2001-2021",
+      "url": "https://search.earthdata.nasa.gov/search?q=CARDAMOM_Gridded_Fluxes_2492",
+      "desc": "This dataset provides global, monthly estimates of terrestrial biosphere carbon, water, and energy cycling states and fluxes for 2001-2021, generated using t…",
+      "org": "ORNL_CLOUD"
     },
     {
-      "title": "ICESat-2 Calibration/Validation LVIS L3A Sea Ice Freeboard V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=IS2LVIS3ACV",
-      "desc": "This data set provides high-resolution sea ice freeboard estimates derived from airborne measurements collected over the Arctic Ocean.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) NASA ER-2 Cloud Lidar System Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_ER2_LIDAR",
+      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) SOFIA Le Suroit Radiation Pressure Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_SOF_SUR_RAD",
       "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
       "org": "LARC_CLOUD"
     },
     {
-      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) PSU Valdivia Ceilometer Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_PSU_CEIL_VAL",
-      "desc": "The First ISCCP Regional Experiments (FIRE) have been designed to improve data products and cloud/radiation parameterizations used in general circulation mod…",
-      "org": "LARC_CLOUD"
+      "title": "UAVSAR_POLSAR_PAULI",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
+      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
+      "org": "ASF"
     },
     {
-      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) University of Washington C-131A 1Hz Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_UW_GERB_1HZ",
-      "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
-      "org": "LARC_CLOUD"
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
+      "desc": "UAVSAR PolSAR Scene Complex",
+      "org": "ASF"
     },
     {
-      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) University of Washington C-131A 10Hz Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_UW_GERB_10HZ",
-      "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
-      "org": "LARC_CLOUD"
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
+      "org": "ASF"
     },
     {
-      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) University of Washington C-131A Discrete Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_UW_DSCRT",
-      "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
-      "org": "LARC_CLOUD"
+      "title": "UAVSAR_POLSAR_METADATA",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
+      "desc": "UAVSAR PolSAR Scene Metadata",
+      "org": "ASF"
     },
     {
-      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) University of Washington C-131A Aircraft Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_UW_C131A",
-      "desc": "The First ISCCP Regional Experiments (FIRE) have been designed to improve data products and cloud/radiation parameterizations used in general circulation mod…",
-      "org": "LARC_CLOUD"
+      "title": "UAVSAR_POLSAR_KMZ",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
+      "desc": "UAVSAR PolSAR Scene KMZ",
+      "org": "ASF"
     },
     {
-      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) SOFIA ARAT Fokker F27 Aircraft Flight Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_SOF_ARAT_FLT",
-      "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
-      "org": "LARC_CLOUD"
+      "title": "UAVSAR_POLSAR_INCIDENCE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
+      "desc": "UAVSAR PolSAR Scene Incidence Angle",
+      "org": "ASF"
     },
     {
-      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) PSU Microwave Radiometer Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_PSU_H2OVAP",
-      "desc": "The First ISCCP Regional Experiments (FIRE) have been designed to improve data products and cloud/radiation parameterizations used in general circulation mod…",
-      "org": "LARC_CLOUD"
+      "title": "UAVSAR_POLSAR_DEM",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_DEM",
+      "desc": "UAVSAR PolSAR Scene DEM TIFF",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_INSAR_METADATA",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_INSAR_META",
+      "desc": "UAVSAR Repeat Pass Interferometry Scene Metadata",
+      "org": "ASF"
     }
   ],
   "datagov": [
