@@ -9,6 +9,7 @@ const Records = (() => {
     totalFlips: 0,
     longestOnFire: 0,   // most bonus makes in one ON FIRE run
     mostWins: {},       // name -> win count
+    totalWins: 0,       // wins on this device, across all players — drives skin unlocks
     unlockedSkins: ['bottle'],  // flippable editions earned on this device
   };
   let data = load();
@@ -35,8 +36,10 @@ const Records = (() => {
   function recordWin(name) {
     if (!name) return;
     data.mostWins[name] = (data.mostWins[name] || 0) + 1;
+    data.totalWins = (data.totalWins || 0) + 1;
     save();
   }
+  function totalWins() { return data.totalWins || 0; }
   function topWinner() {
     let best = null, n = 0;
     for (const [name, c] of Object.entries(data.mostWins)) if (c > n) { best = name; n = c; }
@@ -73,5 +76,5 @@ const Records = (() => {
     return true;
   }
 
-  return { recordFlip, recordWin, renderHtml, reset, unlockedSkins, isSkinUnlocked, unlockSkin };
+  return { recordFlip, recordWin, renderHtml, reset, totalWins, unlockedSkins, isSkinUnlocked, unlockSkin };
 })();
