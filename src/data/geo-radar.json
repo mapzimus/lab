@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-24",
+  "generatedAt": "2026-07-25",
   "news": {
     "mapsmania": [
       {
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "quickdraw tools",
-      "url": "https://plugins.qgis.org/plugins/quickdrawtools/"
+      "title": "Reference Grid Labeler",
+      "url": "https://plugins.qgis.org/plugins/reference_grid_labeler/"
     },
     {
-      "title": "Observearthtesting",
-      "url": "https://plugins.qgis.org/plugins/Observearthtesting/"
+      "title": "Gerador de RCO",
+      "url": "https://plugins.qgis.org/plugins/gerador_rco/"
     },
     {
-      "title": "Flash Features",
-      "url": "https://plugins.qgis.org/plugins/flash_features/"
+      "title": "AcuGIS Cloud Publisher",
+      "url": "https://plugins.qgis.org/plugins/acugis_cloud_publisher/"
     },
     {
-      "title": "Raster Statistics Along Line",
-      "url": "https://plugins.qgis.org/plugins/raster_statistics_along_line/"
+      "title": "SwathProfile4QGIS",
+      "url": "https://plugins.qgis.org/plugins/SwathProfile4QGIS/"
     },
     {
-      "title": "Zapisz projekt do GPKG (warstwy i style)",
-      "url": "https://plugins.qgis.org/plugins/zapisz_projekt_gpkg/"
+      "title": "法术网优工具",
+      "url": "https://plugins.qgis.org/plugins/fa_shu_tool/"
     },
     {
-      "title": "Parametric Process",
-      "url": "https://plugins.qgis.org/plugins/parametric_process/"
+      "title": "Multiband Zonal Stats",
+      "url": "https://plugins.qgis.org/plugins/multiband_zonal_stats/"
     },
     {
-      "title": "Observearth",
-      "url": "https://plugins.qgis.org/plugins/observearth/"
+      "title": "Sen Couverture Terrestre",
+      "url": "https://plugins.qgis.org/plugins/sen_couverture_terrestre/"
     },
     {
-      "title": "Advanced Profile Tool",
-      "url": "https://plugins.qgis.org/plugins/advanced_profile_tool/"
+      "title": "Collaboration",
+      "url": "https://plugins.qgis.org/plugins/Collaboration/"
     }
   ],
   "releases": [
@@ -216,9 +216,21 @@
       "answers": 1
     },
     {
+      "title": "Can QGIS handle \"geometry\" field from PostGreSQL",
+      "url": "https://gis.stackexchange.com/questions/501188/can-qgis-handle-geometry-field-from-postgresql",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "How to create a layer filter based on the value in a different layer follow up",
+      "url": "https://gis.stackexchange.com/questions/501187/how-to-create-a-layer-filter-based-on-the-value-in-a-different-layer-follow-up",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "How many countries can be hit by great circles from any point in the U.S.",
       "url": "https://gis.stackexchange.com/questions/501182/how-many-countries-can-be-hit-by-great-circles-from-any-point-in-the-u-s-but-no",
-      "score": -1,
+      "score": -2,
       "answers": 0
     },
     {
@@ -256,32 +268,20 @@
       "url": "https://gis.stackexchange.com/questions/501164/qgis-scaling-adjust-road-thickness-on-different-scales-of-the-imported-arcgis-b",
       "score": 1,
       "answers": 1
-    },
-    {
-      "title": "start QGIS with specific CRS and background map",
-      "url": "https://gis.stackexchange.com/questions/501163/start-qgis-with-specific-crs-and-background-map",
-      "score": -2,
-      "answers": 0
-    },
-    {
-      "title": "QFieldSync Python error on packing for QField",
-      "url": "https://gis.stackexchange.com/questions/501172/qfieldsync-python-error-on-packing-for-qfield",
-      "score": 0,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "CARDAMOM Carbon-Water-Energy Reanalysis v1100.1, 2001-2021",
-      "url": "https://search.earthdata.nasa.gov/search?q=CARDAMOM_Gridded_Fluxes_2492",
-      "desc": "This dataset provides global, monthly estimates of terrestrial biosphere carbon, water, and energy cycling states and fluxes for 2001-2021, generated using t…",
-      "org": "ORNL_CLOUD"
+      "title": "UAVSAR_POLSAR_STOKES",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
+      "desc": "UAVSAR PolSAR Scene Stokes",
+      "org": "ASF"
     },
     {
-      "title": "First ISCCP Regional Experiment (FIRE) Atlantic Stratocumulus Transition Experiment (ASTEX) SOFIA Le Suroit Radiation Pressure Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIRE_AX_SOF_SUR_RAD",
-      "desc": "The First ISCCP Regional Experiments have been designed to improve data products and cloud/radiation parameterizations used in general circulation models (GC…",
-      "org": "LARC_CLOUD"
+      "title": "UAVSAR_POLSAR_SLOPE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
+      "desc": "UAVSAR PolSAR Scene Slope",
+      "org": "ASF"
     },
     {
       "title": "UAVSAR_POLSAR_PAULI",
@@ -302,6 +302,18 @@
       "org": "ASF"
     },
     {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
+      "desc": "UAVSAR PolSAR Scene Projected",
+      "org": "ASF"
+    },
+    {
       "title": "UAVSAR_POLSAR_METADATA",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
       "desc": "UAVSAR PolSAR Scene Metadata",
@@ -317,18 +329,6 @@
       "title": "UAVSAR_POLSAR_INCIDENCE",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
       "desc": "UAVSAR PolSAR Scene Incidence Angle",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_DEM",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_DEM",
-      "desc": "UAVSAR PolSAR Scene DEM TIFF",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_INSAR_METADATA",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_INSAR_META",
-      "desc": "UAVSAR Repeat Pass Interferometry Scene Metadata",
       "org": "ASF"
     }
   ],
