@@ -103,6 +103,15 @@
   // an edition is unlocked (see Records.unlockSkin).
   const FORCE_SKIN = (typeof window !== 'undefined' && window.FLIP_FORCE_SKIN) || null;
 
+  // The default player name for a given skin + flavor index — bottle (or any
+  // skin without its own roster) falls back to the flavor name; a skin with a
+  // `names` list (see skins.js) uses the name at the SAME index, so the color
+  // picked doesn't change when the skin does.
+  function defaultNameFor(skin, flavorIdx) {
+    const names = window.Skins && Skins.namesFor ? Skins.namesFor(skin) : null;
+    return (names && names[flavorIdx]) || FLAVORS[flavorIdx].name;
+  }
+
   function availableSkins() {
     const all = window.Skins ? Skins.list() : [{ id: 'bottle', name: 'Bottle', emoji: '🍾' }];
     return all.filter(s => s.id === 'bottle' || Records.isSkinUnlocked(s.id));
@@ -120,7 +129,7 @@
     return `<div class="player-input-row" data-flavor="${def.flavor}" data-ai="${def.ai ? 1 : 0}" data-skin="${skin}">
       <div class="prow-top">
         <span class="player-num" style="color:${FLAVORS[def.flavor].color}">P${i + 1}</span>
-        <input type="text" placeholder="${escapeHtml(FLAVORS[def.flavor].name)}" maxlength="14" value="${escapeHtml(def.name)}">
+        <input type="text" placeholder="${escapeHtml(defaultNameFor(skin, def.flavor))}" maxlength="14" value="${escapeHtml(def.name)}">
         <button type="button" class="ai-toggle${def.ai ? ' cpu' : ''}" title="Tap to switch Human / CPU">${def.ai ? 'CPU' : 'Human'}</button>
         ${i >= 2 ? '<button type="button" class="remove-player-btn" title="Remove">✕</button>' : ''}
       </div>
@@ -158,16 +167,18 @@
     if (sw) {
       const row = sw.closest('.player-input-row');
       const oldIdx = +row.dataset.flavor, newIdx = +sw.dataset.idx;
+      const skin = row.dataset.skin || 'bottle';
       const input = row.querySelector('input');
-      // The name follows the flavor unless the player typed a custom one.
-      if (!input.value.trim() || input.value.trim() === FLAVORS[oldIdx].name) {
-        input.value = FLAVORS[newIdx].name;
+      // The name follows the flavor's default name for the CURRENT skin,
+      // unless the player typed a custom one.
+      if (!input.value.trim() || input.value.trim() === defaultNameFor(skin, oldIdx)) {
+        input.value = defaultNameFor(skin, newIdx);
       }
       row.dataset.flavor = newIdx;
       row.querySelectorAll('.flavor-swatch').forEach(s => s.classList.remove('selected'));
       sw.classList.add('selected');
       row.querySelector('.player-num').style.color = FLAVORS[newIdx].color;
-      input.placeholder = FLAVORS[newIdx].name;
+      input.placeholder = defaultNameFor(skin, newIdx);
       return;
     }
     const ai = e.target.closest('.ai-toggle');
@@ -182,7 +193,17 @@
     const sk = e.target.closest('.skin-choice');
     if (sk) {
       const row = sk.closest('.player-input-row');
-      row.dataset.skin = sk.dataset.skin;
+      const oldSkin = row.dataset.skin || 'bottle';
+      const newSkin = sk.dataset.skin;
+      const idx = +row.dataset.flavor;
+      const input = row.querySelector('input');
+      // Same rule as the flavor swatch: the name follows the skin's default
+      // unless the player typed a custom one.
+      if (!input.value.trim() || input.value.trim() === defaultNameFor(oldSkin, idx)) {
+        input.value = defaultNameFor(newSkin, idx);
+      }
+      input.placeholder = defaultNameFor(newSkin, idx);
+      row.dataset.skin = newSkin;
       row.querySelectorAll('.skin-choice').forEach(s => s.classList.remove('selected'));
       sk.classList.add('selected');
       return;
@@ -198,12 +219,15 @@
   addPlayerBtn.addEventListener('click', addPlayerInput);
 
   function rowsToDefs(rows) {
-    return rows.map((r) => ({
-      name: (r.name || '').trim() || FLAVORS[r.flavor].name,
-      color: FLAVORS[r.flavor].color,
-      isAI: r.ai,
-      skin: FORCE_SKIN || r.skin || 'bottle',
-    }));
+    return rows.map((r) => {
+      const skin = FORCE_SKIN || r.skin || 'bottle';
+      return {
+        name: (r.name || '').trim() || defaultNameFor(skin, r.flavor),
+        color: FLAVORS[r.flavor].color,
+        isAI: r.ai,
+        skin,
+      };
+    });
   }
   function chosenDifficulty() {
     return document.querySelector('input[name="difficulty"]:checked')?.value || 'medium';

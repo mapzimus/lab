@@ -187,8 +187,19 @@ window.Skins = (function () {
   // available; 'first-win' = unlocked after winning a game (see records.js).
   const META = [
     { id: 'bottle', name: 'Bottle', emoji: '🍾', unlock: null },
-    { id: 'parrot', name: 'Parrot', emoji: '🦜', unlock: 'first-win' },
-    // future: { id: 'taco', name: 'Taco', emoji: '🌮', unlock: 'first-win' }, ...
+    {
+      id: 'parrot', name: 'Parrot', emoji: '🦜', unlock: 'first-win',
+      // Default player names for this skin, aligned BY INDEX to the base
+      // engine's FLAVORS array (js/main.js) — so switching skins swaps the
+      // auto-filled name without touching which color/flavor is selected.
+      // A skin with no `names` just falls back to the flavor name.
+      names: [
+        'Stormy Beak', 'Captain Squawk', 'Limey Lorikeet', 'Cannonball Carl',
+        'Sir Chirpsalot', 'Whisper Wing', 'Barnacle Bill', 'Pegleg Polly',
+        'Riptide Rover', 'Doubloon Dave', 'Cherry Corsair', 'Berry Bandit',
+      ],
+    },
+    // future: { id: 'taco', name: 'Taco', emoji: '🌮', unlock: 'first-win', names: [...] }, ...
   ];
   const drawFns = { parrot: drawParrot };   // 'bottle' is drawn by renderer.js
 
@@ -196,6 +207,7 @@ window.Skins = (function () {
     list: () => META.slice(),
     metaFor: (id) => META.find((m) => m.id === id) || null,
     unlockRule: (id) => (META.find((m) => m.id === id) || {}).unlock ?? null,
+    namesFor: (id) => (META.find((m) => m.id === id) || {}).names || null,
     hasDraw: (id) => !!drawFns[id],
     draw: (ctx, id, opts) => { const f = drawFns[id]; if (f) f(ctx, opts || {}); },
     preload: (colors) => { for (const c of colors || []) getParrotSprite(c); },
