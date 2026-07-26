@@ -55,6 +55,16 @@
   // bottle only when it's at rest (not mid-flight), so a stray resize can't
   // void an in-progress flip.
   let reflowTimer = null;
+  // Editions may bring their own physics (see Skins.physicsFor / skins.js META).
+  // Applied per turn, so one player can be flipping a bottle while the next
+  // takes a bank shot with the alien. Must run AFTER Physics.resetBottle, which
+  // rebuilds the body.
+  function applyTurnPhysics() {
+    if (!Physics.setProfile) return;
+    const skin = (game && game.currentPlayer && game.currentPlayer()?.skin) || 'bottle';
+    Physics.setProfile(window.Skins && Skins.physicsFor ? Skins.physicsFor(skin) : null);
+  }
+
   function scheduleReflow() {
     clearTimeout(reflowTimer);
     reflowTimer = setTimeout(() => {
@@ -65,6 +75,7 @@
       if (!evaluating &&
           (game.state === GAME_STATES.TURN_START || game.state === GAME_STATES.ON_FIRE)) {
         Physics.resetBottle();
+        applyTurnPhysics();
       }
     }, 150);
   }
@@ -128,6 +139,7 @@
     const skin = def.skin || 'bottle';
     return `<div class="player-input-row" data-flavor="${def.flavor}" data-ai="${def.ai ? 1 : 0}" data-skin="${skin}">
       <div class="prow-top">
+        <canvas class="skin-preview" width="76" height="92" aria-hidden="true"></canvas>
         <span class="player-num" style="color:${FLAVORS[def.flavor].color}">P${i + 1}</span>
         <input type="text" placeholder="${escapeHtml(defaultNameFor(skin, def.flavor))}" maxlength="14" value="${escapeHtml(def.name)}">
         <button type="button" class="ai-toggle${def.ai ? ' cpu' : ''}" title="Tap to switch Human / CPU">${def.ai ? 'CPU' : 'Human'}</button>
@@ -147,10 +159,26 @@
     }));
   }
 
+  // Live "what am I flipping" thumbnail on each setup row. Call after anything
+  // that changes a row's skin or color.
+  function paintRowPreview(row) {
+    // NB: renderer.js declares `const Renderer`, which lives in script scope
+    // and never lands on `window` — checking window.Renderer here silently
+    // skips every preview.
+    const cv = row && row.querySelector('.skin-preview');
+    if (!cv || typeof Renderer === 'undefined' || !Renderer.drawPreview) return;
+    const idx = parseInt(row.dataset.flavor) || 0;
+    Renderer.drawPreview(cv, row.dataset.skin || 'bottle', FLAVORS[idx].color);
+  }
+  function paintAllPreviews() {
+    playerInputs.querySelectorAll('.player-input-row').forEach(paintRowPreview);
+  }
+
   function renderFrom(defs) {
     playerCount = defs.length;
     playerInputs.innerHTML = defs.map((d, i) => rowHtml(i, d)).join('');
     addPlayerBtn.disabled = playerCount >= 8;
+    paintAllPreviews();
   }
 
   function addPlayerInput() {
@@ -179,6 +207,7 @@
       sw.classList.add('selected');
       row.querySelector('.player-num').style.color = FLAVORS[newIdx].color;
       input.placeholder = defaultNameFor(skin, newIdx);
+      paintRowPreview(row);
       return;
     }
     const ai = e.target.closest('.ai-toggle');
@@ -206,6 +235,7 @@
       row.dataset.skin = newSkin;
       row.querySelectorAll('.skin-choice').forEach(s => s.classList.remove('selected'));
       sk.classList.add('selected');
+      paintRowPreview(row);
       return;
     }
     const rm = e.target.closest('.remove-player-btn');
@@ -511,6 +541,9 @@
       suddenDeath: game.inSuddenDeath(),
       awaitingFlick: game.state === GAME_STATES.TURN_START || game.state === GAME_STATES.ON_FIRE,
       stake:       game.pointCount,
+      // Both null unless the active edition runs a bounce profile.
+      target:      Physics.getTarget ? Physics.getTarget() : null,
+      obstacles:   Physics.getObstacles ? Physics.getObstacles() : null,
     });
   }
 
@@ -543,6 +576,7 @@
     clearTimeout(aiTimer);
     passScreen.classList.add('hidden');
     Physics.resetBottle();
+    applyTurnPhysics();
     flipHintEl.classList.remove('hidden');
 
     const p = game.currentPlayer();
@@ -592,6 +626,7 @@
     clearTimeout(aiTimer);
     passScreen.classList.add('hidden');
     Physics.resetBottle();
+    applyTurnPhysics();
     flipHintEl.classList.remove('hidden');
 
     const p = game.currentPlayer();
@@ -902,6 +937,35 @@
   Renderer.setReduceMotion(reduceMotionActive());
   syncMuteBtn();
   if (recordsPanel) recordsPanel.innerHTML = Records.renderHtml();
+
+  // ── Secret unlock: tap the title 5× fast ───────────────────────────────────
+  // Unlocks every edition at once, for showing the whole set off without
+  // grinding out 25 wins first. The title is a safe target: nothing else is
+  // bound to it, and 5 taps inside 2s won't happen by accident.
+  const titleEl = setupScreen.querySelector('h1');
+  if (titleEl) {
+    let taps = [];
+    titleEl.addEventListener('click', () => {
+      const now = Date.now();
+      taps = taps.filter((t) => now - t < 2000);
+      taps.push(now);
+      if (taps.length < 5) return;
+      taps = [];
+      if (!window.Skins) return;
+      const fresh = Skins.list().filter((s) => Records.unlockSkin(s.id));
+      showToast(fresh.length
+        ? `🔓 Secret! Unlocked everything (+${fresh.length}).`
+        : '🔓 Everything is already unlocked.');
+      Sound.play('win');
+      renderFrom(readRows());
+    });
+  }
+
+  // Sprites are SVG data URIs that decode a beat after they're requested, so
+  // the first preview paint can land on the placeholder. Repaint when one
+  // arrives (no-op once the setup screen is gone).
+  if (window.Skins && Skins.onSpriteLoad) Skins.onSpriteLoad(paintAllPreviews);
+  paintAllPreviews();
 
   // Show setup on load
   setupScreen.classList.remove('hidden');
