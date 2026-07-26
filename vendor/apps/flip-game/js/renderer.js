@@ -421,14 +421,96 @@ const Renderer = (() => {
   }
 
   // ── Main frame ─────────────────────────────────────────────────────────────
+  // ── Bounce-mode arena (see physics.js profiles) ────────────────────────────
+  // Only drawn when the active edition asks for it: the landing pad on the
+  // table, the wedge overhead that splits a straight-up shot, and the saucers
+  // drifting in between.
+  function drawTargetPad(target, groundY) {
+    if (!target) return;
+    const { x, halfWidth: hw } = target;
+    const pulse = 0.5 + 0.5 * Math.sin(clock * 3);
+    ctx.save();
+    const glow = ctx.createRadialGradient(x, groundY, 4, x, groundY, hw * 1.15);
+    glow.addColorStop(0, `rgba(105,240,174,${0.30 + pulse * 0.16})`);
+    glow.addColorStop(1, 'rgba(105,240,174,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.ellipse(x, groundY, hw * 1.15, hw * 0.34, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = `rgba(105,240,174,${0.75 + pulse * 0.25})`;
+    for (const r of [hw, hw * 0.62, hw * 0.28]) {
+      ctx.beginPath();
+      ctx.ellipse(x, groundY, r, r * 0.29, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawObstacles(obstacles) {
+    if (!obstacles) return;
+    const d = obstacles.deflector;
+    if (d && d.vertices && d.vertices.length) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(d.vertices[0].x, d.vertices[0].y);
+      for (let i = 1; i < d.vertices.length; i++) ctx.lineTo(d.vertices[i].x, d.vertices[i].y);
+      ctx.closePath();
+      const g = ctx.createLinearGradient(0, d.vertices[0].y, 0, d.vertices[0].y + 90);
+      g.addColorStop(0, '#8fa7bd');
+      g.addColorStop(1, '#4a5f75');
+      ctx.fillStyle = g;
+      ctx.fill();
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#26384a';
+      ctx.stroke();
+      ctx.restore();
+    }
+    for (const s of obstacles.saucers || []) {
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.angle * 0.35);   // damped — a saucer shouldn't tumble like debris
+      // Dome
+      ctx.beginPath();
+      ctx.ellipse(0, -s.ry * 0.55, s.rx * 0.46, s.ry * 0.85, 0, Math.PI, 0);
+      ctx.fillStyle = '#bfe7ff';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#5d7f97';
+      ctx.stroke();
+      // Hull
+      const g = ctx.createLinearGradient(0, -s.ry, 0, s.ry);
+      g.addColorStop(0, '#e7edf2');
+      g.addColorStop(1, '#8c99a5');
+      ctx.beginPath();
+      ctx.ellipse(0, 0, s.rx, s.ry * 0.62, 0, 0, Math.PI * 2);
+      ctx.fillStyle = g;
+      ctx.fill();
+      ctx.strokeStyle = '#43586b';
+      ctx.stroke();
+      // Running lights
+      const blink = 0.45 + 0.55 * Math.sin(clock * 5 + s.x * 0.05);
+      ctx.fillStyle = `rgba(255,210,63,${blink})`;
+      for (const lx of [-s.rx * 0.62, 0, s.rx * 0.62]) {
+        ctx.beginPath();
+        ctx.arc(lx, s.ry * 0.22, 3.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
   function frame(dt, state) {
     const { bottle, liquid, drag, groundY, result, resultAlpha, showGlow, isOnFire,
-            liquidColor, intense, suddenDeath, awaitingFlick, stake, skin } = state;
+            liquidColor, intense, suddenDeath, awaitingFlick, stake, skin,
+            target, obstacles } = state;
     clock += dt;
     updateParticles(dt);
 
     drawBackground(groundY, isOnFire);
     drawWalls(groundY);
+    drawTargetPad(target, groundY);
+    drawObstacles(obstacles);
     drawFlickIndicator(drag, bottle, groundY);
     if (showGlow) drawLandingGlow(bottle, groundY);
     drawBottle(bottle, liquid, isOnFire, liquidColor, groundY, skin);
@@ -442,7 +524,37 @@ const Renderer = (() => {
     }
   }
 
+  // Paint one upright object into some OTHER canvas (the setup-screen skin
+  // previews). Borrows the module ctx for the call and puts it back, so this
+  // must stay synchronous — it runs from setup, never from inside frame().
+  // groundY is pushed far below so projectPoint's airborne lift clamps to 0
+  // and the object is drawn flat-on rather than in flight perspective.
+  function drawPreview(target, skin, liquidColor) {
+    const prevCanvas = canvas, prevCtx = ctx, prevW = W, prevH = H;
+    canvas = target;
+    ctx = target.getContext('2d');
+    W = target.width;
+    H = target.height;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    // Fit box measured off the real drawn pixels of every edition — widest is
+    // the T-Rex (x≈±106), tallest the alien and the trophies (y≈-221..58) whose
+    // antennae/statuettes reach high. Already includes the BOTTLE_DRAW_SCALE
+    // that drawBottle applies. The artwork sits well above the origin, so it
+    // centers on y≈-81, not 0. Re-measure if any edition's art grows.
+    const CONTENT_W = 216, CONTENT_H = 284, CONTENT_MID_Y = -81;
+    const scale = Math.min(W / CONTENT_W, H / CONTENT_H) * 0.95;
+    ctx.translate(W / 2, H / 2 - CONTENT_MID_Y * scale);
+    ctx.scale(scale, scale);
+    try {
+      drawBottle({ position: { x: 0, y: 0 }, angle: 0 }, { slosh: 0, vel: 0 },
+        false, liquidColor, -10000, skin);
+    } finally {
+      canvas = prevCanvas; ctx = prevCtx; W = prevW; H = prevH;
+    }
+  }
+
   // drawBottle is exported for the art-iteration harness (drawing one object
   // without the full scene); the game itself only calls frame().
-  return { init, resize, frame, setReduceMotion, projectPoint, projectBottleCenter, bottleDrawScale, drawBottle };
+  return { init, resize, frame, setReduceMotion, projectPoint, projectBottleCenter, bottleDrawScale, drawBottle, drawPreview };
 })();
