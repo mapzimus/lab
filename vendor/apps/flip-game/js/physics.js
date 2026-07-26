@@ -76,6 +76,16 @@ const Physics = (() => {
   };
   let profile = { ...DEFAULT_PROFILE };
   let targetX = null;      // pad center, only set when profile.landOnTarget
+  let targetHW = 84;       // pad half-width actually in play (screen-scaled)
+
+  // The profile's targetHalfWidth is tuned for a phone. On a big screen the
+  // same pad is a sliver of the arena and the bank shot turns pixel-perfect,
+  // so the pad grows with canvas width — ~11.5% of it — capped so a smartboard
+  // doesn't become a gimme. Phones (≲765px wide) keep the tuned base.
+  function currentTargetHalfWidth() {
+    return Math.round(Math.max(profile.targetHalfWidth,
+      Math.min(canvasW * 0.115, profile.targetHalfWidth * 2.2)));
+  }
   let launched = false;    // a flick has been taken this turn
   let wasAirborne = false; // ...and the body actually left the floor
 
@@ -203,13 +213,14 @@ const Physics = (() => {
   // keeping it far enough from the walls that the pad is always fully on screen.
   function placeTarget() {
     if (!profile.landOnTarget || !canvasW) { targetX = null; return; }
-    const margin = WALL_INSET + profile.targetHalfWidth + 16;
+    targetHW = currentTargetHalfWidth();
+    const margin = WALL_INSET + targetHW + 16;
     const span = Math.max(0, canvasW - margin * 2);
     targetX = margin + Math.random() * span;
   }
 
   function getTarget() {
-    return targetX == null ? null : { x: targetX, halfWidth: profile.targetHalfWidth };
+    return targetX == null ? null : { x: targetX, halfWidth: targetHW };
   }
 
 
@@ -276,8 +287,8 @@ const Physics = (() => {
       // Stop it caroming away from the spot it was judged on.
       for (const part of [bottle, ...bottle.parts]) part.restitution = 0.02;
       if (profile.landOnTarget && targetX != null) {
-        const padL = targetX - profile.targetHalfWidth;
-        const padR = targetX + profile.targetHalfWidth;
+        const padL = targetX - targetHW;
+        const padR = targetX + targetHW;
         const touching = bottle.bounds.max.x >= padL && bottle.bounds.min.x <= padR;
         return touching
           ? recordLanding('MAKE', 0, 'on-target')

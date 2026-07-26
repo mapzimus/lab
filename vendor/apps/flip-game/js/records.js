@@ -75,6 +75,15 @@ const Records = (() => {
     save();
     return true;
   }
+  // Wipe ONLY the unlock ladder (editions + the win counter that drives it).
+  // Hall-of-fame stats stay — "start the collection over" shouldn't erase the
+  // party's records. Both fields must clear together: zeroing the skins while
+  // keeping totalWins would re-unlock everything at the next game over.
+  function resetSkinProgress() {
+    data.totalWins = 0;
+    data.unlockedSkins = ['bottle'];
+    save();
+  }
 
-  return { recordFlip, recordWin, renderHtml, reset, totalWins, unlockedSkins, isSkinUnlocked, unlockSkin };
+  return { recordFlip, recordWin, renderHtml, reset, totalWins, unlockedSkins, isSkinUnlocked, unlockSkin, resetSkinProgress };
 })();
