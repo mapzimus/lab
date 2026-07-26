@@ -938,10 +938,13 @@
   syncMuteBtn();
   if (recordsPanel) recordsPanel.innerHTML = Records.renderHtml();
 
-  // ── Secret unlock: tap the title 5× fast ───────────────────────────────────
-  // Unlocks every edition at once, for showing the whole set off without
-  // grinding out 25 wins first. The title is a safe target: nothing else is
-  // bound to it, and 5 taps inside 2s won't happen by accident.
+  // ── Secret: tap the title 5× fast ──────────────────────────────────────────
+  // A toggle. With anything still locked it unlocks every edition at once (for
+  // showing the whole set off without grinding 25 wins); with everything
+  // already unlocked it wipes the ladder back to zero — fresh collection, win
+  // counter at 0 — so the same gesture undoes itself. The title is a safe
+  // target: nothing else is bound to it, and 5 taps inside 2s won't happen by
+  // accident.
   const titleEl = setupScreen.querySelector('h1');
   if (titleEl) {
     let taps = [];
@@ -952,12 +955,24 @@
       if (taps.length < 5) return;
       taps = [];
       if (!window.Skins) return;
-      const fresh = Skins.list().filter((s) => Records.unlockSkin(s.id));
-      showToast(fresh.length
-        ? `🔓 Secret! Unlocked everything (+${fresh.length}).`
-        : '🔓 Everything is already unlocked.');
-      Sound.play('win');
-      renderFrom(readRows());
+      const allUnlocked = Skins.list().every((s) => Records.isSkinUnlocked(s.id));
+      if (!allUnlocked) {
+        const fresh = Skins.list().filter((s) => Records.unlockSkin(s.id));
+        showToast(`🔓 Secret! Unlocked everything (+${fresh.length}).`);
+        Sound.play('win');
+        renderFrom(readRows());
+        return;
+      }
+      Records.resetSkinProgress();
+      // Any row riding a now-locked edition drops back to the bottle; its
+      // auto-filled name follows, but a custom-typed name is kept.
+      const defs = readRows().map((d) => {
+        if (Records.isSkinUnlocked(d.skin)) return d;
+        const wasDefault = !d.name.trim() || d.name.trim() === defaultNameFor(d.skin, d.flavor);
+        return { ...d, skin: 'bottle', name: wasDefault ? FLAVORS[d.flavor].name : d.name };
+      });
+      showToast('🔒 Secret! Progress wiped — earn it all back.');
+      renderFrom(defs);
     });
   }
 
