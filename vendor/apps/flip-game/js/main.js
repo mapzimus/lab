@@ -725,11 +725,21 @@
     winnerNameEl.textContent = active.length ? active[0].name : '???';
     Records.recordWin(active.length ? active[0].name : null);
     if (recordsPanel) recordsPanel.innerHTML = Records.renderHtml();
-    // First win unlocks the Parrot edition on this device; the per-player skin
-    // picker then appears in setup. Re-render setup rows so it shows next time.
-    if (active.length && window.Skins && Records.unlockSkin('parrot')) {
-      showToast('🦜 Parrots unlocked! Pick them per player in setup.');
-      try { renderFrom(readRows()); } catch (_) {}
+    // Skin unlock ladder: each edition's `unlock` is a total-win threshold
+    // (see skins.js META). Check every skin, not just one — a device that
+    // jumps several wins at once (e.g. a long practice-free session) can
+    // cross more than one threshold in the same game-over.
+    if (active.length && window.Skins) {
+      const wins = Records.totalWins();
+      const newlyUnlocked = Skins.list().filter((s) => {
+        const need = Skins.unlockRule(s.id);
+        return typeof need === 'number' && wins >= need && Records.unlockSkin(s.id);
+      });
+      if (newlyUnlocked.length) {
+        const names = newlyUnlocked.map((s) => `${s.emoji} ${s.name}`).join(', ');
+        showToast(`${names} unlocked! Pick per player in setup.`);
+        try { renderFrom(readRows()); } catch (_) {}
+      }
     }
     Sound.play('win');
     Input.disable();

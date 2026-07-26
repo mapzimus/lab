@@ -442,5 +442,7 @@ const Renderer = (() => {
     }
   }
 
-  return { init, resize, frame, setReduceMotion, projectPoint, projectBottleCenter, bottleDrawScale };
+  // drawBottle is exported for the art-iteration harness (drawing one object
+  // without the full scene); the game itself only calls frame().
+  return { init, resize, frame, setReduceMotion, projectPoint, projectBottleCenter, bottleDrawScale, drawBottle };
 })();
