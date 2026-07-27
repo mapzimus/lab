@@ -1,7 +1,17 @@
 {
-  "generatedAt": "2026-07-26",
+  "generatedAt": "2026-07-27",
   "news": {
     "mapsmania": [
+      {
+        "title": "The Most Optimal Road Trip Maps",
+        "url": "http://googlemapsmania.blogspot.com/2026/07/the-most-optimal-road-trip-maps.html",
+        "desc": "In 1954, a landmark paper in computer science famously solved the Traveling Salesman Problem (TSP) by proving the exact, shortest route to visit all 48 conti…"
+      },
+      {
+        "title": "The Many Maps of the Odyssey",
+        "url": "http://googlemapsmania.blogspot.com/2026/07/the-many-maps-of-odyssey.html",
+        "desc": "Since the launch of the Google Maps API back in 2005, two fictional journeys have been mapped over and over again: Phileas Fogg’s global circumnavigation in…"
+      },
       {
         "title": "Free Map Tiles for Everyone",
         "url": "http://googlemapsmania.blogspot.com/2026/07/free-map-tiles-for-everyone.html",
@@ -31,16 +41,6 @@
         "title": "SimCity Meets AI: Exploring New York’s New Digital Twin",
         "url": "http://googlemapsmania.blogspot.com/2026/07/simcity-meets-ai-exploring-new-yorks.html",
         "desc": "NYCSim is a truly impressive digital twin for New York City."
-      },
-      {
-        "title": "The Global Map of Agricultural Decline",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/the-global-map-of-agricultural-decline.html",
-        "desc": "This animated map reveals how agricultural productivity is expected to be affected by climate change around the world throughout this century."
-      },
-      {
-        "title": "Where's Downtown?",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/wheres-downtown.html",
-        "desc": "Where is Downtown? is an interactive map surveying tool designed to crowdsource the boundaries of \"downtown\" for any city."
       }
     ],
     "georealm": [
@@ -210,16 +210,16 @@
   ],
   "gisse": [
     {
-      "title": "Can QGIS handle \"geometry\" field from PostGreSQL",
-      "url": "https://gis.stackexchange.com/questions/501188/can-qgis-handle-geometry-field-from-postgresql",
-      "score": 1,
-      "answers": 0
-    },
-    {
       "title": "How to optimize large gpkg files on QGIS",
       "url": "https://gis.stackexchange.com/questions/501183/how-to-optimize-large-gpkg-files-on-qgis",
       "score": 2,
       "answers": 1
+    },
+    {
+      "title": "Can QGIS handle \"geometry\" field from PostGreSQL",
+      "url": "https://gis.stackexchange.com/questions/501188/can-qgis-handle-geometry-field-from-postgresql",
+      "score": 1,
+      "answers": 0
     },
     {
       "title": "How to create a layer filter based on the value in a different layer follow up",
@@ -231,12 +231,6 @@
       "title": "Installing QGIS3 using Macports to get GRASS and PCRaster tools to function - install fail due to missing XCode installation?",
       "url": "https://gis.stackexchange.com/questions/501186/installing-qgis3-using-macports-to-get-grass-and-pcraster-tools-to-function-in",
       "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "How many countries can be hit by great circles from any point in the U.S.",
-      "url": "https://gis.stackexchange.com/questions/501182/how-many-countries-can-be-hit-by-great-circles-from-any-point-in-the-u-s-but-no",
-      "score": -2,
       "answers": 0
     },
     {
@@ -258,78 +252,84 @@
       "answers": 1
     },
     {
+      "title": "QGIS 4.2 embedded Python version and upgrade timeline for security compliance",
+      "url": "https://gis.stackexchange.com/questions/501162/qgis-4-2-embedded-python-version-and-upgrade-timeline-for-security-compliance",
+      "score": 1,
+      "answers": 0
+    },
+    {
       "title": "Global background shrinks to a line when using Build Globe view",
       "url": "https://gis.stackexchange.com/questions/501174/global-background-shrinks-to-a-line-when-using-build-globe-view",
       "score": 0,
       "answers": 0
     },
     {
-      "title": "QGIS 4.2 embedded Python version and upgrade timeline for security compliance",
-      "url": "https://gis.stackexchange.com/questions/501162/qgis-4-2-embedded-python-version-and-upgrade-timeline-for-security-compliance",
+      "title": "QGIS: Scaling adjust road thickness on different scales of the imported ArcGIS basemap vector tile service using QGIS symbol layers",
+      "url": "https://gis.stackexchange.com/questions/501164/qgis-scaling-adjust-road-thickness-on-different-scales-of-the-imported-arcgis-b",
       "score": 1,
-      "answers": 0
+      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "UAVSAR_POLSAR_STOKES",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
-      "desc": "UAVSAR PolSAR Scene Stokes",
-      "org": "ASF"
+      "title": "ECCO Ocean Mixed Layer Depth - Daily Mean llc90 Grid (Version 4 Release 4)",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECCO_L4_MIXED_LAYER_DEPTH_LLC0090GRID_DAILY_V4R4",
+      "desc": "This dataset provides daily-averaged ocean mixed layer depth on the native Lat-Lon-Cap 90 (LLC90) model grid from the ECCO Version 4 Release 4 (V4r4) ocean a…",
+      "org": "POCLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_SLOPE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
-      "desc": "UAVSAR PolSAR Scene Slope",
-      "org": "ASF"
+      "title": "ECCO Gent-McWilliams Bolus Transport Streamfunction - Monthly Mean llc90 Grid (Version 4 Release 4)",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECCO_L4_OCEAN_BOLUS_STREAMFUNCTION_LLC0090GRID_MONTHLY_V4R4",
+      "desc": "This dataset provides monthly-averaged Gent-McWilliams ocean bolus transport streamfunction on the native Lat-Lon-Cap 90 (LLC90) model grid from the ECCO Ver…",
+      "org": "POCLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_PAULI",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
-      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
-      "org": "ASF"
+      "title": "ECCO Sea-Ice Salt Plume Fluxes - Monthly Mean llc90 Grid (Version 4 Release 4)",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECCO_L4_SEA_ICE_SALT_PLUME_FLUX_LLC0090GRID_MONTHLY_V4R4",
+      "desc": "This dataset provides monthly-averaged sea-ice salt plume fluxes on the native Lat-Lon-Cap 90 (LLC90) model grid from the ECCO Version 4 Release 4 (V4r4) oce…",
+      "org": "POCLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
-      "desc": "UAVSAR PolSAR Scene Complex",
-      "org": "ASF"
+      "title": "ECCO Global Mean Atmospheric Pressure - Snapshot (Version 4 Release 4)",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECCO_L4_GMAP_TIME_SERIES_SNAPSHOT_V4R4",
+      "desc": "This dataset provides instantaneous hourly global mean atmospheric pressure from the ECCO Version 4 Release 4 (V4r4) ocean and sea-ice state estimate.",
+      "org": "POCLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
-      "org": "ASF"
+      "title": "ECCO Ocean Temperature and Salinity - Monthly Mean llc90 Grid (Version 4 Release 4)",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECCO_L4_TEMP_SALINITY_LLC0090GRID_MONTHLY_V4R4",
+      "desc": "This dataset provides monthly-averaged ocean potential temperature and salinity on the native Lat-Lon-Cap 90 (LLC90) model grid from the ECCO Version 4 Relea…",
+      "org": "POCLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
-      "org": "ASF"
+      "title": "ECCO Ocean Three-Dimensional Momentum Tendency - Daily Mean llc90 Grid (Version 4 Release 4)",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECCO_L4_OCEAN_3D_MOMENTUM_TEND_LLC0090GRID_DAILY_V4R4",
+      "desc": "This dataset provides daily-averaged ocean three-dimensional momentum tendency on the native Lat-Lon-Cap 90 (LLC90) model grid from the ECCO Version 4 Releas…",
+      "org": "POCLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
-      "desc": "UAVSAR PolSAR Scene Projected",
-      "org": "ASF"
+      "title": "ECCO Sea-Ice and Snow Horizontal Volume Fluxes - Monthly Mean llc90 Grid (Version 4 Release 4)",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECCO_L4_SEA_ICE_HORIZ_VOLUME_FLUX_LLC0090GRID_MONTHLY_V4R4",
+      "desc": "This dataset provides monthly-averaged sea-ice and snow horizontal volume fluxes on the native Lat-Lon-Cap 90 (LLC90) model grid from the ECCO Version 4 Rele…",
+      "org": "POCLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_METADATA",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
-      "desc": "UAVSAR PolSAR Scene Metadata",
-      "org": "ASF"
+      "title": "ECCO Ocean Three-Dimensional Momentum Tendency - Monthly Mean llc90 Grid (Version 4 Release 4)",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECCO_L4_OCEAN_3D_MOMENTUM_TEND_LLC0090GRID_MONTHLY_V4R4",
+      "desc": "This dataset provides monthly-averaged ocean three-dimensional momentum tendency on the native Lat-Lon-Cap 90 (LLC90) model grid from the ECCO Version 4 Rele…",
+      "org": "POCLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_KMZ",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
-      "desc": "UAVSAR PolSAR Scene KMZ",
-      "org": "ASF"
+      "title": "ECCO Sea-Ice Velocity - Monthly Mean llc90 Grid (Version 4 Release 4)",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECCO_L4_SEA_ICE_VELOCITY_LLC0090GRID_MONTHLY_V4R4",
+      "desc": "This dataset provides monthly-averaged sea-ice velocity on the native Lat-Lon-Cap 90 (LLC90) model grid from the ECCO Version 4 Release 4 (V4r4) ocean and se…",
+      "org": "POCLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_INCIDENCE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
-      "desc": "UAVSAR PolSAR Scene Incidence Angle",
-      "org": "ASF"
+      "title": "ECCO Ocean Three-Dimensional Volume Fluxes - Daily Mean llc90 Grid (Version 4 Release 4)",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECCO_L4_OCEAN_3D_VOLUME_FLUX_LLC0090GRID_DAILY_V4R4",
+      "desc": "This dataset provides daily-averaged ocean three-dimensional volume fluxes on the native Lat-Lon-Cap 90 (LLC90) model grid from the ECCO Version 4 Release 4…",
+      "org": "POCLOUD"
     }
   ],
   "datagov": [
