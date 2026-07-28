@@ -49,6 +49,11 @@ const hostedProjectRoutes = {
   "true-scale": "/true-scale/",
   "train-route-atlas": "/lab/train-routes/",
   "predicting-housing-crisis": "/lab/housing-crisis/",
+  "interstate-challenge": "/interstate-challenge/",
+  "mapzimus-board": "/mapzimus-board/",
+  "boston-in-motion": "/boston-in-motion/",
+  "where-the-games-go": "/where-the-games-go/",
+  "smartpicker": "/smartpicker/",
 };
 
 /** vendor/apps/<dir> → public route */
@@ -61,6 +66,11 @@ const appRoutes = {
   "whydah-voyage": "whydah-voyage",
   "black-sam": "black-sam",
   "true-scale": "true-scale",
+  "interstate-challenge": "interstate-challenge",
+  "mapzimus-board": "mapzimus-board",
+  "boston-in-motion": "boston-in-motion",
+  "where-the-games-go": "where-the-games-go",
+  smartpicker: "smartpicker",
 };
 
 const tools = loadCatalog("tools.json");
@@ -160,17 +170,24 @@ function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 }
 
+function isExternalItem(item) {
+  return Boolean(item.external) || /^https?:\/\//i.test(item.url || "");
+}
+
 function card(item, { featured = false, star = true } = {}) {
   const tags = (item.tags || []).slice(0, 3).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("");
   const status = item.status || "live";
+  const external = isExternalItem(item);
+  const targetAttrs = external ? ' target="_blank" rel="noopener"' : "";
+  const openCue = external ? "Open ↗" : "Open →";
   return `<article class="card${featured ? " featured" : ""}" data-slug="${escapeHtml(item.slug)}" data-category="${escapeHtml(item.category)}">
       ${star ? `<button class="star" type="button" aria-label="Add to favorites" aria-pressed="false">☆</button>` : ""}
-      <a class="card-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">
+      <a class="card-link" href="${escapeHtml(item.url)}"${targetAttrs}>
         <div class="card-meta"><span class="cat-tick" aria-hidden="true"></span><span class="card-type">${escapeHtml(categoryLabels[item.category] || item.category)}</span><span class="card-icon" aria-hidden="true">${escapeHtml(item.icon || "")}</span></div>
         <h3>${escapeHtml(item.title)}</h3>
         <p class="card-copy">${escapeHtml(item.description)}</p>
         ${featured ? "" : `<div class="card-tags">${tags}</div>`}
-        <div class="card-foot">${status === "live" ? "<span></span>" : `<span class="status">${escapeHtml(status)}</span>`}<span class="open-cue">Open ↗</span></div>
+        <div class="card-foot">${status === "live" ? "<span></span>" : `<span class="status">${escapeHtml(status)}</span>`}<span class="open-cue">${openCue}</span></div>
       </a>
     </article>`;
 }
@@ -267,7 +284,7 @@ const projectCount = itemsForView("lab", "").length;
 function sectionCardsHtml() {
   const sections = [
     { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Single-page browser utilities for data, design, teaching, and math." },
-    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "GIS converters and viewers, plus projection experiments and transit maps." },
+    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "GIS converters and viewers, live transit, globes, and atlases." },
     { href: "/games/", label: "Games", category: "play", n: gamesCount, desc: "Strategy and logic games, free in the browser." },
     { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "The bigger projects, apps, and works in progress." },
   ];
@@ -285,11 +302,11 @@ const pages = {
   home: {
     path: "index.html",
     title: "Mapzimus · Browser tools, maps, and games by Maxwell Howe",
-    description: `${toolCount} free browser tools for maps, data, teaching, and math — plus games and experiments. No accounts, no installs.`,
+    description: `${toolCount} free browser tools for maps, data, teaching, and math — plus games and experiments, all hosted on mapzimus.com. No accounts, no installs.`,
     canonical: "https://mapzimus.com/",
     eyebrow: "The lab of Maxwell Howe",
     heading: "Useful tools. Maps. Small games.",
-    intro: `Everything I build for fun and everyday use, in one place: ${toolCount} browser tools for maps, data, teaching, and math, plus games and experiments. It all runs right in your browser.`,
+    intro: `Everything I build for fun and everyday use lives here: ${toolCount} browser tools, plus maps, games, and experiments — each at a first-party mapzimus.com path.`,
     catalogHeading: "Browse by section",
   },
   lab: {
@@ -299,7 +316,7 @@ const pages = {
     canonical: "https://mapzimus.com/lab/",
     eyebrow: "The lab",
     heading: "Projects and experiments",
-    intro: `The ${projectCount} bigger builds: map apps, games, and experiments — everything beyond the single-page tools, including works in progress.`,
+    intro: `The ${projectCount} bigger builds beyond the single-page tools — map apps, games, teaching apps, and experiments, including works in progress.`,
     catalogHeading: "All projects",
   },
   tools: {
@@ -309,17 +326,17 @@ const pages = {
     canonical: "https://mapzimus.com/tools/",
     eyebrow: "The tool catalog",
     heading: "Every tool, one page each",
-    intro: `${utilityCount} standalone browser tools for data, design, teaching, math, and fun. Each is a single page that loads fast and does one job. Map tools have their own shelf under Maps.`,
+    intro: `${utilityCount} standalone browser tools for data, design, teaching, math, and fun. Each is a single page at its own path. Map tools live under Maps.`,
     catalogHeading: "All tools",
   },
   maps: {
     path: "maps/index.html",
     title: "Maps · Mapzimus",
-    description: `All ${mapCount} map tools and map projects from Mapzimus: converters, GIS utilities, projection experiments, transit networks, and atlases.`,
+    description: `All ${mapCount} map tools and map projects from Mapzimus: converters, GIS utilities, live transit, globes, and atlases.`,
     canonical: "https://mapzimus.com/maps/",
     eyebrow: "Maps & GIS",
     heading: "Everything maps",
-    intro: `All ${mapCount} map things in one place — converters and GIS utilities alongside projection experiments, transit networks, and atlases.`,
+    intro: `All ${mapCount} map things in one place — converters and GIS utilities alongside live transit, globes, transit networks, and atlases.`,
     catalogHeading: "All maps",
   },
   games: {
@@ -366,6 +383,12 @@ for (const [key, page] of Object.entries(pages)) {
       ? `<div class="catalog-grid">${itemsForView(view, page.category).map((item) => card(item)).join("\n")}</div>`
       : groupedBrowseHtml(view);
   const browseClass = isHome ? "browse browse-home" : "browse";
+  const heroActions = isHome
+    ? `<div class="hero-actions" aria-label="Primary actions">
+        <a class="hero-cta" href="/tools/">Browse tools</a>
+        <a class="hero-cta quiet" href="/maps/">Browse maps</a>
+      </div>`
+    : "";
   let html = template
     .replaceAll("{{VIEW}}", view)
     .replaceAll("{{CATEGORY}}", page.category || "")
@@ -378,6 +401,7 @@ for (const [key, page] of Object.entries(pages)) {
     .replaceAll("{{EYEBROW}}", page.eyebrow)
     .replaceAll("{{HEADING}}", page.heading)
     .replaceAll("{{INTRO}}", page.intro)
+    .replaceAll("{{HERO_ACTIONS}}", heroActions)
     .replaceAll("{{CATALOG_HEADING}}", page.catalogHeading)
     .replaceAll("{{RESULT_COUNT}}", isHome ? "" : `${items.length} ${items.length === 1 ? "item" : "items"}`)
     .replaceAll("{{FILTERS}}", isHome ? "" : filtersHtml(view, page.category || ""))

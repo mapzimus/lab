@@ -31,11 +31,16 @@
       <a href="/maps/"{{NAV_MAPS}}>Maps</a>
       <a href="/games/"{{NAV_GAMES}}>Games</a>
       <a href="/lab/"{{NAV_LAB}}>Lab</a>
-      <a href="/field-notes/">Notes</a>
-      <a href="/radars/">Radars</a>
-      <a href="/skills/">Skills</a>
-      <a href="/links/">Links</a>
-      <a href="/about/">About</a>
+      <details class="nav-more">
+        <summary>More</summary>
+        <div class="nav-more-panel">
+          <a href="/field-notes/">Notes</a>
+          <a href="/radars/">Radars</a>
+          <a href="/skills/">Skills</a>
+          <a href="/links/">Links</a>
+          <a href="/about/">About</a>
+        </div>
+      </details>
       <a class="professional-link" href="https://maxwellhowegis.com">Portfolio ↗</a>
     </nav>
     <details class="menu">
@@ -66,6 +71,7 @@
       <div class="eyebrow">{{EYEBROW}}</div>
       <h1>{{HEADING}}</h1>
       <p>{{INTRO}}</p>
+      {{HERO_ACTIONS}}
       <div class="trust-row" aria-label="Site facts">
         <span>{{TOOL_COUNT}} browser tools</span>
         <span>Free — no accounts</span>
@@ -99,7 +105,16 @@
   </main>
 
   <footer>
-    <p>Mapzimus is the lab of Maxwell Howe — browser tools, maps, and games, all free.<br>Professional GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
+    <div class="footer-main">
+      <p>Mapzimus is the lab of Maxwell Howe — browser tools, maps, and games, all free.<br>Professional GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
+      <nav class="footer-nav" aria-label="Secondary">
+        <a href="/field-notes/">Notes</a>
+        <a href="/radars/">Radars</a>
+        <a href="/skills/">Skills</a>
+        <a href="/links/">Links</a>
+        <a href="/about/">About</a>
+      </nav>
+    </div>
     <p class="footer-note">MAPZIMUS QUADRANGLE · CATALOG EDITION {{CATALOG_REFRESH}} · STATIC SITE · NO TRACKING</p>
   </footer>
 </div>
