@@ -49,6 +49,7 @@ const hostedProjectRoutes = {
   "true-scale": "/true-scale/",
   "train-route-atlas": "/lab/train-routes/",
   "predicting-housing-crisis": "/lab/housing-crisis/",
+  "game-vault": "/lab/game-vault/",
   "interstate-challenge": "/interstate-challenge/",
   "mapzimus-board": "/mapzimus-board/",
   "boston-in-motion": "/boston-in-motion/",
