@@ -13,6 +13,13 @@
       "runtimeArgs": ["-m", "http.server", "8791", "--directory", "dist"],
       "port": 8791,
       "autoPort": false
+    },
+    {
+      "name": "lab-dist-gv",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8796", "--directory", "dist"],
+      "port": 8796,
+      "autoPort": false
     }
   ]
 }

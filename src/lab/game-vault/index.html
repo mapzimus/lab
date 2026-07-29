@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game Vault · Mapzimus</title>
+<meta name="description" content="Visual ROM-library curator: browse every NA release for 19 classic platforms, pick your games, watch the terabytes fill up, export the list.">
+<link rel="icon" href="../../favicon.svg">
+<link rel="canonical" href="https://mapzimus.com/lab/game-vault/">
+<link rel="stylesheet" href="vault.css?v=1">
+</head>
+<body>
+<a class="skip-link" href="#grid">Skip to game grid</a>
+
+<header class="gv-top">
+  <div class="gv-brand-row">
+    <a class="gv-brand" href="https://mapzimus.com/"><span class="gv-mark">MZ</span> Mapzimus</a>
+    <h1>Game Vault</h1>
+    <p class="gv-sub">Pick the library. Mind the terabytes. <span class="gv-est">All sizes are estimates.</span></p>
+  </div>
+
+  <div class="gv-stats" role="status" aria-live="polite">
+    <div class="gv-budget">
+      <div class="gv-budget-head">
+        <span class="gv-stat-label">Drive budget</span>
+        <label class="gv-budget-edit">cap
+          <input id="budget" type="number" min="100" step="100" value="3600"> GB
+        </label>
+      </div>
+      <div class="gv-bar-track" id="budget-track">
+        <div class="gv-bar-fill" id="budget-fill"></div>
+        <span class="gv-bar-text" id="budget-text">0 GB / 3.6 TB</span>
+      </div>
+    </div>
+    <dl class="gv-counters">
+      <div><dt>Games</dt><dd id="stat-games">0</dd></div>
+      <div><dt>Used</dt><dd id="stat-used">0 GB</dd></div>
+      <div><dt>Left</dt><dd id="stat-left">3.6 TB</dd></div>
+      <div class="tag-ts"><dt>★ Sellers</dt><dd id="stat-ts">0</dd></div>
+      <div class="tag-cl"><dt>◆ Classics</dt><dd id="stat-cl">0</dd></div>
+      <div class="tag-hg"><dt>◈ Gems</dt><dd id="stat-hg">0</dd></div>
+    </dl>
+    <div class="gv-actions">
+      <button id="export-btn" class="gv-btn gv-btn-acid">Export ▾</button>
+      <button id="import-btn" class="gv-btn">Import</button>
+      <input id="import-file" type="file" accept="application/json" hidden>
+    </div>
+  </div>
+
+  <nav class="gv-tabs" id="tabs" aria-label="Platforms"></nav>
+</header>
+
+<main>
+  <div class="gv-toolbar">
+    <input id="search" type="search" placeholder="Search this platform…" aria-label="Search games on this platform">
+    <div class="gv-filters" id="filters" role="group" aria-label="Filters">
+      <button data-filter="all" aria-pressed="true">All</button>
+      <button data-filter="top-seller" class="f-ts">★ Top sellers</button>
+      <button data-filter="classic" class="f-cl">◆ Classics</button>
+      <button data-filter="hidden-gem" class="f-hg">◈ Hidden gems</button>
+      <button data-filter="tagged">Any tag</button>
+      <button data-filter="selected">Selected</button>
+    </div>
+    <div class="gv-bulk">
+      <button id="select-tagged" class="gv-btn">+ all tagged</button>
+      <button id="clear-platform" class="gv-btn">clear platform</button>
+    </div>
+  </div>
+
+  <div class="gv-letters" id="letters" role="group" aria-label="Jump to letter"></div>
+
+  <p class="gv-meta" id="grid-meta"></p>
+  <section class="gv-grid" id="grid" aria-label="Games"></section>
+  <div id="sentinel"></div>
+</main>
+
+<div class="gv-drawer" id="drawer" hidden>
+  <div class="gv-drawer-card">
+    <h2>Export picks</h2>
+    <p id="export-summary"></p>
+    <div class="gv-drawer-btns">
+      <button class="gv-btn gv-btn-acid" data-export="json">JSON <small>for Claude</small></button>
+      <button class="gv-btn" data-export="csv">CSV</button>
+      <button class="gv-btn" data-export="md">Markdown checklist</button>
+    </div>
+    <p class="gv-drawer-note">The JSON includes exact No-Intro / Redump title strings — hand it to a Claude session to plan the downloads.</p>
+    <button class="gv-btn gv-close" id="drawer-close">close</button>
+  </div>
+</div>
+
+<footer class="gv-foot">
+  <p>Box art &amp; naming from the <a href="https://github.com/libretro-thumbnails">libretro-thumbnails</a> project (No-Intro / Redump sets). Sizes are per-platform estimates for budgeting, not exact file sizes. Selections stay in this browser (localStorage) — export to move them.</p>
+</footer>
+
+<script src="vault.js?v=1"></script>
+</body>
+</html>
