@@ -64,20 +64,27 @@
   }
 
   // Keep in sync with card() in scripts/build.mjs.
+  function isExternalItem(item) {
+    return Boolean(item.external) || /^https?:\/\//i.test(item.url || "");
+  }
+
   function card(item, featured) {
     const tags = (item.tags || []).slice(0, 3).map(function (tag) {
       return `<span class="tag">${escapeHtml(tag)}</span>`;
     }).join("");
     const favorite = state.favorites.has(item.slug);
     const status = item.status || "live";
+    const external = isExternalItem(item);
+    const targetAttrs = external ? ' target="_blank" rel="noopener"' : "";
+    const openCue = external ? "Open ↗" : "Open →";
     return `<article class="card${featured ? " featured" : ""}" data-slug="${escapeHtml(item.slug)}" data-category="${escapeHtml(item.category)}">
       <button class="star" type="button" aria-label="${favorite ? "Remove from" : "Add to"} favorites" aria-pressed="${favorite}">${favorite ? "★" : "☆"}</button>
-      <a class="card-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">
+      <a class="card-link" href="${escapeHtml(item.url)}"${targetAttrs}>
         <div class="card-meta"><span class="cat-tick" aria-hidden="true"></span><span class="card-type">${escapeHtml(categoryLabels[item.category] || item.category)}</span><span class="card-icon" aria-hidden="true">${escapeHtml(item.icon || "")}</span></div>
         <h3>${escapeHtml(item.title)}</h3>
         <p class="card-copy">${escapeHtml(item.description)}</p>
         ${featured ? "" : `<div class="card-tags">${tags}</div>`}
-        <div class="card-foot">${status === "live" ? "<span></span>" : `<span class="status">${escapeHtml(status)}</span>`}<span class="open-cue">Open ↗</span></div>
+        <div class="card-foot">${status === "live" ? "<span></span>" : `<span class="status">${escapeHtml(status)}</span>`}<span class="open-cue">${openCue}</span></div>
       </a>
     </article>`;
   }

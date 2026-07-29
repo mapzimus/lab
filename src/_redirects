@@ -36,15 +36,17 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /games/grog-flip /flip-game/ 301
 /games/grog-flip/* /flip-game/:splat 301
 
-# Retired on-site snapshots → canonical homes (see external:true in projects.json)
+# Motion / atlas aliases from GitHub Pages repo names
+/Motion /boston-in-motion/ 301
+/Motion/* /boston-in-motion/:splat 301
+/motion /boston-in-motion/ 301
+/motion/* /boston-in-motion/:splat 301
+
+# Still external by design (own product / classroom domains)
 /mcas https://lehsmath.com/tools/mcas/ 301
 /mcas/* https://lehsmath.com/tools/mcas/ 301
 /tappymaps https://tappymaps.com 301
 /tappymaps/* https://tappymaps.com/:splat 301
-/interstate-challenge https://maxwellhowegis.com/interstate-challenge/ 301
-/interstate-challenge/* https://maxwellhowegis.com/interstate-challenge/:splat 301
-/mapzimus-board https://mapzimus.github.io/mapzimus-board/ 301
-/mapzimus-board/* https://mapzimus.github.io/mapzimus-board/:splat 301
 
 /tools/maps/ /maps/ 301
 /tools/maps /maps 301

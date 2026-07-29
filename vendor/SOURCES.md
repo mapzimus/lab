@@ -2,20 +2,23 @@
 
 The files in this directory are deployable snapshots of projects maintained in separate repositories. They are kept here so one Cloudflare Pages build can serve every catalog item from `mapzimus.com`.
 
-| Hosted route | Upstream source | Notes |
+| Hosted route | Upstream source | Snapshot commit / notes |
 | --- | --- | --- |
-| `/{tool-slug}/` (65 tools) | `mapzimus/max` via `mapzimus.github.io/max/` | Snapshot from the public GitHub Pages shelf. Eleven newer catalog entries await the private `max` PR and ship as placeholders until then. |
+| `/{tool-slug}/` (76 tools) | `mapzimus/max` via the public tool shelf | Full tool library mirrored under `vendor/tools/`. |
 | `/geopuesto/` and `/geopuesto/playground/` | `mapzimus/geopuesto` | |
 | `/bug-wars/` | `mapzimus/bug-wars` | |
-| `/flip-game/` | `mapzimus/flipgame` | Bottle Game — bottle-flip party game (PWA). Parrots are an unlockable skin inside it (win a game to unlock). The old standalone `/parrot-flip/` and `/grog-flip/` routes now redirect here; the full always-parrot port lives only on whydahstory.com. |
-| `/whydah-voyage/` | `mapzimus/Whydah-Unit` (`navigator/`) | Whydah's Voyage / First Sail. Host-bounce redirect to whydahstory.com removed so the game stays on mapzimus.com. |
+| `/flip-game/` | `mapzimus/flipgame` | Bottle Game — bottle-flip party game (PWA). Parrots are an unlockable skin inside it. `/parrot-flip/` and `/grog-flip/` redirect here. |
+| `/whydah-voyage/` | `mapzimus/Whydah-Unit` (`navigator/`) | Whydah's Voyage / First Sail. |
 | `/black-sam/` | `mapzimus/Whydah-Unit` (`black-sam/`) | |
 | `/true-scale/` | `mapzimus/true-scale` | |
 | `/concord-war/` | built from `mapzimus/concord-war` | |
 | `/transit/` | `transit/` in `mapzimus/maxwellhowegis` | |
-| `/interstate-challenge/` | `interstate-challenge/` in `mapzimus/maxwellhowegis` | |
-| `/mapzimus-board/` | `mapzimus/mapzimus-board` | Deployable `index.html` + `app.js` + `data.js` only. |
+| `/interstate-challenge/` | `interstate-challenge/` in `mapzimus/maxwellhowegis` | `121f2af` — was on the portfolio site; now first-party. |
+| `/mapzimus-board/` | `mapzimus/mapzimus-board` | `acdb429` — was `mapzimus.github.io/mapzimus-board/`. Deployable `index.html` + `app.js` + `data.js` only. |
+| `/boston-in-motion/` | `mapzimus/Motion` | `4df1ff7` — was `mapzimus.github.io/Motion/`. Static client only (`css/`, `js/`, `index.html`). |
+| `/where-the-games-go/` | `mapzimus/where-the-games-go` (`public/`) | `2cbec72` — was `mapzimus.github.io/where-the-games-go/`. |
+| `/smartpicker/` | `mapzimus/smartpicker` | `5c6f298` — was `mapzimus.github.io/smartpicker/`. |
 
 Documentation, source-only scripts, Android wrappers, and other non-deployable files are omitted from the snapshots.
 
-**Still external by design:** [tappymaps.com](https://tappymaps.com) (own product domain). The classroom curriculum site remains at [whydahstory.com](https://whydahstory.com); the games listed above are mirrored here.
+**Still external by design:** [tappymaps.com](https://tappymaps.com) (own product domain) and the MCAS item bank at [lehsmath.com](https://lehsmath.com/tools/mcas/). The classroom curriculum site remains at [whydahstory.com](https://whydahstory.com); the games listed above are mirrored here.
