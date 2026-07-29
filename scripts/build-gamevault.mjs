@@ -31,7 +31,9 @@ const PLATFORMS = [
   { id: "gamecube", label: "GameCube", repo: "Nintendo_-_GameCube", avgMB: 1000 },
   { id: "xbox", label: "Xbox", repo: "Microsoft_-_Xbox", avgMB: 2500 },
   { id: "ds", label: "Nintendo DS", repo: "Nintendo_-_Nintendo_DS", avgMB: 45 },
-  { id: "psp", label: "PSP", repo: "Sony_-_PlayStation_Portable", avgMB: 800 },
+  // libretro-thumbnails only carries ~330 USA PSP covers, so the release list comes
+  // from the Redump DAT instead and thumbnails are matched in for art where they exist.
+  { id: "psp", label: "PSP", repo: "Sony_-_PlayStation_Portable", avgMB: 800, dat: "redump/Sony - PlayStation Portable", artAnyRegion: true },
   { id: "wii", label: "Wii", repo: "Nintendo_-_Wii", avgMB: 3000 },
   { id: "3ds", label: "Nintendo 3DS", repo: "Nintendo_-_Nintendo_3DS", avgMB: 350 },
   { id: "neogeo", label: "Neo Geo", repo: "SNK_-_Neo_Geo", avgMB: 30, splitDual: true },
@@ -98,6 +100,19 @@ function displayTitle(t) {
   return t.replace(/ _ /g, " & ").replace(/_ /g, ": ").replace(/_/g, "/");
 }
 
+// Pull the canonical release list out of a libretro-database ClrMamePro .dat
+function datNames(datPath) {
+  const cache = path.join(cacheDir, datPath.replace(/[\\/ ]/g, "_") + ".dat");
+  if (!fs.existsSync(cache)) {
+    if (offline) throw new Error(`--offline but no cache for ${datPath}`);
+    fs.mkdirSync(cacheDir, { recursive: true });
+    const url = `https://raw.githubusercontent.com/libretro/libretro-database/master/metadat/${datPath.split("/").map(encodeURIComponent).join("/")}.dat`;
+    execFileSync("curl", ["-sL", url, "-o", cache], { encoding: "utf8" });
+  }
+  const txt = fs.readFileSync(cache, "utf8");
+  return [...txt.matchAll(/^\s*name\s+"([^"]+)"/gm)].map((m) => m[1]);
+}
+
 const tags = JSON.parse(fs.readFileSync(path.join(root, "scripts", "gamevault-tags.json"), "utf8"));
 const extras = JSON.parse(fs.readFileSync(path.join(root, "scripts", "gamevault-extras.json"), "utf8"));
 
@@ -114,9 +129,10 @@ for (const p of PLATFORMS) {
   // NA release = region tag containing USA or World ("(USA)", "(USA, Europe)",
   // "(Japan, USA)", "(World)" are all NA carts in No-Intro/Redump naming)
   const NA = /\([^)]*\b(?:USA|World)\b[^)]*\)/;
+  files = files.filter((f) => !EXCLUDE.test(f));
+  const allRegions = files; // kept for art fallback on DAT-backed platforms
   const hasRegion = !p.noRegionFilter && files.some((f) => NA.test(f));
   if (hasRegion) files = files.filter((f) => NA.test(f));
-  files = files.filter((f) => !EXCLUDE.test(f));
 
   // group variants by normalized base title (also merges "_"-escape spelling variants)
   const games = new Map();
@@ -132,6 +148,40 @@ for (const p of PLATFORMS) {
     games.set(key, g);
   }
 
+  // DAT-backed platform: the release list is the DAT, thumbnails are art only.
+  // Titles with no matching cover keep f:null and render as blank-but-selectable tiles.
+  if (p.dat) {
+    const art = games; // what we just built from thumbnails, keyed by norm title
+    const fromDat = new Map();
+    for (const raw of datNames(p.dat)) {
+      if (!NA.test(raw) || EXCLUDE.test(raw)) continue;
+      const t = baseTitle(raw + ".png");
+      const key = norm(t);
+      if (!key) continue;
+      const g = fromDat.get(key) || { t, variants: [] };
+      if (t.length < g.t.length) g.t = t;
+      const m = raw.match(/\(Disc (\d+)\)/i);
+      if (m) g.discs = Math.max(g.discs || 1, Number(m[1]));
+      fromDat.set(key, g);
+    }
+    // NA cover if one exists, otherwise any region's cover for the same game
+    let fallback = null;
+    if (p.artAnyRegion) {
+      fallback = new Map();
+      for (const f of allRegions) {
+        const key = norm(baseTitle(f));
+        if (!key) continue;
+        if (!fallback.has(key)) fallback.set(key, []);
+        fallback.get(key).push(f);
+      }
+    }
+    for (const [key, g] of fromDat) {
+      g.variants = art.get(key)?.variants || fallback?.get(key) || [];
+    }
+    games.clear();
+    for (const [key, g] of fromDat) games.set(key, g);
+  }
+
   const platTags = tags[p.id] || {};
   const taggedNorms = new Map(Object.entries(platTags).map(([k, v]) => [norm(k), v]));
   const usedTags = new Set();
@@ -139,9 +189,9 @@ for (const p of PLATFORMS) {
   const rows = [];
   for (const g of games.values()) {
     // canonical art = shortest variant name (fewest qualifier tags), stable tiebreak
-    const art = g.variants.sort((a, b) => a.length - b.length || a.localeCompare(b))[0];
-    // disc count = highest (Disc N) seen among variants
-    let discs = 1;
+    const art = g.variants.sort((a, b) => a.length - b.length || a.localeCompare(b))[0] || null;
+    // disc count = highest (Disc N) seen among variants (or carried from the DAT)
+    let discs = g.discs || 1;
     for (const v of g.variants) {
       const m = v.match(/\(Disc (\d+)\)/i);
       if (m) discs = Math.max(discs, Number(m[1]));
@@ -154,10 +204,15 @@ for (const p of PLATFORMS) {
     rows.push({ t: displayTitle(g.t), f: art, s: sizeMB, d: discs, h: tag });
   }
 
-  // extras: notable titles missing from the thumbnail set (no art)
+  // extras: add notable titles the source list misses, and refine sizes on ones it has
   for (const ex of extras[p.id] || []) {
     const n = norm(ex.t);
-    if (rows.some((r) => norm(r.t) === n)) continue;
+    const hit = rows.find((r) => norm(r.t) === n);
+    if (hit) {
+      if (ex.s) hit.s = ex.s * (hit.d || 1); // hand-measured size beats the platform average
+      if (!hit.h && ex.h) hit.h = ex.h;
+      continue;
+    }
     rows.push({ t: ex.t, f: null, s: ex.s || p.avgMB, d: ex.d || 1, h: taggedNorms.get(n) || ex.h || null });
     if (taggedNorms.has(n)) usedTags.add(n);
   }

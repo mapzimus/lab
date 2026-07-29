@@ -189,16 +189,18 @@
       tile.setAttribute("aria-pressed", String(set.has(r.t)));
       tile.dataset.title = r.t;
       const sizeTxt = r.s >= 1024 ? (r.s / 1024).toFixed(1) + " GB" : Math.round(r.s * 10) / 10 + " MB";
+      // No cover in the thumbnail set: leave the art area blank but keep the tile
+      // fully selectable — the title still reads from the caption below.
       const cover = r.f
         ? `<img loading="lazy" decoding="async" src="${artURL(p, r.f)}" alt="">`
-        : `<span class="no-art">${escapeHTML(r.t)}</span>`;
+        : `<span class="no-art" aria-hidden="true"></span>`;
       tile.innerHTML =
         `${r.h ? `<span class="badge">${TAG_BADGE[r.h]}</span>` : ""}` +
         `<span class="check">✓</span>` +
         `<span class="cover">${cover}</span>` +
         `<span class="label"><span class="name">${escapeHTML(r.t)}</span><span class="size">${sizeTxt}${r.d > 1 ? ` · ${r.d} discs` : ""}</span></span>`;
       const img = tile.querySelector("img");
-      if (img) img.addEventListener("error", () => { tile.querySelector(".cover").innerHTML = `<span class="no-art">${escapeHTML(r.t)}</span>`; }, { once: true });
+      if (img) img.addEventListener("error", () => { tile.querySelector(".cover").innerHTML = `<span class="no-art" aria-hidden="true"></span>`; }, { once: true });
       tile.addEventListener("click", () => toggle(r.t, tile));
       frag.appendChild(tile);
     }

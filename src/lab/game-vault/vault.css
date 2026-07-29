@@ -92,7 +92,8 @@ main { max-width: 1500px; margin: 0 auto; padding: 14px 18px 60px; }
 .gv-tile:hover { border-color: var(--ink); }
 .gv-tile .cover { position: relative; aspect-ratio: 3 / 4; background: var(--panel-2); display: grid; place-items: center; overflow: hidden; }
 .gv-tile img { width: 100%; height: 100%; object-fit: contain; display: block; }
-.gv-tile .no-art { padding: 10px; color: var(--muted); font: 700 12px var(--mono); text-align: center; word-break: break-word; }
+/* blank cover slot — no art available, tile still selectable */
+.gv-tile .no-art { display: block; width: 100%; height: 100%; background: repeating-linear-gradient(45deg, #232833 0 8px, #262b36 8px 16px); }
 .gv-tile .label { display: flex; flex-direction: column; gap: 2px; padding: 6px 8px 7px; }
 .gv-tile .name { font-size: .74rem; font-weight: 600; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .gv-tile .size { color: var(--muted); font: 600 10px var(--mono); }
@@ -115,6 +116,8 @@ main { max-width: 1500px; margin: 0 auto; padding: 14px 18px 60px; }
 
 /* ---------- drawer ---------- */
 .gv-drawer { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; background: rgba(10, 12, 16, .72); }
+/* [hidden] only sets display:none at UA level — the rule above would beat it */
+.gv-drawer[hidden] { display: none; }
 .gv-drawer-card { width: min(480px, 92vw); background: var(--panel); border: 2px solid var(--ink); padding: 22px; }
 .gv-drawer-card h2 { margin: 0 0 6px; letter-spacing: -.03em; }
 .gv-drawer-btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
