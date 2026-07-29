@@ -16,28 +16,30 @@ const cacheDir = path.join(root, "scripts", ".gamevault-cache");
 const offline = process.argv.includes("--offline");
 
 // id, label, libretro repo, avg compressed MB per game, era note
+// Tab order = North American launch date, oldest first. Arcade has no single launch
+// date (its sets span the 1970s-2000s), so it sits at the end rather than in sequence.
 const PLATFORMS = [
-  { id: "nes", label: "NES", repo: "Nintendo_-_Nintendo_Entertainment_System", avgMB: 0.2 },
-  { id: "genesis", label: "Genesis", repo: "Sega_-_Mega_Drive_-_Genesis", avgMB: 1.5 },
-  { id: "snes", label: "SNES", repo: "Nintendo_-_Super_Nintendo_Entertainment_System", avgMB: 1.5 },
-  { id: "gb", label: "Game Boy", repo: "Nintendo_-_Game_Boy", avgMB: 0.5 },
-  { id: "gbc", label: "Game Boy Color", repo: "Nintendo_-_Game_Boy_Color", avgMB: 1 },
-  { id: "gba", label: "Game Boy Advance", repo: "Nintendo_-_Game_Boy_Advance", avgMB: 8 },
-  { id: "n64", label: "Nintendo 64", repo: "Nintendo_-_Nintendo_64", avgMB: 30 },
-  { id: "ps1", label: "PlayStation", repo: "Sony_-_PlayStation", avgMB: 350 },
-  { id: "saturn", label: "Saturn", repo: "Sega_-_Saturn", avgMB: 450 },
-  { id: "dreamcast", label: "Dreamcast", repo: "Sega_-_Dreamcast", avgMB: 700 },
-  { id: "ps2", label: "PlayStation 2", repo: "Sony_-_PlayStation_2", avgMB: 2800 },
-  { id: "gamecube", label: "GameCube", repo: "Nintendo_-_GameCube", avgMB: 1000 },
-  { id: "xbox", label: "Xbox", repo: "Microsoft_-_Xbox", avgMB: 2500 },
-  { id: "ds", label: "Nintendo DS", repo: "Nintendo_-_Nintendo_DS", avgMB: 45 },
+  { id: "nes", label: "NES", repo: "Nintendo_-_Nintendo_Entertainment_System", avgMB: 0.2 },              // Oct 1985
+  { id: "gb", label: "Game Boy", repo: "Nintendo_-_Game_Boy", avgMB: 0.5 },                               // Jul 1989
+  { id: "genesis", label: "Genesis", repo: "Sega_-_Mega_Drive_-_Genesis", avgMB: 1.5 },                   // Aug 1989
+  { id: "neogeo", label: "Neo Geo", repo: "SNK_-_Neo_Geo", avgMB: 30, splitDual: true },                  // 1990
+  { id: "snes", label: "SNES", repo: "Nintendo_-_Super_Nintendo_Entertainment_System", avgMB: 1.5 },      // Aug 1991
+  { id: "saturn", label: "Saturn", repo: "Sega_-_Saturn", avgMB: 450 },                                   // May 1995
+  { id: "ps1", label: "PlayStation", repo: "Sony_-_PlayStation", avgMB: 350 },                            // Sep 1995
+  { id: "n64", label: "Nintendo 64", repo: "Nintendo_-_Nintendo_64", avgMB: 30 },                         // Sep 1996
+  { id: "gbc", label: "Game Boy Color", repo: "Nintendo_-_Game_Boy_Color", avgMB: 1 },                    // Nov 1998
+  { id: "dreamcast", label: "Dreamcast", repo: "Sega_-_Dreamcast", avgMB: 700 },                          // Sep 1999
+  { id: "ps2", label: "PlayStation 2", repo: "Sony_-_PlayStation_2", avgMB: 2800 },                       // Oct 2000
+  { id: "gba", label: "Game Boy Advance", repo: "Nintendo_-_Game_Boy_Advance", avgMB: 8 },                // Jun 2001
+  { id: "xbox", label: "Xbox", repo: "Microsoft_-_Xbox", avgMB: 2500 },                                   // Nov 15 2001
+  { id: "gamecube", label: "GameCube", repo: "Nintendo_-_GameCube", avgMB: 1000 },                        // Nov 18 2001
+  { id: "ds", label: "Nintendo DS", repo: "Nintendo_-_Nintendo_DS", avgMB: 45 },                          // Nov 2004
   // libretro-thumbnails only carries ~330 USA PSP covers, so the release list comes
   // from the Redump DAT instead and thumbnails are matched in for art where they exist.
-  { id: "psp", label: "PSP", repo: "Sony_-_PlayStation_Portable", avgMB: 800, dat: "redump/Sony - PlayStation Portable", artAnyRegion: true },
-  { id: "wii", label: "Wii", repo: "Nintendo_-_Wii", avgMB: 3000 },
-  { id: "3ds", label: "Nintendo 3DS", repo: "Nintendo_-_Nintendo_3DS", avgMB: 350 },
-  { id: "neogeo", label: "Neo Geo", repo: "SNK_-_Neo_Geo", avgMB: 30, splitDual: true },
-  { id: "arcade", label: "Arcade", repo: "FBNeo_-_Arcade_Games", avgMB: 5, noRegionFilter: true },
+  { id: "psp", label: "PSP", repo: "Sony_-_PlayStation_Portable", avgMB: 800, dat: "redump/Sony - PlayStation Portable", artAnyRegion: true }, // Mar 2005
+  { id: "wii", label: "Wii", repo: "Nintendo_-_Wii", avgMB: 3000 },                                       // Nov 2006
+  { id: "3ds", label: "Nintendo 3DS", repo: "Nintendo_-_Nintendo_3DS", avgMB: 350 },                      // Mar 2011
+  { id: "arcade", label: "Arcade", repo: "FBNeo_-_Arcade_Games", avgMB: 5, noRegionFilter: true },        // spans eras
 ];
 
 // Variants that aren't real retail NA releases (or duplicate other tabs).
