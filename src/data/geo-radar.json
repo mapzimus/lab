@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-07-28",
+  "generatedAt": "2026-07-29",
   "news": {
     "mapsmania": [
+      {
+        "title": "German Döner, English Curry & American Pizza",
+        "url": "http://googlemapsmania.blogspot.com/2026/07/german-doner-english-curry-american.html",
+        "desc": "German Döner Kebab restaurants have started popping up all over London."
+      },
       {
         "title": "Bigfoot's Giant Step Forward for Tourism Maps",
         "url": "http://googlemapsmania.blogspot.com/2026/07/bigfoots-giant-step-forward-for-tourism_01313180873.html",
@@ -36,11 +41,6 @@
         "title": "The 5 Best 3D Subway Maps",
         "url": "http://googlemapsmania.blogspot.com/2026/07/the-5-best-3d-subway-maps.html",
         "desc": "Shinjuku Station has a well-earned reputation as one of the world's largest and most bewildering transport hubs."
-      },
-      {
-        "title": "Street Names - As Ranked by the Internet",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/street-names-as-ranked-by-internet.html",
-        "desc": "Streetnames by Elo is a fascinating interactive map which colours streets according to how highly the internet rates the people, places or things they are na…"
       }
     ],
     "georealm": [
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "Reference Grid Labeler",
-      "url": "https://plugins.qgis.org/plugins/reference_grid_labeler/"
+      "title": "Q-CensosBo",
+      "url": "https://plugins.qgis.org/plugins/qcensosbo/"
     },
     {
-      "title": "Gerador de RCO",
-      "url": "https://plugins.qgis.org/plugins/gerador_rco/"
+      "title": "Urban Growth Predictor",
+      "url": "https://plugins.qgis.org/plugins/qgis_urban_growth_predictor/"
     },
     {
-      "title": "AcuGIS Cloud Publisher",
-      "url": "https://plugins.qgis.org/plugins/acugis_cloud_publisher/"
+      "title": "ARENARIA — GML Export for ARiMR (eWniosekPlus)",
+      "url": "https://plugins.qgis.org/plugins/arenaria_arimr/"
     },
     {
-      "title": "SwathProfile4QGIS",
-      "url": "https://plugins.qgis.org/plugins/SwathProfile4QGIS/"
+      "title": "Military Cartography Tools",
+      "url": "https://plugins.qgis.org/plugins/MilitaryCartographyTools/"
     },
     {
-      "title": "法术网优工具",
-      "url": "https://plugins.qgis.org/plugins/fa_shu_tool/"
+      "title": "GeoBan France",
+      "url": "https://plugins.qgis.org/plugins/geoban_france/"
     },
     {
-      "title": "Multiband Zonal Stats",
-      "url": "https://plugins.qgis.org/plugins/multiband_zonal_stats/"
+      "title": "OVER Catalog",
+      "url": "https://plugins.qgis.org/plugins/over_catalog/"
     },
     {
-      "title": "Sen Couverture Terrestre",
-      "url": "https://plugins.qgis.org/plugins/sen_couverture_terrestre/"
+      "title": "Another Autosaver",
+      "url": "https://plugins.qgis.org/plugins/another-autosaver/"
     },
     {
-      "title": "Collaboration",
-      "url": "https://plugins.qgis.org/plugins/Collaboration/"
+      "title": "Multi Layer Filter Toolbar",
+      "url": "https://plugins.qgis.org/plugins/multi_layer_filter/"
     }
   ],
   "releases": [
@@ -210,10 +210,16 @@
   ],
   "gisse": [
     {
+      "title": "Understanding GeoJSON.io centroid accuracy",
+      "url": "https://gis.stackexchange.com/questions/501200/understanding-geojson-io-centroid-accuracy",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Making neighbourhood plan which has grid system of streets in QGIS",
       "url": "https://gis.stackexchange.com/questions/501197/making-neighbourhood-plan-which-has-grid-system-of-streets-in-qgis",
       "score": 1,
-      "answers": 0
+      "answers": 1
     },
     {
       "title": "QGIS Density Analysis result filesize/pixel size",
@@ -225,6 +231,12 @@
       "title": "Calculate field by data from another layer in QGIS",
       "url": "https://gis.stackexchange.com/questions/501194/calculate-field-by-data-from-another-layer-in-qgis",
       "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "How to optimize large gpkg files on QGIS",
+      "url": "https://gis.stackexchange.com/questions/501183/how-to-optimize-large-gpkg-files-on-qgis",
+      "score": 2,
       "answers": 1
     },
     {
@@ -246,90 +258,78 @@
       "answers": 0
     },
     {
-      "title": "How to optimize large gpkg files on QGIS",
-      "url": "https://gis.stackexchange.com/questions/501183/how-to-optimize-large-gpkg-files-on-qgis",
-      "score": 2,
-      "answers": 1
-    },
-    {
       "title": "Can QGIS handle \"geometry\" field from PostGreSQL",
       "url": "https://gis.stackexchange.com/questions/501188/can-qgis-handle-geometry-field-from-postgresql",
       "score": 1,
       "answers": 0
     },
     {
-      "title": "How to create a layer filter based on the value in a different layer follow up",
-      "url": "https://gis.stackexchange.com/questions/501187/how-to-create-a-layer-filter-based-on-the-value-in-a-different-layer-follow-up",
+      "title": "QFieldSync Python error on packing for QField",
+      "url": "https://gis.stackexchange.com/questions/501172/qfieldsync-python-error-on-packing-for-qfield",
       "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Installing QGIS3 using Macports to get GRASS and PCRaster tools to function - install fail due to missing XCode installation?",
-      "url": "https://gis.stackexchange.com/questions/501186/installing-qgis3-using-macports-to-get-grass-and-pcraster-tools-to-function-in",
-      "score": 0,
-      "answers": 0
+      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "MWOW 6-Hourly Global Ocean Wind Level 3 Version 0.2",
-      "url": "https://search.earthdata.nasa.gov/search?q=MWOW_L3_V0.2",
-      "desc": "This data set contains 6-hourly, global gridded wind speed and direction at 0.125 degree horizontal resolution from the MWOW (Multi-sensor Worldwide Ocean Wi…",
-      "org": "POCLOUD"
+      "title": "OCO-2 Level 2 bias-corrected XCO2 and other select fields from the full-physics retrieval aggregated as daily files, Retrospective proces…",
+      "url": "https://search.earthdata.nasa.gov/search?q=OCO2_L2_Lite_FP",
+      "desc": "Version 11.3r is the current version of the data set.",
+      "org": "GES_DISC"
     },
     {
-      "title": "MWOW 6-Hourly High Resolution Global Ocean Wind Level 3 Version 0.2",
-      "url": "https://search.earthdata.nasa.gov/search?q=MWOW_L3_HIGHRES_V0.2",
-      "desc": "This data set contains 6-hourly, global gridded wind speed and direction at 1/64th degree horizontal resolution from the MWOW (Multi-sensor Worldwide Ocean W…",
-      "org": "POCLOUD"
+      "title": "HyTES Level 1 Radiance, Facility Instrument Collection, 2013-2016",
+      "url": "https://search.earthdata.nasa.gov/search?q=HyTES_L1_Radiance_2013_2016_2476",
+      "desc": "This dataset contains Level 1 (L1) radiance imagery from the Hyperspectral Thermal Emission Spectrometer (HyTES) instrument.",
+      "org": "ORNL_CLOUD"
     },
     {
-      "title": "MWOW 6-Hourly High Resolution Global Ocean Wind with Expanded Platform Inputs Level 3 Version 0.2",
-      "url": "https://search.earthdata.nasa.gov/search?q=MWOW_L3_HIGHRES_EPI_V0.2",
-      "desc": "This data set contains 6-hourly, global gridded wind speed and direction at 1/64th degree horizontal resolution from the MWOW (Multi-sensor Worldwide Ocean W…",
-      "org": "POCLOUD"
+      "title": "UAVSAR_POLSAR_STOKES",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
+      "desc": "UAVSAR PolSAR Scene Stokes",
+      "org": "ASF"
     },
     {
-      "title": "MWOW 6-Hourly Global Ocean Wind with Expanded Platform Inputs Level 3 Version 0.2",
-      "url": "https://search.earthdata.nasa.gov/search?q=MWOW_L3_EPI_V0.2",
-      "desc": "This data set contains 6-hourly, global gridded wind speed and direction at 0.125 degree horizontal resolution from the MWOW (Multi-sensor Worldwide Ocean Wi…",
-      "org": "POCLOUD"
+      "title": "UAVSAR_POLSAR_SLOPE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
+      "desc": "UAVSAR PolSAR Scene Slope",
+      "org": "ASF"
     },
     {
-      "title": "SWOT Level 4 Sword of Science River Discharge Products, Version 3",
-      "url": "https://search.earthdata.nasa.gov/search?q=SWOT_L4_HR_DAWG_SOS_DISCHARGE_V3",
-      "desc": "The SWOT Sword of Science River Discharge Products dataset from the Surface Water and Ocean Topography (SWOT) mission and produced by the Discharge Algorithm…",
-      "org": "POCLOUD"
+      "title": "UAVSAR_POLSAR_PAULI",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
+      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
+      "org": "ASF"
     },
     {
-      "title": "SASSIE ECCO Ocean Temperature and Salinity - Snapshot llc1080 Grid (Version 1 Release 1)",
-      "url": "https://search.earthdata.nasa.gov/search?q=SASSIE_ECCO_L4_TEMP_SALINITY_LLC1080GRID_SNAPSHOT_V1R1",
-      "desc": "This dataset provides model-simulated instantaneous ocean potential temperature and salinity from the SASSIE ECCO Version 1 Release 1 (V1R1) ocean and sea-ic…",
-      "org": "POCLOUD"
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
+      "desc": "UAVSAR PolSAR Scene Complex",
+      "org": "ASF"
     },
     {
-      "title": "SASSIE ECCO Sea-Ice and Snow Concentration, Thickness, and Velocity - Snapshot llc1080 Grid (Version 1 Release 1)",
-      "url": "https://search.earthdata.nasa.gov/search?q=SASSIE_ECCO_L4_SEA_ICE_CONC_THICK_VEL_LLC1080GRID_SNAPSHOT_V1R1",
-      "desc": "This dataset provides instantaneous sea-ice and snow concentration, thickness, pressure loading, and velocity from the SASSIE ECCO Version 1 Release 1 (V1R1)…",
-      "org": "POCLOUD"
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
+      "org": "ASF"
     },
     {
-      "title": "SASSIE ECCO Ocean Bottom Pressure and Sea Surface Height - Snapshot llc1080 Grid (Version 1 Release 1)",
-      "url": "https://search.earthdata.nasa.gov/search?q=SASSIE_ECCO_L4_OBP_SSH_LLC1080GRID_SNAPSHOT_V1R1",
-      "desc": "This dataset provides instantaneous model ocean bottom pressure anomaly and sea surface height anomaly from the SASSIE ECCO Version 1 Release 1 (V1R1) ocean…",
-      "org": "POCLOUD"
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
+      "org": "ASF"
     },
     {
-      "title": "SASSIE ECCO KPP Boundary Layer Depth - Daily Mean llc1080 Grid (Version 1 Release 1)",
-      "url": "https://search.earthdata.nasa.gov/search?q=SASSIE_ECCO_L4_KPP_BOUNDARY_LAYER_LLC1080GRID_DAILY_V1R1",
-      "desc": "This dataset provides daily-averaged model-simulated KPP boundary layer depths from the SASSIE ECCO Version 1 Release 1 (V1R1) ocean and sea-ice state estimate.",
-      "org": "POCLOUD"
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
+      "desc": "UAVSAR PolSAR Scene Projected",
+      "org": "ASF"
     },
     {
-      "title": "SASSIE ECCO KPP Mixing Diagnostics - Daily Mean llc1080 Grid (Version 1 Release 1)",
-      "url": "https://search.earthdata.nasa.gov/search?q=SASSIE_ECCO_L4_KPP_DIAGS_LLC1080GRID_DAILY_V1R1",
-      "desc": "This dataset provides daily-averaged model-simulated KPP diagnostic terms and related coefficients from the SASSIE ECCO Version 1 Release 1 (V1R1) ocean and…",
-      "org": "POCLOUD"
+      "title": "UAVSAR_POLSAR_METADATA",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
+      "desc": "UAVSAR PolSAR Scene Metadata",
+      "org": "ASF"
     }
   ],
   "datagov": [
