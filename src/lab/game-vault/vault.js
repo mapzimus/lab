@@ -7,7 +7,7 @@
   const $ = (id) => document.getElementById(id);
 
   const TAG_CLASS = { "top-seller": "tag-ts", "classic": "tag-cl", "hidden-gem": "tag-hg" };
-  const TAG_BADGE = { "top-seller": "★", "classic": "◆", "hidden-gem": "◈" };
+  const TAG_BADGE = { "top-seller": "★ TOP", "classic": "◆ CLASSIC", "hidden-gem": "◈ GEM" };
 
   const state = {
     platforms: [],           // [{id,label,repo,avgMB,count,tagged}]
@@ -233,6 +233,22 @@
     $("select-tagged").addEventListener("click", () => {
       const set = picksFor(state.active);
       for (const r of state.data[state.active] || []) if (r.h) set.add(r.t);
+      save(); applyFilters(); renderStats();
+    });
+
+    $("select-platform").addEventListener("click", () => {
+      const p = state.platforms.find((x) => x.id === state.active);
+      const rows = state.data[state.active] || [];
+      if (!rows.length || !confirm(`Select all ${rows.length.toLocaleString()} games on ${p.label}?`)) return;
+      const set = picksFor(state.active);
+      for (const r of rows) set.add(r.t);
+      save(); applyFilters(); renderStats();
+    });
+
+    $("clear-all").addEventListener("click", () => {
+      const n = Object.values(state.picks).reduce((a, s) => a + s.size, 0);
+      if (!n || !confirm(`Delete ALL ${n.toLocaleString()} picks across every platform? This can't be undone.`)) return;
+      for (const set of Object.values(state.picks)) set.clear();
       save(); applyFilters(); renderStats();
     });
 

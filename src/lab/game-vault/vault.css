@@ -55,6 +55,8 @@ button, input { font: inherit; }
 .gv-btn:hover { border-color: var(--ink); }
 .gv-btn-acid { background: var(--acid); color: #171a20; border-color: var(--acid); }
 .gv-btn-acid:hover { border-color: var(--ink); }
+.gv-btn-danger { border-color: var(--coral); color: var(--coral); }
+.gv-btn-danger:hover { background: var(--coral); color: var(--bg); border-color: var(--coral); }
 
 /* ---------- tabs ---------- */
 .gv-tabs { display: flex; gap: 4px; overflow-x: auto; padding: 4px 0 0; scrollbar-width: thin; }
@@ -98,10 +100,13 @@ main { max-width: 1500px; margin: 0 auto; padding: 14px 18px 60px; }
 .gv-tile .name { font-size: .74rem; font-weight: 600; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .gv-tile .size { color: var(--muted); font: 600 10px var(--mono); }
 
-.gv-tile.tag-ts { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 0 14px rgba(255, 211, 79, .25); }
-.gv-tile.tag-cl { border-color: var(--purple); box-shadow: 0 0 0 1px var(--purple), 0 0 14px rgba(165, 140, 255, .25); }
-.gv-tile.tag-hg { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan), 0 0 14px rgba(80, 215, 211, .25); }
-.gv-tile .badge { position: absolute; top: 5px; left: 5px; z-index: 2; padding: 2px 6px; font: 800 10px var(--mono); color: var(--bg); }
+.gv-tile.tag-ts { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold), 0 0 22px rgba(255, 211, 79, .45); background: linear-gradient(rgba(255, 211, 79, .07), rgba(255, 211, 79, .07)), var(--panel); }
+.gv-tile.tag-cl { border-color: var(--purple); box-shadow: 0 0 0 2px var(--purple), 0 0 22px rgba(165, 140, 255, .45); background: linear-gradient(rgba(165, 140, 255, .07), rgba(165, 140, 255, .07)), var(--panel); }
+.gv-tile.tag-hg { border-color: var(--cyan); box-shadow: 0 0 0 2px var(--cyan), 0 0 22px rgba(80, 215, 211, .45); background: linear-gradient(rgba(80, 215, 211, .07), rgba(80, 215, 211, .07)), var(--panel); }
+.gv-tile.tag-ts .name { color: var(--gold); }
+.gv-tile.tag-cl .name { color: var(--purple); }
+.gv-tile.tag-hg .name { color: var(--cyan); }
+.gv-tile .badge { position: absolute; top: 5px; left: 5px; z-index: 2; padding: 3px 7px; font: 800 10px var(--mono); letter-spacing: .04em; color: var(--bg); }
 .tag-ts .badge { background: var(--gold); }
 .tag-cl .badge { background: var(--purple); }
 .tag-hg .badge { background: var(--cyan); }

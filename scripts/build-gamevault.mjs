@@ -45,6 +45,10 @@ const PLATFORMS = [
 // Variants that aren't real retail NA releases (or duplicate other tabs).
 const EXCLUDE = /\((?:[^)]*\b(?:Demo|Beta|Proto|Sample|Kiosk|Aftermarket|Pirate|Program|Test|Debug|Promo|Competition Cart|bootleg|prototype|Korean|Unl)\b[^)]*|Virtual Console[^)]*)\)|\[[^\]]*\]/i;
 
+// Not games at all: e-Reader card scans (each TCG card is a "title" in No-Intro)
+// and GBA Video cartoon carts. Together they inflated GBA from ~1040 to 2095.
+const NON_GAMES = /^e-Reader\b|-e(?: TCG)? - |^Game Boy Advance Video/i;
+
 // Known giant games where the platform average is way off (MB, per full game).
 const BIG_GAMES = {
   ps2: { "gran turismo 4": 6500, "god of war ii": 6000, "god of war": 4600, "final fantasy xii": 5600, "metal gear solid 3 - subsistence": 7000, "grand theft auto - san andreas": 4300, "shadow of the colossus": 4200, "kingdom hearts ii": 4500, "rogue galaxy": 6900 },
@@ -131,7 +135,7 @@ for (const p of PLATFORMS) {
   // NA release = region tag containing USA or World ("(USA)", "(USA, Europe)",
   // "(Japan, USA)", "(World)" are all NA carts in No-Intro/Redump naming)
   const NA = /\([^)]*\b(?:USA|World)\b[^)]*\)/;
-  files = files.filter((f) => !EXCLUDE.test(f));
+  files = files.filter((f) => !EXCLUDE.test(f) && !NON_GAMES.test(f));
   const allRegions = files; // kept for art fallback on DAT-backed platforms
   const hasRegion = !p.noRegionFilter && files.some((f) => NA.test(f));
   if (hasRegion) files = files.filter((f) => NA.test(f));
