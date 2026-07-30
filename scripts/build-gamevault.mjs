@@ -64,9 +64,53 @@ const PLATFORMS = [
   { id: "3ds", label: "Nintendo 3DS", repo: "Nintendo_-_Nintendo_3DS", avgMB: 350 },                      // Mar 2011
   { id: "wiiu", label: "Wii U", repo: "Nintendo_-_Wii_U", avgMB: 10000 },                                 // Nov 2012
   // Arcade sets carry no region tags (boards weren't region-locked), so this one skips
-  // the NA filter and sits at the end rather than in launch sequence.
-  { id: "arcade", label: "Arcade", repo: "FBNeo_-_Arcade_Games", avgMB: 5, noRegionFilter: true },        // spans eras
+  // the NA filter and sits at the end rather than in launch sequence. FBNeo alone misses
+  // the 3D era (no Model 2/3, System 22, laserdisc), so MAME is merged in for titles
+  // FBNeo doesn't carry — Time Crisis, Killer Instinct, Virtua Fighter 2, Cruis'n USA…
+  { id: "arcade", label: "Arcade", repo: "FBNeo_-_Arcade_Games", avgMB: 5, noRegionFilter: true, extraRepos: ["MAME"] }, // spans eras
 ];
+
+// ROMs ripped from later re-releases (Switch Online, mini consoles, named compilations)
+// rather than the original platform's retail media. A SNES ROM pulled out of Collection
+// of Mana is not a 1990s SNES cart, so these never count as releases of their own.
+const RERELEASE = new RegExp(
+  [
+    "\\(Switch[^)]*\\)", "\\(Wii U Virtual Console\\)", "\\(Classic Mini[^)]*\\)",
+    "\\(Genesis Mini\\)", "\\(Mega Drive Mini\\)",
+    "\\(GameCube Edition\\)", "\\(e-Reader Edition\\)", "\\(Steam\\)", "\\(Evercade\\)",
+    "\\(Antstream\\)", "\\(iam8bit\\)", "\\(Limited Run[^)]*\\)", "\\(Nintendo Leak\\)",
+    "\\([^)]*(?:Anniversary|Legacy|Advance) Collection[^)]*\\)", "\\(Collection of Mana\\)",
+    "\\(Namco Museum[^)]*\\)", "\\(Disney Classic Games\\)", "\\(Atari Anthology\\)",
+    "\\(Capcom Town\\)", "\\(Arcade Archives\\)",
+  ].join("|"),
+  "i"
+);
+
+// Digital-only distribution *native to the platform* — WiiWare on Wii, Sega Channel on
+// Genesis. These ARE genuine NA releases, so they stay in the database, but they're
+// flagged (dg:1) and sized separately: WiiWare capped at 40 MB, nothing like the 3 GB disc
+// average, which otherwise wrecked the Wii drive-budget maths. (Contrast RERELEASE above:
+// a Genesis game sold later on Switch Online is a re-release on other hardware, not a
+// release for this platform.)
+const DIGITAL = /\((?:WiiWare|DSiWare|eShop|PSN|DLC|Digital|Sega Channel)\)/i;
+const DIGITAL_MB = { wii: 40, ds: 16, "3ds": 500, wiiu: 2000 };
+
+// MAME carries thousands of sets that aren't arcade video games people played in NA:
+// gambling and mahjong cabinets, medal/prize machines, BIOS and diagnostic sets, adult
+// titles. Plus Japan/Asia-exclusive boards, which don't belong in an NA list.
+const MAME_JUNK = new RegExp(
+  [
+    "mahjong", "hanafuda", "\\bpoker\\b", "slot machine", "\\bslots?\\b", "casino",
+    "roulette", "bingo", "keno", "\\bbaccarat\\b", "blackjack", "fruit machine",
+    "\\bbios\\b", "\\(bootleg", "hack\\)", "\\bmedal\\b", "redemption", "strip ",
+    "adult", "nude", "\\bpachinko\\b", "\\bpachi", "derby owners", "\\btest set\\b",
+    "diagnostic", "\\bdummy\\b", "playchoice", "photo booth", "print club",
+    "\\bprize\\b", "crane ", "jukebox",
+  ].join("|"),
+  "i"
+);
+const MAME_ASIA_ONLY = /\((?:Japan|Japanese|Asia|Korea|Korean|Taiwan|China|Hong Kong)[^)]*\)/i;
+const MAME_WEST = /\((?:US|USA|U\.S\.|World|Euro|Europe|English|Export)[^)]*\)/i;
 
 // Variants that aren't real retail NA releases (or duplicate other tabs).
 const EXCLUDE = /\((?:[^)]*\b(?:Demo|Beta|Proto|Sample|Kiosk|Aftermarket|Pirate|Program|Test|Debug|Promo|Competition Cart|bootleg|prototype|Korean|Unl)\b[^)]*|Virtual Console[^)]*)\)|\[[^\]]*\]/i;
@@ -199,13 +243,14 @@ for (const p of PLATFORMS) {
   // NA release = region tag containing USA or World ("(USA)", "(USA, Europe)",
   // "(Japan, USA)", "(World)" are all NA carts in No-Intro/Redump naming)
   const NA = /\([^)]*\b(?:USA|World)\b[^)]*\)/;
-  files = files.filter((f) => !EXCLUDE.test(f) && !NON_GAMES.test(f));
+  files = files.filter((f) => !EXCLUDE.test(f) && !NON_GAMES.test(f) && !RERELEASE.test(f));
   const allRegions = files; // kept for art fallback on DAT-backed platforms
   const hasRegion = !p.noRegionFilter && files.some((f) => NA.test(f));
   if (hasRegion) files = files.filter((f) => NA.test(f));
 
   // group variants by normalized base title (also merges "_"-escape spelling variants)
   const games = new Map();
+  const fileRepo = new Map(); // only for files sourced from an extraRepo
   for (const f of files) {
     let t = baseTitle(f);
     // Neo Geo MVS sets are named "English Title _ Japanese Title" — keep the English half
@@ -216,6 +261,27 @@ for (const p of PLATFORMS) {
     if (t.length < g.t.length) g.t = t;
     g.variants.push(f);
     games.set(key, g);
+  }
+
+  // Supplemental repos fill gaps the main set misses. Only titles the main repo doesn't
+  // already have are added, so its (better-curated) art always wins on shared games.
+  for (const extra of p.extraRepos || []) {
+    let add = ghTree(extra).tree
+      .filter((e) => e.type === "blob" && e.path.startsWith("Named_Boxarts/") && e.path.endsWith(".png"))
+      .map((e) => e.path.slice("Named_Boxarts/".length))
+      .filter((f) => !EXCLUDE.test(f) && !NON_GAMES.test(f) && !RERELEASE.test(f));
+    if (extra === "MAME") {
+      add = add.filter((f) => !MAME_JUNK.test(f) && !(MAME_ASIA_ONLY.test(f) && !MAME_WEST.test(f)));
+    }
+    let added = 0;
+    for (const f of add) {
+      const key = norm(baseTitle(f));
+      if (!key || games.has(key)) continue;
+      games.set(key, { t: baseTitle(f), variants: [f] });
+      fileRepo.set(f, extra);
+      added++;
+    }
+    console.log(`  + ${added} titles from ${extra}`);
   }
 
   // DAT-backed platform: the release list is the DAT, thumbnails are art only.
@@ -273,9 +339,20 @@ for (const p of PLATFORMS) {
     if (tag) usedTags.add(n);
     // measured DAT size > hand-measured BIG_GAMES entry > platform average
     const big = (BIG_GAMES[p.id] || {})[n];
+    // digital-only if EVERY variant is digital — a game sold on disc *and* on WiiWare
+    // stays a retail release
+    const digital = g.variants.length > 0 && g.variants.every((v) => DIGITAL.test(v));
     // 3 decimals, not 1: kilobyte-era carts (avgMB 0.01) would otherwise round to zero
-    const sizeMB = g.bytes ? Math.round(g.bytes / 1048576) : big || Math.round(p.avgMB * discs * 1000) / 1000;
-    rows.push({ t: displayTitle(g.t), f: art, s: sizeMB, d: discs, h: tag });
+    const sizeMB = g.bytes
+      ? Math.round(g.bytes / 1048576)
+      : digital && DIGITAL_MB[p.id]
+        ? DIGITAL_MB[p.id]
+        : big || Math.round(p.avgMB * discs * 1000) / 1000;
+    const row = { t: displayTitle(g.t), f: art, s: sizeMB, d: discs, h: tag };
+    if (digital) row.dg = 1;
+    const artRepo = art ? fileRepo.get(art) : null;
+    if (artRepo) row.r = artRepo; // art lives in a supplemental repo, not p.repo
+    rows.push(row);
   }
 
   // extras: add notable titles the source list misses, and refine sizes on ones it has
@@ -297,9 +374,10 @@ for (const p of PLATFORMS) {
   const missedTags = [...taggedNorms.keys()].filter((k) => !usedTags.has(k));
   if (missedTags.length) console.warn(`  ! ${p.id}: ${missedTags.length} tag(s) matched nothing: ${missedTags.slice(0, 8).join("; ")}${missedTags.length > 8 ? " …" : ""}`);
 
-  meta.push({ id: p.id, label: p.label, repo: p.repo, avgMB: p.avgMB, count: rows.length, tagged: rows.filter((r) => r.h).length });
+  const digitalCount = rows.filter((r) => r.dg).length;
+  meta.push({ id: p.id, label: p.label, repo: p.repo, avgMB: p.avgMB, count: rows.length, tagged: rows.filter((r) => r.h).length, ...(digitalCount ? { digital: digitalCount } : {}) });
   grandTotal += rows.length;
-  console.log(`${p.label.padEnd(18)} ${String(rows.length).padStart(5)} games, ${rows.filter((r) => r.h).length} tagged`);
+  console.log(`${p.label.padEnd(18)} ${String(rows.length).padStart(5)} games, ${rows.filter((r) => r.h).length} tagged${digitalCount ? `, ${digitalCount} digital-only` : ""}`);
 }
 
 fs.writeFileSync(path.join(outDir, "platforms.json"), JSON.stringify(meta, null, 2), "utf8");

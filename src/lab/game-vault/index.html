@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Game Vault · Mapzimus</title>
-<meta name="description" content="A browsable database of 21,600+ North American console and handheld game releases across 39 platforms (1976–2012), with box art, curated top-seller/classic/hidden-gem tags, drive-size budgeting, and open JSON data.">
+<meta name="description" content="A browsable database of 22,500+ North American console, handheld and arcade game releases across 39 platforms (1976–2012), with box art, curated top-seller/classic/hidden-gem tags, drive-size budgeting, and open JSON data.">
 <link rel="icon" href="../../favicon.svg">
 <link rel="canonical" href="https://mapzimus.com/lab/game-vault/">
-<link rel="stylesheet" href="vault.css?v=5">
+<link rel="stylesheet" href="vault.css?v=6">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -32,7 +32,7 @@
   <div class="gv-brand-row">
     <a class="gv-brand" href="https://mapzimus.com/"><span class="gv-mark">MZ</span> Mapzimus</a>
     <h1>Game Vault</h1>
-    <p class="gv-sub">A browsable database of <strong id="total-count">21,601</strong> North American releases across <strong id="total-platforms">39</strong> platforms, 1976–2012. Pick the library, mind the terabytes. <span class="gv-est">Sizes are estimates unless measured.</span></p>
+    <p class="gv-sub">A browsable database of <strong id="total-count">22,515</strong> North American releases across <strong id="total-platforms">39</strong> platforms, 1976–2012. Pick the library, mind the terabytes. <span class="gv-est">Sizes are estimates unless measured.</span></p>
   </div>
 
   <div class="gv-stats" role="status" aria-live="polite">
@@ -86,6 +86,8 @@
       <button data-filter="tagged">Any tag</button>
       <button data-filter="selected">Selected</button>
       <button data-filter="unselected">Unselected</button>
+      <button data-filter="retail" class="f-media" hidden>Retail only</button>
+      <button data-filter="digital" class="f-media" hidden>Digital-only</button>
     </div>
     <div class="gv-bulk">
       <button id="select-tagged" class="gv-btn">+ all tagged</button>
@@ -120,10 +122,11 @@
 
 <footer class="gv-foot">
   <p>Box art &amp; naming from the <a href="https://github.com/libretro-thumbnails">libretro-thumbnails</a> project (No-Intro / Redump sets). Sizes are per-platform estimates for budgeting, not exact file sizes. Selections stay in this browser (localStorage) — export to move them.</p>
-  <p><strong>Use the data.</strong> Everything here is plain JSON, no key required: <a href="data/platforms.json">data/platforms.json</a> lists the platforms, and <code>data/&lt;id&gt;.json</code> (e.g. <a href="data/snes.json">data/snes.json</a>) holds each library — <code>t</code> title, <code>f</code> box-art file, <code>s</code> size in MB, <code>d</code> disc count, <code>h</code> tag (<code>top-seller</code> / <code>classic</code> / <code>hidden-gem</code>), <code>y</code> year, and <code>g</code>/<code>dv</code>/<code>pb</code> indexes into <code>data/&lt;id&gt;.meta.json</code> (genre / developer / publisher). Links are shareable too: the URL tracks the platform and filter you're viewing.</p>
-  <p><strong>Known gaps, stated plainly.</strong> Release years, genres and studio credits come from <a href="https://github.com/libretro/libretro-database">libretro-database</a> and are uneven upstream — years exist for most cartridge platforms but none of the disc ones, and a year is the title's original release, which for early ports can predate the North American date. Descriptions exist only for PlayStation and PS2. Xbox 360 and PS3 libraries come from Redump DATs with measured image sizes but almost no box art. The arcade set carries no region tags, so that tab isn't NA-filtered.</p>
+  <p><strong>Use the data.</strong> Everything here is plain JSON, no key required: <a href="data/platforms.json">data/platforms.json</a> lists the platforms, and <code>data/&lt;id&gt;.json</code> (e.g. <a href="data/snes.json">data/snes.json</a>) holds each library — <code>t</code> title, <code>f</code> box-art file, <code>s</code> size in MB, <code>d</code> disc count, <code>h</code> tag (<code>top-seller</code> / <code>classic</code> / <code>hidden-gem</code>), <code>y</code> year, <code>g</code>/<code>dv</code>/<code>pb</code> indexes into <code>data/&lt;id&gt;.meta.json</code> (genre / developer / publisher), <code>dg:1</code> on digital-only releases, and <code>r</code> where the box art lives in a different thumbnail repo than the platform's. Links are shareable too: the URL tracks the platform and filter you're viewing.</p>
+  <p><strong>What counts as a release.</strong> One row per game per platform, NA retail media, variants and revisions collapsed. Digital-only releases that were native to the platform — WiiWare on Wii, Sega Channel on Genesis — are included but marked <em>DIGITAL</em> and sized accordingly, and each platform's retail/digital split is shown in the grid header. ROMs ripped from later re-releases are <em>not</em> counted as releases of their own: a Genesis game sold on Switch Online, Virtual Console, a mini console or an anniversary collection belongs to that product, not to this platform's library. Demos, prototypes, betas, kiosk and service discs, unlicensed carts, e-Reader cards and GBA Video carts are excluded. Where a platform's total differs from a published count, this is usually why — and the underlying JSON lets you re-slice it however you prefer.</p>
+  <p><strong>Known gaps, stated plainly.</strong> Release years, genres and studio credits come from <a href="https://github.com/libretro/libretro-database">libretro-database</a> and are uneven upstream — years exist for most cartridge platforms but none of the disc ones, and a year is the title's original release, which for early ports can predate the North American date. Descriptions exist only for PlayStation and PS2. Xbox 360 and PS3 libraries come from Redump DATs with measured image sizes but almost no box art. The arcade set carries no region tags, so that tab isn't NA-filtered; it merges FBNeo with MAME (which supplies the 3D and Model 2/3 era), minus gambling, mahjong, medal and BIOS sets and Japan-exclusive boards. Daytona USA, Crazy Taxi and the laserdisc titles have no box art upstream and are still missing.</p>
 </footer>
 
-<script src="vault.js?v=5"></script>
+<script src="vault.js?v=6"></script>
 </body>
 </html>

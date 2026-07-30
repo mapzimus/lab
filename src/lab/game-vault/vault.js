@@ -65,8 +65,10 @@
     }
     return state.descs[id];
   }
-  const artURL = (p, f) =>
-    `https://raw.githubusercontent.com/libretro-thumbnails/${p.repo}/master/Named_Boxarts/${encodeURIComponent(f)}`;
+  // r overrides the platform repo for rows whose art came from a supplemental set
+  // (arcade pulls from MAME as well as FBNeo)
+  const artURL = (p, f, repo) =>
+    `https://raw.githubusercontent.com/libretro-thumbnails/${repo || p.repo}/master/Named_Boxarts/${encodeURIComponent(f)}`;
 
   /* ---------- stats ---------- */
   const fmtGB = (gb) => gb >= 1024 ? `${(gb / 1024).toFixed(2)} TB` : `${gb >= 100 ? Math.round(gb) : gb.toFixed(1)} GB`;
@@ -153,6 +155,14 @@
       return;
     }
     renderLetters();
+    // retail/digital split only matters where the platform actually had a digital
+    // storefront (WiiWare, Sega Channel) — hide the chips everywhere else
+    const hasDigital = !!state.platforms.find((x) => x.id === id)?.digital;
+    document.querySelectorAll("#filters .f-media").forEach((b) => { b.hidden = !hasDigital; });
+    if (!hasDigital && (state.filter === "retail" || state.filter === "digital")) {
+      state.filter = "all";
+      document.querySelectorAll("#filters button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.filter === "all")));
+    }
     applyFilters();
     renderStats(); // exact sizes now that rows are loaded
   }
@@ -191,6 +201,8 @@
         case "tagged": return !!r.h;
         case "selected": return set.has(r.t);
         case "unselected": return !set.has(r.t);
+        case "retail": return !r.dg;
+        case "digital": return !!r.dg;
         default: return true;
       }
     });
@@ -224,6 +236,7 @@
     const picked = picksFor(state.active).size;
     $("grid-meta").textContent =
       `${p.label} — showing ${state.visible.length.toLocaleString()} of ${rows.length.toLocaleString()} games` +
+      (p.digital ? ` (${p.digital.toLocaleString()} digital-only)` : "") +
       (picked ? ` · ${picked.toLocaleString()} selected` : "");
   }
 
@@ -236,7 +249,7 @@
     const [plat, filter] = location.hash.replace(/^#/, "").split("/");
     return {
       plat: state.platforms.some((p) => p.id === plat) ? plat : null,
-      filter: ["top-seller", "classic", "hidden-gem", "tagged", "selected", "unselected"].includes(filter) ? filter : null,
+      filter: ["top-seller", "classic", "hidden-gem", "tagged", "selected", "unselected", "retail", "digital"].includes(filter) ? filter : null,
     };
   }
 
@@ -248,19 +261,20 @@
     for (let i = state.rendered; i < end; i++) {
       const r = state.visible[i];
       const tile = document.createElement("button");
-      tile.className = "gv-tile" + (r.h ? " " + TAG_CLASS[r.h] : "");
+      tile.className = "gv-tile" + (r.h ? " " + TAG_CLASS[r.h] : "") + (r.dg ? " is-digital" : "");
       tile.setAttribute("aria-pressed", String(set.has(r.t)));
       tile.dataset.title = r.t;
       const sizeTxt = fmtSize(r.s);
       // No cover in the thumbnail set: leave the art area blank but keep the tile
       // fully selectable — the title still reads from the caption below.
       const cover = r.f
-        ? `<img loading="lazy" decoding="async" src="${artURL(p, r.f)}" alt="">`
+        ? `<img loading="lazy" decoding="async" src="${artURL(p, r.f, r.r)}" alt="">`
         : `<span class="no-art" aria-hidden="true"></span>`;
       tile.innerHTML =
         `${r.h ? `<span class="badge">${TAG_BADGE[r.h]}</span>` : ""}` +
         `<span class="check">✓</span>` +
         `<span class="cover">${cover}</span>` +
+        `${r.dg ? `<span class="dbadge" title="Digital-only release (no retail disc or cartridge)">DIGITAL</span>` : ""}` +
         `<span class="label"><span class="name">${escapeHTML(r.t)}</span><span class="size">${r.y ? r.y + " · " : ""}${sizeTxt}${r.d > 1 ? ` · ${r.d} discs` : ""}</span></span>`;
       tile.addEventListener("pointerenter", () => showTip(r, tile));
       tile.addEventListener("focus", () => showTip(r, tile));

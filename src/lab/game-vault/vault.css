@@ -113,6 +113,11 @@ main { max-width: 1500px; margin: 0 auto; padding: 14px 18px 60px; }
 .tag-cl .badge { background: var(--purple); }
 .tag-hg .badge { background: var(--cyan); }
 
+/* digital-only marker — bottom-left of the cover, so it never collides with the
+   tag badge (top-left) or the selected check (top-right) */
+.gv-tile .dbadge { position: absolute; left: 5px; top: 5px; z-index: 2; padding: 2px 5px; background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); font: 800 8px var(--mono); letter-spacing: .06em; }
+.gv-tile.tag-ts .dbadge, .gv-tile.tag-cl .dbadge, .gv-tile.tag-hg .dbadge { top: 26px; }
+
 .gv-tile .check { position: absolute; top: 5px; right: 5px; z-index: 2; display: none; width: 24px; height: 24px; place-items: center; background: var(--acid); color: var(--bg); font-weight: 900; border: 1px solid var(--bg); }
 .gv-tile[aria-pressed="true"] .check { display: grid; }
 .gv-tile[aria-pressed="true"] { outline: 3px solid var(--acid); outline-offset: -1px; }
