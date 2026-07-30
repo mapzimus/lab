@@ -166,6 +166,7 @@
         case "top-seller": case "classic": case "hidden-gem": return r.h === state.filter;
         case "tagged": return !!r.h;
         case "selected": return set.has(r.t);
+        case "unselected": return !set.has(r.t);
         default: return true;
       }
     });
