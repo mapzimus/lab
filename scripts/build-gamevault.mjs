@@ -74,7 +74,17 @@ const EXCLUDE = /\((?:[^)]*\b(?:Demo|Beta|Proto|Sample|Kiosk|Aftermarket|Pirate|
 
 // Not games at all: e-Reader card scans (each TCG card is a "title" in No-Intro)
 // and GBA Video cartoon carts. Together they inflated GBA from ~1040 to 2095.
-const NON_GAMES = /^e-Reader\b|-e(?: TCG)? - |^Game Boy Advance Video/i;
+// Second line: store-kiosk discs, magazine samplers, demo compilations, firmware and
+// service/diagnostic carts. These carry no (Demo) tag so EXCLUDE misses them.
+const NON_GAMES = new RegExp(
+  [
+    "^e-Reader\\b", "-e(?: TCG)? - ", "^Game Boy Advance Video",
+    "Atari PAM", "Diagnostic", "System Test", "Service (?:Cart|Disc|Test)", "Test Cartri?ge",
+    "Firmware Update", "IDU Firmware", "Kiosk", "Sampler(?: CD| Disc|$)", "CD\\+G Sampler",
+    "Interactive CD Sampler", "Demo Disc", "Jampack", "Preview Trailer", "Wireless Racing Wheel",
+  ].join("|"),
+  "i"
+);
 
 // Known giant games where the platform average is way off (MB, per full game).
 const BIG_GAMES = {
