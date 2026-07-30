@@ -63,10 +63,9 @@ const PLATFORMS = [
   { id: "wii", label: "Wii", repo: "Nintendo_-_Wii", avgMB: 3000 },                                       // Nov 19 2006
   { id: "3ds", label: "Nintendo 3DS", repo: "Nintendo_-_Nintendo_3DS", avgMB: 350 },                      // Mar 2011
   { id: "wiiu", label: "Wii U", repo: "Nintendo_-_Wii_U", avgMB: 10000 },                                 // Nov 2012
-  // No region tags in these sets (arcade boards and DOS releases weren't region-locked),
-  // so they skip the NA filter and sit at the end rather than in launch sequence.
+  // Arcade sets carry no region tags (boards weren't region-locked), so this one skips
+  // the NA filter and sits at the end rather than in launch sequence.
   { id: "arcade", label: "Arcade", repo: "FBNeo_-_Arcade_Games", avgMB: 5, noRegionFilter: true },        // spans eras
-  { id: "dos", label: "PC · DOS", repo: "DOS", avgMB: 30, noRegionFilter: true },                        // 1981-1997
 ];
 
 // Variants that aren't real retail NA releases (or duplicate other tabs).

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Game Vault · Mapzimus</title>
-<meta name="description" content="A browsable database of 16,800+ North American game releases across 19 classic platforms (NES through Wii), with box art, curated top-seller/classic/hidden-gem tags, drive-size budgeting, and open JSON data.">
+<meta name="description" content="A browsable database of 21,600+ North American console and handheld game releases across 39 platforms (1976–2012), with box art, curated top-seller/classic/hidden-gem tags, drive-size budgeting, and open JSON data.">
 <link rel="icon" href="../../favicon.svg">
 <link rel="canonical" href="https://mapzimus.com/lab/game-vault/">
 <link rel="stylesheet" href="vault.css?v=5">
@@ -13,7 +13,7 @@
   "@context": "https://schema.org",
   "@type": "Dataset",
   "name": "Game Vault — North American retro game release database",
-  "description": "Every North American retail release for 19 classic platforms (NES, SNES, N64, GameCube, Wii, Game Boy line, DS, 3DS, PS1, PS2, PSP, Genesis, Saturn, Dreamcast, Neo Geo, Xbox, Arcade) with curated top-seller, classic, and hidden-gem tags. Naming follows No-Intro/Redump conventions.",
+  "description": "North American retail releases for 39 console, handheld and arcade platforms from 1976 to 2012 — Fairchild Channel F, Atari 2600/5200/7800/Lynx/Jaguar, Odyssey², Intellivision, ColecoVision, Vectrex, NES, Master System, Game Boy line, Genesis, TurboGrafx-16, Neo Geo, Game Gear, SNES, Sega CD/32X, 3DO, Saturn, Virtual Boy, PlayStation 1/2/3, N64, Dreamcast, Xbox, Xbox 360, GameCube, Wii, Wii U, DS, 3DS, PSP and arcade — with curated top-seller, classic and hidden-gem tags. Naming follows No-Intro/Redump conventions.",
   "url": "https://mapzimus.com/lab/game-vault/",
   "isAccessibleForFree": true,
   "creator": { "@type": "Person", "name": "Max Howe", "url": "https://mapzimus.com/" },
@@ -32,7 +32,7 @@
   <div class="gv-brand-row">
     <a class="gv-brand" href="https://mapzimus.com/"><span class="gv-mark">MZ</span> Mapzimus</a>
     <h1>Game Vault</h1>
-    <p class="gv-sub">A browsable database of <strong id="total-count">25,719</strong> North American releases across <strong id="total-platforms">40</strong> platforms, 1976–2012. Pick the library, mind the terabytes. <span class="gv-est">Sizes are estimates unless measured.</span></p>
+    <p class="gv-sub">A browsable database of <strong id="total-count">21,601</strong> North American releases across <strong id="total-platforms">39</strong> platforms, 1976–2012. Pick the library, mind the terabytes. <span class="gv-est">Sizes are estimates unless measured.</span></p>
   </div>
 
   <div class="gv-stats" role="status" aria-live="polite">
@@ -121,7 +121,7 @@
 <footer class="gv-foot">
   <p>Box art &amp; naming from the <a href="https://github.com/libretro-thumbnails">libretro-thumbnails</a> project (No-Intro / Redump sets). Sizes are per-platform estimates for budgeting, not exact file sizes. Selections stay in this browser (localStorage) — export to move them.</p>
   <p><strong>Use the data.</strong> Everything here is plain JSON, no key required: <a href="data/platforms.json">data/platforms.json</a> lists the platforms, and <code>data/&lt;id&gt;.json</code> (e.g. <a href="data/snes.json">data/snes.json</a>) holds each library — <code>t</code> title, <code>f</code> box-art file, <code>s</code> size in MB, <code>d</code> disc count, <code>h</code> tag (<code>top-seller</code> / <code>classic</code> / <code>hidden-gem</code>), <code>y</code> year, and <code>g</code>/<code>dv</code>/<code>pb</code> indexes into <code>data/&lt;id&gt;.meta.json</code> (genre / developer / publisher). Links are shareable too: the URL tracks the platform and filter you're viewing.</p>
-  <p><strong>Known gaps, stated plainly.</strong> Release years, genres and studio credits come from <a href="https://github.com/libretro/libretro-database">libretro-database</a> and are uneven upstream — years exist for most cartridge platforms but none of the disc ones, and a year is the title's original release, which for early ports can predate the North American date. Descriptions exist only for PlayStation and PS2. Xbox 360 and PS3 libraries come from Redump DATs with measured image sizes but almost no box art. Arcade and DOS sets carry no region tags, so those two tabs aren't NA-filtered.</p>
+  <p><strong>Known gaps, stated plainly.</strong> Release years, genres and studio credits come from <a href="https://github.com/libretro/libretro-database">libretro-database</a> and are uneven upstream — years exist for most cartridge platforms but none of the disc ones, and a year is the title's original release, which for early ports can predate the North American date. Descriptions exist only for PlayStation and PS2. Xbox 360 and PS3 libraries come from Redump DATs with measured image sizes but almost no box art. The arcade set carries no region tags, so that tab isn't NA-filtered.</p>
 </footer>
 
 <script src="vault.js?v=5"></script>
