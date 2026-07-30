@@ -11,9 +11,12 @@
 
   const state = {
     platforms: [],           // [{id,label,repo,avgMB,count,tagged}]
-    data: {},                // id -> rows [{t,f,s,d,h}]
+    data: {},                // id -> rows [{t,f,s,d,h,y,g,dv,pb}]
+    meta: {},                // id -> {g:[],dv:[],pb:[]} lookup tables
+    descs: {},               // id -> Promise<{title: blurb}>, lazily fetched
     active: null,            // platform id
     filter: "all",
+    sort: "az",
     letter: null,
     query: "",
     budgetGB: 3600,
@@ -48,11 +51,30 @@
     if (!state.data[id]) state.data[id] = await fetchJSON(`data/${id}.json`);
     return state.data[id];
   }
+  // genre/developer/publisher lookup tables (rows store indexes into these)
+  async function platformMeta(id) {
+    if (!state.meta[id]) {
+      state.meta[id] = await fetchJSON(`data/${id}.meta.json`).catch(() => ({ g: [], dv: [], pb: [] }));
+    }
+    return state.meta[id];
+  }
+  // blurbs are a separate file so the grid isn't waiting on them
+  async function platformDescs(id) {
+    if (!state.descs[id]) {
+      state.descs[id] = fetchJSON(`data/${id}.desc.json`).catch(() => ({}));
+    }
+    return state.descs[id];
+  }
   const artURL = (p, f) =>
     `https://raw.githubusercontent.com/libretro-thumbnails/${p.repo}/master/Named_Boxarts/${encodeURIComponent(f)}`;
 
   /* ---------- stats ---------- */
   const fmtGB = (gb) => gb >= 1024 ? `${(gb / 1024).toFixed(2)} TB` : `${gb >= 100 ? Math.round(gb) : gb.toFixed(1)} GB`;
+  // 2600/Intellivision carts are kilobytes — rounding those to MB just prints "0 MB"
+  const fmtSize = (mb) =>
+    mb >= 1024 ? (mb / 1024).toFixed(1) + " GB" :
+    mb >= 1 ? Math.round(mb * 10) / 10 + " MB" :
+    Math.max(1, Math.round(mb * 1024)) + " KB";
 
   function totals() {
     let games = 0, mb = 0;
@@ -120,10 +142,12 @@
   async function selectPlatform(id) {
     state.active = id;
     state.letter = null;
+    syncHash();
     document.querySelectorAll(".gv-tab").forEach((t) => t.setAttribute("aria-selected", String(t.id === `tab-${id}`)));
+    hideTip();
     $("grid").innerHTML = `<p class="gv-empty">Loading ${id}…</p>`;
     try {
-      await platformRows(id);
+      await Promise.all([platformRows(id), platformMeta(id)]);
     } catch (e) {
       $("grid").innerHTML = `<p class="gv-empty">Could not load data (${e.message}). Reload to retry.</p>`;
       return;
@@ -170,12 +194,50 @@
         default: return true;
       }
     });
+    if (state.sort === "year" || state.sort === "year-desc") {
+      // year data is patchy upstream (cartridge platforms mostly), so undated games
+      // always sink to the bottom instead of pretending to be year zero
+      const dir = state.sort === "year" ? 1 : -1;
+      state.visible = [...state.visible].sort((a, b) => {
+        if (!a.y && !b.y) return a.t.localeCompare(b.t);
+        if (!a.y) return 1;
+        if (!b.y) return -1;
+        return (a.y - b.y) * dir || a.t.localeCompare(b.t);
+      });
+    } else if (state.sort === "size") {
+      state.visible = [...state.visible].sort((a, b) => b.s - a.s || a.t.localeCompare(b.t));
+    } else if (state.sort === "tagged") {
+      const rank = { "top-seller": 0, "classic": 1, "hidden-gem": 2 };
+      state.visible = [...state.visible].sort((a, b) => (a.h ? rank[a.h] : 3) - (b.h ? rank[b.h] : 3) || a.t.localeCompare(b.t));
+    }
     state.rendered = 0;
     $("grid").innerHTML = "";
-    const p = state.platforms.find((x) => x.id === state.active);
-    $("grid-meta").textContent = `${p.label} — showing ${state.visible.length.toLocaleString()} of ${rows.length.toLocaleString()} games`;
+    renderMeta();
     if (!state.visible.length) $("grid").innerHTML = `<p class="gv-empty">Nothing matches.</p>`;
     else renderBatch();
+  }
+
+  function renderMeta() {
+    const p = state.platforms.find((x) => x.id === state.active);
+    if (!p) return;
+    const rows = state.data[state.active] || [];
+    const picked = picksFor(state.active).size;
+    $("grid-meta").textContent =
+      `${p.label} — showing ${state.visible.length.toLocaleString()} of ${rows.length.toLocaleString()} games` +
+      (picked ? ` · ${picked.toLocaleString()} selected` : "");
+  }
+
+  // URL hash tracks platform + filter (#ps2/hidden-gem) so views are shareable
+  function syncHash() {
+    const h = "#" + state.active + (state.filter !== "all" ? "/" + state.filter : "");
+    history.replaceState(null, "", h);
+  }
+  function parseHash() {
+    const [plat, filter] = location.hash.replace(/^#/, "").split("/");
+    return {
+      plat: state.platforms.some((p) => p.id === plat) ? plat : null,
+      filter: ["top-seller", "classic", "hidden-gem", "tagged", "selected", "unselected"].includes(filter) ? filter : null,
+    };
   }
 
   function renderBatch() {
@@ -189,7 +251,7 @@
       tile.className = "gv-tile" + (r.h ? " " + TAG_CLASS[r.h] : "");
       tile.setAttribute("aria-pressed", String(set.has(r.t)));
       tile.dataset.title = r.t;
-      const sizeTxt = r.s >= 1024 ? (r.s / 1024).toFixed(1) + " GB" : Math.round(r.s * 10) / 10 + " MB";
+      const sizeTxt = fmtSize(r.s);
       // No cover in the thumbnail set: leave the art area blank but keep the tile
       // fully selectable — the title still reads from the caption below.
       const cover = r.f
@@ -199,10 +261,14 @@
         `${r.h ? `<span class="badge">${TAG_BADGE[r.h]}</span>` : ""}` +
         `<span class="check">✓</span>` +
         `<span class="cover">${cover}</span>` +
-        `<span class="label"><span class="name">${escapeHTML(r.t)}</span><span class="size">${sizeTxt}${r.d > 1 ? ` · ${r.d} discs` : ""}</span></span>`;
+        `<span class="label"><span class="name">${escapeHTML(r.t)}</span><span class="size">${r.y ? r.y + " · " : ""}${sizeTxt}${r.d > 1 ? ` · ${r.d} discs` : ""}</span></span>`;
+      tile.addEventListener("pointerenter", () => showTip(r, tile));
+      tile.addEventListener("focus", () => showTip(r, tile));
+      tile.addEventListener("pointerleave", hideTip);
+      tile.addEventListener("blur", hideTip);
       const img = tile.querySelector("img");
       if (img) img.addEventListener("error", () => { tile.querySelector(".cover").innerHTML = `<span class="no-art" aria-hidden="true"></span>`; }, { once: true });
-      tile.addEventListener("click", () => toggle(r.t, tile));
+      tile.addEventListener("click", () => { toggle(r.t, tile); renderMeta(); });
       frag.appendChild(tile);
     }
     $("grid").appendChild(frag);
@@ -210,6 +276,59 @@
   }
 
   const escapeHTML = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  /* ---------- hover detail ---------- */
+  const TAG_WORD = { "top-seller": "★ Top seller", "classic": "◆ Classic", "hidden-gem": "◈ Hidden gem" };
+  let tipToken = 0;
+
+  async function showTip(r, tile) {
+    const tip = $("tip");
+    const token = ++tipToken;
+    const forPlatform = state.active;
+    const meta = await platformMeta(forPlatform);
+    // bail if the pointer moved on, or the tab changed, while we were awaiting
+    if (token !== tipToken || forPlatform !== state.active || !tile.isConnected) return;
+
+    const facts = [];
+    if (r.y) facts.push(String(r.y));
+    if (r.g != null && meta.g?.[r.g]) facts.push(meta.g[r.g]);
+    const maker = (r.dv != null && meta.dv?.[r.dv]) || (r.pb != null && meta.pb?.[r.pb]);
+    if (maker) facts.push(maker);
+    facts.push(fmtSize(r.s) + (r.d > 1 ? ` · ${r.d} discs` : ""));
+
+    tip.innerHTML =
+      `<strong>${escapeHTML(r.t)}</strong>` +
+      `<span class="tip-facts">${escapeHTML(facts.join("  ·  "))}</span>` +
+      (r.h ? `<span class="tip-tag ${TAG_CLASS[r.h]}">${TAG_WORD[r.h]}</span>` : "") +
+      `<span class="tip-desc" id="tip-desc"></span>`;
+    tip.hidden = false;
+    placeTip(tile);
+
+    // blurbs live in a separate lazily-fetched file; only PS1/PS2 have them upstream
+    const descs = await platformDescs(forPlatform).then((d) => d).catch(() => ({}));
+    if (token !== tipToken || forPlatform !== state.active || !tile.isConnected) return;
+    const blurb = descs?.[r.t];
+    const slot = document.getElementById("tip-desc");
+    if (blurb && slot) { slot.textContent = blurb; placeTip(tile); }
+  }
+
+  function placeTip(tile) {
+    const tip = $("tip");
+    const box = tile.getBoundingClientRect();
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    // prefer right of the tile, flip left near the edge; clamp vertically to the viewport
+    let left = box.right + 10;
+    if (left + w > innerWidth - 8) left = Math.max(8, box.left - w - 10);
+    let top = box.top;
+    if (top + h > innerHeight - 8) top = Math.max(8, innerHeight - h - 8);
+    tip.style.left = left + "px";
+    tip.style.top = top + "px";
+  }
+
+  function hideTip() {
+    tipToken++;
+    $("tip").hidden = true;
+  }
 
   function toggle(title, tile) {
     const set = picksFor(state.active);
@@ -228,7 +347,30 @@
       if (!b) return;
       state.filter = b.dataset.filter;
       document.querySelectorAll("#filters button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      syncHash();
       applyFilters();
+    });
+
+    $("sort").addEventListener("change", (e) => { state.sort = e.target.value; applyFilters(); });
+
+    // back/forward and pasted #platform/filter links are same-document navigations,
+    // so the grid has to be rebuilt explicitly
+    addEventListener("hashchange", () => {
+      const { plat, filter } = parseHash();
+      const nextFilter = filter || "all";
+      if (nextFilter !== state.filter) {
+        state.filter = nextFilter;
+        document.querySelectorAll("#filters button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.filter === nextFilter)));
+      }
+      if (plat && plat !== state.active) selectPlatform(plat);
+      else applyFilters();
+    });
+
+    // "/" jumps to search, Esc clears it
+    document.addEventListener("keydown", (e) => {
+      const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName);
+      if (e.key === "/" && !typing) { e.preventDefault(); $("search").focus(); }
+      else if (e.key === "Escape" && state.query) { $("search").value = ""; state.query = ""; applyFilters(); }
     });
 
     $("select-tagged").addEventListener("click", () => {
@@ -383,11 +525,18 @@
       $("grid").innerHTML = `<p class="gv-empty">Could not load platform list (${e.message}).</p>`;
       return;
     }
+    $("total-count").textContent = state.platforms.reduce((a, p) => a + p.count, 0).toLocaleString();
+    $("total-platforms").textContent = state.platforms.length;
     renderTabs();
     wireControls();
     wireSentinel();
     renderStats();
-    selectPlatform(state.platforms[0].id);
+    const { plat, filter } = parseHash();
+    if (filter) {
+      state.filter = filter;
+      document.querySelectorAll("#filters button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.filter === filter)));
+    }
+    selectPlatform(plat || state.platforms[0].id);
   }
   boot();
 })();
