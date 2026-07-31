@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-07-30",
+  "generatedAt": "2026-07-31",
   "news": {
     "mapsmania": [
+      {
+        "title": "Mapping Meals Under $10",
+        "url": "http://googlemapsmania.blogspot.com/2026/07/mapping-meals-under-10.html",
+        "desc": "CheapFoodMap is an interactive map that highlights restaurants across the United States where you can still find meals for under $10."
+      },
       {
         "title": "German Döner, English Curry & American Pizza",
         "url": "http://googlemapsmania.blogspot.com/2026/07/german-doner-english-curry-american.html",
@@ -36,11 +41,6 @@
         "title": "How Close is Everything You Need?",
         "url": "http://googlemapsmania.blogspot.com/2026/07/how-close-is-everything-you-need.html",
         "desc": "One of the biggest challenges when moving home is deciding which compromise you are prepared to make."
-      },
-      {
-        "title": "The 5 Best 3D Subway Maps",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/the-5-best-3d-subway-maps.html",
-        "desc": "Shinjuku Station has a well-earned reputation as one of the world's largest and most bewildering transport hubs."
       }
     ],
     "georealm": [
@@ -110,39 +110,55 @@
   },
   "qgis": [
     {
-      "title": "Q-CensosBo",
-      "url": "https://plugins.qgis.org/plugins/qcensosbo/"
+      "title": "Coffee Stain",
+      "url": "https://plugins.qgis.org/plugins/coffee_stain_plugin/"
     },
     {
-      "title": "Urban Growth Predictor",
-      "url": "https://plugins.qgis.org/plugins/qgis_urban_growth_predictor/"
+      "title": "LISFLOOD-FP Preprocessor",
+      "url": "https://plugins.qgis.org/plugins/lisflood_preprocessor/"
     },
     {
-      "title": "ARENARIA — GML Export for ARiMR (eWniosekPlus)",
-      "url": "https://plugins.qgis.org/plugins/arenaria_arimr/"
+      "title": "QReplace",
+      "url": "https://plugins.qgis.org/plugins/qreplace/"
     },
     {
-      "title": "Military Cartography Tools",
-      "url": "https://plugins.qgis.org/plugins/MilitaryCartographyTools/"
+      "title": "QGIS Agent MCP",
+      "url": "https://plugins.qgis.org/plugins/qgis_agent_mcp/"
     },
     {
-      "title": "GeoBan France",
-      "url": "https://plugins.qgis.org/plugins/geoban_france/"
+      "title": "RiverDetectWood",
+      "url": "https://plugins.qgis.org/plugins/RiverDetectWood/"
     },
     {
-      "title": "OVER Catalog",
-      "url": "https://plugins.qgis.org/plugins/over_catalog/"
+      "title": "Map Frame Storyboard",
+      "url": "https://plugins.qgis.org/plugins/map_frame_storyboard/"
     },
     {
-      "title": "Another Autosaver",
-      "url": "https://plugins.qgis.org/plugins/another-autosaver/"
+      "title": "PickShift",
+      "url": "https://plugins.qgis.org/plugins/pickshift_plugin/"
     },
     {
-      "title": "Multi Layer Filter Toolbar",
-      "url": "https://plugins.qgis.org/plugins/multi_layer_filter/"
+      "title": "SCIMAP Toolkit",
+      "url": "https://plugins.qgis.org/plugins/SCIMAPQGIS/"
     }
   ],
   "releases": [
+    {
+      "repo": "qgis/QGIS",
+      "title": "QGIS final-3_44_13",
+      "url": "https://github.com/qgis/QGIS/releases/tag/final-3_44_13",
+      "desc": "https://github.com/qgis/QGIS/compare/final-3_44_12%5E...final-3_44_13",
+      "publishedAt": "2026-07-31",
+      "isFresh": true
+    },
+    {
+      "repo": "maplibre/maplibre-gl-js",
+      "title": "maplibre-gl-js v6.1.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.1.0",
+      "desc": "### ✨ Features and improvements - Add support for updating an `ImageSource` with an already-decoded image (`HTMLImageElement`, `HTMLCanvasElement`, `ImageBit…",
+      "publishedAt": "2026-07-30",
+      "isFresh": true
+    },
     {
       "repo": "duckdb/duckdb",
       "title": "duckdb v1.5.5",
@@ -160,27 +176,11 @@
       "isFresh": true
     },
     {
-      "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.0.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.0.0",
-      "desc": "The following incorporates all the pre-releases for version 6 changes.",
-      "publishedAt": "2026-07-22",
-      "isFresh": true
-    },
-    {
       "repo": "visgl/deck.gl",
       "title": "deck.gl v9.3.7",
       "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.7",
       "desc": "- fix(core): do not write View clearColor into the picking buffer (#10431) - fix(mapbox): avoid crash when MapboxOverlay beforeId layer is removed (#10425) -…",
       "publishedAt": "2026-07-16",
-      "isFresh": true
-    },
-    {
-      "repo": "qgis/QGIS",
-      "title": "QGIS final-3_44_12",
-      "url": "https://github.com/qgis/QGIS/releases/tag/final-3_44_12",
-      "desc": "https://github.com/qgis/QGIS/compare/final-3_44_11%5E...final-3_44_12",
-      "publishedAt": "2026-07-03",
       "isFresh": true
     },
     {
@@ -210,6 +210,18 @@
   ],
   "gisse": [
     {
+      "title": "How to draw a line connecting the midpoints of a rectangles shorter edges using FME",
+      "url": "https://gis.stackexchange.com/questions/501208/how-to-draw-a-line-connecting-the-midpoints-of-a-rectangles-shorter-edges-using",
+      "score": 1,
+      "answers": 2
+    },
+    {
+      "title": "Creating Coded Domains in QGIS 3.4",
+      "url": "https://gis.stackexchange.com/questions/501209/creating-coded-domains-in-qgis-3-4",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "How to correctly match a street-layer with point-layer containing additional information",
       "url": "https://gis.stackexchange.com/questions/501207/how-to-correctly-match-a-street-layer-with-point-layer-containing-additional-inf",
       "score": 1,
@@ -230,7 +242,7 @@
     {
       "title": "Making neighbourhood plan which has grid system of streets in QGIS",
       "url": "https://gis.stackexchange.com/questions/501197/making-neighbourhood-plan-which-has-grid-system-of-streets-in-qgis",
-      "score": 1,
+      "score": 0,
       "answers": 1
     },
     {
@@ -256,44 +268,14 @@
       "url": "https://gis.stackexchange.com/questions/501194/calculate-field-by-data-from-another-layer-in-qgis",
       "score": 0,
       "answers": 1
-    },
-    {
-      "title": "Errors found when connecting to OS NGD API in QGIS 3.44",
-      "url": "https://gis.stackexchange.com/questions/501193/errors-found-when-connecting-to-os-ngd-api-in-qgis-3-44",
-      "score": 1,
-      "answers": 0
-    },
-    {
-      "title": "ArcGIS Pro 3.7.0: Internationalization option for Graticule labels is grayed out (worked in 3.5)",
-      "url": "https://gis.stackexchange.com/questions/501192/arcgis-pro-3-7-0-internationalization-option-for-graticule-labels-is-grayed-out",
-      "score": 0,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "PACE OCI Level-2 Regional Closed-Loop Ocean Simulation for Evaluation Data, version 1",
-      "url": "https://search.earthdata.nasa.gov/search?q=PACE_OCI_L2_CLOSE",
-      "desc": "The Closed-Loop Ocean Simulation for Evaluation of ocean color retrieval algorithms (CLOSE) Level-2 collection provides swath-based ocean-color products retr…",
+      "title": "PACE OCI Closed-Loop Ocean Simulation for Evaluation - Model Input Data, version 1",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE_OCI_MI_CLOSE",
+      "desc": "The Closed-Loop Ocean Simulation for Evaluation of ocean color retrieval algorithms (CLOSE) Model Input collection provides modeled remote sensing reflectanc…",
       "org": "OB_CLOUD"
-    },
-    {
-      "title": "ARCSIX P-3B In-Situ Radiation Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=ARCSIX_Radiation_AircraftInSitu_P3B_Data",
-      "desc": "ARCSIX_Radiation_AircraftInSitu_P3B_Data is the in-situ radiation data collected onboard the P-3B aircraft during the Arctic Radiation-Cloud-Aerosol-Surface…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "HyTES Level 1 Radiance, Facility Instrument Collection, 2013-2016",
-      "url": "https://search.earthdata.nasa.gov/search?q=HyTES_L1_Radiance_2013_2016_2476",
-      "desc": "This dataset contains Level 1 (L1) radiance imagery from the Hyperspectral Thermal Emission Spectrometer (HyTES) instrument.",
-      "org": "ORNL_CLOUD"
-    },
-    {
-      "title": "HyTES: Level 2 Emissivity and Land Surface Temperature",
-      "url": "https://search.earthdata.nasa.gov/search?q=HyTES_L2_Emissivity_LST_2460",
-      "desc": "This dataset contains Level 2 (L2) land surface temperature (LST) and emissivity from the Hyperspectral Thermal Emission Spectrometer (HyTES) instrument.",
-      "org": "ORNL_CLOUD"
     },
     {
       "title": "UAVSAR_POLSAR_STOKES",
@@ -329,6 +311,24 @@
       "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
       "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
+      "desc": "UAVSAR PolSAR Scene Projected",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_METADATA",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
+      "desc": "UAVSAR PolSAR Scene Metadata",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_KMZ",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
+      "desc": "UAVSAR PolSAR Scene KMZ",
       "org": "ASF"
     }
   ],
