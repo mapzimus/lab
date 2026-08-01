@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-07-31",
+  "generatedAt": "2026-08-01",
   "news": {
     "mapsmania": [
+      {
+        "title": "The Map of Global Friendship",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/the-map-of-global-friendship.html",
+        "desc": "Social Connectedness Index Map St."
+      },
       {
         "title": "Mapping Meals Under $10",
         "url": "http://googlemapsmania.blogspot.com/2026/07/mapping-meals-under-10.html",
@@ -36,11 +41,6 @@
         "title": "Can You Date the Map? - Daily Challenge",
         "url": "http://googlemapsmania.blogspot.com/2026/07/can-you-date-map-daily-challenge.html",
         "desc": "Randall Munroe's famous xkcd comic Map Age Guide distilled two centuries of global geopolitics into a wonderfully simple flowchart for dating maps."
-      },
-      {
-        "title": "How Close is Everything You Need?",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/how-close-is-everything-you-need.html",
-        "desc": "One of the biggest challenges when moving home is deciding which compromise you are prepared to make."
       }
     ],
     "georealm": [
@@ -210,16 +210,22 @@
   ],
   "gisse": [
     {
+      "title": "I am seeking a profile of the garden in which I grew up 75 years ago.",
+      "url": "https://gis.stackexchange.com/questions/501215/i-am-seeking-a-profile-of-the-garden-in-which-i-grew-up-75-years-ago-i-was-intr",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Selecting layer from Geopackage containing multiple layers using Merge tool of QGIS",
+      "url": "https://gis.stackexchange.com/questions/501214/selecting-layer-from-geopackage-containing-multiple-layers-using-merge-tool-of-q",
+      "score": 1,
+      "answers": 0
+    },
+    {
       "title": "How to draw a line connecting the midpoints of a rectangles shorter edges using FME",
       "url": "https://gis.stackexchange.com/questions/501208/how-to-draw-a-line-connecting-the-midpoints-of-a-rectangles-shorter-edges-using",
       "score": 1,
       "answers": 2
-    },
-    {
-      "title": "Creating Coded Domains in QGIS 3.4",
-      "url": "https://gis.stackexchange.com/questions/501209/creating-coded-domains-in-qgis-3-4",
-      "score": 0,
-      "answers": 0
     },
     {
       "title": "How to correctly match a street-layer with point-layer containing additional information",
@@ -228,8 +234,14 @@
       "answers": 0
     },
     {
-      "title": "Processing plug-in can only export data to a shapefile",
-      "url": "https://gis.stackexchange.com/questions/501204/processing-plug-in-can-only-export-data-to-a-shapefile",
+      "title": "Processing plug-in can only export data to a GPKG",
+      "url": "https://gis.stackexchange.com/questions/501204/processing-plug-in-can-only-export-data-to-a-gpkg",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Creating Coded Domains in QGIS 3.4",
+      "url": "https://gis.stackexchange.com/questions/501209/creating-coded-domains-in-qgis-3-4",
       "score": 0,
       "answers": 0
     },
@@ -246,12 +258,6 @@
       "answers": 1
     },
     {
-      "title": "Understanding GeoJSON.io centroid accuracy",
-      "url": "https://gis.stackexchange.com/questions/501200/understanding-geojson-io-centroid-accuracy",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "QGIS Density Analysis result filesize/pixel size",
       "url": "https://gis.stackexchange.com/questions/501196/qgis-density-analysis-result-filesize-pixel-size",
       "score": 1,
@@ -262,21 +268,9 @@
       "url": "https://gis.stackexchange.com/questions/501183/how-to-optimize-large-gpkg-files-on-qgis",
       "score": 2,
       "answers": 1
-    },
-    {
-      "title": "Calculate field by data from another layer in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501194/calculate-field-by-data-from-another-layer-in-qgis",
-      "score": 0,
-      "answers": 1
     }
   ],
   "nasa": [
-    {
-      "title": "PACE OCI Closed-Loop Ocean Simulation for Evaluation - Model Input Data, version 1",
-      "url": "https://search.earthdata.nasa.gov/search?q=PACE_OCI_MI_CLOSE",
-      "desc": "The Closed-Loop Ocean Simulation for Evaluation of ocean color retrieval algorithms (CLOSE) Model Input collection provides modeled remote sensing reflectanc…",
-      "org": "OB_CLOUD"
-    },
     {
       "title": "UAVSAR_POLSAR_STOKES",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
@@ -330,6 +324,12 @@
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
       "desc": "UAVSAR PolSAR Scene KMZ",
       "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_INCIDENCE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
+      "desc": "UAVSAR PolSAR Scene Incidence Angle",
+      "org": "ASF"
     }
   ],
   "datagov": [
@@ -348,18 +348,11 @@
       "rank": 5
     },
     {
-      "title": "Civil Rights Data Collection (CRDC)",
-      "url": "https://catalog.data.gov/dataset/civil-rights-data-collection-crdc",
-      "desc": "Since 1968, OCR has collected civil rights data related to students' access and barriers to educational opportunity from early childhood through grade 12.",
-      "org": "Department of Education",
-      "rank": 5
-    },
-    {
-      "title": "2015-16 Harassment or Bullying Estimations by Basis Category",
-      "url": "https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-estimations-by-basis-category",
-      "desc": "This set of Excel files contains data on students reported as harassed or bullied or disciplined for harassment or bullying on the basis of sex, race, or disabi",
-      "org": "Department of Education",
-      "rank": 4
+      "title": "Hazard Mitigation Assistance Projects",
+      "url": "https://catalog.data.gov/dataset/hazard-mitigation-assistance-projects",
+      "desc": "This dataset contains funded projects (financial obligation to grantee) under the Hazard Mitigation Assistance (HMA) grant programs.",
+      "org": "Department of Homeland Security",
+      "rank": 3
     },
     {
       "title": "2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection",
@@ -369,23 +362,30 @@
       "rank": 2
     },
     {
-      "title": "2017-18 Harassment or Bullying Civil Rights Data Collection",
-      "url": "https://catalog.data.gov/dataset/2017-18-harassment-or-bullying-civil-rights-data-collection",
-      "desc": "This set of Excel files contains data on students reported as harassed or bullied or disciplined for harassment or bullying on the basis of sex, race, or disabi",
+      "title": "2017-18 Arrests Civil Rights Data Collection",
+      "url": "https://catalog.data.gov/dataset/2017-18-arrests-civil-rights-data-collection",
+      "desc": "This set of Excel file contains data on student referrals to law enforcement by disability and student-related arrests by disability for all states.",
       "org": "Department of Education",
+      "rank": 2
+    },
+    {
+      "title": "Baby Names from Social Security Card Applications - National Data",
+      "url": "https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-data",
+      "desc": "The data (name, year of birth, sex, and number) are from a 100 percent sample of Social Security card applications for 1880 on.",
+      "org": "Social Security Administration",
+      "rank": 2
+    },
+    {
+      "title": "Harmonized Tariff Schedule of the United States (2024)",
+      "url": "https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2024",
+      "desc": "This dataset is the current 2024 Harmonized Tariff Schedule plus all revisions for the current year.",
+      "org": "US International Trade Commission",
       "rank": 2
     },
     {
       "title": "2013-14 Mathematics and Science Civil Rights Data Collection",
       "url": "https://catalog.data.gov/dataset/2013-14-mathematics-and-science-civil-rights-data-collection",
       "desc": "The 2013-14 tables are based on data collected from all of the nation’s school districts and schools—approximately 16,500 school districts and 96,500 schools.",
-      "org": "Department of Education",
-      "rank": 2
-    },
-    {
-      "title": "2017-18 Student Enrollment Civil Rights Data Collection",
-      "url": "https://catalog.data.gov/dataset/2017-18-student-enrollment-civil-rights-data-collection",
-      "desc": "This set of Excel files contains data for all states on overall enrollment, enrollment of students served under IDEA, enrollment of students served under Sectio",
       "org": "Department of Education",
       "rank": 2
     }
