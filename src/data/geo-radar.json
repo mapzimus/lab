@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-03",
+  "generatedAt": "2026-08-04",
   "news": {
     "mapsmania": [
+      {
+        "title": "Isometric San Francisco",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/isometric-san-francisco.html",
+        "desc": "Following the success of Isometric NYC, it was probably only a matter of time before another city received the same pixel-art treatment."
+      },
       {
         "title": "Don't Miss the Eclipse!",
         "url": "http://googlemapsmania.blogspot.com/2026/08/dont-miss-eclipse.html",
@@ -36,11 +41,6 @@
         "title": "The Many Maps of the Odyssey",
         "url": "http://googlemapsmania.blogspot.com/2026/07/the-many-maps-of-odyssey.html",
         "desc": "Since the launch of the Google Maps API back in 2005, two fictional journeys have been mapped over and over again: Phileas Fogg’s global circumnavigation in…"
-      },
-      {
-        "title": "Free Map Tiles for Everyone",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/free-map-tiles-for-everyone.html",
-        "desc": "Free Map Tiles Providers:OpenFreeMapVersaTilesMaptoolkit.orgOne of the biggest barriers to building web maps has always been the cost and complexity of map t…"
       }
     ],
     "georealm": [
@@ -110,39 +110,47 @@
   },
   "qgis": [
     {
+      "title": "Flag Viewer",
+      "url": "https://plugins.qgis.org/plugins/flag_viewer/"
+    },
+    {
+      "title": "Precisa — DWG Batch Converter",
+      "url": "https://plugins.qgis.org/plugins/precisa_dwg_converter/"
+    },
+    {
+      "title": "Conversor Geoespacial",
+      "url": "https://plugins.qgis.org/plugins/aigeo_geoconversor/"
+    },
+    {
+      "title": "Parcel Watershed Delineation",
+      "url": "https://plugins.qgis.org/plugins/parcels_watershed_delineation/"
+    },
+    {
+      "title": "GISCraft Coordinate Extractor",
+      "url": "https://plugins.qgis.org/plugins/giscraft_coordinate_extractor/"
+    },
+    {
+      "title": "WAI QGIS MCP",
+      "url": "https://plugins.qgis.org/plugins/qgis_mcp_wiseman/"
+    },
+    {
+      "title": "QuickMapCine",
+      "url": "https://plugins.qgis.org/plugins/QuickMapCine/"
+    },
+    {
       "title": "Coffee Stain",
       "url": "https://plugins.qgis.org/plugins/coffee_stain_plugin/"
-    },
-    {
-      "title": "LISFLOOD-FP Preprocessor",
-      "url": "https://plugins.qgis.org/plugins/lisflood_preprocessor/"
-    },
-    {
-      "title": "QReplace",
-      "url": "https://plugins.qgis.org/plugins/qreplace/"
-    },
-    {
-      "title": "QGIS Agent MCP",
-      "url": "https://plugins.qgis.org/plugins/qgis_agent_mcp/"
-    },
-    {
-      "title": "RiverDetectWood",
-      "url": "https://plugins.qgis.org/plugins/RiverDetectWood/"
-    },
-    {
-      "title": "Map Frame Storyboard",
-      "url": "https://plugins.qgis.org/plugins/map_frame_storyboard/"
-    },
-    {
-      "title": "PickShift",
-      "url": "https://plugins.qgis.org/plugins/pickshift_plugin/"
-    },
-    {
-      "title": "SCIMAP Toolkit",
-      "url": "https://plugins.qgis.org/plugins/SCIMAPQGIS/"
     }
   ],
   "releases": [
+    {
+      "repo": "Turfjs/turf",
+      "title": "turf v7.4.0",
+      "url": "https://github.com/Turfjs/turf/releases/tag/v7.4.0",
+      "desc": "## What's Changed ⚠️ Due to correctness fixes, behavior across the boolean-* methods has changed.",
+      "publishedAt": "2026-08-03",
+      "isFresh": true
+    },
     {
       "repo": "qgis/QGIS",
       "title": "QGIS final-3_44_13",
@@ -184,14 +192,6 @@
       "isFresh": true
     },
     {
-      "repo": "Turfjs/turf",
-      "title": "turf v7.3.5",
-      "url": "https://github.com/Turfjs/turf/releases/tag/v7.3.5",
-      "desc": "## What's Changed Main goal of this release was to revert a build breaking performance improvement introduced in v7.3.2 that was affecting CommonJS environme…",
-      "publishedAt": "2026-04-20",
-      "isFresh": false
-    },
-    {
       "repo": "felt/tippecanoe",
       "title": "tippecanoe 2.79.0",
       "url": "https://github.com/felt/tippecanoe/releases/tag/2.79.0",
@@ -228,9 +228,9 @@
       "answers": 2
     },
     {
-      "title": "Processing plug-in can only export data to a GPKG",
-      "url": "https://gis.stackexchange.com/questions/501204/processing-plug-in-can-only-export-data-to-a-gpkg",
-      "score": 0,
+      "title": "Processing plug-in can only export data to GeoPackage",
+      "url": "https://gis.stackexchange.com/questions/501204/processing-plug-in-can-only-export-data-to-geopackage",
+      "score": 1,
       "answers": 0
     },
     {
@@ -264,72 +264,72 @@
       "answers": 1
     },
     {
-      "title": "Raster map or group <> not found error with r.fill.dir",
-      "url": "https://gis.stackexchange.com/questions/501205/raster-map-or-group-not-found-error-with-r-fill-dir",
-      "score": 0,
-      "answers": 0
+      "title": "QGIS Density Analysis result filesize/pixel size",
+      "url": "https://gis.stackexchange.com/questions/501196/qgis-density-analysis-result-filesize-pixel-size",
+      "score": 1,
+      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "DISCOVER-AQ Texas Deployment B-200 Aircraft In Situ Meteorological and Navigational Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Texas_MetNav_AircraftInSitu_B200_Data",
-      "desc": "DISCOVERAQ_Texas_MetNav_AircraftInSitu_B200_Data contains in situ meteorological and navigational data collected onboard NASA's B200 aircraft during the Texa…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "Primary Ancillary Data Geo-Colocated to OMI/Aura VIS 1-Orbit L2 Swath 13x24km V4 (OMVANC)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMVANC",
-      "desc": "The Primary Ancillary Data Geo-Colocated to OMI/Aura VIS 1-Orbit L2 Swath 13x24km (OMVANC) provides selected parameters from GEOS-5 Forward Processing for In…",
+      "title": "BUV/Nimbus-4 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (BUVN04L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=BUVN04L2",
+      "desc": "The Solar Backscattered Ultraviolet (SBUV) from Nimbus-4 Level-2 daily product (BUVN04L2) contains ozone nadir profile and total column data from retrievals…",
       "org": "GES_DISC"
     },
     {
-      "title": "OMI/Aura Surface UVB Irradiance and Erythemal Dose Daily L2 Global Gridded 0.25 degree x 0.25 degree V3 (OMUVBG)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMUVBG",
-      "desc": "This is Level-2G daily global gridded Aura-OMI Spectral Surface UVB Irradiance and Erythemal Dose product (OMUVBG).",
+      "title": "Sounder SIPS: Suomi NPP CrIMSS Level 2 SiFSAP Standard: Atmosphere cloud and surface geophysical state per footprint V2 (at GESDISC)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SNDRSNIML2SFSPRET",
+      "desc": "This level 2 standard product is generated by the SiFSAP (Single Field-of-View Sounder Atmospheric Products) algorithm.",
       "org": "GES_DISC"
     },
     {
-      "title": "OMI/Aura Surface UVB Irradiance and Erythemal Dose Daily L3 Global Gridded 1.0 degree x 1.0 degree V3 (OMUVBd)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMUVBd",
-      "desc": "This is Level-3 daily global gridded Aura-OMI Spectral Surface UVB Irradiance and Erythemal Dose product (OMUVBd).",
+      "title": "MLS/Aura Level 3 Daily Binned Methyl Chloride (CH3Cl) Mixing Ratio on Assorted Grids V005 (ML3DBCH3CL)",
+      "url": "https://search.earthdata.nasa.gov/search?q=ML3DBCH3CL",
+      "desc": "ML3DBCH3CL is the EOS Aura Microwave Limb Sounder (MLS) daily binned on various vertical grids product for methyl chloride (CH3Cl) derived from radiances mea…",
       "org": "GES_DISC"
     },
     {
-      "title": "OMI/Aura Surface UV Irradiance 1-orbit L2 Swath 13x24 km V003 (OMUVB)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMUVB",
-      "desc": "The Aura Ozone Monitoring Instrument (OMI) Version 003 Surface UV Irradiance Product (OMUVB) is now available from the NASA Goddard Earth Sciences Data and I…",
+      "title": "MERRA-2 tavgM_2d_flx_Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Surface Flux Diagnostics 0.625 x 0.5 degree V5.12.4 (M2T…",
+      "url": "https://search.earthdata.nasa.gov/search?q=M2TMNXFLX",
+      "desc": "M2TMNXFLX (or tavgM_2d_flx_Nx) is a time-averaged 2-dimensional monthly mean data collection in Modern-Era Retrospective analysis for Research and Applicatio…",
       "org": "GES_DISC"
     },
     {
-      "title": "GEOS-5 FP-IT 3D Time-Averaged Single-Level Diagnostics Geo-Colocated to OMI/Aura UV2 1-Orbit L2 Swath 13x24km V4 (OMUFPSLV)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMUFPSLV",
-      "desc": "The GEOS-5 FP-IT 3D Time-Averaged Single-Level Diagnostics Geo-Colocated to OMI/Aura UV2 1-Orbit L2 Swath 13x24km (OMUFPSLV) provides selected parameters fro…",
-      "org": "GES_DISC"
+      "title": "ECOSTRESS Swath Attitude and Ephemeris Instantaneous L1B Global V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECO_L1B_ATT",
+      "desc": "The ECOsystem Spaceborne Thermal Radiometer Experiment on Space Station (ECOSTRESS) mission measures the temperature of plants to better understand how much…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "GEOS-5 FP-IT 3D Time-Averaged Model-Layer Assimilated Data Geo-Colocated to OMI/Aura UV2 1-Orbit L2 Swath 13x24km V4 (OMUFPMET)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMUFPMET",
-      "desc": "The GEOS-5 FP-IT 3D Time-Averaged Model-Layer Assimilated Data Geo-Colocated to OMI/Aura UV2 1-Orbit L2 Swath 13x24km (OMUFPMET) product provides selected me…",
-      "org": "GES_DISC"
+      "title": "UAVSAR_POLSAR_STOKES",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
+      "desc": "UAVSAR PolSAR Scene Stokes",
+      "org": "ASF"
     },
     {
-      "title": "GEOS-5 FP-IT Assimilation Geo-colocated to OMI/Aura UV-2 1-Orbit L2 Support Swath 13x24km V3 (OMUFPITMET)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMUFPITMET",
-      "desc": "The GEOS-5 FP-IT Assimilation Geo-colocated to OMI/Aura UV-2 1-Orbit L2 Support Swath 13x24km (OMUFPITMET) provides selected parameters from GEOS-5 Forward P…",
-      "org": "GES_DISC"
+      "title": "UAVSAR_POLSAR_SLOPE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
+      "desc": "UAVSAR PolSAR Scene Slope",
+      "org": "ASF"
     },
     {
-      "title": "Primary Ancillary Data Geo-Colocated to OMI/Aura UV2 1-Orbit L2 Swath 13x24km V4 (OMUANC)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMUANC",
-      "desc": "The Primary Ancillary Data Geo-Colocated to OMI/Aura UV2 1-Orbit L2 Swath 13x24km (OMUANC) provides selected parameters from GEOS-5 Forward Processing for In…",
-      "org": "GES_DISC"
+      "title": "UAVSAR_POLSAR_PAULI",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
+      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
+      "org": "ASF"
     },
     {
-      "title": "OMI/Aura Ozone (O3) Total Column Daily L2 Global Gridded 0.25 degree x 0.25 degree V004 (OMTO3G)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMTO3G",
-      "desc": "This Level-2G daily global gridded product OMTO3G is based on the pixel level OMI Level-2 Total Ozone Product OMTO3.",
-      "org": "GES_DISC"
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
+      "desc": "UAVSAR PolSAR Scene Complex",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
+      "org": "ASF"
     }
   ],
   "datagov": [
