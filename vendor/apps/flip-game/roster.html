@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bottle Game — Full Character Roster</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #0b1a2b;
+      color: #e8eef5;
+      padding: 20px 16px 48px;
+    }
+    h1 { margin: 0 0 6px; font-size: 1.5rem; }
+    .sub { color: #9bb0c5; margin: 0 0 18px; font-size: 0.95rem; }
+    .sub a { color: #7cc4ff; }
+    .group { margin: 28px 0 12px; }
+    .group h2 {
+      margin: 0 0 10px;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #ffd166;
+      border-bottom: 1px solid rgba(255,209,102,0.25);
+      padding-bottom: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 10px 8px 12px;
+      text-align: center;
+    }
+    .card canvas {
+      width: 96px;
+      height: 116px;
+      display: block;
+      margin: 0 auto 8px;
+      background: rgba(0,0,0,0.25);
+      border-radius: 10px;
+    }
+    .name { font-weight: 700; font-size: 0.78rem; line-height: 1.25; }
+    .meta { font-size: 0.68rem; color: #9bb0c5; margin-top: 3px; }
+    .swatch {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.4);
+      vertical-align: -1px;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍾 Full Character Roster</h1>
+  <p class="sub">Every unlockable character (flat cartoony SVG), in unlock order. Bottle free → every 3 wins → Aliens last.
+    Includes Pets, Garden, Robots, Ocean, Snacks &amp; Cryptids.
+    <a href="./">← Back to game</a>
+  </p>
+  <div id="root">Loading…</div>
+
+  <script src="js/vendor/matter.min.js"></script>
+  <script src="js/polyfills.js?v=88"></script>
+  <script src="js/renderer.js?v=88"></script>
+  <script src="js/cast25.js?v=88"></script>
+  <script src="js/skins.js?v=88"></script>
+  <script>
+    const GROUP_LABELS = {
+      bottle: 'Starter',
+      parrot: 'Classics',
+      plunger: 'Classics',
+      trex: 'Classics',
+      vending: 'Classics',
+      pineapple: 'Classics',
+      gorilla: 'Classics',
+      people: 'People',
+      buildings: 'Tall Buildings',
+      gods: 'Gods',
+      pets: 'Pets',
+      garden: 'Garden',
+      robots: 'Robots',
+      ocean: 'Ocean',
+      snacks: 'Snacks',
+      cryptids: 'Cryptids',
+      alien: 'Aliens (bank shot — last)',
+    };
+
+    function groupKey(c) {
+      if (['parrot','plunger','trex','vending','pineapple','gorilla'].includes(c.drawAs)) return 'Classics';
+      if (c.drawAs === 'bottle') return 'Starter';
+      return GROUP_LABELS[c.drawAs] || c.drawAs;
+    }
+
+    const list = Skins.list();
+    const root = document.getElementById('root');
+    root.textContent = '';
+
+    const groups = [];
+    const seen = new Map();
+    for (const c of list) {
+      const g = groupKey(c);
+      if (!seen.has(g)) { seen.set(g, []); groups.push(g); }
+      seen.get(g).push(c);
+    }
+
+    const summary = document.createElement('p');
+    summary.className = 'sub';
+    summary.textContent = `${list.length} characters · last unlock @ ${list[list.length - 1].unlock} wins`;
+    root.appendChild(summary);
+
+    for (const g of groups) {
+      const section = document.createElement('section');
+      section.className = 'group';
+      section.innerHTML = `<h2>${g} · ${seen.get(g).length}</h2>`;
+      const grid = document.createElement('div');
+      grid.className = 'grid';
+      for (const c of seen.get(g)) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.id = c.id;
+        const cv = document.createElement('canvas');
+        cv.width = 96;
+        cv.height = 116;
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = `${c.emoji || ''} ${c.name}`.trim();
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const unlock = c.unlock == null ? 'free' : `${c.unlock} wins`;
+        meta.innerHTML = `<span class="swatch" style="background:${c.color || c.tint}"></span>${unlock}`;
+        card.appendChild(cv);
+        card.appendChild(name);
+        card.appendChild(meta);
+        grid.appendChild(card);
+        requestAnimationFrame(() => {
+          try {
+            const tint = c.tint || c.color || '#1f9bff';
+            Renderer.drawPreview(cv, c.drawAs === 'bottle' ? 'bottle' : c.id, tint);
+          } catch (e) {
+            const ctx = cv.getContext('2d');
+            ctx.fillStyle = '#ff5252';
+            ctx.font = '12px monospace';
+            ctx.fillText('err', 8, 20);
+          }
+        });
+      }
+      section.appendChild(grid);
+      root.appendChild(section);
+    }
+
+    // Second pass after SVG sprites decode (skins.js and cast25.js each keep
+    // their own sprite caches, so subscribe to both).
+    function redrawAll() {
+      const canvases = [...document.querySelectorAll('.card canvas')];
+      list.forEach((c, i) => {
+        const cv = canvases[i];
+        if (!cv) return;
+        const tint = c.tint || c.color || '#1f9bff';
+        try {
+          Renderer.drawPreview(cv, c.drawAs === 'bottle' ? 'bottle' : c.id, tint);
+        } catch (_) {}
+      });
+    }
+    if (Skins.onSpriteLoad) Skins.onSpriteLoad(redrawAll);
+    if (window.FLIP_CAST25 && FLIP_CAST25.onSpriteLoad) FLIP_CAST25.onSpriteLoad(redrawAll);
+    // Warm PNG caches
+    if (Skins.preload) {
+      const tints = [...new Set(list.map((c) => c.tint || c.color).filter(Boolean))];
+      Skins.preload(tints);
+    }
+  </script>
+</body>
+</html>

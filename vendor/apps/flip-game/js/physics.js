@@ -1,49 +1,66 @@
 // physics.js — Matter.js world, bottle body, liquid sim
 
 const Physics = (() => {
-  const { Engine, Bodies, Body, World, Events } = Matter;
+  const { Engine, Bodies, Body, World } = Matter;
 
-  let engine, world, bottle, ground, leftWall, rightWall;
-  let stableFrames = 0, groundedFrames = 0;
+  let engine, world, bottle, ground, leftWall, rightWall, ceilingBody;
+  let groundedFrames = 0;
   let angleWin = [];   // sliding window of recent angles (settle detection)
   let totalRotation = 0, hasFlipped = false, launchAngle = 0, hasLanded = false;
-  let maxGroundedTilt = 0;   // display-only: peak |tilt| seen at any point while grounded
-  let canvasW, canvasH;
+  let capSticky = false;   // rare: this landing is damping toward an inverted settle
+  let lastLandingInfo = null;
+  let lastFlickInfo = null;
+  let canvasW;
   let groundY;
+  let arenaH;   // full canvas height — obstacles are placed relative to it
+  let sideWallsEnabled = true;
+  let openArena = false;  // mobile open sides (no wall caroms)
 
-  // Spin tuning (rad/step) — see applyFlick. Single sweet spot near 1 turn:
-  // soft flick under-rotates (<360, fails), medium ≈ one clean turn (make),
-  // hard overshoots (~1.3 turns, miss). Rotation ranges ~0.8 to ~1.35.
-  const SPIN_BASE   = 0.140;  // spin from a soft flick (~0.8 turn)
-  const SPIN_RANGE_DEFAULT = 0.100;  // extra spin at full-strength flick (~1.35 turn)
-  const POWER_SPEED = 4000;   // flick speed (px/s) that maps to full power
+  // Spin tuning (rad/step) — see applyFlick. Normal throws should usually land
+  // if you give a decent flick; only wild overshoots tip. v78: cut high-end
+  // over-rotation (hard flicks were falling ~70% of the time).
+  const SPIN_BASE   = 0.138;  // soft/medium flicks clear 360°
+  const SPIN_RANGE  = 0.082;  // flat high end — hard flicks tip less
+  const POWER_SPEED = 4000;   // flick px/s that maps to full power
   const WALL_INSET  = 14;     // px from each screen edge to the wall's inner face (matches renderer)
-
-  // "Feel" knob: a flatter spin curve widens the make window (soft/hard flicks
-  // differ less), a steeper one narrows it. The curve PIVOTS around the sweet
-  // spot (~2100 px/s) so every feel makes the same ideal flick — only the
-  // punishment for being off-speed changes. 'standard' == the original curve.
-  const SWEET_POWER = 2100 / POWER_SPEED;                              // 0.525
-  const SWEET_SPIN  = SPIN_BASE + SWEET_POWER * SPIN_RANGE_DEFAULT;    // 0.1925 rad/step
-  let   spinRange   = SPIN_RANGE_DEFAULT;
-  let   spinBase    = SPIN_BASE;
-  function setFeel(mode) {
-    spinRange = { forgiving: 0.07, standard: 0.10, pro: 0.13 }[mode] ?? SPIN_RANGE_DEFAULT;
-    spinBase  = SWEET_SPIN - SWEET_POWER * spinRange;   // standard → exactly 0.140
-  }
-
-  // ── Fixed-timestep accumulator ─────────────────────────────────────────────
-  // Matter's integration is not dt-stable: feeding it the render frame's
-  // variable dt makes the same flick behave differently at 60Hz vs 120Hz.
-  // Physics always steps in fixed 1/60s slices; the render loop just tells us
-  // how much real time passed. (Also multiplayer-lockstep prep — see HANDOFF.)
-  const FIXED_DT = 1 / 60;
+  const FIXED_DT    = 1 / 60; // multiplayer-safe fixed physics step
   let acc = 0;
 
+  // ── Landing-detection knobs (the false-miss fix) ───────────────────────────
+  // A verdict is read ONLY once the bottle has truly come to rest. A make is
+  // called the instant it settles upright; an obvious miss (toppled flat, or
+  // never completed a 360°) the instant it settles in that pose. But a
+  // tipped-yet-recoverable pose — the bowling-pin bottle hovering near its ~40°
+  // tipping point — is NOT judged: it can still slowly RIGHT itself into a make,
+  // so we wait it out instead of calling a premature miss. Only if nothing
+  // resolves within MISS_CAP_FRAMES (the glitch / teeter-stall fallback) do we
+  // force a MISS so a turn can never soft-lock in EVALUATING.
+  //
+  // v78: normal throws — generous upright cone + softer settle / landing kick.
+  const SETTLE_FRAMES   = 14;    // frames of stillness required to read the pose
+  const SETTLE_RANGE    = 0.055; // rad — max angle spread across that window
+  // v87: 1.00 rad (±57°!) let a bottle propped against a wall at a heavy lean
+  // score as a MAKE (the "honey bear counted a miss" bug). ±36° reads upright.
+  const MAKE_ANGLE      = 0.63;  // ≤±~36° upright = MAKE
+  const PERFECT_ANGLE   = 0.22;  // perfect-landing flair
+  const FALLEN_ANGLE    = 1.40;  // ≥~80° tilt = toppled past recovery → certain MISS
+  const LEAN_MISS_FRAMES = 45;   // settled between MAKE and FALLEN this long → MISS
+  // Cap / upside-down MAKE: settle within this of ±π. Normally the heavy base
+  // tips these over; the rare "cap sticky" assist (see stepOnce) makes ~1/100
+  // flips actually stick on the neck/cap — those are worth 2 in game.js.
+  const CAP_WINDOW      = 0.48;  // ±~27° of fully inverted
+  const CAP_ZONE        = 0.95;  // first-touch zone that can roll the sticky lottery
+  const CAP_STICK_CHANCE = 0.09; // × share of landings in CAP_ZONE ≈ ~1/100 overall
+  const MISS_CAP_FRAMES = 300;   // ~5s grounded with no verdict → forced MISS (fallback)
+  const ABS_MISS_FRAMES = 600;   // ~10s after leaving the floor → forced MISS no matter what
+  const SETTLE_ANG_VEL  = 0.018; // "at rest" spin threshold
+  const SETTLE_LIN_SPD  = 10.0;  // "at rest" slide threshold
+  const GROUND_TOUCH_PX = 6;     // AABB bottom within this of groundY = touching floor
+
   // ── Seeded PRNG (mulberry32) ───────────────────────────────────────────────
-  // All in-flight randomness (launch jitter + landing kick) draws from this
-  // stream. applyFlick reseeds per flick, records the seed in lastFlickInfo,
-  // and accepts an explicit seed to replay a flick exactly (multiplayer prep).
+  // All in-flight randomness (launch jitter + landing kick + pad placement)
+  // draws from this stream. applyFlick reseeds per flick, records the seed in
+  // lastFlickInfo, and accepts an explicit seed to replay a flick exactly.
   let rngState = 1;
   function seedRng(seed) { rngState = (seed >>> 0) || 1; }
   function rand() {
@@ -54,27 +71,291 @@ const Physics = (() => {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   }
 
-  // Flight/judging state for the current flick
-  let launched      = false;  // set by applyFlick, cleared by resetBottle
-  let pendingResult = null;   // 'MAKE' | 'MISS' once judged
-  let groundContact = false;  // first ground touch after launch (thud SFX)
-  let onImpact      = null;   // callback: (type 'ground'|'wall', speed)
+  // ── Per-edition physics profiles ───────────────────────────────────────────
+  // Most editions are pure reskins and flip under the normal rules. An edition
+  // can instead ship a profile (see META.physics in skins.js) that retunes
+  // gravity, drag, bounce, the launch impulse and how a landing is judged.
+  //
+  // BOUNCE MODE (the 100-win alien — the ONLY non-flip edition) is a different
+  // game: a bank shot, not a flip. You aim sideways, the object caroms off the
+  // two walls and the ceiling, and the FLOOR is dead: the first time it touches
+  // down is where it landed, and it counts if the body is over the pad.
+  const DEFAULT_PROFILE = {
+    gravity: 1.5,
+    frictionAir: 0.024,    // a touch less drag so soft flicks still complete the turn
+    friction: 0.85,
+    restitution: 0.02,
+    spinScale: 1,
+    launchScale: 1,        // multiplies the upward launch speed
+    horizDivisor: 280,     // px/s of flick per unit of sideways launch speed
+    horizMax: 6,           // cap on sideways launch speed
+    wallBounce: 0,         // restitution given to walls + ceiling
+    ceiling: false,
+    floorResolve: false,
+    landOnTarget: false,
+    targetHalfWidth: 84,
+    requireFlip: true,
+    missCapFrames: MISS_CAP_FRAMES,
+    // Bounce-mode furniture (alien bank shot).
+    deflector: false,
+    deflectorCount: 1,
+    saucerCount: 0,
+    keepWalls: false,      // force side walls even on mobile (alien needs them)
+    minHorizRatio: 0,
+    strictTarget: false,   // true = bottle CENTER must be on the pad (not any overlap)
+    allowSlideIn: true,    // bounce mode: off-pad touchdown can still slide onto a MAKE
+    // Scored radius as a fraction of the drawn pad. 1 = whole pad counts;
+    // 0.5 = only the inner half-radius scores (drawn pad stays readable).
+    hitScale: 1,
+  };
+  let profile = { ...DEFAULT_PROFILE };
+  let targetX = null;      // pad center, only set when profile.landOnTarget
+  let targetHW = 84;       // pad half-width actually in play (screen-scaled)
+  let arenaTime = 0;
 
-  let lastFlickInfo = null;   // debug/readout: { upSpeed, power, spin, seed }
-  let lastLanding   = null;   // display-only: { flipped, finalAngle } of last judged stop
+  // The profile's targetHalfWidth is tuned for a phone. On a big screen the
+  // same pad is a sliver of the arena and the bank shot turns pixel-perfect,
+  // so the pad grows with canvas width — but alien's base is now small, and
+  // the scale-up is capped tighter so smartboards aren't a freebie.
+  function currentTargetHalfWidth() {
+    const base = profile.targetHalfWidth;
+    // Bank-shot pads stay nearly fixed — only a tiny grow on huge boards so
+    // the make radius doesn't become a freebie on smartboards.
+    if (base <= 60) {
+      return Math.round(Math.max(base, Math.min(canvasW * 0.045, base * 1.25)));
+    }
+    return Math.round(Math.max(base, Math.min(canvasW * 0.115, base * 2.2)));
+  }
 
-  function setImpactCallback(fn) { onImpact = fn; }
+  function currentHitHalfWidth() {
+    const scale = Math.max(0.2, Math.min(1, profile.hitScale == null ? 1 : profile.hitScale));
+    return Math.max(8, targetHW * scale);
+  }
+  let launched = false;    // a flick has been taken this turn
+  let leanFrames = 0;      // consecutive settled frames in the lean dead zone
+  let wasAirborne = false; // ...and the body actually left the floor
+  let floorTouched = false; // bounce mode: first touchdown happened (slide window open)
+  let slideFrames = 0;      // frames spent in the post-touchdown slide window
+  let maxGroundedTilt = 0;  // display-only: worst |tilt| seen while grounded this flip
+  let flightFrames = 0;     // frames since the bottle left the floor (absolute soft-lock guard)
 
-  // ── Liquid oscillator ──────────────────────────────────────────────────────
-  // Virtual pendulum — tracks the slosh of liquid inside the bottle.
-  // It is NOT a physics body; it's a visual/stability modifier only.
+  function wantsOpenArena() {
+    if (profile.keepWalls || profile.wallBounce > 0) return false;
+    if (typeof window === 'undefined') return false;
+    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    // Phones / small tablets: no side walls so wall-caroms can't make mobile easier.
+    return canvasW < 900 || (coarse && canvasW < 1100);
+  }
+
+  // Compact screens get the lighter bounce-mode furniture (1 wedge). Desktop
+  // keeps the full set. Same breakpoint spirit as the open-arena check, but
+  // bounce modes still want walls, so we don't reuse wantsOpenArena().
+  function isCompactScreen() {
+    if (typeof window === 'undefined') return canvasW < 900;
+    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    return canvasW < 900 || (coarse && canvasW < 1100);
+  }
+
+  function syncSideWalls() {
+    openArena = wantsOpenArena();
+    sideWallsEnabled = !openArena;
+    const mask = sideWallsEnabled ? 0xFFFFFFFF : 0;
+    if (leftWall)  leftWall.collisionFilter.mask = mask;
+    if (rightWall) rightWall.collisionFilter.mask = mask;
+  }
+
+  // Apply before the turn's flick (main.js calls this per turn). Safe to call
+  // with null/undefined to go back to normal physics.
+  function setProfile(next) {
+    profile = { ...DEFAULT_PROFILE, ...(next || {}) };
+    if (engine) engine.gravity.y = profile.gravity;
+    if (ceilingBody) ceilingBody.collisionFilter.mask = profile.ceiling ? 0xFFFFFFFF : 0;
+    // Walls and ceiling are normally dead (no carom, no spin transfer — see
+    // init) so difficulty doesn't track screen width. Bounce mode needs them
+    // live. The GROUND is deliberately left dead in every profile: in bounce
+    // mode the floor is where the shot ends, so it must not throw the object
+    // back up.
+    if (leftWall)    leftWall.restitution    = profile.wallBounce;
+    if (rightWall)   rightWall.restitution   = profile.wallBounce;
+    if (ceilingBody) ceilingBody.restitution = profile.wallBounce;
+    applyBodyMaterial();
+    syncSideWalls();
+    // Pad placement is seeded in seedTurn() so multiplayer peers share the same
+    // target. Don't roll it here off the unseeded Math.random stream.
+    buildObstacles(arenaH);
+  }
+
+  function applyBodyMaterial() {
+    if (!bottle) return;
+    const parts = [bottle, ...bottle.parts];
+    for (const part of parts) {
+      part.frictionAir = profile.frictionAir;
+      part.friction    = profile.friction;
+      part.restitution = profile.restitution;
+    }
+  }
+
+  // ── Obstacles: deflector wedges + saucers (alien bank shot) ────────────────
+  let deflectors = [];
+  let saucers = [];      // { body, vx, phase, rx, ry }
+
+  function clearObstacles() {
+    for (const d of deflectors) World.remove(world, d);
+    deflectors = [];
+    for (const s of saucers) World.remove(world, s.body);
+    saucers = [];
+  }
+
+  function addDeflector(cx, apexWorldY, halfW, height) {
+    // fromVertices centers the body on the shape's centroid, which for this
+    // triangle is height/6 above the middle — so the apex sits 2/3·height
+    // below the centroid.
+    const body = Bodies.fromVertices(cx, apexWorldY - (2 * height) / 3, [[
+      { x: -halfW, y: -height / 2 },
+      { x:  halfW, y: -height / 2 },
+      { x: 0,      y:  height / 2 },
+    ]], { isStatic: true, label: 'deflector', friction: 0, restitution: profile.wallBounce });
+    if (body) {
+      World.add(world, body);
+      deflectors.push(body);
+    }
+  }
+
+  function buildObstacles(h) {
+    if (!world) return;
+    clearObstacles();
+    const arenaH = h || (groundY + 30);
+
+    if (profile.deflector) {
+      // Mobile: a single launch-spot wedge. Desktop: full count, flat-side
+      // bolted to the ceiling so they read as roof teeth across a wide arena.
+      const compact = isCompactScreen();
+      const count = compact ? 1 : Math.max(1, profile.deflectorCount || 3);
+      const halfW = compact ? 62 : 70;
+      const height = compact ? 78 : 88;
+
+      for (let i = 0; i < count; i++) {
+        const t = count === 1 ? 0.5 : i / (count - 1);
+        const cx = WALL_INSET + 90 + t * Math.max(40, canvasW - WALL_INSET * 2 - 180);
+        if (compact) {
+          // Classic mid-arc deflector over the launch spot.
+          const apexWorldY = groundY - 430;
+          addDeflector(cx, apexWorldY, halfW, height);
+        } else {
+          // Roof-anchored: flat base sits just under the ceiling (y≈0), apex
+          // hangs down into the flight path. Spread evenly across the arena.
+          const roofY = 6;                          // flat top near ceiling
+          const apexWorldY = roofY + height;        // apex = base + full height
+          addDeflector(cx, apexWorldY, halfW - (i === 1 ? 0 : 8), height);
+        }
+      }
+    }
+
+    for (let i = 0; i < profile.saucerCount; i++) {
+      const lane = (i + 0.5) / Math.max(1, profile.saucerCount);
+      const x = WALL_INSET + 50 + lane * Math.max(40, canvasW - WALL_INSET * 2 - 100);
+      const y = groundY - 150 - (i % 4) * 70 - (i % 3) * 18;
+      const rx = 38 + (i % 3) * 4, ry = 16 + (i % 2) * 3;
+      const body = Bodies.rectangle(x, y, rx * 2, ry * 2, {
+        label: 'saucer',
+        frictionAir: 0.05,
+        friction: 0,
+        restitution: Math.max(0.7, profile.wallBounce),
+        density: 0.0011,
+      });
+      World.add(world, body);
+      saucers.push({
+        body,
+        vx: (i % 2 ? 1 : -1) * (0.85 + 0.55 * (i % 4)),
+        phase: i * 1.3,
+        rx, ry,
+      });
+    }
+  }
+
+  function updateSaucers(dt) {
+    if (!saucers.length) return;
+    const gy = engine.gravity.y * engine.gravity.scale;
+    for (const s of saucers) {
+      const b = s.body;
+      Body.applyForce(b, b.position, { x: 0, y: -b.mass * gy });
+      const bob = Math.sin(arenaTime * 1.6 + s.phase) * 0.28;
+      const lo = (sideWallsEnabled ? WALL_INSET : 8) + s.rx + 8;
+      const hi = canvasW - (sideWallsEnabled ? WALL_INSET : 8) - s.rx - 8;
+      if (b.position.x < lo) s.vx = Math.abs(s.vx);
+      if (b.position.x > hi) s.vx = -Math.abs(s.vx);
+      Body.setVelocity(b, {
+        x: b.velocity.x + (s.vx - b.velocity.x) * 0.04,
+        y: b.velocity.y * 0.96 + bob * 0.3,
+      });
+      Body.setAngularVelocity(b, b.angularVelocity * 0.9);
+    }
+  }
+
+  function getObstacles() {
+    return {
+      theme: 'alien',
+      deflectors: deflectors.map((d) => ({ vertices: d.vertices.map((v) => ({ x: v.x, y: v.y })) })),
+      // Back-compat single deflector for older renderers
+      deflector: deflectors[0]
+        ? { vertices: deflectors[0].vertices.map((v) => ({ x: v.x, y: v.y })) }
+        : null,
+      saucers: saucers.map((s) => ({
+        x: s.body.position.x, y: s.body.position.y,
+        angle: s.body.angle, rx: s.rx, ry: s.ry,
+      })),
+    };
+  }
+
+  // Randomize the pad's spot each turn so it isn't the same shot every time.
+  // Call only after seedTurn()/seedRng so multiplayer peers place identically.
+  function placeTarget(explicitX) {
+    if (!profile.landOnTarget || !canvasW) { targetX = null; return; }
+    targetHW = currentTargetHalfWidth();
+    const margin = (sideWallsEnabled ? WALL_INSET : 8) + targetHW + 16;
+    if (explicitX != null && Number.isFinite(explicitX)) {
+      targetX = Math.max(margin, Math.min(canvasW - margin, explicitX));
+      return;
+    }
+    const span = Math.max(0, canvasW - margin * 2);
+    targetX = margin + rand() * span;
+  }
+
+  function getTarget() {
+    return targetX == null ? null : {
+      x: targetX,
+      halfWidth: targetHW,
+      hitHalfWidth: currentHitHalfWidth(),
+      style: 'pad',
+    };
+  }
+
+  function overTarget() {
+    if (!profile.landOnTarget || targetX == null || !bottle) return false;
+    const hitHW = currentHitHalfWidth();
+    // Strict: bottle CENTER must sit inside the hit radius (alien).
+    // Generous: any bounds overlap with the hit radius.
+    if (profile.strictTarget) {
+      return Math.abs(bottle.position.x - targetX) <= hitHW;
+    }
+    return bottle.bounds.max.x >= targetX - hitHW &&
+           bottle.bounds.min.x <= targetX + hitHW;
+  }
+
+  // ── Liquid / sand oscillator ───────────────────────────────────────────────
+  // Closed liquids use slosh/vel. Hourglass sand ALSO tracks how much of the
+  // grain sits in the local-bottom bulb (sandBottom 0..1) and drains through
+  // the neck when the glass is upright or inverted — never when sideways.
+  const SAND_FLOW_RATE = 0.42;   // fraction of bulb per second at full upright
   const liquid = {
-    slosh: 0,      // -1..1 offset of liquid mass center (bottle frame)
-    vel: 0,        // rate of change
+    slosh: 0,
+    vel: 0,
     settleTimer: 0,
+    // Most sand starts in the top bulb so the hourglass visibly drains in play.
+    sandBottom: 0.18,
+    sandFlow: 0,       // signed: + drains top→bottom, − drains bottom→top
 
-    update(bottleAngVel, dt) {
-      // Liquid behaves like a damped pendulum driven by bottle rotation
+    update(bottleAngVel, dt, bottleAngle) {
       const spring  = -0.10 * this.slosh;
       const drive   =  0.40 * bottleAngVel;
       const damping = -0.08 * this.vel;
@@ -85,300 +366,450 @@ const Physics = (() => {
       this.settleTimer = Math.abs(this.vel) < 0.10
         ? this.settleTimer + dt
         : 0;
+
+      // Sand drain: cos(angle) ≈ +1 upright, −1 inverted, 0 on its side.
+      const a = bottleAngle == null ? 0 : bottleAngle;
+      const uprightness = Math.cos(a);
+      const aligned = Math.abs(uprightness) > 0.35;
+      const room = uprightness > 0
+        ? (1 - this.sandBottom)   // can still accept sand in bottom
+        : this.sandBottom;        // can still leave the bottom
+      if (aligned && room > 0.001) {
+        const step = SAND_FLOW_RATE * uprightness * dt;
+        this.sandBottom = Math.max(0, Math.min(1, this.sandBottom + step));
+        this.sandFlow = uprightness * Math.min(1, room * 8);
+      } else {
+        this.sandFlow *= Math.max(0, 1 - 6 * dt); // stream fades when tipped over
+        if (Math.abs(this.sandFlow) < 0.02) this.sandFlow = 0;
+      }
     },
 
-    renderOffset() { return this.slosh * 13; }, // px horizontal shift for drawing
+    renderOffset() { return this.slosh * 13; },
     isSettled()    { return this.settleTimer > 0.25; },
-    reset()        { this.slosh = 0; this.vel = 0; this.settleTimer = 0; },
+    reset() {
+      this.slosh = 0; this.vel = 0; this.settleTimer = 0;
+      this.sandBottom = 0.18; this.sandFlow = 0;
+    },
   };
 
-  // ── Landing detection — wait for a TRUE full stop ─────────────────────────
-  // Don't judge mid-teeter. After landing the low-CG bottle slowly rights
-  // itself (or tips over) — a slow rotation that must NOT be mistaken for
-  // "settled". So we require very low spin + drift for a longer window before
-  // reading the final angle, so the bowling-pin wobble fully resolves first.
-  //
-  // Runs once per FIXED physics step (so the 22-step window and 600-step
-  // timeout are the same real duration on every display). The verdict lands in
-  // pendingResult; checkLanding() just reads it.
-  function evaluateLandingStep() {
+  function normalizeSignedAngle(a) {
+    let angle = ((a % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    if (angle > Math.PI) angle -= 2 * Math.PI;
+    return angle;
+  }
+
+  function recordLanding(result, tilt, reason) {
+    let padOffset = null;
+    if (profile.landOnTarget && targetX != null && bottle) {
+      const hitHW = currentHitHalfWidth();
+      padOffset = hitHW > 0 ? Math.abs(bottle.position.x - targetX) / hitHW : null;
+    }
+    // Bounce-mode MAKEs pass tilt=0; use pad centering for "perfect" instead so
+    // every alien pad hit isn't celebrated as Perfect / Bullseye.
+    let perfect = false;
+    if (result === 'MAKE') {
+      if (profile.floorResolve) {
+        perfect = padOffset != null && padOffset <= 0.22;
+      } else {
+        perfect = tilt != null && tilt <= PERFECT_ANGLE;
+      }
+    }
+    lastLandingInfo = {
+      result,
+      tilt,
+      perfect,
+      reason,
+      onCap: reason === 'cap',
+      maxTilt: profile.floorResolve ? 0 : maxGroundedTilt,
+      padOffset,
+    };
+    return result;
+  }
+
+  function touchingFloor() {
+    return !!bottle && bottle.bounds.max.y >= groundY - GROUND_TOUCH_PX;
+  }
+
+  function checkLanding() {
+    if (!bottle) return null;
+
+    // Bounce mode: first contact / slide-on is the verdict (alien profile).
+    if (profile.floorResolve && launched && wasAirborne) {
+      const grounded = touchingFloor();
+
+      if (!floorTouched) {
+        if (bottle.bounds.max.y < groundY - 2) return null;
+        floorTouched = true;
+        slideFrames = 0;
+        for (const part of [bottle, ...bottle.parts]) {
+          part.restitution = 0.02;
+          part.friction = 0.35;
+        }
+        if (overTarget()) return recordLanding('MAKE', 0, 'on-target');
+        if (!profile.landOnTarget || targetX == null) return recordLanding('MISS', null, 'off-target');
+        if (!profile.allowSlideIn) return recordLanding('MISS', null, 'off-target');
+        return null;
+      }
+
+      slideFrames++;
+      if (profile.allowSlideIn && grounded && overTarget()) return recordLanding('MAKE', 0, 'slid-on');
+      const speed = Math.hypot(bottle.velocity.x, bottle.velocity.y);
+      if ((grounded && speed < 0.35 && slideFrames > 20) || slideFrames > 360) {
+        return recordLanding('MISS', null, 'off-target');
+      }
+      return null;
+    }
+
+    // Absolute soft-lock guard: once the bottle has left the floor, something
+    // MUST resolve within ~10s (off-world, perpetual bounce, etc.).
+    if (launched && wasAirborne) {
+      flightFrames++;
+      if (flightFrames > ABS_MISS_FRAMES) return recordLanding('MISS', null, 'timeout');
+    }
+
     const angVel   = Math.abs(bottle.angularVelocity);
     const linSpeed = Math.hypot(bottle.velocity.x, bottle.velocity.y);
-    const grounded = bottle.position.y >= groundY - 80;
+    // Touch the table via AABB bottom — COM can sit well above the floor when
+    // the bottle is inverted on its neck / resting on a tall corner.
+    const grounded = touchingFloor();
 
     if (!grounded) {
-      stableFrames  = 0;
       groundedFrames = 0;
-      return;
+      angleWin = [];
+      return null;
     }
 
     groundedFrames++;
 
-    // Display-only: track the worst tilt seen at any point while grounded
-    // (not gated on "settled" like angleWin below) — this is what lets us
-    // notice the rare "tipped hard, then the low-CG bowling-pin wobble
-    // rights it back up" recovery, regardless of the eventual verdict.
     {
       let a = ((bottle.angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
       if (a > Math.PI) a -= 2 * Math.PI;
-      const tilt = Math.abs(a);
-      if (tilt > maxGroundedTilt) maxGroundedTilt = tilt;
+      const t = Math.abs(a);
+      if (t > maxGroundedTilt) maxGroundedTilt = t;
     }
 
-    // Tight stillness thresholds AND an angle-stability guard: the slow
-    // self-righting rotation must read as "still moving" so we never judge
-    // mid-righting. We only call it once the angle has held steady (range
-    // < 0.03 rad) across a 22-step window — i.e. the bottle has truly stopped.
-    if (angVel < 0.010 && linSpeed < 7) {
-      stableFrames++;
+    if (groundedFrames > profile.missCapFrames) return recordLanding('MISS', null, 'timeout');
+
+    if (angVel < SETTLE_ANG_VEL && linSpeed < SETTLE_LIN_SPD) {
       angleWin.push(bottle.angle);
-      if (angleWin.length > 22) angleWin.shift();
+      if (angleWin.length > SETTLE_FRAMES) angleWin.shift();
       let lo = Infinity, hi = -Infinity;
       for (const a of angleWin) { if (a < lo) lo = a; if (a > hi) hi = a; }
-      if (angleWin.length >= 22 && (hi - lo) < 0.03) {
-        // Must have completed a full rotation AND land upright
-        let angle = ((bottle.angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-        if (angle > Math.PI) angle -= 2 * Math.PI;
-        // display-only — maxTilt feeds the rare "comeback" achievement upstream
-        lastLanding = { flipped: hasFlipped, finalAngle: angle, maxTilt: maxGroundedTilt };
-        if (!hasFlipped) { pendingResult = 'MISS'; return; }
-        pendingResult = Math.abs(angle) < 0.61 ? 'MAKE' : 'MISS';  // ±35° window
+      if (angleWin.length >= SETTLE_FRAMES && (hi - lo) < SETTLE_RANGE) {
+        if (profile.requireFlip && !hasFlipped) return recordLanding('MISS', null, 'underrotated');
+        const angle = normalizeSignedAngle(bottle.angle);
+        const tilt = Math.abs(angle);
+        const invErr = Math.abs(tilt - Math.PI);
+        if (tilt < MAKE_ANGLE) {
+          return recordLanding('MAKE', tilt, 'upright');
+        }
+        // Rare upside-down / on-cap settle — worth 2 in the rules layer.
+        if (invErr < CAP_WINDOW) {
+          return recordLanding('MAKE', tilt, 'cap');
+        }
+        if (tilt >= FALLEN_ANGLE) return recordLanding('MISS', tilt, 'fallen');
+        // Fully at rest but leaning hard (propped on a wall / teetered pose).
+        // A tipped bottle can still slowly right itself, so give it a moment —
+        // but a sustained settled lean is a MISS, not a stall until timeout.
+        leanFrames++;
+        if (leanFrames > LEAN_MISS_FRAMES) return recordLanding('MISS', tilt, 'leaning');
+      } else {
+        leanFrames = 0;
       }
     } else {
-      stableFrames = 0;
       angleWin = [];
-      // Hard timeout: ~10s on ground and still moving → MISS
-      if (groundedFrames > 600) pendingResult = 'MISS';
+      leanFrames = 0;
     }
+
+    return null;
   }
 
-  function checkLanding() { return pendingResult; }
-
-  // ── Bottle creation ────────────────────────────────────────────────────────
-  // Three-part compound body that mimics a ~¼-full Gatorade bottle:
-  //   • Heavy bottom (liquid region) → low CG → "bowling pin" stability
-  //   • Medium upper body
-  //   • Light neck
-  //
-  // With this mass distribution the CG sits ~30px above the base edge, giving
-  // a tipping angle ≈ 40°. A landing within ~35° of vertical can right itself;
-  // steeper than that and gravity wins — producing the "almost stuck" teeter.
   function createBottle() {
     const cx = canvasW / 2;
-    // Spawn resting on the table: base bottom edge (cy+73) sits ~3px above ground
     const cy = groundY - 76;
 
-    // Gatorade bottle — wide, squat, thick base:
-    //   liq:  74×70px heavy base (bottom 70px of body)
-    //   body: 70×50px upper body
-    //   neck: 44×35px wide short neck
-    // Compound CG ends up ~34px below cy → bottle.position.y ≈ groundY - 90
-
-    const liq  = Bodies.rectangle(cx, cy + 38, 74, 70, { density: 0.018 }); // heavy liquid base
+    const liq  = Bodies.rectangle(cx, cy + 38, 74, 70, { density: 0.018 });
     const body = Bodies.rectangle(cx, cy - 18, 70, 50, { density: 0.0015 });
     const neck = Bodies.rectangle(cx, cy - 62, 44, 36, { density: 0.0004 });
 
     const b = Body.create({
       parts: [liq, body, neck],
-      frictionAir: 0.025,  // moderate decay — spin nearly stops before landing
-      friction:    0.85,   // high — grips the table on landing
-      restitution: 0.02,   // near-zero — no bounce, just a thud
+      frictionAir: profile.frictionAir,
+      friction:    profile.friction,
+      restitution: profile.restitution,
       label: 'bottle',
     });
 
     return b;
   }
 
-  // ── Static world bodies (ground + walls) ───────────────────────────────────
-  function addStatics() {
-    ground = Bodies.rectangle(canvasW / 2, groundY + 25, canvasW * 6, 50, {
+  // The table surface sits this far above the canvas bottom. v87: raised from
+  // a fixed 30px so the table reads as a real surface, scaling with screen.
+  function tableInset(h) { return Math.max(64, Math.round(h * 0.13)); }
+
+  function init(w, h, bottomInset = 0) {
+    canvasW = w;
+    arenaH  = h;
+    groundY = h - tableInset(h) - bottomInset;
+    acc = 0;
+
+    engine = Engine.create({ gravity: { y: profile.gravity, scale: 0.001 } });
+    world  = engine.world;
+
+    // Extra-wide ground so open-arena mobile shots still have a floor off-screen.
+    ground = Bodies.rectangle(w / 2, groundY + 25, Math.max(w * 6, 4000), 50, {
       isStatic: true,
       label: 'ground',
       friction: 0.9,
       restitution: 0.01,
     });
 
-    // Side walls (inner faces at x=WALL_INSET and w-WALL_INSET). A bottle that
-    // drifts sideways caroms off them — clean vertical flicks never touch them.
-    const wallOpts = { isStatic: true, label: 'wall', friction: 0.3, restitution: 0.5 };
-    leftWall  = Bodies.rectangle(WALL_INSET - 20, canvasH / 2, 40, canvasH * 3, wallOpts);
-    rightWall = Bodies.rectangle(canvasW - WALL_INSET + 20, canvasH / 2, 40, canvasH * 3, wallOpts);
+    const wallOpts = { isStatic: true, label: 'wall', friction: 0, restitution: 0 };
+    leftWall  = Bodies.rectangle(WALL_INSET - 20, h / 2, 40, h * 4, wallOpts);
+    rightWall = Bodies.rectangle(w - WALL_INSET + 20, h / 2, 40, h * 4, wallOpts);
 
-    World.add(world, [ground, leftWall, rightWall]);
-  }
-
-  // ── Public API ─────────────────────────────────────────────────────────────
-  function init(w, h) {
-    canvasW = w;
-    canvasH = h;
-    groundY = h - 30;          // top surface of the table
-    acc     = 0;
-
-    engine = Engine.create({ gravity: { y: 1.5, scale: 0.001 } });
-    world  = engine.world;
-
-    addStatics();
-
-    // Wall hits → impact callback (bounce SFX). Collisions report compound
-    // PARTS, so match via part.parent. Ground contact is detected positionally
-    // in stepOnce (one thud per flick, exact landing moment).
-    Events.on(engine, 'collisionStart', (ev) => {
-      if (!onImpact || !launched || !bottle) return;
-      for (const { bodyA, bodyB } of ev.pairs) {
-        const aIsBottle = bodyA === bottle || bodyA.parent === bottle;
-        const bIsBottle = bodyB === bottle || bodyB.parent === bottle;
-        if (aIsBottle === bIsBottle) continue;
-        const other = aIsBottle ? bodyB : bodyA;
-        if (other.label === 'wall') {
-          const speed = Math.hypot(bottle.velocity.x, bottle.velocity.y);
-          if (speed > 2) onImpact('wall', speed);
-        }
-      }
+    ceilingBody = Bodies.rectangle(w / 2, -20, Math.max(w * 6, 4000), 40, {
+      isStatic: true, label: 'ceiling', friction: 0, restitution: 0.85,
+      collisionFilter: { mask: profile.ceiling ? 0xFFFFFFFF : 0 },
     });
 
+    World.add(world, [ground, leftWall, rightWall, ceilingBody]);
+    syncSideWalls();
     resetBottle();
   }
 
-  // Rebuild statics for new dimensions (window resize / panel rotation) —
-  // without this the bottle keeps landing on the OLD ground height. The bottle
-  // itself survives; it's clamped inside the new walls and above the new table.
-  function resizeWorld(w, h) {
+  function reflow(w, h, bottomInset = 0) {
     if (!engine) return;
     canvasW = w;
-    canvasH = h;
-    groundY = h - 30;
-    World.remove(world, [ground, leftWall, rightWall]);
-    addStatics();
-    if (bottle) {
-      const x = Math.max(WALL_INSET + 45, Math.min(w - WALL_INSET - 45, bottle.position.x));
-      const y = Math.min(bottle.position.y, groundY - 90);
-      Body.setPosition(bottle, { x, y });
+    arenaH  = h;
+    groundY = h - tableInset(h) - bottomInset;
+    Body.setPosition(ground,    { x: w / 2,                 y: groundY + 25 });
+    Body.setPosition(leftWall,  { x: WALL_INSET - 20,       y: h / 2 });
+    Body.setPosition(rightWall, { x: w - WALL_INSET + 20,   y: h / 2 });
+    Body.setPosition(ceilingBody, { x: w / 2, y: -20 });
+    syncSideWalls();
+    buildObstacles(h);
+    if (profile.landOnTarget) {
+      targetHW = currentTargetHalfWidth();
+      const margin = (sideWallsEnabled ? WALL_INSET : 8) + targetHW + 16;
+      if (targetX != null) targetX = Math.max(margin, Math.min(w - margin, targetX));
     }
   }
 
   function resetBottle() {
     if (bottle) World.remove(world, bottle);
-    stableFrames   = 0;
     groundedFrames = 0;
     angleWin       = [];
     totalRotation  = 0;
     hasFlipped     = false;
     launchAngle    = 0;
     hasLanded      = false;
+    capSticky      = false;
+    lastLandingInfo = null;
+    lastFlickInfo  = null;
     launched       = false;
-    pendingResult  = null;
-    groundContact  = false;
+    leanFrames     = 0;
+    wasAirborne    = false;
+    floorTouched   = false;
+    slideFrames    = 0;
     maxGroundedTilt = 0;
+    flightFrames   = 0;
     liquid.reset();
+    acc = 0;
 
     bottle = createBottle();
     World.add(world, bottle);
+    applyBodyMaterial();
   }
 
-  // Convert a flick gesture (px/s) into a launch — models a wrist snap.
-  //   • A quick UPWARD flick tosses the bottle up AND spins it forward.
-  //   • Flick STRENGTH (upward speed) drives the spin — harder snap = more
-  //     rotation. This is the skill: snap hard enough for one clean 360°.
-  //   • Sideways lean only nudges drift + which way it tumbles.
-  // Launch height stays in a tight band so airtime is steady and the player
-  // is really tuning the *spin* (rotation count) with their flick strength.
-  //
-  // Pass an explicit `seed` to replay a flick's exact randomness (multiplayer/
-  // tuning); otherwise a fresh seed is drawn and recorded in lastFlickInfo.
+  // Seed arena RNG for this turn (pad placement + future furniture). Must run
+  // AFTER setProfile/resetBottle and BEFORE the player aims, so peers that
+  // share turnCounter + playerIndex place the same pad without a net message.
+  function seedTurn(seed) {
+    seedRng((seed >>> 0) || 1);
+    arenaTime = 0;
+    placeTarget();
+  }
+
+  // Pass an explicit `seed` to replay a flick's exact randomness (multiplayer);
+  // otherwise a fresh seed is drawn and recorded in lastFlickInfo.
+  // Does NOT re-roll the pad — that was seeded in seedTurn().
   function applyFlick(vx, vy, seed) {
-    const s = (seed !== undefined ? seed : Math.floor(Math.random() * 0xffffffff)) >>> 0;
+    const s = (seed !== undefined && seed !== null
+      ? seed
+      : Math.floor(Math.random() * 0xffffffff)) >>> 0;
     seedRng(s);
 
-    const upSpeed = Math.max(0, -vy);                  // upward flick speed (px/s)
-    const power   = Math.min(upSpeed / POWER_SPEED, 1.0); // 0..1 flick strength
+    const upSpeed = Math.max(0, -vy);
+    const power   = Math.min(upSpeed / POWER_SPEED, 1.0);
 
-    // Small randomness so the same flick isn't a guaranteed make — a centered
-    // flick still usually lands, but a marginal one becomes a coin flip.
-    const jSpin   = 1 + (rand() - 0.5) * 0.24;  // ±12% spin (dominant lever)
-    const jLaunch = 1 + (rand() - 0.5) * 0.12;  // ±6% launch (scatters airtime)
-    const jDrift  = (rand() - 0.5) * 2.4;       // ±1.2 px/frame stray drift
+    const jSpin   = 1 + (rand() - 0.5) * 0.10;   // mild spin chaos
+    const jLaunch = 1 + (rand() - 0.5) * 0.06;   // mild height chaos
+    const jDrift  = (rand() - 0.5) * 1.1;        // mild sideways chaos
 
-    // Fairly steady launch height so airtime is consistent — the player is
-    // really tuning the *spin* (rotation count) with their flick strength.
-    const launchY = -(16 + power * 5) * jLaunch;       // -16 (soft) .. -21 (hard)
-    const launchX = Math.max(-6, Math.min(6, vx / 280)) + jDrift; // sideways drift
+    // Slightly lower arcs than the "harder/higher/wilder" feel (was 16 + power*5).
+    const launchY = -(15.2 + power * 4.7) * jLaunch * profile.launchScale;
+    let launchX = Math.max(-profile.horizMax,
+      Math.min(profile.horizMax, vx / profile.horizDivisor)) + jDrift;
 
-    // Wrist-snap spin scales with flick strength. Forward by default;
-    // a sideways lean flips the tumble direction.
+    if (profile.minHorizRatio > 0) {
+      const minX = Math.abs(launchY) * profile.minHorizRatio;
+      if (Math.abs(launchX) < minX) launchX = (launchX >= 0 ? 1 : -1) * minX;
+    }
+
     const dir  = vx >= 0 ? 1 : -1;
-    const spin = dir * (spinBase + power * spinRange) * jSpin;
+    const spin = dir * (SPIN_BASE + power * SPIN_RANGE) * jSpin * profile.spinScale;
 
-    lastFlickInfo = { upSpeed: Math.round(upSpeed), power: +power.toFixed(2), spin: +spin.toFixed(3), seed: s };
+    lastFlickInfo = {
+      upSpeed: Math.round(upSpeed),
+      power: +power.toFixed(2),
+      spin: +spin.toFixed(3),
+      seed: s,
+      vx: Math.round(vx),
+      vy: Math.round(vy),
+    };
     launchAngle = bottle.angle;
-    launched    = true;
+    launched = true;
+    wasAirborne = false;
+    flightFrames = 0;
+    groundedFrames = 0;
+    angleWin = [];
+    lastLandingInfo = null;
     Body.setVelocity(bottle, { x: launchX, y: launchY });
     Body.setAngularVelocity(bottle, spin);
   }
 
-  // Slow-mo drama: the bottle is down, barely rotating, and near the tipping
-  // angle — stretch the "will it stick?" moment. The verdict is unaffected:
-  // judging waits for a full stop regardless of pacing, and slow-mo releases
-  // (angVel bounds don't overlap the stillness threshold) before judging.
-  function currentTimeScale() {
-    if (!launched || pendingResult || !bottle) return 1;
-    if (bottle.position.y < groundY - 80) return 1;          // airborne
-    const angVel = Math.abs(bottle.angularVelocity);
-    if (angVel <= 0.012 || angVel >= 0.15) return 1;          // stopped / tumbling
-    let a = ((bottle.angle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-    if (a > Math.PI) a -= 2 * Math.PI;
-    const tilt = Math.abs(a);
-    return (tilt > 0.25 && tilt < 1.15) ? 0.45 : 1;           // near tipping angle
+  function stepOnce() {
+    Engine.update(engine, FIXED_DT * 1000);
+    arenaTime += FIXED_DT;
+
+    if (launched && !wasAirborne && bottle.bounds.max.y < groundY - 24) wasAirborne = true;
+    if (!hasFlipped) {
+      totalRotation = Math.abs(bottle.angle - launchAngle);
+      if (totalRotation >= 5.6) hasFlipped = true;
+    }
+
+    // Landing kick is for normal flips (liquid slosh punch). Bank-shot editions
+    // accumulate "hasFlipped" from wall caroms and must not get a random shove.
+    // v78: softened — the old kick tipped a lot of near-makes into misses.
+    if (!profile.floorResolve && hasFlipped && !hasLanded &&
+        bottle.velocity.y > 0 && bottle.position.y >= groundY - 55) {
+      hasLanded = true;
+      const a = normalizeSignedAngle(bottle.angle);
+      const invErr = Math.abs(Math.abs(a) - Math.PI);
+      // Rare cap-stick lottery: touch down roughly inverted → sometimes the
+      // neck/cap grips and we damp hard toward ±π (~1-in-100 flips overall).
+      if (invErr < CAP_ZONE && rand() < CAP_STICK_CHANCE) capSticky = true;
+      const kickScale = (capSticky || invErr < CAP_WINDOW) ? 0.25 : 1;
+      const kick = (liquid.vel * 0.028 + (rand() - 0.5) * 0.06) * kickScale;
+      Body.setAngularVelocity(bottle, bottle.angularVelocity + kick);
+    }
+
+    // Cap-sticky assist: pull gently toward fully inverted and kill spin so a
+    // rare on-cap balance can actually settle instead of tippling over.
+    if (capSticky && launched && !profile.floorResolve) {
+      const a = normalizeSignedAngle(bottle.angle);
+      const target = a >= 0 ? Math.PI : -Math.PI;
+      const pull = (target - a) * 0.045;
+      Body.setAngularVelocity(bottle, bottle.angularVelocity * 0.78 + pull);
+    }
+
+    liquid.update(bottle.angularVelocity, FIXED_DT, bottle.angle);
+    updateSaucers(FIXED_DT);
   }
 
   function step(dt) {
-    acc += dt * currentTimeScale();
-    if (acc > 0.25) acc = 0.25;    // clamp after long stalls (tab-away etc.)
+    acc += dt;
+    if (acc > 0.25) acc = 0.25;
     while (acc >= FIXED_DT) {
       stepOnce();
       acc -= FIXED_DT;
     }
   }
 
-  function stepOnce() {
-    Engine.update(engine, FIXED_DT * 1000);
+  // Profile-driven base zoom (Alien pulls way back so the pad is harder).
+  function profileArenaZoom() {
+    const compact = isCompactScreen();
+    const z = compact
+      ? (profile.mobileArenaZoom != null ? profile.mobileArenaZoom : profile.arenaZoom)
+      : profile.arenaZoom;
+    if (z == null || !(z > 0)) return null;
+    return Math.max(0.35, Math.min(1, z));
+  }
 
-    // Require a full 360° flip: track angle traveled since launch.
-    // Matter's body.angle accumulates (doesn't wrap) so this is exact.
-    if (!hasFlipped) {
-      totalRotation = Math.abs(bottle.angle - launchAngle);
-      if (totalRotation >= 5.6) hasFlipped = true; // ~320° ≈ a completed flip
+  // Camera helper: when the bottle leaves the frame (mobile open arena), the
+  // renderer zooms out so the shot stays visible. Returns world bounds that
+  // should remain on-screen. Some profiles (Alien) force a pulled-back zoom
+  // even with walls so phones feel like a bigger arena.
+  function getViewHint() {
+    const forced = profileArenaZoom();
+    const cx = canvasW / 2;
+    const cy = groundY / 2;
+    if (!bottle) {
+      return {
+        openArena, sideWalls: sideWallsEnabled,
+        zoom: forced != null ? forced : 1,
+        camX: cx, camY: cy,
+      };
     }
-
-    // Liquid-driven landing kick: the instant the bottle first comes down on
-    // the table, the still-sloshing liquid gives it a shove. Sometimes it
-    // sticks, sometimes that extra push tips it over — the "almost stuck then
-    // falls" moment. Keeps a good flick from being a guaranteed make.
-    if (hasFlipped && !hasLanded && bottle.velocity.y > 0 && bottle.position.y >= groundY - 55) {
-      hasLanded = true;
-      const kick = liquid.vel * 0.06 + (rand() - 0.5) * 0.16;
-      Body.setAngularVelocity(bottle, bottle.angularVelocity + kick);
+    if (!openArena) {
+      return {
+        openArena: false,
+        sideWalls: sideWallsEnabled,
+        zoom: forced != null ? forced : 1,
+        camX: cx,
+        camY: cy,
+        worldW: canvasW,
+        worldH: groundY + 30,
+      };
     }
-
-    // First ground contact after launch → impact callback (landing thud SFX)
-    if (launched && !groundContact && bottle.velocity.y > 0 && bottle.position.y >= groundY - 55) {
-      groundContact = true;
-      if (onImpact) onImpact('ground', Math.abs(bottle.velocity.y));
-    }
-
-    liquid.update(bottle.angularVelocity, FIXED_DT);
-
-    if (launched && !pendingResult) evaluateLandingStep();
+    const pad = 48;
+    const minX = Math.min(0, bottle.bounds.min.x - pad);
+    const maxX = Math.max(canvasW, bottle.bounds.max.x + pad);
+    const minY = Math.min(0, bottle.bounds.min.y - pad);
+    const maxY = Math.max(groundY + 30, bottle.bounds.max.y + 20);
+    const spanX = maxX - minX;
+    const spanY = maxY - minY;
+    const zoom = Math.min(1, canvasW / spanX, (groundY + 30) / Math.max(spanY, 1));
+    // Only zoom out (never in past 1). Floor lowered so long open-arena shots
+    // (and forced Alien zoom) can pull further back on phones.
+    let z = Math.max(0.40, Math.min(1, zoom));
+    if (forced != null) z = Math.min(z, forced);
+    return {
+      openArena,
+      sideWalls: sideWallsEnabled,
+      zoom: z,
+      camX: (minX + maxX) / 2,
+      camY: (minY + maxY) / 2,
+      worldW: canvasW,
+      worldH: groundY + 30,
+    };
   }
 
   function getBottle()  { return bottle; }
   function getLiquid()  { return liquid; }
   function getGroundY() { return groundY; }
-  // getRotations is a debug/console helper. getLastFlickInfo also feeds the
-  // optional post-flick strength readout + practice meter in main.js;
-  // getLandingInfo feeds the "So close!" near-miss banner.
-  function getRotations()    { return bottle ? Math.abs(bottle.angle - launchAngle) / (2 * Math.PI) : 0; }
+  function getLastLandingInfo() { return lastLandingInfo; }
   function getLastFlickInfo() { return lastFlickInfo; }
-  function getLandingInfo()   { return lastLanding; }
+  function isOpenArena() { return openArena; }
 
-  return { init, setFeel, step, resetBottle, applyFlick, checkLanding, resizeWorld, setImpactCallback, getBottle, getLiquid, getGroundY, getRotations, getLastFlickInfo, getLandingInfo };
+  // Force a verdict from the network authority (hybrid lockstep).
+  function forceLanding(result, info) {
+    lastLandingInfo = {
+      result,
+      tilt: info && info.tilt != null ? info.tilt : null,
+      perfect: !!(info && info.perfect),
+      reason: (info && info.reason) || 'net-authority',
+      onCap: !!(info && (info.onCap || info.reason === 'cap')),
+      maxTilt: (info && info.maxTilt) || 0,
+    };
+    return result;
+  }
+
+  return {
+    init, reflow, step, resetBottle, applyFlick, checkLanding, forceLanding,
+    getBottle, getLiquid, getGroundY, getLastLandingInfo, getLastFlickInfo,
+    setProfile, getTarget, getObstacles, getViewHint, isOpenArena, placeTarget,
+    seedTurn,
+  };
 })();

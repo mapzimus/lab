@@ -5,47 +5,51 @@ const Input = (() => {
 
   let canvas, onFlick;
   let dragging = false;
-  let activePointerId = null;                  // lock onto ONE pointer per gesture
   let startX = 0, startY = 0;
   let curX = 0, curY = 0;
   let lastX = 0, lastY = 0, lastT = 0;
   let peakSpeed = 0, peakVx = 0, peakVy = 0;  // fastest instant of the gesture
+  let rect = null;                             // canvas rect, captured at gesture start
   let enabled = false;
-  let lastFlick = null;                        // debug: last flick vector
+  let activePointerId = null;                  // the one pointer that owns the in-flight flick
 
   function attach(cvs, flickCallback) {
     canvas  = cvs;
     onFlick = flickCallback;
 
-    canvas.addEventListener('pointerdown',   onDown);
-    canvas.addEventListener('pointermove',   onMove);
-    canvas.addEventListener('pointerup',     onUp);
-    canvas.addEventListener('pointercancel', onCancel);  // phantom-flick guard
+    canvas.addEventListener('pointerdown',  onDown);
+    canvas.addEventListener('pointermove',  onMove);
+    canvas.addEventListener('pointerup',    onUp);
+    canvas.addEventListener('pointercancel', onCancel);
   }
 
   function enable()  { enabled = true;  }
-  function disable() { enabled = false; releaseGesture(); }
+  function disable() { enabled = false; dragging = false; activePointerId = null; }
 
   function onDown(e) {
     if (!enabled) return;
-    if (activePointerId !== null) return;      // already tracking a finger — ignore the 2nd
+    // Single-flick ownership: ignore extra fingers while one flick is in flight,
+    // so a second touch (or a palm) can't hijack the in-progress drag state.
+    if (dragging) return;
     e.preventDefault();
     activePointerId = e.pointerId;
-    try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+    try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
     dragging = true;
-    const r = canvas.getBoundingClientRect();
-    startX = curX = lastX = e.clientX - r.left;
-    startY = curY = lastY = e.clientY - r.top;
+    // Capture the canvas rect ONCE at gesture start. Recomputing it per move
+    // event means a mid-gesture chrome shift (e.g. a mobile address bar
+    // collapsing) injects a fake dy and biases the flick's vertical speed.
+    rect = canvas.getBoundingClientRect();
+    startX = curX = lastX = e.clientX - rect.left;
+    startY = curY = lastY = e.clientY - rect.top;
     lastT = performance.now();
     peakSpeed = peakVx = peakVy = 0;
   }
 
   function onMove(e) {
-    if (!dragging || e.pointerId !== activePointerId) return;
+    if (!dragging || !rect || e.pointerId !== activePointerId) return;
     e.preventDefault();
-    const r = canvas.getBoundingClientRect();
-    curX = e.clientX - r.left;
-    curY = e.clientY - r.top;
+    curX = e.clientX - rect.left;
+    curY = e.clientY - rect.top;
     const now = performance.now();
     const dt = Math.max((now - lastT) / 1000, 0.001);
     const ivx = (curX - lastX) / dt;   // instantaneous velocity this sample
@@ -58,39 +62,30 @@ const Input = (() => {
   }
 
   function onUp(e) {
-    if (!dragging || e.pointerId !== activePointerId) return;
+    if (!dragging || !enabled || e.pointerId !== activePointerId) return;
+    dragging = false;
+    activePointerId = null;
 
     const dx = curX - startX, dy = curY - startY;
     const dist = Math.hypot(dx, dy);
-    const wasEnabled = enabled;
-    releaseGesture(e);                 // clear capture/state BEFORE the callback
-
-    if (!wasEnabled || dist < MIN_DRAG) return;
+    if (dist < MIN_DRAG) return;
 
     // Use the gesture's peak velocity. Fall back to a distance estimate if
     // we somehow captured almost no motion (e.g. one big jump then release).
     let vx = peakVx, vy = peakVy;
     if (peakSpeed < 80) { vx = dx * 10; vy = dy * 10; }
 
-    lastFlick = { vx: Math.round(vx), vy: Math.round(vy), peak: Math.round(peakSpeed) };
     onFlick(vx, vy);
   }
 
-  // pointercancel (palm rejection, OS gesture steal): reset, do NOT fire a flick.
+  // A pointercancel (palm rejection, OS gesture interrupt, lost capture) must
+  // ABORT the gesture WITHOUT firing a flick. The old code routed cancel to
+  // onUp, so an interrupted drag could launch a phantom flick.
   function onCancel(e) {
     if (e.pointerId !== activePointerId) return;
-    releaseGesture(e);
-  }
-
-  function releaseGesture(e) {
     dragging = false;
-    if (activePointerId !== null) {
-      try { canvas.releasePointerCapture(activePointerId); } catch (_) {}
-    }
     activePointerId = null;
   }
-
-  function getLastFlick() { return lastFlick; }
 
   // Returns drag vector for drawing the preview arrow
   function getDragState() {
@@ -98,5 +93,5 @@ const Input = (() => {
     return { startX, startY, curX, curY };
   }
 
-  return { attach, enable, disable, getDragState, getLastFlick };
+  return { attach, enable, disable, getDragState };
 })();
