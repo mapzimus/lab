@@ -1,16 +1,17 @@
-// records.js — persisted hall-of-fame (localStorage). Loaded before main.js.
-// Pure read of game state — touches no rules or physics.
+// records.js — persisted lifetime stats (Hall of Fame). Pure storage + render;
+// touches no rules or physics. Loaded before achievements.js and main.js.
 const Records = (() => {
   const KEY = 'flipgame.records.v1';
   const DEFAULTS = {
-    bestStreak: 0,      // longest personal consecutive makes
-    highestStake: 0,    // highest shared stake (pointCount) ever reached
-    totalMakes: 0,
-    totalFlips: 0,
+    totalFlips:    0,
+    totalMakes:    0,
+    bestStreak:    0,   // longest personal run of consecutive makes, ever
+    highestStake:  0,   // highest shared stake (pointCount) ever reached
     longestOnFire: 0,   // most bonus makes in one ON FIRE run
-    mostWins: {},       // name -> win count
-    totalWins: 0,       // wins on this device, across all players — drives skin unlocks
-    unlockedSkins: ['bottle'],  // flippable editions earned on this device
+    soCloseCount:  0,   // lifetime "So close!" near-misses
+    greatSaves:    0,   // lifetime rare tip-and-recover MAKEs
+    gamesPlayed:   0,
+    mostWins:      {},  // name -> win count
   };
   let data = load();
 
@@ -23,67 +24,60 @@ const Records = (() => {
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
 
-  // Call AFTER each game.resolveFlip() (normal play and practice).
-  function recordFlip(g) {
+  // Call once per resolved flip (practice or real). `info`:
+  //   { result:'MAKE'|'MISS', practice, streak, pointCount, onFireBonus, soClose, greatSave }
+  // Returns a snapshot of the updated totals (handy for achievement checks
+  // that need "lifetime count AFTER this flip").
+  function recordFlip(info) {
     data.totalFlips++;
-    if (g.lastResult === 'MAKE') data.totalMakes++;
-    const streak = g.practice ? g.practiceStreak : (g.currentPlayer()?.streak || 0);
-    if (streak > data.bestStreak) data.bestStreak = streak;
-    if (g.pointCount > data.highestStake) data.highestStake = g.pointCount;
-    if (g.onFireBonus > data.longestOnFire) data.longestOnFire = g.onFireBonus;
+    if (info.result === 'MAKE') data.totalMakes++;
+    if (info.streak > data.bestStreak) data.bestStreak = info.streak;
+    if (!info.practice) {
+      if (info.pointCount > data.highestStake) data.highestStake = info.pointCount;
+      if (info.onFireBonus > data.longestOnFire) data.longestOnFire = info.onFireBonus;
+    }
+    if (info.soClose)   data.soCloseCount++;
+    if (info.greatSave) data.greatSaves++;
     save();
+    return clone(data);
   }
+
   function recordWin(name) {
-    if (!name) return;
-    data.mostWins[name] = (data.mostWins[name] || 0) + 1;
-    data.totalWins = (data.totalWins || 0) + 1;
+    data.gamesPlayed++;
+    if (name) data.mostWins[name] = (data.mostWins[name] || 0) + 1;
     save();
+    return clone(data);
   }
-  function totalWins() { return data.totalWins || 0; }
+
   function topWinner() {
     let best = null, n = 0;
     for (const [name, c] of Object.entries(data.mostWins)) if (c > n) { best = name; n = c; }
-    return best ? `${best} · ${n}` : '—';
+    return best ? `${best} (${n})` : '—';
   }
+
+  function snapshot() { return clone(data); }
+
   function renderHtml() {
+    const pct = data.totalFlips ? Math.round(data.totalMakes / data.totalFlips * 100) : 0;
     const rows = [
-      ['🏆', 'Most wins',   topWinner()],
-      ['🔥', 'Best streak', data.bestStreak],
-      ['⚡', 'Top stake',   '×' + data.highestStake],
-      ['🔥', 'Hot run',     '+' + data.longestOnFire],
-      ['✓',  'Total makes', data.totalMakes],
-      ['Σ',  'Total flips', data.totalFlips],
+      ['🏆', 'Most wins',    topWinner()],
+      ['🎮', 'Games played', data.gamesPlayed],
+      ['🔥', 'Best streak',  data.bestStreak],
+      ['⚡', 'Top stake',    '×' + data.highestStake],
+      ['🌋', 'Hottest run',  '+' + data.longestOnFire],
+      ['🧤', 'Great Saves',  data.greatSaves],
+      ['😩', 'So close',     data.soCloseCount],
+      ['✓',  'Total makes',  data.totalMakes],
+      ['Σ',  'Total flips',  data.totalFlips],
+      ['%',  'Make rate',    pct + '%'],
     ];
     return '<div class="records-title">🏅 Hall of Fame</div><div class="records-grid">' +
       rows.map(([icon, key, val]) =>
         `<div class="rec-item"><span class="rec-val">${val}</span>` +
         `<span class="rec-key">${icon} ${key}</span></div>`).join('') + '</div>';
   }
+
   function reset() { data = clone(DEFAULTS); save(); }
 
-  // ── Unlockable skins ──────────────────────────────────────────────────────
-  function unlockedSkins() {
-    if (!Array.isArray(data.unlockedSkins)) data.unlockedSkins = ['bottle'];
-    if (!data.unlockedSkins.includes('bottle')) data.unlockedSkins.unshift('bottle');
-    return data.unlockedSkins.slice();
-  }
-  function isSkinUnlocked(id) { return unlockedSkins().includes(id); }
-  // Returns true only if this call is what newly unlocked it (for the reveal).
-  function unlockSkin(id) {
-    if (isSkinUnlocked(id)) return false;
-    data.unlockedSkins = unlockedSkins().concat(id);
-    save();
-    return true;
-  }
-  // Wipe ONLY the unlock ladder (editions + the win counter that drives it).
-  // Hall-of-fame stats stay — "start the collection over" shouldn't erase the
-  // party's records. Both fields must clear together: zeroing the skins while
-  // keeping totalWins would re-unlock everything at the next game over.
-  function resetSkinProgress() {
-    data.totalWins = 0;
-    data.unlockedSkins = ['bottle'];
-    save();
-  }
-
-  return { recordFlip, recordWin, renderHtml, reset, totalWins, unlockedSkins, isSkinUnlocked, unlockSkin, resetSkinProgress };
+  return { recordFlip, recordWin, renderHtml, snapshot, reset };
 })();
