@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-06",
+  "generatedAt": "2026-08-07",
   "news": {
     "mapsmania": [
+      {
+        "title": "CastleGuessr",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/castleguessr.html",
+        "desc": "I had determined not to post about Castle Map despite it being written about extensively elsewhere."
+      },
       {
         "title": "SimCity London: The Pixelated City",
         "url": "http://googlemapsmania.blogspot.com/2026/08/simcity-london-pixelated-city.html",
@@ -36,11 +41,6 @@
         "title": "German Döner, English Curry & American Pizza",
         "url": "http://googlemapsmania.blogspot.com/2026/07/german-doner-english-curry-american.html",
         "desc": "German Döner Kebab restaurants have started popping up all over London."
-      },
-      {
-        "title": "Bigfoot's Giant Step Forward for Tourism Maps",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/bigfoots-giant-step-forward-for-tourism_01313180873.html",
-        "desc": "Tourism websites often present destinations using static maps, brochures and carefully curated lists of attractions."
       }
     ],
     "georealm": [
@@ -110,6 +110,22 @@
   },
   "qgis": [
     {
+      "title": "Chak Star Alignment",
+      "url": "https://plugins.qgis.org/plugins/star_alignment_plugin/"
+    },
+    {
+      "title": "IGN Altibonne",
+      "url": "https://plugins.qgis.org/plugins/IGN_altibonne/"
+    },
+    {
+      "title": "IGN Objets préférés",
+      "url": "https://plugins.qgis.org/plugins/IGN_objets_preferes/"
+    },
+    {
+      "title": "Auto Contour Generator",
+      "url": "https://plugins.qgis.org/plugins/auto_contour_generator/"
+    },
+    {
       "title": "QGeoAI Toolkit",
       "url": "https://plugins.qgis.org/plugins/qgeoai_toolkit1/"
     },
@@ -124,22 +140,6 @@
     {
       "title": "Affecter ID Classe",
       "url": "https://plugins.qgis.org/plugins/affecter_id_classe/"
-    },
-    {
-      "title": "Attribute Form Toggle",
-      "url": "https://plugins.qgis.org/plugins/attribute_form_toggle/"
-    },
-    {
-      "title": "Clip2Place",
-      "url": "https://plugins.qgis.org/plugins/clip2place/"
-    },
-    {
-      "title": "Mapdex for QGIS",
-      "url": "https://plugins.qgis.org/plugins/mapdex/"
-    },
-    {
-      "title": "LayerWheel",
-      "url": "https://plugins.qgis.org/plugins/LayerWheel/"
     }
   ],
   "releases": [
@@ -210,6 +210,24 @@
   ],
   "gisse": [
     {
+      "title": "QGIS loads shapefile from network but says invalid when loading from local hard drive",
+      "url": "https://gis.stackexchange.com/questions/501239/qgis-loads-shapefile-from-network-but-says-invalid-when-loading-from-local-hard",
+      "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "Selecting linear unit for buffer tool when using ModelBuilder Iterator in ArcGIS Pro",
+      "url": "https://gis.stackexchange.com/questions/501238/selecting-linear-unit-for-buffer-tool-when-using-modelbuilder-iterator-in-arcgis",
+      "score": -1,
+      "answers": 0
+    },
+    {
+      "title": "QGIS points are only clamped to ground",
+      "url": "https://gis.stackexchange.com/questions/501226/qgis-points-are-only-clamped-to-ground",
+      "score": 2,
+      "answers": 2
+    },
+    {
       "title": "GeoServer partial transparency issue",
       "url": "https://gis.stackexchange.com/questions/501237/geoserver-partial-transparency-issue",
       "score": 0,
@@ -218,14 +236,8 @@
     {
       "title": "Exporting points with coordinates",
       "url": "https://gis.stackexchange.com/questions/501232/exporting-points-with-coordinates",
-      "score": 0,
+      "score": 1,
       "answers": 0
-    },
-    {
-      "title": "QGIS points are only clamped to ground",
-      "url": "https://gis.stackexchange.com/questions/501226/qgis-points-are-only-clamped-to-ground",
-      "score": 2,
-      "answers": 1
     },
     {
       "title": "QGIS 3.44 Failed to parse capabilities error when trying to view items in WMS layer",
@@ -242,7 +254,7 @@
     {
       "title": "Selecting layer from Geopackage containing multiple layers using Merge tool of QGIS",
       "url": "https://gis.stackexchange.com/questions/501214/selecting-layer-from-geopackage-containing-multiple-layers-using-merge-tool-of-q",
-      "score": 2,
+      "score": 3,
       "answers": 2
     },
     {
@@ -256,33 +268,9 @@
       "url": "https://gis.stackexchange.com/questions/501215/i-am-seeking-a-profile-of-the-garden-in-which-i-grew-up-75-years-ago-i-was-intr",
       "score": 1,
       "answers": 2
-    },
-    {
-      "title": "Processing plug-in can only export data to GeoPackage",
-      "url": "https://gis.stackexchange.com/questions/501204/processing-plug-in-can-only-export-data-to-geopackage",
-      "score": 1,
-      "answers": 0
-    },
-    {
-      "title": "How to draw a line connecting the midpoints of a rectangles shorter edges using FME",
-      "url": "https://gis.stackexchange.com/questions/501208/how-to-draw-a-line-connecting-the-midpoints-of-a-rectangles-shorter-edges-using",
-      "score": 1,
-      "answers": 2
     }
   ],
   "nasa": [
-    {
-      "title": "Low Cost Sensors AQ Pakistan Air Quality Initiative Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=Low-Cost-Sensors-AQ_PakAirQuality",
-      "desc": "Low-Cost-Sensors-AQ_PakAirQuality is the ground site data collected by the Pakistan Air Quality Initiative (PAQI) sensor network as part of the Low-Cost Air…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "Low Cost Sensors AQ AirGradient Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=Low-Cost-Sensors-AQ_AirGradient",
-      "desc": "Low-Cost-Sensors-AQ_AirGradient is the ground site data collected by the AirGradient sensor network as part of the Low-Cost Air Quality Sensor Harmonization…",
-      "org": "LARC_CLOUD"
-    },
     {
       "title": "UAVSAR_POLSAR_STOKES",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
@@ -329,6 +317,18 @@
       "title": "UAVSAR_POLSAR_METADATA",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
       "desc": "UAVSAR PolSAR Scene Metadata",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_KMZ",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
+      "desc": "UAVSAR PolSAR Scene KMZ",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_INCIDENCE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
+      "desc": "UAVSAR PolSAR Scene Incidence Angle",
       "org": "ASF"
     }
   ],
