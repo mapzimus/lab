@@ -4,28 +4,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>State Extremes · Mapzimus Lab</title>
-  <meta name="description" content="Four dots per state — the northernmost, easternmost, southernmost, and westernmost points of every U.S. state — on an equirectangular map with straight latitude and longitude lines.">
+  <meta name="description" content="Four dots per state — the northernmost, easternmost, southernmost, and westernmost points of every U.S. state — on a 3D globe.">
   <link rel="canonical" href="https://mapzimus.com/lab/state-extremes/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="State Extremes · Mapzimus Lab">
-  <meta property="og:description" content="Four dots per state — the northernmost, easternmost, southernmost, and westernmost points of every U.S. state — on an equirectangular map with straight latitude and longitude lines.">
+  <meta property="og:description" content="Four dots per state — the northernmost, easternmost, southernmost, and westernmost points of every U.S. state — on a 3D globe.">
   <meta property="og:url" content="https://mapzimus.com/lab/state-extremes/">
   <meta name="twitter:card" content="summary">
-  <meta name="theme-color" content="#1a2430">
+  <meta name="theme-color" content="#0b1016">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/state-extremes/vendor/maplibre-gl.css">
   <link rel="stylesheet" href="/lab/state-extremes/state-extremes.css">
-  <script src="/lab/state-extremes/vendor/d3.min.js" defer></script>
+  <script src="/lab/state-extremes/vendor/maplibre-gl.js" defer></script>
   <script src="/lab/state-extremes/state-extremes.js" defer></script>
 </head>
 <body>
-  <div id="map" role="application" aria-label="Equirectangular map of northernmost, easternmost, southernmost, and westernmost points in each U.S. state"></div>
+  <div id="map" role="application" aria-label="Globe map of northernmost, easternmost, southernmost, and westernmost points in each U.S. state"></div>
 
   <header class="chrome">
     <a class="back" href="/lab/">← Lab</a>
     <div class="brand-block">
       <p class="brand">Mapzimus</p>
       <h1>State Extremes</h1>
-      <p class="lede">One map. Four dots per state — north, east, south, west. Straight lat/lon lines.</p>
+      <p class="lede">One globe. Four dots per state — north, east, south, west.</p>
     </div>
   </header>
 
@@ -44,20 +45,13 @@
     </div>
   </aside>
 
-  <div class="zoom-btns" role="group" aria-label="Zoom">
-    <button type="button" id="zoomIn" aria-label="Zoom in">+</button>
-    <button type="button" id="zoomOut" aria-label="Zoom out">−</button>
-  </div>
-
   <p class="readout" id="readout" aria-live="polite"></p>
-  <div class="popup" id="popup" hidden></div>
 
   <footer class="credit">
-    Equirectangular (plate carrée) — meridians and parallels are straight.
     Vertices from U.S. Census TIGER/Line cartographic boundaries (500k).
-    Alaska / All views rotate the plate so Attu stays west of the mainland;
     Hawaii’s north/west sit in the Northwestern Hawaiian Islands.
-    D3 · <a href="/lab/">Mapzimus Lab</a>
+    MapLibre GL JS globe · tiles © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
+    · <a href="/lab/">Mapzimus Lab</a>
   </footer>
 </body>
 </html>
