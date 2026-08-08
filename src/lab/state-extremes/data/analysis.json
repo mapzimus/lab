@@ -1,0 +1,1047 @@
+{
+  "generated": "2026-08-08",
+  "meta": {
+    "usUnits": 56,
+    "states": 50,
+    "territories": 5,
+    "countries": 236,
+    "countriesIncludingAntarctica": 237,
+    "usPoints": 224,
+    "worldPoints": 948,
+    "note": "Spans use great-circle distance between opposite extreme vertices. U.S. units from Census TIGER 500k; countries from Natural Earth 50m. Some country envelopes include overseas departments (e.g. France, Netherlands). East/west unwraps longitudes for antimeridian-spanning units."
+  },
+  "national": {
+    "all": {
+      "N": {
+        "name": "Alaska",
+        "state": "Alaska",
+        "abbr": "AK",
+        "kind": "state",
+        "iso": null,
+        "direction": "N",
+        "lat": 71.36516,
+        "lng": -156.34563
+      },
+      "S": {
+        "name": "American Samoa",
+        "state": "American Samoa",
+        "abbr": "AS",
+        "kind": "territory",
+        "iso": null,
+        "direction": "S",
+        "lat": -14.5487,
+        "lng": -168.1449
+      },
+      "E": {
+        "name": "Commonwealth of the Northern Mariana Islands",
+        "state": "Commonwealth of the Northern Mariana Islands",
+        "abbr": "MP",
+        "kind": "territory",
+        "iso": null,
+        "direction": "E",
+        "lat": 16.0249,
+        "lng": 146.06482
+      },
+      "W": {
+        "name": "Guam",
+        "state": "Guam",
+        "abbr": "GU",
+        "kind": "territory",
+        "iso": null,
+        "direction": "W",
+        "lat": 13.44781,
+        "lng": 144.61807
+      }
+    },
+    "states": {
+      "N": {
+        "name": "Alaska",
+        "state": "Alaska",
+        "abbr": "AK",
+        "kind": "state",
+        "iso": null,
+        "direction": "N",
+        "lat": 71.36516,
+        "lng": -156.34563
+      },
+      "S": {
+        "name": "Hawaii",
+        "state": "Hawaii",
+        "abbr": "HI",
+        "kind": "state",
+        "iso": null,
+        "direction": "S",
+        "lat": 18.91036,
+        "lng": -155.68279
+      },
+      "E": {
+        "name": "Maine",
+        "state": "Maine",
+        "abbr": "ME",
+        "kind": "state",
+        "iso": null,
+        "direction": "E",
+        "lat": 44.81742,
+        "lng": -66.94989
+      },
+      "W": {
+        "name": "Alaska",
+        "state": "Alaska",
+        "abbr": "AK",
+        "kind": "state",
+        "iso": null,
+        "direction": "W",
+        "lat": 52.92716,
+        "lng": 172.46167
+      }
+    },
+    "conus": {
+      "N": {
+        "name": "Minnesota",
+        "state": "Minnesota",
+        "abbr": "MN",
+        "kind": "state",
+        "iso": null,
+        "direction": "N",
+        "lat": 49.38436,
+        "lng": -95.15331
+      },
+      "S": {
+        "name": "Florida",
+        "state": "Florida",
+        "abbr": "FL",
+        "kind": "state",
+        "iso": null,
+        "direction": "S",
+        "lat": 24.5231,
+        "lng": -81.97836
+      },
+      "E": {
+        "name": "Maine",
+        "state": "Maine",
+        "abbr": "ME",
+        "kind": "state",
+        "iso": null,
+        "direction": "E",
+        "lat": 44.81742,
+        "lng": -66.94989
+      },
+      "W": {
+        "name": "Washington",
+        "state": "Washington",
+        "abbr": "WA",
+        "kind": "state",
+        "iso": null,
+        "direction": "W",
+        "lat": 48.17628,
+        "lng": -124.76307
+      }
+    }
+  },
+  "world": {
+    "cardinals": {
+      "N": {
+        "name": "Greenland",
+        "state": "Greenland",
+        "abbr": "GL",
+        "kind": "country",
+        "iso": "GRL",
+        "direction": "N",
+        "lat": 83.59961,
+        "lng": -32.98442
+      },
+      "S": {
+        "name": "Antarctica",
+        "state": "Antarctica",
+        "abbr": "AQ",
+        "kind": "country",
+        "iso": "ATA",
+        "direction": "S",
+        "lat": -89.99893,
+        "lng": 180
+      },
+      "E": {
+        "name": "Tuvalu",
+        "state": "Tuvalu",
+        "abbr": "TV",
+        "kind": "country",
+        "iso": "TUV",
+        "direction": "E",
+        "lat": -8.51484,
+        "lng": 179.2166
+      },
+      "W": {
+        "name": "Niger",
+        "state": "Niger",
+        "abbr": "NE",
+        "kind": "country",
+        "iso": "NER",
+        "direction": "W",
+        "lat": 14.49722,
+        "lng": 0.16387
+      }
+    },
+    "tallestNs": [
+      {
+        "rank": 1,
+        "name": "France",
+        "state": "France",
+        "abbr": "FR",
+        "kind": "country",
+        "iso": "FRA",
+        "km": 9578,
+        "deg": 72.47
+      },
+      {
+        "rank": 2,
+        "name": "Netherlands",
+        "state": "Netherlands",
+        "abbr": "NL",
+        "kind": "country",
+        "iso": "NLD",
+        "km": 7947,
+        "deg": 41.59
+      },
+      {
+        "rank": 3,
+        "name": "United States of America",
+        "state": "United States of America",
+        "abbr": "US",
+        "kind": "country",
+        "iso": "USA",
+        "km": 5832,
+        "deg": 52.44
+      },
+      {
+        "rank": 4,
+        "name": "Australia",
+        "state": "Australia",
+        "abbr": "AU",
+        "kind": "country",
+        "iso": "AUS",
+        "km": 5184,
+        "deg": 44.7
+      },
+      {
+        "rank": 5,
+        "name": "New Zealand",
+        "state": "New Zealand",
+        "abbr": "NZ",
+        "kind": "country",
+        "iso": "NZL",
+        "km": 5170,
+        "deg": 44.02
+      },
+      {
+        "rank": 6,
+        "name": "Canada",
+        "state": "Canada",
+        "abbr": "CA",
+        "kind": "country",
+        "iso": "CAN",
+        "km": 4628,
+        "deg": 41.44
+      },
+      {
+        "rank": 7,
+        "name": "Russia",
+        "state": "Russia",
+        "abbr": "RU",
+        "kind": "country",
+        "iso": "RUS",
+        "km": 4541,
+        "deg": 40.65
+      },
+      {
+        "rank": 8,
+        "name": "Brazil",
+        "state": "Brazil",
+        "abbr": "BR",
+        "kind": "country",
+        "iso": "BRA",
+        "km": 4396,
+        "deg": 39
+      }
+    ],
+    "widestEw": [
+      {
+        "rank": 1,
+        "name": "France",
+        "state": "France",
+        "abbr": "FR",
+        "kind": "country",
+        "iso": "FRA",
+        "km": 13465,
+        "deg": 117.63
+      },
+      {
+        "rank": 2,
+        "name": "Netherlands",
+        "state": "Netherlands",
+        "abbr": "NL",
+        "kind": "country",
+        "iso": "NLD",
+        "km": 7961,
+        "deg": 75.57
+      },
+      {
+        "rank": 3,
+        "name": "United States of America",
+        "state": "United States of America",
+        "abbr": "US",
+        "kind": "country",
+        "iso": "USA",
+        "km": 7760,
+        "deg": 120.52
+      },
+      {
+        "rank": 4,
+        "name": "Russia",
+        "state": "Russia",
+        "abbr": "RU",
+        "kind": "country",
+        "iso": "RUS",
+        "km": 6591,
+        "deg": 170.67
+      },
+      {
+        "rank": 5,
+        "name": "Canada",
+        "state": "Canada",
+        "abbr": "CA",
+        "kind": "country",
+        "iso": "CAN",
+        "km": 5495,
+        "deg": 88.35
+      },
+      {
+        "rank": 6,
+        "name": "Indonesia",
+        "state": "Indonesia",
+        "abbr": "ID",
+        "kind": "country",
+        "iso": "IDN",
+        "km": 5320,
+        "deg": 45.77
+      },
+      {
+        "rank": 7,
+        "name": "New Zealand",
+        "state": "New Zealand",
+        "abbr": "NZ",
+        "kind": "country",
+        "iso": "NZL",
+        "km": 5065,
+        "deg": 22.92
+      },
+      {
+        "rank": 8,
+        "name": "Australia",
+        "state": "Australia",
+        "abbr": "AU",
+        "kind": "country",
+        "iso": "AUS",
+        "km": 4932,
+        "deg": 46.05
+      }
+    ]
+  },
+  "rankings": {
+    "tallestNs": [
+      {
+        "rank": 1,
+        "name": "Hawaii",
+        "state": "Hawaii",
+        "abbr": "HI",
+        "kind": "state",
+        "iso": null,
+        "km": 2527,
+        "deg": 9.49
+      },
+      {
+        "rank": 2,
+        "name": "Alaska",
+        "state": "Alaska",
+        "abbr": "AK",
+        "kind": "state",
+        "iso": null,
+        "km": 2514,
+        "deg": 20.15
+      },
+      {
+        "rank": 3,
+        "name": "Texas",
+        "state": "Texas",
+        "abbr": "TX",
+        "kind": "state",
+        "iso": null,
+        "km": 1272,
+        "deg": 10.66
+      },
+      {
+        "rank": 4,
+        "name": "California",
+        "state": "California",
+        "abbr": "CA",
+        "kind": "state",
+        "iso": null,
+        "km": 1151,
+        "deg": 9.48
+      },
+      {
+        "rank": 5,
+        "name": "New Mexico",
+        "state": "New Mexico",
+        "abbr": "NM",
+        "kind": "state",
+        "iso": null,
+        "km": 819,
+        "deg": 5.67
+      },
+      {
+        "rank": 6,
+        "name": "Idaho",
+        "state": "Idaho",
+        "abbr": "ID",
+        "kind": "state",
+        "iso": null,
+        "km": 798,
+        "deg": 7.01
+      },
+      {
+        "rank": 7,
+        "name": "Nebraska",
+        "state": "Nebraska",
+        "abbr": "NE",
+        "kind": "state",
+        "iso": null,
+        "km": 794,
+        "deg": 3
+      },
+      {
+        "rank": 8,
+        "name": "Florida",
+        "state": "Florida",
+        "abbr": "FL",
+        "kind": "state",
+        "iso": null,
+        "km": 785,
+        "deg": 6.48
+      }
+    ],
+    "widestEw": [
+      {
+        "rank": 1,
+        "name": "Alaska",
+        "state": "Alaska",
+        "abbr": "AK",
+        "kind": "state",
+        "iso": null,
+        "km": 3654,
+        "deg": 57.56
+      },
+      {
+        "rank": 2,
+        "name": "Hawaii",
+        "state": "Hawaii",
+        "abbr": "HI",
+        "kind": "state",
+        "iso": null,
+        "km": 2580,
+        "deg": 23.53
+      },
+      {
+        "rank": 3,
+        "name": "Texas",
+        "state": "Texas",
+        "abbr": "TX",
+        "kind": "state",
+        "iso": null,
+        "km": 1249,
+        "deg": 13.14
+      },
+      {
+        "rank": 4,
+        "name": "California",
+        "state": "California",
+        "abbr": "CA",
+        "kind": "state",
+        "iso": null,
+        "km": 1138,
+        "deg": 10.28
+      },
+      {
+        "rank": 5,
+        "name": "Montana",
+        "state": "Montana",
+        "abbr": "MT",
+        "kind": "state",
+        "iso": null,
+        "km": 986,
+        "deg": 12.01
+      },
+      {
+        "rank": 6,
+        "name": "Florida",
+        "state": "Florida",
+        "abbr": "FL",
+        "kind": "state",
+        "iso": null,
+        "km": 868,
+        "deg": 7.6
+      },
+      {
+        "rank": 7,
+        "name": "New Mexico",
+        "state": "New Mexico",
+        "abbr": "NM",
+        "kind": "state",
+        "iso": null,
+        "km": 821,
+        "deg": 6.05
+      },
+      {
+        "rank": 8,
+        "name": "North Carolina",
+        "state": "North Carolina",
+        "abbr": "NC",
+        "kind": "state",
+        "iso": null,
+        "km": 807,
+        "deg": 8.86
+      }
+    ],
+    "shortestNs": [
+      {
+        "rank": 1,
+        "name": "Rhode Island",
+        "state": "Rhode Island",
+        "abbr": "RI",
+        "kind": "state",
+        "iso": null,
+        "km": 98.6,
+        "deg": 0.87
+      },
+      {
+        "rank": 2,
+        "name": "Connecticut",
+        "state": "Connecticut",
+        "abbr": "CT",
+        "kind": "state",
+        "iso": null,
+        "km": 120,
+        "deg": 1.07
+      },
+      {
+        "rank": 3,
+        "name": "Delaware",
+        "state": "Delaware",
+        "abbr": "DE",
+        "kind": "state",
+        "iso": null,
+        "km": 158,
+        "deg": 1.39
+      },
+      {
+        "rank": 4,
+        "name": "Massachusetts",
+        "state": "Massachusetts",
+        "abbr": "MA",
+        "kind": "state",
+        "iso": null,
+        "km": 198,
+        "deg": 1.65
+      },
+      {
+        "rank": 5,
+        "name": "Vermont",
+        "state": "Vermont",
+        "abbr": "VT",
+        "kind": "state",
+        "iso": null,
+        "km": 256,
+        "deg": 2.29
+      }
+    ],
+    "narrowestEw": [
+      {
+        "rank": 1,
+        "name": "Rhode Island",
+        "state": "Rhode Island",
+        "abbr": "RI",
+        "kind": "state",
+        "iso": null,
+        "km": 65.3,
+        "deg": 0.74
+      },
+      {
+        "rank": 2,
+        "name": "Delaware",
+        "state": "Delaware",
+        "abbr": "DE",
+        "kind": "state",
+        "iso": null,
+        "km": 151,
+        "deg": 0.74
+      },
+      {
+        "rank": 3,
+        "name": "New Hampshire",
+        "state": "New Hampshire",
+        "abbr": "NH",
+        "kind": "state",
+        "iso": null,
+        "km": 159,
+        "deg": 1.95
+      },
+      {
+        "rank": 4,
+        "name": "Connecticut",
+        "state": "Connecticut",
+        "abbr": "CT",
+        "kind": "state",
+        "iso": null,
+        "km": 173,
+        "deg": 1.94
+      },
+      {
+        "rank": 5,
+        "name": "Vermont",
+        "state": "Vermont",
+        "abbr": "VT",
+        "kind": "state",
+        "iso": null,
+        "km": 190,
+        "deg": 1.97
+      }
+    ],
+    "tallestAspect": [
+      {
+        "rank": 1,
+        "name": "New Hampshire",
+        "state": "New Hampshire",
+        "abbr": "NH",
+        "ratio": 1.83,
+        "nsKm": 291,
+        "ewKm": 159
+      },
+      {
+        "rank": 2,
+        "name": "Illinois",
+        "state": "Illinois",
+        "abbr": "IL",
+        "ratio": 1.66,
+        "nsKm": 629,
+        "ewKm": 378
+      },
+      {
+        "rank": 3,
+        "name": "Alabama",
+        "state": "Alabama",
+        "abbr": "AL",
+        "ratio": 1.56,
+        "nsKm": 532,
+        "ewKm": 340
+      },
+      {
+        "rank": 4,
+        "name": "Maine",
+        "state": "Maine",
+        "abbr": "ME",
+        "ratio": 1.55,
+        "nsKm": 510,
+        "ewKm": 329
+      },
+      {
+        "rank": 5,
+        "name": "Indiana",
+        "state": "Indiana",
+        "abbr": "IN",
+        "ratio": 1.52,
+        "nsKm": 470,
+        "ewKm": 308
+      }
+    ],
+    "widestAspect": [
+      {
+        "rank": 1,
+        "name": "Tennessee",
+        "state": "Tennessee",
+        "abbr": "TN",
+        "ratio": 2.66,
+        "nsKm": 301,
+        "ewKm": 801
+      },
+      {
+        "rank": 2,
+        "name": "Virginia",
+        "state": "Virginia",
+        "abbr": "VA",
+        "ratio": 2.24,
+        "nsKm": 341,
+        "ewKm": 762
+      },
+      {
+        "rank": 3,
+        "name": "Kansas",
+        "state": "Kansas",
+        "abbr": "KS",
+        "ratio": 1.93,
+        "nsKm": 335,
+        "ewKm": 646
+      },
+      {
+        "rank": 4,
+        "name": "North Dakota",
+        "state": "North Dakota",
+        "abbr": "ND",
+        "ratio": 1.87,
+        "nsKm": 343,
+        "ewKm": 641
+      },
+      {
+        "rank": 5,
+        "name": "Montana",
+        "state": "Montana",
+        "abbr": "MT",
+        "ratio": 1.86,
+        "nsKm": 529,
+        "ewKm": 986
+      }
+    ]
+  },
+  "facts": [
+    {
+      "id": "alaska-date-line",
+      "scope": "us",
+      "title": "Alaska straddles the date line",
+      "body": "Alaska’s western tip sits at 172.46°E while its eastern tip is at 129.97°W — an east–west span that wraps the antimeridian (~3654 km).",
+      "center": [
+        172.46167,
+        52.92716
+      ],
+      "zoom": 3.4,
+      "highlight": {
+        "state": "Alaska",
+        "directions": [
+          "W",
+          "E"
+        ]
+      },
+      "tag": "anomaly"
+    },
+    {
+      "id": "hawaii-nwhi",
+      "scope": "us",
+      "title": "Hawaii’s north and west are not the Big Island",
+      "body": "Both Hawaii’s northernmost and westernmost vertices land in the Northwestern Hawaiian Islands (~4.69 km apart).",
+      "center": [
+        -178.28893,
+        28.40212
+      ],
+      "zoom": 4.2,
+      "highlight": {
+        "state": "Hawaii",
+        "directions": [
+          "N",
+          "W"
+        ]
+      },
+      "tag": "anomaly"
+    },
+    {
+      "id": "american-samoa-south",
+      "scope": "us",
+      "title": "The only U.S. land south of the equator",
+      "body": "American Samoa’s southern tip reaches 14.55°S — the sole U.S. unit here in the Southern Hemisphere.",
+      "center": [
+        -168.1449,
+        -14.5487
+      ],
+      "zoom": 5.2,
+      "highlight": {
+        "state": "American Samoa",
+        "directions": [
+          "S",
+          "N"
+        ]
+      },
+      "tag": "anomaly"
+    },
+    {
+      "id": "conus-four-tips",
+      "scope": "us",
+      "title": "The Lower 48’s four tips",
+      "body": "Contiguous extremes: Minnesota north (49.38°N), Maine east, Florida south (24.52°N), Washington west.",
+      "center": [
+        -96.5,
+        38.5
+      ],
+      "zoom": 3.15,
+      "highlight": null,
+      "tag": "national"
+    },
+    {
+      "id": "md-de-east",
+      "scope": "us",
+      "title": "Maryland and Delaware share an eastern tip",
+      "body": "On this Census boundary, Maryland’s and Delaware’s easternmost vertices coincide near Fenwick Island.",
+      "center": [
+        -75.04894,
+        38.45126
+      ],
+      "zoom": 8.2,
+      "highlight": {
+        "points": [
+          {
+            "state": "Maryland",
+            "direction": "E"
+          },
+          {
+            "state": "Delaware",
+            "direction": "E"
+          }
+        ]
+      },
+      "tag": "anomaly"
+    },
+    {
+      "id": "nebraska-corner",
+      "scope": "us",
+      "title": "Nebraska’s southeast corner does double duty",
+      "body": "Nebraska is the only state where two cardinal extremes land on the exact same vertex (east = south).",
+      "center": [
+        -95.30829,
+        40
+      ],
+      "zoom": 7.5,
+      "highlight": {
+        "state": "Nebraska",
+        "directions": [
+          "E",
+          "S"
+        ]
+      },
+      "tag": "anomaly"
+    },
+    {
+      "id": "tennessee-wide",
+      "scope": "us",
+      "title": "Tennessee is the widest-shaped state",
+      "body": "Tennessee’s east–west distance is ~2.66× its north–south span. New Hampshire is the tallest-shaped (~1.83×).",
+      "center": [
+        -83.6469,
+        35.830545
+      ],
+      "zoom": 5.4,
+      "highlight": {
+        "state": "Tennessee",
+        "directions": [
+          "E",
+          "W",
+          "N",
+          "S"
+        ]
+      },
+      "tag": "shape"
+    },
+    {
+      "id": "rhode-island-tiny",
+      "scope": "us",
+      "title": "Rhode Island: smallest envelope",
+      "body": "Rhode Island is both the shortest north–south (~98.6 km) and the narrowest east–west state here.",
+      "center": [
+        -71.12057,
+        41.582570000000004
+      ],
+      "zoom": 7.8,
+      "highlight": {
+        "state": "Rhode Island",
+        "directions": [
+          "N",
+          "E",
+          "S",
+          "W"
+        ]
+      },
+      "tag": "ranking"
+    },
+    {
+      "id": "mi-to-fl",
+      "scope": "us",
+      "title": "Michigan to Florida covers most of CONUS latitude",
+      "body": "From Michigan’s northern tip (48.24°N) to Florida’s southern tip (24.52°N) is 23.72° of latitude.",
+      "center": [
+        -84.5,
+        36.5
+      ],
+      "zoom": 3.6,
+      "highlight": {
+        "points": [
+          {
+            "state": "Michigan",
+            "direction": "N"
+          },
+          {
+            "state": "Florida",
+            "direction": "S"
+          }
+        ]
+      },
+      "tag": "span"
+    },
+    {
+      "id": "easternmost-surprise",
+      "scope": "us",
+      "title": "Easternmost isn’t Maine",
+      "body": "Among all U.S. units, the Northern Mariana Islands win east (~146.1°E). Among states, Maine holds the Atlantic tip.",
+      "center": [
+        146.06,
+        16.02
+      ],
+      "zoom": 5.5,
+      "highlight": {
+        "state": "Commonwealth of the Northern Mariana Islands",
+        "directions": [
+          "E"
+        ]
+      },
+      "tag": "national"
+    },
+    {
+      "id": "westernmost-guam",
+      "scope": "us",
+      "title": "Westernmost is Guam, past Alaska",
+      "body": "Heading west past Alaska’s Attu tip, Guam’s western shore is the farthest U.S. land in this dataset. Among states alone, Alaska wins.",
+      "center": [
+        144.62,
+        13.45
+      ],
+      "zoom": 6.2,
+      "highlight": {
+        "state": "Guam",
+        "directions": [
+          "W"
+        ]
+      },
+      "tag": "national"
+    },
+    {
+      "id": "greenland-north",
+      "scope": "world",
+      "title": "Greenland owns the high Arctic tip",
+      "body": "Greenland’s northernmost vertex (~83.6°N) outranks Canada and Russia on these Natural Earth boundaries.",
+      "center": [
+        -32.98442,
+        83.59961
+      ],
+      "zoom": 3.2,
+      "highlight": {
+        "state": "Greenland",
+        "directions": [
+          "N"
+        ]
+      },
+      "tag": "world"
+    },
+    {
+      "id": "russia-span",
+      "scope": "world",
+      "title": "Russia is the widest country",
+      "body": "Russia’s east–west tip-to-tip span is ~6591 km — the largest among countries here (Antarctica excluded from width rankings).",
+      "center": [
+        90,
+        60
+      ],
+      "zoom": 1.8,
+      "highlight": {
+        "state": "Russia",
+        "directions": [
+          "E",
+          "W"
+        ]
+      },
+      "tag": "world"
+    },
+    {
+      "id": "chile-tall",
+      "scope": "world",
+      "title": "Chile is a latitude needle",
+      "body": "Chile stretches from the Atacama to Cape Horn — among the tallest north–south country envelopes (~4271 km tip-to-tip).",
+      "center": [
+        -70,
+        -35
+      ],
+      "zoom": 2.8,
+      "highlight": {
+        "state": "Chile",
+        "directions": [
+          "N",
+          "S"
+        ]
+      },
+      "tag": "world"
+    },
+    {
+      "id": "kiribati-date-line",
+      "scope": "world",
+      "title": "Kiribati straddles the date line",
+      "body": "Kiribati’s islands sit on both sides of 180° — so its eastern tip can land east of the antimeridian while western islets stay west.",
+      "center": [
+        8.870165,
+        3.92354
+      ],
+      "zoom": 3.5,
+      "highlight": {
+        "state": "Kiribati",
+        "directions": [
+          "E",
+          "W"
+        ]
+      },
+      "tag": "anomaly"
+    },
+    {
+      "id": "france-scattered",
+      "scope": "world",
+      "title": "France’s extremes are not all in Europe",
+      "body": "Natural Earth keeps many French overseas collectivities as separate units; metropolitan France’s envelope still stretches from the Channel to the Mediterranean (~9578 km N–S).",
+      "center": [
+        53.83906,
+        14.86404
+      ],
+      "zoom": 4.8,
+      "highlight": {
+        "state": "France",
+        "directions": [
+          "N",
+          "E",
+          "S",
+          "W"
+        ]
+      },
+      "tag": "world"
+    },
+    {
+      "id": "usa-among-nations",
+      "scope": "world",
+      "title": "Toggle the U.S.: one country or fifty states",
+      "body": "As one country, the U.S. runs from ~71.4°N (Alaska) to Hawaii’s south, and west across the date line. Flip to “U.S. as states” to nest the Census state tips among every other country.",
+      "center": [
+        -140,
+        30
+      ],
+      "zoom": 1.55,
+      "highlight": {
+        "state": "United States of America",
+        "directions": [
+          "N",
+          "E",
+          "S",
+          "W"
+        ]
+      },
+      "tag": "tip"
+    }
+  ]
+}
