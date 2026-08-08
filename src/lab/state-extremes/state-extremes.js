@@ -6,7 +6,8 @@ const DIR_WORDS = { N: "Northernmost", E: "Easternmost", S: "Southernmost", W: "
 const VIEWS = {
   conus: { center: [-96.5, 38.5], zoom: 3.55, bounds: [[-125.5, 24.2], [-66.5, 49.6]] },
   alaska: { center: [-153, 64], zoom: 3.1, bounds: [[172.2, 51], [-129.5, 71.6]] },
-  hawaii: { center: [-157.5, 20.5], zoom: 5.4, bounds: [[-178.6, 18.7], [-154.6, 28.6]] },
+  // Include the Northwestern Hawaiian Islands (Midway / Kure) — Hawaii's true N/W extremes.
+  hawaii: { center: [-166.2, 23.4], zoom: 3.85, bounds: [[-178.6, 18.7], [-154.6, 28.6]] },
   all: { center: [-155, 40], zoom: 2.15, bounds: [[172.2, 18.7], [-66.5, 71.6]] },
 };
 
