@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-07",
+  "generatedAt": "2026-08-08",
   "news": {
     "mapsmania": [
+      {
+        "title": "7 Billion People Are Awake Right Now",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/7-billion-people-are-awake-right-now.html",
+        "desc": "At the moment (as I write), 6.962 billion people are awake, while another 2.1 billion are fast asleep."
+      },
       {
         "title": "CastleGuessr",
         "url": "http://googlemapsmania.blogspot.com/2026/08/castleguessr.html",
@@ -36,11 +41,6 @@
         "title": "Mapping Meals Under $10",
         "url": "http://googlemapsmania.blogspot.com/2026/07/mapping-meals-under-10.html",
         "desc": "CheapFoodMap is an interactive map that highlights restaurants across the United States where you can still find meals for under $10."
-      },
-      {
-        "title": "German Döner, English Curry & American Pizza",
-        "url": "http://googlemapsmania.blogspot.com/2026/07/german-doner-english-curry-american.html",
-        "desc": "German Döner Kebab restaurants have started popping up all over London."
       }
     ],
     "georealm": [
@@ -110,6 +110,18 @@
   },
   "qgis": [
     {
+      "title": "ALHAMBRA",
+      "url": "https://plugins.qgis.org/plugins/alhambra/"
+    },
+    {
+      "title": "Sentinel Download",
+      "url": "https://plugins.qgis.org/plugins/sentinel_download/"
+    },
+    {
+      "title": "SearchAttribute",
+      "url": "https://plugins.qgis.org/plugins/SearchAttribute/"
+    },
+    {
       "title": "Chak Star Alignment",
       "url": "https://plugins.qgis.org/plugins/star_alignment_plugin/"
     },
@@ -128,21 +140,17 @@
     {
       "title": "QGeoAI Toolkit",
       "url": "https://plugins.qgis.org/plugins/qgeoai_toolkit1/"
-    },
-    {
-      "title": "QGIS2WebMap by NIKA",
-      "url": "https://plugins.qgis.org/plugins/nika_onlymap_exporter/"
-    },
-    {
-      "title": "3D Track Viewer",
-      "url": "https://plugins.qgis.org/plugins/three_d_track_viewer/"
-    },
-    {
-      "title": "Affecter ID Classe",
-      "url": "https://plugins.qgis.org/plugins/affecter_id_classe/"
     }
   ],
   "releases": [
+    {
+      "repo": "visgl/deck.gl",
+      "title": "deck.gl v9.3.8",
+      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.8",
+      "desc": "- feat(core): override size zoom in OrthographicView (#10532) - fix(mapbox,google-maps): use css-dpr pixel sizing in overlaid mode to prevent basemap misalig…",
+      "publishedAt": "2026-08-07",
+      "isFresh": true
+    },
     {
       "repo": "maplibre/maplibre-gl-js",
       "title": "maplibre-gl-js v6.2.0",
@@ -184,14 +192,6 @@
       "isFresh": true
     },
     {
-      "repo": "visgl/deck.gl",
-      "title": "deck.gl v9.3.7",
-      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.7",
-      "desc": "- fix(core): do not write View clearColor into the picking buffer (#10431) - fix(mapbox): avoid crash when MapboxOverlay beforeId layer is removed (#10425) -…",
-      "publishedAt": "2026-07-16",
-      "isFresh": true
-    },
-    {
       "repo": "felt/tippecanoe",
       "title": "tippecanoe 2.79.0",
       "url": "https://github.com/felt/tippecanoe/releases/tag/2.79.0",
@@ -210,16 +210,22 @@
   ],
   "gisse": [
     {
+      "title": "Finding different types of attributes within each suburb of a city",
+      "url": "https://gis.stackexchange.com/questions/501250/finding-different-types-of-attributes-within-each-suburb-of-a-city",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Avoiding QGIS lock on a GeoPackage while rendering",
+      "url": "https://gis.stackexchange.com/questions/501248/avoiding-qgis-lock-on-a-geopackage-while-rendering",
+      "score": 1,
+      "answers": 0
+    },
+    {
       "title": "QGIS loads shapefile from network but says invalid when loading from local hard drive",
       "url": "https://gis.stackexchange.com/questions/501239/qgis-loads-shapefile-from-network-but-says-invalid-when-loading-from-local-hard",
       "score": 1,
       "answers": 1
-    },
-    {
-      "title": "Selecting linear unit for buffer tool when using ModelBuilder Iterator in ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501238/selecting-linear-unit-for-buffer-tool-when-using-modelbuilder-iterator-in-arcgis",
-      "score": -1,
-      "answers": 0
     },
     {
       "title": "QGIS points are only clamped to ground",
@@ -228,14 +234,26 @@
       "answers": 2
     },
     {
+      "title": "Selecting linear unit for buffer tool when using ModelBuilder Iterator in ArcGIS Pro",
+      "url": "https://gis.stackexchange.com/questions/501238/selecting-linear-unit-for-buffer-tool-when-using-modelbuilder-iterator-in-arcgis",
+      "score": -1,
+      "answers": 0
+    },
+    {
+      "title": "Exporting points with coordinates",
+      "url": "https://gis.stackexchange.com/questions/501232/exporting-points-with-coordinates",
+      "score": 1,
+      "answers": 0
+    },
+    {
       "title": "GeoServer partial transparency issue",
       "url": "https://gis.stackexchange.com/questions/501237/geoserver-partial-transparency-issue",
       "score": 0,
       "answers": 0
     },
     {
-      "title": "Exporting points with coordinates",
-      "url": "https://gis.stackexchange.com/questions/501232/exporting-points-with-coordinates",
+      "title": "QGIS: Display OSM Buildings at higher scale (1:25000) for both urban and remote areas to show density",
+      "url": "https://gis.stackexchange.com/questions/501236/qgis-display-osm-buildings-at-higher-scale-125000-for-both-urban-and-remote",
       "score": 1,
       "answers": 0
     },
@@ -250,24 +268,6 @@
       "url": "https://gis.stackexchange.com/questions/501225/no-compatible-graphics-adapter-warning",
       "score": 0,
       "answers": 0
-    },
-    {
-      "title": "Selecting layer from Geopackage containing multiple layers using Merge tool of QGIS",
-      "url": "https://gis.stackexchange.com/questions/501214/selecting-layer-from-geopackage-containing-multiple-layers-using-merge-tool-of-q",
-      "score": 3,
-      "answers": 2
-    },
-    {
-      "title": "Is my classification methodology sound?",
-      "url": "https://gis.stackexchange.com/questions/501221/is-my-classification-methodology-sound-using-arcgis",
-      "score": 0,
-      "answers": 1
-    },
-    {
-      "title": "I am seeking a profile of the garden in which I grew up 75 years ago.",
-      "url": "https://gis.stackexchange.com/questions/501215/i-am-seeking-a-profile-of-the-garden-in-which-i-grew-up-75-years-ago-i-was-intr",
-      "score": 1,
-      "answers": 2
     }
   ],
   "nasa": [
