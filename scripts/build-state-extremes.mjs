@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 /**
- * Rebuild state extreme points + simplified outlines from Census 500k GeoJSON.
+ * Rebuild extreme points + simplified outlines for US states, DC, and territories.
  *
- * Source (public domain TIGER/Line cartographic boundary, 2010 vintage mirror):
- *   https://eric.clst.org/assets/wiki/uploads/Stuff/gz_2010_us_040_00_500k.json
+ * Default source (Census TIGER cartographic boundary 500k, 2019, via citysdk mirror):
+ *   https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON/500k/2019/state.json
  *
  * Usage:
  *   node scripts/build-state-extremes.mjs [path-to-states.geojson]
- *   # or with network:
  *   node scripts/build-state-extremes.mjs --download
  */
 import fs from "node:fs";
@@ -16,21 +15,10 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = path.join(root, "src/lab/state-extremes/data");
-const SOURCE_URL = "https://eric.clst.org/assets/wiki/uploads/Stuff/gz_2010_us_040_00_500k.json";
+const SOURCE_URL =
+  "https://raw.githubusercontent.com/uscensusbureau/citysdk/master/v2/GeoJSON/500k/2019/state.json";
 
-const ABBR = {
-  Alabama: "AL", Alaska: "AK", Arizona: "AZ", Arkansas: "AR", California: "CA",
-  Colorado: "CO", Connecticut: "CT", Delaware: "DE", "District of Columbia": "DC",
-  Florida: "FL", Georgia: "GA", Hawaii: "HI", Idaho: "ID", Illinois: "IL",
-  Indiana: "IN", Iowa: "IA", Kansas: "KS", Kentucky: "KY", Louisiana: "LA",
-  Maine: "ME", Maryland: "MD", Massachusetts: "MA", Michigan: "MI", Minnesota: "MN",
-  Mississippi: "MS", Missouri: "MO", Montana: "MT", Nebraska: "NE", Nevada: "NV",
-  "New Hampshire": "NH", "New Jersey": "NJ", "New Mexico": "NM", "New York": "NY",
-  "North Carolina": "NC", "North Dakota": "ND", Ohio: "OH", Oklahoma: "OK",
-  Oregon: "OR", Pennsylvania: "PA", "Rhode Island": "RI", "South Carolina": "SC",
-  "South Dakota": "SD", Tennessee: "TN", Texas: "TX", Utah: "UT", Vermont: "VT",
-  Virginia: "VA", Washington: "WA", "West Virginia": "WV", Wisconsin: "WI", Wyoming: "WY",
-};
+const TERRITORY = new Set(["PR", "GU", "VI", "AS", "MP"]);
 
 function walkCoords(geom, fn) {
   const t = geom.type;
@@ -144,7 +132,7 @@ async function loadSource(argv) {
     return res.json();
   }
   const arg = argv.find((a) => !a.startsWith("-"));
-  const file = arg || path.join("/tmp/state-extremes/states-500k.json");
+  const file = arg || path.join("/tmp/state-extremes/census_state.json");
   return JSON.parse(fs.readFileSync(file, "utf8"));
 }
 
@@ -154,12 +142,12 @@ const outlineFeatures = [];
 
 for (const f of g.features) {
   const name = f.properties.NAME || f.properties.name;
-  if (name === "Puerto Rico") continue;
-  const abbr = ABBR[name];
-  if (!abbr) {
-    console.warn("skip", name);
+  const abbr = f.properties.STUSPS || f.properties.postal;
+  if (!name || !abbr) {
+    console.warn("skip unnamed", f.properties);
     continue;
   }
+  const kind = TERRITORY.has(abbr) ? "territory" : abbr === "DC" ? "district" : "state";
   const ex = extremesFor(f.geometry);
   for (const [dir, label] of [
     ["N", "north"],
@@ -173,6 +161,7 @@ for (const f of g.features) {
       properties: {
         state: name,
         abbr,
+        kind,
         direction: dir,
         directionLabel: label,
         lat: +p.lat.toFixed(5),
@@ -183,12 +172,28 @@ for (const f of g.features) {
   }
   outlineFeatures.push({
     type: "Feature",
-    properties: { state: name, abbr },
-    geometry: simplifyGeom(f.geometry, 0.02),
+    properties: { state: name, abbr, kind },
+    geometry: simplifyGeom(f.geometry, 0.025),
   });
 }
 
 fs.mkdirSync(outDir, { recursive: true });
-fs.writeFileSync(path.join(outDir, "extremes.geojson"), JSON.stringify({ type: "FeatureCollection", features: extremeFeatures }));
-fs.writeFileSync(path.join(outDir, "states.geojson"), JSON.stringify({ type: "FeatureCollection", features: outlineFeatures }));
-console.log(`Wrote ${extremeFeatures.length} extreme points and ${outlineFeatures.length} state outlines → ${outDir}`);
+fs.writeFileSync(
+  path.join(outDir, "extremes.geojson"),
+  JSON.stringify({ type: "FeatureCollection", features: extremeFeatures }),
+);
+fs.writeFileSync(
+  path.join(outDir, "states.geojson"),
+  JSON.stringify({ type: "FeatureCollection", features: outlineFeatures }),
+);
+const kinds = Object.fromEntries(
+  ["state", "district", "territory"].map((k) => [
+    k,
+    outlineFeatures.filter((f) => f.properties.kind === k).length,
+  ]),
+);
+console.log(
+  `Wrote ${extremeFeatures.length} extreme points and ${outlineFeatures.length} outlines`,
+  kinds,
+  `→ ${outDir}`,
+);
