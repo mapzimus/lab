@@ -48,6 +48,7 @@ const hostedProjectRoutes = {
   "black-sam": "/black-sam/",
   "true-scale": "/true-scale/",
   "train-route-atlas": "/lab/train-routes/",
+  "state-extremes": "/lab/state-extremes/",
   "predicting-housing-crisis": "/lab/housing-crisis/",
   "game-vault": "/lab/game-vault/",
   "interstate-challenge": "/interstate-challenge/",
