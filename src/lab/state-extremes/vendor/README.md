@@ -1,10 +1,11 @@
 # Vendored libraries
 
-Self-hosted so the page satisfies `script-src 'self'`.
+Self-hosted so the page satisfies `script-src 'self'`. MapLibre workers need
+`worker-src 'self' blob:` / `child-src 'self' blob:` when a CSP is enforced.
+Raster tiles also need the tile host under `connect-src` (MapLibre fetches
+them; putting the host only in `img-src` fails silently).
 
 | File | Library | Version | Source | License |
 |---|---|---|---|---|
-| `d3.min.js` | D3 | 7.9.0 | `https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js` | ISC © Mike Bostock |
-
-The map uses D3’s `geoEquirectangular` (plate carrée) so meridians and
-parallels are straight — not Web Mercator.
+| `maplibre-gl.js` | MapLibre GL JS | 5.6.1 | `https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.js` | BSD-3-Clause © MapLibre contributors |
+| `maplibre-gl.css` | MapLibre GL JS | 5.6.1 | `https://unpkg.com/maplibre-gl@5.6.1/dist/maplibre-gl.css` | BSD-3-Clause © MapLibre contributors |
