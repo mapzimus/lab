@@ -31,18 +31,24 @@ let unitsIndex = [];
 let activeFactId = null;
 let highlightSpec = null;
 
-const map = new maplibregl.Map({
-  container: "map",
-  center: VIEWS.conus.center,
-  zoom: VIEWS.conus.zoom,
-  minZoom: 1.05,
-  maxZoom: 9,
-  attributionControl: false,
-  style: "https://tiles.openfreemap.org/styles/dark",
-});
-
-map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right");
-map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+let map;
+try {
+  map = new maplibregl.Map({
+    container: "map",
+    center: VIEWS.conus.center,
+    zoom: VIEWS.conus.zoom,
+    minZoom: 1.05,
+    maxZoom: 9,
+    attributionControl: false,
+    style: "https://tiles.openfreemap.org/styles/dark",
+  });
+  map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right");
+  map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+} catch (err) {
+  console.error(err);
+  document.body.classList.add("map-failed");
+  setTimeout(() => setReadout("Map failed to initialize (WebGL). Controls still work."), 0);
+}
 
 const readout = document.getElementById("readout");
 const dirButtons = [...document.querySelectorAll(".dir")];
@@ -202,7 +208,7 @@ function combineFilters(...parts) {
 }
 
 function applyFilter() {
-  if (!ready) return;
+  if (!ready || !map) return;
   const filter = combineFilters(coverageFilter(), directionFilter());
   map.setFilter("us-line", coverageFilter());
   map.setFilter("world-line", coverageFilter());
@@ -235,7 +241,7 @@ function highlightFilter(spec) {
 }
 
 function applyHighlight() {
-  if (!ready) return;
+  if (!ready || !map) return;
   const on = Boolean(highlightSpec);
   const filter = combineFilters(coverageFilter(), directionFilter(), highlightFilter(highlightSpec));
   map.setFilter("extremes-focus", on ? filter : ["==", ["get", "state"], "__none__"]);
@@ -255,6 +261,7 @@ function clearHighlight() {
 }
 
 function flyTo(center, zoom) {
+  if (!map) return;
   map.easeTo({
     center,
     zoom,
@@ -317,6 +324,7 @@ function fitView(name, animate = true) {
     btn.setAttribute("aria-pressed", String(btn.dataset.view === name));
   }
   clearHighlight();
+  if (!map) return;
   map.easeTo({
     center: v.center,
     zoom: v.zoom,
@@ -851,12 +859,31 @@ async function boot() {
   });
 }
 
-map.once("style.load", () => {
-  boot().catch((err) => {
-    console.error(err);
-    setReadout("Could not load extremes data.");
+if (map) {
+  map.once("style.load", () => {
+    boot().catch((err) => {
+      console.error(err);
+      setReadout("Could not load extremes data.");
+    });
   });
-});
+} else {
+  // Still load analysis/search data when the map cannot start.
+  Promise.all([
+    fetch("/lab/state-extremes/data/all-extremes.geojson").then((r) => r.json()),
+    fetch("/lab/state-extremes/data/analysis.json").then((r) => r.json()),
+  ])
+    .then(([extremes, analysisData]) => {
+      extremesFc = extremes;
+      analysis = analysisData;
+      buildUnitsIndex(extremes);
+      syncCoverageUi();
+      renderAnalysis();
+    })
+    .catch((err) => {
+      console.error(err);
+      setReadout("Could not load extremes data.");
+    });
+}
 
 for (const btn of dirButtons) {
   btn.addEventListener("click", () => {
