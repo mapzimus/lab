@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>State Extremes · Mapzimus Lab</title>
+  <meta name="description" content="Four dots per state — the northernmost, easternmost, southernmost, and westernmost points of every U.S. state, nothing else.">
+  <link rel="canonical" href="https://mapzimus.com/lab/state-extremes/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="State Extremes · Mapzimus Lab">
+  <meta property="og:description" content="Four dots per state — the northernmost, easternmost, southernmost, and westernmost points of every U.S. state, nothing else.">
+  <meta property="og:url" content="https://mapzimus.com/lab/state-extremes/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#1a2430">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/state-extremes/vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="/lab/state-extremes/state-extremes.css">
+  <script src="/lab/state-extremes/vendor/maplibre-gl.js" defer></script>
+  <script src="/lab/state-extremes/state-extremes.js" defer></script>
+</head>
+<body>
+  <div id="map" role="application" aria-label="Map of northernmost, easternmost, southernmost, and westernmost points in each U.S. state"></div>
+
+  <header class="chrome">
+    <a class="back" href="/lab/">← Lab</a>
+    <div class="brand-block">
+      <p class="brand">Mapzimus</p>
+      <h1>State Extremes</h1>
+      <p class="lede">One map. Four dots per state — north, east, south, west.</p>
+    </div>
+  </header>
+
+  <aside class="legend" aria-label="Cardinal directions">
+    <div class="legend-row" role="group" aria-label="Show directions">
+      <button type="button" class="dir" data-dir="N" aria-pressed="true"><span class="swatch n"></span>North</button>
+      <button type="button" class="dir" data-dir="E" aria-pressed="true"><span class="swatch e"></span>East</button>
+      <button type="button" class="dir" data-dir="S" aria-pressed="true"><span class="swatch s"></span>South</button>
+      <button type="button" class="dir" data-dir="W" aria-pressed="true"><span class="swatch w"></span>West</button>
+    </div>
+    <div class="views" role="group" aria-label="Map region">
+      <button type="button" class="view" data-view="conus" aria-pressed="true">Contiguous</button>
+      <button type="button" class="view" data-view="alaska" aria-pressed="false">Alaska</button>
+      <button type="button" class="view" data-view="hawaii" aria-pressed="false">Hawaii</button>
+      <button type="button" class="view" data-view="all" aria-pressed="false">All</button>
+    </div>
+  </aside>
+
+  <p class="readout" id="readout" aria-live="polite"></p>
+
+  <footer class="credit">
+    Vertices from U.S. Census TIGER/Line cartographic boundaries (500k).
+    East/west for Alaska unwrap across the antimeridian so Attu stays west.
+    MapLibre GL JS · <a href="/lab/">Mapzimus Lab</a>
+  </footer>
+</body>
+</html>
