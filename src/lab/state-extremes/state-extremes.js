@@ -4,10 +4,12 @@ const COLORS = { N: "#ff5a3c", E: "#f0c23a", S: "#2ec4a2", W: "#4aa3ff" };
 const DIR_WORDS = { N: "Northernmost", E: "Easternmost", S: "Southernmost", W: "Westernmost" };
 
 const VIEWS = {
-  conus: { center: [-96.5, 38.5], zoom: 3.2, pitch: 0 },
-  alaska: { center: [-153, 64], zoom: 2.9, pitch: 0 },
-  hawaii: { center: [-166.2, 23.4], zoom: 3.6, pitch: 0 },
-  all: { center: [-140, 40], zoom: 1.85, pitch: 0 },
+  conus: { center: [-96.5, 38.5], zoom: 3.15, pitch: 0 },
+  alaska: { center: [-153, 64], zoom: 2.85, pitch: 0 },
+  hawaii: { center: [-166.2, 23.4], zoom: 3.5, pitch: 0 },
+  territories: { center: [-66.5, 17.8], zoom: 4.4, pitch: 0 }, // PR + VI
+  pacific: { center: [145.5, 8], zoom: 3.35, pitch: 0 }, // GU + MP + AS
+  all: { center: [-140, 30], zoom: 1.55, pitch: 0 },
 };
 
 const activeDirs = new Set(["N", "E", "S", "W"]);
@@ -19,27 +21,10 @@ const map = new maplibregl.Map({
   container: "map",
   center: VIEWS.conus.center,
   zoom: VIEWS.conus.zoom,
-  minZoom: 1.2,
-  maxZoom: 8,
+  minZoom: 1.1,
+  maxZoom: 9,
   attributionControl: false,
-  style: {
-    version: 8,
-    projection: { type: "globe" },
-    sky: {
-      "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0],
-    },
-    light: { anchor: "map", intensity: 0.45 },
-    sources: {
-      osm: {
-        type: "raster",
-        tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-        tileSize: 256,
-        maxzoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      },
-    },
-    layers: [{ id: "osm", type: "raster", source: "osm" }],
-  },
+  style: "https://tiles.openfreemap.org/styles/dark",
 });
 
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right");
@@ -49,7 +34,7 @@ const readout = document.getElementById("readout");
 const dirButtons = [...document.querySelectorAll(".dir")];
 const viewButtons = [...document.querySelectorAll(".view")];
 
-/** Densify rings so state outlines hug the sphere (globe-maps gotcha #1). */
+/** Densify rings so outlines hug the sphere (globe-maps gotcha #1). */
 function densify(coords, stepDeg = 1) {
   const out = [coords[0]];
   for (let i = 1; i < coords.length; i++) {
@@ -91,9 +76,11 @@ function fmtCoord(lat, lng) {
 }
 
 function popupHtml(p) {
+  const kind =
+    p.kind === "territory" ? "Territory" : p.kind === "district" ? "District" : "State";
   return `<div class="popup">
     <h3>${p.state}</h3>
-    <span class="dir-label" style="color:${COLORS[p.direction]}">${DIR_WORDS[p.direction]} point</span>
+    <span class="dir-label" style="color:${COLORS[p.direction]}">${DIR_WORDS[p.direction]} · ${kind}</span>
     <p class="coords">${fmtCoord(p.lat, p.lng)}</p>
   </div>`;
 }
@@ -136,6 +123,15 @@ function fitView(name, animate = true) {
 }
 
 async function boot() {
+  // Globe projection + atmosphere on the OpenFreeMap dark basemap.
+  if (typeof map.setProjection === "function") {
+    map.setProjection({ type: "globe" });
+  }
+  map.setSky({
+    "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0],
+  });
+  map.setLight({ anchor: "map", intensity: 0.4 });
+
   const [statesRaw, extremes] = await Promise.all([
     fetch("/lab/state-extremes/data/states.geojson").then((r) => {
       if (!r.ok) throw new Error("states.geojson");
@@ -152,14 +148,22 @@ async function boot() {
   map.addSource("states", { type: "geojson", data: states });
   map.addSource("extremes", { type: "geojson", data: extremes });
 
-  // Thin state outlines only — no translucent fill wash over the globe tiles.
+  // Crisp outlines only — no translucent fill wash.
   map.addLayer({
     id: "states-line",
     type: "line",
     source: "states",
     paint: {
-      "line-color": "#ffffff",
-      "line-width": 0.9,
+      "line-color": [
+        "match", ["get", "kind"],
+        "territory", "#8fd3ff",
+        "#c8d0d8",
+      ],
+      "line-width": [
+        "match", ["get", "kind"],
+        "territory", 1.35,
+        0.85,
+      ],
       "line-opacity": 1,
     },
   });
@@ -175,7 +179,7 @@ async function boot() {
         4, 7.5,
         7, 10,
       ],
-      "circle-color": "#ffffff",
+      "circle-color": "#0b1016",
       "circle-opacity": 1,
     },
   });
@@ -199,8 +203,8 @@ async function boot() {
         "W", COLORS.W,
         "#fff",
       ],
-      "circle-stroke-width": 1.2,
-      "circle-stroke-color": "#0b1016",
+      "circle-stroke-width": 1.15,
+      "circle-stroke-color": "#f0ecdf",
       "circle-opacity": 1,
       "circle-stroke-opacity": 1,
     },
@@ -215,7 +219,8 @@ async function boot() {
     const f = e.features?.[0];
     if (!f) return;
     const p = f.properties;
-    setReadout(`${p.state} · ${DIR_WORDS[p.direction]} · ${fmtCoord(p.lat, p.lng)}`);
+    const kind = p.kind === "territory" ? "territory" : p.kind === "district" ? "DC" : "state";
+    setReadout(`${p.state} · ${DIR_WORDS[p.direction]} · ${kind} · ${fmtCoord(p.lat, p.lng)}`);
   });
   map.on("mouseleave", "extremes", () => {
     map.getCanvas().style.cursor = "";

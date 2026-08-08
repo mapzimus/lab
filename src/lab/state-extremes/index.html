@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>State Extremes · Mapzimus Lab</title>
-  <meta name="description" content="Four dots per state — the northernmost, easternmost, southernmost, and westernmost points of every U.S. state — on a 3D globe.">
+  <meta name="description" content="Four dots per state and territory — the northernmost, easternmost, southernmost, and westernmost points across the U.S. — on a 3D globe.">
   <link rel="canonical" href="https://mapzimus.com/lab/state-extremes/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="State Extremes · Mapzimus Lab">
-  <meta property="og:description" content="Four dots per state — the northernmost, easternmost, southernmost, and westernmost points of every U.S. state — on a 3D globe.">
+  <meta property="og:description" content="Four dots per state and territory — the northernmost, easternmost, southernmost, and westernmost points across the U.S. — on a 3D globe.">
   <meta property="og:url" content="https://mapzimus.com/lab/state-extremes/">
   <meta name="twitter:card" content="summary">
   <meta name="theme-color" content="#0b1016">
@@ -19,14 +19,14 @@
   <script src="/lab/state-extremes/state-extremes.js" defer></script>
 </head>
 <body>
-  <div id="map" role="application" aria-label="Globe map of northernmost, easternmost, southernmost, and westernmost points in each U.S. state"></div>
+  <div id="map" role="application" aria-label="Globe map of northernmost, easternmost, southernmost, and westernmost points in each U.S. state and territory"></div>
 
   <header class="chrome">
     <a class="back" href="/lab/">← Lab</a>
     <div class="brand-block">
       <p class="brand">Mapzimus</p>
       <h1>State Extremes</h1>
-      <p class="lede">One globe. Four dots per state — north, east, south, west.</p>
+      <p class="lede">One globe. Four dots per state and territory — north, east, south, west.</p>
     </div>
   </header>
 
@@ -41,6 +41,8 @@
       <button type="button" class="view" data-view="conus" aria-pressed="true">Contiguous</button>
       <button type="button" class="view" data-view="alaska" aria-pressed="false">Alaska</button>
       <button type="button" class="view" data-view="hawaii" aria-pressed="false">Hawaii</button>
+      <button type="button" class="view" data-view="territories" aria-pressed="false">Caribbean</button>
+      <button type="button" class="view" data-view="pacific" aria-pressed="false">Pacific</button>
       <button type="button" class="view" data-view="all" aria-pressed="false">All</button>
     </div>
   </aside>
@@ -48,9 +50,9 @@
   <p class="readout" id="readout" aria-live="polite"></p>
 
   <footer class="credit">
-    Vertices from U.S. Census TIGER/Line cartographic boundaries (500k).
-    Hawaii’s north/west sit in the Northwestern Hawaiian Islands.
-    MapLibre GL JS globe · tiles © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
+    Vertices from U.S. Census TIGER/Line cartographic boundaries (500k) — 50 states, DC, and
+    PR / VI / GU / AS / MP. Hawaii’s north/west sit in the Northwestern Hawaiian Islands.
+    MapLibre GL JS globe · basemap <a href="https://openfreemap.org/">OpenFreeMap</a>
     · <a href="/lab/">Mapzimus Lab</a>
   </footer>
 </body>
