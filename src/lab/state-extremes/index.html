@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>State Extremes · Mapzimus Lab</title>
-  <meta name="description" content="Four dots per state and territory — the northernmost, easternmost, southernmost, and westernmost points across the U.S. — on a 3D globe.">
+  <meta name="description" content="Northernmost, easternmost, southernmost, and westernmost points for U.S. states and every country — with coverage toggles and geographic anomalies on a 3D globe.">
   <link rel="canonical" href="https://mapzimus.com/lab/state-extremes/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="State Extremes · Mapzimus Lab">
-  <meta property="og:description" content="Four dots per state and territory — the northernmost, easternmost, southernmost, and westernmost points across the U.S. — on a 3D globe.">
+  <meta property="og:description" content="Northernmost, easternmost, southernmost, and westernmost points for U.S. states and every country — with coverage toggles and geographic anomalies on a 3D globe.">
   <meta property="og:url" content="https://mapzimus.com/lab/state-extremes/">
   <meta name="twitter:card" content="summary">
   <meta name="theme-color" content="#0b1016">
@@ -19,39 +19,99 @@
   <script src="/lab/state-extremes/state-extremes.js" defer></script>
 </head>
 <body>
-  <div id="map" role="application" aria-label="Globe map of northernmost, easternmost, southernmost, and westernmost points in each U.S. state and territory"></div>
+  <div id="map" role="application" aria-label="Globe map of northernmost, easternmost, southernmost, and westernmost points for U.S. states and world countries"></div>
 
   <header class="chrome">
     <a class="back" href="/lab/">← Lab</a>
     <div class="brand-block">
       <p class="brand">Mapzimus</p>
       <h1>State Extremes</h1>
-      <p class="lede">One globe. Four dots per state and territory — north, east, south, west.</p>
+      <p class="lede">Four tips per place — north, east, south, west. Toggle U.S. units and the world’s countries.</p>
+    </div>
+    <div class="chrome-actions">
+      <button type="button" class="stats-toggle" id="stats-toggle" aria-expanded="false" aria-controls="analysis">
+        Stats &amp; facts
+      </button>
     </div>
   </header>
 
-  <aside class="legend" aria-label="Cardinal directions">
-    <div class="legend-row" role="group" aria-label="Show directions">
-      <button type="button" class="dir" data-dir="N" aria-pressed="true"><span class="swatch n"></span>North</button>
-      <button type="button" class="dir" data-dir="E" aria-pressed="true"><span class="swatch e"></span>East</button>
-      <button type="button" class="dir" data-dir="S" aria-pressed="true"><span class="swatch s"></span>South</button>
-      <button type="button" class="dir" data-dir="W" aria-pressed="true"><span class="swatch w"></span>West</button>
+  <aside class="analysis" id="analysis" hidden>
+    <div class="analysis-head">
+      <p class="analysis-kicker">Analysis</p>
+      <button type="button" class="analysis-close" id="analysis-close" aria-label="Close analysis">Close</button>
     </div>
-    <div class="views" role="group" aria-label="Map region">
-      <button type="button" class="view" data-view="conus" aria-pressed="true">Contiguous</button>
-      <button type="button" class="view" data-view="alaska" aria-pressed="false">Alaska</button>
-      <button type="button" class="view" data-view="hawaii" aria-pressed="false">Hawaii</button>
-      <button type="button" class="view" data-view="territories" aria-pressed="false">Caribbean</button>
-      <button type="button" class="view" data-view="pacific" aria-pressed="false">Pacific</button>
-      <button type="button" class="view" data-view="all" aria-pressed="false">All</button>
+    <div class="analysis-tabs" role="tablist" aria-label="Analysis sections">
+      <button type="button" role="tab" id="tab-facts" aria-controls="panel-facts" aria-selected="true">Facts</button>
+      <button type="button" role="tab" id="tab-rankings" aria-controls="panel-rankings" aria-selected="false">Rankings</button>
+      <button type="button" role="tab" id="tab-national" aria-controls="panel-national" aria-selected="false">Tips</button>
+    </div>
+    <div class="analysis-body">
+      <section class="analysis-panel" id="panel-facts" role="tabpanel" aria-labelledby="tab-facts"></section>
+      <section class="analysis-panel" id="panel-rankings" role="tabpanel" aria-labelledby="tab-rankings" hidden></section>
+      <section class="analysis-panel" id="panel-national" role="tabpanel" aria-labelledby="tab-national" hidden></section>
+    </div>
+    <p class="analysis-note" id="analysis-note"></p>
+  </aside>
+
+  <aside class="legend" aria-label="Map controls">
+    <div class="legend-block">
+      <p class="legend-label">Directions</p>
+      <div class="legend-row" role="group" aria-label="Show directions">
+        <button type="button" class="dir" data-dir="N" aria-pressed="true"><span class="swatch n"></span>N</button>
+        <button type="button" class="dir" data-dir="E" aria-pressed="true"><span class="swatch e"></span>E</button>
+        <button type="button" class="dir" data-dir="S" aria-pressed="true"><span class="swatch s"></span>S</button>
+        <button type="button" class="dir" data-dir="W" aria-pressed="true"><span class="swatch w"></span>W</button>
+      </div>
+    </div>
+
+    <div class="legend-block">
+      <p class="legend-label">Coverage</p>
+      <div class="toggles" role="group" aria-label="Coverage">
+        <button type="button" class="tog" id="tog-world" aria-pressed="false">World countries</button>
+        <button type="button" class="tog" id="tog-states" aria-pressed="true">50 states</button>
+        <button type="button" class="tog" id="tog-dc" aria-pressed="true">+ D.C.</button>
+        <button type="button" class="tog" id="tog-territories" aria-pressed="true">+ Territories</button>
+      </div>
+      <div class="us-mode" id="us-mode" hidden>
+        <p class="legend-label">U.S. among the world</p>
+        <div class="segment" role="radiogroup" aria-label="How to show the United States">
+          <button type="button" class="seg" data-us-mode="states" aria-checked="true">As states</button>
+          <button type="button" class="seg" data-us-mode="country" aria-checked="false">As one country</button>
+        </div>
+      </div>
+      <div class="presets" role="group" aria-label="Coverage presets">
+        <button type="button" class="preset" data-preset="us-full">U.S. full</button>
+        <button type="button" class="preset" data-preset="us-50">U.S. 50</button>
+        <button type="button" class="preset" data-preset="world-country">World + U.S.</button>
+        <button type="button" class="preset" data-preset="world-states">World + states</button>
+      </div>
+    </div>
+
+    <div class="legend-block">
+      <p class="legend-label">View</p>
+      <div class="views" role="group" aria-label="Map region">
+        <button type="button" class="view" data-view="conus" aria-pressed="true">Contiguous</button>
+        <button type="button" class="view" data-view="alaska" aria-pressed="false">Alaska</button>
+        <button type="button" class="view" data-view="hawaii" aria-pressed="false">Hawaii</button>
+        <button type="button" class="view" data-view="territories" aria-pressed="false">Caribbean</button>
+        <button type="button" class="view" data-view="pacific" aria-pressed="false">Pacific</button>
+        <button type="button" class="view" data-view="world" aria-pressed="false">World</button>
+        <button type="button" class="view" data-view="all" aria-pressed="false">All</button>
+      </div>
+    </div>
+
+    <div class="legend-block find-block">
+      <label class="legend-label" for="find-input">Find</label>
+      <input id="find-input" class="find-input" type="search" placeholder="State or country…" autocomplete="off" spellcheck="false">
+      <ul id="find-results" class="find-results" hidden></ul>
     </div>
   </aside>
 
   <p class="readout" id="readout" aria-live="polite"></p>
 
   <footer class="credit">
-    Vertices from U.S. Census TIGER/Line cartographic boundaries (500k) — 50 states, DC, and
-    PR / VI / GU / AS / MP. Hawaii’s north/west sit in the Northwestern Hawaiian Islands.
+    U.S. vertices: Census TIGER/Line 500k. Countries: Natural Earth 50m.
+    Spans are great-circle between opposite tips.
     MapLibre GL JS globe · basemap <a href="https://openfreemap.org/">OpenFreeMap</a>
     · <a href="/lab/">Mapzimus Lab</a>
   </footer>
