@@ -1,46 +1,46 @@
 {
-  "generatedAt": "2026-08-10",
+  "generatedAt": "2026-08-11",
   "news": {
     "mapsmania": [
       {
+        "title": "Finding the Falcon 9 Crash Site on the Moon",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/finding-falcon-9-crash-site-on-moon.html",
+        "desc": ""
+      },
+      {
         "title": "Mapping the Hollowing of the United States",
         "url": "http://googlemapsmania.blogspot.com/2026/08/mapping-hollowing-of-united-states.html",
-        "desc": "The American population is moving south and west."
+        "desc": ""
       },
       {
         "title": "7 Billion People Are Awake Right Now",
         "url": "http://googlemapsmania.blogspot.com/2026/08/7-billion-people-are-awake-right-now.html",
-        "desc": "At the moment (as I write), 6.962 billion people are awake, while another 2.1 billion are fast asleep."
+        "desc": ""
       },
       {
         "title": "CastleGuessr",
         "url": "http://googlemapsmania.blogspot.com/2026/08/castleguessr.html",
-        "desc": "I had determined not to post about Castle Map despite it being written about extensively elsewhere."
+        "desc": ""
       },
       {
         "title": "SimCity London: The Pixelated City",
         "url": "http://googlemapsmania.blogspot.com/2026/08/simcity-london-pixelated-city.html",
-        "desc": "London, drawn A Isometric NYC appears to have started something of a trend."
+        "desc": ""
       },
       {
         "title": "A World of Plane Crashes",
         "url": "http://googlemapsmania.blogspot.com/2026/08/a-world-of-plane-crashes.html",
-        "desc": "If you are already afraid of flying then you might want to give CrashAtlas a miss."
+        "desc": ""
       },
       {
         "title": "Isometric San Francisco",
         "url": "http://googlemapsmania.blogspot.com/2026/08/isometric-san-francisco.html",
-        "desc": "Following the success of Isometric NYC, it was probably only a matter of time before another city received the same pixel-art treatment."
+        "desc": ""
       },
       {
         "title": "Don't Miss the Eclipse!",
         "url": "http://googlemapsmania.blogspot.com/2026/08/dont-miss-eclipse.html",
-        "desc": "On August 12, 2026, a total solar eclipse will cross Greenland, Iceland and northern Spain."
-      },
-      {
-        "title": "The Map of Global Friendship",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/the-map-of-global-friendship.html",
-        "desc": "Social Connectedness Index Map St."
+        "desc": ""
       }
     ],
     "georealm": [
@@ -110,53 +110,53 @@
   },
   "qgis": [
     {
-      "title": "ALHAMBRA",
-      "url": "https://plugins.qgis.org/plugins/alhambra/"
+      "title": "SmartModeler GIS",
+      "url": "https://plugins.qgis.org/plugins/planx_smartmodeler/"
     },
     {
-      "title": "Sentinel Download",
-      "url": "https://plugins.qgis.org/plugins/sentinel_download/"
+      "title": "ArcGIS-like Workspace",
+      "url": "https://plugins.qgis.org/plugins/arcgis_like_workspace/"
     },
     {
-      "title": "SearchAttribute",
-      "url": "https://plugins.qgis.org/plugins/SearchAttribute/"
+      "title": "PARACUDA-NG",
+      "url": "https://plugins.qgis.org/plugins/paracuda_ng/"
     },
     {
-      "title": "KrigMultiProfile",
-      "url": "https://plugins.qgis.org/plugins/krig_multi_profile/"
+      "title": "Sentinel Timeline",
+      "url": "https://plugins.qgis.org/plugins/SentinelTimeline/"
     },
     {
-      "title": "MJ-AutoAttributes",
-      "url": "https://plugins.qgis.org/plugins/MJ_AutoAttributes/"
+      "title": "02Agent OSM Downloader",
+      "url": "https://plugins.qgis.org/plugins/zero2agent_osm_downloader/"
     },
     {
-      "title": "FBDS Search",
-      "url": "https://plugins.qgis.org/plugins/fbds_search/"
+      "title": "Field Boundary Tools",
+      "url": "https://plugins.qgis.org/plugins/field_boundary_tools/"
     },
     {
-      "title": "IsoParcel",
-      "url": "https://plugins.qgis.org/plugins/isoparcel/"
+      "title": "Point Shift Tracker",
+      "url": "https://plugins.qgis.org/plugins/point_shift_tracker/"
     },
     {
-      "title": "CRS Batch Reprojection – Vector & Raster (Worldwide)",
-      "url": "https://plugins.qgis.org/plugins/przeliczanie_swiat/"
+      "title": "OpenStaR-Elec Déploiement",
+      "url": "https://plugins.qgis.org/plugins/openstar_elec_deploiement/"
     }
   ],
   "releases": [
+    {
+      "repo": "maplibre/maplibre-gl-js",
+      "title": "maplibre-gl-js v6.3.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.3.0",
+      "desc": "### ✨ Features and improvements - Make fired/listened map events typed.",
+      "publishedAt": "2026-08-10",
+      "isFresh": true
+    },
     {
       "repo": "visgl/deck.gl",
       "title": "deck.gl v9.3.9",
       "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.9",
       "desc": "- fix(core): OrthographicViewport distance scale (#10540)",
       "publishedAt": "2026-08-09",
-      "isFresh": true
-    },
-    {
-      "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.2.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.2.0",
-      "desc": "### ✨ Features and improvements - Add the `fill-extrusion-rounded-corner-distance` layout property, which replaces each fill-extrusion corner with an arc spa…",
-      "publishedAt": "2026-08-06",
       "isFresh": true
     },
     {
@@ -210,9 +210,27 @@
   ],
   "gisse": [
     {
+      "title": "Climate data NetCDF files being incorrectly read by QGIS",
+      "url": "https://gis.stackexchange.com/questions/501266/climate-data-netcdf-files-being-incorrectly-read-by-qgis",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "QGIS - How to get the average distances (one distance per feature) between a polyline layer and a point?",
+      "url": "https://gis.stackexchange.com/questions/501262/qgis-how-to-get-the-average-distances-one-distance-per-feature-between-a-pol",
+      "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "Export Web Mercator Tile Pyramid as COG GeoTIFF using QGIS",
+      "url": "https://gis.stackexchange.com/questions/501261/export-web-mercator-tile-pyramid-as-cog-geotiff-using-qgis",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "QGIS: Sharpness and glitches issues upon export (image) of ESRI OpenStreetMap",
       "url": "https://gis.stackexchange.com/questions/501253/qgis-sharpness-and-glitches-issues-upon-export-image-of-esri-openstreetmap",
-      "score": 0,
+      "score": 1,
       "answers": 0
     },
     {
@@ -250,27 +268,15 @@
       "url": "https://gis.stackexchange.com/questions/501238/selecting-linear-unit-for-buffer-tool-when-using-modelbuilder-iterator-in-arcgis",
       "score": -1,
       "answers": 0
-    },
-    {
-      "title": "Exporting points with coordinates",
-      "url": "https://gis.stackexchange.com/questions/501232/exporting-points-with-coordinates",
-      "score": 1,
-      "answers": 0
-    },
-    {
-      "title": "GeoServer partial transparency issue",
-      "url": "https://gis.stackexchange.com/questions/501237/geoserver-partial-transparency-issue",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "QGIS: Display OSM Buildings at higher scale (1:25000) for both urban and remote areas to show density",
-      "url": "https://gis.stackexchange.com/questions/501236/qgis-display-osm-buildings-at-higher-scale-125000-for-both-urban-and-remote",
-      "score": 1,
-      "answers": 0
     }
   ],
   "nasa": [
+    {
+      "title": "North American Land Carbon Reanalysis, 2012-2024",
+      "url": "https://search.earthdata.nasa.gov/search?q=Land_C_Reanalysis_NorthAmerica_2507",
+      "desc": "This dataset provides a gridded ensemble of continental-scale carbon and water budgets at 0.00833-degree (~1 km) resolution across North America from 2012 to…",
+      "org": "ORNL_CLOUD"
+    },
     {
       "title": "UAVSAR_POLSAR_STOKES",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
@@ -323,12 +329,6 @@
       "title": "UAVSAR_POLSAR_KMZ",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
       "desc": "UAVSAR PolSAR Scene KMZ",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_INCIDENCE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
-      "desc": "UAVSAR PolSAR Scene Incidence Angle",
       "org": "ASF"
     }
   ],
