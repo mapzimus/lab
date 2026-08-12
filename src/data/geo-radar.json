@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-11",
+  "generatedAt": "2026-08-12",
   "news": {
     "mapsmania": [
+      {
+        "title": "Trains and Termini",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/trains-and-termini.html",
+        "desc": ""
+      },
       {
         "title": "Finding the Falcon 9 Crash Site on the Moon",
         "url": "http://googlemapsmania.blogspot.com/2026/08/finding-falcon-9-crash-site-on-moon.html",
@@ -35,11 +40,6 @@
       {
         "title": "Isometric San Francisco",
         "url": "http://googlemapsmania.blogspot.com/2026/08/isometric-san-francisco.html",
-        "desc": ""
-      },
-      {
-        "title": "Don't Miss the Eclipse!",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/dont-miss-eclipse.html",
         "desc": ""
       }
     ],
@@ -144,19 +144,19 @@
   ],
   "releases": [
     {
+      "repo": "visgl/deck.gl",
+      "title": "deck.gl v9.3.10",
+      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.10",
+      "desc": "- fix(layers): restore SDF text outlines (#10545) - fix(core): use correct stat for updateLayersCount metric (#10469)",
+      "publishedAt": "2026-08-11",
+      "isFresh": true
+    },
+    {
       "repo": "maplibre/maplibre-gl-js",
       "title": "maplibre-gl-js v6.3.0",
       "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.3.0",
       "desc": "### ✨ Features and improvements - Make fired/listened map events typed.",
       "publishedAt": "2026-08-10",
-      "isFresh": true
-    },
-    {
-      "repo": "visgl/deck.gl",
-      "title": "deck.gl v9.3.9",
-      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.9",
-      "desc": "- fix(core): OrthographicViewport distance scale (#10540)",
-      "publishedAt": "2026-08-09",
       "isFresh": true
     },
     {
@@ -213,13 +213,19 @@
       "title": "Climate data NetCDF files being incorrectly read by QGIS",
       "url": "https://gis.stackexchange.com/questions/501266/climate-data-netcdf-files-being-incorrectly-read-by-qgis",
       "score": 0,
-      "answers": 0
+      "answers": 1
     },
     {
       "title": "QGIS - How to get the average distances (one distance per feature) between a polyline layer and a point?",
       "url": "https://gis.stackexchange.com/questions/501262/qgis-how-to-get-the-average-distances-one-distance-per-feature-between-a-pol",
       "score": 1,
       "answers": 1
+    },
+    {
+      "title": "AGOL Pop Up Show Relationship Link Only if Populated",
+      "url": "https://gis.stackexchange.com/questions/501263/agol-pop-up-show-relationship-link-only-if-populated",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "Export Web Mercator Tile Pyramid as COG GeoTIFF using QGIS",
@@ -246,6 +252,12 @@
       "answers": 1
     },
     {
+      "title": "QGIS points are only clamped to ground",
+      "url": "https://gis.stackexchange.com/questions/501226/qgis-points-are-only-clamped-to-ground",
+      "score": 2,
+      "answers": 2
+    },
+    {
       "title": "Finding different types of attributes within each suburb of a city",
       "url": "https://gis.stackexchange.com/questions/501250/finding-different-types-of-attributes-within-each-suburb-of-a-city",
       "score": 1,
@@ -256,26 +268,44 @@
       "url": "https://gis.stackexchange.com/questions/501248/avoiding-qgis-lock-on-a-geopackage-while-rendering",
       "score": 1,
       "answers": 0
-    },
-    {
-      "title": "QGIS points are only clamped to ground",
-      "url": "https://gis.stackexchange.com/questions/501226/qgis-points-are-only-clamped-to-ground",
-      "score": 2,
-      "answers": 2
-    },
-    {
-      "title": "Selecting linear unit for buffer tool when using ModelBuilder Iterator in ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501238/selecting-linear-unit-for-buffer-tool-when-using-modelbuilder-iterator-in-arcgis",
-      "score": -1,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "North American Land Carbon Reanalysis, 2012-2024",
-      "url": "https://search.earthdata.nasa.gov/search?q=Land_C_Reanalysis_NorthAmerica_2507",
-      "desc": "This dataset provides a gridded ensemble of continental-scale carbon and water budgets at 0.00833-degree (~1 km) resolution across North America from 2012 to…",
+      "title": "HyTES Level 2 Emissivity and LST Overlay Images, Facility Instrument Collection",
+      "url": "https://search.earthdata.nasa.gov/search?q=HyTES_L2_Emissivity_Overlays_2469",
+      "desc": "This dataset contains geocorrected image overlays of Level 2 (L2) emissivity and land surface temperature (LST) from imagery acquired by the Hyperspectral Th…",
       "org": "ORNL_CLOUD"
+    },
+    {
+      "title": "HyTES Level 1 Flight Paths, Facility Instrument Collection",
+      "url": "https://search.earthdata.nasa.gov/search?q=HyTES_L1_Flight_Path_2463",
+      "desc": "This dataset contains paths of flight lines for the Hyperspectral Thermal Emission Spectrometer (HyTES) instrument from 2013 to 2023.",
+      "org": "ORNL_CLOUD"
+    },
+    {
+      "title": "CERES Single Scanner Footprint (SSF) TOA/Surface Fluxes, Clouds and Aerosols NPP-FM5 Edition2A",
+      "url": "https://search.earthdata.nasa.gov/search?q=CER_SSF_NPP-FM5-VIIRS",
+      "desc": "CER_SSF_NPP-FM5-VIIRS_Edition2A data have CERES observed TOA fluxes, MODIS clouds and aerosols, and parameterized surface fluxes.",
+      "org": "LARC_CLOUD"
+    },
+    {
+      "title": "CERES Time-Interpolated TOA Fluxes, Clouds and Aerosols Daily NPP Edition2A",
+      "url": "https://search.earthdata.nasa.gov/search?q=CER_SSF1deg-Day_NPP-VIIRS",
+      "desc": "CER_SSF1deg-Day_NPP-VIIRS_Edition2A is the Clouds and the Earth's Radiant Energy System (CERES) Time-Interpolated Top of Atmosphere (TOA) Fluxes, Clouds and…",
+      "org": "LARC_CLOUD"
+    },
+    {
+      "title": "CERES SSF 1 degree Regionally Averaged TOA Fluxes, Clouds and Aerosols Hourly NPP VIIRS Edition2A",
+      "url": "https://search.earthdata.nasa.gov/search?q=CER_SSF1deg-Hour_NPP-VIIRS",
+      "desc": "CER_SSF1deg-Hour_NPP-VIIRS_Edition2A is the Clouds and the Earth's Radiant Energy System (CERES) Single Scanner Footprint One Degree (SSF1deg) Regionally Ave…",
+      "org": "LARC_CLOUD"
+    },
+    {
+      "title": "CERES SSF 1 degree Time-Interpolated TOA Fluxes, Clouds and Aerosols Monthly NPP Edition2A",
+      "url": "https://search.earthdata.nasa.gov/search?q=CER_SSF1deg-Month_NPP-VIIRS",
+      "desc": "CER_SSF1deg-Month_NPP-VIIRS_Edition2A is the Clouds and the Earth's Radiant Energy System (CERES) Single Scanner Footprint One Degree (SSF1deg) Time-Interpol…",
+      "org": "LARC_CLOUD"
     },
     {
       "title": "UAVSAR_POLSAR_STOKES",
@@ -300,39 +330,16 @@
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
       "desc": "UAVSAR PolSAR Scene Complex",
       "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
-      "desc": "UAVSAR PolSAR Scene Projected",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_METADATA",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
-      "desc": "UAVSAR PolSAR Scene Metadata",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_KMZ",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
-      "desc": "UAVSAR PolSAR Scene KMZ",
-      "org": "ASF"
     }
   ],
   "datagov": [
+    {
+      "title": "Inventory of Owned and Leased Properties (IOLP)",
+      "url": "https://catalog.data.gov/dataset/inventory-of-owned-and-leased-properties-iolp",
+      "desc": "The Inventory of Owned and Leased Properties (IOLP) allows users to search properties owned and leased by the General Services Administration (GSA) across the U",
+      "org": "General Services Administration",
+      "rank": 13
+    },
     {
       "title": "Civil Rights Data Collection (CRDC) for the 2017-18 school year",
       "url": "https://catalog.data.gov/dataset/civil-rights-data-collection-crdc-for-the-2017-18-school-year",
@@ -379,13 +386,6 @@
       "title": "2013-14 Mathematics and Science Civil Rights Data Collection",
       "url": "https://catalog.data.gov/dataset/2013-14-mathematics-and-science-civil-rights-data-collection",
       "desc": "The 2013-14 tables are based on data collected from all of the nation’s school districts and schools—approximately 16,500 school districts and 96,500 schools.",
-      "org": "Department of Education",
-      "rank": 2
-    },
-    {
-      "title": "2017-18 Harassment or Bullying Civil Rights Data Collection",
-      "url": "https://catalog.data.gov/dataset/2017-18-harassment-or-bullying-civil-rights-data-collection",
-      "desc": "This set of Excel files contains data on students reported as harassed or bullied or disciplined for harassment or bullying on the basis of sex, race, or disabi",
       "org": "Department of Education",
       "rank": 2
     }
