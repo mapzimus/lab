@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-12",
+  "generatedAt": "2026-08-13",
   "news": {
     "mapsmania": [
+      {
+        "title": "How to Find the Best Sunset Views",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/how-to-find-best-sunset-views.html",
+        "desc": ""
+      },
       {
         "title": "Trains and Termini",
         "url": "http://googlemapsmania.blogspot.com/2026/08/trains-and-termini.html",
@@ -35,11 +40,6 @@
       {
         "title": "A World of Plane Crashes",
         "url": "http://googlemapsmania.blogspot.com/2026/08/a-world-of-plane-crashes.html",
-        "desc": ""
-      },
-      {
-        "title": "Isometric San Francisco",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/isometric-san-francisco.html",
         "desc": ""
       }
     ],
@@ -210,6 +210,18 @@
   ],
   "gisse": [
     {
+      "title": "Can't filter ArcGIS WFS service using GDAL vector pipeline",
+      "url": "https://gis.stackexchange.com/questions/501269/cant-filter-arcgis-wfs-service-using-gdal-vector-pipeline",
+      "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "QGIS OpenTopography output issue",
+      "url": "https://gis.stackexchange.com/questions/501270/qgis-opentopography-output-issue",
+      "score": -1,
+      "answers": 0
+    },
+    {
       "title": "Climate data NetCDF files being incorrectly read by QGIS",
       "url": "https://gis.stackexchange.com/questions/501266/climate-data-netcdf-files-being-incorrectly-read-by-qgis",
       "score": 0,
@@ -256,57 +268,9 @@
       "url": "https://gis.stackexchange.com/questions/501226/qgis-points-are-only-clamped-to-ground",
       "score": 2,
       "answers": 2
-    },
-    {
-      "title": "Finding different types of attributes within each suburb of a city",
-      "url": "https://gis.stackexchange.com/questions/501250/finding-different-types-of-attributes-within-each-suburb-of-a-city",
-      "score": 1,
-      "answers": 0
-    },
-    {
-      "title": "Avoiding QGIS lock on a GeoPackage while rendering",
-      "url": "https://gis.stackexchange.com/questions/501248/avoiding-qgis-lock-on-a-geopackage-while-rendering",
-      "score": 1,
-      "answers": 0
     }
   ],
   "nasa": [
-    {
-      "title": "HyTES Level 2 Emissivity and LST Overlay Images, Facility Instrument Collection",
-      "url": "https://search.earthdata.nasa.gov/search?q=HyTES_L2_Emissivity_Overlays_2469",
-      "desc": "This dataset contains geocorrected image overlays of Level 2 (L2) emissivity and land surface temperature (LST) from imagery acquired by the Hyperspectral Th…",
-      "org": "ORNL_CLOUD"
-    },
-    {
-      "title": "HyTES Level 1 Flight Paths, Facility Instrument Collection",
-      "url": "https://search.earthdata.nasa.gov/search?q=HyTES_L1_Flight_Path_2463",
-      "desc": "This dataset contains paths of flight lines for the Hyperspectral Thermal Emission Spectrometer (HyTES) instrument from 2013 to 2023.",
-      "org": "ORNL_CLOUD"
-    },
-    {
-      "title": "CERES Single Scanner Footprint (SSF) TOA/Surface Fluxes, Clouds and Aerosols NPP-FM5 Edition2A",
-      "url": "https://search.earthdata.nasa.gov/search?q=CER_SSF_NPP-FM5-VIIRS",
-      "desc": "CER_SSF_NPP-FM5-VIIRS_Edition2A data have CERES observed TOA fluxes, MODIS clouds and aerosols, and parameterized surface fluxes.",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "CERES Time-Interpolated TOA Fluxes, Clouds and Aerosols Daily NPP Edition2A",
-      "url": "https://search.earthdata.nasa.gov/search?q=CER_SSF1deg-Day_NPP-VIIRS",
-      "desc": "CER_SSF1deg-Day_NPP-VIIRS_Edition2A is the Clouds and the Earth's Radiant Energy System (CERES) Time-Interpolated Top of Atmosphere (TOA) Fluxes, Clouds and…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "CERES SSF 1 degree Regionally Averaged TOA Fluxes, Clouds and Aerosols Hourly NPP VIIRS Edition2A",
-      "url": "https://search.earthdata.nasa.gov/search?q=CER_SSF1deg-Hour_NPP-VIIRS",
-      "desc": "CER_SSF1deg-Hour_NPP-VIIRS_Edition2A is the Clouds and the Earth's Radiant Energy System (CERES) Single Scanner Footprint One Degree (SSF1deg) Regionally Ave…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "CERES SSF 1 degree Time-Interpolated TOA Fluxes, Clouds and Aerosols Monthly NPP Edition2A",
-      "url": "https://search.earthdata.nasa.gov/search?q=CER_SSF1deg-Month_NPP-VIIRS",
-      "desc": "CER_SSF1deg-Month_NPP-VIIRS_Edition2A is the Clouds and the Earth's Radiant Energy System (CERES) Single Scanner Footprint One Degree (SSF1deg) Time-Interpol…",
-      "org": "LARC_CLOUD"
-    },
     {
       "title": "UAVSAR_POLSAR_STOKES",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
@@ -329,6 +293,42 @@
       "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
       "desc": "UAVSAR PolSAR Scene Complex",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
+      "desc": "UAVSAR PolSAR Scene Projected",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_METADATA",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
+      "desc": "UAVSAR PolSAR Scene Metadata",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_KMZ",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
+      "desc": "UAVSAR PolSAR Scene KMZ",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_INCIDENCE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
+      "desc": "UAVSAR PolSAR Scene Incidence Angle",
       "org": "ASF"
     }
   ],
