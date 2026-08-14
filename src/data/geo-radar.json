@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-13",
+  "generatedAt": "2026-08-14",
   "news": {
     "mapsmania": [
+      {
+        "title": "Where does the North Begin?",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/where-does-north-begin.html",
+        "desc": ""
+      },
       {
         "title": "How to Find the Best Sunset Views",
         "url": "http://googlemapsmania.blogspot.com/2026/08/how-to-find-best-sunset-views.html",
@@ -35,11 +40,6 @@
       {
         "title": "SimCity London: The Pixelated City",
         "url": "http://googlemapsmania.blogspot.com/2026/08/simcity-london-pixelated-city.html",
-        "desc": ""
-      },
-      {
-        "title": "A World of Plane Crashes",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/a-world-of-plane-crashes.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "SmartModeler GIS",
-      "url": "https://plugins.qgis.org/plugins/planx_smartmodeler/"
+      "title": "Label Switcher",
+      "url": "https://plugins.qgis.org/plugins/auto_label_switcher/"
     },
     {
-      "title": "ArcGIS-like Workspace",
-      "url": "https://plugins.qgis.org/plugins/arcgis_like_workspace/"
+      "title": "SDM",
+      "url": "https://plugins.qgis.org/plugins/sdm_plugin/"
     },
     {
-      "title": "PARACUDA-NG",
-      "url": "https://plugins.qgis.org/plugins/paracuda_ng/"
+      "title": "Qgis PostGIS Sync",
+      "url": "https://plugins.qgis.org/plugins/Qgis_PostGIS_Sync/"
     },
     {
-      "title": "Sentinel Timeline",
-      "url": "https://plugins.qgis.org/plugins/SentinelTimeline/"
+      "title": "Living Legend",
+      "url": "https://plugins.qgis.org/plugins/LivingLegend/"
     },
     {
-      "title": "02Agent OSM Downloader",
-      "url": "https://plugins.qgis.org/plugins/zero2agent_osm_downloader/"
+      "title": "RasterNinja",
+      "url": "https://plugins.qgis.org/plugins/RasterNinja/"
     },
     {
-      "title": "Field Boundary Tools",
-      "url": "https://plugins.qgis.org/plugins/field_boundary_tools/"
+      "title": "Layout_IA",
+      "url": "https://plugins.qgis.org/plugins/Layout_IA/"
     },
     {
-      "title": "Point Shift Tracker",
-      "url": "https://plugins.qgis.org/plugins/point_shift_tracker/"
+      "title": "QuickShapeStatistics",
+      "url": "https://plugins.qgis.org/plugins/quick_shape_statistics/"
     },
     {
-      "title": "OpenStaR-Elec Déploiement",
-      "url": "https://plugins.qgis.org/plugins/openstar_elec_deploiement/"
+      "title": "GeoLens",
+      "url": "https://plugins.qgis.org/plugins/geolens_qgis/"
     }
   ],
   "releases": [
@@ -218,7 +218,7 @@
     {
       "title": "QGIS OpenTopography output issue",
       "url": "https://gis.stackexchange.com/questions/501270/qgis-opentopography-output-issue",
-      "score": -1,
+      "score": -2,
       "answers": 0
     },
     {
@@ -252,16 +252,16 @@
       "answers": 0
     },
     {
-      "title": "How to add imagery from a JSON or SOAP ArcGIS service to JOSM?",
-      "url": "https://gis.stackexchange.com/questions/501254/how-to-add-imagery-from-a-json-or-soap-arcgis-service-to-josm",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "QGIS loads shapefile from network but says invalid when loading from local hard drive",
       "url": "https://gis.stackexchange.com/questions/501239/qgis-loads-shapefile-from-network-but-says-invalid-when-loading-from-local-hard",
       "score": 1,
       "answers": 1
+    },
+    {
+      "title": "How to add imagery from a JSON or SOAP ArcGIS service to JOSM?",
+      "url": "https://gis.stackexchange.com/questions/501254/how-to-add-imagery-from-a-json-or-soap-arcgis-service-to-josm",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "QGIS points are only clamped to ground",
@@ -271,6 +271,12 @@
     }
   ],
   "nasa": [
+    {
+      "title": "GEO-LEO Merged Deep Blue Aerosol Monthly 1 x 1 degree Gridded L3",
+      "url": "https://search.earthdata.nasa.gov/search?q=AERDB_M3_GEOLEO_Merged",
+      "desc": "The Level-3 (L3) Geostationary Earth Orbit (GEO)-Low-Earth Orbit (LEO) Merged Deep Blue Aerosol Monthly 1 x 1 degree Gridded dataset is part of a 12-product…",
+      "org": "LAADS"
+    },
     {
       "title": "UAVSAR_POLSAR_STOKES",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
@@ -323,12 +329,6 @@
       "title": "UAVSAR_POLSAR_KMZ",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
       "desc": "UAVSAR PolSAR Scene KMZ",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_INCIDENCE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
-      "desc": "UAVSAR PolSAR Scene Incidence Angle",
       "org": "ASF"
     }
   ],
