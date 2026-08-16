@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-15",
+  "generatedAt": "2026-08-16",
   "news": {
     "mapsmania": [
       {
@@ -144,19 +144,19 @@
   ],
   "releases": [
     {
+      "repo": "maplibre/maplibre-gl-js",
+      "title": "maplibre-gl-js v6.4.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.4.0",
+      "desc": "### ✨ Features and improvements - Avoid a per-query `Array.sort()` in cross-tile symbol matching (`TileLayerIndex.findMatches`), claiming the lowest-index un…",
+      "publishedAt": "2026-08-16",
+      "isFresh": true
+    },
+    {
       "repo": "visgl/deck.gl",
       "title": "deck.gl v9.3.10",
       "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.10",
       "desc": "- fix(layers): restore SDF text outlines (#10545) - fix(core): use correct stat for updateLayersCount metric (#10469)",
       "publishedAt": "2026-08-11",
-      "isFresh": true
-    },
-    {
-      "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.3.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.3.0",
-      "desc": "### ✨ Features and improvements - Make fired/listened map events typed.",
-      "publishedAt": "2026-08-10",
       "isFresh": true
     },
     {
@@ -210,6 +210,12 @@
   ],
   "gisse": [
     {
+      "title": "How to modify las intensity so different scanners have directly comparable intensities",
+      "url": "https://gis.stackexchange.com/questions/501275/how-to-modify-las-intensity-so-different-scanners-have-directly-comparable-inten",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Can't filter ArcGIS WFS service using GDAL vector pipeline",
       "url": "https://gis.stackexchange.com/questions/501269/cant-filter-arcgis-wfs-service-using-gdal-vector-pipeline",
       "score": 1,
@@ -246,21 +252,15 @@
       "answers": 0
     },
     {
-      "title": "QGIS: Sharpness and glitches issues upon export (image) of ESRI OpenStreetMap",
-      "url": "https://gis.stackexchange.com/questions/501253/qgis-sharpness-and-glitches-issues-upon-export-image-of-esri-openstreetmap",
-      "score": 1,
-      "answers": 0
-    },
-    {
       "title": "QGIS loads shapefile from network but says invalid when loading from local hard drive",
       "url": "https://gis.stackexchange.com/questions/501239/qgis-loads-shapefile-from-network-but-says-invalid-when-loading-from-local-hard",
       "score": 1,
       "answers": 1
     },
     {
-      "title": "QGIS: Scale pattern (symbology) based on administrative boundaries (tiles)",
-      "url": "https://gis.stackexchange.com/questions/501259/qgis-scale-pattern-symbology-based-on-administrative-boundaries-tiles",
-      "score": 0,
+      "title": "QGIS: Sharpness and glitches issues upon export (image) of ESRI OpenStreetMap",
+      "url": "https://gis.stackexchange.com/questions/501253/qgis-sharpness-and-glitches-issues-upon-export-image-of-esri-openstreetmap",
+      "score": 1,
       "answers": 0
     },
     {
@@ -392,16 +392,16 @@
   ],
   "osm": [
     {
+      "title": "weeklyOSM 838",
+      "url": "https://weeklyosm.eu/archives/18803"
+    },
+    {
       "title": "weeklyOSM 837",
       "url": "https://weeklyosm.eu/archives/18779"
     },
     {
       "title": "weeklyOSM 836",
       "url": "https://weeklyosm.eu/archives/18761"
-    },
-    {
-      "title": "weeklyOSM 835",
-      "url": "https://weeklyosm.eu/archives/18747"
     }
   ]
 }
