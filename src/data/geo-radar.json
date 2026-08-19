@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-18",
+  "generatedAt": "2026-08-19",
   "news": {
     "mapsmania": [
+      {
+        "title": "The 2026 Fall Foliage Map Has Landed",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/the-2026-fall-foliage-map-has-landed.html",
+        "desc": ""
+      },
       {
         "title": "How to Win the World Cup - From Above",
         "url": "http://googlemapsmania.blogspot.com/2026/08/how-to-win-world-cup-from-above.html",
@@ -35,11 +40,6 @@
       {
         "title": "Finding the Falcon 9 Crash Site on the Moon",
         "url": "http://googlemapsmania.blogspot.com/2026/08/finding-falcon-9-crash-site-on-moon.html",
-        "desc": ""
-      },
-      {
-        "title": "Mapping the Hollowing of the United States",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/mapping-hollowing-of-united-states.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "QGIS CSAPI Plugin",
-      "url": "https://plugins.qgis.org/plugins/qgis_oacs/"
+      "title": "SATHI",
+      "url": "https://plugins.qgis.org/plugins/temporal_grid_extractor/"
     },
     {
-      "title": "Terrain Product Studio",
-      "url": "https://plugins.qgis.org/plugins/terrain_product_studio/"
+      "title": "Map Extent QR",
+      "url": "https://plugins.qgis.org/plugins/map_extent_qr/"
     },
     {
-      "title": "Click & Color",
-      "url": "https://plugins.qgis.org/plugins/click_and_color/"
+      "title": "GeoSIG",
+      "url": "https://plugins.qgis.org/plugins/GeoSIG/"
     },
     {
-      "title": "Flood Simulator",
-      "url": "https://plugins.qgis.org/plugins/flood_simulator/"
+      "title": "HydroROC",
+      "url": "https://plugins.qgis.org/plugins/HydroROC/"
     },
     {
-      "title": "G-CHAM Data Pack Builder",
-      "url": "https://plugins.qgis.org/plugins/gcham_datapack_builder/"
+      "title": "Aeternum Aquae - Estaciones Climatológicas (México)",
+      "url": "https://plugins.qgis.org/plugins/aeternum_aquae_stations/"
     },
     {
-      "title": "Auto House Numbering",
-      "url": "https://plugins.qgis.org/plugins/AutoHouseNumber/"
+      "title": "QRouteCode",
+      "url": "https://plugins.qgis.org/plugins/QRouteCode/"
     },
     {
-      "title": "AR-Tarseem",
-      "url": "https://plugins.qgis.org/plugins/ar_tarseem/"
+      "title": "FiberHome FTK QGIS GeoCopy",
+      "url": "https://plugins.qgis.org/plugins/fiberhome_ftk_qgis_geocopy/"
     },
     {
-      "title": "GeoSort",
-      "url": "https://plugins.qgis.org/plugins/geosort/"
+      "title": "JSON Converter Studio",
+      "url": "https://plugins.qgis.org/plugins/JSON_Converter_QGIS/"
     }
   ],
   "releases": [
@@ -153,10 +153,10 @@
     },
     {
       "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.4.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.4.0",
-      "desc": "### ✨ Features and improvements - Avoid a per-query `Array.sort()` in cross-tile symbol matching (`TileLayerIndex.findMatches`), claiming the lowest-index un…",
-      "publishedAt": "2026-08-16",
+      "title": "maplibre-gl-js v6.4.1",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.4.1",
+      "desc": "### 🐞 Bug fixes - Fix `DOM.sanitize` leaving dangerous attributes behind when multiple consecutive attributes are present.",
+      "publishedAt": "2026-08-18",
       "isFresh": true
     },
     {
@@ -210,6 +210,18 @@
   ],
   "gisse": [
     {
+      "title": "Web AppBuilder does not retain arrow line symbology from Map Viewer, while Experience Builder does",
+      "url": "https://gis.stackexchange.com/questions/501281/web-appbuilder-does-not-retain-arrow-line-symbology-from-map-viewer-while-exper",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Export vectorfiles from QGIS to edit in Design software",
+      "url": "https://gis.stackexchange.com/questions/501280/export-vectorfiles-from-qgis-to-edit-in-design-software",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "How do you structure raster-processing code so the I/O can be replaced in tests?",
       "url": "https://gis.stackexchange.com/questions/501277/how-do-you-structure-raster-processing-code-so-the-i-o-can-be-replaced-in-tests",
       "score": 1,
@@ -256,21 +268,33 @@
       "url": "https://gis.stackexchange.com/questions/501266/climate-data-netcdf-files-being-incorrectly-read-by-qgis",
       "score": 0,
       "answers": 1
-    },
-    {
-      "title": "Avoiding QGIS lock on a GeoPackage while rendering",
-      "url": "https://gis.stackexchange.com/questions/501248/avoiding-qgis-lock-on-a-geopackage-while-rendering",
-      "score": 1,
-      "answers": 0
-    },
-    {
-      "title": "I am seeking a profile of the garden in which I grew up 75 years ago.",
-      "url": "https://gis.stackexchange.com/questions/501215/i-am-seeking-a-profile-of-the-garden-in-which-i-grew-up-75-years-ago-i-was-intr",
-      "score": 1,
-      "answers": 3
     }
   ],
   "nasa": [
+    {
+      "title": "VIIRS/NOAA20 Deep Blue Aerosol L2 6-Min Swath 6 km",
+      "url": "https://search.earthdata.nasa.gov/search?q=AERDB_L2_VIIRS_NOAA20",
+      "desc": "The Visible Infrared Imaging Radiometer Suite (VIIRS) NASA standard Level-2 (L2) Deep Blue aerosol products from the NOAA-20 — formerly known as the Joint Po…",
+      "org": "LAADS"
+    },
+    {
+      "title": "VIIRS/JPSS2 Actual and Potential Evapotranspiration Gap-Filled Yearly L4 Global 500m SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ216A3GF",
+      "desc": "The NOAA-21 Visible Infrared Imaging Radiometer Suite (VIIRS) Actual and Potential Evapotranspiration product is a gap-filled yearly composite dataset produc…",
+      "org": "LPCLOUD"
+    },
+    {
+      "title": "VIIRS/SNPP Deep Blue Aerosol L2 6 Min Swath 6km",
+      "url": "https://search.earthdata.nasa.gov/search?q=AERDB_L2_VIIRS_SNPP",
+      "desc": "The Visible Infrared Imaging Radiometer Suite (VIIRS) NASA standard Level-2 (L2) Deep Blue aerosol products from the Suomi National Polar-orbiting Partnershi…",
+      "org": "LAADS"
+    },
+    {
+      "title": "CERES Single Scanner Footprint (SSF) TOA/Surface Fluxes, Clouds and Aerosols NPP-FM5 Edition2B",
+      "url": "https://search.earthdata.nasa.gov/search?q=CER_SSF_NPP-FM5-VIIRS",
+      "desc": "CER_SSF_NPP-FM5-VIIRS_Edition2B is the Suomi National Polar-orbiting Partnership (NPP) Single Scanner Footprint (SSF) Clouds and the Earth's Radiant Energy S…",
+      "org": "LARC_CLOUD"
+    },
     {
       "title": "UAVSAR_POLSAR_STOKES",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
@@ -305,30 +329,6 @@
       "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
       "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
-      "desc": "UAVSAR PolSAR Scene Projected",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_METADATA",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
-      "desc": "UAVSAR PolSAR Scene Metadata",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_KMZ",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
-      "desc": "UAVSAR PolSAR Scene KMZ",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_INCIDENCE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
-      "desc": "UAVSAR PolSAR Scene Incidence Angle",
       "org": "ASF"
     }
   ],
