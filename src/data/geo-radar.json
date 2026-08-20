@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-19",
+  "generatedAt": "2026-08-20",
   "news": {
     "mapsmania": [
+      {
+        "title": "Surfing the Jet Stream",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/surfing-jet-stream.html",
+        "desc": ""
+      },
       {
         "title": "The 2026 Fall Foliage Map Has Landed",
         "url": "http://googlemapsmania.blogspot.com/2026/08/the-2026-fall-foliage-map-has-landed.html",
@@ -35,11 +40,6 @@
       {
         "title": "Trains and Termini",
         "url": "http://googlemapsmania.blogspot.com/2026/08/trains-and-termini.html",
-        "desc": ""
-      },
-      {
-        "title": "Finding the Falcon 9 Crash Site on the Moon",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/finding-falcon-9-crash-site-on-moon.html",
         "desc": ""
       }
     ],
@@ -130,16 +130,16 @@
       "url": "https://plugins.qgis.org/plugins/aeternum_aquae_stations/"
     },
     {
-      "title": "QRouteCode",
-      "url": "https://plugins.qgis.org/plugins/QRouteCode/"
-    },
-    {
       "title": "FiberHome FTK QGIS GeoCopy",
       "url": "https://plugins.qgis.org/plugins/fiberhome_ftk_qgis_geocopy/"
     },
     {
       "title": "JSON Converter Studio",
       "url": "https://plugins.qgis.org/plugins/JSON_Converter_QGIS/"
+    },
+    {
+      "title": "qPansopy",
+      "url": "https://plugins.qgis.org/plugins/Q_Pansopy/"
     }
   ],
   "releases": [
@@ -210,6 +210,24 @@
   ],
   "gisse": [
     {
+      "title": "Summing attribute values along line layer not working",
+      "url": "https://gis.stackexchange.com/questions/501290/summing-attribute-values-along-line-layer-not-working",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Direction of OSMnx network from graph module in ArcGIS Pro",
+      "url": "https://gis.stackexchange.com/questions/501289/direction-of-osmnx-network-from-graph-module-in-arcgis-pro",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Geofencing area spans two UTM zones",
+      "url": "https://gis.stackexchange.com/questions/501286/geofencing-area-spans-two-utm-zones",
+      "score": 0,
+      "answers": 1
+    },
+    {
       "title": "Web AppBuilder does not retain arrow line symbology from Map Viewer, while Experience Builder does",
       "url": "https://gis.stackexchange.com/questions/501281/web-appbuilder-does-not-retain-arrow-line-symbology-from-map-viewer-while-exper",
       "score": 0,
@@ -234,66 +252,30 @@
       "answers": 0
     },
     {
-      "title": "QGIS 3.44.11 (Solothurn) - WhiteboxTools- stream_order file empty",
-      "url": "https://gis.stackexchange.com/questions/501276/qgis-3-44-11-solothurn-whiteboxtools-stream-order-file-empty",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "QGIS - How to get the average distances (one distance per feature) between a polyline layer and a point?",
       "url": "https://gis.stackexchange.com/questions/501262/qgis-how-to-get-the-average-distances-one-distance-per-feature-between-a-pol",
       "score": 1,
       "answers": 1
     },
     {
+      "title": "QGIS 3.44.11 (Solothurn) - WhiteboxTools- stream_order file empty",
+      "url": "https://gis.stackexchange.com/questions/501276/qgis-3-44-11-solothurn-whiteboxtools-stream-order-file-empty",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "QGIS Symbology: Scale pattern symbol based on size of administrative boundaries (tiles)",
       "url": "https://gis.stackexchange.com/questions/501259/qgis-symbology-scale-pattern-symbol-based-on-size-of-administrative-boundaries",
       "score": 0,
       "answers": 0
-    },
-    {
-      "title": "Can't filter ArcGIS WFS service using GDAL vector pipeline",
-      "url": "https://gis.stackexchange.com/questions/501269/cant-filter-arcgis-wfs-service-using-gdal-vector-pipeline",
-      "score": 1,
-      "answers": 1
-    },
-    {
-      "title": "QGIS OpenTopography output issue",
-      "url": "https://gis.stackexchange.com/questions/501270/qgis-opentopography-output-issue",
-      "score": -2,
-      "answers": 0
-    },
-    {
-      "title": "Climate data NetCDF files being incorrectly read by QGIS",
-      "url": "https://gis.stackexchange.com/questions/501266/climate-data-netcdf-files-being-incorrectly-read-by-qgis",
-      "score": 0,
-      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "VIIRS/NOAA20 Deep Blue Aerosol L2 6-Min Swath 6 km",
-      "url": "https://search.earthdata.nasa.gov/search?q=AERDB_L2_VIIRS_NOAA20",
-      "desc": "The Visible Infrared Imaging Radiometer Suite (VIIRS) NASA standard Level-2 (L2) Deep Blue aerosol products from the NOAA-20 — formerly known as the Joint Po…",
-      "org": "LAADS"
-    },
-    {
-      "title": "VIIRS/JPSS2 Actual and Potential Evapotranspiration Gap-Filled Yearly L4 Global 500m SIN Grid V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ216A3GF",
-      "desc": "The NOAA-21 Visible Infrared Imaging Radiometer Suite (VIIRS) Actual and Potential Evapotranspiration product is a gap-filled yearly composite dataset produc…",
-      "org": "LPCLOUD"
-    },
-    {
-      "title": "VIIRS/SNPP Deep Blue Aerosol L2 6 Min Swath 6km",
-      "url": "https://search.earthdata.nasa.gov/search?q=AERDB_L2_VIIRS_SNPP",
-      "desc": "The Visible Infrared Imaging Radiometer Suite (VIIRS) NASA standard Level-2 (L2) Deep Blue aerosol products from the Suomi National Polar-orbiting Partnershi…",
-      "org": "LAADS"
-    },
-    {
-      "title": "CERES Single Scanner Footprint (SSF) TOA/Surface Fluxes, Clouds and Aerosols NPP-FM5 Edition2B",
-      "url": "https://search.earthdata.nasa.gov/search?q=CER_SSF_NPP-FM5-VIIRS",
-      "desc": "CER_SSF_NPP-FM5-VIIRS_Edition2B is the Suomi National Polar-orbiting Partnership (NPP) Single Scanner Footprint (SSF) Clouds and the Earth's Radiant Energy S…",
-      "org": "LARC_CLOUD"
+      "title": "Vulcan: High-Resolution Annual Fossil Fuel CO2 Emissions in USA, 2010-2022",
+      "url": "https://search.earthdata.nasa.gov/search?q=Vulcan_V4_Annual_Emissions_2505",
+      "desc": "This dataset provides estimates of annual carbon dioxide emissions due to the combustion of fossil fuel and cement production in the contiguous United States…",
+      "org": "ORNL_CLOUD"
     },
     {
       "title": "UAVSAR_POLSAR_STOKES",
@@ -329,6 +311,24 @@
       "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
       "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
+      "desc": "UAVSAR PolSAR Scene Projected",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_METADATA",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
+      "desc": "UAVSAR PolSAR Scene Metadata",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_KMZ",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
+      "desc": "UAVSAR PolSAR Scene KMZ",
       "org": "ASF"
     }
   ],
