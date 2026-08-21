@@ -36,6 +36,7 @@
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 8px;
+    -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
   }
   .panel h1 { margin: 0; font-size: 17px; letter-spacing: -0.01em; }
@@ -44,6 +45,7 @@
   .readout { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
   .readout .year { font-size: 34px; font-weight: 650; line-height: 1; font-variant-numeric: tabular-nums; }
   .readout .totals { margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+  .readout .net-line { margin-top: 4px; }
   .readout .totals b { color: var(--text); font-variant-numeric: tabular-nums; font-weight: 600; }
   .swatch { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: baseline; }
 
@@ -75,6 +77,7 @@
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 8px;
+    -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
   }
   #play {
@@ -109,9 +112,66 @@
   }
   #error code { background: #22262c; padding: 2px 6px; border-radius: 4px; }
 
+  .more { margin-top: 12px; }
+  .more > summary {
+    display: none;
+    cursor: pointer;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--muted);
+    padding: 4px 0;
+  }
+  .more > summary::marker { color: var(--muted); }
+
   @media (max-width: 640px) {
-    .panel { width: auto; right: 12px; max-height: 38%; }
+    /* The panel is a top bar on phones. Everything above the fold has to be
+       the stuff you cannot read the map without: the year, the totals, and
+       the colour key. The prose collapses into <details> instead of being
+       silently clipped off the bottom of a scroll box. */
+    .panel { width: auto; right: 12px; max-height: 52%; padding: 12px 14px; }
+    .panel .sub { display: none; }
+    .readout { margin-top: 10px; padding-top: 10px; }
+    .readout .year { font-size: 28px; }
+    .legend { margin-top: 10px; padding-top: 10px; }
+    .more > summary { display: list-item; }
     .timeline { bottom: 12px; }
+    .maplibregl-ctrl-bottom-left { bottom: 82px; }
+  }
+
+  /* The timeline is min(620px, 100% - 24px) centred, so its right edge sits at
+     50% + 310px. The attribution pill is ~250px wide against the right edge —
+     the two collide on any viewport under roughly 1120px, tablets included. */
+  @media (max-width: 1120px) {
+    .maplibregl-ctrl-bottom-right { bottom: 88px; }
+  }
+
+  /* Short viewports — landscape phones clear the 640px width breakpoint but
+     have no vertical room — get the same compact panel as portrait phones. */
+  @media (max-height: 620px) {
+    /* The timeline reserves ~80px at the bottom, so this is about as tall as
+       the panel can get without colliding with it. Everything inside tightens:
+       the totals go to one wrapped row and the ramp loses its caption, which
+       is what buys the prose enough room to stay out of a scroll box. */
+    .panel { max-height: calc(100% - 100px); padding: 10px 14px; }
+    .panel h1 { font-size: 15px; }
+    .panel .sub { display: none; }
+    .readout { margin-top: 8px; padding-top: 8px; }
+    .readout .year { font-size: 24px; }
+    .readout .totals { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 2px 14px; }
+    .readout .net-line { margin-top: 0; }
+    .legend { margin-top: 8px; padding-top: 8px; }
+    .legend .cap { display: none; }
+    .legend .ramp { margin-top: 0; }
+    .more { margin-top: 8px; }
+    .more > summary { display: list-item; }
+  }
+
+  /* Short phones: the ramp plus its −25/0/+20 labels sit directly under the
+     red/green totals swatches, so the caption is the one line that can go. */
+  @media (max-width: 640px) and (max-height: 620px) {
+    .panel { max-height: 58%; }
+    .readout .year { font-size: 24px; }
+    .legend .cap { display: none; }
+    .legend .ramp { margin-top: 0; }
   }
 </style>
 </head>
@@ -128,7 +188,7 @@
     <div class="totals">
       <div><span class="swatch" style="background:var(--loss)"></span>Demolitions <b id="t-demo">—</b></div>
       <div><span class="swatch" style="background:var(--gain)"></span>New builds <b id="t-new">—</b></div>
-      <div style="margin-top:4px">Citywide net <b id="t-net">—</b></div>
+      <div class="net-line">Citywide net <b id="t-net">—</b></div>
     </div>
   </div>
 
@@ -136,17 +196,25 @@
     <div class="cap">Net structures, this year</div>
     <div class="ramp"></div>
     <div class="ramp-labels"><span>−25</span><span>0</span><span>+20</span></div>
-    <div class="note">Net = new-construction permits − completed demolitions in the cell. Cells with no activity that year are left dim.</div>
   </div>
 
   <div class="warn" id="warn-permits" hidden></div>
   <div class="warn" id="warn-partial" hidden></div>
 
-  <p class="note">
-    Demolitions: <a href="https://data.detroitmi.gov/" target="_blank" rel="noopener">City of Detroit Completed Demolitions</a>.
-    New builds: BSEED Building Permits, <code>permit_type</code> of New or Foundation Only.
-    Boundary: Census TIGERweb. Basemap © CARTO, © OpenStreetMap contributors.
-  </p>
+  <details class="more" id="more" open>
+    <summary>Method &amp; sources</summary>
+    <div class="note">Net = new-construction permits − completed demolitions in the cell. Cells with no activity that year are left dim.</div>
+    <p class="note">
+      BSEED publishes building permits from 2019 onward only; demolitions run back to 2014.
+      Before 2019 the net is demolitions alone — new construction happened and is simply not
+      in the published record.
+    </p>
+    <p class="note">
+      Demolitions: <a href="https://data.detroitmi.gov/" target="_blank" rel="noopener">City of Detroit Completed Demolitions</a>.
+      New builds: BSEED Building Permits, <code>permit_type</code> of New or Foundation Only.
+      Boundary: Census TIGERweb. Basemap © CARTO, © OpenStreetMap contributors.
+    </p>
+  </details>
 </div>
 
 <div class="timeline">
@@ -177,6 +245,17 @@
   var GRID_URL = "data/detroit-grid.geojson";
   var BOUNDARY_URL = "data/detroit-boundary.geojson";
   var FRAME_MS = 900;
+  var NARROW_PX = 640;  // keep in step with the @media breakpoints
+  var SHORT_PX = 620;
+
+  // <details> cannot be opened by CSS, so the breakpoints are mirrored here:
+  // prose stays expanded only where the panel actually has room for it —
+  // a landscape phone is wide but far too short.
+  function syncDisclosure() {
+    var more = document.getElementById("more");
+    if (more) more.open = window.innerWidth > NARROW_PX && window.innerHeight > SHORT_PX;
+  }
+  syncDisclosure();
 
   var years = [];
   var meta = null;
@@ -264,9 +343,8 @@
     var permitWarn = document.getElementById("warn-permits");
     if (year < meta.newbuild_years[0]) {
       permitWarn.textContent =
-        "BSEED building permits are only published from " + meta.newbuild_years[0] +
-        ". For " + year + " the net shown is demolitions alone — new construction almost" +
-        " certainly happened and is simply not in the record.";
+        "No permit data before " + meta.newbuild_years[0] +
+        " — this year's net is demolitions only.";
       permitWarn.hidden = false;
     } else {
       permitWarn.hidden = true;
@@ -275,8 +353,8 @@
     var partial = document.getElementById("warn-partial");
     var lastYear = years[years.length - 1];
     if (year === lastYear) {
-      partial.textContent = "Partial year: demolitions through " + meta.demolitions_through +
-        ", permits through " + meta.newbuilds_through + ".";
+      partial.textContent = "Partial year — demolitions through " +
+        meta.demolitions_through + ", permits through " + meta.newbuilds_through + ".";
       partial.hidden = false;
     } else {
       partial.hidden = true;
@@ -403,16 +481,35 @@
       boundary.features[0].geometry.coordinates.forEach(function (ring) {
         ring.forEach(function (c) { bounds.extend(c); });
       });
-      var panelBox = document.querySelector(".panel").getBoundingClientRect();
-      var railBox = document.querySelector(".timeline").getBoundingClientRect();
-      var narrow = map.getContainer().clientWidth < 640;
-      var below = Math.round(window.innerHeight - railBox.top) + 16;
-      map.fitBounds(bounds, {
-        // On narrow screens the panel sits above the map, on wide screens beside it.
-        padding: narrow
-          ? { top: Math.round(panelBox.bottom) + 16, right: 20, bottom: below, left: 20 }
-          : { top: 40, right: 40, bottom: below, left: Math.round(panelBox.right) + 20 },
-        duration: 0
+
+      function frameCity() {
+        var panelBox = document.querySelector(".panel").getBoundingClientRect();
+        var railBox = document.querySelector(".timeline").getBoundingClientRect();
+        var narrow = map.getContainer().clientWidth < NARROW_PX;
+        var below = Math.round(window.innerHeight - railBox.top) + 16;
+        map.fitBounds(bounds, {
+          // On narrow screens the panel sits above the map, on wide screens beside it.
+          padding: narrow
+            ? { top: Math.round(panelBox.bottom) + 16, right: 20, bottom: below, left: 20 }
+            : { top: 40, right: 40, bottom: below, left: Math.round(panelBox.right) + 20 },
+          duration: 0
+        });
+      }
+      frameCity();
+
+      // Re-frame on rotate/resize, but never yank the view out from under
+      // someone who has already panned or zoomed it themselves.
+      var userMoved = false;
+      map.on("dragstart", function () { userMoved = true; });
+      map.on("zoomstart", function (e) { if (e.originalEvent) userMoved = true; });
+
+      var reframe = null;
+      window.addEventListener("resize", function () {
+        clearTimeout(reframe);
+        reframe = setTimeout(function () {
+          syncDisclosure();
+          if (!userMoved) frameCity();
+        }, 200);
       });
 
       map.on("click", "cells", showPopup);
