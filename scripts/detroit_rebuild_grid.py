@@ -160,6 +160,24 @@ BUILT_FIRST_YEAR = 1870
 # question worth asking of it.
 CUMBUILT_FIRST_YEAR = 2000
 
+# Decennial housing units by census tract, straight off TIGERweb — the counts
+# ride on the geometry layer as HU100, so no data-API key is involved.
+#
+# This exists because the demolition feed starts in 2014 and nothing in the
+# city's own data reaches behind it. Housing units are not buildings and a
+# tract is far coarser than a half-mile hex, but it is an authoritative,
+# independent measure of net loss that covers 2010-2020 — including the four
+# years the demolition record misses entirely.
+#
+# Tract lines were redrawn for 2020, so each vintage is allocated to the hex
+# grid independently and only the resulting hex totals are compared.
+TRACTS = [
+    ("2010", "tigerWMS_Census2010", 14),
+    ("2020", "tigerWMS_Census2020", 6),
+]
+TRACT_URL = ("https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/"
+             "{svc}/MapServer/{layer}/query")
+
 # Census TIGERweb incorporated places. Detroit's own portal publishes council
 # districts but no single city outline; this one polygon already carries the
 # Hamtramck / Highland Park enclave as an interior ring, which is exactly the
@@ -285,6 +303,26 @@ def fetch_parcels(refresh):
     return cached(path, refresh, build)
 
 
+def fetch_tracts(vintage, svc, layer, refresh):
+    path = os.path.join(RAW_DIR, f"tracts_{vintage}.geojson")
+
+    def build():
+        payload = get_json(TRACT_URL.format(svc=svc, layer=layer), {
+            # Wayne plus the two neighbouring counties, so tracts straddling
+            # the city line are whole rather than clipped.
+            "where": "STATE='26' AND COUNTY IN ('163','099','125')",
+            "outFields": "GEOID,HU100,POP100,AREALAND,AREAWATER",
+            "outSR": 4326,
+            "f": "geojson",
+        })
+        if not payload.get("features"):
+            raise RuntimeError(f"tract query {vintage} returned no features")
+        print(f"  tracts {vintage}: {len(payload['features'])} -> data/raw/tracts_{vintage}.geojson")
+        return payload
+
+    return cached(path, refresh, build)
+
+
 def fetch_boundary(refresh):
     path = os.path.join(RAW_DIR, "detroit_boundary.geojson")
 
@@ -373,6 +411,84 @@ def hex_corners(cx, cy, size):
 # --------------------------------------------------------------------------
 # processing
 # --------------------------------------------------------------------------
+
+def index_tracts(collection, rings_bbox_cache=None):
+    """Tract polygons in local metres, bucketed by a 2 km grid for lookup."""
+    entries, buckets = [], defaultdict(list)
+    for feature in collection["features"]:
+        geom = feature.get("geometry")
+        props = feature.get("properties") or {}
+        if not geom:
+            continue
+        rings = rings_of(geom)
+        xs = [p[0] for ring in rings for p in ring]
+        ys = [p[1] for ring in rings for p in ring]
+        if not xs:
+            continue
+        bbox = (min(xs), min(ys), max(xs), max(ys))
+        idx = len(entries)
+        entries.append({
+            "rings": rings, "bbox": bbox,
+            "geoid": props.get("GEOID"),
+            "hu": int(props.get("HU100") or 0),
+        })
+        for bx in range(int(bbox[0] // 2000), int(bbox[2] // 2000) + 1):
+            for by in range(int(bbox[1] // 2000), int(bbox[3] // 2000) + 1):
+                buckets[(bx, by)].append(idx)
+    return entries, buckets
+
+
+def find_tract(x, y, entries, buckets):
+    for idx in buckets.get((int(x // 2000), int(y // 2000)), ()):
+        e = entries[idx]
+        if point_in_rings(x, y, e["rings"], e["bbox"]):
+            return idx
+    return None
+
+
+def allocate_housing(collection, weight_points, city_rings, city_bbox):
+    """Spread each tract's decennial housing units across the hex grid.
+
+    Tracts are far coarser than a half-mile hex, so splitting them by area
+    would smear housing units across parks, freeways and industrial land. The
+    weights here are buildings — every improved parcel, plus the ones since
+    demolished that were still standing at that census — which puts the units
+    where the housing actually was.
+
+    Only tracts whose centre falls inside the city are allocated; a tract
+    straddling the boundary would otherwise empty its whole count into
+    Detroit, because the parcel file stops at the city line.
+    """
+    entries, buckets = index_tracts(collection)
+    inside = set()
+    for idx, e in enumerate(entries):
+        cx = (e["bbox"][0] + e["bbox"][2]) / 2
+        cy = (e["bbox"][1] + e["bbox"][3]) / 2
+        if point_in_rings(cx, cy, city_rings, city_bbox):
+            inside.add(idx)
+
+    tract_total = defaultdict(float)
+    tract_cell = defaultdict(lambda: defaultdict(float))
+    for x, y, cell, w in weight_points:
+        idx = find_tract(x, y, entries, buckets)
+        if idx is None or idx not in inside:
+            continue
+        tract_total[idx] += w
+        if cell is not None:
+            tract_cell[idx][cell] += w
+
+    out = defaultdict(float)
+    allocated = 0
+    for idx, cells in tract_cell.items():
+        total = tract_total[idx]
+        if not total:
+            continue
+        hu = entries[idx]["hu"]
+        allocated += hu
+        for cell, w in cells.items():
+            out[cell] += hu * w / total
+    return out, allocated, len(inside)
+
 
 def year_of(raw_date):
     if isinstance(raw_date, str):
@@ -476,6 +592,7 @@ def main():
     boundary = fetch_boundary(args.refresh)
     raw = [(spec, fetch_source(spec, args.refresh)) for spec in SOURCES]
     parcels = fetch_parcels(args.refresh)
+    tract_sets = [(v, fetch_tracts(v, svc, layer, args.refresh)) for v, svc, layer in TRACTS]
 
     rings = rings_of(boundary["features"][0]["geometry"])
     xs = [p[0] for ring in rings for p in ring]
@@ -493,6 +610,7 @@ def main():
     # ---- denominator: buildings standing today -----------------------------
     stock_now = defaultdict(int)
     parcel_count = defaultdict(int)
+    parcel_points = []                  # (x, y, cell, buildings) for allocation
     built_year = defaultdict(Counter)   # cell -> year_built -> buildings
     ages = defaultdict(list)            # cell -> year_built, for the median
     parcels_outside = 0
@@ -504,10 +622,14 @@ def main():
         cell = xy_to_axial(*to_xy(lon, lat), size)
         if cell not in kept:
             parcels_outside += 1
+            px, py = to_xy(lon, lat)
+            parcel_points.append((px, py, None, 1))
             continue
         attrs = feature.get("attributes", {})
         n = attrs.get("num_buildings")
         n = int(n) if n else 1
+        px, py = to_xy(lon, lat)
+        parcel_points.append((px, py, cell, n))
         stock_now[cell] += n
         parcel_count[cell] += 1
         built = attrs.get("year_built")
@@ -546,6 +668,34 @@ def main():
                 names[cell][hood] += 1
             if district:
                 districts[cell][str(district)] += 1
+
+    # A building demolished in 2016 was standing at the 2010 census, and one
+    # demolished in 2023 was standing in 2020. Adding them back to each
+    # vintage's weight surface stops the allocation from assuming the city
+    # always looked the way it looks now.
+    demo_points = []
+    for spec, collection in raw:
+        if spec["key"] != "demolitions":
+            continue
+        records, _, _ = read_records(collection, spec)
+        for year, x, y, _, _, _ in records:
+            cell = xy_to_axial(x, y, size)
+            demo_points.append((year, x, y, cell if cell in kept else None, 1))
+
+    housing = {}
+    housing_census = {}
+    print()
+    for vintage, tracts in tract_sets:
+        census_year = int(vintage)
+        weights = list(parcel_points) + [
+            (x, y, cell, w) for yr, x, y, cell, w in demo_points if yr >= census_year
+        ]
+        alloc, allocated_hu, n_tracts = allocate_housing(
+            tracts, weights, rings, bbox)
+        housing[vintage] = alloc
+        housing_census[vintage] = allocated_hu
+        print(f"  housing units {vintage}: {allocated_hu:,} over {n_tracts} tracts "
+              f"centred in the city -> {sum(alloc.values()):,.0f} placed on the grid")
 
     years_seen = defaultdict(set)
     for cell_counts in counts.values():
@@ -669,6 +819,12 @@ def main():
         props["total_built"] = built_since
         props["built_share"] = round(built_since / stock_today * 100, 2) if stock_today else 0
         props["built_pre_window"] = sum(n for y, n in built.items() if y < BUILT_FIRST_YEAR)
+        hu10 = round(housing.get("2010", {}).get(cell, 0))
+        hu20 = round(housing.get("2020", {}).get(cell, 0))
+        props["hu_2010"] = hu10
+        props["hu_2020"] = hu20
+        props["hu_change"] = hu20 - hu10
+        props["hu_change_pct"] = round((hu20 - hu10) / hu10 * 100, 2) if hu10 >= 25 else None
         props["loss_rate"] = loss_rate
         props["rebuild_ratio"] = round(rebuild / cum_demo, 2) if cum_demo else None
         props["low_stock"] = stock_start < MIN_STOCK_FOR_RATE
@@ -694,13 +850,21 @@ def main():
                       "through": coverage.get(k)})
                  for k in COUNT_KEYS if years_seen.get(k)] +
                 [(BUILT_KEY, {"first": BUILT_FIRST_YEAR, "last": years[-1], "through": None}),
-                 ("cumbuilt", {"first": CUMBUILT_FIRST_YEAR, "last": years[-1], "through": None})]),
+                 ("cumbuilt", {"first": CUMBUILT_FIRST_YEAR, "last": years[-1], "through": None}),
+                 ("housing", {"first": int(TRACTS[0][0]), "last": int(TRACTS[-1][0]),
+                              "through": None})]),
             "cell_width_miles": CELL_WIDTH_MILES,
             "min_stock_for_rate": MIN_STOCK_FOR_RATE,
             "citywide_totals": {str(y): dict(totals[y]) for y in years},
             "built_first_year": BUILT_FIRST_YEAR,
             "built_before_window": pre_window,
             "citywide_stock_now": sum(stock_now.values()),
+            # The census figure is the authoritative citywide count for tracts
+            # centred in Detroit; the placed figure is what actually lands on
+            # the grid, a couple of percent lower where a tract's buildings sit
+            # outside the clipped hexes.
+            "housing_units": housing_census,
+            "housing_units_placed": {v: round(sum(housing[v].values())) for v in housing},
             "loss_rate_breaks": quantile_breaks(rate_pool, 6),
             "trajectories": dict(trajectory_counts),
             "sources": {
@@ -712,6 +876,7 @@ def main():
                 "landbank": "Detroit Land Bank Authority sales (auction, own-it-now, project, vacant land)",
                 "stock": "Parcels (Current) — improved parcels, num_buildings",
                 "built": "Parcels (Current) — year_built on standing buildings; survivorship-biased, counts only what still stands",
+                "housing": "US Census decennial housing units (HU100) by tract, 2010 and 2020, via TIGERweb; allocated to hexes by building weight",
                 "boundary": "US Census TIGERweb incorporated places",
             },
         },
