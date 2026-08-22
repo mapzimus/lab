@@ -4,18 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Detroit: Torn Down / Built Back</title>
-<meta name="description" content="Block-by-block structure loss and rebuild in Detroit, 2014-2026, on a half-mile hex grid.">
+<meta name="description" content="Block-by-block structure loss and rebuild in Detroit, 2014-2026, normalised against the buildings actually standing.">
 <link rel="icon" href="/favicon.svg">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
 <style>
   :root {
     --bg: #14161a;
-    --panel: rgba(20, 22, 26, 0.92);
+    --panel: rgba(20, 22, 26, 0.94);
+    --sunk: #1b1e23;
     --line: #333840;
     --text: #e7e9ec;
     --muted: #949aa4;
-    --loss: #d7191c;
-    --gain: #1a9850;
+    --dim: #6d747e;
+    --loss: #e0443f;
+    --gain: #35c46b;
+    --accent: #8fb8e8;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: var(--bg); }
@@ -29,7 +32,7 @@
   .panel {
     position: absolute;
     top: 12px; left: 12px;
-    width: 292px;
+    width: 310px;
     max-height: calc(100% - 140px);
     overflow-y: auto;
     padding: 14px 16px;
@@ -39,26 +42,65 @@
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
   }
+  .panel.has-more {
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 34px), transparent 100%);
+    mask-image: linear-gradient(180deg, #000 calc(100% - 34px), transparent 100%);
+  }
   .panel h1 { margin: 0; font-size: 17px; letter-spacing: -0.01em; }
   .panel .sub { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
 
-  .readout { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
-  .readout .year { font-size: 34px; font-weight: 650; line-height: 1; font-variant-numeric: tabular-nums; }
-  .readout .totals { margin-top: 8px; font-size: 12.5px; color: var(--muted); }
-  .readout .net-line { margin-top: 4px; }
+  .readout { margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line); }
+  .readout .year { font-size: 32px; font-weight: 650; line-height: 1; font-variant-numeric: tabular-nums; }
+  .readout .totals { margin-top: 7px; font-size: 12.5px; color: var(--muted); }
   .readout .totals b { color: var(--text); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .readout .net-line { margin-top: 4px; }
   .swatch { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: baseline; }
 
-  .legend { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
-  .legend .cap { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
-  .ramp {
-    height: 10px; margin: 7px 0 5px; border-radius: 3px;
-    background: linear-gradient(90deg, #d7191c 0%, #e8635a 24%, #a06a6d 40%, #5a5f68 50%, #6b9e73 62%, #3fa25a 80%, #1a9850 100%);
+  .field { margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line); }
+  .cap { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+  select, input[type="search"] {
+    width: 100%; margin-top: 6px; padding: 6px 8px;
+    background: var(--sunk); color: var(--text);
+    border: 1px solid var(--line); border-radius: 6px;
+    font: inherit; font-size: 13px;
   }
-  .ramp-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .metric-note { margin-top: 6px; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
 
-  .note { margin-top: 12px; font-size: 11.5px; line-height: 1.4; color: var(--muted); }
-  .note a { color: #8fb8e8; }
+  .ramp { display: flex; height: 11px; margin: 8px 0 4px; border-radius: 3px; overflow: hidden; }
+  .ramp i { flex: 1; }
+  .ramp-labels { display: flex; font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .ramp-labels span { flex: 1; text-align: center; }
+  .ramp-labels span:first-child { text-align: left; }
+  .ramp-labels span:last-child { text-align: right; }
+  .nodata { margin-top: 6px; font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .nodata i { width: 13px; height: 11px; border-radius: 2px; background: #454e5c; border: 1px solid #5c6675; display: inline-block; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 8px; border-radius: 999px; cursor: pointer;
+    background: var(--sunk); border: 1px solid var(--line);
+    color: var(--muted); font-size: 11.5px;
+  }
+  .chip i { width: 8px; height: 8px; border-radius: 2px; }
+  .chip[aria-pressed="true"] { border-color: var(--accent); color: var(--text); background: #232a34; }
+  .chip b { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  .board { margin-top: 7px; }
+  .board button {
+    display: flex; width: 100%; gap: 8px; align-items: baseline;
+    padding: 4px 6px; margin-bottom: 2px; text-align: left;
+    background: none; border: 0; border-radius: 5px; cursor: pointer;
+    color: var(--text); font: inherit; font-size: 12px;
+  }
+  .board button:hover { background: #232a34; }
+  .board .rank { color: var(--dim); width: 16px; flex: none; font-variant-numeric: tabular-nums; }
+  .board .who { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .board .val { flex: none; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+  .note { margin-top: 10px; font-size: 11.5px; line-height: 1.45; color: var(--muted); }
+  .note a { color: var(--accent); }
+  .note code { font-size: 11px; }
   .warn {
     margin-top: 10px; padding: 7px 9px;
     border-left: 2px solid #c98a2e;
@@ -66,6 +108,15 @@
     font-size: 11.5px; color: #e0c48d;
   }
   .warn[hidden] { display: none; }
+
+  details { margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line); }
+  details > summary {
+    cursor: pointer; list-style: revert;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted);
+  }
+  details > summary::marker { color: var(--dim); }
+  .toggle { display: flex; align-items: center; gap: 7px; margin-top: 9px; font-size: 12px; color: var(--muted); cursor: pointer; }
+  .toggle input { accent-color: var(--accent); }
 
   .timeline {
     position: absolute;
@@ -81,76 +132,41 @@
     backdrop-filter: blur(6px);
   }
   #play {
-    flex: none;
-    width: 34px; height: 34px;
+    flex: none; width: 34px; height: 34px;
     display: grid; place-items: center;
     border: 1px solid var(--line); border-radius: 6px;
-    background: #1e2127; color: var(--text);
+    background: var(--sunk); color: var(--text);
     font-size: 13px; cursor: pointer;
   }
-  #play:hover { background: #262a31; }
-  #year-slider { flex: 1; accent-color: #7f8794; cursor: pointer; }
+  #play:hover:not(:disabled) { background: #262a31; }
+  .timeline.frozen { opacity: 0.45; }
+  .timeline.frozen #play, .timeline.frozen #year-slider { cursor: not-allowed; }
+  #year-slider { flex: 1; accent-color: #7f8794; cursor: pointer; width: 100%; }
   .timeline .ticks { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted); }
-  #year-now { flex: none; width: 42px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  #year-now { flex: none; min-width: 66px; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 600; }
 
   .maplibregl-popup-content {
-    background: #1b1e23; color: var(--text);
+    background: var(--sunk); color: var(--text);
     border: 1px solid var(--line); border-radius: 7px;
-    padding: 11px 13px; font: 13px/1.5 system-ui, sans-serif;
+    padding: 12px 14px; font: 13px/1.5 system-ui, sans-serif;
   }
-  .maplibregl-popup-tip { border-top-color: #1b1e23 !important; border-bottom-color: #1b1e23 !important; }
+  .maplibregl-popup-tip { border-top-color: var(--sunk) !important; border-bottom-color: var(--sunk) !important; }
   .maplibregl-popup-close-button { color: var(--muted); font-size: 17px; padding: 2px 6px; }
-  .pop-h { font-weight: 650; margin-bottom: 5px; }
-  .pop-row { display: flex; justify-content: space-between; gap: 18px; font-variant-numeric: tabular-nums; }
-  .pop-row.net { margin-top: 5px; padding-top: 5px; border-top: 1px solid var(--line); font-weight: 600; }
-  .pop-sub { margin-top: 6px; font-size: 11.5px; color: var(--muted); }
+  .pop-h { font-weight: 650; }
+  .pop-sub { color: var(--muted); font-size: 11.5px; margin-bottom: 8px; }
+  .pop-row { display: flex; justify-content: space-between; gap: 18px; font-variant-numeric: tabular-nums; font-size: 12.5px; }
+  .pop-row span:first-child { color: var(--muted); }
+  .pop-sep { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--line); }
+  .pop-legend { display: flex; gap: 12px; font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .pop-legend i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 4px; }
+  .pop-chart { margin-top: 8px; }
 
-  #error {
-    position: absolute; inset: 0; display: none;
-    place-items: center; padding: 24px; text-align: center;
-    background: var(--bg);
-  }
+  #error { position: absolute; inset: 0; display: none; place-items: center; padding: 24px; text-align: center; background: var(--bg); }
   #error code { background: #22262c; padding: 2px 6px; border-radius: 4px; }
-
-  .more { margin-top: 12px; }
-  .more > summary {
-    display: none;
-    cursor: pointer;
-    font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
-    color: var(--muted);
-    padding: 4px 0;
-  }
-  .more > summary::marker { color: var(--muted); }
-
-  @media (max-width: 640px) {
-    /* The panel is a top bar on phones. Everything above the fold has to be
-       the stuff you cannot read the map without: the year, the totals, and
-       the colour key. The prose collapses into <details> instead of being
-       silently clipped off the bottom of a scroll box. */
-    .panel { width: auto; right: 12px; max-height: 52%; padding: 12px 14px; }
-    .panel .sub { display: none; }
-    .readout { margin-top: 10px; padding-top: 10px; }
-    .readout .year { font-size: 28px; }
-    .legend { margin-top: 10px; padding-top: 10px; }
-    .more > summary { display: list-item; }
-    .timeline { bottom: 12px; }
-    .maplibregl-ctrl-bottom-left { bottom: 82px; }
-  }
-
-  /* The timeline is min(620px, 100% - 24px) centred, so its right edge sits at
-     50% + 310px. The attribution pill is ~250px wide against the right edge —
-     the two collide on any viewport under roughly 1120px, tablets included. */
-  @media (max-width: 1120px) {
-    .maplibregl-ctrl-bottom-right { bottom: 88px; }
-  }
 
   /* Short viewports — landscape phones clear the 640px width breakpoint but
      have no vertical room — get the same compact panel as portrait phones. */
   @media (max-height: 620px) {
-    /* The timeline reserves ~80px at the bottom, so this is about as tall as
-       the panel can get without colliding with it. Everything inside tightens:
-       the totals go to one wrapped row and the ramp loses its caption, which
-       is what buys the prose enough room to stay out of a scroll box. */
     .panel { max-height: calc(100% - 100px); padding: 10px 14px; }
     .panel h1 { font-size: 15px; }
     .panel .sub { display: none; }
@@ -158,20 +174,53 @@
     .readout .year { font-size: 24px; }
     .readout .totals { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 2px 14px; }
     .readout .net-line { margin-top: 0; }
-    .legend { margin-top: 8px; padding-top: 8px; }
-    .legend .cap { display: none; }
-    .legend .ramp { margin-top: 0; }
-    .more { margin-top: 8px; }
-    .more > summary { display: list-item; }
+    .field, details { margin-top: 8px; padding-top: 8px; }
+    .metric-note {
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden; margin-top: 5px;
+    }
+    .warn { margin-top: 8px; padding: 6px 8px; }
   }
 
-  /* Short phones: the ramp plus its −25/0/+20 labels sit directly under the
-     red/green totals swatches, so the caption is the one line that can go. */
+  @media (max-width: 640px) {
+    /* The panel is a top bar on phones. Above the fold: the year, the totals,
+       the metric picker and the colour key — the things you cannot read the
+       map without. Everything else lives in <details>, and the fade at the
+       bottom edge says when there is more. */
+    .panel { width: auto; right: 12px; max-height: 60%; padding: 12px 14px; }
+    .panel .sub { display: none; }
+    .readout { margin-top: 10px; padding-top: 10px; }
+    .readout .year { font-size: 28px; }
+    .readout .totals { display: flex; flex-wrap: wrap; gap: 2px 14px; }
+    .readout .net-line { margin-top: 0; }
+    .field, details { margin-top: 9px; padding-top: 9px; }
+    .metric-note {
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden; margin-top: 5px;
+    }
+    .warn { margin-top: 8px; padding: 6px 8px; }
+    .timeline { bottom: 12px; }
+    .maplibregl-ctrl-bottom-left { bottom: 82px; }
+  }
+
   @media (max-width: 640px) and (max-height: 620px) {
-    .panel { max-height: 58%; }
+    .panel { max-height: 62%; }
     .readout .year { font-size: 24px; }
-    .legend .cap { display: none; }
-    .legend .ramp { margin-top: 0; }
+  }
+
+  @media (max-height: 480px) and (min-width: 700px) {
+    .panel { width: 474px; max-height: calc(100% - 92px); }
+    .cols { display: flex; gap: 16px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+    .cols > * { flex: 1; min-width: 0; margin-top: 0; padding-top: 0; border-top: 0; }
+    .readout .totals { display: block; }
+    .metric-note { -webkit-line-clamp: 3; }
+  }
+
+  /* The timeline is min(620px, 100% - 24px) centred, so its right edge sits at
+     50% + 310px. The attribution pill is ~250px wide against the right edge —
+     the two collide on any viewport under roughly 1120px, tablets included. */
+  @media (max-width: 1120px) {
+    .maplibregl-ctrl-bottom-right { bottom: 88px; }
   }
 </style>
 </head>
@@ -183,42 +232,98 @@
   <h1>Torn Down / Built Back</h1>
   <p class="sub">Detroit structure loss and replacement, half-mile hexes.</p>
 
+  <div class="cols">
   <div class="readout">
     <div class="year" id="year-big">—</div>
-    <div class="totals">
-      <div><span class="swatch" style="background:var(--loss)"></span>Demolitions <b id="t-demo">—</b></div>
-      <div><span class="swatch" style="background:var(--gain)"></span>New builds <b id="t-new">—</b></div>
-      <div class="net-line">Citywide net <b id="t-net">—</b></div>
-    </div>
+    <div class="totals" id="totals"></div>
   </div>
 
-  <div class="legend">
-    <div class="cap">Net structures, this year</div>
-    <div class="ramp"></div>
-    <div class="ramp-labels"><span>−25</span><span>0</span><span>+20</span></div>
+  <div class="field">
+    <label class="cap" for="metric">Colour cells by</label>
+    <select id="metric"></select>
+    <div class="metric-note" id="metric-note"></div>
+    <div class="ramp" id="ramp"></div>
+    <div class="ramp-labels" id="ramp-labels"></div>
+    <div class="nodata" id="nodata" hidden><i></i><span></span></div>
+  </div>
   </div>
 
-  <div class="warn" id="warn-permits" hidden></div>
+  <div class="warn" id="warn-coverage" hidden></div>
   <div class="warn" id="warn-partial" hidden></div>
 
-  <details class="more" id="more" open>
-    <summary>Method &amp; sources</summary>
-    <div class="note">Net = new-construction permits − completed demolitions in the cell. Cells with no activity that year are left dim.</div>
+  <details id="explore">
+    <summary>Explore</summary>
+
+    <div style="margin-top:10px">
+      <div class="cap">Trajectory, 2014&ndash;2026</div>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div style="margin-top:12px">
+      <label class="cap" for="search">Find a neighbourhood</label>
+      <input id="search" type="search" list="hoods" placeholder="e.g. Brightmoor" autocomplete="off">
+      <datalist id="hoods"></datalist>
+    </div>
+
+    <div style="margin-top:12px">
+      <div class="cap" id="board-cap">Top cells</div>
+      <div class="board" id="board"></div>
+    </div>
+
+    <label class="toggle">
+      <input type="checkbox" id="cvd">
+      <span>Colourblind-safe ramp (red&ndash;blue)</span>
+    </label>
+  </details>
+
+  <details id="about">
+    <summary>What this shows &amp; how</summary>
     <p class="note">
-      BSEED publishes building permits from 2019 onward only; demolitions run back to 2014.
-      Before 2019 the net is demolitions alone — new construction happened and is simply not
-      in the published record.
+      Detroit has torn down more than it has put up in every year on record. Between
+      2014 and 2026 the city completed about <b>31,600 demolitions</b> against roughly
+      <b>940 new-construction permits</b> &mdash; but new construction was never where the
+      rebuilding happened. Rehab permits climbed from 48 a year in 2019 to 558 in 2025,
+      the Land Bank moved 54,000 properties into private hands, and from 2021 the city
+      began boarding up and stabilising buildings instead of demolishing them.
     </p>
     <p class="note">
-      Demolitions: <a href="https://data.detroitmi.gov/" target="_blank" rel="noopener">City of Detroit Completed Demolitions</a>.
-      New builds: BSEED Building Permits, <code>permit_type</code> of New or Foundation Only.
-      Boundary: Census TIGERweb. Basemap © CARTO, © OpenStreetMap contributors.
+      Raw counts of demolitions mostly map where the houses used to be. The
+      <b>share of standing stock lost</b> is the honest measure, so every cell here is
+      divided by the buildings actually standing in it &mdash; 235,947 citywide, walked
+      backwards year by year. The median half-mile cell lost about a tenth of its
+      buildings over the period. The worst lost more than half.
+    </p>
+    <p class="note">
+      Cells are pointy-top hexagons 0.5&nbsp;mi across the flats, kept when their centre
+      falls inside the Census city polygon &mdash; which carries the Hamtramck / Highland
+      Park enclave as a hole. Building stock is the sum of <code>num_buildings</code> over
+      improved parcels; stock in earlier years is reconstructed by adding back
+      demolitions and subtracting new builds. Cells holding fewer than 25 buildings are
+      shown but excluded from rate shading, because a rate over a handful of buildings
+      swings wildly.
+    </p>
+    <p class="note">
+      Permit types are our split: <b>new builds</b> are New and Foundation&nbsp;Only;
+      <b>rehabs</b> are Residential&nbsp;Rehab and Addition; <b>alterations</b> are the
+      Alteration type, by far the largest and covering everything from a furnace swap to
+      a gut job &mdash; read it as investment activity, never as structures gained.
+      Revisions are excluded so nothing is counted twice.
+    </p>
+    <p class="note">
+      Coverage differs by source: demolitions from 2014, permits from 2019, stabilisations
+      2021&ndash;2025, Land Bank sales throughout. The most recent year is partial.
+    </p>
+    <p class="note">
+      Data: <a href="https://data.detroitmi.gov/" target="_blank" rel="noopener">City of Detroit Open Data</a>
+      (completed demolitions, BSEED building permits, completed property stabilizations,
+      Land Bank sales, parcels) and US Census TIGERweb. Basemap &copy; CARTO,
+      &copy; OpenStreetMap contributors.
     </p>
   </details>
 </div>
 
 <div class="timeline">
-  <button id="play" aria-label="Play through the years">▶</button>
+  <button id="play" aria-label="Play through the years">&#9654;</button>
   <div style="flex:1">
     <input id="year-slider" type="range" min="0" max="0" step="1" value="0" aria-label="Year">
     <div class="ticks"><span id="tick-min"></span><span id="tick-max"></span></div>
@@ -245,23 +350,105 @@
   var GRID_URL = "data/detroit-grid.geojson";
   var BOUNDARY_URL = "data/detroit-boundary.geojson";
   var FRAME_MS = 900;
-  var NARROW_PX = 640;  // keep in step with the @media breakpoints
+  var NARROW_PX = 640;
   var SHORT_PX = 620;
+  var NO_DATA = "#454e5c";   // low stock: its own visual class, never the ramp's low end
 
-  // <details> cannot be opened by CSS, so the breakpoints are mirrored here:
-  // prose stays expanded only where the panel actually has room for it —
-  // a landscape phone is wide but far too short.
-  function syncDisclosure() {
-    var more = document.getElementById("more");
-    if (more) more.open = window.innerWidth > NARROW_PX && window.innerHeight > SHORT_PX;
+  // --------------------------------------------------------------------
+  // Colour
+  //
+  // Classed, not continuous: six classes with fixed breaks, so a year is
+  // comparable to every other year as the slider moves.
+  //
+  // Sequential ramps are one hue running dim -> bright, which reads correctly
+  // on a dark basemap (low values recede into it) and is colourblind-safe by
+  // construction because the signal lives in lightness.
+  //
+  // The diverging ramps are the exception, and the reason for the CVD toggle:
+  // measured against a #14161a surface, the red/green poles separate by only
+  // ΔE 5.9 under deuteranopia — a fail. The red/blue alternative measures 22.8.
+  // Same breaks, same neutral midpoint; only the positive pole changes.
+  // --------------------------------------------------------------------
+  var DIVERGING_NEG = ["#e0443f", "#b34a48", "#7d4a4e"];
+  var DIVERGING_MID = "#45484f";
+  var DIVERGING_POS = { rg: ["#4a7a58", "#3f9e5c", "#35c46b"],
+                        rb: ["#3f6d8f", "#3f8fc4", "#3fb2e8"] };
+
+  // Seven classes: three negative, a neutral straddling zero, three positive.
+  // The neutral lands at index 3, so every diverging metric's break list must
+  // put the class containing zero at index 3 as well (breaks[2] < 0 <= breaks[3]).
+  function diverging(mode) {
+    return DIVERGING_NEG.concat([DIVERGING_MID], DIVERGING_POS[mode]);
   }
-  syncDisclosure();
 
-  var years = [];
-  var meta = null;
-  var index = 0;
-  var timer = null;
-  var popup = null;
+  var SEQ = {
+    red:   ["#2e2124", "#5c2b2f", "#8c363a", "#b8464a", "#d9635f", "#f28a83"],
+    green: ["#1f2a24", "#254534", "#2b6146", "#357f59", "#43a06e", "#5cc189"],
+    blue:  ["#1f262e", "#233b4d", "#28516d", "#2f6b91", "#3b88b5", "#54a7d6"],
+    amber: ["#2b2620", "#4d3d22", "#6f5626", "#95712c", "#bb8e35", "#dcae4a"],
+    plum:  ["#262029", "#3f2b45", "#593763", "#754682", "#9159a1", "#ac74bd"]
+  };
+
+  // Fixed class breaks per metric — five interior breaks, six classes.
+  var METRICS = [
+    { key: "lossrate", label: "Share of stock demolished (year)", unit: "%",
+      type: "seq", hue: "red", breaks: [0.5, 1, 2, 4, 8], rate: true, yearly: true,
+      source: "demolitions",
+      note: "Demolitions that year as a percent of the buildings standing at its start. The normalised view — raw counts mostly map where the houses were." },
+    { key: "net", label: "Net structures (year)", unit: "",
+      type: "div", breaks: [-20, -8, -2, 1, 2, 8], yearly: true, source: "newbuilds",
+      note: "New-construction permits minus completed demolitions, that year." },
+    { key: "cumnet", label: "Net structures (cumulative)", unit: "",
+      type: "div", breaks: [-60, -25, -6, 2, 8, 25], yearly: true, source: "newbuilds",
+      note: "Running total of net structures from 2014 to the selected year." },
+    { key: "demolitions", label: "Demolitions (year)", unit: "",
+      type: "seq", hue: "red", breaks: [1, 3, 8, 15, 25], yearly: true, source: "demolitions",
+      note: "Completed demolitions in the cell that year, unnormalised." },
+    { key: "rehabs", label: "Rehab & addition permits (year)", unit: "",
+      type: "seq", hue: "green", breaks: [1, 2, 3, 4, 5], yearly: true, source: "rehabs",
+      note: "Residential Rehab and Addition permits — structural work that puts habitable building back. Citywide these climbed roughly tenfold from 2019." },
+    { key: "alterations", label: "Alteration permits (year)", unit: "",
+      type: "seq", hue: "amber", breaks: [3, 7, 11, 16, 25], yearly: true, source: "alterations",
+      note: "The largest permit class and the best proxy for money spent on a standing building — but it spans a furnace swap to a gut job. Investment activity, not structures gained." },
+    { key: "stabilizations", label: "Stabilisations (year)", unit: "",
+      type: "seq", hue: "blue", breaks: [1, 2, 3, 7, 12], yearly: true, source: "stabilizations",
+      note: "Buildings boarded up and held rather than demolished — a demolition not taken. Published 2021 to 2025 only." },
+    { key: "landbank", label: "Land Bank sales (year)", unit: "",
+      type: "seq", hue: "plum", breaks: [2, 6, 13, 22, 35], yearly: true, source: "landbank",
+      note: "Detroit Land Bank Authority disposals — auction, own-it-now, project and vacant-land sales — moving property back into private hands." },
+    { key: "loss_rate", label: "Share of stock lost (2014–2026)", unit: "%",
+      type: "seq", hue: "red", breaks: [2, 5, 10, 20, 30], rate: true, yearly: false,
+      source: "demolitions",
+      note: "Total demolitions over the whole period as a percent of the stock standing in 2014. The median cell lost about a tenth; the worst lost more than half." }
+  ];
+
+  // Ordered loss -> rebuild. Deliberately a filter and not a fill scheme: five
+  // classes spanning red to green cannot pass an all-pairs CVD check, so
+  // selecting one highlights its cells instead, which encodes membership by
+  // opacity — and swatches only ever appear beside their own text label.
+  var TRAJECTORIES = [
+    { key: "gutted", label: "Gutted", color: "#e0443f",
+      note: "A quarter or more of the buildings gone, almost nothing back." },
+    { key: "thinning", label: "Thinning", color: "#b8605a",
+      note: "Steady loss, limited rebuilding." },
+    { key: "churning", label: "Churning", color: "#c99a3c",
+      note: "Heavy loss and heavy rebuilding at once." },
+    { key: "holding", label: "Holding", color: "#6b7f96",
+      note: "Little demolition either way." },
+    { key: "rebuilding", label: "Rebuilding", color: "#35c46b",
+      note: "More put back than taken down." },
+    { key: "quiet", label: "No activity", color: "#3a3f47", note: "Nothing recorded." },
+    { key: "sparse", label: "Little stock", color: "#2b2f36", note: "Too few buildings to judge." }
+  ];
+
+  var METRIC_BY_KEY = {};
+  METRICS.forEach(function (m) { METRIC_BY_KEY[m.key] = m; });
+
+  var years = [], meta = null, grid = null;
+  var index = 0, timer = null, popup = null;
+  var metric = METRICS[0];
+  var cvd = false;
+  var activeTrajectory = null;
 
   var map = new maplibregl.Map({
     container: "map",
@@ -277,12 +464,12 @@
           ],
           tileSize: 256,
           maxzoom: 19,
-          attribution: '© <a href="https://carto.com/attributions">CARTO</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }
       },
       layers: [
         { id: "bg", type: "background", paint: { "background-color": "#14161a" } },
-        { id: "carto", type: "raster", source: "carto", paint: { "raster-opacity": 0.65 } }
+        { id: "carto", type: "raster", source: "carto", paint: { "raster-opacity": 0.6 } }
       ]
     },
     center: [-83.1, 42.36],
@@ -294,74 +481,201 @@
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
   // Registered before the fetches start: the style can finish loading while the
-  // GeoJSON is still in flight, and a late map.on(...) would never fire.
-  // Waits on the style, not on "load" — "load" also waits for basemap tiles, so
-  // an unreachable tile host would otherwise take the whole page down with it.
+  // GeoJSON is still in flight, and a late map.on(...) would never fire. Waits
+  // on the style, not on "load" — "load" also waits for basemap tiles, so an
+  // unreachable tile host would otherwise take the whole page down with it.
   var mapReady = new Promise(function (resolve) {
     if (map.isStyleLoaded()) resolve();
     else { map.once("style.load", resolve); map.once("styledata", resolve); }
   });
 
-  // Diverging red -> grey -> green on that year's net. Stops are asymmetric
-  // because the data is: cells lose up to ~90 structures a year and gain at
-  // most ~27, so a symmetric ramp would flatten every hard-hit block together.
-  function fillColor(year) {
-    return ["interpolate", ["linear"], ["get", "net_" + year],
-      -25, "#d7191c",
-      -12, "#e8635a",
-       -4, "#a06a6d",
-        0, "#5a5f68",
-        4, "#6b9e73",
-       10, "#3fa25a",
-       20, "#1a9850"];
+  function colors(m) { return m.type === "div" ? diverging(cvd ? "rb" : "rg") : SEQ[m.hue]; }
+
+  function fieldFor(m) { return m.yearly ? m.key + "_" + years[index] : m.key; }
+
+  function fillColor(m) {
+    var ramp = colors(m);
+    // step() gives the classed choropleth; the case ahead of it pulls
+    // low-stock cells out of rate metrics entirely rather than shading them.
+    var stepped = ["step", ["to-number", ["get", fieldFor(m)], 0], ramp[0]];
+    m.breaks.forEach(function (b, i) { stepped.push(b, ramp[i + 1]); });
+    if (!m.rate) return stepped;
+    return ["case", ["==", ["get", "low_stock"], true], NO_DATA, stepped];
   }
 
-  // Cells with nothing recorded that year stay near-transparent, so "quiet"
-  // never reads as "balanced".
-  function fillOpacity(year) {
-    return ["case",
-      ["==", ["+", ["get", "demolitions_" + year], ["get", "newbuilds_" + year]], 0], 0.05,
-      0.78];
+  function fillOpacity(m) {
+    var quiet = 0.06;
+    // A cell with nothing recorded should read as quiet, not as a low value.
+    var hasData = m.yearly && !m.rate
+      ? [">", ["+", ["to-number", ["get", "demolitions_" + years[index]], 0],
+                    ["to-number", ["get", "newbuilds_" + years[index]], 0],
+                    ["to-number", ["get", m.key + "_" + years[index]], 0]], 0]
+      : true;
+    var base = hasData === true ? 0.8 : ["case", hasData, 0.8, quiet];
+    if (!activeTrajectory) return base;
+    return ["case", ["==", ["get", "trajectory"], activeTrajectory], 0.85, 0.05];
   }
 
-  function fmt(n) { return n.toLocaleString("en-US"); }
+  function fmt(n) { return Number(n).toLocaleString("en-US"); }
   function signed(n) { return (n > 0 ? "+" : "") + fmt(n); }
+  function fmtVal(m, v) {
+    if (v === null || v === undefined) return "n/a";
+    return m.rate ? Number(v).toFixed(1) + "%" : (m.type === "div" ? signed(v) : fmt(v));
+  }
 
-  function render() {
+  function coverageFor(m) { return meta.coverage[m.source] || null; }
+
+  function metricLive(m) {
+    var cov = coverageFor(m);
+    if (!cov || !m.yearly) return true;
     var year = years[index];
-    document.getElementById("year-big").textContent = year;
-    document.getElementById("year-now").textContent = year;
-    document.getElementById("year-slider").value = index;
+    return year >= cov.first && year <= cov.last;
+  }
 
-    var totals = meta.citywide_totals[year] || { demolitions: 0, newbuilds: 0 };
-    var net = totals.newbuilds - totals.demolitions;
-    document.getElementById("t-demo").textContent = fmt(totals.demolitions);
-    document.getElementById("t-new").textContent =
-      year < meta.newbuild_years[0] ? "not published" : fmt(totals.newbuilds);
-    document.getElementById("t-net").textContent = signed(net);
+  // ---- chrome -------------------------------------------------------------
 
-    var permitWarn = document.getElementById("warn-permits");
-    if (year < meta.newbuild_years[0]) {
-      permitWarn.textContent =
-        "No permit data before " + meta.newbuild_years[0] +
-        " — this year's net is demolitions only.";
-      permitWarn.hidden = false;
-    } else {
-      permitWarn.hidden = true;
+  function renderLegend() {
+    var ramp = colors(metric);
+    document.getElementById("ramp").innerHTML =
+      ramp.map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("");
+    var labels = [""].concat(metric.breaks.map(function (b) {
+      return metric.rate ? b + "%" : (metric.type === "div" ? signed(b) : b);
+    }));
+    document.getElementById("ramp-labels").innerHTML =
+      labels.map(function (l, i) {
+        return "<span>" + (i === 0 ? (metric.type === "div" ? "less" : "low") : l) + "</span>";
+      }).join("");
+    var nodata = document.getElementById("nodata");
+    nodata.hidden = !metric.rate;
+    nodata.querySelector("span").textContent =
+      "Fewer than " + meta.min_stock_for_rate + " buildings — rate not shown";
+    document.getElementById("metric-note").textContent = metric.note;
+  }
+
+  function periodTotals() {
+    var out = {};
+    years.forEach(function (y) {
+      var t = meta.citywide_totals[y] || {};
+      Object.keys(t).forEach(function (k) { out[k] = (out[k] || 0) + t[k]; });
+    });
+    return out;
+  }
+
+  function renderTotals() {
+    var year = years[index];
+    // A period metric is not a snapshot of the selected year, so it must not
+    // be captioned with that year's numbers.
+    var t = metric.yearly ? (meta.citywide_totals[year] || {}) : periodTotals();
+    var demolitions = t.demolitions || 0;
+    var newbuilds = t.newbuilds || 0;
+    var rows = [
+      '<div><span class="swatch" style="background:var(--loss)"></span>Demolitions <b>' + fmt(demolitions) + "</b></div>",
+      '<div><span class="swatch" style="background:var(--gain)"></span>New builds <b>' +
+        (metric.yearly && year < (meta.coverage.newbuilds || {}).first ? "not published" : fmt(newbuilds)) + "</b></div>"
+    ];
+    if (metric.source && metric.source !== "demolitions" && metric.source !== "newbuilds") {
+      var extra = t[metric.source];
+      rows.push('<div>' + metric.label.replace(/ \(year\)$/, "") + " <b>" +
+        (extra === undefined ? "not published" : fmt(extra)) + "</b></div>");
     }
+    rows.push('<div class="net-line">Citywide net <b>' + signed(newbuilds - demolitions) + "</b></div>");
+    document.getElementById("totals").innerHTML = rows.join("");
+  }
 
+  function renderWarnings() {
+    var year = years[index];
+    var cov = coverageFor(metric);
+    var warn = document.getElementById("warn-coverage");
+    if (metric.yearly && cov && (year < cov.first || year > cov.last)) {
+      warn.textContent = metric.label.replace(/ \(year\)$/, "") +
+        " is published for " + cov.first + "–" + cov.last + " only — nothing to show for " + year + ".";
+      warn.hidden = false;
+    } else {
+      warn.hidden = true;
+    }
     var partial = document.getElementById("warn-partial");
-    var lastYear = years[years.length - 1];
-    if (year === lastYear) {
-      partial.textContent = "Partial year — demolitions through " +
-        meta.demolitions_through + ", permits through " + meta.newbuilds_through + ".";
+    if (metric.yearly && year === years[years.length - 1]) {
+      var through = (meta.coverage.demolitions || {}).through;
+      partial.textContent = "Partial year" + (through ? " — demolitions through " + through : "") + ".";
       partial.hidden = false;
     } else {
       partial.hidden = true;
     }
+  }
 
-    map.setPaintProperty("cells", "fill-color", fillColor(year));
-    map.setPaintProperty("cells", "fill-opacity", fillOpacity(year));
+  function renderBoard() {
+    var field = fieldFor(metric);
+    var wantHigh = !(metric.type === "div");
+    var rows = grid.features.filter(function (f) {
+      if (metric.rate && f.properties.low_stock) return false;
+      if (activeTrajectory && f.properties.trajectory !== activeTrajectory) return false;
+      var v = f.properties[field];
+      return v !== undefined && v !== null && v !== 0;
+    });
+    rows.sort(function (a, b) {
+      return wantHigh ? b.properties[field] - a.properties[field]
+                      : a.properties[field] - b.properties[field];
+    });
+    document.getElementById("board-cap").textContent =
+      (wantHigh ? "Highest" : "Deepest loss") + " — " + metric.label.replace(/ \(.*\)$/, "");
+    var board = document.getElementById("board");
+    board.innerHTML = "";
+    rows.slice(0, 8).forEach(function (f, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.innerHTML = '<span class="rank">' + (i + 1) + '</span>' +
+        '<span class="who">' + (f.properties.neighborhood || "Cell " + f.properties.id) + "</span>" +
+        '<span class="val">' + fmtVal(metric, f.properties[field]) + "</span>";
+      b.addEventListener("click", function () { focusCell(f); });
+      board.appendChild(b);
+    });
+    if (!rows.length) board.innerHTML = '<p class="note" style="margin:6px 0 0">Nothing recorded for this year.</p>';
+  }
+
+  function renderChips() {
+    var chips = document.getElementById("chips");
+    chips.innerHTML = "";
+    TRAJECTORIES.forEach(function (t) {
+      var n = meta.trajectories[t.key] || 0;
+      if (!n) return;
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.title = t.note;
+      b.setAttribute("aria-pressed", activeTrajectory === t.key ? "true" : "false");
+      b.innerHTML = '<i style="background:' + t.color + '"></i>' + t.label + " <b>" + n + "</b>";
+      b.addEventListener("click", function () {
+        activeTrajectory = activeTrajectory === t.key ? null : t.key;
+        renderChips();
+        paint();
+        renderBoard();
+      });
+      chips.appendChild(b);
+    });
+  }
+
+  function paint() {
+    map.setPaintProperty("cells", "fill-color", fillColor(metric));
+    map.setPaintProperty("cells", "fill-opacity", fillOpacity(metric));
+  }
+
+  function render() {
+    var year = years[index];
+    var span = years[0] + "–" + String(years[years.length - 1]).slice(2);
+    document.getElementById("year-big").textContent = metric.yearly ? year : span;
+    // A metric with no year axis should not leave a live slider implying one.
+    if (!metric.yearly && timer) setPlaying(false);
+    document.querySelector(".timeline").classList.toggle("frozen", !metric.yearly);
+    document.getElementById("year-slider").disabled = !metric.yearly;
+    document.getElementById("play").disabled = !metric.yearly;
+    document.getElementById("year-now").textContent = metric.yearly ? year : span;
+    document.getElementById("year-slider").value = index;
+    renderTotals();
+    renderWarnings();
+    renderLegend();
+    renderBoard();
+    paint();
+    syncScrollHint();
     if (popup) { popup.remove(); popup = null; }
   }
 
@@ -374,69 +688,184 @@
     var button = document.getElementById("play");
     if (on) {
       timer = setInterval(function () { step(1); }, FRAME_MS);
-      button.textContent = "❚❚";
+      button.innerHTML = "&#10074;&#10074;";
       button.setAttribute("aria-label", "Pause");
     } else {
       clearInterval(timer);
       timer = null;
-      button.textContent = "▶";
+      button.innerHTML = "&#9654;";
       button.setAttribute("aria-label", "Play through the years");
     }
   }
 
+  // ---- cell detail --------------------------------------------------------
+
+  function historyChart(props) {
+    // Diverging bars: structures lost below the baseline, put back above it.
+    // Same polarity and palette as the map so the two read as one statement.
+    var lost = years.map(function (y) { return props["demolitions_" + y] || 0; });
+    var back = years.map(function (y) {
+      return (props["newbuilds_" + y] || 0) + (props["rehabs_" + y] || 0) + (props["stabilizations_" + y] || 0);
+    });
+    var peak = Math.max(1, Math.max.apply(null, lost), Math.max.apply(null, back));
+    var w = 236, h = 62, mid = h / 2, gap = 2;
+    var bw = (w / years.length) - gap;
+    var pos = colors({ type: "div" })[5];
+    var bars = years.map(function (y, i) {
+      var x = i * (w / years.length);
+      var lh = lost[i] / peak * (mid - 3);
+      var bh = back[i] / peak * (mid - 3);
+      var title = y + ": −" + lost[i] + " lost, +" + back[i] + " back";
+      var out = '<g><title>' + title + "</title>";
+      if (lh > 0) out += '<rect x="' + x.toFixed(1) + '" y="' + mid + '" width="' + bw.toFixed(1) +
+        '" height="' + Math.max(lh, 1).toFixed(1) + '" rx="1.5" fill="' + DIVERGING_NEG[0] + '"/>';
+      if (bh > 0) out += '<rect x="' + x.toFixed(1) + '" y="' + (mid - Math.max(bh, 1)).toFixed(1) +
+        '" width="' + bw.toFixed(1) + '" height="' + Math.max(bh, 1).toFixed(1) + '" rx="1.5" fill="' + pos + '"/>';
+      return out + "</g>";
+    }).join("");
+    return '<svg class="pop-chart" width="' + w + '" height="' + h + '" role="img" ' +
+      'aria-label="Structures lost and put back per year, ' + years[0] + " to " + years[years.length - 1] + '">' +
+      bars + '<line x1="0" y1="' + mid + '" x2="' + w + '" y2="' + mid +
+      '" stroke="#4a505a" stroke-width="1"/></svg>' +
+      '<div class="pop-legend"><span><i style="background:' + DIVERGING_NEG[0] + '"></i>lost</span>' +
+      '<span><i style="background:' + pos + '"></i>put back</span>' +
+      '<span style="margin-left:auto">' + years[0] + "–" + years[years.length - 1] + "</span></div>";
+  }
+
+  function cellHTML(props) {
+    var year = years[index];
+    var traj = TRAJECTORIES.filter(function (t) { return t.key === props.trajectory; })[0];
+    var cov = meta.coverage;
+    function row(label, value) {
+      return '<div class="pop-row"><span>' + label + "</span><span>" + value + "</span></div>";
+    }
+    function yearly(label, key) {
+      var c = cov[key];
+      var live = !c || (year >= c.first && year <= c.last);
+      return row(label, live ? fmt(props[key + "_" + year] || 0) : "n/a");
+    }
+    return '<div class="pop-h">' + (props.neighborhood || "Cell " + props.id) + "</div>" +
+      '<div class="pop-sub">' +
+        (props.district ? "District " + props.district + " · " : "") +
+        fmt(props.stock_now) + " buildings standing" +
+        (traj ? " · " + traj.label.toLowerCase() : "") + "</div>" +
+      historyChart(props) +
+      '<div class="pop-sep">' +
+        row("<b>" + year + "</b>", "") +
+        yearly("Demolished", "demolitions") +
+        yearly("New builds", "newbuilds") +
+        yearly("Rehab permits", "rehabs") +
+        yearly("Alterations", "alterations") +
+        yearly("Stabilised", "stabilizations") +
+        yearly("Land Bank sales", "landbank") +
+      "</div>" +
+      '<div class="pop-sep">' +
+        row("<b>2014–26</b>", "") +
+        row("Demolished", fmt(props.total_demolitions)) +
+        row("Put back", fmt(props.total_newbuilds + props.total_rehabs + props.total_stabilizations)) +
+        row("Share of stock lost", props.low_stock
+              ? "too few buildings" : props.loss_rate.toFixed(1) + "%") +
+      "</div>";
+  }
+
+  function showPopup(lngLat, props) {
+    if (popup) popup.remove();
+    popup = new maplibregl.Popup({ closeButton: true, maxWidth: "272px" })
+      .setLngLat(lngLat)
+      .setHTML(cellHTML(props))
+      .addTo(map);
+  }
+
+  function centroidOf(feature) {
+    var ring = feature.geometry.coordinates[0];
+    var lon = 0, lat = 0;
+    for (var i = 0; i < ring.length - 1; i++) { lon += ring[i][0]; lat += ring[i][1]; }
+    return [lon / (ring.length - 1), lat / (ring.length - 1)];
+  }
+
+  function focusCell(feature) {
+    var at = centroidOf(feature);
+    map.easeTo({ center: at, zoom: Math.max(map.getZoom(), 12.5), duration: 600 });
+    showPopup(at, feature.properties);
+  }
+
+  // ---- wiring -------------------------------------------------------------
+
+  // Every disclosure starts closed. The panel's full content runs past even a
+  // 1000px-tall viewport, so anything opened by default would sit below the
+  // fold unannounced; opening one is a deliberate act, and scrolling then is
+  // expected. What stays above the fold is what the map cannot be read without.
+  function syncDisclosure() {}
+
+  // Fade the panel's bottom edge while there is more below, so an overflowing
+  // panel never looks like it simply ended.
+  function syncScrollHint() {
+    var el = document.querySelector(".panel");
+    var more = el.scrollHeight - el.clientHeight - el.scrollTop > 4;
+    el.classList.toggle("has-more", more);
+  }
+
   function wireControls() {
+    var select = document.getElementById("metric");
+    METRICS.forEach(function (m) {
+      var o = document.createElement("option");
+      o.value = m.key;
+      o.textContent = m.label;
+      select.appendChild(o);
+    });
+    select.value = metric.key;
+    select.addEventListener("change", function () {
+      metric = METRIC_BY_KEY[select.value];
+      render();
+    });
+
     var slider = document.getElementById("year-slider");
     slider.min = 0;
     slider.max = years.length - 1;
     slider.value = index;
     document.getElementById("tick-min").textContent = years[0];
     document.getElementById("tick-max").textContent = years[years.length - 1];
-
     slider.addEventListener("input", function () {
       if (timer) setPlaying(false);
       index = Number(slider.value);
       render();
     });
-    document.getElementById("play").addEventListener("click", function () {
-      setPlaying(!timer);
+
+    document.getElementById("play").addEventListener("click", function () { setPlaying(!timer); });
+    document.getElementById("cvd").addEventListener("change", function (e) {
+      cvd = e.target.checked;
+      render();
     });
+    ["explore", "about"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener("toggle", syncScrollHint);
+    });
+    document.querySelector(".panel").addEventListener("scroll", syncScrollHint);
+
+    var hoods = {};
+    grid.features.forEach(function (f) {
+      var n = f.properties.neighborhood;
+      if (n && !hoods[n]) hoods[n] = f;
+    });
+    var list = document.getElementById("hoods");
+    Object.keys(hoods).sort().forEach(function (n) {
+      var o = document.createElement("option");
+      o.value = n;
+      list.appendChild(o);
+    });
+    var search = document.getElementById("search");
+    search.addEventListener("change", function () {
+      var hit = hoods[search.value];
+      if (hit) focusCell(hit);
+    });
+
     document.addEventListener("keydown", function (event) {
-      if (event.target.tagName === "INPUT" && event.key !== " ") return;
+      var tag = event.target.tagName;
+      if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
       if (event.key === "ArrowRight") { if (timer) setPlaying(false); step(1); }
       else if (event.key === "ArrowLeft") { if (timer) setPlaying(false); step(-1); }
       else if (event.key === " ") { event.preventDefault(); setPlaying(!timer); }
     });
-  }
-
-  function showPopup(event) {
-    var props = event.features[0].properties;
-    var year = years[index];
-    var demolitions = props["demolitions_" + year];
-    var newbuilds = props["newbuilds_" + year];
-    var hasPermits = year >= meta.newbuild_years[0];
-
-    var allDemo = 0, allNew = 0;
-    years.forEach(function (y) {
-      allDemo += props["demolitions_" + y];
-      allNew += props["newbuilds_" + y];
-    });
-
-    var html =
-      '<div class="pop-h">' + year + '</div>' +
-      '<div class="pop-row"><span>Demolished</span><span>' + fmt(demolitions) + '</span></div>' +
-      '<div class="pop-row"><span>New builds</span><span>' +
-        (hasPermits ? fmt(newbuilds) : "n/a") + '</span></div>' +
-      '<div class="pop-row net"><span>Net</span><span>' +
-        (hasPermits ? signed(newbuilds - demolitions) : signed(-demolitions) + "*") + '</span></div>' +
-      '<div class="pop-sub">All years: ' + (allDemo ? "−" + fmt(allDemo) : "0") + ' demolished, ' +
-        (allNew ? "+" + fmt(allNew) : "0") + ' built' +
-      (hasPermits ? '' : '<br>*no permit data before ' + meta.newbuild_years[0]) + '</div>';
-
-    if (popup) popup.remove();
-    popup = new maplibregl.Popup({ closeButton: true, maxWidth: "240px" })
-      .setLngLat(event.lngLat)
-      .setHTML(html)
-      .addTo(map);
   }
 
   Promise.all([
@@ -444,81 +873,70 @@
     fetch(BOUNDARY_URL).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }),
     mapReady
   ]).then(function (results) {
-    var grid = results[0];
+    grid = results[0];
     var boundary = results[1];
     meta = grid.metadata;
     years = meta.years;
     index = years.length - 1;
 
-    (function addLayers() {
-      map.addSource("grid", { type: "geojson", data: grid });
-      map.addSource("boundary", { type: "geojson", data: boundary });
+    map.addSource("grid", { type: "geojson", data: grid });
+    map.addSource("boundary", { type: "geojson", data: boundary });
 
-      map.addLayer({
-        id: "cells",
-        type: "fill",
-        source: "grid",
-        paint: {
-          "fill-color": fillColor(years[index]),
-          "fill-opacity": fillOpacity(years[index])
-        }
+    map.addLayer({
+      id: "cells", type: "fill", source: "grid",
+      paint: { "fill-color": fillColor(metric), "fill-opacity": fillOpacity(metric) }
+    });
+    map.addLayer({
+      id: "cells-outline", type: "line", source: "grid",
+      paint: { "line-color": "#000", "line-width": 0.5, "line-opacity": 0.35 }
+    });
+    map.addLayer({
+      id: "boundary-line", type: "line", source: "boundary",
+      paint: { "line-color": "#98a2b3", "line-width": 1.2, "line-opacity": 0.7 }
+    });
+
+    map.on("click", "cells", function (e) { showPopup(e.lngLat, e.features[0].properties); });
+    map.on("mouseenter", "cells", function () { map.getCanvas().style.cursor = "pointer"; });
+    map.on("mouseleave", "cells", function () { map.getCanvas().style.cursor = ""; });
+
+    var bounds = new maplibregl.LngLatBounds();
+    boundary.features[0].geometry.coordinates.forEach(function (ring) {
+      ring.forEach(function (c) { bounds.extend(c); });
+    });
+
+    function frameCity() {
+      var panelBox = document.querySelector(".panel").getBoundingClientRect();
+      var railBox = document.querySelector(".timeline").getBoundingClientRect();
+      var narrow = map.getContainer().clientWidth < NARROW_PX;
+      var below = Math.round(window.innerHeight - railBox.top) + 16;
+      map.fitBounds(bounds, {
+        // On narrow screens the panel sits above the map, on wide screens beside it.
+        padding: narrow
+          ? { top: Math.round(panelBox.bottom) + 16, right: 20, bottom: below, left: 20 }
+          : { top: 40, right: 40, bottom: below, left: Math.round(panelBox.right) + 20 },
+        duration: 0
       });
-      map.addLayer({
-        id: "cells-outline",
-        type: "line",
-        source: "grid",
-        paint: { "line-color": "#000", "line-width": 0.5, "line-opacity": 0.35 }
-      });
-      map.addLayer({
-        id: "boundary-line",
-        type: "line",
-        source: "boundary",
-        paint: { "line-color": "#98a2b3", "line-width": 1.2, "line-opacity": 0.7 }
-      });
+    }
 
-      // Frame the city, leaving room for the panel and the timeline.
-      var bounds = new maplibregl.LngLatBounds();
-      boundary.features[0].geometry.coordinates.forEach(function (ring) {
-        ring.forEach(function (c) { bounds.extend(c); });
-      });
+    syncDisclosure();
+    wireControls();
+    renderChips();
+    render();
+    frameCity();
 
-      function frameCity() {
-        var panelBox = document.querySelector(".panel").getBoundingClientRect();
-        var railBox = document.querySelector(".timeline").getBoundingClientRect();
-        var narrow = map.getContainer().clientWidth < NARROW_PX;
-        var below = Math.round(window.innerHeight - railBox.top) + 16;
-        map.fitBounds(bounds, {
-          // On narrow screens the panel sits above the map, on wide screens beside it.
-          padding: narrow
-            ? { top: Math.round(panelBox.bottom) + 16, right: 20, bottom: below, left: 20 }
-            : { top: 40, right: 40, bottom: below, left: Math.round(panelBox.right) + 20 },
-          duration: 0
-        });
-      }
-      frameCity();
-
-      // Re-frame on rotate/resize, but never yank the view out from under
-      // someone who has already panned or zoomed it themselves.
-      var userMoved = false;
-      map.on("dragstart", function () { userMoved = true; });
-      map.on("zoomstart", function (e) { if (e.originalEvent) userMoved = true; });
-
-      var reframe = null;
-      window.addEventListener("resize", function () {
-        clearTimeout(reframe);
-        reframe = setTimeout(function () {
-          syncDisclosure();
-          if (!userMoved) frameCity();
-        }, 200);
-      });
-
-      map.on("click", "cells", showPopup);
-      map.on("mouseenter", "cells", function () { map.getCanvas().style.cursor = "pointer"; });
-      map.on("mouseleave", "cells", function () { map.getCanvas().style.cursor = ""; });
-
-      wireControls();
-      render();
-    })();
+    // Re-frame on rotate/resize, but never yank the view out from under
+    // someone who has already panned or zoomed it themselves.
+    var userMoved = false;
+    map.on("dragstart", function () { userMoved = true; });
+    map.on("zoomstart", function (e) { if (e.originalEvent) userMoved = true; });
+    var reframe = null;
+    window.addEventListener("resize", function () {
+      clearTimeout(reframe);
+      reframe = setTimeout(function () {
+        syncScrollHint();
+        if (!userMoved) frameCity();
+      }, 200);
+    });
   }).catch(function (err) {
     console.error(err);
     document.getElementById("error").style.display = "grid";
