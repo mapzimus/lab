@@ -24,6 +24,9 @@ comparable to every other year as the slider moves:
 | Share of stock lost (2014–2026) | sequential | the whole period at once |
 | Share of stock built since 2000 | sequential | Detroit's newest ground |
 | Median year built | sequential | age of what still stands, 1904–2009 |
+| Housing units lost/gained, % (2010–2020) | diverging | **the only measure reaching behind 2014** |
+| Housing units lost/gained (2010–2020) | diverging | the same change as a count |
+| Housing units (2020 census) | sequential | decennial units allocated to the grid |
 
 Plus a trajectory filter (gutted / thinning / churning / holding / rebuilding /
 no activity / little stock), a neighbourhood search over 181 names, a leaderboard
@@ -49,6 +52,7 @@ the worst lost 55.7%.
 | Building stock | Parcels (Current) — improved parcels, `num_buildings` | current | 235,947 buildings |
 | Construction dates | Parcels (Current) — `year_built` on standing buildings | 1870–2026 | 241,085 dated; 4,181 since 2000 |
 | City boundary | Census TIGERweb incorporated places | — | 1 |
+| Housing units | Census decennial `HU100` by tract, via TIGERweb | 2010, 2020 | 349,028 → 309,789 |
 
 **Coverage differs by source, and the map says so rather than drawing a gap as a
 zero.** Construction dates run from 2000, demolitions from 2014, permits only from
@@ -78,6 +82,31 @@ alone**, against 4,181 across the whole quarter-century since 2000. Peak
 surviving years are 1950, 1948, 1941 and 1925. In the modern era it is roughly
 300–660 a year through 2007, a collapse to a few dozen from the crash through
 the bankruptcy and into 2021, then a modest recovery from 2022.
+
+### The one witness behind 2014
+
+The demolition feed starts in 2014 and nothing in the city's own data reaches
+behind it. The **decennial census** does. Housing-unit counts ride on TIGERweb's
+tract geometry as `HU100`, so no Census data-API key is involved — which matters,
+because that API now rejects unkeyed requests outright.
+
+Detroit held **349,028 housing units in 2010 and 309,789 in 2020** — a loss of
+**39,239**, of which the demolition record can only account for the years from
+2014. Those two figures land within 0.04% of Detroit's published decennial
+counts (349,170 and 309,899), which is the check that the "tracts centred in the
+city" selection captures the city and not its neighbours.
+
+Tract lines were redrawn for 2020, so each vintage is allocated to the hex grid
+independently and only the resulting hex totals are compared. Allocation is
+**dasymetric, not areal**: splitting a tract by area would smear housing units
+across parks, freeways and industrial land, so the weights are buildings —
+every improved parcel, plus the ones since demolished that were still standing
+at that census. Cells under 25 units in 2010 are drawn in the no-data class
+rather than given a rate.
+
+Read the pair as a second opinion on the loss, not a finer version of it:
+housing units are not buildings, a tract is far coarser than a half-mile hex,
+and the two censuses are ten years apart.
 
 ### The slider follows the metric
 
