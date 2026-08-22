@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-21",
+  "generatedAt": "2026-08-22",
   "news": {
     "mapsmania": [
+      {
+        "title": "Bending Maps, Inception Style",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/bending-maps-inception-style.html",
+        "desc": ""
+      },
       {
         "title": "The 3D Underground Map",
         "url": "http://googlemapsmania.blogspot.com/2026/08/the-3d-underground-map.html",
@@ -35,11 +40,6 @@
       {
         "title": "Where does the North Begin?",
         "url": "http://googlemapsmania.blogspot.com/2026/08/where-does-north-begin.html",
-        "desc": ""
-      },
-      {
-        "title": "How to Find the Best Sunset Views",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/how-to-find-best-sunset-views.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "SATHI",
-      "url": "https://plugins.qgis.org/plugins/temporal_grid_extractor/"
+      "title": "Hub Browser",
+      "url": "https://plugins.qgis.org/plugins/hub_browser/"
     },
     {
-      "title": "Map Extent QR",
-      "url": "https://plugins.qgis.org/plugins/map_extent_qr/"
+      "title": "Quick RightMenu Actions",
+      "url": "https://plugins.qgis.org/plugins/quick_rightmenu_actions/"
     },
     {
-      "title": "GeoSIG",
-      "url": "https://plugins.qgis.org/plugins/GeoSIG/"
+      "title": "Overlay Multiple",
+      "url": "https://plugins.qgis.org/plugins/Overlay_Multiple_V1_0_0/"
     },
     {
-      "title": "HydroROC",
-      "url": "https://plugins.qgis.org/plugins/HydroROC/"
+      "title": "Conflate Roads",
+      "url": "https://plugins.qgis.org/plugins/conflate_roads/"
     },
     {
-      "title": "Aeternum Aquae - Estaciones Climatológicas (México)",
-      "url": "https://plugins.qgis.org/plugins/aeternum_aquae_stations/"
+      "title": "Natural Breaks Raster Symbology",
+      "url": "https://plugins.qgis.org/plugins/natural_breaks_symbology/"
     },
     {
-      "title": "FiberHome FTK QGIS GeoCopy",
-      "url": "https://plugins.qgis.org/plugins/fiberhome_ftk_qgis_geocopy/"
+      "title": "Terrain Analysis Symbology",
+      "url": "https://plugins.qgis.org/plugins/terrain_analysis_symbology/"
     },
     {
-      "title": "JSON Converter Studio",
-      "url": "https://plugins.qgis.org/plugins/JSON_Converter_QGIS/"
+      "title": "Fillet & Chamfer for QGIS 3.x (Interactive & Batch)",
+      "url": "https://plugins.qgis.org/plugins/fillet/"
     },
     {
-      "title": "qPansopy",
-      "url": "https://plugins.qgis.org/plugins/Q_Pansopy/"
+      "title": "QGIS 2.5D Styling",
+      "url": "https://plugins.qgis.org/plugins/qgis_25d_styling/"
     }
   ],
   "releases": [
@@ -189,7 +189,7 @@
       "url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.5",
       "desc": "This is a bug fix release for various issues discovered after we released v1.5.4.",
       "publishedAt": "2026-07-22",
-      "isFresh": true
+      "isFresh": false
     },
     {
       "repo": "felt/tippecanoe",
@@ -209,12 +209,6 @@
     }
   ],
   "gisse": [
-    {
-      "title": "Does anybody need a full Windows x64 build of the latest GDAL 3.13.3, including GRASS support?",
-      "url": "https://gis.stackexchange.com/questions/501291/does-anybody-need-a-full-windows-x64-build-of-the-latest-gdal-3-13-3-including",
-      "score": -2,
-      "answers": 0
-    },
     {
       "title": "Geofencing area spans two UTM zones",
       "url": "https://gis.stackexchange.com/questions/501286/geofencing-area-spans-two-utm-zones",
@@ -240,6 +234,12 @@
       "answers": 0
     },
     {
+      "title": "How do you structure raster-processing code so the I/O can be replaced in tests?",
+      "url": "https://gis.stackexchange.com/questions/501277/how-do-you-structure-raster-processing-code-so-the-i-o-can-be-replaced-in-tests",
+      "score": 1,
+      "answers": 1
+    },
+    {
       "title": "Web AppBuilder does not retain arrow line symbology from Map Viewer, while Experience Builder does",
       "url": "https://gis.stackexchange.com/questions/501281/web-appbuilder-does-not-retain-arrow-line-symbology-from-map-viewer-while-exper",
       "score": 0,
@@ -252,8 +252,8 @@
       "answers": 0
     },
     {
-      "title": "How do you structure raster-processing code so the I/O can be replaced in tests?",
-      "url": "https://gis.stackexchange.com/questions/501277/how-do-you-structure-raster-processing-code-so-the-i-o-can-be-replaced-in-tests",
+      "title": "QGIS - How to get the average distances (one distance per feature) between a polyline layer and a point?",
+      "url": "https://gis.stackexchange.com/questions/501262/qgis-how-to-get-the-average-distances-one-distance-per-feature-between-a-pol",
       "score": 1,
       "answers": 1
     },
@@ -264,61 +264,13 @@
       "answers": 0
     },
     {
-      "title": "QGIS - How to get the average distances (one distance per feature) between a polyline layer and a point?",
-      "url": "https://gis.stackexchange.com/questions/501262/qgis-how-to-get-the-average-distances-one-distance-per-feature-between-a-pol",
-      "score": 1,
-      "answers": 1
+      "title": "QGIS 3.44.11 (Solothurn) - WhiteboxTools- stream_order file empty",
+      "url": "https://gis.stackexchange.com/questions/501276/qgis-3-44-11-solothurn-whiteboxtools-stream-order-file-empty",
+      "score": 0,
+      "answers": 0
     }
   ],
   "nasa": [
-    {
-      "title": "VIIRS/NOAA20 Cloud Properties COSP Level 3 monthly, 1x1 degree grid",
-      "url": "https://search.earthdata.nasa.gov/search?q=CLDPROPCOSP_M3_VIIRS_NOAA20",
-      "desc": "Cloud processes and their feedback are recognized as the largest uncertainty in climate models.",
-      "org": "LAADS"
-    },
-    {
-      "title": "VIIRS/SNPP Cloud Properties COSP Level 3 daily, 1x1 degree grid",
-      "url": "https://search.earthdata.nasa.gov/search?q=CLDPROPCOSP_D3_VIIRS_SNPP",
-      "desc": "Cloud processes and their feedback are recognized as the largest uncertainty in climate models.",
-      "org": "LAADS"
-    },
-    {
-      "title": "VIIRS/NOAA20 Cloud Properties COSP Level 3 daily, 1x1 degree grid",
-      "url": "https://search.earthdata.nasa.gov/search?q=CLDPROPCOSP_D3_VIIRS_NOAA20",
-      "desc": "Cloud processes and their feedback are recognized as the largest uncertainty in climate models.",
-      "org": "LAADS"
-    },
-    {
-      "title": "MODIS/Aqua Cloud Properties COSP Level 3 monthly, 1x1 degree grid",
-      "url": "https://search.earthdata.nasa.gov/search?q=CLDPROPCOSP_M3_MODIS_Aqua",
-      "desc": "Cloud processes and their feedback are recognized as the largest uncertainty in climate models.",
-      "org": "LAADS"
-    },
-    {
-      "title": "AIRS/Aqua L2G Precipitation Estimate (AIRS-only) V006 (AIRG2SSD_IRonly)",
-      "url": "https://search.earthdata.nasa.gov/search?q=AIRG2SSD_IRonly",
-      "desc": "The Atmospheric Infrared Sounder (AIRS) is a grating spectrometer (R = 1200) aboard the second Earth Observing System (EOS) polar-orbiting platform, EOS Aqua.",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "GPS Radio Occultation Boundary Layer Depth Seasonal L3 V2 (GPSROZPBLS)",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPSROZPBLS",
-      "desc": "This dataset provides a seasonal average climatology of global planetary boundary layer (PBL) height derived from COSMIC/FORMOSAT-3, TerraSAR-X, KOMPSAT-5, a…",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "CAR Skukuza South African Ecosystems L1 V1 (CAR_SKUKUZA_L1C)",
-      "url": "https://search.earthdata.nasa.gov/search?q=CAR_SKUKUZA_L1C",
-      "desc": "CAR mission Skukuza measured bidirectional reflection functions over different natural surfaces and ecosystems in southern Africa.",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "OMPS-NPP L2 NM Formaldehyde (HCHO) Total Column swath orbital",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMPS_NPP_NMHCHO_L2",
-      "desc": "The OMPS-NPP L2 NM Formaldehyde (HCHO) Total Column swath orbital product provides formaldehyde measurements from the Ozone Mapping and Profiling Suite (OMPS…",
-      "org": "GES_DISC"
-    },
     {
       "title": "UAVSAR_POLSAR_STOKES",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
@@ -329,6 +281,54 @@
       "title": "UAVSAR_POLSAR_SLOPE",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
       "desc": "UAVSAR PolSAR Scene Slope",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_PAULI",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
+      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
+      "desc": "UAVSAR PolSAR Scene Complex",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
+      "desc": "UAVSAR PolSAR Scene Projected",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_METADATA",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
+      "desc": "UAVSAR PolSAR Scene Metadata",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_KMZ",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
+      "desc": "UAVSAR PolSAR Scene KMZ",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_INCIDENCE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
+      "desc": "UAVSAR PolSAR Scene Incidence Angle",
       "org": "ASF"
     }
   ],
