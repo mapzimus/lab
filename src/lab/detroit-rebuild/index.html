@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Detroit: Torn Down / Built Back</title>
-<meta name="description" content="Block-by-block structure loss and rebuild in Detroit, 2014-2026, normalised against the buildings actually standing.">
+<meta name="description" content="Block-by-block structure loss and rebuild in Detroit, 2000-2026, normalised against the buildings actually standing.">
 <link rel="icon" href="/favicon.svg">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
 <style>
@@ -230,7 +230,7 @@
 
 <div class="panel">
   <h1>Torn Down / Built Back</h1>
-  <p class="sub">Detroit structure loss and replacement, half-mile hexes.</p>
+  <p class="sub">Structure loss and replacement, 2000&ndash;2026, half-mile hexes.</p>
 
   <div class="cols">
   <div class="readout">
@@ -294,6 +294,20 @@
       buildings over the period. The worst lost more than half.
     </p>
     <p class="note">
+      The permit record stops dead at 2019, so the long arc comes from the parcel
+      file's <code>year_built</code> instead: <b>4,181 buildings standing today went up
+      since 2000</b>. The shape of that is the story permits cannot tell &mdash; roughly
+      300&ndash;660 a year through 2007, a collapse to a few dozen a year from the crash
+      through the bankruptcy and into 2021, then a modest recovery from 2022.
+    </p>
+    <p class="note">
+      <b>That series counts survivors, not starts.</b> A house built in 2003 and
+      demolished in 2019 is not in it, so it undercounts, and undercounts more the
+      further back you look. It is labelled &ldquo;still standing&rdquo; everywhere for
+      that reason. Demolitions before 2014 and permits before 2019 are simply not
+      published &mdash; the map greys those years out rather than drawing them as zero.
+    </p>
+    <p class="note">
       Cells are pointy-top hexagons 0.5&nbsp;mi across the flats, kept when their centre
       falls inside the Census city polygon &mdash; which carries the Hamtramck / Highland
       Park enclave as a hole. Building stock is the sum of <code>num_buildings</code> over
@@ -310,8 +324,10 @@
       Revisions are excluded so nothing is counted twice.
     </p>
     <p class="note">
-      Coverage differs by source: demolitions from 2014, permits from 2019, stabilisations
-      2021&ndash;2025, Land Bank sales throughout. The most recent year is partial.
+      Coverage differs by source and the map says so rather than drawing a gap as a zero:
+      construction dates from 2000, demolitions from 2014, permits from 2019,
+      stabilisations 2021&ndash;2025, Land Bank sales throughout. The most recent year is
+      partial.
     </p>
     <p class="note">
       Data: <a href="https://data.detroitmi.gov/" target="_blank" rel="noopener">City of Detroit Open Data</a>
@@ -393,33 +409,49 @@
   var METRICS = [
     { key: "lossrate", label: "Share of stock demolished (year)", unit: "%",
       type: "seq", hue: "red", breaks: [0.5, 1, 2, 4, 8], rate: true, yearly: true,
-      source: "demolitions",
+      source: "demolitions", group: "Loss",
       note: "Demolitions that year as a percent of the buildings standing at its start. The normalised view — raw counts mostly map where the houses were." },
     { key: "net", label: "Net structures (year)", unit: "",
-      type: "div", breaks: [-20, -8, -2, 1, 2, 8], yearly: true, source: "newbuilds",
+      type: "div", breaks: [-20, -8, -2, 1, 2, 8], yearly: true, source: "newbuilds", group: "Balance",
       note: "New-construction permits minus completed demolitions, that year." },
     { key: "cumnet", label: "Net structures (cumulative)", unit: "",
-      type: "div", breaks: [-60, -25, -6, 2, 8, 25], yearly: true, source: "newbuilds",
+      type: "div", breaks: [-60, -25, -6, 2, 8, 25], yearly: true, source: "newbuilds", group: "Balance",
       note: "Running total of net structures from 2014 to the selected year." },
     { key: "demolitions", label: "Demolitions (year)", unit: "",
-      type: "seq", hue: "red", breaks: [1, 3, 8, 15, 25], yearly: true, source: "demolitions",
+      type: "seq", hue: "red", breaks: [1, 3, 8, 15, 25], yearly: true, source: "demolitions", group: "Loss",
       note: "Completed demolitions in the cell that year, unnormalised." },
     { key: "rehabs", label: "Rehab & addition permits (year)", unit: "",
-      type: "seq", hue: "green", breaks: [1, 2, 3, 4, 5], yearly: true, source: "rehabs",
+      type: "seq", hue: "green", breaks: [1, 2, 3, 4, 5], yearly: true, source: "rehabs", group: "Rebuilding",
       note: "Residential Rehab and Addition permits — structural work that puts habitable building back. Citywide these climbed roughly tenfold from 2019." },
     { key: "alterations", label: "Alteration permits (year)", unit: "",
-      type: "seq", hue: "amber", breaks: [3, 7, 11, 16, 25], yearly: true, source: "alterations",
+      type: "seq", hue: "amber", breaks: [3, 7, 11, 16, 25], yearly: true, source: "alterations", group: "Rebuilding",
       note: "The largest permit class and the best proxy for money spent on a standing building — but it spans a furnace swap to a gut job. Investment activity, not structures gained." },
     { key: "stabilizations", label: "Stabilisations (year)", unit: "",
-      type: "seq", hue: "blue", breaks: [1, 2, 3, 7, 12], yearly: true, source: "stabilizations",
+      type: "seq", hue: "blue", breaks: [1, 2, 3, 7, 12], yearly: true, source: "stabilizations", group: "Rebuilding",
       note: "Buildings boarded up and held rather than demolished — a demolition not taken. Published 2021 to 2025 only." },
     { key: "landbank", label: "Land Bank sales (year)", unit: "",
-      type: "seq", hue: "plum", breaks: [2, 6, 13, 22, 35], yearly: true, source: "landbank",
+      type: "seq", hue: "plum", breaks: [2, 6, 13, 22, 35], yearly: true, source: "landbank", group: "Rebuilding",
       note: "Detroit Land Bank Authority disposals — auction, own-it-now, project and vacant-land sales — moving property back into private hands." },
+    { key: "built", label: "Built that year, still standing", unit: "",
+      type: "seq", hue: "green", breaks: [1, 3, 8, 20, 40], yearly: true, source: "built",
+      group: "Rebuilding",
+      note: "Buildings standing today that went up that year, from the parcel file's year_built. Reaches back to 2000, where the permit record stops at 2019 — but counts only what survived, so it undercounts the further back you look." },
+    { key: "cumbuilt", label: "Built since 2000, cumulative", unit: "",
+      type: "seq", hue: "green", breaks: [1, 5, 15, 35, 70], yearly: true, source: "built",
+      group: "Rebuilding",
+      note: "Running total of still-standing buildings put up from 2000 to the selected year." },
     { key: "loss_rate", label: "Share of stock lost (2014–2026)", unit: "%",
       type: "seq", hue: "red", breaks: [2, 5, 10, 20, 30], rate: true, yearly: false,
-      source: "demolitions",
-      note: "Total demolitions over the whole period as a percent of the stock standing in 2014. The median cell lost about a tenth; the worst lost more than half." }
+      source: "demolitions", group: "The whole period",
+      note: "Total demolitions over the whole period as a percent of the stock standing in 2014. The median cell lost about a tenth; the worst lost more than half." },
+    { key: "built_share", label: "Share of stock built since 2000", unit: "%",
+      type: "seq", hue: "green", breaks: [1, 3, 8, 20, 40], yearly: false,
+      source: "built", group: "The whole period", needs: "stock_now",
+      note: "Of the buildings standing in this cell, the percent put up since 2000. Detroit's newest ground." },
+    { key: "median_year_built", label: "Median year built", unit: "",
+      type: "seq", hue: "plum", breaks: [1915, 1925, 1935, 1945, 1955], yearly: false,
+      plain: true, needs: "dated_buildings", group: "The whole period",
+      note: "The age of what is still standing — 1904 to 2009 across the city. Darker is older." }
   ];
 
   // Ordered loss -> rebuild. Deliberately a filter and not a fill scheme: five
@@ -499,8 +531,13 @@
     // low-stock cells out of rate metrics entirely rather than shading them.
     var stepped = ["step", ["to-number", ["get", fieldFor(m)], 0], ramp[0]];
     m.breaks.forEach(function (b, i) { stepped.push(b, ramp[i + 1]); });
-    if (!m.rate) return stepped;
-    return ["case", ["==", ["get", "low_stock"], true], NO_DATA, stepped];
+    var guards = [];
+    if (m.rate) guards.push(["==", ["get", "low_stock"], true]);
+    // A metric can name a property it needs before it means anything — median
+    // age is meaningless where nothing carries a construction date.
+    if (m.needs) guards.push(["<=", ["to-number", ["get", m.needs], 0], 0]);
+    if (!guards.length) return stepped;
+    return ["case", guards.length === 1 ? guards[0] : ["any"].concat(guards), NO_DATA, stepped];
   }
 
   function fillOpacity(m) {
@@ -520,6 +557,7 @@
   function signed(n) { return (n > 0 ? "+" : "") + fmt(n); }
   function fmtVal(m, v) {
     if (v === null || v === undefined) return "n/a";
+    if (m.plain) return String(v);
     return m.rate ? Number(v).toFixed(1) + "%" : (m.type === "div" ? signed(v) : fmt(v));
   }
 
@@ -539,16 +577,19 @@
     document.getElementById("ramp").innerHTML =
       ramp.map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("");
     var labels = [""].concat(metric.breaks.map(function (b) {
+      if (metric.plain) return String(b);
       return metric.rate ? b + "%" : (metric.type === "div" ? signed(b) : b);
     }));
     document.getElementById("ramp-labels").innerHTML =
       labels.map(function (l, i) {
-        return "<span>" + (i === 0 ? (metric.type === "div" ? "less" : "low") : l) + "</span>";
+        var first = metric.plain ? "older" : metric.type === "div" ? "less" : "low";
+        return "<span>" + (i === 0 ? first : l) + "</span>";
       }).join("");
     var nodata = document.getElementById("nodata");
-    nodata.hidden = !metric.rate;
-    nodata.querySelector("span").textContent =
-      "Fewer than " + meta.min_stock_for_rate + " buildings — rate not shown";
+    nodata.hidden = !(metric.rate || metric.needs);
+    nodata.querySelector("span").textContent = metric.rate
+      ? "Fewer than " + meta.min_stock_for_rate + " buildings — rate not shown"
+      : "No building here carries a construction date";
     document.getElementById("metric-note").textContent = metric.note;
   }
 
@@ -605,7 +646,7 @@
 
   function renderBoard() {
     var field = fieldFor(metric);
-    var wantHigh = !(metric.type === "div");
+    var wantHigh = metric.type !== "div" && !metric.plain;
     var rows = grid.features.filter(function (f) {
       if (metric.rate && f.properties.low_stock) return false;
       if (activeTrajectory && f.properties.trajectory !== activeTrajectory) return false;
@@ -617,7 +658,8 @@
                       : a.properties[field] - b.properties[field];
     });
     document.getElementById("board-cap").textContent =
-      (wantHigh ? "Highest" : "Deepest loss") + " — " + metric.label.replace(/ \(.*\)$/, "");
+      (metric.plain ? "Oldest" : wantHigh ? "Highest" : "Deepest loss") +
+      " — " + metric.label.replace(/ \(.*\)$/, "");
     var board = document.getElementById("board");
     board.innerHTML = "";
     rows.slice(0, 8).forEach(function (f, i) {
@@ -765,6 +807,13 @@
         row("Put back", fmt(props.total_newbuilds + props.total_rehabs + props.total_stabilizations)) +
         row("Share of stock lost", props.low_stock
               ? "too few buildings" : props.loss_rate.toFixed(1) + "%") +
+      "</div>" +
+      '<div class="pop-sep">' +
+        row("<b>Standing stock</b>", "") +
+        row("Buildings", fmt(props.stock_now)) +
+        row("Built since 2000", fmt(props.total_built || 0) +
+            (props.stock_now ? " (" + (props.built_share || 0).toFixed(1) + "%)" : "")) +
+        row("Median year built", props.median_year_built || "—") +
       "</div>";
   }
 
@@ -807,11 +856,18 @@
 
   function wireControls() {
     var select = document.getElementById("metric");
+    var groups = {};
     METRICS.forEach(function (m) {
+      var name = m.group || "Other";
+      if (!groups[name]) {
+        groups[name] = document.createElement("optgroup");
+        groups[name].label = name;
+        select.appendChild(groups[name]);
+      }
       var o = document.createElement("option");
       o.value = m.key;
       o.textContent = m.label;
-      select.appendChild(o);
+      groups[name].appendChild(o);
     });
     select.value = metric.key;
     select.addEventListener("change", function () {

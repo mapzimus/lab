@@ -19,7 +19,11 @@ comparable to every other year as the slider moves:
 | Alteration permits (year) | sequential | money spent on standing buildings |
 | Stabilisations (year) | sequential | boarded up instead of demolished |
 | Land Bank sales (year) | sequential | property returning to private hands |
+| Built that year, still standing | sequential | construction from `year_built`, back to 2000 |
+| Built since 2000, cumulative | sequential | running total of surviving construction |
 | Share of stock lost (2014–2026) | sequential | the whole period at once |
+| Share of stock built since 2000 | sequential | Detroit's newest ground |
+| Median year built | sequential | age of what still stands, 1904–2009 |
 
 Plus a trajectory filter (gutted / thinning / churning / holding / rebuilding /
 no activity / little stock), a neighbourhood search over 181 names, a leaderboard
@@ -43,11 +47,27 @@ the worst lost 55.7%.
 | Stabilisations | City of Detroit Completed Property Stabilizations | 2021–2025 | 2,703 |
 | Land Bank sales | DLBA auction / own-it-now / project / vacant-land sales | 2014–2026 | 54,292 |
 | Building stock | Parcels (Current) — improved parcels, `num_buildings` | current | 235,947 buildings |
+| Construction dates | Parcels (Current) — `year_built` on standing buildings | 1850s–2026 | 4,181 built since 2000 |
 | City boundary | Census TIGERweb incorporated places | — | 1 |
 
 **Coverage differs by source, and the map says so rather than drawing a gap as a
-zero.** Demolitions run from 2014; permits only from 2019; stabilisations
-2021–2025 only. The most recent year is partial.
+zero.** Construction dates run from 2000, demolitions from 2014, permits only from
+2019, stabilisations 2021–2025 only. The most recent year is partial.
+
+### Why `year_built` carries the long arc
+
+Every one of BSEED's five permit services begins `2019-01-02` — a system
+migration, not a gap that can be searched around. The parcel file's `year_built`
+is the only construction record that reaches further, and it reaches to the
+1850s. It is also a different kind of measurement, and the map labels it as one:
+a permit is an intention filed, `year_built` is a building that exists now.
+
+**It counts survivors, not starts.** A house built in 2003 and demolished in 2019
+is not in it, so it undercounts, and undercounts more the further back you look.
+Every label says "still standing" for that reason. What it shows is worth the
+caveat: roughly 300–660 buildings a year going up through 2007, a collapse to a
+few dozen a year from the crash through the bankruptcy and into 2021, then a
+modest recovery from 2022.
 
 Permit categories are our split. `Alteration` is by far the largest class and the
 best proxy for money spent on a standing building, but it spans a furnace swap to

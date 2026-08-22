@@ -132,8 +132,22 @@ for _svc in DLBA_SERVICES:
 PARCELS = {
     "url": f"{ORG}/parcel_file_current/FeatureServer/0/query",
     "where": "is_improved=1",
-    "out_fields": "ObjectId,num_buildings,property_class",
+    "out_fields": "ObjectId,num_buildings,property_class,year_built",
 }
+
+# BSEED's permit record begins in 2019 — every one of its five services starts
+# 2019-01-02, which is a system migration, not a gap that can be searched
+# around. year_built on the standing stock is the only construction record that
+# reaches further, and it reaches a great deal further: back to the 1850s.
+#
+# It is a different kind of measurement and the map has to say so. A permit is
+# an intention filed; year_built is a building that exists now. That makes it
+# the better record of what actually got built — and a survivorship-biased one,
+# because a house built in 2003 and demolished in 2019 is not in it. For recent
+# decades the undercount is small (demolition targets old stock), but it grows
+# the further back you look, which is why the long series is reported as
+# "still standing", never as "built".
+BUILT_FIRST_YEAR = 2000
 
 # Census TIGERweb incorporated places. Detroit's own portal publishes council
 # districts but no single city outline; this one polygon already carries the
@@ -161,6 +175,9 @@ M_PER_DEG_LON = 111320.0 * math.cos(math.radians(LAT0))
 
 COUNT_KEYS = ["demolitions", "newbuilds", "rehabs", "alterations",
               "stabilizations", "landbank"]
+# Derived from the parcel file rather than an event feed, so it is counted
+# separately from the sources above.
+BUILT_KEY = "built"
 
 
 # --------------------------------------------------------------------------
@@ -465,6 +482,8 @@ def main():
     # ---- denominator: buildings standing today -----------------------------
     stock_now = defaultdict(int)
     parcel_count = defaultdict(int)
+    built_year = defaultdict(Counter)   # cell -> year_built -> buildings
+    ages = defaultdict(list)            # cell -> year_built, for the median
     parcels_outside = 0
     for feature in parcels["features"]:
         centroid = feature.get("centroid") or {}
@@ -475,9 +494,15 @@ def main():
         if cell not in kept:
             parcels_outside += 1
             continue
-        n = feature.get("attributes", {}).get("num_buildings")
-        stock_now[cell] += int(n) if n else 1
+        attrs = feature.get("attributes", {})
+        n = attrs.get("num_buildings")
+        n = int(n) if n else 1
+        stock_now[cell] += n
         parcel_count[cell] += 1
+        built = attrs.get("year_built")
+        if built and 1850 <= int(built) <= 2026:
+            built_year[cell][int(built)] += n
+            ages[cell].append(int(built))
     print(f"  building stock today: {sum(stock_now.values()):,} across "
           f"{sum(parcel_count.values()):,} improved parcels "
           f"({parcels_outside:,} parcels outside the clipped grid)")
@@ -519,10 +544,16 @@ def main():
     # Land Bank sales reach back to 2012, but demolitions — the spine of this
     # map — start in 2014, and 2012/2013 carry 18 records between them. Anchor
     # the window to the demolition record so the slider has no dead stops.
-    all_years = sorted(set().union(*years_seen.values()))
-    first_year = min(years_seen["demolitions"]) if years_seen.get("demolitions") else all_years[0]
-    years = [y for y in all_years if y >= first_year]
+    all_years = sorted(set().union(*years_seen.values()) | set(range(BUILT_FIRST_YEAR, 2027)))
+    demo_first = min(years_seen["demolitions"]) if years_seen.get("demolitions") else BUILT_FIRST_YEAR
+    # Land Bank sales reach back to 2012 but 2012/2013 hold 18 records between
+    # them. The construction record is the one that genuinely opens the window
+    # early, so the slider starts where it does.
+    first_year = min(demo_first, BUILT_FIRST_YEAR)
+    last_year = max(y for y in all_years if y <= 2026)
+    years = [y for y in range(first_year, last_year + 1)]
     trimmed = [y for y in all_years if y < first_year]
+    years_seen["built"] = set(y for y in years if y >= BUILT_FIRST_YEAR)
 
     if trimmed:
         print(f"\n  window starts {first_year} (demolition record); "
@@ -545,12 +576,15 @@ def main():
         cell = (q, r)
         cc = counts.get(cell, {})
         stock_today = stock_now.get(cell, 0)
+        cell_ages = sorted(ages.get(cell, []))
         props = {
             "id": index,
             "neighborhood": names[cell].most_common(1)[0][0] if names[cell] else None,
             "district": districts[cell].most_common(1)[0][0] if districts[cell] else None,
             "parcels": parcel_count.get(cell, 0),
             "stock_now": stock_today,
+            "median_year_built": cell_ages[len(cell_ages) // 2] if cell_ages else None,
+            "dated_buildings": len(cell_ages),
         }
 
         per_year = {k: [cc.get(f"{k}_{y}", 0) for y in years] for k in COUNT_KEYS}
@@ -565,6 +599,8 @@ def main():
             stock_at[i] = max(running + per_year["demolitions"][i] - per_year["newbuilds"][i], 0)
             running = stock_at[i]
 
+        built = built_year.get(cell, {})
+        built_since = 0
         cum_demo = cum_new = cum_net = 0
         for i, year in enumerate(years):
             demolitions = per_year["demolitions"][i]
@@ -574,19 +610,36 @@ def main():
             cum_new += newbuilds
             cum_net += net
             base = stock_at[i]
-            props[f"demolitions_{year}"] = demolitions
-            props[f"newbuilds_{year}"] = newbuilds
-            props[f"rehabs_{year}"] = per_year["rehabs"][i]
-            props[f"alterations_{year}"] = per_year["alterations"][i]
-            props[f"stabilizations_{year}"] = per_year["stabilizations"][i]
-            props[f"landbank_{year}"] = per_year["landbank"][i]
-            props[f"net_{year}"] = net
-            props[f"cumnet_{year}"] = cum_net
-            props[f"cumdemo_{year}"] = cum_demo
+            # Most cells record nothing for most metrics in most years, and a
+            # 27-year window across nine series makes that the bulk of the
+            # file. Zeros are omitted; every reader (paint expressions, popup,
+            # leaderboard) already treats a missing property as zero.
+            def put(key, value):
+                if value:
+                    props[f"{key}_{year}"] = value
+
+            put("demolitions", demolitions)
+            put("newbuilds", newbuilds)
+            put("rehabs", per_year["rehabs"][i])
+            put("alterations", per_year["alterations"][i])
+            put("stabilizations", per_year["stabilizations"][i])
+            put("landbank", per_year["landbank"][i])
+            put("net", net)
+            put("cumnet", cum_net)
             # Share of that year's standing stock demolished, in percent.
-            props[f"lossrate_{year}"] = round(demolitions / base * 100, 2) if base else 0
+            put("lossrate", round(demolitions / base * 100, 2) if base else 0)
+            # Buildings standing today that were put up that year. Survivorship
+            # -biased by construction: anything built and later demolished is
+            # absent, so this is "still standing", never "built".
+            if year >= BUILT_FIRST_YEAR:
+                n_built = built.get(year, 0)
+                built_since += n_built
+                put("built", n_built)
+                put("cumbuilt", built_since)
             for key in COUNT_KEYS:
                 totals[year][key] += per_year[key][i]
+            if year >= BUILT_FIRST_YEAR:
+                totals[year][BUILT_KEY] += built.get(year, 0)
 
         stock_start = stock_at[0] if stock_at else stock_today
         loss_rate = round(cum_demo / stock_start * 100, 2) if stock_start else 0
@@ -598,6 +651,8 @@ def main():
         props["total_stabilizations"] = sum(per_year["stabilizations"])
         props["total_landbank"] = sum(per_year["landbank"])
         props["stock_start"] = stock_start
+        props["total_built"] = built_since
+        props["built_share"] = round(built_since / stock_today * 100, 2) if stock_today else 0
         props["loss_rate"] = loss_rate
         props["rebuild_ratio"] = round(rebuild / cum_demo, 2) if cum_demo else None
         props["low_stock"] = stock_start < MIN_STOCK_FOR_RATE
@@ -618,12 +673,15 @@ def main():
         "metadata": {
             "title": "Detroit structure loss and rebuild, by ~0.5 mile hex",
             "years": years,
-            "coverage": {k: {"first": min(years_seen[k]), "last": max(years_seen[k]),
-                             "through": coverage.get(k)}
-                         for k in COUNT_KEYS if years_seen.get(k)},
+            "coverage": dict(
+                [(k, {"first": min(years_seen[k]), "last": max(years_seen[k]),
+                      "through": coverage.get(k)})
+                 for k in COUNT_KEYS if years_seen.get(k)] +
+                [(BUILT_KEY, {"first": BUILT_FIRST_YEAR, "last": years[-1], "through": None})]),
             "cell_width_miles": CELL_WIDTH_MILES,
             "min_stock_for_rate": MIN_STOCK_FOR_RATE,
             "citywide_totals": {str(y): dict(totals[y]) for y in years},
+            "built_first_year": BUILT_FIRST_YEAR,
             "citywide_stock_now": sum(stock_now.values()),
             "loss_rate_breaks": quantile_breaks(rate_pool, 6),
             "trajectories": dict(trajectory_counts),
@@ -635,6 +693,7 @@ def main():
                 "stabilizations": "City of Detroit Completed Property Stabilizations",
                 "landbank": "Detroit Land Bank Authority sales (auction, own-it-now, project, vacant land)",
                 "stock": "Parcels (Current) — improved parcels, num_buildings",
+                "built": "Parcels (Current) — year_built on standing buildings; survivorship-biased, counts only what still stands",
                 "boundary": "US Census TIGERweb incorporated places",
             },
         },
@@ -659,11 +718,11 @@ def main():
     print(f"\nloss-rate breaks (%% of stock): {collection['metadata']['loss_rate_breaks']}")
     print(f"trajectories: {dict(trajectory_counts)}")
     print("\nCitywide by year:")
-    head = "  year " + "".join(f"{k[:7]:>9}" for k in COUNT_KEYS) + "      net"
+    head = "  year " + "".join(f"{k[:7]:>9}" for k in COUNT_KEYS + [BUILT_KEY]) + "      net"
     print(head)
     for year in years:
         t = totals[year]
-        row = "".join(f"{t[k]:>9,}" for k in COUNT_KEYS)
+        row = "".join(f"{t[k]:>9,}" for k in COUNT_KEYS + [BUILT_KEY])
         print(f"  {year} {row} {t['newbuilds'] - t['demolitions']:>8,}")
 
 
