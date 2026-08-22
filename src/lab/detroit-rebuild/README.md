@@ -19,7 +19,7 @@ comparable to every other year as the slider moves:
 | Alteration permits (year) | sequential | money spent on standing buildings |
 | Stabilisations (year) | sequential | boarded up instead of demolished |
 | Land Bank sales (year) | sequential | property returning to private hands |
-| Built that year, still standing | sequential | construction from `year_built`, back to 2000 |
+| Built that year, still standing | sequential | construction from `year_built`, back to **1870** |
 | Built since 2000, cumulative | sequential | running total of surviving construction |
 | Share of stock lost (2014–2026) | sequential | the whole period at once |
 | Share of stock built since 2000 | sequential | Detroit's newest ground |
@@ -47,7 +47,7 @@ the worst lost 55.7%.
 | Stabilisations | City of Detroit Completed Property Stabilizations | 2021–2025 | 2,703 |
 | Land Bank sales | DLBA auction / own-it-now / project / vacant-land sales | 2014–2026 | 54,292 |
 | Building stock | Parcels (Current) — improved parcels, `num_buildings` | current | 235,947 buildings |
-| Construction dates | Parcels (Current) — `year_built` on standing buildings | 1850s–2026 | 4,181 built since 2000 |
+| Construction dates | Parcels (Current) — `year_built` on standing buildings | 1870–2026 | 241,085 dated; 4,181 since 2000 |
 | City boundary | Census TIGERweb incorporated places | — | 1 |
 
 **Coverage differs by source, and the map says so rather than drawing a gap as a
@@ -62,12 +62,30 @@ is the only construction record that reaches further, and it reaches to the
 1850s. It is also a different kind of measurement, and the map labels it as one:
 a permit is an intention filed, `year_built` is a building that exists now.
 
-**It counts survivors, not starts.** A house built in 2003 and demolished in 2019
-is not in it, so it undercounts, and undercounts more the further back you look.
-Every label says "still standing" for that reason. What it shows is worth the
-caveat: roughly 300–660 buildings a year going up through 2007, a collapse to a
-few dozen a year from the crash through the bankruptcy and into 2021, then a
-modest recovery from 2022.
+**It counts survivors, not starts**, and that matters more the further back you
+go: a 1920s value is what is *left* of the 1920s, not what was built then. Every
+label says "still standing" for that reason.
+
+The window opens at **1870**. Dates run back to 1701 — Detroit's founding year,
+on exactly one building, plainly a placeholder — and only 32 buildings in the
+grid predate 1870, scattered across 14 years. Those are counted into the totals
+and reported in the metadata (`built_before_window`) rather than silently
+dropped.
+
+What the long series shows: the streetcar core filling in through the 1910s and
+1920s, then the postwar ring — **10,497 buildings still standing went up in 1950
+alone**, against 4,181 across the whole quarter-century since 2000. Peak
+surviving years are 1950, 1948, 1941 and 1925. In the modern era it is roughly
+300–660 a year through 2007, a collapse to a few dozen from the crash through
+the bankruptcy and into 2021, then a modest recovery from 2022.
+
+### The slider follows the metric
+
+The construction record runs 157 years and the demolition record 13. A single
+slider spanning the union would leave most metrics a sliver of it, so the slider
+spans whatever the selected metric actually covers, and holds the year across a
+metric change when the new range contains it. Playback scales to a roughly
+24-second pass regardless of span.
 
 Permit categories are our split. `Alteration` is by far the largest class and the
 best proxy for money spent on a standing building, but it spans a furnace swap to

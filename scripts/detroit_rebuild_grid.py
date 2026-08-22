@@ -147,7 +147,18 @@ PARCELS = {
 # decades the undercount is small (demolition targets old stock), but it grows
 # the further back you look, which is why the long series is reported as
 # "still standing", never as "built".
-BUILT_FIRST_YEAR = 2000
+# year_built runs to 1701 — Detroit's founding year, on exactly one building,
+# which is a placeholder rather than a survivor. Before 1870 the record is 14
+# scattered years holding 69 buildings between them; from 1870 it is continuous.
+# The window opens there, and the earlier buildings are counted into the
+# baseline and reported rather than silently dropped.
+BUILT_FIRST_YEAR = 1870
+
+# The cumulative series is kept to the modern era. Carried back to 1870 it would
+# be non-zero in almost every cell-year and roughly double the file for a
+# reading nobody needs; "how much of this block went up since 2000" is the
+# question worth asking of it.
+CUMBUILT_FIRST_YEAR = 2000
 
 # Census TIGERweb incorporated places. Detroit's own portal publishes council
 # districts but no single city outline; this one polygon already carries the
@@ -545,6 +556,7 @@ def main():
     # map — start in 2014, and 2012/2013 carry 18 records between them. Anchor
     # the window to the demolition record so the slider has no dead stops.
     all_years = sorted(set().union(*years_seen.values()) | set(range(BUILT_FIRST_YEAR, 2027)))
+    pre_window = sum(n for c in built_year.values() for y, n in c.items() if y < BUILT_FIRST_YEAR)
     demo_first = min(years_seen["demolitions"]) if years_seen.get("demolitions") else BUILT_FIRST_YEAR
     # Land Bank sales reach back to 2012 but 2012/2013 hold 18 records between
     # them. The construction record is the one that genuinely opens the window
@@ -554,7 +566,10 @@ def main():
     years = [y for y in range(first_year, last_year + 1)]
     trimmed = [y for y in all_years if y < first_year]
     years_seen["built"] = set(y for y in years if y >= BUILT_FIRST_YEAR)
+    years_seen["cumbuilt"] = set(y for y in years if y >= CUMBUILT_FIRST_YEAR)
 
+    print(f"  construction record: {BUILT_FIRST_YEAR}-{2026}, plus {pre_window} "
+          f"buildings dated earlier (scattered, treated as unreliable)")
     if trimmed:
         print(f"\n  window starts {first_year} (demolition record); "
               f"dropped {', '.join(str(y) for y in trimmed)} from the slider")
@@ -632,9 +647,9 @@ def main():
             # -biased by construction: anything built and later demolished is
             # absent, so this is "still standing", never "built".
             if year >= BUILT_FIRST_YEAR:
-                n_built = built.get(year, 0)
-                built_since += n_built
-                put("built", n_built)
+                put("built", built.get(year, 0))
+            if year >= CUMBUILT_FIRST_YEAR:
+                built_since += built.get(year, 0)
                 put("cumbuilt", built_since)
             for key in COUNT_KEYS:
                 totals[year][key] += per_year[key][i]
@@ -653,6 +668,7 @@ def main():
         props["stock_start"] = stock_start
         props["total_built"] = built_since
         props["built_share"] = round(built_since / stock_today * 100, 2) if stock_today else 0
+        props["built_pre_window"] = sum(n for y, n in built.items() if y < BUILT_FIRST_YEAR)
         props["loss_rate"] = loss_rate
         props["rebuild_ratio"] = round(rebuild / cum_demo, 2) if cum_demo else None
         props["low_stock"] = stock_start < MIN_STOCK_FOR_RATE
@@ -677,11 +693,13 @@ def main():
                 [(k, {"first": min(years_seen[k]), "last": max(years_seen[k]),
                       "through": coverage.get(k)})
                  for k in COUNT_KEYS if years_seen.get(k)] +
-                [(BUILT_KEY, {"first": BUILT_FIRST_YEAR, "last": years[-1], "through": None})]),
+                [(BUILT_KEY, {"first": BUILT_FIRST_YEAR, "last": years[-1], "through": None}),
+                 ("cumbuilt", {"first": CUMBUILT_FIRST_YEAR, "last": years[-1], "through": None})]),
             "cell_width_miles": CELL_WIDTH_MILES,
             "min_stock_for_rate": MIN_STOCK_FOR_RATE,
             "citywide_totals": {str(y): dict(totals[y]) for y in years},
             "built_first_year": BUILT_FIRST_YEAR,
+            "built_before_window": pre_window,
             "citywide_stock_now": sum(stock_now.values()),
             "loss_rate_breaks": quantile_breaks(rate_pool, 6),
             "trajectories": dict(trajectory_counts),

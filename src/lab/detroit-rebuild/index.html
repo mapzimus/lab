@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Detroit: Torn Down / Built Back</title>
-<meta name="description" content="Block-by-block structure loss and rebuild in Detroit, 2000-2026, normalised against the buildings actually standing.">
+<meta name="description" content="Block-by-block structure loss and rebuild in Detroit, 1870-2026, normalised against the buildings actually standing.">
 <link rel="icon" href="/favicon.svg">
 <link rel="stylesheet" href="vendor/maplibre-gl.css">
 <style>
@@ -230,7 +230,7 @@
 
 <div class="panel">
   <h1>Torn Down / Built Back</h1>
-  <p class="sub">Structure loss and replacement, 2000&ndash;2026, half-mile hexes.</p>
+  <p class="sub">Structure loss and replacement, 1870&ndash;2026, half-mile hexes.</p>
 
   <div class="cols">
   <div class="readout">
@@ -295,17 +295,21 @@
     </p>
     <p class="note">
       The permit record stops dead at 2019, so the long arc comes from the parcel
-      file's <code>year_built</code> instead: <b>4,181 buildings standing today went up
-      since 2000</b>. The shape of that is the story permits cannot tell &mdash; roughly
-      300&ndash;660 a year through 2007, a collapse to a few dozen a year from the crash
-      through the bankruptcy and into 2021, then a modest recovery from 2022.
+      file's <code>year_built</code> instead, and it reaches <b>back to 1870</b>. You can
+      watch the city build itself: the streetcar core filling in through the 1910s and
+      1920s, then the enormous postwar ring &mdash; <b>10,497 buildings still standing
+      went up in 1950 alone</b>, against 4,181 in the whole quarter-century since 2000.
+      Peak surviving years are 1950, 1948, 1941 and 1925.
     </p>
     <p class="note">
-      <b>That series counts survivors, not starts.</b> A house built in 2003 and
-      demolished in 2019 is not in it, so it undercounts, and undercounts more the
-      further back you look. It is labelled &ldquo;still standing&rdquo; everywhere for
-      that reason. Demolitions before 2014 and permits before 2019 are simply not
-      published &mdash; the map greys those years out rather than drawing them as zero.
+      <b>That series counts survivors, not starts</b>, which matters more the further
+      back you go: a 1920s bar is what is left of the 1920s, not what was built then.
+      It is labelled &ldquo;still standing&rdquo; everywhere for that reason. Dates run
+      to 1701 &mdash; Detroit's founding year, on one building, plainly a placeholder
+      &mdash; and only 32 buildings predate 1870, so the window opens there.
+      Demolitions before 2014 and permits before 2019 are simply not published; the map
+      greys those years out rather than drawing them as zero, and the slider spans
+      whatever the metric you picked actually covers.
     </p>
     <p class="note">
       Cells are pointy-top hexagons 0.5&nbsp;mi across the flats, kept when their centre
@@ -365,7 +369,7 @@
 
   var GRID_URL = "data/detroit-grid.geojson";
   var BOUNDARY_URL = "data/detroit-boundary.geojson";
-  var FRAME_MS = 900;
+  var FRAME_MS = 900;   // ceiling; frameMs() scales a full pass to ~24s
   var NARROW_PX = 640;
   var SHORT_PX = 620;
   var NO_DATA = "#454e5c";   // low stock: its own visual class, never the ramp's low end
@@ -433,11 +437,11 @@
       type: "seq", hue: "plum", breaks: [2, 6, 13, 22, 35], yearly: true, source: "landbank", group: "Rebuilding",
       note: "Detroit Land Bank Authority disposals — auction, own-it-now, project and vacant-land sales — moving property back into private hands." },
     { key: "built", label: "Built that year, still standing", unit: "",
-      type: "seq", hue: "green", breaks: [1, 3, 8, 20, 40], yearly: true, source: "built",
+      type: "seq", hue: "green", breaks: [1, 5, 15, 40, 90], yearly: true, source: "built",
       group: "Rebuilding",
-      note: "Buildings standing today that went up that year, from the parcel file's year_built. Reaches back to 2000, where the permit record stops at 2019 — but counts only what survived, so it undercounts the further back you look." },
+      note: "Buildings standing today that went up that year, from the parcel file's year_built — back to 1870, where the permit record stops at 2019. Counts survivors, not starts, so it undercounts further back. Peak surviving years: 1950, 1948, 1941, 1925." },
     { key: "cumbuilt", label: "Built since 2000, cumulative", unit: "",
-      type: "seq", hue: "green", breaks: [1, 5, 15, 35, 70], yearly: true, source: "built",
+      type: "seq", hue: "green", breaks: [1, 5, 15, 35, 70], yearly: true, source: "cumbuilt",
       group: "Rebuilding",
       note: "Running total of still-standing buildings put up from 2000 to the selected year." },
     { key: "loss_rate", label: "Share of stock lost (2014–2026)", unit: "%",
@@ -446,11 +450,11 @@
       note: "Total demolitions over the whole period as a percent of the stock standing in 2014. The median cell lost about a tenth; the worst lost more than half." },
     { key: "built_share", label: "Share of stock built since 2000", unit: "%",
       type: "seq", hue: "green", breaks: [1, 3, 8, 20, 40], yearly: false,
-      source: "built", group: "The whole period", needs: "stock_now",
+      source: "cumbuilt", group: "The whole period", needs: "stock_now",
       note: "Of the buildings standing in this cell, the percent put up since 2000. Detroit's newest ground." },
     { key: "median_year_built", label: "Median year built", unit: "",
       type: "seq", hue: "plum", breaks: [1915, 1925, 1935, 1945, 1955], yearly: false,
-      plain: true, needs: "dated_buildings", group: "The whole period",
+      plain: true, needs: "dated_buildings", source: "built", group: "The whole period",
       note: "The age of what is still standing — 1904 to 2009 across the city. Darker is older." }
   ];
 
@@ -523,7 +527,19 @@
 
   function colors(m) { return m.type === "div" ? diverging(cvd ? "rb" : "rg") : SEQ[m.hue]; }
 
-  function fieldFor(m) { return m.yearly ? m.key + "_" + years[index] : m.key; }
+  // The construction record runs 157 years and the demolition record 13. One
+  // slider spanning the union would leave a metric's own range a sliver of it,
+  // so the slider spans whatever the selected metric actually covers.
+  function yearsFor(m) {
+    var cov = m && m.source ? meta.coverage[m.source] : null;
+    if (!cov) return years;
+    return years.filter(function (y) { return y >= cov.first && y <= cov.last; });
+  }
+
+  function activeYears() { return yearsFor(metric); }
+  function currentYear() { var a = activeYears(); return a[Math.min(index, a.length - 1)]; }
+
+  function fieldFor(m) { return m.yearly ? m.key + "_" + currentYear() : m.key; }
 
   function fillColor(m) {
     var ramp = colors(m);
@@ -544,9 +560,9 @@
     var quiet = 0.06;
     // A cell with nothing recorded should read as quiet, not as a low value.
     var hasData = m.yearly && !m.rate
-      ? [">", ["+", ["to-number", ["get", "demolitions_" + years[index]], 0],
-                    ["to-number", ["get", "newbuilds_" + years[index]], 0],
-                    ["to-number", ["get", m.key + "_" + years[index]], 0]], 0]
+      ? [">", ["+", ["to-number", ["get", "demolitions_" + currentYear()], 0],
+                    ["to-number", ["get", "newbuilds_" + currentYear()], 0],
+                    ["to-number", ["get", m.key + "_" + currentYear()], 0]], 0]
       : true;
     var base = hasData === true ? 0.8 : ["case", hasData, 0.8, quiet];
     if (!activeTrajectory) return base;
@@ -562,13 +578,6 @@
   }
 
   function coverageFor(m) { return meta.coverage[m.source] || null; }
-
-  function metricLive(m) {
-    var cov = coverageFor(m);
-    if (!cov || !m.yearly) return true;
-    var year = years[index];
-    return year >= cov.first && year <= cov.last;
-  }
 
   // ---- chrome -------------------------------------------------------------
 
@@ -603,7 +612,7 @@
   }
 
   function renderTotals() {
-    var year = years[index];
+    var year = currentYear();
     // A period metric is not a snapshot of the selected year, so it must not
     // be captioned with that year's numbers.
     var t = metric.yearly ? (meta.citywide_totals[year] || {}) : periodTotals();
@@ -624,7 +633,7 @@
   }
 
   function renderWarnings() {
-    var year = years[index];
+    var year = currentYear();
     var cov = coverageFor(metric);
     var warn = document.getElementById("warn-coverage");
     if (metric.yearly && cov && (year < cov.first || year > cov.last)) {
@@ -635,7 +644,8 @@
       warn.hidden = true;
     }
     var partial = document.getElementById("warn-partial");
-    if (metric.yearly && year === years[years.length - 1]) {
+    var span = activeYears();
+    if (metric.yearly && year === span[span.length - 1] && year === years[years.length - 1]) {
       var through = (meta.coverage.demolitions || {}).through;
       partial.textContent = "Partial year" + (through ? " — demolitions through " + through : "") + ".";
       partial.hidden = false;
@@ -702,16 +712,22 @@
   }
 
   function render() {
-    var year = years[index];
-    var span = years[0] + "–" + String(years[years.length - 1]).slice(2);
+    var active = activeYears();
+    if (index > active.length - 1) index = active.length - 1;
+    var year = active[index];
+    var span = active[0] + "–" + String(active[active.length - 1]).slice(2);
     document.getElementById("year-big").textContent = metric.yearly ? year : span;
     // A metric with no year axis should not leave a live slider implying one.
     if (!metric.yearly && timer) setPlaying(false);
     document.querySelector(".timeline").classList.toggle("frozen", !metric.yearly);
-    document.getElementById("year-slider").disabled = !metric.yearly;
+    var slider = document.getElementById("year-slider");
+    slider.disabled = !metric.yearly;
     document.getElementById("play").disabled = !metric.yearly;
     document.getElementById("year-now").textContent = metric.yearly ? year : span;
-    document.getElementById("year-slider").value = index;
+    slider.max = active.length - 1;
+    slider.value = index;
+    document.getElementById("tick-min").textContent = active[0];
+    document.getElementById("tick-max").textContent = active[active.length - 1];
     renderTotals();
     renderWarnings();
     renderLegend();
@@ -722,14 +738,21 @@
   }
 
   function step(delta) {
-    index = (index + delta + years.length) % years.length;
+    var n = activeYears().length;
+    index = (index + delta + n) % n;
     render();
+  }
+
+  // A full pass should read as an animation, not a wait: 157 construction years
+  // at the 13-year pace would run four minutes.
+  function frameMs() {
+    return Math.max(90, Math.min(900, Math.round(24000 / activeYears().length)));
   }
 
   function setPlaying(on) {
     var button = document.getElementById("play");
     if (on) {
-      timer = setInterval(function () { step(1); }, FRAME_MS);
+      timer = setInterval(function () { step(1); }, frameMs());
       button.innerHTML = "&#10074;&#10074;";
       button.setAttribute("aria-label", "Pause");
     } else {
@@ -745,16 +768,19 @@
   function historyChart(props) {
     // Diverging bars: structures lost below the baseline, put back above it.
     // Same polarity and palette as the map so the two read as one statement.
-    var lost = years.map(function (y) { return props["demolitions_" + y] || 0; });
-    var back = years.map(function (y) {
+    // Restricted to the demolition record: every series plotted here starts
+    // 2014 or later, and 157 bars in a 236px popup would be 1px each.
+    var chartYears = yearsFor({ yearly: true, source: "demolitions" });
+    var lost = chartYears.map(function (y) { return props["demolitions_" + y] || 0; });
+    var back = chartYears.map(function (y) {
       return (props["newbuilds_" + y] || 0) + (props["rehabs_" + y] || 0) + (props["stabilizations_" + y] || 0);
     });
     var peak = Math.max(1, Math.max.apply(null, lost), Math.max.apply(null, back));
     var w = 236, h = 62, mid = h / 2, gap = 2;
-    var bw = (w / years.length) - gap;
+    var bw = (w / chartYears.length) - gap;
     var pos = colors({ type: "div" })[5];
-    var bars = years.map(function (y, i) {
-      var x = i * (w / years.length);
+    var bars = chartYears.map(function (y, i) {
+      var x = i * (w / chartYears.length);
       var lh = lost[i] / peak * (mid - 3);
       var bh = back[i] / peak * (mid - 3);
       var title = y + ": −" + lost[i] + " lost, +" + back[i] + " back";
@@ -766,16 +792,16 @@
       return out + "</g>";
     }).join("");
     return '<svg class="pop-chart" width="' + w + '" height="' + h + '" role="img" ' +
-      'aria-label="Structures lost and put back per year, ' + years[0] + " to " + years[years.length - 1] + '">' +
+      'aria-label="Structures lost and put back per year, ' + chartYears[0] + " to " + chartYears[chartYears.length - 1] + '">' +
       bars + '<line x1="0" y1="' + mid + '" x2="' + w + '" y2="' + mid +
       '" stroke="#4a505a" stroke-width="1"/></svg>' +
       '<div class="pop-legend"><span><i style="background:' + DIVERGING_NEG[0] + '"></i>lost</span>' +
       '<span><i style="background:' + pos + '"></i>put back</span>' +
-      '<span style="margin-left:auto">' + years[0] + "–" + years[years.length - 1] + "</span></div>";
+      '<span style="margin-left:auto">' + chartYears[0] + "–" + chartYears[chartYears.length - 1] + "</span></div>";
   }
 
   function cellHTML(props) {
-    var year = years[index];
+    var year = currentYear();
     var traj = TRAJECTORIES.filter(function (t) { return t.key === props.trajectory; })[0];
     var cov = meta.coverage;
     function row(label, value) {
@@ -871,16 +897,18 @@
     });
     select.value = metric.key;
     select.addEventListener("change", function () {
+      var wasYear = currentYear();
       metric = METRIC_BY_KEY[select.value];
+      // Hold the year across a metric change where the new range contains it,
+      // so switching lens does not also jump you through time.
+      var next = activeYears().indexOf(wasYear);
+      index = next >= 0 ? next : activeYears().length - 1;
+      if (timer) { setPlaying(false); setPlaying(true); }
       render();
     });
 
     var slider = document.getElementById("year-slider");
     slider.min = 0;
-    slider.max = years.length - 1;
-    slider.value = index;
-    document.getElementById("tick-min").textContent = years[0];
-    document.getElementById("tick-max").textContent = years[years.length - 1];
     slider.addEventListener("input", function () {
       if (timer) setPlaying(false);
       index = Number(slider.value);
@@ -933,7 +961,7 @@
     var boundary = results[1];
     meta = grid.metadata;
     years = meta.years;
-    index = years.length - 1;
+    index = years.length - 1;  // clamped to the active metric on first render
 
     map.addSource("grid", { type: "geojson", data: grid });
     map.addSource("boundary", { type: "geojson", data: boundary });
