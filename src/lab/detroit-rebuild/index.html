@@ -482,7 +482,6 @@
   "use strict";
 
   var GRID_URL = "data/detroit-grid.geojson";
-  var BOUNDARY_URL = "data/detroit-boundary.geojson";
   var FRAME_MS = 900;   // ceiling; frameMs() scales a full pass to ~24s
   var NARROW_PX = 900;
   var SHORT_PX = 620;
@@ -1125,17 +1124,14 @@
 
   Promise.all([
     fetch(GRID_URL).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }),
-    fetch(BOUNDARY_URL).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }),
     mapReady
   ]).then(function (results) {
     grid = results[0];
-    var boundary = results[1];
     meta = grid.metadata;
     years = meta.years;
     index = years.length - 1;  // clamped to the active metric on first render
 
     map.addSource("grid", { type: "geojson", data: grid });
-    map.addSource("boundary", { type: "geojson", data: boundary });
 
     map.addLayer({
       id: "cells", type: "fill", source: "grid",
@@ -1145,18 +1141,18 @@
       id: "cells-outline", type: "line", source: "grid",
       paint: { "line-color": "#000", "line-width": 0.5, "line-opacity": 0.35 }
     });
-    map.addLayer({
-      id: "boundary-line", type: "line", source: "boundary",
-      paint: { "line-color": "#98a2b3", "line-width": 1.2, "line-opacity": 0.7 }
-    });
 
     map.on("click", "cells", function (e) { showPopup(e.lngLat, e.features[0].properties); });
     map.on("mouseenter", "cells", function () { map.getCanvas().style.cursor = "pointer"; });
     map.on("mouseleave", "cells", function () { map.getCanvas().style.cursor = ""; });
 
+    // The grid is the only thing drawn, so it is what the view frames. Cells are
+    // clipped to the city by centre, so this sits within 0.2 mi of the city bbox.
     var bounds = new maplibregl.LngLatBounds();
-    boundary.features[0].geometry.coordinates.forEach(function (ring) {
-      ring.forEach(function (c) { bounds.extend(c); });
+    grid.features.forEach(function (f) {
+      f.geometry.coordinates.forEach(function (ring) {
+        ring.forEach(function (c) { bounds.extend(c); });
+      });
     });
 
     function frameCity() {

@@ -51,7 +51,7 @@ the worst lost 55.7%.
 | Land Bank sales | DLBA auction / own-it-now / project / vacant-land sales | 2014–2026 | 54,292 |
 | Building stock | Parcels (Current) — improved parcels, `num_buildings` | current | 235,947 buildings |
 | Construction dates | Parcels (Current) — `year_built` on standing buildings | 1870–2026 | 241,085 dated; 4,181 since 2000 |
-| City boundary | Census TIGERweb incorporated places | — | 1 |
+| City boundary | Census TIGERweb incorporated places | — | 1 (clip only, not drawn) |
 | Housing units | Census decennial `HU100` by tract, via TIGERweb | 2010, 2020 | 349,028 → 309,789 |
 
 **Coverage differs by source, and the map says so rather than drawing a gap as a
@@ -150,7 +150,8 @@ python3 ../../../scripts/detroit_rebuild_grid.py --refresh  # re-pull from the p
 A full refresh pulls ~360,000 records and takes about six minutes. Raw pulls are
 cached to `data/raw/` at the repo root (gitignored, ~120 MB). The processed grid
 lands here as `detroit-grid.geojson` (660 cells, ~2 MB) and
-`detroit-boundary.geojson`.
+`detroit-boundary.geojson`. The page loads only the grid — the boundary is the
+pipeline's clip input and a record of it, and is no longer drawn on the map.
 
 The script is stdlib-only — no geopandas or shapely in this repo's toolchain — so
 the hex grid, the point-in-polygon clip, and the spatial join are written out by
