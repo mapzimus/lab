@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-24",
+  "generatedAt": "2026-08-25",
   "news": {
     "mapsmania": [
+      {
+        "title": "GTA - San Francisco",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/gta-san-francisco.html",
+        "desc": ""
+      },
       {
         "title": "Mapping 219,469 Rail Journeys",
         "url": "http://googlemapsmania.blogspot.com/2026/08/mapping-219469-rail-journeys.html",
@@ -35,11 +40,6 @@
       {
         "title": "Where Area Equals People",
         "url": "http://googlemapsmania.blogspot.com/2026/08/where-area-equals-people.html",
-        "desc": ""
-      },
-      {
-        "title": "Mapping All Our Yesterdays",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/mapping-all-our-yesterdays.html",
         "desc": ""
       }
     ],
@@ -145,10 +145,10 @@
   "releases": [
     {
       "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.5.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.5.0",
-      "desc": "### ✨ Features and improvements - Add experimental `ImageSource.setWarp` and `ImageSource.getWarp`, choosing between a `auto`, `perspective` and a `flat` war…",
-      "publishedAt": "2026-08-21",
+      "title": "maplibre-gl-js v6.6.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.6.0",
+      "desc": "### ✨ Features and improvements - Add support for `symbol-height-offset` and `symbol-height-anchor` layout properties, which raise icons and text above the map.",
+      "publishedAt": "2026-08-24",
       "isFresh": true
     },
     {
@@ -210,15 +210,27 @@
   ],
   "gisse": [
     {
+      "title": "Arcade Expression not showing minimum value in dynamic text for visible rows",
+      "url": "https://gis.stackexchange.com/questions/501299/arcade-expression-not-showing-minimum-value-in-dynamic-text-for-visible-rows",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Digital signature missing in QGIS 4.2.1 (Code Signing)",
+      "url": "https://gis.stackexchange.com/questions/501298/digital-signature-missing-in-qgis-4-2-1-code-signing",
+      "score": 2,
+      "answers": 0
+    },
+    {
       "title": "Retrieving 10,000+ features from WFS service without overloading server",
       "url": "https://gis.stackexchange.com/questions/501296/retrieving-10-000-features-from-wfs-service-without-overloading-server",
-      "score": -1,
+      "score": -3,
       "answers": 0
     },
     {
       "title": "How to apply the Hard Light Blending mode in a QGIS layout legend?",
       "url": "https://gis.stackexchange.com/questions/501293/how-to-apply-the-hard-light-blending-mode-in-a-qgis-layout-legend",
-      "score": 1,
+      "score": 3,
       "answers": 0
     },
     {
@@ -246,28 +258,16 @@
       "answers": 0
     },
     {
-      "title": "Joined attributes location in identification tool of QGIS",
-      "url": "https://gis.stackexchange.com/questions/501288/joined-attributes-location-in-identification-tool-of-qgis",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "How do you structure raster-processing code so the I/O can be replaced in tests?",
       "url": "https://gis.stackexchange.com/questions/501277/how-do-you-structure-raster-processing-code-so-the-i-o-can-be-replaced-in-tests",
       "score": 1,
       "answers": 1
     },
     {
-      "title": "Export vectorfiles from QGIS to edit in Design software",
-      "url": "https://gis.stackexchange.com/questions/501280/export-vectorfiles-from-qgis-to-edit-in-design-software",
-      "score": 1,
+      "title": "Joined attributes location in identification tool of QGIS",
+      "url": "https://gis.stackexchange.com/questions/501288/joined-attributes-location-in-identification-tool-of-qgis",
+      "score": 0,
       "answers": 0
-    },
-    {
-      "title": "Avoiding QGIS lock on a GeoPackage while rendering",
-      "url": "https://gis.stackexchange.com/questions/501248/avoiding-qgis-lock-on-a-geopackage-while-rendering",
-      "score": 1,
-      "answers": 2
     }
   ],
   "nasa": [
