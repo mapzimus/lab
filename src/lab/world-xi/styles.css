@@ -1,0 +1,184 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #0b1016;
+  color: #f0ecdf;
+  overflow: hidden;
+}
+
+#map { position: absolute; inset: 0; }
+
+.chrome {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  max-width: 340px;
+  padding: 14px 16px;
+  background: rgba(11, 16, 22, 0.82);
+  border: 1px solid rgba(240, 236, 223, 0.15);
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+.backlink { font-size: 12px; margin-bottom: 4px; pointer-events: auto; }
+.backlink a { color: rgba(240, 236, 223, 0.7); text-decoration: none; }
+.backlink a:hover { color: #f0ecdf; }
+
+.chrome h1 {
+  font-size: 22px;
+  letter-spacing: 0.02em;
+}
+
+.lede {
+  margin-top: 4px;
+  font-size: 13px;
+  color: rgba(240, 236, 223, 0.75);
+}
+
+.legend {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 235px;
+  padding: 12px 14px;
+  background: rgba(11, 16, 22, 0.82);
+  border: 1px solid rgba(240, 236, 223, 0.15);
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.legend h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(240, 236, 223, 0.6);
+  margin-bottom: 6px;
+}
+
+.league {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  margin-bottom: 3px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.league:hover { border-color: rgba(240, 236, 223, 0.25); }
+
+.league[aria-pressed="false"] { opacity: 0.38; }
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: none;
+  border: 1px solid rgba(11, 16, 22, 0.6);
+}
+
+.league-name { flex: 1; }
+
+.count {
+  font-size: 11px;
+  color: rgba(240, 236, 223, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+.readout {
+  position: absolute;
+  left: 16px;
+  bottom: 44px;
+  max-width: 60vw;
+  padding: 6px 10px;
+  background: rgba(11, 16, 22, 0.82);
+  border-radius: 7px;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.readout:empty { display: none; }
+
+.credit {
+  position: absolute;
+  left: 16px;
+  bottom: 12px;
+  font-size: 11px;
+  color: rgba(240, 236, 223, 0.55);
+}
+
+.credit a { color: rgba(240, 236, 223, 0.8); }
+
+/* popup */
+.maplibregl-popup-content {
+  background: #141b24;
+  color: #f0ecdf;
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+}
+
+.maplibregl-popup-tip { border-top-color: #141b24 !important; border-bottom-color: #141b24 !important; }
+
+.maplibregl-popup-close-button { color: #f0ecdf; font-size: 18px; right: 4px; top: 2px; }
+
+.club-card { display: flex; gap: 12px; align-items: flex-start; }
+
+.club-card + hr { border: none; border-top: 1px solid rgba(240, 236, 223, 0.15); margin: 10px 0; }
+
+.club-crest { flex: none; width: 56px; height: auto; }
+
+.club-card h3 { font-size: 15px; margin-bottom: 2px; }
+
+.club-card p { font-size: 12.5px; color: rgba(240, 236, 223, 0.8); }
+
+.club-card a { color: #8ab8ff; }
+
+.chip {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.map-fallback { display: none; }
+
+body.map-failed .map-fallback {
+  display: block;
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 16px 20px;
+  background: rgba(11, 16, 22, 0.9);
+  border: 1px solid rgba(240, 236, 223, 0.2);
+  border-radius: 10px;
+}
+
+@media (max-width: 720px) {
+  .chrome { max-width: calc(100vw - 32px); }
+  .legend {
+    top: auto;
+    bottom: 70px;
+    right: 12px;
+    width: 190px;
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+  .readout { display: none; }
+}
