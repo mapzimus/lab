@@ -206,6 +206,44 @@
   footer.sources li { margin-top: 5px; }
   footer.sources .back { display: inline-block; margin-top: 16px; font-family: var(--mono); font-size: 12px; }
 
+  /* ---------- floating map key ---------- */
+  #map-legend {
+    position: fixed; left: 18px; bottom: 42px; z-index: 2;
+    width: 200px; padding: 10px 13px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 9px;
+    -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  #map-legend.on { opacity: 1; }
+  #map-legend .lg-title {
+    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 7px;
+  }
+  #map-legend .lg-ramp { display: flex; height: 9px; border-radius: 3px; overflow: hidden; }
+  #map-legend .lg-ramp i { flex: 1; }
+  #map-legend .lg-labels {
+    display: flex; justify-content: space-between;
+    font-family: var(--mono); font-size: 9.5px; color: var(--dim); margin-top: 3px;
+  }
+  #map-legend .lg-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--muted); padding: 2px 0;
+  }
+  #map-legend .lg-row i { flex: none; }
+  #map-legend .lg-row i.line { width: 16px; height: 3px; border-radius: 2px; }
+  #map-legend .lg-row i.dot { width: 9px; height: 9px; border-radius: 50%; }
+  #map-legend .lg-row i.box { width: 11px; height: 11px; border-radius: 3px; }
+  #map-legend .lg-row i.ring { width: 10px; height: 10px; border-radius: 50%; border: 2px solid; background: none !important; }
+  @media (max-width: 640px) {
+    #map-legend { left: 10px; top: 12px; bottom: auto; width: 168px; padding: 8px 11px; }
+    #map-legend .lg-row { font-size: 10px; }
+  }
+  /* Exploring: the panel carries its own context; only the metric key shows. */
+  body.exploring #map-legend { bottom: auto; top: 16px; }
+  @media (max-width: 640px) { body.exploring #map-legend { display: none; } }
+
   /* ---------- chapter rail ---------- */
   #chapter-rail {
     position: fixed; right: 16px; top: 50%; transform: translateY(-50%);
@@ -329,6 +367,7 @@
 
 <div id="map" aria-hidden="true"></div>
 <div id="epoch-hud"><div class="yr">1975</div><div class="sub">built-up footprint</div></div>
+<div id="map-legend" aria-label="Map key"></div>
 
 <main id="story">
   <section class="hero" data-step="intro">

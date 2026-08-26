@@ -234,8 +234,40 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
     });
 
     initMarkers(map, cities);
+    initCountryLabels(map, population.labels || []);
     initSteps(map);
   });
+}
+
+/* ------------------------------------------------- country name labels */
+// Most readers can't identify African countries by outline alone, so the
+// choropleth chapters carry name labels. HTML markers again (no glyph
+// server), with the animation on an inner element MapLibre never touches.
+let countryMarkers = [];
+
+function initCountryLabels(map, labels) {
+  const style = document.createElement("style");
+  style.textContent = `
+    .country-label { pointer-events: none; }
+    .country-label .inner { display: block; font-family: "IBM Plex Mono", monospace;
+      font-size: 9.5px; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase;
+      color: #9aa1ad; white-space: nowrap; text-shadow: 0 1px 4px #000, 0 0 8px rgba(0,0,0,0.85);
+      opacity: 0; transition: opacity 0.5s ease; }
+    .country-label.on .inner { opacity: 0.85; }
+    @media (max-width: 640px) { .country-label .inner { font-size: 8px; letter-spacing: 0.04em; } }`;
+  document.head.appendChild(style);
+  for (const [iso3, name, lon, lat] of labels) {
+    const el = document.createElement("div");
+    el.className = "country-label";
+    el.innerHTML = `<span class="inner">${name}</span>`;
+    new maplibregl.Marker({ element: el, anchor: "center" })
+      .setLngLat([lon, lat]).addTo(map);
+    countryMarkers.push(el);
+  }
+}
+
+function setCountryLabels(on) {
+  for (const el of countryMarkers) el.classList.toggle("on", !!on);
 }
 
 /* -------------------------------------------------------- HTML city labels */
@@ -370,14 +402,16 @@ function initSteps(map) {
       countriesOpacity(0.88, 0.3);
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null); lightsOn(0);
+      setCountryLabels(true);
     },
     c2: () => {
       countriesOpacity(0.2, 0.08); hollow2100(0);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null); lightsOn(0);
+      setCountryLabels(false);
     },
     c3: () => {
       countriesOpacity(0.14, 0.06); hollow2100(0); setLabels(null);
-      lightsOn(0); kinshasa(0, 0, null);
+      lightsOn(0); kinshasa(0, 0, null); setCountryLabels(false);
     },
     c4: () => {
       // The 1:50m country polygons are far too coarse at city zoom — their
@@ -385,6 +419,7 @@ function initSteps(map) {
       countriesOpacity(0, 0);
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
       corridors(0, 0, 0, 0, 0); lightsOn(0); densityOn(0);
+      setCountryLabels(false);
     },
   };
 
@@ -394,7 +429,7 @@ function initSteps(map) {
       setChoropleth("pop2025", POP_RAMP); countriesOpacity(0.7, 0.25);
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
-      lightsOn(0); densityOn(0);
+      lightsOn(0); densityOn(0); setCountryLabels(false);
       spinStart();
     },
     "ch1": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2025", POP_RAMP); },
@@ -420,6 +455,7 @@ function initSteps(map) {
       countriesOpacity(0.14, 0.06);
       setCityEpoch(2025, 0.5); setLabels(null); hollow2100(0);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null); lightsOn(0); densityOn(0);
+      setCountryLabels(false);
     },
     "c4-arrive": () => { fly(KINSHASA_BOUNDS, 11); base.c4(); kinshasa(0.95, 0.35, null); },
     "c4-1975": () => { fly(POOL_BOUNDS, 12); base.c4(); kinshasa(0.95, 0.25, 1975); },
@@ -448,6 +484,7 @@ function initSteps(map) {
       document.querySelectorAll(".step.is-active").forEach((el) => el.classList.remove("is-active"));
       entry.target.classList.add("is-active");
       setRail(id);
+      renderLegend(LEGENDS[id]);
       steps[id]();
     }
   }, { rootMargin: "-42% 0px -42% 0px" });
@@ -496,8 +533,17 @@ function initSteps(map) {
     pop2025: POP_RAMP, pop2050: POP_RAMP, pop2100: POP_RAMP,
     multiple: MULT_RAMP, medAge25: AGE_RAMP,
   };
+  const METRIC_LEGENDS = {
+    pop2025: rampLegend("People per country, 2025", POP_RAMP, fmtM),
+    pop2050: rampLegend("People per country, 2050", POP_RAMP, fmtM),
+    pop2100: rampLegend("People per country, 2100", POP_RAMP, fmtM),
+    multiple: rampLegend("Growth, 2025 → 2100", MULT_RAMP, fmtX),
+    medAge25: rampLegend("Median age, 2025", AGE_RAMP, fmtY),
+  };
   const applyMetric = () => {
     const m = metricSel.value;
+    setCountryLabels(m !== "off");
+    renderLegend(m === "off" ? null : METRIC_LEGENDS[m]);
     if (m === "off") { countriesOpacity(0, 0); return; }
     setChoropleth(m, METRIC_RAMPS[m]);
     countriesOpacity(0.88, 0.3);
@@ -597,12 +643,98 @@ function initSteps(map) {
     map.removeControl(nav);
     popup.remove();
     map.getCanvas().style.cursor = "";
-    if (active && steps[active]) steps[active]();
+    if (active && steps[active]) {
+      renderLegend(LEGENDS[active]);
+      steps[active]();
+    }
   });
 
   steps.intro();
   active = "intro";
   setRail("intro");
+}
+
+/* ------------------------------------------------------ floating legend */
+// A persistent key for whatever the map is currently showing. Card legends
+// scroll away with their step; this one travels with the reader.
+const fmtM = (v) => (v ? `${v}M` : "0");
+const fmtX = (v) => `×${v}`;
+const fmtY = (v) => `${v} yrs`;
+
+function rampLegend(title, stops, fmt) {
+  return { title, ramp: { stops, fmt } };
+}
+const ROW = (color, label, shape) => ({ color, label, shape: shape || "line" });
+const CITY_ROWS = [
+  ROW("#f4a93a", "African city — size = people", "dot"),
+  ROW("#5b6c85", "New York · London · Paris · Tokyo", "dot"),
+];
+const EPOCH_ROWS = (upTo) =>
+  EPOCHS.filter((e) => e <= upTo).map((e) =>
+    ROW(EPOCH_COLORS[e], `built by ${e}${e === 2030 ? " (projected)" : ""}`, "box"));
+
+const LEGENDS = {
+  "ch1": rampLegend("People per country, 2025", POP_RAMP, fmtM),
+  "c1-2025": rampLegend("People per country, 2025", POP_RAMP, fmtM),
+  "c1-2100": rampLegend("People per country, 2100", POP_RAMP, fmtM),
+  "c1-multiple": rampLegend("Growth, 2025 → 2100", MULT_RAMP, fmtX),
+  "c1-crossovers": rampLegend("Growth, 2025 → 2100", MULT_RAMP, fmtX),
+  "ch2": { title: "Cities in 1975", rows: CITY_ROWS },
+  "c2-1975": { title: "Cities in 1975", rows: CITY_ROWS },
+  "c2-2025": { title: "Cities in 2025", rows: CITY_ROWS },
+  "c2-2050": { title: "Cities in 2050", rows: CITY_ROWS },
+  "c2-2100": { title: "Cities in 2050 + 2100 outlook", rows: [
+    ...CITY_ROWS, ROW("#ffd166", "2100 projection (hollow ring)", "ring")] },
+  "ch3": { title: "What exists today", rows: [
+    ROW("#8b93a0", "existing railway"), ROW("#4a5261", "major highway")] },
+  "c3-existing": { title: "What exists today", rows: [
+    ROW("#8b93a0", "existing railway"), ROW("#4a5261", "major highway")] },
+  "c3-planned": { title: "Who is building", rows: [
+    ROW("#e0645a", "China-financed, built/building"),
+    ROW("#8fb8e8", "other backers, built/building"),
+    ROW("#c9a53f", "Trans-African Highway plan")] },
+  "c3-model": { title: "Predicted demand", rows: [
+    ROW("#f4a93a", "modeled corridor — width = pull"),
+    ROW("#8b93a0", "existing rail (dim)")] },
+  "c3-lights": { title: "Africa at night, 2020", rows: [
+    ROW("#ffd166", "brightly lit (city cores)", "box"),
+    ROW("#8a6a35", "lit (towns and sprawl)", "box")] },
+  "ch4": { title: "Cities in 2025", rows: CITY_ROWS },
+  "c4-arrive": { title: "Kinshasa–Brazzaville", rows: [
+    ROW("#1d3242", "Congo River / Malebo Pool", "box"),
+    ROW("#aeb6c2", "major road")] },
+  "c4-1975": { title: "Built-up ground", rows: [...EPOCH_ROWS(1975), ROW("#1d3242", "river", "box")] },
+  "c4-2000": { title: "Built-up ground", rows: [...EPOCH_ROWS(2000), ROW("#1d3242", "river", "box")] },
+  "c4-2020": { title: "Built-up ground", rows: [...EPOCH_ROWS(2020), ROW("#1d3242", "river", "box")] },
+  "c4-2030": { title: "Built-up ground", rows: [...EPOCH_ROWS(2030), ROW("#1d3242", "river", "box")] },
+  "c4-density": { title: "People per km², 2025", rows: [
+    ROW("#5a3a7a", "5,000+", "box"), ROW("#95457f", "15,000+", "box"),
+    ROW("#d5566a", "30,000+", "box"), ROW("#ff9d5c", "60,000+", "box")] },
+  "explore": null,
+};
+
+function renderLegend(spec) {
+  const el = document.getElementById("map-legend");
+  if (!el) return;
+  if (!spec) { el.classList.remove("on"); return; }
+  let html = `<div class="lg-title">${spec.title}</div>`;
+  if (spec.ramp) {
+    const { stops, fmt } = spec.ramp;
+    const sw = [];
+    for (let i = 1; i < stops.length; i += 2) sw.push(`<i style="background:${stops[i]}"></i>`);
+    const values = [];
+    for (let i = 0; i < stops.length; i += 2) values.push(stops[i]);
+    const picks = [0, Math.floor((values.length - 1) / 2), values.length - 1];
+    html += `<div class="lg-ramp">${sw.join("")}</div><div class="lg-labels">`
+      + picks.map((i, k) => `<span>${fmt(values[i])}${k === 2 ? "+" : ""}</span>`).join("") + "</div>";
+  }
+  if (spec.rows) {
+    html += spec.rows.map((r) =>
+      `<div class="lg-row"><i class="${r.shape}" style="${r.shape === "ring"
+        ? `border-color:${r.color}` : `background:${r.color}`}"></i><span>${r.label}</span></div>`).join("");
+  }
+  el.innerHTML = html;
+  el.classList.add("on");
 }
 
 /* ---------------------------------------------------------- static widgets */

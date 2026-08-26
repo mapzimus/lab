@@ -42,6 +42,19 @@ REGIONS = {
     "Latin America and the Caribbean", "Oceania", "World",
 }
 
+# Countries that get a name label on the continental map. Curated: big enough
+# to hold a label at zoom ~2.5 without collisions; short display names.
+LABELED = {
+    "MAR": "Morocco", "DZA": "Algeria", "LBY": "Libya", "EGY": "Egypt",
+    "MRT": "Mauritania", "MLI": "Mali", "NER": "Niger", "TCD": "Chad",
+    "SDN": "Sudan", "ETH": "Ethiopia", "SOM": "Somalia", "NGA": "Nigeria",
+    "GHA": "Ghana", "CIV": "Côte d'Ivoire", "SEN": "Senegal",
+    "CMR": "Cameroon", "SSD": "South Sudan", "KEN": "Kenya",
+    "COD": "DR Congo", "TZA": "Tanzania", "AGO": "Angola", "ZMB": "Zambia",
+    "MOZ": "Mozambique", "NAM": "Namibia", "BWA": "Botswana",
+    "ZAF": "South Africa", "MDG": "Madagascar", "UGA": "Uganda",
+}
+
 
 def load_wpp():
     med = defaultdict(dict)        # iso3 -> {year: millions}
@@ -111,6 +124,7 @@ def build_countries(med, ages):
     )
     fields = [f[0] for f in r.fields[1:]]
     features = []
+    labels = []
     for sr in r.shapeRecords():
         rec = dict(zip(fields, sr.record))
         iso3 = rec.get("ISO_A3_EH") or rec.get("ISO_A3")
@@ -141,8 +155,15 @@ def build_countries(med, ages):
             props["medAge25"] = round(age[2025], 1)
         if age.get(2100):
             props["medAge100"] = round(age[2100], 1)
+        if iso3 in LABELED:
+            # Label the biggest polygon's representative point so names land
+            # on the mainland, not a centroid out at sea or on an island.
+            biggest = max(getattr(geom, "geoms", [geom]), key=lambda g: g.area)
+            pt = biggest.representative_point()
+            labels.append([iso3, LABELED[iso3], round(pt.x, 2), round(pt.y, 2)])
         features.append({"geometry": mapping(simplified), "properties": props})
     write_geojson(DATA_DIR / "countries.geojson", features, ndigits=3)
+    return labels
 
 
 def main():
@@ -176,8 +197,8 @@ def main():
                        for var, s in variants.items()}
                 for iso3, variants in fan.items()},
     }
+    out["labels"] = build_countries(med, load_median_age())
     write_json(DATA_DIR / "population.json", out)
-    build_countries(med, load_median_age())
 
     for c in crossovers:
         print(f"  {c['aName']} passes {c['bName']} in {c['year']}")
