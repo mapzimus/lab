@@ -51,6 +51,7 @@ const hostedProjectRoutes = {
   "predicting-housing-crisis": "/lab/housing-crisis/",
   "game-vault": "/lab/game-vault/",
   "detroit-rebuild": "/lab/detroit-rebuild/",
+  "african-urbanization": "/lab/african-urbanization/",
   "interstate-challenge": "/interstate-challenge/",
   "mapzimus-board": "/mapzimus-board/",
   "boston-in-motion": "/boston-in-motion/",
