@@ -46,6 +46,7 @@ const game = {
   // Modes
   practice: false,       // solo free-flip practice (no lives/turns)
   difficulty: 'medium',  // AI skill: 'easy' | 'medium' | 'hard'
+  feel: 'standard',      // physics spin-curve knob: forgiving | standard | pro
   practiceMakes: 0,
   practiceAttempts: 0,
   practiceStreak: 0,
@@ -60,6 +61,7 @@ const game = {
   init(defs, direction, opts = {}) {
     this.practice   = !!opts.practice;
     this.difficulty = opts.difficulty || 'medium';
+    this.feel = ['forgiving', 'standard', 'pro'].includes(opts.feel) ? opts.feel : 'standard';
     this.startingLives = STARTING_LIFE_PRESETS.includes(+opts.startingLives) ? +opts.startingLives : 10;
     // Headroom above the start count so ON FIRE can actually mint lives.
     // Classic 10-life games keep the old 20 cap; 100-life games were stuck at
@@ -88,6 +90,7 @@ const game = {
     this.perfectLanding = false;
     this.capLand = false;
     this.goldenFlip = false;
+    this.plinkoPrize = null;
 
     // Winner-starts-next: caller passes the winner's INDEX (not name, which is
     // ambiguous when two players share a name). Ignored in practice.
@@ -138,6 +141,70 @@ const game = {
     return penalty > 0 && p.lives - penalty <= 0;
   },
 
+  // ── Plinko drop resolution (1/1000 easter egg) ─────────────────────────
+  // Replaces the normal make/miss outcome. Never a penalty; stake, streaks
+  // and ON FIRE state are untouched (the drop happens "outside" the game).
+  //   'win'   center slot  → every opponent is out; flipper wins the game
+  //   'zap'   mid slots    → every opponent loses 1 life
+  //   'lives' outer slots  → flipper gains 2 lives
+  resolvePlinko(prize) {
+    this.lastResult = 'MAKE';
+    const player = this.currentPlayer();
+    this.lastPenalty    = 0;
+    this.onFireGain     = 0;
+    this.justIgnited    = false;
+    this.fireEnded      = false;
+    this.fireCapped     = false;
+    this.justEliminated = false;
+    this.endedFireBonus = 0;
+    this.perfectLanding = false;
+    this.capLand        = false;
+    this.goldenFlip     = false;
+    this.plinkoPrize    = prize;
+
+    if (this.practice) {
+      this.practiceAttempts++;
+      this.practiceMakes++;
+      this.practiceStreak++;
+      this.practiceBest = Math.max(this.practiceBest, this.practiceStreak);
+      this.setState(GAME_STATES.RESULT);
+      return;
+    }
+
+    this.turnCounter++;
+    if (prize === 'win') {
+      for (const p of this.players) {
+        if (p === player || p.eliminated) continue;
+        p.eliminated = true;
+        p.isOnFire = false;
+        p.isHeatingUp = false;
+        p.streak = 0;
+      }
+      if (this.onFirePlayer && this.onFirePlayer !== player) {
+        this.onFirePlayer = null;
+        this.onFireBonus = 0;
+      }
+    } else if (prize === 'zap') {
+      for (const p of this.players) {
+        if (p === player || p.eliminated) continue;
+        p.lives = Math.max(0, p.lives - 1);
+        if (p.lives <= 0) {
+          p.eliminated = true;
+          p.isOnFire = false;
+          p.isHeatingUp = false;
+          p.streak = 0;
+          if (this.onFirePlayer === p) {
+            this.onFirePlayer = null;
+            this.onFireBonus = 0;
+          }
+        }
+      }
+    } else {
+      player.lives = Math.min(player.lives + 2, this.maxLives);
+    }
+    this.setState(GAME_STATES.RESULT);
+  },
+
   // Called by physics when bottle result is determined
   resolveFlip(result, meta = {}) {
     this.lastResult = result;
@@ -155,6 +222,7 @@ const game = {
     this.perfectLanding = result === 'MAKE' && !!meta.perfect;
     this.capLand        = result === 'MAKE' && !!meta.onCap;
     this.goldenFlip     = result === 'MAKE' && !!meta.golden;
+    this.plinkoPrize    = null;
     // Cap / upside-down makes — and the rare golden flip — are worth 2
     // (stake steps, or ON FIRE lives).
     const worth = (this.capLand || this.goldenFlip) ? 2 : 1;

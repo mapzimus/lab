@@ -15,6 +15,7 @@
   const turnTimerEl  = document.getElementById('turn-timer');
   const turnTimerFillEl = document.getElementById('turn-timer-fill');
   const flipHintEl   = document.getElementById('flip-hint');
+  const practiceMeterEl = document.getElementById('practice-meter');
   const startBtn     = document.getElementById('start-btn');
   const practiceBtn  = document.getElementById('practice-btn');
   const onlineBtn    = document.getElementById('online-btn');
@@ -82,8 +83,9 @@
   let reflowTimer = null;
   // Editions may bring their own physics (see Skins.physicsFor / skins.js META).
   // Applied per turn, so one player can be flipping a bottle while the next
-  // takes a bank shot with the alien. Must run AFTER Physics.resetBottle, which
-  // rebuilds the body.
+  // takes a bank shot with the alien. Must run BEFORE Physics.resetBottle —
+  // setProfile may resize the world (alien expand), and the bottle has to
+  // spawn at the new center.
   function applyTurnPhysics() {
     if (!Physics.setProfile) return;
     const skin = (game && game.currentPlayer && game.currentPlayer()?.skin) || BASE_SKIN;
@@ -99,8 +101,8 @@
       // (a stray resize must not reset a bottle in flight and void it as a MISS).
       if (!evaluating &&
           (game.state === GAME_STATES.TURN_START || game.state === GAME_STATES.ON_FIRE)) {
-        Physics.resetBottle();
         applyTurnPhysics();
+        Physics.resetBottle();
         prepareTurnArena();
       }
     }, 150);
@@ -457,6 +459,7 @@
     const defs = readRows();
     defs.push(seatDefaults(defs.length, defs.map((d) => d.color)));
     renderFrom(defs);
+    if (typeof saveSetup === 'function') saveSetup();
   }
 
   // event delegation: open picker, color, AI toggle, remove
@@ -477,6 +480,7 @@
       // Keep the family, switch the color — resolveCharForColor swaps a cast to
       // that color's variant and leaves a single-object skin to recolor in place.
       applyRowChar(row, null, sw.dataset.color);
+      if (typeof saveSetup === 'function') saveSetup();
       return;
     }
     const ai = e.target.closest('.ai-toggle');
@@ -486,6 +490,7 @@
       row.dataset.ai = on ? '0' : '1';
       ai.textContent = on ? 'Human' : 'CPU';
       ai.classList.toggle('cpu', !on);
+      if (typeof saveSetup === 'function') saveSetup();
       return;
     }
     const rm = e.target.closest('.remove-player-btn');
@@ -493,7 +498,17 @@
       const defs = readRows();
       defs.splice([...playerInputs.children].indexOf(rm.closest('.player-input-row')), 1);
       renderFrom(defs);
+      if (typeof saveSetup === 'function') saveSetup();
     }
+  });
+  // Debounced name typing → persist the lobby.
+  let nameSaveTimer = null;
+  playerInputs.addEventListener('input', (e) => {
+    if (!e.target || e.target.tagName !== 'INPUT') return;
+    clearTimeout(nameSaveTimer);
+    nameSaveTimer = setTimeout(() => {
+      if (typeof saveSetup === 'function') saveSetup();
+    }, 400);
   });
 
   addPlayerBtn.addEventListener('click', addPlayerInput);
@@ -655,10 +670,94 @@
   function chosenDifficulty() {
     return document.querySelector('input[name="difficulty"]:checked')?.value || 'medium';
   }
+  function chosenFeel() {
+    return document.querySelector('input[name="feel"]:checked')?.value ||
+      (window.Settings && Settings.feel) || 'standard';
+  }
   function chosenStartingLives() {
     const v = parseInt(document.querySelector('input[name="starting-lives"]:checked')?.value || '10', 10);
     return [3, 5, 10, 20, 100].includes(v) ? v : 10;
   }
+  function flickFeedbackOn() {
+    const el = document.getElementById('flick-feedback-toggle');
+    if (el) return !!el.checked;
+    return !!(window.Settings && Settings.flickFeedback);
+  }
+  function setRadio(name, value) {
+    const el = document.querySelector(`input[name="${name}"][value="${value}"]`);
+    if (el) el.checked = true;
+  }
+  function setFeelRadio(value) { setRadio('feel', value); }
+
+  // ── Setup persistence — names, lives, direction, difficulty, feel ──────────
+  const SETUP_KEY = 'flipgame.setup.v2';
+  function saveSetup() {
+    try {
+      localStorage.setItem(SETUP_KEY, JSON.stringify({
+        rows: readRows().map((r) => ({
+          name: String(r.name || '').slice(0, 14),
+          charId: r.charId,
+          color: r.color,
+          ai: !!r.ai,
+        })),
+        direction:  document.querySelector('input[name="direction"]:checked')?.value ?? '1',
+        difficulty: chosenDifficulty(),
+        feel:       chosenFeel(),
+        startingLives: String(chosenStartingLives()),
+        feedback:   flickFeedbackOn(),
+      }));
+    } catch (_) {}
+  }
+  function loadSetup() {
+    try {
+      const s = JSON.parse(localStorage.getItem(SETUP_KEY));
+      if (!s || !Array.isArray(s.rows) || s.rows.length < 1) return false;
+      const rows = s.rows.slice(0, 8).map((r, i) => {
+        const color = normalizeColor(r.color || defaultColorFor(r.charId || defaultCharId()));
+        const charId = resolveCharForColor(r.charId || defaultCharId(), color);
+        return {
+          name: String(r.name ?? '').slice(0, 14),
+          charId,
+          color,
+          ai: !!r.ai,
+          // Keep seatDefaults-compatible shape for rowHtml
+        };
+      });
+      // Need at least 2 seats for a lobby; pad if a solo save somehow landed.
+      while (rows.length < 2) rows.push(seatDefaults(rows.length, rows.map((x) => x.color)));
+      renderFrom(rows);
+      setRadio('direction', s.direction);
+      setRadio('difficulty', s.difficulty);
+      setRadio('feel', s.feel);
+      setRadio('starting-lives', s.startingLives);
+      const fb = document.getElementById('flick-feedback-toggle');
+      if (fb) fb.checked = !!s.feedback;
+      if (window.Settings) {
+        if (s.feel) Settings.setFeel(s.feel);
+        Settings.setFlickFeedback(!!s.feedback);
+      }
+      return true;
+    } catch (_) { return false; }
+  }
+
+  // Persist feel / flick-feedback whenever the player picks them.
+  document.querySelectorAll('input[name="feel"]').forEach((el) => {
+    el.addEventListener('change', () => {
+      if (window.Settings) Settings.setFeel(el.value);
+      saveSetup();
+    });
+  });
+  const flickFeedbackEl = document.getElementById('flick-feedback-toggle');
+  if (flickFeedbackEl) {
+    if (window.Settings) flickFeedbackEl.checked = !!Settings.flickFeedback;
+    flickFeedbackEl.addEventListener('change', () => {
+      if (window.Settings) Settings.setFlickFeedback(flickFeedbackEl.checked);
+      saveSetup();
+    });
+  }
+  document.querySelectorAll('input[name="direction"], input[name="difficulty"], input[name="starting-lives"]')
+    .forEach((el) => el.addEventListener('change', saveSetup));
+  if (window.Settings) setFeelRadio(Settings.feel);
 
   // ── Start game ─────────────────────────────────────────────────────────────
   // ── Immersive mode: fullscreen + keep the screen awake (panel ergonomics) ──
@@ -686,6 +785,7 @@
     const defs = rowsToDefs(readRows());
     if (defs.length < 2) { alert('Need at least 2 players!'); return; }
     const dir = parseInt(document.querySelector('input[name="direction"]:checked')?.value ?? '1');
+    saveSetup();
     Sound.unlock();   // first user gesture — unlock audio
     onlineMode = false;
     if (window.Net) Net.leave();
@@ -695,6 +795,7 @@
     gameOverEl.classList.add('hidden');
     startGame(defs, dir, {
       difficulty: chosenDifficulty(),
+      feel: chosenFeel(),
       startingLives: chosenStartingLives(),
       newMatch: true,
     });
@@ -711,6 +812,7 @@
       isAI: false,
       skin: charId,
     };
+    saveSetup();
     Sound.unlock();
     onlineMode = false;
     if (window.Net) Net.leave();
@@ -720,6 +822,7 @@
     gameOverEl.classList.add('hidden');
     startGame([def], 1, {
       practice: true,
+      feel: chosenFeel(),
       startingLives: chosenStartingLives(),
       newMatch: true,
     });
@@ -739,11 +842,13 @@
         const payload = {
           defs, direction: game.direction, startingLives: game.startingLives,
           startIndex: game.winnerIndex, newMatch: false,
+          feel: game.feel || chosenFeel(),
         };
         Net.startMatch(payload);
         if (playAgainBtn) playAgainBtn.textContent = 'Play Again';
         startGame(defs, game.direction, {
           difficulty: 'medium',
+          feel: payload.feel,
           startingLives: game.startingLives,
           startIndex: game.winnerIndex,
           newMatch: false,
@@ -760,7 +865,7 @@
         [{ name: game.players[0].name, color: game.players[0].color, isAI: false,
            skin: FORCE_SKIN || game.players[0].skin || BASE_SKIN }],
         1,
-        { practice: true, startingLives: game.startingLives }
+        { practice: true, feel: game.feel || chosenFeel(), startingLives: game.startingLives }
       );
     } else {
       const defs = game.players.map(p => ({ name: p.name, color: p.color, isAI: p.isAI,
@@ -768,18 +873,21 @@
       // Winner starts the next game (by index — robust to duplicate names).
       startGame(defs, game.direction, {
         difficulty: game.difficulty,
+        feel: game.feel || chosenFeel(),
         startingLives: game.startingLives,
         startIndex: game.winnerIndex,
       });
     }
   });
 
-  // initial two rows — rotate families, and never two seats on the same flavor
-  renderFrom((() => {
-    const seats = [];
-    for (let i = 0; i < 2; i++) seats.push(seatDefaults(i, seats.map((s) => s.color)));
-    return seats;
-  })());
+  // Restore yesterday's lobby, else two fresh seats (rotate families / colors).
+  if (!loadSetup()) {
+    renderFrom((() => {
+      const seats = [];
+      for (let i = 0; i < 2; i++) seats.push(seatDefaults(i, seats.map((s) => s.color)));
+      return seats;
+    })());
+  }
 
   // ── Game loop state ────────────────────────────────────────────────────────
   let lastTime    = 0;
@@ -804,10 +912,37 @@
   let goldenFlipActive = false;  // this flick rolled golden
   let goldenShowActive = false;  // the RESULT being shown is a golden make
   const GOLDEN_COLOR = '#f2c14e';
-  // Easter egg: secret player names. "party"/"disco" light up the table;
-  // "ghost"/"boo" flip a see-through object. Pure cosmetics.
+  // Easter egg: ~1/200 throws happen on the moon (physics rolls it from the
+  // flick seed) — floaty low-gravity flight, moon in the sky, normal scoring.
+  let moonFlipActive = false;
+  // Easter egg: ~1/1000 flips the floor vanishes and the throw drops into a
+  // plinko board (center = auto win). Physics rolls it from the flick seed;
+  // disabled online because prizes rewrite lives directly.
+  let plinkoFlipActive = false;
+  // Easter egg: secret player names — all pure cosmetics.
+  //   party/disco   → rainbow table edge      ghost/boo     → see-through object
+  //   tiny/smol     → pocket-sized object     giant/jumbo   → oversized object
+  //   ninja/shadow  → silhouette object       rainbow/unicorn → hue-cycling object
   const isPartyName = (n) => /^(party|disco)$/i.test(String(n || '').trim());
   const isGhostName = (n) => /^(ghost|boo)$/i.test(String(n || '').trim());
+  const isTinyName  = (n) => /^(tiny|smol)$/i.test(String(n || '').trim());
+  const isGiantName = (n) => /^(giant|jumbo|biggie)$/i.test(String(n || '').trim());
+  const isNinjaName = (n) => /^(ninja|shadow)$/i.test(String(n || '').trim());
+  const isRainbowName = (n) => /^(rainbow|unicorn)$/i.test(String(n || '').trim());
+  // Secret plinko triggers: name a player "plinko" (every flick drops), or
+  // type the letters p-l-i-n-k-o on a keyboard (arms the next flick only).
+  const isPlinkoName = (n) => /^plinko$/i.test(String(n || '').trim());
+  let plinkoArmed = false;
+  // Rainbow egg: cycle the 12 flavor colors (~1.1s each) — each is a cached
+  // sprite bake, so no per-frame cache churn.
+  function rainbowColor() {
+    const flavors = (window.FLIP_CAST25 && FLIP_CAST25.flavors) ||
+      ['#1f9bff', '#e3263c', '#8ed11a', '#ff7a00', '#8a3ffc', '#5fcfe6'];
+    return flavors[Math.floor(Date.now() / 1100) % flavors.length];
+  }
+  // Konami code (keyboard) toggles party mode without the secret name.
+  let konamiParty = false;
+  try { konamiParty = localStorage.getItem('flipgame.party') === '1'; } catch (_) {}
   let onlineMode = false;      // playing via Net rooms
   let netAuthority = false;    // this client owns the current flick's verdict
   let pendingNetResult = null; // authoritative result waiting to apply
@@ -863,6 +998,7 @@
       perfect: !!(landingInfo && landingInfo.perfect),
       onCap:   !!(landingInfo && (landingInfo.onCap || landingInfo.reason === 'cap')),
       golden:  goldenFlipActive,
+      plinko:  (landingInfo && landingInfo.plinko) || null,
     };
   }
 
@@ -911,6 +1047,37 @@
     if (window.Skins) Skins.preload(defs.map(d => d.color));   // warm skin sprites
     resize();   // sets DPR transform + renderer logical dims (must run after init)
     Physics.init(window.innerWidth, window.innerHeight, stageBottomInset());  // logical coords
+    const feel = (opts && opts.feel) || chosenFeel();
+    if (Physics.setFeel) Physics.setFeel(feel);
+    if (window.Settings && !onlineMode) Settings.setFeel(feel);
+    if (Physics.setImpactCallback) {
+      let lastWallT = 0;
+      Physics.setImpactCallback((type, speed, x, y) => {
+        if (type === 'ground') {
+          Sound.play('thud');
+          if (Renderer.burst) Renderer.burst(x, y, '#c4a484', 8);
+          if (Renderer.nudge) Renderer.nudge(Math.min(5, 1.5 + speed * 0.15));
+          return;
+        }
+        // Caroms can fire many collisions per bounce — throttle the juice.
+        const now = performance.now();
+        if (now - lastWallT < 80) return;
+        lastWallT = now;
+        Sound.play('wall');
+        if (Renderer.burst) Renderer.burst(x, y, '#9ec9ff', 10);
+        if (Renderer.nudge) Renderer.nudge(Math.min(4, 1.2 + speed * 0.1));
+      });
+    }
+
+    if (practiceMeterEl) {
+      practiceMeterEl.classList.toggle('hidden', !(opts && opts.practice));
+      practiceMeterEl.classList.remove('pm-bank');
+      // Reset markers until the first drag/flick.
+      const pm = document.getElementById('pm-power-marker');
+      const sm = document.getElementById('pm-side-marker');
+      if (pm) pm.style.left = '50%';
+      if (sm) sm.style.left = '50%';
+    }
 
     game.on(GAME_STATES.TURN_START, onTurnStart);
     game.on(GAME_STATES.RESULT,     onResult);
@@ -919,6 +1086,7 @@
     game.on(GAME_STATES.GAME_OVER,  onGameOver);
 
     game.init(defs, dir, opts || {});
+    game.feel = feel;
     gameStarted = true;
     gameStats = {
       topStake: 0, longestFire: 0, sawSuddenDeath: false, ignitionsThisGame: 0,
@@ -1013,10 +1181,19 @@
             });
           }
           netAuthority = false;
-          game.resolveFlip(result, landingMeta(landingInfo));
+          const meta = landingMeta(landingInfo);
+          if (meta.plinko && game.resolvePlinko) game.resolvePlinko(meta.plinko);
+          else game.resolveFlip(result, meta);
           break;
         }
       }
+    }
+
+    // Practice trainer: live needle while dragging (before the flick fires).
+    if (game.practice && !evaluating &&
+        (game.state === GAME_STATES.TURN_START || game.state === GAME_STATES.ON_FIRE)) {
+      const live = practiceMeterFromDrag(Input.getDragState && Input.getDragState());
+      if (live) updatePracticeMeter(live, true);
     }
 
     // Per-turn flip clock (human turns only) — runs out → forfeited miss
@@ -1052,17 +1229,29 @@
       result:      game.state === GAME_STATES.RESULT ? game.lastResult : null,
       resultAlpha,
       specialLabel: game.state === GAME_STATES.RESULT
-        ? (capLandActive ? '🙃 CAP LAND! ×2'
+        ? (game.plinkoPrize ? (game.plinkoPrize === 'win' ? '🎰 JACKPOT!' : '🎰 PLINKO!')
+          : capLandActive ? '🙃 CAP LAND! ×2'
           : goldenShowActive ? '🌟 GOLDEN FLIP! ×2'
           : greatSaveActive ? '🧤 THE GREAT SAVE!'
           : null)
         : null,
       showGlow,
       isOnFire:    !!(game.onFirePlayer),
-      liquidColor: goldenFlipActive ? GOLDEN_COLOR : game.currentPlayer()?.color,
+      // Ninja/rainbow work by re-baking the sprite in a different color (the
+      // old ctx.filter approach silently no-ops on older iOS Safari).
+      liquidColor: goldenFlipActive ? GOLDEN_COLOR
+        : isNinjaName(game.currentPlayer()?.name) ? '#2a2633'
+        : isRainbowName(game.currentPlayer()?.name) ? rainbowColor()
+        : game.currentPlayer()?.color,
       golden:      goldenFlipActive,
+      moon:        moonFlipActive,
       ghostly:     isGhostName(game.currentPlayer()?.name),
-      party:       game.players.some((pl) => isPartyName(pl.name)),
+      ninja:       isNinjaName(game.currentPlayer()?.name),
+      rainbow:     isRainbowName(game.currentPlayer()?.name),
+      sizeFx:      isTinyName(game.currentPlayer()?.name) ? 0.68
+                   : isGiantName(game.currentPlayer()?.name) ? 1.28 : 1,
+      party:       konamiParty || game.players.some((pl) => isPartyName(pl.name)),
+      plinkoBoard: Physics.getPlinko ? Physics.getPlinko() : null,
       skin:        game.currentPlayer()?.skin,
       intense:     intenseTurn,
       suddenDeath: game.sdLevelForNextFlip ? game.sdLevelForNextFlip() > 0 : game.inSuddenDeath(),
@@ -1076,10 +1265,49 @@
   }
 
   // ── State callbacks ────────────────────────────────────────────────────────
+  function currentIsBankShot() {
+    const skin = game.currentPlayer()?.skin || BASE_SKIN;
+    const bank = window.Skins && Skins.physicsFor && Skins.physicsFor(skin);
+    return !!(bank && bank.floorResolve);
+  }
+
+  function updateFlipHint() {
+    if (!flipHintEl) return;
+    flipHintEl.textContent = currentIsBankShot()
+      ? 'Flick sideways — bank off the walls onto the pad!'
+      : 'Flick up to flip!';
+  }
+
+  // First time an alien/bank-shot seat comes up, teach the mode once.
+  const ALIEN_HINT_KEY = 'flipgame.alienHintSeen';
+  function maybeTeachBankShot() {
+    if (!currentIsBankShot()) return;
+    let seen = false;
+    try { seen = localStorage.getItem(ALIEN_HINT_KEY) === '1'; } catch (_) {}
+    if (seen) return;
+    try { localStorage.setItem(ALIEN_HINT_KEY, '1'); } catch (_) {}
+    showToast('👽 Bank shot! Flick sideways — walls & ceiling bounce, green pad scores.');
+  }
+
+  function nearMissLabel(landing) {
+    if (!landing || landing.result === 'MAKE') return null;
+    // Alien bank shot: just outside the pad / slide window.
+    if (landing.padOffset != null && landing.padOffset < 1.35) return 'Almost on the pad!';
+    // Normal flip: tipped just past the make cone (not a flat under-rotate).
+    if (landing.reason === 'underrotated') return null;
+    if (landing.tilt != null && landing.tilt < 0.95 &&
+        (landing.reason === 'leaning' || landing.reason === 'fallen')) {
+      return 'So close!';
+    }
+    return null;
+  }
+
   // Arm a human's turn: show the hint, fire the make-or-break sting (timed to
   // when the player is actually ready), enable input, start the flip clock.
   function armHumanTurn() {
     passScreen.classList.add('hidden');
+    updateFlipHint();
+    maybeTeachBankShot();
     flipHintEl.classList.remove('hidden');
     if (intenseTurn) Sound.play('tension');
     Input.enable();
@@ -1104,13 +1332,17 @@
     capLandActive   = false;
     goldenFlipActive = false;
     goldenShowActive = false;
+    moonFlipActive  = false;
+    plinkoFlipActive = false;
     lastFlickPower  = null;
+    if (Physics.setPlinkoEnabled) Physics.setPlinkoEnabled(!onlineMode);
     stopTurnTimer();
     clearTimeout(aiTimer);
     passScreen.classList.add('hidden');
-    Physics.resetBottle();
     applyTurnPhysics();
+    Physics.resetBottle();
     prepareTurnArena();
+    updateFlipHint();
     flipHintEl.classList.remove('hidden');
 
     const p = game.currentPlayer();
@@ -1120,6 +1352,8 @@
     if (game.practice) {
       turnBannerEl.textContent = '🎯 Practice';
       pointCountEl.textContent = '';
+      maybeTeachBankShot();
+      configurePracticeMeter();
       Input.enable();
       updateHUD();
       return;
@@ -1177,9 +1411,10 @@
     stopTurnTimer();
     clearTimeout(aiTimer);
     passScreen.classList.add('hidden');
-    Physics.resetBottle();
     applyTurnPhysics();
+    Physics.resetBottle();
     prepareTurnArena();
+    updateFlipHint();
     flipHintEl.classList.remove('hidden');
 
     const p = game.currentPlayer();
@@ -1236,6 +1471,11 @@
     if (capLandActive || goldenShowActive) Sound.play('capland');
     else if (greatSaveActive) Sound.play('greatsave');
 
+    // Lifetime flip milestones on this device — tiny celebration, no effect.
+    if (rec && [100, 500, 1000, 2500, 5000, 10000, 25000].includes(rec.totalFlips)) {
+      showToast(`🎉 Flip #${rec.totalFlips.toLocaleString()} on this device!`);
+    }
+
     const p = game.currentPlayer();
 
     if (!game.practice && gameStats) {
@@ -1279,7 +1519,12 @@
 
     if (game.practice) {
       if (game.lastResult === 'MAKE') {
-        if (capLandActive) {
+        if (game.plinkoPrize) {
+          streakBannerEl.textContent = game.plinkoPrize === 'win'
+            ? '🎰👑 PLINKO JACKPOT!' : '🎰 Plinko drop — nice!';
+          streakBannerEl.className = 'streak-banner on-fire';
+          Sound.play('win');
+        } else if (capLandActive) {
           streakBannerEl.textContent = '🙃 Cap land! Worth 2!';
           streakBannerEl.className = 'streak-banner on-fire';
         } else if (goldenShowActive) {
@@ -1293,16 +1538,33 @@
         }
         Sound.play(capLandActive ? 'capland' : 'make');
       } else {
-        streakBannerEl.textContent = '✗ Miss';
+        const almost = nearMissLabel(landing);
+        streakBannerEl.textContent = almost ? `✗ ${almost}` : '✗ Miss';
         streakBannerEl.className = 'streak-banner miss-penalty';
         Sound.play('miss');
       }
+      // Verdict juice in practice too.
+      const b = Physics.getBottle && Physics.getBottle();
+      if (b && Renderer.burst) {
+        Renderer.burst(b.position.x, b.position.y,
+          game.lastResult === 'MAKE' ? '#69f0ae' : '#ff5252',
+          game.lastResult === 'MAKE' ? 18 : 10);
+      }
+      if (game.lastResult === 'MAKE' && Renderer.nudge) Renderer.nudge(3);
       updateHUD();
       return;
     }
 
     if (game.lastResult === 'MAKE') {
-      if (capLandActive) {
+      if (game.plinkoPrize) {
+        // 1/1000 plinko drop — the prize IS the outcome.
+        streakBannerEl.textContent =
+          game.plinkoPrize === 'win' ? `🎰👑 PLINKO JACKPOT — ${p.name} WINS THE GAME!`
+          : game.plinkoPrize === 'zap' ? '🎰⚡ Plinko: every opponent loses a life!'
+          : '🎰❤️ Plinko: +2 lives!';
+        streakBannerEl.className = 'streak-banner on-fire';
+        Sound.play(game.plinkoPrize === 'win' ? 'win' : 'life');
+      } else if (capLandActive) {
         // Rare upside-down / on-cap — celebrates over everything else this flip.
         const stakeBit = game.onFireGain > 0
           ? `+${game.onFireGain} life!`
@@ -1356,10 +1618,32 @@
     } else {
       const n = game.lastPenalty;
       const lives = `${n} ${n === 1 ? 'life' : 'lives'}`;
-      streakBannerEl.textContent = timedOut ? `⏱ Out of time!  −${lives}` : `−${lives}`;
+      const almost = !timedOut ? nearMissLabel(landing) : null;
+      streakBannerEl.textContent = timedOut
+        ? `⏱ Out of time!  −${lives}`
+        : (almost ? `${almost}  −${lives}` : `−${lives}`);
       streakBannerEl.className   = 'streak-banner miss-penalty';
       Sound.play('miss');
     }
+
+    // 11:11 (AM or PM) — land a make on the wishing minute and the banner
+    // sparkles. Pure flourish.
+    const wish = new Date();
+    if (game.lastResult === 'MAKE' && wish.getHours() % 12 === 11 && wish.getMinutes() === 11) {
+      streakBannerEl.textContent = `${streakBannerEl.textContent || 'Make!'}  11:11 ✨`;
+      if (!streakBannerEl.className.includes('on-fire')) {
+        streakBannerEl.className = 'streak-banner heating-up';
+      }
+    }
+
+    // MAKE/MISS celebration burst at the object.
+    const b = Physics.getBottle && Physics.getBottle();
+    if (b && Renderer.burst) {
+      Renderer.burst(b.position.x, b.position.y,
+        game.lastResult === 'MAKE' ? '#69f0ae' : '#ff5252',
+        game.lastResult === 'MAKE' ? 20 : 12);
+    }
+    if (game.lastResult === 'MAKE' && Renderer.nudge) Renderer.nudge(3.5);
 
     updateHUD();
   }
@@ -1549,15 +1833,148 @@
     Sound.unlock();
     Sound.play('flick');
     lastFlickPower = Math.min(Math.max(0, -vy) / 4000, 1);
+    // Secret plinko test triggers (never online — prizes rewrite lives).
+    if (!onlineMode && Physics.forcePlinko &&
+        (plinkoArmed || isPlinkoName(game.currentPlayer()?.name))) {
+      Physics.forcePlinko();
+      plinkoArmed = false;
+    }
     Physics.applyFlick(vx, vy, seed);
     // Golden flip lottery — read the seed physics actually used (it generates
     // one when we pass undefined) so local and replayed flicks agree.
     const fi = Physics.getLastFlickInfo ? Physics.getLastFlickInfo() : null;
     goldenFlipActive = !!(fi && fi.seed % 150 === 77);
+    moonFlipActive = !!(fi && fi.moon);
+    plinkoFlipActive = !!(fi && fi.plinko);
+    if (game.practice) updatePracticeMeter(fi, false);
+    if (plinkoFlipActive) {
+      streakBannerEl.textContent = '🎰 PLINKO DROP! The floor is gone!';
+      streakBannerEl.className = 'streak-banner on-fire';
+      Sound.play('ignite');
+    } else if (moonFlipActive) {
+      streakBannerEl.textContent = '🌙 MOON GRAVITY!';
+      streakBannerEl.className = 'streak-banner on-fire';
+    } else if (flickFeedbackOn() && fi && !currentIsBankShot()) {
+      // Learning aid during airtime (onResult overwrites). Sweet spot ~2500 px/s.
+      const d = fi.upSpeed - 2500;
+      streakBannerEl.textContent = Math.abs(d) < 280 ? '✦ Sweet spot'
+        : (d < 0 ? 'Too soft' : 'Too hard');
+      streakBannerEl.className = 'streak-banner';
+    } else if (flickFeedbackOn() && fi && currentIsBankShot()) {
+      const side = Math.abs(fi.vx || 0);
+      streakBannerEl.textContent = side < 400 ? 'More sideways!'
+        : (side > 2200 ? 'Easy on the side' : '✦ Nice bank angle');
+      streakBannerEl.className = 'streak-banner';
+    }
     game.setState(GAME_STATES.EVALUATING);
   }
 
-  function onFlick(vx, vy) {
+  // ── Practice trainer meter ─────────────────────────────────────────────────
+  // Flip mode: one track for flick strength (sweet spot ~2500 px/s).
+  // Bank-shot (alien) mode: strength + sideways aim vs the pad diamond.
+  function configurePracticeMeter() {
+    if (!practiceMeterEl || !game.practice) {
+      if (practiceMeterEl) practiceMeterEl.classList.add('hidden');
+      return;
+    }
+    practiceMeterEl.classList.remove('hidden');
+    const bank = currentIsBankShot();
+    practiceMeterEl.classList.toggle('pm-bank', bank);
+    const sideRow = document.getElementById('pm-side-row');
+    if (sideRow) sideRow.classList.toggle('hidden', !bank);
+
+    const powerBand = document.getElementById('pm-power-band');
+    const powerLabel = document.getElementById('pm-power-label');
+    // Map px/s → % on a fixed scale. Flip sweet ~2500; alien wants less pure-up.
+    if (bank) {
+      // Alien scale 600..3200; green 1100..2300
+      if (powerBand) { powerBand.style.left = '19.2%'; powerBand.style.width = '46.2%'; }
+      if (powerLabel) powerLabel.textContent = 'launch power — green keeps the bank airborne';
+    } else {
+      // Flip scale 1000..3600; green 2100..2900 around the 2500 sweet spot
+      if (powerBand) { powerBand.style.left = '42.3%'; powerBand.style.width = '30.8%'; }
+      if (powerLabel) powerLabel.textContent = 'flick strength — green ≈ one clean flip';
+    }
+
+    const sideBand = document.getElementById('pm-side-band');
+    if (sideBand) {
+      // Sideways |vx| isn't the pad — the pad diamond is. Keep a soft "useful
+      // sideways" band in the middle of the aim track as a training cue.
+      sideBand.style.left = '22%';
+      sideBand.style.width = '56%';
+    }
+    syncPracticePadMark();
+  }
+
+  function syncPracticePadMark() {
+    const padEl = document.getElementById('pm-pad-mark');
+    if (!padEl || !practiceMeterEl || practiceMeterEl.classList.contains('hidden')) return;
+    const t = Physics.getTarget && Physics.getTarget();
+    const view = Physics.getViewHint && Physics.getViewHint();
+    const worldW = (view && view.worldW) || window.innerWidth;
+    if (!t || !worldW) {
+      padEl.style.display = 'none';
+      return;
+    }
+    padEl.style.display = '';
+    padEl.style.left = Math.max(2, Math.min(98, (t.x / worldW) * 100)) + '%';
+  }
+
+  function powerPct(upSpeed, bank) {
+    if (bank) return Math.max(0, Math.min(1, (upSpeed - 600) / 2600)) * 100;
+    return Math.max(0, Math.min(1, (upSpeed - 1000) / 2600)) * 100;
+  }
+
+  // Sideways aim: map gesture/flick horizontal onto the arena (0=left wall).
+  function sideAimPct(vx, liveDx) {
+    if (liveDx != null) {
+      const span = Math.max(160, window.innerWidth * 0.42);
+      return Math.max(0, Math.min(100, 50 + (liveDx / span) * 50));
+    }
+    // Post-flick: vx px/s → same track (±2400 ≈ full width)
+    return Math.max(0, Math.min(100, 50 + (vx / 2400) * 50));
+  }
+
+  function updatePracticeMeter(info, live) {
+    if (!practiceMeterEl || !game.practice || !info) return;
+    configurePracticeMeter();
+    const bank = currentIsBankShot();
+    const pm = document.getElementById('pm-power-marker');
+    const sm = document.getElementById('pm-side-marker');
+    if (pm) {
+      pm.style.left = powerPct(info.upSpeed || 0, bank) + '%';
+      pm.classList.toggle('pm-live', !!live);
+    }
+    if (sm && bank) {
+      sm.style.left = sideAimPct(info.vx || 0, info.liveDx) + '%';
+      sm.classList.toggle('pm-live', !!live);
+    }
+  }
+
+  function practiceMeterFromDrag(drag) {
+    if (!drag) return null;
+    const dx = drag.curX - drag.startX;
+    const dy = drag.curY - drag.startY;
+    if (Math.hypot(dx, dy) < 18) return null;
+    // Distance→speed proxy matches Input's fallback (dx*10); a bit hotter so
+    // the live needle reaches the green band before you release.
+    let vx = dx * 12, vy = dy * 12;
+    // Same equalizer as onFlick so the live needle matches the real throw.
+    if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) {
+      vx *= 1.32; vy *= 1.32;
+    } else {
+      vx *= 0.92; vy *= 0.92;
+    }
+    return { upSpeed: Math.max(0, -vy), vx, vy, liveDx: dx };
+  }
+
+  function onFlick(vx, vy, ptrType) {
+    // Flick-feel equalizer: a thumb flick on glass reports far fewer px/s than
+    // a mouse sweep for the same intent, so touch gets a boost and mouse/pen a
+    // small trim. AI flicks pass no pointer type and stay untouched (their
+    // aim is tuned to raw speeds).
+    if (ptrType === 'touch') { vx *= 1.32; vy *= 1.32; }
+    else if (ptrType) { vx *= 0.92; vy *= 0.92; }
     // Online: only the current player may flick, and only on their device.
     if (onlineMode && window.Net) {
       const cur = game.currentPlayer();
@@ -1645,6 +2062,7 @@
     gameScreen.classList.add('hidden');
     gameOverEl.classList.add('hidden');
     passScreen.classList.add('hidden');
+    if (practiceMeterEl) practiceMeterEl.classList.add('hidden');
     dismissMystery();
     if (onlineScreen) onlineScreen.classList.add('hidden');
     renderRecordsPanel();
@@ -1717,6 +2135,7 @@
     if (playAgainBtn) playAgainBtn.textContent = 'Play Again';
     startGame(defs, dir || 1, {
       difficulty: 'medium',
+      feel: (opts && opts.feel) || chosenFeel(),
       startingLives: (opts && opts.startingLives) || chosenStartingLives(),
       startIndex: (opts && Number.isInteger(opts.startIndex)) ? opts.startIndex : undefined,
       // Default true for first match; rematch host sends newMatch: false.
@@ -1787,6 +2206,7 @@
         defs,
         direction: 1,
         startingLives: chosenStartingLives(),
+        feel: chosenFeel(),
       };
       Net.startMatch(payload);
       beginOnlineMatch(defs, 1, payload);
@@ -1865,7 +2285,11 @@
       if (!window.Skins) return;
       const allUnlocked = Skins.list().every((s) => Records.isSkinUnlocked(s.id));
       if (!allUnlocked) {
-        const fresh = Skins.list().filter((s) => Records.unlockSkin(s.id));
+        // unlockAll also raises totalWins to the top threshold — the ladder is
+        // strictly win-derived now, so plain unlockSkin calls wouldn't survive
+        // the next boot reconcile.
+        const fresh = Records.unlockAll ? Records.unlockAll()
+          : Skins.list().filter((s) => Records.unlockSkin(s.id));
         showToast(`🔓 Secret! Unlocked everything (+${fresh.length}).`);
         Sound.play('win');
         renderFrom(readRows());
@@ -1907,6 +2331,39 @@
         e.stopPropagation();
         onSecretTap(el.dataset.secret);
       });
+    });
+  }
+
+  // ── Secret: Konami code toggles party mode (keyboard / smartboard) ─────────
+  {
+    const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+                    'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let konamiIdx = 0;
+    // Typed-word secrets (skip when focus is in a text input — player names).
+    const WORDS = { plinko: () => {
+      plinkoArmed = true;
+      showToast('🎰 Plinko armed — next flip drops!');
+      Sound.play('ignite');
+    } };
+    let typed = '';
+    window.addEventListener('keydown', (e) => {
+      const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      konamiIdx = (k === KONAMI[konamiIdx]) ? konamiIdx + 1 : (k === KONAMI[0] ? 1 : 0);
+      if (konamiIdx >= KONAMI.length) {
+        konamiIdx = 0;
+        konamiParty = !konamiParty;
+        try { localStorage.setItem('flipgame.party', konamiParty ? '1' : '0'); } catch (_) {}
+        showToast(konamiParty ? '🪩 Party mode ON!' : '🪩 Party mode off.');
+        Sound.play('win');
+        return;
+      }
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') { typed = ''; return; }
+      if (e.key.length !== 1) return;
+      typed = (typed + e.key.toLowerCase()).slice(-12);
+      for (const [word, fire] of Object.entries(WORDS)) {
+        if (typed.endsWith(word)) { typed = ''; fire(); }
+      }
     });
   }
 

@@ -1750,9 +1750,16 @@ ${crown}
     strictTarget: false,   // AABB overlap with pad = make (whole alien counts)
     allowSlideIn: true,    // can still slide onto the pad after touchdown
     hitScale: 0.90,        // nearly the full drawn pad scores
-    // Still pulled back a bit on phones, but not as extreme as before.
-    arenaZoom: 0.78,
-    mobileArenaZoom: 0.58,
+    // TRUE bigger arena (not camera-shrink): physics world is wider/taller than
+    // the screen, camera fits wall-to-wall so the phone stays full-bleed while
+    // bank shots actually have more travel. Old arenaZoom letterboxed a
+    // postage stamp or cramped the court — expand replaces that.
+    arenaExpand: 1.18,         // desktop: mild real widen
+    mobileArenaExpand: 1.42,   // phone: proper bank-shot court
+    arenaExpandY: 1.0,
+    mobileArenaExpandY: 1.14,  // a bit more air for ceiling banks on phones
+    arenaZoom: 1,
+    mobileArenaZoom: 1,
   };
 
   // One silly default name per flavor color × object. Index-aligned to

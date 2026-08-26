@@ -7,9 +7,8 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/{tool-slug}/` (55 tools) | `mapzimus/max` via the public tool shelf | Full tool library mirrored under `vendor/tools/`. |
 | `/geopuesto/` and `/geopuesto/playground/` | `mapzimus/geopuesto` | |
 | `/bug-wars/` | `mapzimus/bug-wars` | |
-| `/flip-game/` | `mapzimus/flipgame` | Bottle Game — bottle-flip party game (PWA). Parrots are an unlockable skin inside it. `/parrot-flip/` and `/grog-flip/` redirect here. |
+| `/flip-game/` | `mapzimus/flipgame` | `1a667bf` — Bottle Game (PWA), synced from Pages `master`. Parrots unlockable skin. `/parrot-flip/` and `/grog-flip/` redirect here. |
 | `/whydah-voyage/` | `mapzimus/Whydah-Unit` (`navigator/`) | Whydah's Voyage / First Sail. |
-| `/black-sam/` | `mapzimus/Whydah-Unit` (`black-sam/`) | |
 | `/true-scale/` | `mapzimus/true-scale` | |
 | `/concord-war/` | built from `mapzimus/concord-war` | |
 | `/transit/` | `transit/` in `mapzimus/maxwellhowegis` | |

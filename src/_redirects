@@ -30,6 +30,11 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /bottle-game /flip-game/ 301
 /bottle-game/ /flip-game/ 301
 
+# Black Sam removed from Games; curriculum copy (if any) stays under /whydah/
+/black-sam /games/ 301
+/black-sam/ /games/ 301
+/black-sam/* /games/ 301
+
 # Retired /games/<slug> snapshots → canonical first-party route
 /games/flip /flip-game/ 301
 /games/flip/* /flip-game/:splat 301

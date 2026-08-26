@@ -15,7 +15,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Bottle Game">
 
-  <link rel="stylesheet" href="css/style.css?v=88">
+  <link rel="stylesheet" href="css/style.css?v=98">
 </head>
 <body>
 
@@ -45,6 +45,16 @@
           <label><input type="radio" name="difficulty" value="medium" checked> 🟡 Medium</label>
           <label><input type="radio" name="difficulty" value="hard"> 🔴 Hard</label>
         </div>
+      </div>
+
+      <div>
+        <div class="section-label">Feel</div>
+        <div class="direction-options">
+          <label><input type="radio" name="feel" value="forgiving"> 🟢 Forgiving</label>
+          <label><input type="radio" name="feel" value="standard" checked> 🟡 Standard</label>
+          <label><input type="radio" name="feel" value="pro"> 🔴 Pro</label>
+        </div>
+        <label class="checkbox-row"><input type="checkbox" id="flick-feedback-toggle"> Show flick feedback</label>
       </div>
 
       <div>
@@ -150,6 +160,23 @@
       <div id="streak-banner"></div>
     </div>
     <div id="flip-hint">Flick up to flip!</div>
+    <div id="practice-meter" class="hidden" aria-hidden="true">
+      <div class="pm-row" id="pm-power-row">
+        <div class="pm-track">
+          <div class="pm-band" id="pm-power-band"></div>
+          <div class="pm-marker" id="pm-power-marker"></div>
+        </div>
+        <div class="pm-label" id="pm-power-label">flick strength — green ≈ sweet spot</div>
+      </div>
+      <div class="pm-row hidden" id="pm-side-row">
+        <div class="pm-track pm-track-side">
+          <div class="pm-band pm-band-side" id="pm-side-band"></div>
+          <div class="pm-pad" id="pm-pad-mark" title="pad"></div>
+          <div class="pm-marker" id="pm-side-marker"></div>
+        </div>
+        <div class="pm-label" id="pm-side-label">sideways aim — diamond = pad</div>
+      </div>
+    </div>
     <div id="player-list"></div>
   </div>
 
@@ -178,19 +205,19 @@
   <!-- ?v= forces the browser to refetch on each release (dev server sends no
        cache headers). Bump alongside the service-worker CACHE_NAME. -->
   <script src="js/vendor/matter.min.js"></script>
-  <script src="js/polyfills.js?v=88"></script>
-  <script src="js/game.js?v=88"></script>
-  <script src="js/physics.js?v=88"></script>
-  <script src="js/input.js?v=88"></script>
-  <script src="js/renderer.js?v=88"></script>
-  <script src="js/audio.js?v=88"></script>
-  <script src="js/settings.js?v=88"></script>
-  <script src="js/records.js?v=88"></script>
-  <script src="js/achievements.js?v=88"></script>
-  <script src="js/cast25.js?v=88"></script>
-  <script src="js/skins.js?v=88"></script>
-  <script src="js/net.js?v=88"></script>
-  <script src="js/main.js?v=88"></script>
+  <script src="js/polyfills.js?v=98"></script>
+  <script src="js/game.js?v=98"></script>
+  <script src="js/physics.js?v=98"></script>
+  <script src="js/input.js?v=98"></script>
+  <script src="js/renderer.js?v=98"></script>
+  <script src="js/audio.js?v=98"></script>
+  <script src="js/settings.js?v=98"></script>
+  <script src="js/records.js?v=98"></script>
+  <script src="js/achievements.js?v=98"></script>
+  <script src="js/cast25.js?v=98"></script>
+  <script src="js/skins.js?v=98"></script>
+  <script src="js/net.js?v=98"></script>
+  <script src="js/main.js?v=98"></script>
   <script>
     window.onerror = (msg, src, line) => {
       const el = document.getElementById('err-overlay') || (() => {

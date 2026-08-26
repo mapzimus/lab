@@ -83,6 +83,18 @@ html, body {
   -webkit-user-select: none;
 }
 
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 0.92rem;
+  color: var(--muted, #9bb0c9);
+  cursor: pointer;
+  user-select: none;
+}
+.checkbox-row input { accent-color: var(--accent, #69f0ae); width: 16px; height: 16px; }
+
 .section-label {
   font-size: 0.78rem;
   font-weight: 600;
@@ -847,6 +859,75 @@ html, body {
   color: rgba(255,255,255,0.45);
   pointer-events: none;
   animation: pulse 2s ease-in-out infinite;
+}
+
+/* ── Practice trainer meter (power + alien sideways aim) ─── */
+#practice-meter {
+  position: fixed;
+  bottom: calc(148px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(440px, 78vw);
+  pointer-events: none;
+  text-align: center;
+  z-index: 5;
+}
+.pm-row.hidden { display: none; }
+.pm-row + .pm-row { margin-top: 10px; }
+.pm-track {
+  position: relative;
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+.pm-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(105,240,174,0.42);
+  border-radius: 6px;
+}
+.pm-band-side {
+  background: rgba(105,200,255,0.38);
+}
+.pm-marker {
+  position: absolute;
+  top: -5px;
+  width: 4px;
+  height: 22px;
+  margin-left: -2px;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.85);
+  transition: left 0.12s ease;
+}
+.pm-marker.pm-live {
+  background: #ffd21a;
+  box-shadow: 0 0 10px rgba(255,210,26,0.9);
+  transition: left 0.05s linear;
+}
+.pm-pad {
+  position: absolute;
+  top: -7px;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  background: #69f0ae;
+  transform: rotate(45deg);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(105,240,174,0.8);
+}
+.pm-label {
+  margin-top: 5px;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+/* Lift the flick hint a bit when the meter is up so they don't collide. */
+#game-screen:has(#practice-meter:not(.hidden)) #flip-hint {
+  bottom: calc(210px + env(safe-area-inset-bottom, 0px));
 }
 
 @keyframes pulse {
