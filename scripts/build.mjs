@@ -150,7 +150,7 @@ const catalogRefresh = new Date(Date.UTC(refreshYear, refreshMonth - 1)).toLocal
 // same structures client-side for search/filter/favorites) ----
 
 const categoryLabels = {
-  maps: "Maps",
+  maps: "Maps & GIS",
   data: "Data",
   design: "Design",
   classroom: "Classroom",
