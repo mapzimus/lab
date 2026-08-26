@@ -228,13 +228,16 @@ function initMarkers(map, cities) {
       text-shadow: 0 1px 4px #000, 0 0 10px rgba(0,0,0,0.9);
       transform: translateY(-11px); opacity: 0; transition: opacity 0.5s ease; }
     .city-label.on .inner { opacity: 1; }
-    .city-label small { display: block; font-weight: 400; color: #99a0ab; font-size: 9px; }`;
+    .city-label small { display: block; font-weight: 400; color: #99a0ab; font-size: 9px; }
+    @media (max-width: 640px) { .city-label.bench { display: none; } }`;
   document.head.appendChild(style);
   for (const f of cities.features) {
     const name = f.properties.name;
     if (!LABEL_CITIES.includes(name)) continue;
     const el = document.createElement("div");
-    el.className = "city-label";
+    // Benchmark labels sit at the map edges on phones and clip; CSS hides them
+    // below the phone breakpoint via the "bench" class.
+    el.className = "city-label" + (f.properties.african ? "" : " bench");
     el.dataset.name = name;
     const display = name.includes("(") ? name.match(/\(([^)]+)\)/)[1] : name;
     el.innerHTML = `<span class="inner">${display}<small></small></span>`;
@@ -269,6 +272,24 @@ function initSteps(map) {
     });
   };
 
+  // Ambient globe rotation while the hero is on screen. A slow drift sells
+  // the globe projection; any camera move or step change cancels it.
+  let spinFrame = null;
+  const spinStop = () => { if (spinFrame) { cancelAnimationFrame(spinFrame); spinFrame = null; } };
+  const spinStart = () => {
+    if (prefersStill || spinFrame) return;
+    let last = performance.now();
+    const tick = (now) => {
+      const c = map.getCenter();
+      c.lng += ((now - last) / 1000) * 1.1; // degrees per second
+      last = now;
+      map.jumpTo({ center: c });
+      spinFrame = requestAnimationFrame(tick);
+    };
+    // Wait out the fly-in so the drift doesn't fight the camera animation.
+    setTimeout(() => { if (active === "intro" && !exploring) spinFrame = requestAnimationFrame(tick); }, 2400);
+  };
+
   const setChoropleth = (prop, stops) =>
     map.setPaintProperty("countries-fill", "fill-color", ramp(prop, stops));
   const countriesOpacity = (afr, other) =>
@@ -298,70 +319,81 @@ function initSteps(map) {
   };
   const hollow2100 = (v) => map.setPaintProperty("cities-2100", "circle-stroke-opacity", v);
 
+  // Every step applies its chapter's full baseline plus its own delta, and
+  // every step sets the camera. Re-flying to the current bounds is a visual
+  // no-op, and full baselines make the story correct whichever direction —
+  // and however fast — the reader arrives from (scroll up, find-in-page,
+  // keyboard jumps). Partial-state steps are how phantom layers happen.
+  const base = {
+    c1: () => {
+      countriesOpacity(0.88, 0.3);
+      setCityEpoch(null, 0); hollow2100(0); setLabels(null);
+      corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
+    },
+    c2: () => {
+      countriesOpacity(0.2, 0.08); hollow2100(0);
+      corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
+    },
+    c3: () => {
+      countriesOpacity(0.14, 0.06); hollow2100(0); setLabels(null);
+      kinshasa(0, 0, null);
+    },
+    c4: () => {
+      // The 1:50m country polygons are far too coarse at city zoom — their
+      // border mismatch draws phantom stripes across the Pool, so they go.
+      countriesOpacity(0, 0);
+      setCityEpoch(null, 0); hollow2100(0); setLabels(null);
+      corridors(0, 0, 0, 0, 0);
+    },
+  };
+
   const steps = {
     "intro": () => {
       map.flyTo({ center: [12, 4], zoom: 1.6, duration: prefersStill ? 0 : 2200, essential: true });
       setChoropleth("pop2025", POP_RAMP); countriesOpacity(0.7, 0.25);
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
+      spinStart();
     },
-    "ch1": () => {
-      fly(AFRICA_BOUNDS, 5);
-      setChoropleth("pop2025", POP_RAMP); countriesOpacity(0.88, 0.3);
-      setCityEpoch(null, 0); hollow2100(0); setLabels(null);
-      corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
-    },
-    "c1-2025": () => { setChoropleth("pop2025", POP_RAMP); countriesOpacity(0.88, 0.3); },
-    "c1-2100": () => { setChoropleth("pop2100", POP_RAMP); countriesOpacity(0.88, 0.3); },
-    "c1-multiple": () => { setChoropleth("multiple", MULT_RAMP); countriesOpacity(0.88, 0.35); },
-    "c1-crossovers": () => { setChoropleth("multiple", MULT_RAMP); countriesOpacity(0.88, 0.35); },
-    "ch2": () => {
-      fly(AFRICA_BOUNDS, 5);
-      countriesOpacity(0.2, 0.08);
-      setCityEpoch(1975, 0.85); hollow2100(0); setLabels(1975);
-      corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
-    },
-    "c2-1975": () => { setCityEpoch(1975, 0.85); setLabels(1975); hollow2100(0); },
-    "c2-2025": () => { setCityEpoch(2025, 0.85); setLabels(2025); hollow2100(0); },
-    "c2-2050": () => { setCityEpoch(2050, 0.85); setLabels(2050); hollow2100(0); },
-    "c2-2100": () => { setCityEpoch(2050, 0.85); setLabels(2050); hollow2100(0.9); },
-    "ch3": () => {
-      fly(AFRICA_BOUNDS, 5);
-      countriesOpacity(0.14, 0.06);
-      setCityEpoch(2050, 0.3); hollow2100(0); setLabels(null);
-      corridors(0.9, 0.55, 0, 0, 0); kinshasa(0, 0, null);
-    },
-    "c3-existing": () => { corridors(0.9, 0.55, 0, 0, 0); setCityEpoch(2050, 0.3); },
-    "c3-planned": () => { corridors(0.55, 0.3, 0.75, 0.95, 0); setCityEpoch(2050, 0.3); },
-    "c3-model": () => { corridors(0.25, 0.15, 0.3, 0.35, 0.9); setCityEpoch(2050, 0.45); },
+    "ch1": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2025", POP_RAMP); },
+    "c1-2025": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2025", POP_RAMP); },
+    "c1-2100": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2100", POP_RAMP); },
+    "c1-multiple": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("multiple", MULT_RAMP); countriesOpacity(0.88, 0.35); },
+    "c1-crossovers": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("multiple", MULT_RAMP); countriesOpacity(0.88, 0.35); },
+    "ch2": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(1975, 0.85); setLabels(1975); },
+    "c2-1975": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(1975, 0.85); setLabels(1975); },
+    "c2-2025": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(2025, 0.85); setLabels(2025); },
+    "c2-2050": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(2050, 0.85); setLabels(2050); },
+    "c2-2100": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(2050, 0.85); setLabels(2050); hollow2100(0.9); },
+    "ch3": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.9, 0.55, 0, 0, 0); setCityEpoch(2050, 0.3); },
+    "c3-existing": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.9, 0.55, 0, 0, 0); setCityEpoch(2050, 0.3); },
+    "c3-planned": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.55, 0.3, 0.75, 0.95, 0); setCityEpoch(2050, 0.3); },
+    "c3-model": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.25, 0.15, 0.3, 0.35, 0.9); setCityEpoch(2050, 0.45); },
     "ch4": () => {
       fly(WEST_AFRICA_BOUNDS, 6);
       countriesOpacity(0.14, 0.06);
       setCityEpoch(2025, 0.5); setLabels(null); hollow2100(0);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
     },
-    "c4-arrive": () => {
-      fly(KINSHASA_BOUNDS, 11);
-      // The 1:50m country polygons are far too coarse at city zoom — their
-      // border mismatch draws phantom stripes across the Pool, so they go.
-      countriesOpacity(0, 0);
-      setCityEpoch(null, 0); setLabels(null);
-      kinshasa(0.95, 0.35, null);
-    },
-    "c4-1975": () => { fly(POOL_BOUNDS, 12); kinshasa(0.95, 0.25, 1975); },
-    "c4-2000": () => { fly(KINSHASA_BOUNDS, 12); kinshasa(0.95, 0.25, 2000); },
-    "c4-2020": () => { fly(KINSHASA_BOUNDS, 12); kinshasa(0.95, 0.45, 2020); },
-    "c4-2030": () => { fly(KINSHASA_BOUNDS, 12); kinshasa(0.95, 0.5, 2030); },
+    "c4-arrive": () => { fly(KINSHASA_BOUNDS, 11); base.c4(); kinshasa(0.95, 0.35, null); },
+    "c4-1975": () => { fly(POOL_BOUNDS, 12); base.c4(); kinshasa(0.95, 0.25, 1975); },
+    "c4-2000": () => { fly(KINSHASA_BOUNDS, 12); base.c4(); kinshasa(0.95, 0.25, 2000); },
+    "c4-2020": () => { fly(KINSHASA_BOUNDS, 12); base.c4(); kinshasa(0.95, 0.45, 2020); },
+    "c4-2030": () => { fly(KINSHASA_BOUNDS, 12); base.c4(); kinshasa(0.95, 0.5, 2030); },
+    "explore": () => { fly(KINSHASA_BOUNDS, 11); base.c4(); kinshasa(0.95, 0.5, 2030); },
   };
 
   const els = document.querySelectorAll("[data-step]");
   let active = null;
+  let exploring = false;
   const io = new IntersectionObserver((entries) => {
+    if (exploring) return; // free-explore owns the map until "back to story"
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
       const id = entry.target.dataset.step;
       if (id === active || !steps[id]) continue;
       active = id;
+      if (id !== "intro") spinStop();
       document.querySelectorAll(".step.is-active").forEach((el) => el.classList.remove("is-active"));
       entry.target.classList.add("is-active");
       steps[id]();
@@ -369,21 +401,65 @@ function initSteps(map) {
   }, { rootMargin: "-42% 0px -42% 0px" });
   els.forEach((el) => io.observe(el));
 
+  // ---- free-explore mode ----
+  const handlers = ["scrollZoom", "dragPan", "dragRotate", "doubleClickZoom", "touchZoomRotate", "keyboard"];
+  const exploreToggles = {
+    population: (on) => {
+      setChoropleth("pop2100", POP_RAMP);
+      countriesOpacity(on ? 0.88 : 0, on ? 0.3 : 0);
+    },
+    cities: (on) => { setCityEpoch(2050, on ? 0.85 : 0); setLabels(on ? 2050 : null); },
+    corridors: (on) => (on ? corridors(0.7, 0.4, 0.75, 0.95, 0.9) : corridors(0, 0, 0, 0, 0)),
+    kinshasa: (on) => kinshasa(on ? 0.95 : 0, on ? 0.5 : 0, on ? 2030 : null),
+  };
+  const panel = document.getElementById("explore-panel");
+  document.getElementById("explore-btn")?.addEventListener("click", () => {
+    exploring = true;
+    spinStop();
+    document.body.classList.add("exploring");
+    handlers.forEach((h) => map[h].enable());
+    panel.querySelectorAll("input[data-layer]").forEach((box) => {
+      exploreToggles[box.dataset.layer](box.checked);
+    });
+  });
+  panel?.addEventListener("change", (e) => {
+    const box = e.target.closest("input[data-layer]");
+    if (box && exploring) exploreToggles[box.dataset.layer](box.checked);
+  });
+  document.getElementById("explore-exit")?.addEventListener("click", () => {
+    exploring = false;
+    document.body.classList.remove("exploring");
+    handlers.forEach((h) => map[h].disable());
+    if (active && steps[active]) steps[active]();
+  });
+
   steps.intro();
+  active = "intro";
 }
 
 /* ---------------------------------------------------------- static widgets */
 
 function buildRamps() {
-  const paint = (el, stops) => {
+  // Swatches AND labels come from the same stop arrays the map style uses,
+  // so the legend can't drift from the actual classification.
+  const build = (el, stops, fmt) => {
     for (let i = 1; i < stops.length; i += 2) {
       const b = document.createElement("i");
       b.style.background = stops[i];
       el.appendChild(b);
     }
+    const labels = el.nextElementSibling;
+    if (!labels || !labels.classList.contains("ramp-labels")) return;
+    const values = [];
+    for (let i = 0; i < stops.length; i += 2) values.push(stops[i]);
+    const picks = [0, Math.floor((values.length - 1) / 2), values.length - 1];
+    labels.innerHTML = picks.map((i, k) =>
+      `<span>${fmt(values[i])}${k === 2 ? "+" : ""}</span>`).join("");
   };
-  document.querySelectorAll('[data-ramp="pop"]').forEach((el) => paint(el, POP_RAMP));
-  document.querySelectorAll('[data-ramp="mult"]').forEach((el) => paint(el, MULT_RAMP));
+  document.querySelectorAll('[data-ramp="pop"]').forEach((el) =>
+    build(el, POP_RAMP, (v) => (v ? `${v}M` : "0")));
+  document.querySelectorAll('[data-ramp="mult"]').forEach((el) =>
+    build(el, MULT_RAMP, (v) => `×${v}`));
 }
 
 function buildRegionChart(regions) {
