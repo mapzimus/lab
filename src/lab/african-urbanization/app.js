@@ -14,6 +14,8 @@ const POP_RAMP = [0, "#242b39", 10, "#3d3a52", 25, "#5c4368", 50, "#8a4f6d",
                   100, "#c05f60", 250, "#f0924c", 450, "#ffd166"];
 const MULT_RAMP = [0.5, "#4a6fa5", 0.85, "#39415a", 1.0, "#2c3140", 1.6, "#8a4457",
                    2.4, "#d06a4e", 3.4, "#f4a93a"];
+// Median age: young countries hot (the story's accent), old countries blue.
+const AGE_RAMP = [15, "#f4a93a", 22, "#c47a4e", 30, "#8a6a70", 40, "#5a5f88", 50, "#4a6fa5"];
 
 const AFRICA_BOUNDS = [[-19.5, -36.5], [53.5, 38.5]];
 const WEST_AFRICA_BOUNDS = [[-18, 3], [16, 15]];
@@ -452,35 +454,130 @@ function initSteps(map) {
 
   // ---- free-explore mode ----
   const handlers = ["scrollZoom", "dragPan", "dragRotate", "doubleClickZoom", "touchZoomRotate", "keyboard"];
+  const panel = document.getElementById("explore-panel");
+  const yearSlider = document.getElementById("explore-year");
+  const yearOut = document.getElementById("explore-year-out");
+  const metricSel = document.getElementById("explore-metric");
+  const nav = new maplibregl.NavigationControl({ showCompass: false });
+  const popup = new maplibregl.Popup({ maxWidth: "260px" });
+
+  const currentEpoch = () => CITY_EPOCHS[+yearSlider.value];
   const exploreToggles = {
-    population: (on) => {
-      setChoropleth("pop2100", POP_RAMP);
-      countriesOpacity(on ? 0.88 : 0, on ? 0.3 : 0);
+    cities: (on) => {
+      const epoch = currentEpoch();
+      setCityEpoch(epoch, on ? 0.85 : 0);
+      setLabels(on ? epoch : null);
     },
-    cities: (on) => { setCityEpoch(2050, on ? 0.85 : 0); setLabels(on ? 2050 : null); },
     corridors: (on) => (on ? corridors(0.7, 0.4, 0.75, 0.95, 0.9) : corridors(0, 0, 0, 0, 0)),
     lights: (on) => lightsOn(on ? 1 : 0),
     kinshasa: (on) => kinshasa(on ? 0.95 : 0, on ? 0.5 : 0, on ? 2030 : null),
     density: (on) => densityOn(on ? 1 : 0),
   };
-  const panel = document.getElementById("explore-panel");
+  const METRIC_RAMPS = {
+    pop2025: POP_RAMP, pop2050: POP_RAMP, pop2100: POP_RAMP,
+    multiple: MULT_RAMP, medAge25: AGE_RAMP,
+  };
+  const applyMetric = () => {
+    const m = metricSel.value;
+    if (m === "off") { countriesOpacity(0, 0); return; }
+    setChoropleth(m, METRIC_RAMPS[m]);
+    countriesOpacity(0.88, 0.3);
+  };
+  const applyPanel = () => {
+    applyMetric();
+    panel.querySelectorAll("input[data-layer]").forEach((box) => {
+      exploreToggles[box.dataset.layer](box.checked);
+    });
+  };
+
+  const GOTO = {
+    continent: [AFRICA_BOUNDS, 5],
+    gulf: [[[-9.5, 3.5], [7.0, 9.5]], 7],
+    nile: [[[26.0, 13.0], [36.5, 32.0]], 7],
+    kinshasa: [KINSHASA_BOUNDS, 12],
+  };
+
+  const M = (v) => (v >= 10 ? Math.round(v) + "M" : v.toFixed(1) + "M");
+  const row = (label, value, proj) =>
+    `<div class="pop-row${proj ? " proj" : ""}"><span>${label}</span><span>${value}</span></div>`;
+
+  function describe(f) {
+    const p = f.properties;
+    if (f.layer.id === "cities") {
+      const rows = [[1975, p.p1975], [2000, p.p2000], [2025, p.p2025], [2050, p.p2050]]
+        .filter(([, v]) => v != null)
+        .map(([y, v]) => row(y, M(v))).join("");
+      const proj = p.p2100 ? row("2100 (projection)", M(p.p2100), true) : "";
+      return `<div class="pop-h">${p.name}</div><div class="pop-sub">people in the urban area</div>${rows}${proj}`;
+    }
+    if (f.layer.id === "countries-fill") {
+      if (p.pop2025 == null) return `<div class="pop-h">${p.name}</div><div class="pop-sub">no UN series joined</div>`;
+      return `<div class="pop-h">${p.name}</div><div class="pop-sub">UN WPP 2024, medium variant</div>`
+        + row("2025", M(p.pop2025)) + row("2050", M(p.pop2050)) + row("2100", M(p.pop2100))
+        + row("growth to 2100", "×" + p.multiple)
+        + (p.medAge25 ? row("median age 2025", p.medAge25 + " yrs") : "");
+    }
+    if (f.layer.id === "cor-model") {
+      return `<div class="pop-h">${p.a} — ${p.b}</div><div class="pop-sub">modeled corridor</div>`
+        + row("distance", p.km + " km") + row("gravity score", p.score);
+    }
+    // built / planned corridor lines
+    return `<div class="pop-h">${p.name}</div><div class="pop-sub">${p.status}</div>` + row("backer", p.backer);
+  }
+
+  const CLICKABLE = ["cities", "cor-built", "cor-tah", "cor-model", "countries-fill"];
+  map.on("click", (e) => {
+    if (!exploring) return;
+    const hits = map.queryRenderedFeatures(e.point, { layers: CLICKABLE.filter((l) => map.getLayer(l)) });
+    hits.sort((a, b) => CLICKABLE.indexOf(a.layer.id) - CLICKABLE.indexOf(b.layer.id));
+    const f = hits.find((h) => {
+      const op = map.getPaintProperty(h.layer.id,
+        h.layer.type === "fill" ? "fill-opacity" : h.layer.type === "line" ? "line-opacity" : "circle-opacity");
+      return typeof op === "number" ? op > 0 : true; // expression opacities are per-feature; let them through
+    });
+    if (!f) { popup.remove(); return; }
+    popup.setLngLat(e.lngLat).setHTML(describe(f)).addTo(map);
+  });
+  map.on("mousemove", (e) => {
+    if (!exploring) return;
+    const hits = map.queryRenderedFeatures(e.point, { layers: CLICKABLE.filter((l) => map.getLayer(l)) });
+    map.getCanvas().style.cursor = hits.length ? "pointer" : "";
+  });
+
   document.getElementById("explore-btn")?.addEventListener("click", () => {
     exploring = true;
     spinStop();
     document.body.classList.add("exploring");
     handlers.forEach((h) => map[h].enable());
-    panel.querySelectorAll("input[data-layer]").forEach((box) => {
-      exploreToggles[box.dataset.layer](box.checked);
-    });
+    map.addControl(nav, "top-right");
+    applyPanel();
   });
   panel?.addEventListener("change", (e) => {
+    if (!exploring) return;
     const box = e.target.closest("input[data-layer]");
-    if (box && exploring) exploreToggles[box.dataset.layer](box.checked);
+    if (box) exploreToggles[box.dataset.layer](box.checked);
+    if (e.target === metricSel) applyMetric();
+  });
+  yearSlider?.addEventListener("input", () => {
+    yearOut.textContent = currentEpoch();
+    if (!exploring) return;
+    const citiesBox = panel.querySelector('input[data-layer="cities"]');
+    if (!citiesBox.checked) citiesBox.checked = true;
+    exploreToggles.cities(true);
+  });
+  panel?.addEventListener("click", (e) => {
+    const chip = e.target.closest("button[data-go]");
+    if (!chip || !exploring) return;
+    const [bounds, maxZoom] = GOTO[chip.dataset.go];
+    map.fitBounds(bounds, { padding: 60, maxZoom, duration: prefersStill ? 0 : 1800, essential: true });
   });
   document.getElementById("explore-exit")?.addEventListener("click", () => {
     exploring = false;
     document.body.classList.remove("exploring");
     handlers.forEach((h) => map[h].disable());
+    map.removeControl(nav);
+    popup.remove();
+    map.getCanvas().style.cursor = "";
     if (active && steps[active]) steps[active]();
   });
 
