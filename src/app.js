@@ -93,8 +93,11 @@
   }
 
   function allowedByView(item) {
-    if (view === "lab") return item.source === "projects" || (item.status || "live") !== "live";
-    if (view === "maps") return item.source === "projects" && item.category === "maps";
+    // Keep in sync with itemsForView() in scripts/build.mjs.
+    if (view === "lab") return item.source === "projects";
+    if (view === "maps") {
+      return item.source === "projects" && item.category === "maps" && !item.external;
+    }
     if (view === "tools" && item.source !== "tools") return false;
     const allowed = viewCategories[view];
     return !allowed || allowed.includes(item.category);

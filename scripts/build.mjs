@@ -163,8 +163,9 @@ const categoryLabels = {
   teaching: "Classroom",
   fun: "Utilities",
 };
-// Tools = every single-page utility (including GIS). Maps = map projects only.
-// Games = playable. Lab = all projects (+ unfinished tools).
+// Tools = every single-page utility (including GIS).
+// Maps = first-party map projects hosted here.
+// Games = playable. Lab = every project (maps included); no tools or skills.
 const viewCategories = {
   home: null,
   tools: ["maps", "data", "design", "classroom", "math", "soccer", "utilities"],
@@ -201,10 +202,12 @@ function card(item, { featured = false, star = true } = {}) {
 function itemsForView(view, category) {
   return catalog.filter((item) => {
     if (view === "lab") {
-      if (item.source !== "projects" && (item.status || "live") === "live") return false;
+      // Lab = every project (maps included). No tools, no skills.
+      if (item.source !== "projects") return false;
     } else if (view === "maps") {
-      // Destinations only — GIS utilities live under Tools → Maps & GIS.
-      if (item.source !== "projects" || item.category !== "maps") return false;
+      // First-party map projects that live on this site (embeddable destinations).
+      // GIS utilities stay under Tools → Maps & GIS.
+      if (item.source !== "projects" || item.category !== "maps" || item.external) return false;
     } else {
       if (view === "tools" && item.source !== "tools") return false;
       const allowed = viewCategories[view];
@@ -288,9 +291,9 @@ const projectCount = itemsForView("lab", "").length;
 function sectionCardsHtml() {
   const sections = [
     { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Single-page browser utilities — GIS, data, design, math, classroom, and soccer." },
-    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "Map destinations: live transit, globes, atlases, and spatial stories." },
+    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "First-party map projects you can open right here — transit, globes, atlases, stories." },
     { href: "/games/", label: "Games", category: "play", n: gamesCount, desc: "Strategy and logic games, free in the browser." },
-    { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "The bigger projects, apps, and works in progress." },
+    { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "Every project in one place — maps, games, classroom apps, and experiments." },
   ];
   return sections
     .map((s) => `<a class="section-card" href="${s.href}" data-category="${s.category}">
@@ -316,11 +319,11 @@ const pages = {
   lab: {
     path: "lab/index.html",
     title: "Lab · Mapzimus",
-    description: `The ${projectCount} projects of the Mapzimus lab: map apps, games, and experiments, including works in progress.`,
+    description: `The ${projectCount} projects of the Mapzimus lab: map apps, games, classroom apps, and experiments — no single-page tools.`,
     canonical: "https://mapzimus.com/lab/",
     eyebrow: "The lab",
-    heading: "Projects and experiments",
-    intro: `The ${projectCount} bigger builds beyond the single-page tools — map destinations, games, classroom apps, and experiments, including works in progress.`,
+    heading: "Every project",
+    intro: `All ${projectCount} projects in one shelf — the map destinations from Maps, plus games, classroom apps, and experiments. Tools and skills live elsewhere.`,
     catalogHeading: "All projects",
   },
   tools: {
@@ -336,12 +339,12 @@ const pages = {
   maps: {
     path: "maps/index.html",
     title: "Maps · Mapzimus",
-    description: `Map destinations from Mapzimus: live transit, globes, atlases, and spatial stories.`,
+    description: `First-party map projects from Mapzimus: live transit, globes, atlases, and spatial stories — each hosted on this site.`,
     canonical: "https://mapzimus.com/maps/",
     eyebrow: "Maps",
-    heading: "Map destinations",
-    intro: `${mapCount} map projects to explore — live transit, globes, transit networks, atlases, and spatial stories. GIS utilities live under Tools.`,
-    catalogHeading: "All maps",
+    heading: "Map projects",
+    intro: `${mapCount} map projects hosted here and ready to open — live transit, globes, transit networks, atlases, and spatial stories. GIS utilities live under Tools; the full project shelf is in Lab.`,
+    catalogHeading: "All map projects",
   },
   games: {
     path: "games/index.html",
