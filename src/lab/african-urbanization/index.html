@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Century of Africa</title>
+<meta name="description" content="Africa's population century, scroll by scroll: UN projections to 2100, the megacities rising, the corridors they will need, and Kinshasa on the ground.">
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="vendor/maplibre-gl.css">
+<style>
+  @font-face {
+    font-family: "Archivo";
+    src: url("/fonts/archivo-var-latin.woff2") format("woff2");
+    font-weight: 100 900;
+    font-stretch: 62% 125%;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "IBM Plex Mono";
+    src: url("/fonts/plex-mono-400-latin.woff2") format("woff2");
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "IBM Plex Mono";
+    src: url("/fonts/plex-mono-600-latin.woff2") format("woff2");
+    font-weight: 600;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #101319;
+    --panel: rgba(16, 19, 25, 0.92);
+    --sunk: #181c24;
+    --line: #333840;
+    --text: #e7e9ec;
+    --muted: #99a0ab;
+    --dim: #6d747e;
+    --accent: #f4a93a;
+    --accent2: #8fb8e8;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; line-height: 1.55;
+  }
+
+  #map {
+    position: fixed; inset: 0;
+    z-index: 0;
+  }
+  .maplibregl-ctrl-attrib {
+    background: rgba(16,19,25,0.75) !important;
+    color: var(--dim);
+    font-size: 10px;
+  }
+  .maplibregl-ctrl-attrib a { color: var(--muted) !important; }
+
+  main { position: relative; z-index: 1; pointer-events: none; }
+  main a, .card, .hero-inner, footer.sources { pointer-events: auto; }
+
+  /* ---------- hero ---------- */
+  .hero {
+    min-height: 100vh;
+    display: grid; place-items: center;
+    padding: 24px;
+    text-align: center;
+  }
+  .hero-inner { max-width: 620px; }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  .hero h1 {
+    margin: 14px 0 0;
+    font-size: clamp(38px, 7vw, 64px);
+    font-weight: 750; font-stretch: 108%;
+    line-height: 1.04; letter-spacing: -0.02em;
+    text-shadow: 0 2px 30px rgba(0,0,0,0.8);
+  }
+  .hero p.lede {
+    margin: 18px auto 0; max-width: 480px;
+    font-size: 17px; color: var(--muted);
+    text-shadow: 0 1px 14px rgba(0,0,0,0.9);
+  }
+  .hero .scroll-cue {
+    margin-top: 36px; color: var(--dim);
+    font-family: var(--mono); font-size: 12px;
+  }
+  .hero .scroll-cue::after {
+    content: "↓"; display: block;
+    margin-top: 6px; font-size: 16px;
+    animation: bob 1.8s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  /* ---------- chapters & steps ---------- */
+  .chapter-head {
+    min-height: 72vh;
+    display: grid; place-items: center;
+    padding: 24px;
+  }
+  .chapter-head .card { text-align: left; }
+  .ch-num {
+    font-family: var(--mono); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.14em; color: var(--accent);
+  }
+  .chapter-head h2 { margin: 8px 0 0; font-size: 28px; font-weight: 720; letter-spacing: -0.015em; line-height: 1.1; }
+  .chapter-head p { margin: 10px 0 0; color: var(--muted); }
+
+  .step {
+    min-height: 92vh;
+    display: flex; align-items: center;
+    padding: 24px;
+  }
+  .card {
+    width: min(430px, 100%);
+    padding: 18px 20px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    -webkit-backdrop-filter: blur(7px);
+    backdrop-filter: blur(7px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    opacity: 0.45;
+  }
+  .step.is-active .card, .chapter-head .card, .hero-inner { opacity: 1; }
+  .card h3 { margin: 0 0 8px; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  .card p { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
+  .card p b, .card p strong { color: var(--text); font-weight: 650; }
+  .card .stat {
+    font-family: var(--mono); font-weight: 600;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .card .fine { font-size: 11.5px; color: var(--dim); margin-top: 10px; line-height: 1.45; }
+  .card a { color: var(--accent2); }
+
+  /* legend rows inside cards */
+  .legend { margin-top: 12px; display: grid; gap: 5px; }
+  .legend .row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+  .legend .row i { flex: none; width: 18px; height: 4px; border-radius: 2px; }
+  .legend .row i.dot { width: 10px; height: 10px; border-radius: 50%; }
+  .legend .row i.box { width: 12px; height: 12px; border-radius: 3px; }
+  .ramp { display: flex; height: 10px; margin-top: 12px; border-radius: 3px; overflow: hidden; }
+  .ramp i { flex: 1; }
+  .ramp-labels { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--dim); margin-top: 3px; }
+
+  /* the inline SVG chart */
+  .chart { margin-top: 12px; }
+  .chart svg { display: block; width: 100%; height: auto; }
+  .chart .axis { stroke: var(--line); stroke-width: 1; }
+  .chart text { fill: var(--dim); font-family: var(--mono); font-size: 9.5px; }
+  .chart .lbl { font-size: 10px; font-weight: 600; }
+
+  /* crossover ticker */
+  .ticker { margin-top: 12px; display: grid; gap: 4px; }
+  .ticker .row {
+    display: flex; gap: 10px; align-items: baseline;
+    font-size: 12.5px;
+  }
+  .ticker .yr { font-family: var(--mono); font-weight: 600; color: var(--accent); flex: none; width: 42px; font-variant-numeric: tabular-nums; }
+  .ticker .what { color: var(--muted); }
+  .ticker .what b { color: var(--text); font-weight: 600; }
+
+  /* epoch readout that floats with chapter 4 */
+  #epoch-hud {
+    position: fixed; right: 18px; bottom: 42px; z-index: 2;
+    padding: 10px 16px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
+    text-align: right;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  #epoch-hud.on { opacity: 1; }
+  #epoch-hud .yr { font-family: var(--mono); font-size: 30px; font-weight: 600; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+  #epoch-hud .sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ---------- outro / sources ---------- */
+  footer.sources {
+    position: relative; z-index: 1;
+    margin: 0 auto; padding: 48px 24px 72px;
+    max-width: 640px;
+  }
+  footer.sources .card { width: 100%; opacity: 1; }
+  footer.sources h3 { font-size: 15px; }
+  footer.sources ul { margin: 10px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--muted); }
+  footer.sources li { margin-top: 5px; }
+  footer.sources .back { display: inline-block; margin-top: 16px; font-family: var(--mono); font-size: 12px; }
+
+  #error {
+    position: fixed; inset: 0; z-index: 5;
+    display: none; place-items: center;
+    padding: 24px; text-align: center; background: var(--bg);
+  }
+
+  @media (max-width: 640px) {
+    .step { align-items: flex-end; padding: 16px 12px 22vh; min-height: 96vh; }
+    .card { width: 100%; padding: 14px 16px; }
+    .card h3 { font-size: 15.5px; }
+    .card p { font-size: 13px; }
+    .chapter-head, .hero { padding: 16px; }
+    #epoch-hud { right: 10px; bottom: auto; top: 12px; padding: 7px 12px; }
+    #epoch-hud .yr { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="map" aria-hidden="true"></div>
+<div id="epoch-hud"><div class="yr">1975</div><div class="sub">built-up footprint</div></div>
+
+<main id="story">
+  <section class="hero" data-step="intro">
+    <div class="hero-inner">
+      <div class="kicker">mapzimus · maps</div>
+      <h1>The Century of Africa</h1>
+      <p class="lede">Between now and 2100, most of the world's population growth happens on one
+      continent. This is a tour of where the people, the cities, and the
+      concrete will go — ending on the ground in Kinshasa.</p>
+      <div class="scroll-cue">scroll</div>
+    </div>
+  </section>
+
+  <!-- ================= chapter 1 ================= -->
+  <section class="chapter-head" data-step="ch1">
+    <div class="card">
+      <div class="ch-num">Chapter 1 / 4</div>
+      <h2>The population century</h2>
+      <p>UN World Population Prospects 2024, medium variant. Every country,
+      1950 to 2100. Watch the weight of the world move.</p>
+    </div>
+  </section>
+
+  <div class="step" data-step="c1-2025">
+    <div class="card">
+      <h3>2025: one person in five</h3>
+      <p>Africa holds <b>1.55 billion</b> people today — about <span class="stat">19%</span>
+      of everyone alive. Nigeria, Ethiopia, Egypt and DR Congo are already among
+      the world's most populous countries.</p>
+      <div class="ramp" data-ramp="pop"></div>
+      <div class="ramp-labels"><span>&lt;10M</span><span>50M</span><span>250M+</span></div>
+      <p class="fine">Countries shaded by total population, 2025. Non-African
+      countries are muted for contrast but drawn on the same scale.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c1-2100">
+    <div class="card">
+      <h3>2100: nearly two in five</h3>
+      <p>By century's end the UN's central estimate puts Africa at
+      <b>3.8 billion</b> — <span class="stat">37%</span> of humanity.
+      Europe shrinks. Asia peaks and turns down. Africa keeps climbing through
+      the whole century.</p>
+      <div class="chart" id="chart-regions"></div>
+      <p class="fine">Regional totals, UN WPP 2024 medium variant.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c1-multiple">
+    <div class="card">
+      <h3>The multiplication map</h3>
+      <p>Shading switches to <b>growth between 2025 and 2100</b>. The deepest
+      colors nearly quadruple: <b>DR Congo ×3.8</b>, <b>Angola ×3.8</b>,
+      <b>Tanzania ×3.7</b>. Most of Europe and East Asia fall below ×1.</p>
+      <div class="ramp" data-ramp="mult"></div>
+      <div class="ramp-labels"><span>×0.5</span><span>×1</span><span>×2</span><span>×3+</span></div>
+    </div>
+  </div>
+
+  <div class="step" data-step="c1-crossovers">
+    <div class="card">
+      <h3>The overtaking years</h3>
+      <p>Single years when an African country's population passes a Western
+      one, on the UN's central path:</p>
+      <div class="ticker" id="crossover-ticker"></div>
+      <p class="fine">Computed from annual WPP 2024 medium-variant series; a
+      pass counts only if the lead holds through 2100.</p>
+    </div>
+  </div>
+
+  <!-- ================= chapter 2 ================= -->
+  <section class="chapter-head" data-step="ch2">
+    <div class="card">
+      <div class="ch-num">Chapter 2 / 4</div>
+      <h2>Where the megacities rise</h2>
+      <p>Every circle is a city, sized by population. UN World Urbanization
+      Prospects 2025 tracks each agglomeration from 1975 to 2050.</p>
+    </div>
+  </section>
+
+  <div class="step" data-step="c2-1975">
+    <div class="card">
+      <h3>1975: a rural continent</h3>
+      <p>Only <b>Cairo</b> clears 6 million. Lagos is 2.5M; Kinshasa barely
+      1M. Africa is still an overwhelmingly rural continent.</p>
+      <div class="legend">
+        <div class="row"><i class="dot" style="background:#f4a93a"></i> African agglomeration</div>
+        <div class="row"><i class="dot" style="background:#5b6c85"></i> benchmark: New York, London, Paris, Tokyo</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="c2-2025">
+    <div class="card">
+      <h3>2025: the arrival</h3>
+      <p>Cairo <b>25M</b>, Lagos <b>13M</b>, Kinshasa <b>11M</b> — already
+      bigger than Paris or London. The Gulf of Guinea coast from Abidjan to
+      Lagos is fusing into a near-continuous urban arc of tens of millions.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c2-2050">
+    <div class="card">
+      <h3>2050: past every Western city</h3>
+      <p>Cairo reaches <b>32M</b>, Luanda <b>20M</b>, Lagos <b>16M</b>,
+      Dar es Salaam <b>13M</b> — while New York sits near <b>13M</b> and
+      shrinking Tokyo near 31M. <b>129 African cities</b> clear a million
+      people by mid-century on UN numbers.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c2-2100">
+    <div class="card">
+      <h3>2100: cities with no precedent</h3>
+      <p>Push the growth curves to century's end (Hoornweg &amp; Pope, 2017)
+      and <b>Lagos ~88M</b>, <b>Kinshasa ~84M</b> and
+      <b>Dar es Salaam ~74M</b> become the largest cities that have ever
+      existed — each bigger than all of today's Germany.</p>
+      <p class="fine">2100 circles are academic projections, not UN estimates —
+      drawn hollow to say so.</p>
+    </div>
+  </div>
+
+  <!-- ================= chapter 3 ================= -->
+  <section class="chapter-head" data-step="ch3">
+    <div class="card">
+      <div class="ch-num">Chapter 3 / 4</div>
+      <h2>Connecting a continent</h2>
+      <p>People at this scale need steel and asphalt. What exists, what is
+      being financed, and what the 2050 city map says should exist.</p>
+    </div>
+  </section>
+
+  <div class="step" data-step="c3-existing">
+    <div class="card">
+      <h3>What exists today</h3>
+      <p>Africa's rail map is thin, coastal, and colonial — lines built to move
+      minerals to ports, not people between cities. Vast interiors, including
+      most of the DR Congo, have <b>no railway at all</b>.</p>
+      <div class="legend">
+        <div class="row"><i style="background:#8b93a0"></i> existing railway</div>
+        <div class="row"><i style="background:#4a5261"></i> major highway</div>
+      </div>
+      <p class="fine">Natural Earth 1:10m rail and major roads.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c3-planned">
+    <div class="card">
+      <h3>What is being built — and who pays</h3>
+      <p>China financed and built the marquee lines of the last decade:
+      Mombasa–Nairobi, Addis–Djibouti, Lagos–Ibadan — on top of 1975's TAZARA.
+      The West answered in 2023 with the <b>Lobito Corridor</b> into the
+      copper belt. Infrastructure here is geopolitics in concrete.</p>
+      <div class="legend">
+        <div class="row"><i style="background:#e0645a"></i> China-financed, built or building</div>
+        <div class="row"><i style="background:#8fb8e8"></i> other backers, built or building</div>
+        <div class="row"><i style="background:#c9a53f"></i> Trans-African Highway network (AU plan)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="c3-model">
+    <div class="card">
+      <h3>What the 2050 map asks for</h3>
+      <p>A simple gravity model — every pair of top-30 cities scored by
+      <span class="stat">pop × pop / distance²</span> at 2050 — sketches the
+      corridors demand will pull into being: the Gulf of Guinea arc, the Nile
+      spine, a Great Lakes ladder, Kinshasa–Luanda.</p>
+      <div class="legend">
+        <div class="row"><i style="background:#f4a93a"></i> modeled corridor (demand, not a proposal)</div>
+      </div>
+      <p class="fine">Great-circle links, width by gravity score. A model of
+      where demand concentrates — alignment, terrain and politics not
+      included.</p>
+    </div>
+  </div>
+
+  <!-- ================= chapter 4 ================= -->
+  <section class="chapter-head" data-step="ch4">
+    <div class="card">
+      <div class="ch-num">Chapter 4 / 4</div>
+      <h2>Kinshasa, ground truth</h2>
+      <p>Across the Pool from Brazzaville — the closest pair of capitals on
+      Earth — sits the city that shows what this century actually looks like
+      from the street.</p>
+    </div>
+  </section>
+
+  <div class="step" data-step="c4-arrive">
+    <div class="card">
+      <h3>Two capitals, one pool</h3>
+      <p><b>Kinshasa</b> (south bank) and <b>Brazzaville</b> (north) face each
+      other across the Malebo Pool of the Congo River — <b>4 km</b> apart, the
+      closest neighboring-country capitals in the world, and still not
+      connected by a bridge.</p>
+      <div class="legend">
+        <div class="row"><i class="box" style="background:#1d3242"></i> Congo River / Malebo Pool</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-step="c4-1975">
+    <div class="card">
+      <h3>1975: the colonial footprint</h3>
+      <p>Kinshasa holds <b>a million</b> people, still recognizably the
+      planned city of Léopoldville: a dense riverside core and a grid running
+      south. Satellite-mapped built fabric covers a fraction of today's
+      extent.</p>
+      <p class="fine">Built-up footprint from the JRC Global Human Settlement
+      Layer (GHS-BUILT-S), ~92 m cells, ≥20% built.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c4-2000">
+    <div class="card">
+      <h3>1990–2000: growth without a boom</h3>
+      <p>Through war and collapse the city <b>quintuples anyway</b> — 3
+      million by 1990, 5.2 million by 2000. Almost all of it is informal: unplanned neighborhoods
+      packing tighter and pushing up the hills south of the core.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c4-2020">
+    <div class="card">
+      <h3>2010–2020: the megacity</h3>
+      <p><b>10 million by 2020.</b> New fabric surges east along the N1 toward
+      the airport and N'sele, and the sprawl frontier climbs terrain never
+      meant for streets. Most trips still happen on a road network laid out
+      for a city one-tenth the size.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c4-2030">
+    <div class="card">
+      <h3>2030 and the century beyond</h3>
+      <p>GHSL projects the footprint to 2030; the UN sees <b>11.6M</b> people by
+      2030 and Hoornweg &amp; Pope's curve reaches <b>~84M by 2100</b> — a city
+      the size of a mid-tier country, on the ground you just watched fill in.
+      Density, not sprawl, has carried most of the load so far. The century of
+      Africa gets decided in places exactly like this.</p>
+      <div class="legend" id="epoch-legend"></div>
+    </div>
+  </div>
+</main>
+
+<footer class="sources">
+  <div class="card">
+    <h3>Method &amp; sources</h3>
+    <ul>
+      <li><b>Population:</b> UN World Population Prospects 2024, medium variant (regional shares, country series, crossover years computed from annual data).</li>
+      <li><b>Cities:</b> UN World Urbanization Prospects 2025, DEGURBA city database, 1975–2050; 2100 city figures from Hoornweg &amp; Pope, <i>Environment &amp; Urbanization</i> 29(1), 2017 — projections, shown hollow.</li>
+      <li><b>Corridors:</b> Natural Earth 1:10m rail/roads; curated project list (AU/UNECA Trans-African Highways; SGR/BRI lines per public financing records); gravity model computed from the city data above. Corridor geometry is schematic, city-to-city.</li>
+      <li><b>Kinshasa:</b> JRC Global Human Settlement Layer GHS-BUILT-S R2023A (CC BY 4.0), 3-arcsecond epochs 1975–2030, ≥20% built threshold; river & roads © OpenStreetMap contributors (ODbL).</li>
+      <li><b>Base:</b> Natural Earth (public domain). Built with MapLibre GL JS; no tiles, no backend — the whole map is ~2 MB of GeoJSON.</li>
+    </ul>
+    <p class="fine">Pipeline code ships with this page — see <code>pipeline/</code> in the repo. Projections are the UN's and the cited authors', not predictions of this site.</p>
+    <a class="back" href="/maps/">← more maps at mapzimus</a>
+  </div>
+</footer>
+
+<div id="error"><div><h2>Couldn't load the map data.</h2><p>Reload, or check the console.</p></div></div>
+
+<script src="vendor/maplibre-gl.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

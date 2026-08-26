@@ -1,284 +1,303 @@
 [
-  {
-    "slug": "detroit-rebuild",
-    "title": "Torn Down / Built Back",
-    "description": "Detroit's block-by-block structure loss and replacement, 1870-2026, on half-mile hexes normalised against the buildings actually standing — sixteen metrics, decennial census cross-check, and a measured colourblind-safe ramp.",
-    "category": "maps",
-    "tags": [
-      "MapLibre",
-      "Python",
-      "GeoJSON",
-      "hex grid",
-      "choropleth",
-      "census",
-      "open data",
-      "Detroit"
-    ],
-    "url": "https://mapzimus.com/lab/detroit-rebuild/",
-    "status": "live",
-    "updated": "2026-08"
-  },
-  {
-    "slug": "train-route-atlas",
-    "title": "Train Route Atlas",
-    "description": "Twelve legendary train routes — high-speed, scenic, night, and classic — draped over an interactive 3D globe with specs, filters, and popups, all client-side.",
-    "category": "maps",
-    "tags": [
-      "MapLibre",
-      "globe",
-      "GeoJSON",
-      "railways"
-    ],
-    "url": "https://mapzimus.com/lab/train-routes/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "state-extremes",
-    "title": "State Extremes",
-    "description": "Four tips per place — north, east, south, west — for U.S. states and every country, with coverage toggles, rankings, and anomalies on a 3D globe.",
-    "category": "maps",
-    "tags": [
-      "MapLibre",
-      "globe",
-      "GeoJSON",
-      "US states",
-      "world",
-      "analysis"
-    ],
-    "url": "https://mapzimus.com/lab/state-extremes/",
-    "status": "live",
-    "updated": "2026-08"
-  },
-  {
-    "slug": "geopuesto-playground",
-    "title": "Geopuesto Playground",
-    "description": "Spherical-geometry experiments for great circles, equidistant points, polyhedra, and curve analysis on a globe.",
-    "category": "experiments",
-    "tags": [
-      "geometry",
-      "Leaflet",
-      "research sandbox"
-    ],
-    "url": "https://mapzimus.com/geopuesto/playground/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "us-fantasy-transit",
-    "title": "U.S. Fantasy Transit Network",
-    "description": "A generated four-tier North American transit network connecting Census places at continental, regional, metro, and commuter scales.",
-    "category": "maps",
-    "tags": [
-      "Python",
-      "Leaflet",
-      "fantasy transit"
-    ],
-    "url": "https://mapzimus.com/transit/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "concord-civil-war",
-    "title": "Concord Civil War",
-    "description": "An alternate-history scrollytelling map that divides Concord, New Hampshire along the Merrimack River.",
-    "category": "experiments",
-    "tags": [
-      "MapLibre",
-      "scrollytelling",
-      "alternate history"
-    ],
-    "url": "https://mapzimus.com/concord-war/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "bug-wars",
-    "title": "Bug Wars",
-    "description": "A compact browser strategy game about building an insect colony and surviving rival swarms.",
-    "category": "play",
-    "tags": [
-      "strategy",
-      "browser game"
-    ],
-    "url": "https://mapzimus.com/bug-wars/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "flip-game",
-    "title": "Bottle Game",
-    "description": "A bottle-flip party game — flick for a clean 360°, land upright, and steal lives across the table. Win a game to unlock the parrot skin. Installable PWA with Matter.js physics.",
-    "category": "play",
-    "tags": [
-      "physics",
-      "party game",
-      "PWA"
-    ],
-    "url": "https://mapzimus.com/flip-game/",
-    "status": "live",
-    "updated": "2026-08"
-  },
-  {
-    "slug": "whydah-voyage",
-    "title": "Whydah's Voyage",
-    "description": "Steer Black Sam Bellamy's 1717 voyage from the Caribbean to Maine — ten missions, ship battles, and the nor'easter the real crew never beat.",
-    "category": "play",
-    "tags": [
-      "Whydah",
-      "voyage",
-      "canvas game"
-    ],
-    "url": "https://mapzimus.com/whydah-voyage/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "true-scale",
-    "title": "True Scale",
-    "description": "A map experiment for comparing the apparent and actual size of places across latitudes.",
-    "category": "maps",
-    "tags": [
-      "projection",
-      "MapLibre",
-      "scale"
-    ],
-    "url": "https://mapzimus.com/true-scale/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "interstate-challenge",
-    "title": "Sequential Interstate Challenge",
-    "description": "Drive every two-digit Interstate end to end — an optimized order and orientation cuts connector drive time 86% versus strict numerical order.",
-    "category": "maps",
-    "tags": [
-      "route optimization",
-      "MapLibre",
-      "OSRM"
-    ],
-    "url": "https://mapzimus.com/interstate-challenge/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "mapzimus-board",
-    "title": "Mapzimus Board",
-    "description": "The lab's idea engine — a live board that scores roughly 20,000 candidate map ideas by predicted virality with a weighted seven-dimension V-Score.",
-    "category": "experiments",
-    "tags": [
-      "idea scoring",
-      "vanilla JS",
-      "Python"
-    ],
-    "url": "https://mapzimus.com/mapzimus-board/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "boston-in-motion",
-    "title": "Boston in Motion",
-    "description": "One live map of everything moving through Boston — MBTA trains, buses, ferries, Amtrak, planes over Logan, harbor AIS, and Bluebikes, all client-side.",
-    "category": "maps",
-    "tags": [
-      "MapLibre",
-      "MBTA",
-      "real-time",
-      "transit"
-    ],
-    "url": "https://mapzimus.com/boston-in-motion/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "where-the-games-go",
-    "title": "Where the Games Go",
-    "description": "A 3D globe of North Shore Nostalgia eBay shipments — generalized destinations, great-circle routes, and sales geography from Salem, Massachusetts.",
-    "category": "maps",
-    "tags": [
-      "MapLibre",
-      "globe",
-      "eBay",
-      "sales atlas"
-    ],
-    "url": "https://mapzimus.com/where-the-games-go/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "smartpicker",
-    "title": "SmartPicker",
-    "description": "Fair classroom cold-calling — random, balanced, reach-the-quiet, or everyone-first modes, with think time, groups, and a participation report that never leaves the browser.",
-    "category": "classroom",
-    "tags": [
-      "teaching",
-      "classroom",
-      "random"
-    ],
-    "url": "https://mapzimus.com/smartpicker/",
-    "status": "live",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "predicting-housing-crisis",
-    "title": "Predicting Tomorrow's Housing Crisis",
-    "description": "A predictive-GIS screening explorer for Massachusetts housing — six tract surfaces (stress, pressure, suitability, development, trend, 2030), MBTA and siting overlays, and live re-weighting of the suitability index in your browser.",
-    "category": "maps",
-    "tags": [
-      "Python",
-      "geopandas",
-      "MapLibre",
-      "suitability model",
-      "housing"
-    ],
-    "url": "https://mapzimus.com/lab/housing-crisis/",
-    "status": "in-progress",
-    "updated": "2026-07"
-  },
-  {
-    "slug": "tappymaps",
-    "title": "Tappymaps Arcade",
-    "description": "Tap-to-color US state and county maps plus a shelf of geography arcade games — locate, recall, duel, and daily draft modes.",
-    "category": "play",
-    "tags": [
-      "geography",
-      "games",
-      "maps"
-    ],
-    "url": "https://tappymaps.com",
-    "status": "live",
-    "updated": "2026-07",
-    "external": true
-  },
-  {
-    "slug": "mcas-dashboard",
-    "title": "MCAS Item Bank",
-    "description": "The full Grade 10 MCAS math item bank — 2,000+ released questions with rendered math, filterable by DOK level, chapter, and standard.",
-    "category": "classroom",
-    "tags": [
-      "MCAS",
-      "math",
-      "assessment",
-      "data"
-    ],
-    "url": "https://lehsmath.com/tools/mcas/",
-    "status": "live",
-    "updated": "2026-07",
-    "external": true
-  },
-  {
-    "slug": "game-vault",
-    "title": "Game Vault",
-    "description": "Visual ROM-library curator: every NA release for 19 classic platforms with box art, highlight tags for top sellers and hidden gems, live terabyte budget bars, and an exportable pick list.",
-    "category": "experiments",
-    "tags": [
-      "retro games",
-      "emulation",
-      "curation",
-      "dashboard"
-    ],
-    "url": "https://mapzimus.com/lab/game-vault/",
-    "status": "live",
-    "updated": "2026-07"
-  }
+ {
+  "slug": "african-urbanization",
+  "title": "The Century of Africa",
+  "description": "A scroll-driven tour of Africa's population century: UN projections to 2100, the megacities rising past every Western city, the corridors they will need, and Kinshasa's growth on the ground from GHSL satellite epochs.",
+  "category": "maps",
+  "tags": [
+   "MapLibre",
+   "scrollytelling",
+   "GeoJSON",
+   "UN WPP",
+   "GHSL",
+   "Python",
+   "Kinshasa",
+   "Africa"
+  ],
+  "url": "https://mapzimus.com/lab/african-urbanization/",
+  "status": "live",
+  "updated": "2026-08"
+ },
+ {
+  "slug": "detroit-rebuild",
+  "title": "Torn Down / Built Back",
+  "description": "Detroit's block-by-block structure loss and replacement, 1870-2026, on half-mile hexes normalised against the buildings actually standing — sixteen metrics, decennial census cross-check, and a measured colourblind-safe ramp.",
+  "category": "maps",
+  "tags": [
+   "MapLibre",
+   "Python",
+   "GeoJSON",
+   "hex grid",
+   "choropleth",
+   "census",
+   "open data",
+   "Detroit"
+  ],
+  "url": "https://mapzimus.com/lab/detroit-rebuild/",
+  "status": "live",
+  "updated": "2026-08"
+ },
+ {
+  "slug": "train-route-atlas",
+  "title": "Train Route Atlas",
+  "description": "Twelve legendary train routes — high-speed, scenic, night, and classic — draped over an interactive 3D globe with specs, filters, and popups, all client-side.",
+  "category": "maps",
+  "tags": [
+   "MapLibre",
+   "globe",
+   "GeoJSON",
+   "railways"
+  ],
+  "url": "https://mapzimus.com/lab/train-routes/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "state-extremes",
+  "title": "State Extremes",
+  "description": "Four tips per place — north, east, south, west — for U.S. states and every country, with coverage toggles, rankings, and anomalies on a 3D globe.",
+  "category": "maps",
+  "tags": [
+   "MapLibre",
+   "globe",
+   "GeoJSON",
+   "US states",
+   "world",
+   "analysis"
+  ],
+  "url": "https://mapzimus.com/lab/state-extremes/",
+  "status": "live",
+  "updated": "2026-08"
+ },
+ {
+  "slug": "geopuesto-playground",
+  "title": "Geopuesto Playground",
+  "description": "Spherical-geometry experiments for great circles, equidistant points, polyhedra, and curve analysis on a globe.",
+  "category": "experiments",
+  "tags": [
+   "geometry",
+   "Leaflet",
+   "research sandbox"
+  ],
+  "url": "https://mapzimus.com/geopuesto/playground/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "us-fantasy-transit",
+  "title": "U.S. Fantasy Transit Network",
+  "description": "A generated four-tier North American transit network connecting Census places at continental, regional, metro, and commuter scales.",
+  "category": "maps",
+  "tags": [
+   "Python",
+   "Leaflet",
+   "fantasy transit"
+  ],
+  "url": "https://mapzimus.com/transit/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "concord-civil-war",
+  "title": "Concord Civil War",
+  "description": "An alternate-history scrollytelling map that divides Concord, New Hampshire along the Merrimack River.",
+  "category": "experiments",
+  "tags": [
+   "MapLibre",
+   "scrollytelling",
+   "alternate history"
+  ],
+  "url": "https://mapzimus.com/concord-war/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "bug-wars",
+  "title": "Bug Wars",
+  "description": "A compact browser strategy game about building an insect colony and surviving rival swarms.",
+  "category": "play",
+  "tags": [
+   "strategy",
+   "browser game"
+  ],
+  "url": "https://mapzimus.com/bug-wars/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "flip-game",
+  "title": "Bottle Game",
+  "description": "A bottle-flip party game — flick for a clean 360°, land upright, and steal lives across the table. Win a game to unlock the parrot skin. Installable PWA with Matter.js physics.",
+  "category": "play",
+  "tags": [
+   "physics",
+   "party game",
+   "PWA"
+  ],
+  "url": "https://mapzimus.com/flip-game/",
+  "status": "live",
+  "updated": "2026-08"
+ },
+ {
+  "slug": "whydah-voyage",
+  "title": "Whydah's Voyage",
+  "description": "Steer Black Sam Bellamy's 1717 voyage from the Caribbean to Maine — ten missions, ship battles, and the nor'easter the real crew never beat.",
+  "category": "play",
+  "tags": [
+   "Whydah",
+   "voyage",
+   "canvas game"
+  ],
+  "url": "https://mapzimus.com/whydah-voyage/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "true-scale",
+  "title": "True Scale",
+  "description": "A map experiment for comparing the apparent and actual size of places across latitudes.",
+  "category": "maps",
+  "tags": [
+   "projection",
+   "MapLibre",
+   "scale"
+  ],
+  "url": "https://mapzimus.com/true-scale/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "interstate-challenge",
+  "title": "Sequential Interstate Challenge",
+  "description": "Drive every two-digit Interstate end to end — an optimized order and orientation cuts connector drive time 86% versus strict numerical order.",
+  "category": "maps",
+  "tags": [
+   "route optimization",
+   "MapLibre",
+   "OSRM"
+  ],
+  "url": "https://mapzimus.com/interstate-challenge/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "mapzimus-board",
+  "title": "Mapzimus Board",
+  "description": "The lab's idea engine — a live board that scores roughly 20,000 candidate map ideas by predicted virality with a weighted seven-dimension V-Score.",
+  "category": "experiments",
+  "tags": [
+   "idea scoring",
+   "vanilla JS",
+   "Python"
+  ],
+  "url": "https://mapzimus.com/mapzimus-board/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "boston-in-motion",
+  "title": "Boston in Motion",
+  "description": "One live map of everything moving through Boston — MBTA trains, buses, ferries, Amtrak, planes over Logan, harbor AIS, and Bluebikes, all client-side.",
+  "category": "maps",
+  "tags": [
+   "MapLibre",
+   "MBTA",
+   "real-time",
+   "transit"
+  ],
+  "url": "https://mapzimus.com/boston-in-motion/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "where-the-games-go",
+  "title": "Where the Games Go",
+  "description": "A 3D globe of North Shore Nostalgia eBay shipments — generalized destinations, great-circle routes, and sales geography from Salem, Massachusetts.",
+  "category": "maps",
+  "tags": [
+   "MapLibre",
+   "globe",
+   "eBay",
+   "sales atlas"
+  ],
+  "url": "https://mapzimus.com/where-the-games-go/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "smartpicker",
+  "title": "SmartPicker",
+  "description": "Fair classroom cold-calling — random, balanced, reach-the-quiet, or everyone-first modes, with think time, groups, and a participation report that never leaves the browser.",
+  "category": "classroom",
+  "tags": [
+   "teaching",
+   "classroom",
+   "random"
+  ],
+  "url": "https://mapzimus.com/smartpicker/",
+  "status": "live",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "predicting-housing-crisis",
+  "title": "Predicting Tomorrow's Housing Crisis",
+  "description": "A predictive-GIS screening explorer for Massachusetts housing — six tract surfaces (stress, pressure, suitability, development, trend, 2030), MBTA and siting overlays, and live re-weighting of the suitability index in your browser.",
+  "category": "maps",
+  "tags": [
+   "Python",
+   "geopandas",
+   "MapLibre",
+   "suitability model",
+   "housing"
+  ],
+  "url": "https://mapzimus.com/lab/housing-crisis/",
+  "status": "in-progress",
+  "updated": "2026-07"
+ },
+ {
+  "slug": "tappymaps",
+  "title": "Tappymaps Arcade",
+  "description": "Tap-to-color US state and county maps plus a shelf of geography arcade games — locate, recall, duel, and daily draft modes.",
+  "category": "play",
+  "tags": [
+   "geography",
+   "games",
+   "maps"
+  ],
+  "url": "https://tappymaps.com",
+  "status": "live",
+  "updated": "2026-07",
+  "external": true
+ },
+ {
+  "slug": "mcas-dashboard",
+  "title": "MCAS Item Bank",
+  "description": "The full Grade 10 MCAS math item bank — 2,000+ released questions with rendered math, filterable by DOK level, chapter, and standard.",
+  "category": "classroom",
+  "tags": [
+   "MCAS",
+   "math",
+   "assessment",
+   "data"
+  ],
+  "url": "https://lehsmath.com/tools/mcas/",
+  "status": "live",
+  "updated": "2026-07",
+  "external": true
+ },
+ {
+  "slug": "game-vault",
+  "title": "Game Vault",
+  "description": "Visual ROM-library curator: every NA release for 19 classic platforms with box art, highlight tags for top sellers and hidden gems, live terabyte budget bars, and an exportable pick list.",
+  "category": "experiments",
+  "tags": [
+   "retro games",
+   "emulation",
+   "curation",
+   "dashboard"
+  ],
+  "url": "https://mapzimus.com/lab/game-vault/",
+  "status": "live",
+  "updated": "2026-07"
+ }
 ]
