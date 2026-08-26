@@ -36,6 +36,8 @@ order; raw downloads land in `pipeline/raw/`, which is gitignored — set
 | `03_corridors.py` | Natural Earth 10m rail/roads; curated projects; gravity model | `corridors-*.geojson` |
 | `04_kinshasa.py` | JRC GHS-BUILT-S R2023A, 3ss, tile R10_C20 | `kinshasa-builtup.geojson` |
 | `05_kinshasa_context.py` | OpenStreetMap via Overpass | `kinshasa-water.geojson`, `kinshasa-roads.geojson` |
+| `06_lights.py` | Harmonized DMSP/VIIRS nighttime lights 2020 (Li et al., figshare) | `lights.geojson` |
+| `07_kinshasa_density.py` | JRC GHS-POP R2023A, 1975 + 2025 | `kinshasa-density.geojson` (+ densification stats) |
 
 Python deps: `pyshp shapely numpy rasterio requests osm2geojson`.
 
