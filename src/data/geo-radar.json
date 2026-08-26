@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-25",
+  "generatedAt": "2026-08-26",
   "news": {
     "mapsmania": [
+      {
+        "title": "(MAPS) Painting By Number",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/maps-painting-by-number.html",
+        "desc": ""
+      },
       {
         "title": "GTA - San Francisco",
         "url": "http://googlemapsmania.blogspot.com/2026/08/gta-san-francisco.html",
@@ -35,11 +40,6 @@
       {
         "title": "How to Win the World Cup - From Above",
         "url": "http://googlemapsmania.blogspot.com/2026/08/how-to-win-world-cup-from-above.html",
-        "desc": ""
-      },
-      {
-        "title": "Where Area Equals People",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/where-area-equals-people.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "Sen2Patches",
-      "url": "https://plugins.qgis.org/plugins/sen2patches/"
+      "title": "Mangrove Extraction",
+      "url": "https://plugins.qgis.org/plugins/mangrove_extraction/"
     },
     {
-      "title": "Kriging Tools",
-      "url": "https://plugins.qgis.org/plugins/kriging_plugin/"
+      "title": "CoastProfile",
+      "url": "https://plugins.qgis.org/plugins/coastprofile/"
     },
     {
-      "title": "MDE AP - Acurácia Posicional",
-      "url": "https://plugins.qgis.org/plugins/pos_accuracy/"
+      "title": "XY Creator",
+      "url": "https://plugins.qgis.org/plugins/XY_Creator/"
     },
     {
-      "title": "Hub Browser",
-      "url": "https://plugins.qgis.org/plugins/hub_browser/"
+      "title": "Smart Layer Filter",
+      "url": "https://plugins.qgis.org/plugins/SmartLayerFilter/"
     },
     {
-      "title": "Quick RightMenu Actions",
-      "url": "https://plugins.qgis.org/plugins/quick_rightmenu_actions/"
+      "title": "GeoBridge",
+      "url": "https://plugins.qgis.org/plugins/GeoBridge_Plugin/"
     },
     {
-      "title": "Overlay Multiple",
-      "url": "https://plugins.qgis.org/plugins/Overlay_Multiple_V1_0_0/"
+      "title": "OpenGeoData France",
+      "url": "https://plugins.qgis.org/plugins/OpenGeoDataFR/"
     },
     {
-      "title": "Conflate Roads",
-      "url": "https://plugins.qgis.org/plugins/conflate_roads/"
+      "title": "Pobieranie Landsat",
+      "url": "https://plugins.qgis.org/plugins/pobieranie_landsat/"
     },
     {
-      "title": "Natural Breaks Raster Symbology",
-      "url": "https://plugins.qgis.org/plugins/natural_breaks_symbology/"
+      "title": "Konwerter CAD na GIS",
+      "url": "https://plugins.qgis.org/plugins/cad_to_gis/"
     }
   ],
   "releases": [
@@ -210,10 +210,22 @@
   ],
   "gisse": [
     {
+      "title": "ArcGIS Pro Contour labelling masks - is there a simpler approach than variable depth masking?",
+      "url": "https://gis.stackexchange.com/questions/501305/arcgis-pro-contour-labelling-masks-is-there-a-simpler-approach-than-variable-d",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Arcade Expression not showing minimum value in dynamic text for visible rows",
       "url": "https://gis.stackexchange.com/questions/501299/arcade-expression-not-showing-minimum-value-in-dynamic-text-for-visible-rows",
       "score": 0,
       "answers": 1
+    },
+    {
+      "title": "Make global customizations for all users in QGIS?",
+      "url": "https://gis.stackexchange.com/questions/501302/make-global-customizations-for-all-users-in-qgis",
+      "score": 1,
+      "answers": 0
     },
     {
       "title": "Digital signature missing in QGIS 4.2.1 (Code Signing)",
@@ -234,16 +246,16 @@
       "answers": 0
     },
     {
-      "title": "Web AppBuilder does not retain arrow line symbology from Map Viewer, while Experience Builder does",
-      "url": "https://gis.stackexchange.com/questions/501281/web-appbuilder-does-not-retain-arrow-line-symbology-from-map-viewer-while-exper",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "Geofencing area spans two UTM zones",
       "url": "https://gis.stackexchange.com/questions/501286/geofencing-area-spans-two-utm-zones",
       "score": 0,
       "answers": 1
+    },
+    {
+      "title": "Web AppBuilder does not retain arrow line symbology from Map Viewer, while Experience Builder does",
+      "url": "https://gis.stackexchange.com/questions/501281/web-appbuilder-does-not-retain-arrow-line-symbology-from-map-viewer-while-exper",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "Summing attribute values along line layer not working",
@@ -252,22 +264,10 @@
       "answers": 0
     },
     {
-      "title": "Direction of OSMnx network from graph module in ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501289/direction-of-osmnx-network-from-graph-module-in-arcgis-pro",
+      "title": "QGIS 3.44.11 (Solothurn) - WhiteboxTools- stream_order file empty",
+      "url": "https://gis.stackexchange.com/questions/501276/qgis-3-44-11-solothurn-whiteboxtools-stream-order-file-empty",
       "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "How do you structure raster-processing code so the I/O can be replaced in tests?",
-      "url": "https://gis.stackexchange.com/questions/501277/how-do-you-structure-raster-processing-code-so-the-i-o-can-be-replaced-in-tests",
-      "score": 1,
       "answers": 1
-    },
-    {
-      "title": "Joined attributes location in identification tool of QGIS",
-      "url": "https://gis.stackexchange.com/questions/501288/joined-attributes-location-in-identification-tool-of-qgis",
-      "score": 0,
-      "answers": 0
     }
   ],
   "nasa": [
