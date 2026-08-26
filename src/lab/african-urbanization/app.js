@@ -447,10 +447,29 @@ function initSteps(map) {
       if (id !== "intro") spinStop();
       document.querySelectorAll(".step.is-active").forEach((el) => el.classList.remove("is-active"));
       entry.target.classList.add("is-active");
+      setRail(id);
       steps[id]();
     }
   }, { rootMargin: "-42% 0px -42% 0px" });
   els.forEach((el) => io.observe(el));
+
+  // Chapter rail: highlight follows the active step; clicking jumps chapters.
+  const rail = document.getElementById("chapter-rail");
+  const railKey = (id) =>
+    id === "intro" ? "intro"
+    : id === "explore" ? "explore"
+    : "ch" + (id.match(/^c(?:h)?(\d)/) || [])[1];
+  function setRail(id) {
+    const key = railKey(id);
+    rail?.querySelectorAll("button").forEach((b) =>
+      b.classList.toggle("on", b.dataset.target === key));
+  }
+  rail?.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-target]");
+    if (!btn) return;
+    document.querySelector(`[data-step="${btn.dataset.target}"]`)
+      ?.scrollIntoView({ behavior: prefersStill ? "instant" : "smooth", block: "start" });
+  });
 
   // ---- free-explore mode ----
   const handlers = ["scrollZoom", "dragPan", "dragRotate", "doubleClickZoom", "touchZoomRotate", "keyboard"];
@@ -583,6 +602,7 @@ function initSteps(map) {
 
   steps.intro();
   active = "intro";
+  setRail("intro");
 }
 
 /* ---------------------------------------------------------- static widgets */

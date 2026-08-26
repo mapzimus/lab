@@ -206,6 +206,33 @@
   footer.sources li { margin-top: 5px; }
   footer.sources .back { display: inline-block; margin-top: 16px; font-family: var(--mono); font-size: 12px; }
 
+  /* ---------- chapter rail ---------- */
+  #chapter-rail {
+    position: fixed; right: 16px; top: 50%; transform: translateY(-50%);
+    z-index: 2; display: flex; flex-direction: column; gap: 14px;
+  }
+  #chapter-rail button {
+    display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+    background: none; border: 0; padding: 2px; cursor: pointer;
+  }
+  #chapter-rail i {
+    flex: none; width: 9px; height: 9px; border-radius: 50%;
+    background: #3a4150; border: 1px solid #4a5261;
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+  #chapter-rail button.on i { background: var(--accent); border-color: var(--accent); transform: scale(1.25); }
+  #chapter-rail span {
+    font: 600 10.5px var(--mono); letter-spacing: 0.06em;
+    color: var(--muted); white-space: nowrap;
+    opacity: 0; transform: translateX(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+    pointer-events: none;
+  }
+  #chapter-rail:hover span, #chapter-rail button:focus-visible span { opacity: 1; transform: none; }
+  body.exploring #chapter-rail { display: none; }
+  @media (max-width: 900px) { #chapter-rail { display: none; } }
+
   /* ---------- free-explore mode ---------- */
   #explore-btn {
     margin-top: 14px; padding: 9px 16px;
@@ -621,6 +648,15 @@
   </div>
 </main>
 
+<nav id="chapter-rail" aria-label="Chapters">
+  <button type="button" data-target="intro"><i></i><span>Top</span></button>
+  <button type="button" data-target="ch1"><i></i><span>1 · People</span></button>
+  <button type="button" data-target="ch2"><i></i><span>2 · Cities</span></button>
+  <button type="button" data-target="ch3"><i></i><span>3 · Corridors</span></button>
+  <button type="button" data-target="ch4"><i></i><span>4 · Kinshasa</span></button>
+  <button type="button" data-target="explore"><i></i><span>Explore</span></button>
+</nav>
+
 <div id="explore-panel" aria-label="Map controls">
   <div class="cap">Country shading</div>
   <select id="explore-metric">
@@ -659,7 +695,7 @@
     <ul>
       <li><b>Population:</b> UN World Population Prospects 2024, medium variant (regional shares, country series, crossover years computed from annual data).</li>
       <li><b>Cities:</b> UN World Urbanization Prospects 2025, DEGURBA city database, 1975–2050; 2100 city figures from Hoornweg &amp; Pope, <i>Environment &amp; Urbanization</i> 29(1), 2017 — projections, shown hollow.</li>
-      <li><b>Corridors:</b> Natural Earth 1:10m rail/roads; curated project list (AU/UNECA Trans-African Highways; SGR/BRI lines per public financing records); gravity model computed from the city data above. Corridor geometry is schematic, city-to-city.</li>
+      <li><b>Corridors:</b> Natural Earth 1:10m rail/roads; curated project list (AU/UNECA Trans-African Highways; SGR/BRI lines per public financing records); gravity model computed from the city data above. Built railways are drawn on their real alignments from OpenStreetMap; planned corridors are schematic, city-to-city.</li>
       <li><b>Kinshasa:</b> JRC Global Human Settlement Layer GHS-BUILT-S and GHS-POP R2023A (CC BY 4.0), 3-arcsecond epochs, ≥20% built threshold; densification computed as GHS-POP 1975/2025 within the 1975 footprint; river & roads © OpenStreetMap contributors (ODbL).</li>
       <li><b>Night lights:</b> harmonized DMSP/VIIRS global nighttime light dataset, 2020 layer (Li, Zhou, Zhao & Zhao; figshare doi:10.6084/m9.figshare.9828827, CC BY 4.0).</li>
       <li><b>Base:</b> Natural Earth (public domain). Built with MapLibre GL JS; no tiles, no backend — the whole map is ~2 MB of GeoJSON.</li>

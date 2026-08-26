@@ -135,14 +135,80 @@ PROJECTS = [
 ]
 
 
+# Railways that exist on the ground get their real OSM alignment instead of a
+# schematic city-to-city line. Planned/under-construction corridors stay
+# schematic — drawing an alignment that isn't built yet would overclaim.
+REAL_GEOMETRY = {
+    "Mombasa–Nairobi SGR", "Addis Ababa–Djibouti Railway", "TAZARA Railway",
+    "Lagos–Ibadan SGR", "Abuja–Kaduna SGR",
+    "Lobito Corridor",  # the Benguela line being rehabilitated is fully built
+}
+OVERPASS_APIS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+]
+
+
+def real_rail_geometry(schematic_coords):
+    """Stitched OSM railway ways within a buffer of the schematic corridor.
+
+    © OpenStreetMap contributors (ODbL); the page already attributes OSM.
+    Returns a MultiLineString mapping, or None when the query yields nothing
+    usable (the caller keeps the schematic line).
+    """
+    import requests
+    import osm2geojson
+    from shapely.geometry import LineString
+    from shapely.ops import linemerge
+
+    corridor = LineString(schematic_coords).buffer(0.2).simplify(0.05)
+    poly = " ".join(f"{lat:.3f} {lon:.3f}" for lon, lat in corridor.exterior.coords)
+    query = f'[out:json][timeout:120];way["railway"="rail"](poly:"{poly}");out geom;'
+    gj = None
+    for api in OVERPASS_APIS:
+        try:
+            r = requests.post(api, data={"data": query}, timeout=180)
+            r.raise_for_status()
+            gj = osm2geojson.json2geojson(r.json())
+            break
+        except requests.RequestException:
+            continue
+    if not gj:
+        return None
+    lines = [shape(f["geometry"]) for f in gj["features"]
+             if f["geometry"]["type"] in ("LineString", "MultiLineString")]
+    if not lines:
+        return None
+    merged = linemerge(unary_union(lines))
+    parts = [merged] if merged.geom_type == "LineString" else list(merged.geoms)
+    # Yards, sidings and stubs merge into short pieces; the mainline is long.
+    parts = [p for p in parts if p.length * 111 >= 25]  # ~km
+    if not parts:
+        return None
+    simplified = unary_union(parts).simplify(0.01, preserve_topology=True)
+    return mapping(simplified)
+
+
 def planned_layer():
+    import time
     features = []
     for name, kind, status, backer, stops in PROJECTS:
         coords = [PLACES[s] for s in stops]
+        geometry = {"type": "LineString", "coordinates": [list(c) for c in coords]}
+        real = 0
+        if name in REAL_GEOMETRY:
+            fetched = real_rail_geometry(coords)
+            if fetched:
+                geometry, real = fetched, 1
+                print(f"  {name}: real OSM alignment")
+            else:
+                print(f"  {name}: OSM fetch empty, keeping schematic")
+            time.sleep(2)  # be polite to the shared Overpass service
         features.append({
-            "geometry": {"type": "LineString", "coordinates": [list(c) for c in coords]},
+            "geometry": geometry,
             "properties": {"name": name, "kind": kind, "status": status, "backer": backer,
-                           "china": 1 if "China" in backer else 0},
+                           "china": 1 if "China" in backer else 0, "real": real},
         })
     write_geojson(DATA_DIR / "corridors-planned.geojson", features, ndigits=3)
 
