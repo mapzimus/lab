@@ -232,6 +232,41 @@
     padding: 3px 0;
   }
   #explore-panel input { accent-color: var(--accent); }
+  #explore-panel .cap + .cap, #explore-panel label + .cap, #explore-panel .chips + .cap,
+  #explore-panel select + .cap, #explore-panel .slider-row + .cap { margin-top: 12px; }
+  #explore-panel select {
+    width: 100%; padding: 5px 8px;
+    background: var(--sunk); color: var(--text);
+    border: 1px solid var(--line); border-radius: 6px;
+    font: inherit; font-size: 12.5px;
+  }
+  #explore-panel .slider-row { display: flex; align-items: center; gap: 10px; }
+  #explore-panel input[type="range"] { flex: 1; }
+  #explore-panel output {
+    font: 600 12.5px var(--mono); color: var(--accent);
+    min-width: 38px; text-align: right; font-variant-numeric: tabular-nums;
+  }
+  #explore-panel .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  #explore-panel .chips button {
+    padding: 4px 9px; font-size: 11.5px; cursor: pointer;
+    color: var(--muted); background: var(--sunk);
+    border: 1px solid var(--line); border-radius: 999px;
+  }
+  #explore-panel .chips button:hover { color: var(--text); border-color: var(--accent); }
+  #explore-panel .hint { margin: 12px 0 0; font-size: 11px; color: var(--dim); }
+  .maplibregl-popup-content {
+    background: var(--sunk); color: var(--text);
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 12px 14px; font: 13px/1.5 "Archivo", system-ui, sans-serif;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  .maplibregl-popup-tip { border-top-color: var(--sunk) !important; border-bottom-color: var(--sunk) !important; }
+  .maplibregl-popup-close-button { color: var(--muted); font-size: 16px; padding: 2px 7px; }
+  .pop-h { font-weight: 700; font-size: 14px; padding-right: 14px; }
+  .pop-sub { color: var(--muted); font-size: 11px; margin-bottom: 7px; }
+  .pop-row { display: flex; justify-content: space-between; gap: 20px; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .pop-row span:first-child { color: var(--muted); }
+  .pop-row.proj span:last-child { color: var(--accent); }
   #explore-exit {
     display: block; margin-top: 11px; padding: 6px 10px; width: 100%;
     font: 600 12px var(--mono);
@@ -243,7 +278,7 @@
   body.exploring main, body.exploring footer.sources { visibility: hidden; }
   body.exploring #explore-panel { display: block; }
   @media (max-width: 640px) {
-    #explore-panel { left: 10px; right: 10px; bottom: 14px; }
+    #explore-panel { left: 10px; right: 10px; bottom: 14px; max-height: 55vh; overflow-y: auto; }
   }
 
   #error {
@@ -586,14 +621,35 @@
   </div>
 </main>
 
-<div id="explore-panel" aria-label="Map layers">
+<div id="explore-panel" aria-label="Map controls">
+  <div class="cap">Country shading</div>
+  <select id="explore-metric">
+    <option value="off" selected>None</option>
+    <option value="pop2025">Population 2025</option>
+    <option value="pop2050">Population 2050</option>
+    <option value="pop2100">Population 2100</option>
+    <option value="multiple">Growth 2025 → 2100</option>
+    <option value="medAge25">Median age 2025</option>
+  </select>
   <div class="cap">Layers</div>
-  <label><input type="checkbox" data-layer="population"> Population 2100</label>
-  <label><input type="checkbox" data-layer="cities"> Megacities 2050</label>
+  <label><input type="checkbox" data-layer="cities"> Cities</label>
   <label><input type="checkbox" data-layer="corridors"> Corridors</label>
   <label><input type="checkbox" data-layer="lights"> Night lights</label>
   <label><input type="checkbox" data-layer="kinshasa" checked> Kinshasa growth</label>
   <label><input type="checkbox" data-layer="density"> Kinshasa density</label>
+  <div class="cap">Cities in year</div>
+  <div class="slider-row">
+    <input type="range" id="explore-year" min="0" max="8" step="1" value="8">
+    <output id="explore-year-out">2050</output>
+  </div>
+  <div class="cap">Go to</div>
+  <div class="chips">
+    <button type="button" data-go="continent">Continent</button>
+    <button type="button" data-go="gulf">Gulf of Guinea</button>
+    <button type="button" data-go="nile">The Nile</button>
+    <button type="button" data-go="kinshasa">Kinshasa</button>
+  </div>
+  <p class="hint">Click any country, city, or corridor for its numbers.</p>
   <button id="explore-exit" type="button">← Back to the story</button>
 </div>
 

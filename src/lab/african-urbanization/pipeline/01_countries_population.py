@@ -81,7 +81,26 @@ def crossover_year(a, b):
     return None
 
 
-def build_countries(med):
+def load_median_age():
+    """Median age per country from the WPP demographic indicators file."""
+    ages = defaultdict(dict)
+    with gzip.open(RAW_DIR / "WPP2024_Demographic_Indicators_Medium.csv.gz",
+                   "rt", encoding="utf-8-sig") as fh:
+        for row in csv.DictReader(fh):
+            iso3 = row["ISO3_code"]
+            if not iso3:
+                continue
+            year = int(row["Time"])
+            if year not in (2025, 2100):
+                continue
+            try:
+                ages[iso3][year] = float(row["MedianAgePop"])
+            except ValueError:
+                continue
+    return ages
+
+
+def build_countries(med, ages):
     zpath = RAW_DIR / "ne_50m_admin_0_countries.zip"
     zf = zipfile.ZipFile(zpath)
     base = "ne_50m_admin_0_countries"
@@ -117,6 +136,11 @@ def build_countries(med):
                     "multiple": round(p100 / p25, 2),
                     "africa": 1 if iso3 in AFRICA_ISO3 else 0,
                 })
+        age = ages.get(iso3, {})
+        if age.get(2025):
+            props["medAge25"] = round(age[2025], 1)
+        if age.get(2100):
+            props["medAge100"] = round(age[2100], 1)
         features.append({"geometry": mapping(simplified), "properties": props})
     write_geojson(DATA_DIR / "countries.geojson", features, ndigits=3)
 
@@ -153,7 +177,7 @@ def main():
                 for iso3, variants in fan.items()},
     }
     write_json(DATA_DIR / "population.json", out)
-    build_countries(med)
+    build_countries(med, load_median_age())
 
     for c in crossovers:
         print(f"  {c['aName']} passes {c['bName']} in {c['year']}")
