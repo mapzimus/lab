@@ -57,6 +57,7 @@ const hostedProjectRoutes = {
   "boston-in-motion": "/boston-in-motion/",
   "where-the-games-go": "/where-the-games-go/",
   "smartpicker": "/smartpicker/",
+  "world-xi": "/lab/world-xi/",
 };
 
 /** vendor/apps/<dir> → public route */

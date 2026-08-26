@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>World XI · Mapzimus Lab</title>
+  <meta name="description" content="Every top-flight club of the Premier League, La Liga, Bundesliga, Serie A, Ligue 1, Women's Super League and NWSL, plotted at its home stadium on a 3D globe.">
+  <meta property="og:title" content="World XI">
+  <meta property="og:description" content="Every big-league soccer club at its home stadium, on a 3D globe.">
+  <meta name="theme-color" content="#0b1016">
+  <link rel="canonical" href="https://mapzimus.com/lab/world-xi/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/world-xi/vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="/lab/world-xi/styles.css">
+  <script src="/lab/world-xi/vendor/maplibre-gl.js" defer></script>
+  <script src="/lab/world-xi/app.js" defer></script>
+</head>
+<body>
+  <div id="map"></div>
+
+  <header class="chrome">
+    <p class="backlink"><a href="/lab/">← Lab</a></p>
+    <h1>World XI</h1>
+    <p class="lede">Every top-flight club at its home stadium — men's big five plus the WSL and NWSL, 2025–26.</p>
+  </header>
+
+  <aside class="legend" aria-label="League filters">
+    <div class="legend-group" id="legend-men">
+      <h2>Men</h2>
+    </div>
+    <div class="legend-group" id="legend-women">
+      <h2>Women</h2>
+    </div>
+  </aside>
+
+  <p id="readout" class="readout" role="status" aria-live="polite"></p>
+
+  <footer class="credit">
+    Club &amp; stadium data <a href="https://www.wikidata.org/">Wikidata</a> (CC0) ·
+    crests hotlinked from Wikipedia (trademarks of their clubs) ·
+    <a href="https://maplibre.org/">MapLibre GL</a> globe ·
+    basemap <a href="https://openfreemap.org/">OpenFreeMap</a>
+  </footer>
+
+  <div class="map-fallback">This globe needs WebGL, which didn't initialize in this browser.</div>
+</body>
+</html>
