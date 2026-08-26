@@ -5,6 +5,7 @@ const Input = (() => {
 
   let canvas, onFlick;
   let dragging = false;
+  let ptrType = 'mouse';   // pointerType of the active gesture (touch/pen/mouse)
   let startX = 0, startY = 0;
   let curX = 0, curY = 0;
   let lastX = 0, lastY = 0, lastT = 0;
@@ -33,6 +34,7 @@ const Input = (() => {
     if (dragging) return;
     e.preventDefault();
     activePointerId = e.pointerId;
+    ptrType = e.pointerType || 'mouse';
     try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
     dragging = true;
     // Capture the canvas rect ONCE at gesture start. Recomputing it per move
@@ -75,7 +77,7 @@ const Input = (() => {
     let vx = peakVx, vy = peakVy;
     if (peakSpeed < 80) { vx = dx * 10; vy = dy * 10; }
 
-    onFlick(vx, vy);
+    onFlick(vx, vy, ptrType);
   }
 
   // A pointercancel (palm rejection, OS gesture interrupt, lost capture) must

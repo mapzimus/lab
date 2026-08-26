@@ -30,6 +30,11 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /bottle-game /flip-game/ 301
 /bottle-game/ /flip-game/ 301
 
+# Black Sam removed from Games; curriculum copy (if any) stays under /whydah/
+/black-sam /games/ 301
+/black-sam/ /games/ 301
+/black-sam/* /games/ 301
+
 # Retired /games/<slug> snapshots → canonical first-party route
 /games/flip /flip-game/ 301
 /games/flip/* /flip-game/:splat 301
@@ -48,6 +53,16 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /tappymaps https://tappymaps.com 301
 /tappymaps/* https://tappymaps.com/:splat 301
 
+# Classroom math tools that live on lehsmath.com (removed from mapzimus catalog)
+/scientific-calculator https://lehsmath.com/tools/calc/ 301
+/scientific-calculator/ https://lehsmath.com/tools/calc/ 301
+/practice-problems https://lehsmath.com/tools/practice/ 301
+/practice-problems/ https://lehsmath.com/tools/practice/ 301
+/core-skills-builder https://lehsmath.com/tools/core-skills/ 301
+/core-skills-builder/ https://lehsmath.com/tools/core-skills/ 301
+/math-vocab-flashcards https://lehsmath.com/tools/vocab/ 301
+/math-vocab-flashcards/ https://lehsmath.com/tools/vocab/ 301
+
 /tools/maps/ /maps/ 301
 /tools/maps /maps 301
 
@@ -56,3 +71,8 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /play /games 301
 /experiments/ /lab/ 301
 /experiments /lab 301
+
+# Field Notes hidden until there are real posts
+/field-notes / 301
+/field-notes/ / 301
+/field-notes/* / 301

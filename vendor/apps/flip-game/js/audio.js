@@ -71,6 +71,12 @@ const Sound = (() => {
       tone({ freq: 55,  type: 'sine', dur: 0.18, gain: 0.3, delay: 0.0 });
       tone({ freq: 55,  type: 'sine', dur: 0.18, gain: 0.3, delay: 0.45 });
     },
+    // Impact juice — landing thud + wall/ceiling carom tick (alien banks).
+    thud: () => noise(0.11, 0.22, 700),
+    wall: () => {
+      noise(0.05, 0.14, 2200);
+      tone({ freq: 520, slideTo: 240, type: 'triangle', dur: 0.08, gain: 0.10 });
+    },
   };
 
   // Haptic vibration patterns (ms) per event — no-op on devices without it
@@ -85,6 +91,8 @@ const Sound = (() => {
     greatsave: [20, 30, 20, 30, 80],
     capland: [30, 20, 30, 20, 50, 20, 100],
     tension: [25, 70, 25, 70],          // ominous pulse
+    thud:    18,
+    wall:    12,
   };
   function buzz(name) {
     if (muted || !navigator.vibrate) return;

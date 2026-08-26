@@ -11,10 +11,23 @@ const Renderer = (() => {
   const FLIGHT_LIFT = 0.18;
   // Easter-egg cosmetics for the current frame (set in frame() from state).
   let fxGolden = false, fxGhost = false, fxParty = false;
+  let fxMoon = false, fxNinja = false, fxRainbow = false, fxSize = 1;
+  let fxPlinko = null;   // plinko board geometry while a drop is live
   // Smooth camera for mobile open-arena: zoom out when the object leaves frame.
   let camZoom = 1, camX = 0, camY = 0;
+  let shakeAmp = 0;   // brief impact / verdict screen shake (screen space)
 
   function setReduceMotion(v) { reduceMotion = !!v; }
+
+  function burst(x, y, color, count = 14) {
+    if (reduceMotion) return;
+    spawnSplash(x, y, count, color || '#69f0ae');
+  }
+
+  function nudge(amount = 3) {
+    if (reduceMotion) return;
+    shakeAmp = Math.max(shakeAmp, amount);
+  }
 
   function init(cvs) {
     canvas = cvs;
@@ -125,6 +138,7 @@ const Renderer = (() => {
       ctx.fillRect(0, 0, W, H);
     }
     if (skyOnly) return;
+    if (fxPlinko) return;   // plinko drop: the floor has vanished
 
     // Extra-wide table so open-arena zoom-outs still show a floor.
     const x0 = -W * 2, tw = W * 5;
@@ -153,6 +167,55 @@ const Renderer = (() => {
       }
       ctx.fillStyle = g;
       ctx.fillRect(x0, groundY - 5, tw, 6);
+    }
+  }
+
+  // ── Sky ambience: moon throws + seasonal easter eggs ───────────────────────
+  // Drawn in screen space right after the sky, before the camera transform.
+  // Pure cosmetics; dates use the device clock.
+  function drawAmbience() {
+    const now = new Date();
+    const mo = now.getMonth(), day = now.getDate();
+    const spooky = mo === 9 && day >= 24;            // late October
+    const snowy  = mo === 11;                        // December
+    const hearts = mo === 1 && day === 14;           // Valentine's
+    const newyr  = mo === 0 && day === 1;            // New Year's Day
+
+    if (fxMoon || spooky) {
+      const mx = W - 86, my = 84;
+      ctx.save();
+      ctx.fillStyle = spooky ? '#f4d9a8' : '#f2ecdc';
+      ctx.beginPath(); ctx.arc(mx, my, 36, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(0,0,0,0.10)';
+      for (const [cx2, cy2, r2] of [[-12, -8, 7], [10, 6, 9], [2, -16, 4]]) {
+        ctx.beginPath(); ctx.arc(mx + cx2, my + cy2, r2, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+    if (snowy || hearts || newyr) {
+      ctx.save();
+      for (let i = 0; i < 22; i++) {
+        // Deterministic drift lanes so no particle state is needed.
+        const seed = (i * 2654435761 % 1000) / 1000;
+        const x = ((seed * W + clock * (12 + seed * 16) * (i % 2 ? 1 : -1)) % W + W) % W;
+        const y = ((seed * 700 + clock * (26 + seed * 30)) % (H + 40)) - 20;
+        if (snowy) {
+          ctx.fillStyle = 'rgba(255,255,255,0.75)';
+          ctx.beginPath(); ctx.arc(x, y, 1.6 + seed * 2.2, 0, Math.PI * 2); ctx.fill();
+        } else if (hearts) {
+          ctx.fillStyle = `rgba(255,110,150,${0.25 + seed * 0.3})`;
+          const s2 = 5 + seed * 6;
+          ctx.beginPath();
+          ctx.moveTo(x, y + s2 * 0.8);
+          ctx.bezierCurveTo(x - s2, y - s2 * 0.2, x - s2 * 0.5, y - s2, x, y - s2 * 0.3);
+          ctx.bezierCurveTo(x + s2 * 0.5, y - s2, x + s2, y - s2 * 0.2, x, y + s2 * 0.8);
+          ctx.fill();
+        } else {
+          ctx.fillStyle = `hsl(${Math.round(seed * 360)}, 90%, 62%)`;
+          ctx.fillRect(x, y, 4, 7);
+        }
+      }
+      ctx.restore();
     }
   }
 
@@ -193,11 +256,17 @@ const Renderer = (() => {
     }
 
     ctx.save();
-    ctx.translate(x, y);
+    // tiny/giant name eggs scale the paint; the extra y shift keeps the drawn
+    // base on the table (projectBottleCenter compensates for the stock scale).
+    const drawScale = BOTTLE_DRAW_SCALE * (fxSize || 1);
+    ctx.translate(x, y + (BOTTLE_DRAW_SCALE - drawScale) * 43);
     ctx.rotate(angle);
-    ctx.scale(BOTTLE_DRAW_SCALE, BOTTLE_DRAW_SCALE);
+    ctx.scale(drawScale, drawScale);
     // Ghost name egg: the object flips see-through. Cosmetic only.
     if (fxGhost) ctx.globalAlpha = 0.55;
+    // Ninja: darken toward silhouette where ctx.filter is supported (the dark
+    // color re-bake from main.js carries the effect everywhere else).
+    if (fxNinja) ctx.filter = 'brightness(0.3)';
 
     // Skin dispatch: a non-bottle edition paints the object in the same local
     // frame (origin = CG, ground plane ≈ +39) and we're done. See js/skins.js.
@@ -422,10 +491,12 @@ const Renderer = (() => {
   }
 
   // ── Side walls ───────────────────────────────────────────────────────────────
-  function drawWalls(groundY, sideWalls) {
+  // `worldW` is the physics arena width (may exceed the screen on alien).
+  function drawWalls(groundY, sideWalls, worldW) {
     if (sideWalls === false) return; // mobile open arena — no painted walls
     const WALL = 14; // matches physics WALL_INSET
-    for (const x0 of [0, W - WALL]) {
+    const ww = worldW > 0 ? worldW : W;
+    for (const x0 of [0, ww - WALL]) {
       const g = ctx.createLinearGradient(x0, 0, x0 + WALL, 0);
       const flip = x0 === 0;
       g.addColorStop(0, flip ? 'rgba(28,40,58,0.95)' : 'rgba(58,78,105,0.75)');
@@ -436,7 +507,51 @@ const Renderer = (() => {
     // inner edge highlights
     ctx.fillStyle = 'rgba(150,185,215,0.30)';
     ctx.fillRect(WALL - 2, 0, 2, groundY);
-    ctx.fillRect(W - WALL, 0, 2, groundY);
+    ctx.fillRect(ww - WALL, 0, 2, groundY);
+  }
+
+  // Safety net for expanded courts: if the fit-zoom leaves a sub-pixel gutter
+  // (or an older profile still letterboxes), paint outer hull + table so the
+  // phone never shows empty sky beside the walls. Runs in SCREEN space.
+  function drawCourtGutters(view, groundY) {
+    if (!view || !view.courtFrame || view.sideWalls === false || view.openArena) return;
+    if (fxPlinko) return;
+    if (camZoom >= 0.985) return;
+
+    const ww = view.worldW > 0 ? view.worldW : W;
+    const leftEdge = W / 2 + camZoom * (0 - camX);
+    const rightEdge = W / 2 + camZoom * (ww - camX);
+    const tableY = H / 2 + camZoom * (groundY - camY);
+    const roofY = H / 2 + camZoom * (0 - camY);
+    const courtTop = Math.max(0, Math.min(H, roofY));
+    const courtBot = Math.max(0, Math.min(H, tableY));
+
+    if (leftEdge > 1.5) {
+      const g = ctx.createLinearGradient(0, 0, leftEdge, 0);
+      g.addColorStop(0, '#070c14');
+      g.addColorStop(0.65, '#0e1724');
+      g.addColorStop(1, '#1c283a');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, leftEdge + 1, H);
+      ctx.fillStyle = 'rgba(150,185,215,0.22)';
+      ctx.fillRect(leftEdge - 2, courtTop, 2, Math.max(0, courtBot - courtTop));
+    }
+    if (rightEdge < W - 1.5) {
+      const g = ctx.createLinearGradient(W, 0, rightEdge, 0);
+      g.addColorStop(0, '#070c14');
+      g.addColorStop(0.65, '#0e1724');
+      g.addColorStop(1, '#1c283a');
+      ctx.fillStyle = g;
+      ctx.fillRect(rightEdge - 1, 0, W - rightEdge + 2, H);
+      ctx.fillStyle = 'rgba(150,185,215,0.22)';
+      ctx.fillRect(rightEdge, courtTop, 2, Math.max(0, courtBot - courtTop));
+    }
+    if (tableY < H) {
+      ctx.fillStyle = '#3e2723';
+      ctx.fillRect(0, tableY, W, H - tableY + 2);
+      ctx.fillStyle = '#5d4037';
+      ctx.fillRect(0, tableY - 2, W, 3);
+    }
   }
 
   // ── Result text ────────────────────────────────────────────────────────────
@@ -537,26 +652,29 @@ const Renderer = (() => {
   // Only drawn when the active edition asks for it: the landing pad on the
   // table, the wedge overhead that splits a straight-up shot, and the saucers
   // drifting in between.
-  function drawTargetPad(target, groundY) {
+  function drawTargetPad(target, groundY, aiming) {
     if (!target) return;
     const { x, halfWidth: hw } = target;
     const hitHW = target.hitHalfWidth != null ? target.hitHalfWidth : hw;
-    const pulse = 0.5 + 0.5 * Math.sin(clock * 3);
+    const pulse = 0.5 + 0.5 * Math.sin(clock * (aiming ? 5.5 : 3));
+    // Aim telegraph: brighter / wider while the player is dragging a bank shot.
+    const aim = aiming ? 1 : 0;
+    const glowR = hw * (1.15 + aim * 0.28);
     ctx.save();
-    const glow = ctx.createRadialGradient(x, groundY, 4, x, groundY, hw * 1.15);
-    glow.addColorStop(0, `rgba(105,240,174,${0.22 + pulse * 0.12})`);
+    const glow = ctx.createRadialGradient(x, groundY, 4, x, groundY, glowR);
+    glow.addColorStop(0, `rgba(105,240,174,${0.22 + pulse * 0.12 + aim * 0.22})`);
     glow.addColorStop(1, 'rgba(105,240,174,0)');
     ctx.fillStyle = glow;
     ctx.beginPath();
-    ctx.ellipse(x, groundY, hw * 1.15, hw * 0.34, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, groundY, glowR, hw * (0.34 + aim * 0.08), 0, 0, Math.PI * 2);
     ctx.fill();
     // Outer ring = visual pad (soft), inner ring = actual MAKE radius
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = `rgba(105,240,174,${0.35 + pulse * 0.15})`;
+    ctx.lineWidth = 2 + aim;
+    ctx.strokeStyle = `rgba(105,240,174,${0.35 + pulse * 0.15 + aim * 0.25})`;
     ctx.beginPath();
     ctx.ellipse(x, groundY, hw, hw * 0.29, 0, 0, Math.PI * 2);
     ctx.stroke();
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3 + aim;
     ctx.strokeStyle = `rgba(105,240,174,${0.85 + pulse * 0.15})`;
     ctx.beginPath();
     ctx.ellipse(x, groundY, hitHW, hitHW * 0.29, 0, 0, Math.PI * 2);
@@ -564,6 +682,31 @@ const Renderer = (() => {
     ctx.beginPath();
     ctx.ellipse(x, groundY, hitHW * 0.35, hitHW * 0.12, 0, 0, Math.PI * 2);
     ctx.stroke();
+    if (aiming) {
+      ctx.fillStyle = `rgba(255,255,255,${0.45 + pulse * 0.35})`;
+      ctx.beginPath();
+      ctx.arc(x, groundY - 1, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // Bank-shot ceiling rail — the bounce plane is physical but was invisible.
+  function drawCeiling(view) {
+    if (!view || view.sideWalls === false || view.openArena) return;
+    if (view.ceilingY == null && !(view.worldW > 0)) return;
+    // Only draw when a bounce profile is active (ceiling collisions live).
+    // getViewHint always sends ceilingY for walled courts; skip open arena.
+    const ww = view.worldW > 0 ? view.worldW : W;
+    const y = view.ceilingY != null ? view.ceilingY : 0;
+    ctx.save();
+    const g = ctx.createLinearGradient(0, y - 6, 0, y + 18);
+    g.addColorStop(0, 'rgba(90,120,160,0.55)');
+    g.addColorStop(1, 'rgba(90,120,160,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, y - 6, ww, 24);
+    ctx.fillStyle = 'rgba(170,205,235,0.55)';
+    ctx.fillRect(0, y, ww, 3);
     ctx.restore();
   }
 
@@ -623,6 +766,80 @@ const Renderer = (() => {
     }
   }
 
+  // ── Plinko board (1/1000 drop) ──────────────────────────────────────────────
+  function drawPlinko(p) {
+    const bw = p.right - p.left;
+    ctx.save();
+    // Backboard
+    ctx.fillStyle = 'rgba(12, 24, 40, 0.92)';
+    ctx.strokeStyle = 'rgba(150, 190, 230, 0.55)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.roundRect(p.left - 8, p.top - 8, bw + 16, (p.bottom - p.top) + 20, 14);
+    ctx.fill();
+    ctx.stroke();
+    // Marquee dots around the rim
+    ctx.fillStyle = 'rgba(255, 210, 63, 0.9)';
+    const per = Math.max(10, Math.round(bw / 46));
+    for (let i = 0; i <= per; i++) {
+      const t = 0.35 + 0.65 * Math.abs(Math.sin(clock * 4 + i));
+      ctx.globalAlpha = t;
+      ctx.beginPath();
+      ctx.arc(p.left - 8 + ((bw + 16) / per) * i, p.top - 8, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Slots (behind pegs so long labels never hide a peg)
+    const n = p.slots.length;
+    const slotW = bw / n;
+    for (let i = 0; i < n; i++) {
+      const s = p.slots[i];
+      const x = p.left + slotW * i;
+      const isWin = s.kind === 'win';
+      if (isWin) {
+        const pulse = 0.28 + 0.2 * Math.sin(clock * 5);
+        ctx.fillStyle = `rgba(255, 200, 40, ${pulse})`;
+      } else {
+        ctx.fillStyle = s.kind === 'zap' ? 'rgba(140, 90, 255, 0.18)' : 'rgba(90, 220, 140, 0.15)';
+      }
+      ctx.fillRect(x + 3, p.bottom - p.slotH, slotW - 6, p.slotH);
+      // Label
+      ctx.fillStyle = isWin ? '#ffd23f' : '#e8f2fa';
+      ctx.font = `900 ${isWin ? 26 : 20}px system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const label = isWin ? '👑 WIN' : (s.kind === 'zap' ? '⚡ −1 ALL' : '+2 ❤️');
+      ctx.fillText(label, x + slotW / 2, p.bottom - p.slotH / 2 + 14);
+    }
+    // Dividers
+    ctx.fillStyle = '#9fb6c8';
+    for (const d of p.dividers) {
+      ctx.beginPath();
+      ctx.roundRect(d.x - 5, d.y0, 10, d.y1 - d.y0, 5);
+      ctx.fill();
+    }
+    // Floor lip
+    ctx.fillStyle = '#7d93a6';
+    ctx.fillRect(p.left - 8, p.bottom, bw + 16, 8);
+    // Pegs
+    for (const peg of p.pegs) {
+      ctx.beginPath();
+      ctx.arc(peg.x, peg.y + 2, peg.r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(peg.x, peg.y, peg.r, 0, Math.PI * 2);
+      ctx.fillStyle = '#dfe9f2';
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(peg.x - 2, peg.y - 2, peg.r * 0.35, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
   function applyCamera(view) {
     const targetZoom = view && view.zoom != null ? view.zoom : 1;
     const tx = view && view.camX != null ? view.camX : W / 2;
@@ -642,11 +859,19 @@ const Renderer = (() => {
     const { bottle, liquid, drag, groundY, result, resultAlpha, specialLabel, showGlow, isOnFire,
             liquidColor, intense, suddenDeath, awaitingFlick, stake, skin,
             target, obstacles, view } = state;
-    fxGolden = !!state.golden;
-    fxGhost  = !!state.ghostly;
-    fxParty  = !!state.party;
+    fxGolden  = !!state.golden;
+    fxGhost   = !!state.ghostly;
+    fxParty   = !!state.party;
+    fxMoon    = !!state.moon;
+    fxNinja   = !!state.ninja;
+    fxRainbow = !!state.rainbow;
+    fxPlinko  = state.plinkoBoard || null;
+    // During a plinko drop the physics body is a ball — draw the character
+    // curled up small so it visually fits the peg gaps it's bouncing through.
+    fxSize    = (state.sizeFx || 1) * (fxPlinko ? 0.6 : 1);
     clock += dt;
     updateParticles(dt);
+    if (shakeAmp > 0) shakeAmp = Math.max(0, shakeAmp - dt * 18);
 
     // Reset any camera transform from the previous frame (DPR setTransform
     // lives on the canvas from main.resize — we only add a logical camera).
@@ -657,18 +882,32 @@ const Renderer = (() => {
 
     ctx.clearRect(0, 0, W, H);
     drawBackground(groundY, isOnFire, { skyOnly: true });
+    drawAmbience();
+
+    // Brief impact/verdict shake — screen space, before the world camera.
+    if (shakeAmp > 0.05) {
+      ctx.save();
+      ctx.translate((Math.random() - 0.5) * shakeAmp, (Math.random() - 0.5) * shakeAmp);
+    }
 
     ctx.save();
     applyCamera(view);
     drawBackground(groundY, isOnFire, { tableOnly: true });
-    drawWalls(groundY, view ? view.sideWalls : true);
-    drawTargetPad(target, groundY);
+    drawWalls(groundY, view ? view.sideWalls : true, view && view.worldW);
+    if (target) drawCeiling(view);
+    const aimingPad = !!(target && drag && awaitingFlick);
+    drawTargetPad(target, groundY, aimingPad);
     drawObstacles(obstacles);
+    if (fxPlinko) drawPlinko(fxPlinko);
     drawFlickIndicator(drag, bottle, groundY);
-    if (showGlow) drawLandingGlow(bottle, groundY);
+    if (showGlow && !fxPlinko) drawLandingGlow(bottle, groundY);
     drawBottle(bottle, liquid, isOnFire, liquidColor, groundY, skin);
     drawParticles();
     ctx.restore();
+
+    // Alien (etc.) pulled-back courts: fill letterbox gutters so the phone
+    // still feels full-screen instead of a floating postage-stamp arena.
+    drawCourtGutters(view, groundY);
 
     // HUD overlays stay screen-fixed (not affected by world zoom).
     drawStake(stake);
@@ -678,6 +917,8 @@ const Renderer = (() => {
       const color = result === 'MAKE' ? '#69f0ae' : '#ff5252';
       drawResult(result === 'MAKE' ? 'MAKE!' : 'MISS', color, resultAlpha, specialLabel);
     }
+
+    if (shakeAmp > 0.05) ctx.restore();
   }
 
   // Paint one upright object into some OTHER canvas (the setup-screen skin
@@ -687,7 +928,8 @@ const Renderer = (() => {
   // and the object is drawn flat-on rather than in flight perspective.
   function drawPreview(target, skin, liquidColor) {
     const prevCanvas = canvas, prevCtx = ctx, prevW = W, prevH = H;
-    fxGolden = fxGhost = false;   // never leak in-game egg cosmetics into previews
+    fxGolden = fxGhost = fxNinja = fxRainbow = false;   // never leak egg cosmetics into previews
+    fxSize = 1;
     canvas = target;
     ctx = target.getContext('2d');
     W = target.width;
@@ -718,5 +960,8 @@ const Renderer = (() => {
 
   // drawBottle is exported for the art-iteration harness (drawing one object
   // without the full scene); the game itself only calls frame().
-  return { init, resize, frame, setReduceMotion, projectPoint, projectBottleCenter, bottleDrawScale, drawBottle, drawPreview };
+  return {
+    init, resize, frame, setReduceMotion, projectPoint, projectBottleCenter,
+    bottleDrawScale, drawBottle, drawPreview, burst, nudge,
+  };
 })();

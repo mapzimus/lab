@@ -42,33 +42,6 @@ const Records = (() => {
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
 
-  // Expand legacy edition unlocks (people/buildings/…) into individual
-  // character ids once Skins is available. Safe to call repeatedly.
-  function migrateEditionUnlocks() {
-    if (typeof window === 'undefined' || !window.Skins || typeof Skins.editionChars !== 'function') return false;
-    let changed = false;
-    const next = [];
-    for (const id of unlockedSkins()) {
-      // Christ the Redeemer retired → Space Needle (same yellow slot).
-      if (id === 'building-redeemer') {
-        next.push('building-needle');
-        changed = true;
-        continue;
-      }
-      const kids = Skins.editionChars(id);
-      if (kids && kids.length) {
-        next.push(...kids);
-        changed = true;
-      } else {
-        next.push(id);
-      }
-    }
-    if (!changed) return false;
-    data.unlockedSkins = [...new Set(next)];
-    save();
-    return true;
-  }
-
   // ── Threshold unlocks (bare-bones ladder) ──────────────────────────────────
   // Free bottle at 0 wins, then one character every 4 wins up to Alien at 100.
   // No random mystery draws — the ladder order in Skins.list() is the order.
@@ -80,19 +53,38 @@ const Records = (() => {
   }
   function lockedChars() { return allChars().filter((s) => !isSkinUnlocked(s.id)); }
 
-  // Grant every character whose unlock threshold is <= totalWins.
+  // STRICT ladder reconcile: the collection is a pure function of totalWins.
+  // Rebuilds unlockedSkins from thresholds, which both grants anything newly
+  // earned AND drops out-of-order leftovers (legacy random mystery-box draws,
+  // retired edition ids) so the tree always unlocks in sequence.
+  // Returns the ids that were newly granted (for the reveal animation).
   function grantEarnedUnlocks() {
+    const chars = allChars();
+    if (!chars.length) return [];
     const wins = data.totalWins || 0;
-    const newly = [];
-    for (const c of allChars()) {
-      if (c.unlock == null) continue;
-      if (wins >= c.unlock && !isSkinUnlocked(c.id)) {
-        data.unlockedSkins = unlockedSkins().concat(c.id);
-        newly.push(c.id);
-      }
+    const before = new Set(unlockedSkins());
+    const next = [BASE_SKIN];
+    for (const c of chars) {
+      if (c.unlock != null && wins >= c.unlock && c.id !== BASE_SKIN) next.push(c.id);
     }
-    if (newly.length) save();
+    const newly = next.filter((id) => !before.has(id));
+    const changed = newly.length > 0 ||
+      next.length !== before.size || next.some((id) => !before.has(id)) ||
+      [...before].some((id) => !next.includes(id));
+    if (changed) {
+      data.unlockedSkins = next;
+      save();
+    }
     return newly;
+  }
+
+  // Demo secret (title taps): unlock the whole ladder by granting the win
+  // total that earns it — the collection is a pure function of totalWins, so
+  // anything less would be revoked by the next boot reconcile.
+  function unlockAll() {
+    const need = Math.max(0, ...allChars().map((c) => c.unlock || 0));
+    if ((data.totalWins || 0) < need) data.totalWins = need;
+    return grantEarnedUnlocks();
   }
 
   function pendingBoxes() {
@@ -109,10 +101,9 @@ const Records = (() => {
     return next == null ? 0 : Math.max(0, next - wins);
   }
 
-  // BOOT: quietly grant anything already earned (returning players / migrations).
+  // BOOT: quietly reconcile the collection with totalWins (returning players,
+  // migrations from the random mystery-box era, branded ports).
   function syncUnlocksFromWins() {
-    if (!allChars().length) return [];
-    migrateEditionUnlocks();
     return grantEarnedUnlocks();
   }
 
@@ -195,6 +186,7 @@ const Records = (() => {
   }
 
   return { recordFlip, recordWin, renderHtml, reset, totalWins, unlockedSkins,
-           isSkinUnlocked, unlockSkin, resetSkinProgress, syncUnlocksFromWins,
-           claimBoxes, pendingBoxes, winsToNextBox, WINS_PER_BOX };
+           isSkinUnlocked, unlockSkin, unlockAll, resetSkinProgress,
+           syncUnlocksFromWins, claimBoxes, pendingBoxes, winsToNextBox,
+           WINS_PER_BOX };
 })();

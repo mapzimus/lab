@@ -45,7 +45,6 @@ const hostedProjectRoutes = {
   "bug-wars": "/bug-wars/",
   "flip-game": "/flip-game/",
   "whydah-voyage": "/whydah-voyage/",
-  "black-sam": "/black-sam/",
   "true-scale": "/true-scale/",
   "train-route-atlas": "/lab/train-routes/",
   "state-extremes": "/lab/state-extremes/",
@@ -67,7 +66,6 @@ const appRoutes = {
   "bug-wars": "bug-wars",
   "flip-game": "flip-game",
   "whydah-voyage": "whydah-voyage",
-  "black-sam": "black-sam",
   "true-scale": "true-scale",
   "interstate-challenge": "interstate-challenge",
   "mapzimus-board": "mapzimus-board",
@@ -80,7 +78,8 @@ const tools = loadCatalog("tools.json");
 const projects = loadCatalog("projects.json");
 const featuredSlugs = loadCatalog("featured.json");
 const sourceCatalog = [...tools, ...projects];
-const fieldNotes = loadCatalog("field-notes.json");
+// Field Notes dormant — page redirects home until posts return.
+// const fieldNotes = loadCatalog("field-notes.json");
 const linkGroups = loadCatalog("links.json");
 const problems = [];
 const seenSlugs = new Set();
@@ -507,13 +506,6 @@ const radarCards = radars.map((radar) => `<article class="card featured" data-ca
     </article>`).join("\n");
 fillStatic("radars/index.html", { RADAR_CARDS: radarCards });
 
-const publishedNotes = fieldNotes.filter((note) => note.status === "published");
-const notesHtml = publishedNotes.map((note) => `<article class="note">
-  <div class="note-meta"><time datetime="${escapeHtml(note.date)}">${escapeHtml(note.date)}</time>${(note.tags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>
-  <h2>${escapeHtml(note.title)}</h2>
-  ${note.body.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n  ")}
-</article>`).join("\n");
-fillStatic("field-notes/index.html", { NOTES: notesHtml || `<p class="empty">No notes yet.</p>` });
 
 const skills = loadCatalog("skills.json");
 const skillCards = skills.map((skill) => `<article class="skill-card">
@@ -535,7 +527,7 @@ fillStatic("skills/index.html", { SKILL_CARDS: skillCards });
 
 // ---- Sitemap ----
 
-const staticPages = ["field-notes", "radars", "radar", "geo-radar", "soccer-radar", "stocks-radar", "politics-radar", "skills", "links", "about"];
+const staticPages = ["radars", "radar", "geo-radar", "soccer-radar", "stocks-radar", "politics-radar", "skills", "links", "about"];
 const sitemapUrls = [
   ...Object.values(pages).map((page) => page.canonical),
   ...staticPages.map((s) => `https://mapzimus.com/${s}/`),

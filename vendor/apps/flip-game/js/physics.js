@@ -1,27 +1,54 @@
 // physics.js — Matter.js world, bottle body, liquid sim
 
 const Physics = (() => {
-  const { Engine, Bodies, Body, World } = Matter;
+  const { Engine, Bodies, Body, World, Events } = Matter;
 
   let engine, world, bottle, ground, leftWall, rightWall, ceilingBody;
   let groundedFrames = 0;
   let angleWin = [];   // sliding window of recent angles (settle detection)
   let totalRotation = 0, hasFlipped = false, launchAngle = 0, hasLanded = false;
   let capSticky = false;   // rare: this landing is damping toward an inverted settle
+  let capThrowArmed = false; // seed-rolled over-spin throw aiming for a cap land
   let lastLandingInfo = null;
   let lastFlickInfo = null;
-  let canvasW;
+  let onImpact = null;          // (type, speed, x, y) → wall/ceiling/ground juice
+  let groundImpactSent = false; // one thud per flick
+  function setImpactCallback(fn) { onImpact = fn; }
+  let canvasW;            // PHYSICS world width (may exceed the screen on alien)
   let groundY;
-  let arenaH;   // full canvas height — obstacles are placed relative to it
+  let arenaH;             // view height — used for some camera / furniture math
+  let viewW = 0;          // screen logical width (CSS px)
+  let viewH = 0;          // screen logical height
+  let viewBottomInset = 0;
+  let ceilingY = 0;       // top of playable air (0 = flush with screen top)
   let sideWallsEnabled = true;
   let openArena = false;  // mobile open sides (no wall caroms)
 
   // Spin tuning (rad/step) — see applyFlick. Normal throws should usually land
   // if you give a decent flick; only wild overshoots tip. v78: cut high-end
   // over-rotation (hard flicks were falling ~70% of the time).
-  const SPIN_BASE   = 0.138;  // soft/medium flicks clear 360°
-  const SPIN_RANGE  = 0.082;  // flat high end — hard flicks tip less
+  //
+  // "Feel" knob: a flatter spin curve widens the make window (soft/hard flicks
+  // differ less), a steeper one narrows it. The curve PIVOTS around the sweet
+  // spot (~2500 px/s) so every feel makes the same ideal flick — only the
+  // punishment for being off-speed changes. 'standard' == today's default.
+  const SPIN_BASE_DEFAULT  = 0.138;  // soft/medium flicks clear 360°
+  const SPIN_RANGE_DEFAULT = 0.082;  // flat high end — hard flicks tip less
   const POWER_SPEED = 4000;   // flick px/s that maps to full power
+  const SWEET_POWER = 2500 / POWER_SPEED; // AI / measured sweet-spot power
+  const SWEET_SPIN  = SPIN_BASE_DEFAULT + SWEET_POWER * SPIN_RANGE_DEFAULT;
+  // Relative to standard (0.082): forgiving ≈ 0.7×, pro ≈ 1.3× — same ratios
+  // as the v8-era knob, retargeted onto the current spin curve.
+  const FEEL_RANGES = { forgiving: 0.057, standard: 0.082, pro: 0.107 };
+  let spinRange = SPIN_RANGE_DEFAULT;
+  let spinBase  = SPIN_BASE_DEFAULT;
+  let feelMode  = 'standard';
+  function setFeel(mode) {
+    const m = FEEL_RANGES[mode] != null ? mode : 'standard';
+    feelMode  = m;
+    spinRange = FEEL_RANGES[m];
+    spinBase  = SWEET_SPIN - SWEET_POWER * spinRange; // standard → exactly 0.138
+  }
   const WALL_INSET  = 14;     // px from each screen edge to the wall's inner face (matches renderer)
   const FIXED_DT    = 1 / 60; // multiplayer-safe fixed physics step
   let acc = 0;
@@ -107,6 +134,15 @@ const Physics = (() => {
     // Scored radius as a fraction of the drawn pad. 1 = whole pad counts;
     // 0.5 = only the inner half-radius scores (drawn pad stays readable).
     hitScale: 1,
+    // True arena expand (bank-shot profiles): world size = view size × expand.
+    // Camera then fits wall-to-wall. 1 = no expand. Prefer this over arenaZoom.
+    arenaExpand: 1,
+    mobileArenaExpand: 1,
+    arenaExpandY: 1,
+    mobileArenaExpandY: 1,
+    // Optional extra camera pullback AFTER expand-fit (usually leave at 1).
+    arenaZoom: null,
+    mobileArenaZoom: null,
   };
   let profile = { ...DEFAULT_PROFILE };
   let targetX = null;      // pad center, only set when profile.landOnTarget
@@ -139,21 +175,25 @@ const Physics = (() => {
   let maxGroundedTilt = 0;  // display-only: worst |tilt| seen while grounded this flip
   let flightFrames = 0;     // frames since the bottle left the floor (absolute soft-lock guard)
 
+  function screenW() { return viewW || canvasW || 0; }
+
   function wantsOpenArena() {
     if (profile.keepWalls || profile.wallBounce > 0) return false;
     if (typeof window === 'undefined') return false;
     const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    const w = screenW();
     // Phones / small tablets: no side walls so wall-caroms can't make mobile easier.
-    return canvasW < 900 || (coarse && canvasW < 1100);
+    return w < 900 || (coarse && w < 1100);
   }
 
   // Compact screens get the lighter bounce-mode furniture (1 wedge). Desktop
-  // keeps the full set. Same breakpoint spirit as the open-arena check, but
-  // bounce modes still want walls, so we don't reuse wantsOpenArena().
+  // keeps the full set. Uses the SCREEN width — never the expanded physics
+  // world width — so alien's bigger court doesn't flip us into "desktop" mode.
   function isCompactScreen() {
-    if (typeof window === 'undefined') return canvasW < 900;
+    const w = screenW();
+    if (typeof window === 'undefined') return w < 900;
     const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-    return canvasW < 900 || (coarse && canvasW < 1100);
+    return w < 900 || (coarse && w < 1100);
   }
 
   function syncSideWalls() {
@@ -164,10 +204,49 @@ const Physics = (() => {
     if (rightWall) rightWall.collisionFilter.mask = mask;
   }
 
+  // Bank-shot profiles can grow the PHYSICS world past the screen. Camera then
+  // fits wall-to-wall so the phone stays full-bleed while caroms have room.
+  function arenaExpandX() {
+    if (!(profile.floorResolve || profile.keepWalls)) return 1;
+    const compact = isCompactScreen();
+    const x = compact
+      ? (profile.mobileArenaExpand != null ? profile.mobileArenaExpand : profile.arenaExpand)
+      : profile.arenaExpand;
+    return Math.max(1, Number(x) || 1);
+  }
+  function arenaExpandY() {
+    if (!(profile.floorResolve || profile.keepWalls)) return 1;
+    const compact = isCompactScreen();
+    const y = compact
+      ? (profile.mobileArenaExpandY != null ? profile.mobileArenaExpandY : profile.arenaExpandY)
+      : profile.arenaExpandY;
+    return Math.max(1, Number(y) || 1);
+  }
+
+  function layoutArena() {
+    if (!viewW || !viewH) return;
+    canvasW = Math.round(viewW * arenaExpandX());
+    groundY = viewH - tableInset(viewH) - viewBottomInset;
+    // Extra air = raise the ceiling (more negative). Floor stays HUD-relative
+    // so the table still meets the player cards.
+    ceilingY = -Math.round(Math.max(0, arenaExpandY() - 1) * groundY);
+    arenaH = viewH;
+    if (!engine) return;
+    const midY = (groundY + ceilingY) / 2;
+    Body.setPosition(ground,      { x: canvasW / 2,                 y: groundY + 25 });
+    Body.setPosition(leftWall,    { x: WALL_INSET - 20,             y: midY });
+    Body.setPosition(rightWall,   { x: canvasW - WALL_INSET + 20,   y: midY });
+    Body.setPosition(ceilingBody, { x: canvasW / 2,                 y: ceilingY - 20 });
+    syncSideWalls();
+  }
+
   // Apply before the turn's flick (main.js calls this per turn). Safe to call
   // with null/undefined to go back to normal physics.
+  // IMPORTANT: call BEFORE resetBottle when the skin changes — layoutArena may
+  // resize the world, and the bottle must spawn at the new center.
   function setProfile(next) {
     profile = { ...DEFAULT_PROFILE, ...(next || {}) };
+    layoutArena();
     if (engine) engine.gravity.y = profile.gravity;
     if (ceilingBody) ceilingBody.collisionFilter.mask = profile.ceiling ? 0xFFFFFFFF : 0;
     // Walls and ceiling are normally dead (no carom, no spin transfer — see
@@ -194,6 +273,140 @@ const Physics = (() => {
       part.restitution = profile.restitution;
     }
   }
+
+  // ── PLINKO DROP (1/1000 easter egg) ────────────────────────────────────────
+  // On the roll, the floor vanishes at the flick and the object falls through
+  // into a plinko board below the table. Center slot = automatic game win;
+  // mid slots zap every opponent −1 life; outer slots = +2 lives. Seed-derived
+  // but main.js disables it for online games (it rewrites lives directly).
+  // Always 5 slots. The board can be WIDER than the screen (the camera zooms
+  // out to frame it), so slots stay big enough for the ball on any device.
+  const PLINKO_KINDS = ['lives', 'zap', 'win', 'zap', 'lives'];
+  let plinkoEnabled = true;
+  let plinkoForced = false;   // secret test trigger — consumed by the next flick
+  let plinko = null;          // { left, right, top, bottom, pegs, dividers, slots }
+  let plinkoBodies = [];
+  let plinkoSettle = 0;
+  let plinkoNudges = 0;       // "machine shakes" applied to a wedged object
+
+  function setPlinkoEnabled(v) { plinkoEnabled = !!v; }
+  function forcePlinko() { plinkoForced = true; }
+
+  function startPlinko() {
+    clearPlinko();
+    // Bank-shot furniture (alien wedges/saucers) would steal the drop — clear
+    // them for this throw. Next turn's setProfile/buildObstacles rebuilds.
+    clearObstacles();
+    // Board width is independent of the screen — at least 640 so five slots
+    // stay ball-sized; the camera pulls back to show all of it.
+    const bw = Math.max(640, Math.min(canvasW - 36, 980));
+    const left = canvasW / 2 - bw / 2;
+    const right = left + bw;
+    const top = groundY + 26;
+    // The flipped object is BIG (~74×140), so peg gaps and slots must be wide
+    // enough for it to tumble through — this is bottle plinko, not puck plinko.
+    const rows = 4, rowGap = 82, slotH = 130;
+    const bottom = top + 42 + rows * rowGap + slotH;
+    const pegs = [];
+    const dividers = [];
+    const opts = { isStatic: true, label: 'plinko', friction: 0.05, restitution: 0.55 };
+
+    // Offset peg grid — the object becomes a ball (r=34) for the drop, so
+    // ~110px gaps give real plinko action without wedging.
+    const cols = Math.max(3, Math.min(10, Math.floor(bw / 112)));
+    for (let r = 0; r < rows; r++) {
+      const y = top + 42 + r * rowGap;
+      const n = cols + (r % 2 ? 0 : 1);
+      for (let i = 0; i < n; i++) {
+        const x = r % 2
+          ? left + (bw / (n + 1)) * (i + 1)
+          : left + (bw / n) * (i + 0.5);
+        if (x < left + 20 || x > right - 20) continue;
+        pegs.push({ x, y, r: 9 });
+        plinkoBodies.push(Bodies.circle(x, y, 9, opts));
+      }
+    }
+    // Dividers get a pointed cap so the object sheds off instead of balancing.
+    const kinds = PLINKO_KINDS;
+    for (let k = 1; k < kinds.length; k++) {
+      const x = left + (bw / kinds.length) * k;
+      dividers.push({ x, y0: bottom - slotH, y1: bottom });
+      plinkoBodies.push(Bodies.rectangle(x, bottom - slotH / 2, 10, slotH, opts));
+      plinkoBodies.push(Bodies.circle(x, bottom - slotH, 9, opts));
+    }
+    plinkoBodies.push(Bodies.rectangle(canvasW / 2, bottom + 22, Math.max(canvasW, bw) * 2, 44, {
+      ...opts, friction: 0.8, restitution: 0.02,
+    }));
+    // The board brings its own side rails (it may be wider than the arena).
+    const railH = bottom + 500;
+    plinkoBodies.push(Bodies.rectangle(left - 24, bottom - railH / 2, 48, railH, opts));
+    plinkoBodies.push(Bodies.rectangle(right + 24, bottom - railH / 2, 48, railH, opts));
+    const slots = kinds.map((kind, i) => ({
+      kind,
+      x0: left + (bw / kinds.length) * i,
+      x1: left + (bw / kinds.length) * (i + 1),
+    }));
+    World.add(world, plinkoBodies);
+
+    // The floor "disappears", and the arena walls/ceiling go dead too — the
+    // board's own rails take over (the board may extend past the screen edges).
+    // Alien mode keeps a live ceiling for bank shots; kill it for the drop so
+    // the ball isn't trapped bouncing under the roof.
+    ground.collisionFilter.mask = 0;
+    if (leftWall)  leftWall.collisionFilter.mask = 0;
+    if (rightWall) rightWall.collisionFilter.mask = 0;
+    if (ceilingBody) ceilingBody.collisionFilter.mask = 0;
+
+    plinko = { left, right, top, bottom, slotH, pegs, dividers, slots,
+               drift: rand() < 0.5 ? -1 : 1 };
+    plinkoSettle = 0;
+    plinkoNudges = 0;
+
+    // The object "curls up" into a ball for the drop — a bottle-shaped body
+    // bridges pegs and wedges, a ball plinkos properly. The renderer draws
+    // the character at ~60% scale so it reads as the same object tumbling.
+    const pos = { x: bottle.position.x, y: bottle.position.y };
+    World.remove(world, bottle);
+    bottle = Bodies.circle(pos.x, pos.y, 34, {
+      label: 'bottle',
+      density: 0.008,
+      friction: 0.15,
+      frictionAir: 0.004,
+      restitution: 0.5,
+    });
+    World.add(world, bottle);
+  }
+
+  function clearPlinko() {
+    for (const b of plinkoBodies) World.remove(world, b);
+    plinkoBodies = [];
+    plinko = null;
+    plinkoSettle = 0;
+    if (ground) ground.collisionFilter.mask = 0xFFFFFFFF;
+    if (ceilingBody) ceilingBody.collisionFilter.mask = profile.ceiling ? 0xFFFFFFFF : 0;
+    syncSideWalls();
+  }
+
+  function plinkoVerdict() {
+    const bw = plinko.right - plinko.left;
+    const n = plinko.slots.length;
+    const i = Math.max(0, Math.min(n - 1,
+      Math.floor((bottle.position.x - plinko.left) / (bw / n))));
+    lastLandingInfo = {
+      result: 'MAKE',
+      tilt: null,
+      perfect: false,
+      reason: 'plinko',
+      plinko: plinko.slots[i].kind,
+      plinkoSlot: i,
+      onCap: false,
+      maxTilt: 0,
+      padOffset: null,
+    };
+    return 'MAKE';
+  }
+
+  function getPlinko() { return plinko; }
 
   // ── Obstacles: deflector wedges + saucers (alien bank shot) ────────────────
   let deflectors = [];
@@ -225,11 +438,11 @@ const Physics = (() => {
     if (!world) return;
     clearObstacles();
     const arenaH = h || (groundY + 30);
+    const compact = isCompactScreen();
 
     if (profile.deflector) {
       // Mobile: a single launch-spot wedge. Desktop: full count, flat-side
       // bolted to the ceiling so they read as roof teeth across a wide arena.
-      const compact = isCompactScreen();
       const count = compact ? 1 : Math.max(1, profile.deflectorCount || 3);
       const halfW = compact ? 62 : 70;
       const height = compact ? 78 : 88;
@@ -251,8 +464,13 @@ const Physics = (() => {
       }
     }
 
-    for (let i = 0; i < profile.saucerCount; i++) {
-      const lane = (i + 0.5) / Math.max(1, profile.saucerCount);
+    // Phones: fewer saucers so the court isn't a UFO traffic jam when the
+    // camera is pulled back to show the whole bank-shot arena.
+    const saucerN = compact
+      ? Math.min(profile.saucerCount, 3)
+      : profile.saucerCount;
+    for (let i = 0; i < saucerN; i++) {
+      const lane = (i + 0.5) / Math.max(1, saucerN);
       const x = WALL_INSET + 50 + lane * Math.max(40, canvasW - WALL_INSET * 2 - 100);
       const y = groundY - 150 - (i % 4) * 70 - (i % 3) * 18;
       const rx = 38 + (i % 3) * 4, ry = 16 + (i % 2) * 3;
@@ -433,6 +651,35 @@ const Physics = (() => {
   function checkLanding() {
     if (!bottle) return null;
 
+    // Plinko drop: the only verdict is which slot it settles in.
+    if (plinko && launched) {
+      flightFrames++;
+      if (flightFrames > 1500) return plinkoVerdict();   // ~25s failsafe
+      const speed = Math.hypot(bottle.velocity.x, bottle.velocity.y);
+      const inPegZone = bottle.position.y < plinko.bottom - plinko.slotH - 20;
+      if (inPegZone) {
+        // A bottle-sized puck loves to bridge two pegs and doze off, so the
+        // machine "shakes" while it's slow up here: a continuous seeded drift
+        // push (reversing periodically if it stays stuck) until it drops into
+        // the slot zone. Verdict only happens down in the slots.
+        if (speed < 2.5) {
+          plinkoNudges++;   // shake-frame counter
+          const dir = plinko.drift * (Math.floor(plinkoNudges / 70) % 2 === 0 ? 1 : -1);
+          Body.setVelocity(bottle, {
+            x: bottle.velocity.x + dir * 0.45,
+            y: bottle.velocity.y - 0.12,
+          });
+        }
+        if (plinkoNudges > 700) return plinkoVerdict();  // pathological wedge
+        plinkoSettle = 0;
+        return null;
+      }
+      if (speed < 1.2 && Math.abs(bottle.angularVelocity) < 0.05) plinkoSettle++;
+      else plinkoSettle = 0;
+      if (plinkoSettle > 40) return plinkoVerdict();
+      return null;
+    }
+
     // Bounce mode: first contact / slide-on is the verdict (alien profile).
     if (profile.floorResolve && launched && wasAirborne) {
       const grounded = touchingFloor();
@@ -548,16 +795,20 @@ const Physics = (() => {
   function tableInset(h) { return Math.max(64, Math.round(h * 0.13)); }
 
   function init(w, h, bottomInset = 0) {
+    viewW = w;
+    viewH = h;
+    viewBottomInset = bottomInset;
     canvasW = w;
     arenaH  = h;
     groundY = h - tableInset(h) - bottomInset;
+    ceilingY = 0;
     acc = 0;
 
     engine = Engine.create({ gravity: { y: profile.gravity, scale: 0.001 } });
     world  = engine.world;
 
-    // Extra-wide ground so open-arena mobile shots still have a floor off-screen.
-    ground = Bodies.rectangle(w / 2, groundY + 25, Math.max(w * 6, 4000), 50, {
+    // Extra-wide ground so open-arena / expanded-court shots still have a floor.
+    ground = Bodies.rectangle(w / 2, groundY + 25, Math.max(w * 8, 6000), 50, {
       isStatic: true,
       label: 'ground',
       friction: 0.9,
@@ -565,39 +816,58 @@ const Physics = (() => {
     });
 
     const wallOpts = { isStatic: true, label: 'wall', friction: 0, restitution: 0 };
-    leftWall  = Bodies.rectangle(WALL_INSET - 20, h / 2, 40, h * 4, wallOpts);
-    rightWall = Bodies.rectangle(w - WALL_INSET + 20, h / 2, 40, h * 4, wallOpts);
+    leftWall  = Bodies.rectangle(WALL_INSET - 20, h / 2, 40, h * 5, wallOpts);
+    rightWall = Bodies.rectangle(w - WALL_INSET + 20, h / 2, 40, h * 5, wallOpts);
 
-    ceilingBody = Bodies.rectangle(w / 2, -20, Math.max(w * 6, 4000), 40, {
+    ceilingBody = Bodies.rectangle(w / 2, -20, Math.max(w * 8, 6000), 40, {
       isStatic: true, label: 'ceiling', friction: 0, restitution: 0.85,
       collisionFilter: { mask: profile.ceiling ? 0xFFFFFFFF : 0 },
     });
 
     World.add(world, [ground, leftWall, rightWall, ceilingBody]);
+    layoutArena(); // honor any pre-set bank-shot expand profile
     syncSideWalls();
+
+    // Wall / ceiling / furniture hits → impact juice (SFX + sparks). Ground
+    // thuds are positional in stepOnce so we get exactly one per landing.
+    Events.on(engine, 'collisionStart', (ev) => {
+      if (!onImpact || !launched || !bottle) return;
+      for (const { bodyA, bodyB } of ev.pairs) {
+        const aIsBottle = bodyA === bottle || bodyA.parent === bottle;
+        const bIsBottle = bodyB === bottle || bodyB.parent === bottle;
+        if (aIsBottle === bIsBottle) continue;
+        const other = aIsBottle ? bodyB : bodyA;
+        const label = other.label;
+        if (label !== 'wall' && label !== 'ceiling' &&
+            label !== 'deflector' && label !== 'saucer') continue;
+        const speed = Math.hypot(bottle.velocity.x, bottle.velocity.y);
+        if (speed < 1.8) continue;
+        const type = (label === 'deflector' || label === 'saucer') ? 'wall' : label;
+        onImpact(type, speed, bottle.position.x, bottle.position.y);
+      }
+    });
+
     resetBottle();
   }
 
   function reflow(w, h, bottomInset = 0) {
     if (!engine) return;
-    canvasW = w;
-    arenaH  = h;
-    groundY = h - tableInset(h) - bottomInset;
-    Body.setPosition(ground,    { x: w / 2,                 y: groundY + 25 });
-    Body.setPosition(leftWall,  { x: WALL_INSET - 20,       y: h / 2 });
-    Body.setPosition(rightWall, { x: w - WALL_INSET + 20,   y: h / 2 });
-    Body.setPosition(ceilingBody, { x: w / 2, y: -20 });
-    syncSideWalls();
+    viewW = w;
+    viewH = h;
+    viewBottomInset = bottomInset;
+    layoutArena();
     buildObstacles(h);
     if (profile.landOnTarget) {
       targetHW = currentTargetHalfWidth();
       const margin = (sideWallsEnabled ? WALL_INSET : 8) + targetHW + 16;
-      if (targetX != null) targetX = Math.max(margin, Math.min(w - margin, targetX));
+      if (targetX != null) targetX = Math.max(margin, Math.min(canvasW - margin, targetX));
     }
   }
 
   function resetBottle() {
     if (bottle) World.remove(world, bottle);
+    if (engine) engine.gravity.y = profile.gravity;   // clear any moon throw
+    if (plinko) clearPlinko();                        // restore the floor
     groundedFrames = 0;
     angleWin       = [];
     totalRotation  = 0;
@@ -609,11 +879,13 @@ const Physics = (() => {
     lastFlickInfo  = null;
     launched       = false;
     leanFrames     = 0;
+    capThrowArmed  = false;
     wasAirborne    = false;
     floorTouched   = false;
     slideFrames    = 0;
     maxGroundedTilt = 0;
     flightFrames   = 0;
+    groundImpactSent = false;
     liquid.reset();
     acc = 0;
 
@@ -640,6 +912,30 @@ const Physics = (() => {
       : Math.floor(Math.random() * 0xffffffff)) >>> 0;
     seedRng(s);
 
+    // Easter egg: ~1/200 throws happen on the moon — gravity drops to 42% for
+    // this one flight. Seed-derived so online peers replaying the same seed
+    // float identically. Bank-shot profiles (alien) keep normal gravity: their
+    // furniture and pad tuning assume it.
+    const moon = !profile.floorResolve && (s % 199) === 42;
+    if (engine) engine.gravity.y = profile.gravity * (moon ? 0.42 : 1);
+
+    // Easter egg: ~1/1000 flips the floor vanishes and this throw drops into
+    // a plinko board (see startPlinko). Works in bank-shot/alien mode too —
+    // checkLanding prioritizes the plinko slot verdict over floorResolve, and
+    // startPlinko clears alien furniture so pegs own the drop. Secret trigger
+    // (name "plinko" / typing "plinko") forces the next one. Still offline-only
+    // (main.js disables it online — prizes rewrite lives).
+    const plinkoRoll = plinkoForced || (plinkoEnabled && (s % 997) === 123);
+    plinkoForced = false;
+    if (plinkoRoll) startPlinko();
+
+    // CAP THROW (~1/100, seed-rolled): normal spin tuning lands completed
+    // flips upright, so an inverted touchdown never occurs naturally. These
+    // throws over-rotate by ~an extra half turn so the object genuinely
+    // arrives upside down, then the cap-sticky assist below can balance it
+    // on the cap for the ×2. A cap throw that arrives badly just misses.
+    capThrowArmed = !profile.floorResolve && !plinkoRoll && (s % 101) === 55;
+
     const upSpeed = Math.max(0, -vy);
     const power   = Math.min(upSpeed / POWER_SPEED, 1.0);
 
@@ -658,13 +954,16 @@ const Physics = (() => {
     }
 
     const dir  = vx >= 0 ? 1 : -1;
-    const spin = dir * (SPIN_BASE + power * SPIN_RANGE) * jSpin * profile.spinScale;
+    const spin = dir * (spinBase + power * spinRange) * jSpin * profile.spinScale *
+      (capThrowArmed ? 1.52 : 1);
 
     lastFlickInfo = {
       upSpeed: Math.round(upSpeed),
       power: +power.toFixed(2),
       spin: +spin.toFixed(3),
       seed: s,
+      moon,
+      plinko: plinkoRoll,
       vx: Math.round(vx),
       vy: Math.round(vy),
     };
@@ -684,6 +983,16 @@ const Physics = (() => {
     arenaTime += FIXED_DT;
 
     if (launched && !wasAirborne && bottle.bounds.max.y < groundY - 24) wasAirborne = true;
+
+    // One ground thud per flick (positional — Matter ground collisions are dead
+    // / masked in bounce mode, so we can't rely on collisionStart for the floor).
+    if (onImpact && launched && wasAirborne && !groundImpactSent && !plinko &&
+        bottle.bounds.max.y >= groundY - GROUND_TOUCH_PX && bottle.velocity.y > 0.5) {
+      groundImpactSent = true;
+      const speed = Math.hypot(bottle.velocity.x, bottle.velocity.y);
+      onImpact('ground', speed, bottle.position.x, groundY);
+    }
+
     if (!hasFlipped) {
       totalRotation = Math.abs(bottle.angle - launchAngle);
       if (totalRotation >= 5.6) hasFlipped = true;
@@ -692,14 +1001,17 @@ const Physics = (() => {
     // Landing kick is for normal flips (liquid slosh punch). Bank-shot editions
     // accumulate "hasFlipped" from wall caroms and must not get a random shove.
     // v78: softened — the old kick tipped a lot of near-makes into misses.
-    if (!profile.floorResolve && hasFlipped && !hasLanded &&
+    if (!plinko && !profile.floorResolve && hasFlipped && !hasLanded &&
         bottle.velocity.y > 0 && bottle.position.y >= groundY - 55) {
       hasLanded = true;
       const a = normalizeSignedAngle(bottle.angle);
       const invErr = Math.abs(Math.abs(a) - Math.PI);
       // Rare cap-stick lottery: touch down roughly inverted → sometimes the
       // neck/cap grips and we damp hard toward ±π (~1-in-100 flips overall).
-      if (invErr < CAP_ZONE && rand() < CAP_STICK_CHANCE) capSticky = true;
+      // Seed-rolled cap throws (over-spun to arrive inverted) stick whenever
+      // they get anywhere close.
+      if (capThrowArmed && invErr < 1.35) capSticky = true;
+      else if (invErr < CAP_ZONE && rand() < CAP_STICK_CHANCE) capSticky = true;
       const kickScale = (capSticky || invErr < CAP_WINDOW) ? 0.25 : 1;
       const kick = (liquid.vel * 0.028 + (rand() - 0.5) * 0.06) * kickScale;
       Body.setAngularVelocity(bottle, bottle.angularVelocity + kick);
@@ -707,11 +1019,11 @@ const Physics = (() => {
 
     // Cap-sticky assist: pull gently toward fully inverted and kill spin so a
     // rare on-cap balance can actually settle instead of tippling over.
-    if (capSticky && launched && !profile.floorResolve) {
+    if (capSticky && launched && !profile.floorResolve && !plinko) {
       const a = normalizeSignedAngle(bottle.angle);
       const target = a >= 0 ? Math.PI : -Math.PI;
-      const pull = (target - a) * 0.045;
-      Body.setAngularVelocity(bottle, bottle.angularVelocity * 0.78 + pull);
+      const pull = (target - a) * 0.085;
+      Body.setAngularVelocity(bottle, bottle.angularVelocity * 0.72 + pull);
     }
 
     liquid.update(bottle.angularVelocity, FIXED_DT, bottle.angle);
@@ -727,54 +1039,92 @@ const Physics = (() => {
     }
   }
 
-  // Profile-driven base zoom (Alien pulls way back so the pad is harder).
-  function profileArenaZoom() {
+  // Optional extra camera pullback AFTER the expand-fit (usually 1 / unset).
+  function profileZoomMul() {
     const compact = isCompactScreen();
     const z = compact
       ? (profile.mobileArenaZoom != null ? profile.mobileArenaZoom : profile.arenaZoom)
       : profile.arenaZoom;
-    if (z == null || !(z > 0)) return null;
+    if (z == null || !(z > 0)) return 1;
     return Math.max(0.35, Math.min(1, z));
   }
 
+  // Wall-to-wall fit for an expanded physics world (+ optional zoom mul).
+  function courtFitZoom() {
+    const vw = screenW() || canvasW;
+    if (!vw || !canvasW) return profileZoomMul();
+    const fit = Math.min(1, vw / canvasW);
+    return Math.max(0.35, Math.min(1, fit * profileZoomMul()));
+  }
+
   // Camera helper: when the bottle leaves the frame (mobile open arena), the
-  // renderer zooms out so the shot stays visible. Returns world bounds that
-  // should remain on-screen. Some profiles (Alien) force a pulled-back zoom
-  // even with walls so phones feel like a bigger arena.
+  // renderer zooms out so the shot stays visible. Expanded bank-shot courts
+  // (alien) size the PHYSICS world past the screen and fit wall-to-wall so the
+  // phone stays full-bleed while caroms have real room to travel.
   function getViewHint() {
-    const forced = profileArenaZoom();
     const cx = canvasW / 2;
     const cy = groundY / 2;
+    const vw = screenW() || canvasW;
+    const vh = viewH || arenaH || groundY;
+    const expanded = canvasW > vw + 1 || ceilingY < -1;
+    // Plinko drop: frame the whole board (plus the object) — this is what
+    // makes the camera "zoom out" as the floor opens up.
+    if (plinko && bottle) {
+      const minX = Math.min(bottle.bounds.min.x - 40, plinko.left - 70);
+      const maxX = Math.max(bottle.bounds.max.x + 40, plinko.right + 70);
+      const minY = Math.min(bottle.bounds.min.y - 60, groundY - 280, ceilingY);
+      const maxY = Math.max(bottle.bounds.max.y, plinko.bottom + 90);
+      const spanX = maxX - minX, spanY = maxY - minY;
+      // Fit to the SCREEN (not the possibly-expanded physics world).
+      const zoom = Math.max(0.2,
+        Math.min(1, vw / spanX, vh / Math.max(spanY, 1)) * 0.88);
+      return {
+        openArena,
+        sideWalls: false,   // arena walls are dead + the board has its own rails
+        zoom,
+        camX: (minX + maxX) / 2,
+        camY: (minY + maxY) / 2,
+        worldW: canvasW,
+        worldH: plinko.bottom + 90,
+      };
+    }
+    // Expanded / walled courts: fit the physics world wall-to-wall and bias
+    // the camera through the playable air column (ceiling → table).
+    const courtZoom = courtFitZoom();
+    const courtCamY = expanded ? (groundY + ceilingY) * 0.52 : cy;
     if (!bottle) {
       return {
         openArena, sideWalls: sideWallsEnabled,
-        zoom: forced != null ? forced : 1,
-        camX: cx, camY: cy,
+        zoom: openArena ? 1 : courtZoom,
+        camX: cx, camY: courtCamY,
+        worldW: canvasW,
+        worldH: groundY + 30,
+        ceilingY,
+        courtFrame: expanded,
       };
     }
     if (!openArena) {
       return {
         openArena: false,
         sideWalls: sideWallsEnabled,
-        zoom: forced != null ? forced : 1,
+        zoom: courtZoom,
         camX: cx,
-        camY: cy,
+        camY: courtCamY,
         worldW: canvasW,
         worldH: groundY + 30,
+        ceilingY,
+        courtFrame: expanded,
       };
     }
     const pad = 48;
     const minX = Math.min(0, bottle.bounds.min.x - pad);
     const maxX = Math.max(canvasW, bottle.bounds.max.x + pad);
-    const minY = Math.min(0, bottle.bounds.min.y - pad);
+    const minY = Math.min(ceilingY, bottle.bounds.min.y - pad);
     const maxY = Math.max(groundY + 30, bottle.bounds.max.y + 20);
     const spanX = maxX - minX;
     const spanY = maxY - minY;
-    const zoom = Math.min(1, canvasW / spanX, (groundY + 30) / Math.max(spanY, 1));
-    // Only zoom out (never in past 1). Floor lowered so long open-arena shots
-    // (and forced Alien zoom) can pull further back on phones.
-    let z = Math.max(0.40, Math.min(1, zoom));
-    if (forced != null) z = Math.min(z, forced);
+    // Open-arena follow-cam fits to the SCREEN.
+    let z = Math.max(0.40, Math.min(1, vw / spanX, (groundY + 30 - ceilingY) / Math.max(spanY, 1)));
     return {
       openArena,
       sideWalls: sideWallsEnabled,
@@ -810,6 +1160,7 @@ const Physics = (() => {
     init, reflow, step, resetBottle, applyFlick, checkLanding, forceLanding,
     getBottle, getLiquid, getGroundY, getLastLandingInfo, getLastFlickInfo,
     setProfile, getTarget, getObstacles, getViewHint, isOpenArena, placeTarget,
-    seedTurn,
+    seedTurn, setPlinkoEnabled, forcePlinko, getPlinko, setFeel,
+    getFeel: () => feelMode, setImpactCallback,
   };
 })();
