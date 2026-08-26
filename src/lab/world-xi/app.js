@@ -91,7 +91,8 @@ function buildLegend(meta) {
     btn.className = "league";
     btn.setAttribute("aria-pressed", "true");
     btn.innerHTML = `<span class="swatch" style="background:${lg.color}"></span>` +
-      `<span class="league-name">${lg.label}</span><span class="count">${lg.count}</span>`;
+      `<span class="league-name">${lg.label}<small>${lg.country}</small></span>` +
+      `<span class="count">${lg.count}</span>`;
     btn.addEventListener("click", () => {
       const on = !activeLeagues.has(lg.key);
       if (on) activeLeagues.add(lg.key);
@@ -211,7 +212,7 @@ async function boot() {
   });
 
   setReadout(`${data.features.length} clubs · ${data.metadata.seasons}`);
-  map.easeTo({ center: [3, 46], zoom: 3.1, duration: 2500 });
+  map.easeTo({ center: [0, 40], zoom: 2.6, duration: 2500 });
 
   loadCrests(data.features);
 }
