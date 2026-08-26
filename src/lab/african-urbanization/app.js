@@ -55,6 +55,7 @@ Promise.all([
   "countries.geojson", "population.json", "cities.geojson",
   "corridors-existing.geojson", "corridors-planned.geojson", "corridors-model.geojson",
   "kinshasa-builtup.geojson", "kinshasa-water.geojson", "kinshasa-roads.geojson",
+  "lights.geojson", "kinshasa-density.geojson",
 ].map((f) => fetch(DATA + f).then((r) => {
   if (!r.ok) throw new Error(f + ": " + r.status);
   return r.json();
@@ -64,7 +65,8 @@ Promise.all([
 });
 
 function boot([countries, population, cities, corExisting, corPlanned, corModel,
-               kinBuilt, kinWater, kinRoads]) {
+               kinBuilt, kinWater, kinRoads, lights, kinDensity]) {
+  window.__densityStats = kinDensity.stats || {};
 
   buildRamps();
   buildRegionChart(population.regions);
@@ -96,6 +98,8 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
     map.addSource("kin-built", { type: "geojson", data: kinBuilt });
     map.addSource("kin-water", { type: "geojson", data: kinWater });
     map.addSource("kin-roads", { type: "geojson", data: kinRoads });
+    map.addSource("lights", { type: "geojson", data: lights });
+    map.addSource("kin-density", { type: "geojson", data: kinDensity });
 
     map.addLayer({
       id: "countries-fill", type: "fill", source: "countries",
@@ -109,6 +113,18 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
     map.addLayer({
       id: "countries-line", type: "line", source: "countries",
       paint: { "line-color": "#0e1015", "line-width": 0.6, "line-opacity": 0.9 },
+    });
+
+    // Observed nighttime lights (chapter 3's reality check).
+    map.addLayer({
+      id: "lights-lit", type: "fill", source: "lights",
+      filter: ["==", ["get", "class"], "lit"],
+      paint: { "fill-color": "#8a6a35", "fill-opacity": 0, "fill-opacity-transition": { duration: 700 } },
+    });
+    map.addLayer({
+      id: "lights-bright", type: "fill", source: "lights",
+      filter: ["==", ["get", "class"], "bright"],
+      paint: { "fill-color": "#ffd166", "fill-opacity": 0, "fill-opacity-transition": { duration: 700 } },
     });
 
     // Kinshasa deep-dive stack (invisible until chapter 4).
@@ -129,6 +145,15 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
         },
       });
     });
+    // Density bands paint over the growth rings when chapter 4 asks how many
+    // people share the ground; lowest band first so hotter bands sit on top.
+    for (const [band, color] of [[5000, "#5a3a7a"], [15000, "#95457f"], [30000, "#d5566a"], [60000, "#ff9d5c"]]) {
+      map.addLayer({
+        id: "density-" + band, type: "fill", source: "kin-density",
+        filter: ["==", ["get", "min"], band],
+        paint: { "fill-color": color, "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
+      });
+    }
     map.addLayer({
       id: "kin-roads", type: "line", source: "kin-roads",
       paint: {
@@ -314,10 +339,24 @@ function initSteps(map) {
     lineOpacity("kin-water", water);
     lineOpacity("kin-roads", roads);
     for (const e of EPOCHS) lineOpacity("built-" + e, upTo && e <= upTo ? 0.92 : 0);
-    if (upTo) { hud.classList.add("on"); hudYr.textContent = upTo; }
+    if (upTo) hudSet(upTo, "built-up footprint");
     else hud.classList.remove("on");
   };
   const hollow2100 = (v) => map.setPaintProperty("cities-2100", "circle-stroke-opacity", v);
+  const lightsOn = (v) => {
+    map.setPaintProperty("lights-lit", "fill-opacity", v * 0.45);
+    map.setPaintProperty("lights-bright", "fill-opacity", v * 0.85);
+  };
+  const densityOn = (v) => {
+    for (const band of [5000, 15000, 30000, 60000]) {
+      map.setPaintProperty("density-" + band, "fill-opacity", v * 0.92);
+    }
+  };
+  const hudSet = (big, sub) => {
+    hud.classList.add("on");
+    hudYr.textContent = big;
+    hud.querySelector(".sub").textContent = sub;
+  };
 
   // Every step applies its chapter's full baseline plus its own delta, and
   // every step sets the camera. Re-flying to the current bounds is a visual
@@ -328,22 +367,22 @@ function initSteps(map) {
     c1: () => {
       countriesOpacity(0.88, 0.3);
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
-      corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
+      corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null); lightsOn(0);
     },
     c2: () => {
       countriesOpacity(0.2, 0.08); hollow2100(0);
-      corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
+      corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null); lightsOn(0);
     },
     c3: () => {
       countriesOpacity(0.14, 0.06); hollow2100(0); setLabels(null);
-      kinshasa(0, 0, null);
+      lightsOn(0); kinshasa(0, 0, null);
     },
     c4: () => {
       // The 1:50m country polygons are far too coarse at city zoom — their
       // border mismatch draws phantom stripes across the Pool, so they go.
       countriesOpacity(0, 0);
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
-      corridors(0, 0, 0, 0, 0);
+      corridors(0, 0, 0, 0, 0); lightsOn(0); densityOn(0);
     },
   };
 
@@ -353,6 +392,7 @@ function initSteps(map) {
       setChoropleth("pop2025", POP_RAMP); countriesOpacity(0.7, 0.25);
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
+      lightsOn(0); densityOn(0);
       spinStart();
     },
     "ch1": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2025", POP_RAMP); },
@@ -369,17 +409,26 @@ function initSteps(map) {
     "c3-existing": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.9, 0.55, 0, 0, 0); setCityEpoch(2050, 0.3); },
     "c3-planned": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.55, 0.3, 0.75, 0.95, 0); setCityEpoch(2050, 0.3); },
     "c3-model": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.25, 0.15, 0.3, 0.35, 0.9); setCityEpoch(2050, 0.45); },
+    "c3-lights": () => {
+      fly(AFRICA_BOUNDS, 5); base.c3();
+      lightsOn(1); corridors(0, 0, 0, 0.4, 0.55); setCityEpoch(2050, 0);
+    },
     "ch4": () => {
       fly(WEST_AFRICA_BOUNDS, 6);
       countriesOpacity(0.14, 0.06);
       setCityEpoch(2025, 0.5); setLabels(null); hollow2100(0);
-      corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
+      corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null); lightsOn(0); densityOn(0);
     },
     "c4-arrive": () => { fly(KINSHASA_BOUNDS, 11); base.c4(); kinshasa(0.95, 0.35, null); },
     "c4-1975": () => { fly(POOL_BOUNDS, 12); base.c4(); kinshasa(0.95, 0.25, 1975); },
     "c4-2000": () => { fly(KINSHASA_BOUNDS, 12); base.c4(); kinshasa(0.95, 0.25, 2000); },
     "c4-2020": () => { fly(KINSHASA_BOUNDS, 12); base.c4(); kinshasa(0.95, 0.45, 2020); },
     "c4-2030": () => { fly(KINSHASA_BOUNDS, 12); base.c4(); kinshasa(0.95, 0.5, 2030); },
+    "c4-density": () => {
+      fly(KINSHASA_BOUNDS, 12); base.c4();
+      kinshasa(0.95, 0.35, 1975); densityOn(1);
+      hudSet("×6.3", "people on the 1975 ground");
+    },
     "explore": () => { fly(KINSHASA_BOUNDS, 11); base.c4(); kinshasa(0.95, 0.5, 2030); },
   };
 
@@ -410,7 +459,9 @@ function initSteps(map) {
     },
     cities: (on) => { setCityEpoch(2050, on ? 0.85 : 0); setLabels(on ? 2050 : null); },
     corridors: (on) => (on ? corridors(0.7, 0.4, 0.75, 0.95, 0.9) : corridors(0, 0, 0, 0, 0)),
+    lights: (on) => lightsOn(on ? 1 : 0),
     kinshasa: (on) => kinshasa(on ? 0.95 : 0, on ? 0.5 : 0, on ? 2030 : null),
+    density: (on) => densityOn(on ? 1 : 0),
   };
   const panel = document.getElementById("explore-panel");
   document.getElementById("explore-btn")?.addEventListener("click", () => {
