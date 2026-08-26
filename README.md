@@ -18,10 +18,10 @@ The production setup: one source in `src/`, a reproducible `dist/` build, Cloudf
 
 Navigation keeps four primary doors — Tools, Maps, Games, Lab — with Radars, Skills, Links, and About under **More** (and repeated in the footer). `/play/` and `/experiments/` redirect to `/games/` and `/lab/`.
 
-- **Tools** — full catalog with per-type pages at `/tools/{category}/`
-- **Maps** — map tools plus map projects (live transit, globes, atlases)
+- **Tools** — all single-page utilities (GIS, data, design, math, classroom, soccer, utilities) at `/tools/` and `/tools/{category}/`
+- **Maps** — map *destinations* only (live transit, globes, atlases, spatial stories)
 - **Games** — everything playable
-- **Lab** — every project (hosted apps + works in progress)
+- **Lab** — bigger projects and experiments (including classroom apps and WIP)
 - **Field Notes** — dormant until there are real posts (`src/data/field-notes.json`; `/field-notes/` redirects home)
 - **Radars** — daily scrapers at `/radars/` (`src/data/radars.json`)
 - **Skills** — downloadable Claude skills at `/skills/`
