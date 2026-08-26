@@ -43,7 +43,9 @@ body {
   position: absolute;
   top: 16px;
   right: 16px;
-  width: 235px;
+  width: 250px;
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
   padding: 12px 14px;
   background: rgba(11, 16, 22, 0.82);
   border: 1px solid rgba(240, 236, 223, 0.15);
@@ -91,7 +93,13 @@ body {
   border: 1px solid rgba(11, 16, 22, 0.6);
 }
 
-.league-name { flex: 1; }
+.league-name { flex: 1; line-height: 1.25; }
+
+.league-name small {
+  display: block;
+  font-size: 10.5px;
+  color: rgba(240, 236, 223, 0.55);
+}
 
 .count {
   font-size: 11px;
