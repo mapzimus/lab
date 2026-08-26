@@ -32,7 +32,7 @@ function decodeText(value) {
     .replaceAll("&gt;", ">");
 }
 
-const knownCategories = new Set(["maps", "data", "design", "teaching", "math", "fun", "play", "experiments"]);
+const knownCategories = new Set(["maps", "data", "design", "classroom", "math", "soccer", "utilities", "play", "experiments"]);
 const requiredFields = ["slug", "title", "description", "category", "url"];
 
 /** First-party routes for projects hosted on-site (snapshotted under vendor/
@@ -150,20 +150,24 @@ const catalogRefresh = new Date(Date.UTC(refreshYear, refreshMonth - 1)).toLocal
 // same structures client-side for search/filter/favorites) ----
 
 const categoryLabels = {
-  maps: "Maps & GIS",
+  maps: "Maps",
   data: "Data",
-  design: "Design & Media",
-  teaching: "Teaching",
+  design: "Design",
+  classroom: "Classroom",
   math: "Math",
-  fun: "Fun & Learning",
+  soccer: "Soccer",
+  utilities: "Utilities",
   play: "Games",
   experiments: "Experiments",
+  // Legacy aliases kept for any lingering project tags
+  teaching: "Classroom",
+  fun: "Utilities",
 };
-// One home per item: map things → Maps, playable things → Games, utility
-// tools → Tools. Lab is source-based (all projects + anything unfinished).
+// Tools = every single-page utility (including GIS). Maps = map projects only.
+// Games = playable. Lab = all projects (+ unfinished tools).
 const viewCategories = {
   home: null,
-  tools: ["data", "design", "teaching", "math", "fun"],
+  tools: ["maps", "data", "design", "classroom", "math", "soccer", "utilities"],
   maps: ["maps"],
   games: ["play"],
 };
@@ -198,6 +202,9 @@ function itemsForView(view, category) {
   return catalog.filter((item) => {
     if (view === "lab") {
       if (item.source !== "projects" && (item.status || "live") === "live") return false;
+    } else if (view === "maps") {
+      // Destinations only — GIS utilities live under Tools → Maps & GIS.
+      if (item.source !== "projects" || item.category !== "maps") return false;
     } else {
       if (view === "tools" && item.source !== "tools") return false;
       const allowed = viewCategories[view];
@@ -216,19 +223,12 @@ function filtersHtml(view, activeCategory) {
 }
 
 // Canonical order for grouped subsections.
-const catOrder = ["maps", "data", "design", "teaching", "math", "fun", "play", "experiments"];
+const catOrder = ["maps", "data", "design", "math", "classroom", "soccer", "utilities", "play", "experiments"];
 
 /** Split a view's items into labelled groups so a long list reads as a few
-    scannable shelves instead of one wall. Maps splits tools vs projects;
-    everything else groups by category. */
+    scannable shelves instead of one wall. */
 function groupsForView(view) {
   const items = itemsForView(view, "");
-  if (view === "maps") {
-    return [
-      { key: "map-tools", label: "Map tools", items: items.filter((i) => i.source === "tools") },
-      { key: "map-projects", label: "Map projects", items: items.filter((i) => i.source === "projects") },
-    ].filter((g) => g.items.length);
-  }
   return catOrder
     .map((cat) => ({ key: cat, label: categoryLabels[cat] || cat, items: items.filter((i) => i.category === cat) }))
     .filter((g) => g.items.length);
@@ -270,11 +270,13 @@ fs.writeFileSync(
 
 const template = fs.readFileSync(path.join(source, "_template.html"), "utf8");
 const toolCategories = {
+  maps: ["Maps & GIS tools", "Coordinate converters, GeoJSON, geocoders, grids, and map utilities."],
   data: ["Data tools", "CSV wrangling, charts, converters, and small data utilities."],
-  design: ["Design tools", "Color, layout, media, and design helpers."],
-  teaching: ["Teaching tools", "Classroom helpers and interactive teaching aids."],
-  math: ["Math tools", "Calculators, solvers, and math visualizations."],
-  fun: ["Fun & learning", "Playful tools and learning experiments."],
+  design: ["Design tools", "Color, CSS, images, icons, and pattern helpers."],
+  math: ["Math tools", "Interactive explorers, graphing, geometry, and reference sheets."],
+  classroom: ["Classroom tools", "Seating, timers, groups, and probability demos for class."],
+  soccer: ["Soccer tools", "Tactics boards, lineups, training plans, and match graphics."],
+  utilities: ["Utility tools", "Unit conversion, QR codes, Markdown, and quick helpers."],
 };
 
 const utilityCount = itemsForView("tools", "").length;
@@ -285,8 +287,8 @@ const projectCount = itemsForView("lab", "").length;
 /** Home "browse by section" cards — four doors instead of the whole catalog. */
 function sectionCardsHtml() {
   const sections = [
-    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Single-page browser utilities for data, design, teaching, and math." },
-    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "GIS converters and viewers, live transit, globes, and atlases." },
+    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Single-page browser utilities — GIS, data, design, math, classroom, and soccer." },
+    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "Map destinations: live transit, globes, atlases, and spatial stories." },
     { href: "/games/", label: "Games", category: "play", n: gamesCount, desc: "Strategy and logic games, free in the browser." },
     { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "The bigger projects, apps, and works in progress." },
   ];
@@ -318,27 +320,27 @@ const pages = {
     canonical: "https://mapzimus.com/lab/",
     eyebrow: "The lab",
     heading: "Projects and experiments",
-    intro: `The ${projectCount} bigger builds beyond the single-page tools — map apps, games, teaching apps, and experiments, including works in progress.`,
+    intro: `The ${projectCount} bigger builds beyond the single-page tools — map destinations, games, classroom apps, and experiments, including works in progress.`,
     catalogHeading: "All projects",
   },
   tools: {
     path: "tools/index.html",
     title: "Browser tools · Mapzimus",
-    description: `A searchable catalog of ${utilityCount} standalone browser tools for data, design, teaching, and math.`,
+    description: `A searchable catalog of ${utilityCount} standalone browser tools for maps, data, design, math, classroom, and soccer.`,
     canonical: "https://mapzimus.com/tools/",
     eyebrow: "The tool catalog",
     heading: "Every tool, one page each",
-    intro: `${utilityCount} standalone browser tools for data, design, teaching, math, and fun. Each is a single page at its own path. Map tools live under Maps.`,
+    intro: `${utilityCount} standalone browser tools — GIS utilities, data, design, math, classroom, soccer, and everyday helpers. Each is a single page at its own path.`,
     catalogHeading: "All tools",
   },
   maps: {
     path: "maps/index.html",
     title: "Maps · Mapzimus",
-    description: `All ${mapCount} map tools and map projects from Mapzimus: converters, GIS utilities, live transit, globes, and atlases.`,
+    description: `Map destinations from Mapzimus: live transit, globes, atlases, and spatial stories.`,
     canonical: "https://mapzimus.com/maps/",
-    eyebrow: "Maps & GIS",
-    heading: "Everything maps",
-    intro: `All ${mapCount} map things in one place — converters and GIS utilities alongside live transit, globes, transit networks, and atlases.`,
+    eyebrow: "Maps",
+    heading: "Map destinations",
+    intro: `${mapCount} map projects to explore — live transit, globes, transit networks, atlases, and spatial stories. GIS utilities live under Tools.`,
     catalogHeading: "All maps",
   },
   games: {
