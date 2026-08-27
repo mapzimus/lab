@@ -70,10 +70,8 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
                kinBuilt, kinWater, kinRoads, lights, kinDensity]) {
   window.__densityStats = kinDensity.stats || {};
 
-  buildRamps();
   buildRegionChart(population.regions);
   buildCrossoverTicker(population.crossovers);
-  buildEpochLegend();
 
   const map = new maplibregl.Map({
     container: "map",
@@ -235,6 +233,7 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
 
     initMarkers(map, cities);
     initCountryLabels(map, population.labels || []);
+    initPlaceLabels(map);
     initSteps(map);
   });
 }
@@ -254,11 +253,23 @@ function initCountryLabels(map, labels) {
       color: #9aa1ad; white-space: nowrap; text-shadow: 0 1px 4px #000, 0 0 8px rgba(0,0,0,0.85);
       opacity: 0; transition: opacity 0.5s ease; }
     .country-label.on .inner { opacity: 0.85; }
+    /* Chapters 2 and 3 keep the names for orientation but drop them back so
+       the cities and corridors stay the subject. */
+    .country-label.on.dim .inner { opacity: 0.42; }
+    .place-label { pointer-events: none; }
+    .place-label .inner { display: block; font-family: "IBM Plex Mono", monospace;
+      white-space: nowrap; opacity: 0; transition: opacity 0.5s ease;
+      text-shadow: 0 1px 4px #000, 0 0 9px rgba(0,0,0,0.9); }
+    .place-label.on .inner { opacity: 1; }
+    .place-label.city .inner { font-size: 12px; font-weight: 600; color: #e7e9ec; letter-spacing: 0.04em; }
+    .place-label.spot .inner { font-size: 9.5px; color: #9aa1ad; letter-spacing: 0.08em; text-transform: uppercase; }
+    .place-label.water .inner { font-size: 10px; color: #7f9ec2; letter-spacing: 0.16em; text-transform: uppercase; font-style: italic; }
     @media (max-width: 640px) { .country-label .inner { font-size: 8px; letter-spacing: 0.04em; } }`;
   document.head.appendChild(style);
   for (const [iso3, name, lon, lat] of labels) {
     const el = document.createElement("div");
     el.className = "country-label";
+    el.dataset.iso3 = iso3;
     el.innerHTML = `<span class="inner">${name}</span>`;
     new maplibregl.Marker({ element: el, anchor: "center" })
       .setLngLat([lon, lat]).addTo(map);
@@ -266,8 +277,46 @@ function initCountryLabels(map, labels) {
   }
 }
 
-function setCountryLabels(on) {
-  for (const el of countryMarkers) el.classList.toggle("on", !!on);
+// Countries whose largest city is already labelled on the map. Naming both
+// stacks two words on one spot, so the country name steps aside in the
+// chapters where the city labels are the point.
+const CITY_NAMED = new Set(["NGA", "COD", "EGY", "TZA", "KEN", "CIV", "AGO"]);
+
+function setCountryLabels(mode) {
+  for (const el of countryMarkers) {
+    const hide = mode === "dim" && CITY_NAMED.has(el.dataset.iso3);
+    el.classList.toggle("on", !!mode && !hide);
+    el.classList.toggle("dim", mode === "dim");
+  }
+}
+
+/* --------------------------------------------------- Kinshasa place labels */
+// At city zoom the country names are gone and the reader has no anchors, so
+// the last chapter names the two capitals, the water, and the two landmarks
+// the narrative points at.
+const KIN_PLACES = [
+  ["Kinshasa", 15.28, -4.43, "city"],
+  ["Brazzaville", 15.23, -4.20, "city"],
+  ["Malebo Pool", 15.46, -4.26, "water"],
+  ["Congo River", 15.06, -4.57, "water"],
+  ["N'Djili airport", 15.46, -4.40, "spot"],
+  ["N'sele", 15.67, -4.33, "spot"],
+];
+let placeMarkers = [];
+
+function initPlaceLabels(map) {
+  for (const [name, lon, lat, kind] of KIN_PLACES) {
+    const el = document.createElement("div");
+    el.className = `place-label ${kind}`;
+    el.innerHTML = `<span class="inner">${name}</span>`;
+    new maplibregl.Marker({ element: el, anchor: "center" })
+      .setLngLat([lon, lat]).addTo(map);
+    placeMarkers.push(el);
+  }
+}
+
+function setPlaceLabels(on) {
+  for (const el of placeMarkers) el.classList.toggle("on", !!on);
 }
 
 /* -------------------------------------------------------- HTML city labels */
@@ -402,16 +451,17 @@ function initSteps(map) {
       countriesOpacity(0.88, 0.3);
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null); lightsOn(0);
-      setCountryLabels(true);
+      setCountryLabels(true); setPlaceLabels(false);
     },
     c2: () => {
       countriesOpacity(0.2, 0.08); hollow2100(0);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null); lightsOn(0);
-      setCountryLabels(false);
+      setCountryLabels("dim"); setPlaceLabels(false);
     },
     c3: () => {
       countriesOpacity(0.14, 0.06); hollow2100(0); setLabels(null);
-      lightsOn(0); kinshasa(0, 0, null); setCountryLabels(false);
+      lightsOn(0); kinshasa(0, 0, null);
+      setCountryLabels("dim"); setPlaceLabels(false);
     },
     c4: () => {
       // The 1:50m country polygons are far too coarse at city zoom — their
@@ -419,7 +469,7 @@ function initSteps(map) {
       countriesOpacity(0, 0);
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
       corridors(0, 0, 0, 0, 0); lightsOn(0); densityOn(0);
-      setCountryLabels(false);
+      setCountryLabels(false); setPlaceLabels(true);
     },
   };
 
@@ -429,7 +479,8 @@ function initSteps(map) {
       setChoropleth("pop2025", POP_RAMP); countriesOpacity(0.7, 0.25);
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
-      lightsOn(0); densityOn(0); setCountryLabels(false);
+      lightsOn(0); densityOn(0);
+      setCountryLabels(false); setPlaceLabels(false);
       spinStart();
     },
     "ch1": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2025", POP_RAMP); },
@@ -455,7 +506,7 @@ function initSteps(map) {
       countriesOpacity(0.14, 0.06);
       setCityEpoch(2025, 0.5); setLabels(null); hollow2100(0);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null); lightsOn(0); densityOn(0);
-      setCountryLabels(false);
+      setCountryLabels("dim"); setPlaceLabels(false);
     },
     "c4-arrive": () => { fly(KINSHASA_BOUNDS, 11); base.c4(); kinshasa(0.95, 0.35, null); },
     "c4-1975": () => { fly(POOL_BOUNDS, 12); base.c4(); kinshasa(0.95, 0.25, 1975); },
@@ -542,7 +593,7 @@ function initSteps(map) {
   };
   const applyMetric = () => {
     const m = metricSel.value;
-    setCountryLabels(m !== "off");
+    setCountryLabels(m === "off" ? "dim" : true);
     renderLegend(m === "off" ? null : METRIC_LEGENDS[m]);
     if (m === "off") { countriesOpacity(0, 0); return; }
     setChoropleth(m, METRIC_RAMPS[m]);
@@ -583,7 +634,7 @@ function initSteps(map) {
         + (p.medAge25 ? row("median age 2025", p.medAge25 + " yrs") : "");
     }
     if (f.layer.id === "cor-model") {
-      return `<div class="pop-h">${p.a} — ${p.b}</div><div class="pop-sub">modeled corridor</div>`
+      return `<div class="pop-h">${p.a} to ${p.b}</div><div class="pop-sub">modeled corridor</div>`
         + row("distance", p.km + " km") + row("gravity score", p.score);
     }
     // built / planned corridor lines
@@ -666,7 +717,7 @@ function rampLegend(title, stops, fmt) {
 }
 const ROW = (color, label, shape) => ({ color, label, shape: shape || "line" });
 const CITY_ROWS = [
-  ROW("#f4a93a", "African city — size = people", "dot"),
+  ROW("#f4a93a", "African city, sized by people", "dot"),
   ROW("#5b6c85", "New York · London · Paris · Tokyo", "dot"),
 ];
 const EPOCH_ROWS = (upTo) =>
@@ -694,13 +745,13 @@ const LEGENDS = {
     ROW("#8fb8e8", "other backers, built/building"),
     ROW("#c9a53f", "Trans-African Highway plan")] },
   "c3-model": { title: "Predicted demand", rows: [
-    ROW("#f4a93a", "modeled corridor — width = pull"),
+    ROW("#f4a93a", "modeled corridor, thicker pulls harder"),
     ROW("#8b93a0", "existing rail (dim)")] },
   "c3-lights": { title: "Africa at night, 2020", rows: [
     ROW("#ffd166", "brightly lit (city cores)", "box"),
     ROW("#8a6a35", "lit (towns and sprawl)", "box")] },
   "ch4": { title: "Cities in 2025", rows: CITY_ROWS },
-  "c4-arrive": { title: "Kinshasa–Brazzaville", rows: [
+  "c4-arrive": { title: "Kinshasa and Brazzaville", rows: [
     ROW("#1d3242", "Congo River / Malebo Pool", "box"),
     ROW("#aeb6c2", "major road")] },
   "c4-1975": { title: "Built-up ground", rows: [...EPOCH_ROWS(1975), ROW("#1d3242", "river", "box")] },
@@ -738,29 +789,6 @@ function renderLegend(spec) {
 }
 
 /* ---------------------------------------------------------- static widgets */
-
-function buildRamps() {
-  // Swatches AND labels come from the same stop arrays the map style uses,
-  // so the legend can't drift from the actual classification.
-  const build = (el, stops, fmt) => {
-    for (let i = 1; i < stops.length; i += 2) {
-      const b = document.createElement("i");
-      b.style.background = stops[i];
-      el.appendChild(b);
-    }
-    const labels = el.nextElementSibling;
-    if (!labels || !labels.classList.contains("ramp-labels")) return;
-    const values = [];
-    for (let i = 0; i < stops.length; i += 2) values.push(stops[i]);
-    const picks = [0, Math.floor((values.length - 1) / 2), values.length - 1];
-    labels.innerHTML = picks.map((i, k) =>
-      `<span>${fmt(values[i])}${k === 2 ? "+" : ""}</span>`).join("");
-  };
-  document.querySelectorAll('[data-ramp="pop"]').forEach((el) =>
-    build(el, POP_RAMP, (v) => (v ? `${v}M` : "0")));
-  document.querySelectorAll('[data-ramp="mult"]').forEach((el) =>
-    build(el, MULT_RAMP, (v) => `×${v}`));
-}
 
 function buildRegionChart(regions) {
   const el = document.getElementById("chart-regions");
@@ -801,13 +829,5 @@ function buildCrossoverTicker(crossovers) {
   const rows = crossovers.filter((c) => c.year >= 2026).slice(0, 9);
   el.innerHTML = rows.map((c) =>
     `<div class="row"><span class="yr">${c.year}</span><span class="what"><b>${shortName(c.aName)}</b> passes ${shortName(c.bName)}</span></div>`
-  ).join("");
-}
-
-function buildEpochLegend() {
-  const el = document.getElementById("epoch-legend");
-  if (!el) return;
-  el.innerHTML = EPOCHS.map((e) =>
-    `<div class="row"><i class="box" style="background:${EPOCH_COLORS[e]}"></i> built by ${e}${e === 2030 ? " (projected)" : ""}</div>`
   ).join("");
 }
