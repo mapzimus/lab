@@ -129,20 +129,39 @@ function circleImage(color) {
   return g.getImageData(0, 0, 48, 48);
 }
 
+// Crest thumbnails arrive around 250px on their long edge. Left alone that is
+// ~4x the texture memory they need and renders the icons at roughly twice the
+// intended size, because icon-size is expressed as a fraction of CREST_SIZE.
+// Normalising the long edge to CREST_SIZE fixes both.
+function fitCrest(source) {
+  const w = source.width, h = source.height;
+  const scale = Math.min(1, CREST_SIZE / Math.max(w, h));
+  if (scale === 1) return source;
+  const cw = Math.max(1, Math.round(w * scale));
+  const ch = Math.max(1, Math.round(h * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = cw;
+  canvas.height = ch;
+  const g = canvas.getContext("2d", { willReadFrequently: true });
+  g.imageSmoothingEnabled = true;
+  g.imageSmoothingQuality = "high";
+  g.drawImage(source, 0, 0, cw, ch);
+  return g.getImageData(0, 0, cw, ch);
+}
+
 // Symbol tiles cache resolved icons; re-setting the (identical) layout
-// expression makes freshly added crest images take effect. Coalesced to one
-// call per frame — a fixed "every N crests" counter silently skips the tail of
-// a small batch, which is exactly what a single league toggle produces.
-let refreshPending = false;
+// expression makes freshly added crest images take effect. Each call re-lays
+// out every symbol, so this is throttled on a trailing timer rather than fired
+// per image — a bulk league toggle would otherwise re-layout every frame.
+let refreshTimer = null;
 function refreshIcons() {
-  if (refreshPending || !map?.getLayer("clubs")) return;
-  refreshPending = true;
-  requestAnimationFrame(() => {
-    refreshPending = false;
-    if (map.getLayer("clubs")) {
+  if (refreshTimer || !map?.getLayer("clubs")) return;
+  refreshTimer = setTimeout(() => {
+    refreshTimer = null;
+    if (map?.getLayer("clubs")) {
       map.setLayoutProperty("clubs", "icon-image", map.getLayoutProperty("clubs", "icon-image"));
     }
-  });
+  }, 200);
 }
 
 const crestQueue = [];
@@ -158,6 +177,23 @@ function ensureCrests(leagueKey) {
   drainCrests();
 }
 
+// Hiding a league hands its textures back. Without this every league ever
+// opened stays resident, which is what pushed the page into the hundreds of
+// megabytes and killed tabs on phones.
+function releaseCrests(leagueKey) {
+  if (!crestsRequested.has(leagueKey)) return;
+  crestsRequested.delete(leagueKey);
+  for (let i = crestQueue.length - 1; i >= 0; i--) {
+    if (crestQueue[i].properties.leagueKey === leagueKey) crestQueue.splice(i, 1);
+  }
+  if (!map) return;
+  for (const f of featuresByLeague.get(leagueKey) ?? []) {
+    const id = `club-${f.properties.qid}`;
+    if (map.hasImage(id)) { try { map.removeImage(id); } catch { /* already gone */ } }
+  }
+  refreshIcons();
+}
+
 async function drainCrests() {
   if (draining) return;
   draining = true;
@@ -169,7 +205,9 @@ async function drainCrests() {
       if (map.hasImage(`club-${qid}`)) continue;
       try {
         const img = await map.loadImage(crest);
-        if (!map.hasImage(`club-${qid}`)) map.addImage(`club-${qid}`, img.data);
+        // the league may have been switched off while this was in flight
+        if (!crestsRequested.has(f.properties.leagueKey)) continue;
+        if (!map.hasImage(`club-${qid}`)) map.addImage(`club-${qid}`, fitCrest(img.data));
         refreshIcons();
       } catch { /* keep the colored-dot fallback */ }
     }
@@ -271,7 +309,7 @@ function setLeague(key, on) {
   if (row) row.setAttribute("aria-pressed", String(on));
   const lg = leagues.find((l) => l.key === key);
   if (lg) updateSectionHeader(lg.group);
-  if (on) ensureCrests(key);
+  if (on) ensureCrests(key); else releaseCrests(key);
   applyFilter();
   persist();
 }
@@ -282,7 +320,7 @@ function setGroup(groupKey, on) {
     else state.activeLeagues.delete(lg.key);
     const row = legendEl.querySelector(`[data-league="${lg.key}"]`);
     if (row) row.setAttribute("aria-pressed", String(on));
-    if (on) ensureCrests(lg.key);
+    if (on) ensureCrests(lg.key); else releaseCrests(lg.key);
   }
   updateSectionHeader(groupKey);
   applyFilter();
@@ -711,11 +749,10 @@ function wirePanels() {
 
 /* ------------------------------------------------------------------- boot */
 
-async function boot() {
-  if (typeof map.setProjection === "function") map.setProjection({ type: "globe" });
-  map.setSky({ "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.85, 5, 0.85, 7, 0] });
-  map.setLight({ anchor: "viewport", color: "#ffffff", intensity: 0.55, position: [1.15, 210, 30] });
-
+// The panels are plain DOM and must not wait on the basemap: if the tile host
+// is slow, blocked or down, style.load never fires, and gating everything on it
+// leaves a page that looks alive but does nothing at all.
+async function loadData() {
   const data = await fetch(DATA_URL).then((r) => {
     if (!r.ok) throw new Error("clubs.geojson failed to load");
     return r.json();
@@ -729,6 +766,14 @@ async function boot() {
   restoreState();
   buildLegend();
   renderStats();
+  updateShownCount();
+  return data;
+}
+
+function addMapLayers(data) {
+  if (typeof map.setProjection === "function") map.setProjection({ type: "globe" });
+  map.setSky({ "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.85, 5, 0.85, 7, 0] });
+  map.setLight({ anchor: "viewport", color: "#ffffff", intensity: 0.55, position: [1.15, 210, 30] });
 
   // fallback dots exist for every league from the start, so a league switched
   // on mid-session draws immediately while its crests stream in
@@ -774,8 +819,12 @@ async function boot() {
     layout: {
       "icon-image": ["coalesce", ["image", ["concat", "club-", ["get", "qid"]]],
         ["image", ["concat", "dot-", ["get", "leagueKey"]]]],
+      // Crests are normalised to a CREST_SIZE long edge (see fitCrest), where
+      // they previously arrived at ~250px. These stops are scaled by that same
+      // ratio so the on-screen size is unchanged — and now consistent, since
+      // the handful of small raw logos used to render smaller than the rest.
       "icon-size": ["interpolate", ["linear"], ["zoom"],
-        3, 8 / CREST_SIZE, 5, 22 / CREST_SIZE, 7, 30 / CREST_SIZE, 11, 46 / CREST_SIZE],
+        3, 16 / CREST_SIZE, 5, 43 / CREST_SIZE, 7, 59 / CREST_SIZE, 11, 90 / CREST_SIZE],
       "icon-allow-overlap": true,
       "icon-ignore-placement": true,
     },
@@ -784,6 +833,7 @@ async function boot() {
 
   for (const layer of ["clubs", "clubs-ring"]) {
     map.on("click", layer, (e) => {
+      if (e.defaultPrevented) return; // both club layers hit on the same click
       e.preventDefault();
       const pad = 6;
       const box = [[e.point.x - pad, e.point.y - pad], [e.point.x + pad, e.point.y + pad]];
@@ -817,7 +867,37 @@ async function boot() {
 
 wireSearch();
 wirePanels();
-if (map) map.once("style.load", boot);
+
+(async () => {
+  let data;
+  try {
+    data = await loadData();
+  } catch (err) {
+    console.error(err);
+    setReadout("Club data failed to load — try reloading.");
+    return;
+  }
+  if (!map) return; // WebGL unavailable: the legend, search and Numbers still work
+
+  let layered = false;
+  const startLayers = () => {
+    if (layered) return;
+    layered = true;
+    try {
+      addMapLayers(data);
+    } catch (err) {
+      console.error(err);
+      setReadout("The map layers failed to initialise.");
+    }
+  };
+  if (map.isStyleLoaded()) startLayers();
+  else map.once("style.load", startLayers);
+
+  // a basemap that never arrives should not leave the globe silently empty
+  setTimeout(() => {
+    if (!layered) setReadout("Basemap is taking a while — the league list and search still work.");
+  }, 12000);
+})();
 
 // read-only surface for the headless test suite
 window.__worldxi = {
@@ -829,6 +909,7 @@ window.__worldxi = {
   searchClubs,
   selectClub,
   nearestOf: (qid) => buildNearest().get(qid),
+  imageOf: (qid) => { const i = map?.getImage(`club-${qid}`); return i ? { width: i.data.width, height: i.data.height } : null; },
   capacityRankOf: (qid) => ranks.get(qid),
   shownClubCount,
 };
