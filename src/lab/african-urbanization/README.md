@@ -69,7 +69,9 @@ tiles) under the exact filenames the scripts expect, skipping anything already
 present, so an interrupted run resumes. Set `AFRICAN_URBANIZATION_RAW` to keep
 them outside the repo; `pipeline/raw/` is gitignored either way. After a rerun,
 bump `DATA_VERSION` in `app.js` so browsers fetch the new files rather than
-their cached copies.
+their cached copies. That constant is the only manual step: `app.js` and the
+vendored library are fingerprinted automatically at build time, since the data
+files are fetched from JavaScript and so cannot be stamped from the HTML.
 
 ## Honesty notes
 
