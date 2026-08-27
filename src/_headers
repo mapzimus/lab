@@ -31,11 +31,16 @@
 # Lab project assets. The data files are addressed with a ?v= version from
 # app.js, so they can be cached hard; the code that points at them must not be,
 # or a deploy leaves readers on a stale script for hours.
-/lab/*/data/*
+#
+# The middle segment has to be a :placeholder, not a splat. Cloudflare Pages
+# only honours a wildcard at the end of a path, so `/lab/*/data/*` matched
+# nothing and every lab data file fell back to the Pages default of
+# max-age=0, must-revalidate. Confirmed against a preview deploy.
+/lab/:project/data/*
   Cache-Control: public, max-age=31536000, immutable
 
-/lab/*/app.js
+/lab/:project/app.js
   Cache-Control: public, max-age=0, must-revalidate
 
-/lab/*/vendor/*
+/lab/:project/vendor/*
   Cache-Control: public, max-age=31536000, immutable
