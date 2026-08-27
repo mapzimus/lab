@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -543,6 +544,58 @@ const sitemapUrls = [
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...new Set(sitemapUrls)].map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n`;
 fs.writeFileSync(path.join(output, "sitemap.xml"), sitemap, "utf8");
 
+// ---- Asset fingerprints ----
+//
+// mapzimus.com sets a zone-level Browser Cache TTL of four hours, which raises
+// any shorter max-age the origin sends. That defeats the revalidate rules in
+// src/_headers: a returning reader can be served a four-hour-old app.js against
+// freshly deployed data, which is what made deploys look like nothing changed.
+//
+// Stamping a content hash onto every local script and stylesheet reference
+// means each deploy hands out new URLs, so the stale copy is never the one the
+// page asks for. A query string rather than a renamed file, so the paths in
+// src/_headers keep matching. The HTML itself is not cached, which is what
+// makes the new references reachable straight away.
+const HASHABLE = /(<(?:script|link)\b[^>]*?\b(?:src|href)=")([^"]+\.(?:js|css))(")/gi;
+const hashes = new Map();
+
+function assetHash(file) {
+  if (!hashes.has(file)) {
+    hashes.set(file, crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex").slice(0, 8));
+  }
+  return hashes.get(file);
+}
+
+function stampAssets(dir) {
+  let stamped = 0;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      stamped += stampAssets(full);
+      continue;
+    }
+    if (!entry.name.endsWith(".html")) continue;
+    const html = fs.readFileSync(full, "utf8");
+    const next = html.replace(HASHABLE, (whole, before, ref, after) => {
+      // Leave the CDN copies of Leaflet, MapLibre and Turf alone, along with
+      // anything already carrying a query. The concord-war bundle is SvelteKit
+      // output: its chunks are already content-hashed and are resolved by the
+      // framework at runtime, so a query string there risks breaking imports.
+      if (/^(?:https?:)?\/\//.test(ref) || ref.includes("?") || ref.includes("_app/immutable/")) return whole;
+      const target = ref.startsWith("/")
+        ? path.join(output, ref.slice(1))
+        : path.resolve(path.dirname(full), ref);
+      if (!path.resolve(target).startsWith(output + path.sep) || !fs.existsSync(target)) return whole;
+      stamped += 1;
+      return `${before}${ref}?v=${assetHash(target)}${after}`;
+    });
+    if (next !== html) fs.writeFileSync(full, next, "utf8");
+  }
+  return stamped;
+}
+
+const stampedRefs = stampAssets(output);
+
 const missingTools = publicTools.filter((item) => !item.hosted).map((item) => item.slug);
 console.log(
   `Built ${Object.keys(pages).length} Mapzimus pages, ${publicTools.filter((t) => t.hosted).length} hosted tools` +
@@ -550,4 +603,7 @@ console.log(
     `, and ${Object.keys(appRoutes).length} hosted apps in dist/.`,
 );
 
-console.log(`Built ${Object.keys(pages).length + 3} Mapzimus pages in dist/ (${catalog.length} catalog items pre-rendered).`);
+console.log(
+  `Built ${Object.keys(pages).length + 3} Mapzimus pages in dist/ ` +
+    `(${catalog.length} catalog items pre-rendered, ${stampedRefs} asset references fingerprinted).`,
+);
