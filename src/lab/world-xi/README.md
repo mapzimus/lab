@@ -2,10 +2,10 @@
 
 Hosted copy of [mapzimus/world-xi-map](https://github.com/mapzimus/world-xi-map)
 at https://mapzimus.com/lab/world-xi/ — an interactive 3D globe of every club of
-39 big leagues, men's and women's, across five continents (650 clubs, 2025-26
-and 2026 seasons), each at its home stadium, searchable and filterable per
-league. Only the men's big five are shown at first; the rest switch on from the
-legend.
+46 leagues, men's and women's, across five continents (1,041 clubs), each at its
+home stadium, searchable and filterable per league. That includes the whole
+United States pyramid, MLS down to the fourth tier. Only the men's big five are
+shown at first; the rest switch on from the legend.
 
 That repo is the source of truth: the data pipeline (`scripts/build-data.mjs`,
 hand-curated rosters, overrides) lives there, and `data/clubs.geojson` here is
@@ -17,6 +17,9 @@ link and site favicon, absolute `/lab/world-xi/...` asset paths plus the
 `DATA_URL` in `app.js`. Nothing else should differ — `diff` against the source
 after copying.
 
-Data: Wikidata (CC0). Crests are hotlinked from Wikipedia/Commons at runtime
-and remain trademarks of their clubs; no crest files are committed.
+Data: Wikidata (CC0) plus club rosters, grounds and towns read from Wikipedia.
+143 clubs in the lower US tiers have no Wikidata item, and 169 clubs are placed
+on their town rather than their ground; the map labels those as approximate.
+Crests are hotlinked from Wikipedia/Commons at runtime and remain trademarks of
+their clubs; no crest files are committed.
 Basemap: OpenFreeMap. MapLibre GL JS 5.6.1 vendored (see `vendor/README.md`).
