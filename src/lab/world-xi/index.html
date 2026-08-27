@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>World XI · Mapzimus Lab</title>
-  <meta name="description" content="Every club of 24 big soccer leagues — 18 men's and 6 women's, across four continents — plotted at its home stadium on a 3D globe.">
+  <meta name="description" content="Every club of 39 big soccer leagues — men's and women's, across five continents — plotted at its home stadium on a 3D globe.">
   <meta property="og:title" content="World XI">
   <meta property="og:description" content="Every big-league soccer club at its home stadium, on a 3D globe.">
   <meta name="theme-color" content="#0b1016">
@@ -18,20 +18,41 @@
 <body>
   <div id="map"></div>
 
-  <header class="chrome">
-    <p class="backlink"><a href="/lab/">← Lab</a></p>
-    <h1>World XI</h1>
-    <p class="lede">Every club of 24 big leagues at its home stadium — 18 men's and 6 women's leagues across four continents.</p>
-  </header>
+  <div class="rail-left">
+    <header class="chrome panel">
+      <p class="backlink"><a href="/lab/">← Lab</a></p>
+      <h1>World XI</h1>
+      <p class="lede">Every club of 39 big leagues at its home stadium. The big five are shown first — open a section to add more.</p>
+    </header>
 
-  <aside class="legend" aria-label="League filters">
-    <div class="legend-group" id="legend-men">
-      <h2>Men</h2>
+    <div class="search panel" role="search">
+      <label class="sr-only" for="club-search">Find a club or stadium</label>
+      <input id="club-search" type="search" autocomplete="off" spellcheck="false"
+             placeholder="Find a club or stadium…  ( / )"
+             role="combobox" aria-expanded="false" aria-autocomplete="list"
+             aria-controls="search-results" aria-haspopup="listbox">
+      <button id="search-clear" type="button" class="search-clear" aria-label="Clear search" hidden>×</button>
+      <ul id="search-results" class="search-results" role="listbox" aria-label="Club search results" hidden></ul>
     </div>
-    <div class="legend-group" id="legend-women">
-      <h2>Women</h2>
-    </div>
-  </aside>
+  </div>
+
+  <aside class="legend panel" id="legend" aria-label="League filters"></aside>
+
+  <section class="stats panel" id="stats" aria-label="Numbers">
+    <h2 class="panel-head">
+      <button type="button" class="sec-toggle" id="stats-toggle" aria-expanded="false" aria-controls="stats-body">
+        <span class="caret" aria-hidden="true"></span><span class="sec-name">Numbers</span>
+      </button>
+    </h2>
+    <div class="sec-body" id="stats-body" hidden></div>
+  </section>
+
+  <nav class="sheet-bar" aria-label="Panels">
+    <button type="button" data-sheet="legend" aria-expanded="false" aria-controls="legend">
+      Leagues <span id="sheet-count">5</span>
+    </button>
+    <button type="button" data-sheet="stats" aria-expanded="false" aria-controls="stats">Numbers</button>
+  </nav>
 
   <p id="readout" class="readout" role="status" aria-live="polite"></p>
 
