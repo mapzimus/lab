@@ -4,12 +4,15 @@ const DATA_URL = "/lab/world-xi/data/clubs.geojson";
 const CREST_SIZE = 128; // px, matches the thumbnails baked into clubs.geojson
 const STORE_KEY = "worldxi.v3";
 const FALLBACK_TOP = ["epl", "laliga", "bundesliga", "seriea", "ligue1"];
+// Only used if a committed geojson predates metadata.groups; the pipeline is
+// the source of truth for grouping. Keep in step with GROUPS in build-data.mjs.
 const FALLBACK_GROUPS = [
   { key: "top", label: "Top men's leagues" },
+  { key: "usa", label: "United States — the pyramid" },
   { key: "eu", label: "More Europe — men" },
   { key: "americas", label: "Americas — men" },
   { key: "rest", label: "Asia, Africa & Pacific — men" },
-  { key: "women", label: "Women" },
+  { key: "women", label: "Women — rest of the world" },
 ];
 
 const REDUCED_MOTION = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
@@ -66,12 +69,12 @@ const store = (() => {
 
 /* ------------------------------------------------------------------ state */
 
-const state = { activeLeagues: new Set(), collapsed: new Set(), selectedQid: null };
+const state = { activeLeagues: new Set(), collapsed: new Set(), selectedId: null };
 
 let leagues = [];
 let groups = [];
 let allFeatures = [];
-const byQid = new Map();
+const byId = new Map();
 const byCoord = new Map();
 const featuresByLeague = new Map();
 let searchIndex = [];
@@ -79,7 +82,7 @@ let ranks = new Map();
 let nearest = null;
 let stats = null;
 let popup = null;
-let popupQids = [];
+let popupIds = [];
 
 /* -------------------------------------------------------------------- map */
 
@@ -188,7 +191,7 @@ function releaseCrests(leagueKey) {
   }
   if (!map) return;
   for (const f of featuresByLeague.get(leagueKey) ?? []) {
-    const id = `club-${f.properties.qid}`;
+    const id = `club-${f.properties.id}`;
     if (map.hasImage(id)) { try { map.removeImage(id); } catch { /* already gone */ } }
   }
   refreshIcons();
@@ -201,13 +204,13 @@ async function drainCrests() {
     for (;;) {
       const f = crestQueue.shift();
       if (!f) return;
-      const { qid, crest } = f.properties;
-      if (map.hasImage(`club-${qid}`)) continue;
+      const { id, crest } = f.properties;
+      if (map.hasImage(`club-${id}`)) continue;
       try {
         const img = await map.loadImage(crest);
         // the league may have been switched off while this was in flight
         if (!crestsRequested.has(f.properties.leagueKey)) continue;
-        if (!map.hasImage(`club-${qid}`)) map.addImage(`club-${qid}`, fitCrest(img.data));
+        if (!map.hasImage(`club-${id}`)) map.addImage(`club-${id}`, fitCrest(img.data));
         refreshIcons();
       } catch { /* keep the colored-dot fallback */ }
     }
@@ -228,8 +231,8 @@ function applyFilter() {
     map.setFilter("clubs", leagueFilter());
 
     // a popup whose clubs are all hidden no longer describes anything on screen
-    if (popup && popupQids.length) {
-      const stillShown = popupQids.some((q) => state.activeLeagues.has(byQid.get(q)?.properties.leagueKey));
+    if (popup && popupIds.length) {
+      const stillShown = popupIds.some((q) => state.activeLeagues.has(byId.get(q)?.properties.leagueKey));
       if (!stillShown) closePopup();
     }
   }
@@ -286,7 +289,10 @@ function restoreState() {
     state.collapsed = new Set(collapsed);
   } else {
     state.activeLeagues = new Set(defaultOn());
-    state.collapsed = new Set(groups.map((g) => g.key).filter((k) => k !== "top"));
+    // Open the top section and the US pyramid: the pyramid is the reason most
+    // of this map exists now, and a collapsed section is a section nobody finds.
+    // Expanded, not enabled — the big five are still the only leagues switched on.
+    state.collapsed = new Set(groups.map((g) => g.key).filter((k) => k !== "top" && k !== "usa"));
   }
 }
 
@@ -385,7 +391,7 @@ function buildLegend() {
       btn.setAttribute("aria-pressed", String(state.activeLeagues.has(lg.key)));
       btn.innerHTML =
         `<span class="swatch" style="background:${esc(lg.color)}"></span>` +
-        `<span class="league-name">${esc(lg.label)}<small>${esc(lg.country)}</small></span>` +
+        `<span class="league-name">${esc(lg.label)}<small>${esc(lg.tier ? `${lg.tier} · ${lg.country}` : lg.country)}</small></span>` +
         `<span class="count">${lg.count}</span>`;
       btn.addEventListener("click", () => setLeague(lg.key, !state.activeLeagues.has(lg.key)));
       body.appendChild(btn);
@@ -408,10 +414,12 @@ function buildLegend() {
 function buildIndexes(features) {
   for (const f of features) {
     const p = f.properties;
-    byQid.set(p.qid, f);
-    const ck = coordKey(f.geometry.coordinates);
-    if (!byCoord.has(ck)) byCoord.set(ck, []);
-    byCoord.get(ck).push(f);
+    byId.set(p.id, f);
+    if (p.precision !== "city") {
+      const ck = coordKey(f.geometry.coordinates);
+      if (!byCoord.has(ck)) byCoord.set(ck, []);
+      byCoord.get(ck).push(f);
+    }
     if (!featuresByLeague.has(p.leagueKey)) featuresByLeague.set(p.leagueKey, []);
     featuresByLeague.get(p.leagueKey).push(f);
   }
@@ -419,7 +427,7 @@ function buildIndexes(features) {
   searchIndex = features.map((f) => {
     const p = f.properties;
     return {
-      qid: p.qid, name: p.name, venue: p.venue, league: p.league, leagueKey: p.leagueKey,
+      id: p.id, name: p.name, venue: p.venue, league: p.league, leagueKey: p.leagueKey,
       country: p.country, capacity: p.capacity, coords: f.geometry.coordinates,
       nameFold: fold(p.name),
       haystack: fold(`${p.name} ${p.venue ?? ""} ${p.country ?? ""}`),
@@ -432,7 +440,7 @@ function buildIndexes(features) {
     let rank = 0, prev = null;
     withCap.forEach((f, i) => {
       if (f.properties.capacity !== prev) { rank = i + 1; prev = f.properties.capacity; }
-      ranks.set(f.properties.qid, { rank, of: withCap.length, total: feats.length, league: f.properties.league });
+      ranks.set(f.properties.id, { rank, of: withCap.length, total: feats.length, league: f.properties.league });
     });
   }
 }
@@ -442,16 +450,16 @@ function buildIndexes(features) {
 // dataset that spans both.
 function buildNearest() {
   if (nearest) return nearest;
-  const pts = allFeatures.map((f) => ({ qid: f.properties.qid, name: f.properties.name, c: f.geometry.coordinates, ck: coordKey(f.geometry.coordinates) }));
+  const pts = allFeatures.map((f) => ({ id: f.properties.id, name: f.properties.name, c: f.geometry.coordinates, ck: coordKey(f.geometry.coordinates) }));
   const best = new Map();
   for (let i = 0; i < pts.length; i++) {
     for (let j = i + 1; j < pts.length; j++) {
       if (pts[i].ck === pts[j].ck) continue; // ground-sharers: covered by the shared note
       const km = haversineKm(pts[i].c, pts[j].c);
-      const bi = best.get(pts[i].qid);
-      if (!bi || km < bi.km) best.set(pts[i].qid, { qid: pts[j].qid, name: pts[j].name, km });
-      const bj = best.get(pts[j].qid);
-      if (!bj || km < bj.km) best.set(pts[j].qid, { qid: pts[i].qid, name: pts[i].name, km });
+      const bi = best.get(pts[i].id);
+      if (!bi || km < bi.km) best.set(pts[i].id, { id: pts[j].id, name: pts[j].name, km });
+      const bj = best.get(pts[j].id);
+      if (!bj || km < bj.km) best.set(pts[j].id, { id: pts[i].id, name: pts[i].name, km });
     }
   }
   nearest = best;
@@ -488,7 +496,7 @@ function computeStats() {
 
 function clubRow(f, extra) {
   const p = f.properties;
-  return `<button type="button" class="stat-row" data-qid="${esc(p.qid)}">` +
+  return `<button type="button" class="stat-row" data-club="${esc(p.id)}">` +
     `<span class="swatch" style="background:${esc(leagueColor(p.leagueKey))}"></span>` +
     `<span class="stat-name">${esc(p.name)}<small>${esc(p.venue ?? "")}</small></span>` +
     `<span class="stat-val">${esc(extra)}</span></button>`;
@@ -505,7 +513,7 @@ function renderStats() {
     sub("Biggest grounds", stats.biggest.map((f) => clubRow(f, fmtNum(f.properties.capacity))).join("")) +
     sub("Smallest grounds", stats.smallest.map((f) => clubRow(f, fmtNum(f.properties.capacity))).join("")) +
     sub(`Shared grounds (${stats.shared.length})`, stats.shared.map((g) =>
-      `<button type="button" class="stat-row" data-qid="${esc(g[0].properties.qid)}">` +
+      `<button type="button" class="stat-row" data-club="${esc(g[0].properties.id)}">` +
       `<span class="stat-name">${esc(g.map((f) => f.properties.name).join(" + "))}` +
       `<small>${esc(g[0].properties.venue ?? "")}</small></span></button>`).join("")) +
     sub("Average capacity", stats.leagueAvg.map((l) =>
@@ -514,8 +522,8 @@ function renderStats() {
       `<span class="bar" style="width:${Math.round((l.avg / maxAvg) * 100)}%;background:${esc(l.color)}"></span></button>`).join("")) +
     `<p class="stat-note">Across all ${leagues.length} leagues, regardless of filters.</p>`;
 
-  statsBody.querySelectorAll(".stat-row[data-qid]").forEach((el) =>
-    el.addEventListener("click", () => selectClub(el.dataset.qid, { zoom: 12 })));
+  statsBody.querySelectorAll(".stat-row[data-club]").forEach((el) =>
+    el.addEventListener("click", () => selectClub(el.dataset.club, { zoom: 12 })));
   statsBody.querySelectorAll(".stat-row[data-league]").forEach((el) =>
     el.addEventListener("click", () => {
       const key = el.dataset.league;
@@ -531,20 +539,31 @@ const leagueColor = (key) => leagues.find((l) => l.key === key)?.color ?? "#ffff
 
 function popupHtml(feats) {
   const near = buildNearest();
-  const groupNote = feats.length > 1
-    ? `<p class="shared-note">Shared ground — ${feats.length} clubs at ${esc(feats[0].properties.venue ?? "one stadium")}</p>`
-    : "";
+  // Only venue-precision clubs actually share a stadium. Clubs placed on a town
+  // can land on one point too, and calling that a shared ground would invent a
+  // fact — so decide here rather than trusting whoever assembled the group.
+  const sharesGround = feats.length > 1 && feats.every((f) => f.properties.precision === "venue");
+  const groupNote = feats.length < 2
+    ? ""
+    : sharesGround
+      ? `<p class="shared-note">Shared ground — ${feats.length} clubs at ${esc(feats[0].properties.venue ?? "one stadium")}</p>`
+      : `<p class="shared-note">${feats.length} clubs placed on the same town</p>`;
 
   const cards = feats.map((f) => {
     const p = f.properties;
     const crest = httpsOnly(p.crest);
     const wd = httpsOnly(p.wikidata);
     const cap = p.capacity ? `${fmtNum(p.capacity)} seats` : "capacity unknown";
-    const r = ranks.get(p.qid);
+    // A city-precision club sits on its town, not its ground: say so rather
+    // than letting the marker imply a stadium location we do not have.
+    const approxLine = p.precision === "city"
+      ? `<p class="approx">Approximate — placed on the club's town${p.venue ? `; ${esc(p.venue)} is not mapped` : ""}</p>`
+      : "";
+    const r = ranks.get(p.id);
     const rankLine = r
       ? `<p class="rank">${ordinal(r.rank)} largest ${r.of < r.total ? `of ${r.of} ranked ` : ""}in ${esc(r.league)}</p>`
       : "";
-    const n = feats.length === 1 ? near.get(p.qid) : null;
+    const n = feats.length === 1 ? near.get(p.id) : null;
     const nearLine = n ? `<p class="near">Nearest: ${esc(n.name)}, ${fmtKm(n.km)}</p>` : "";
     return `<article class="club-card">
       ${crest ? `<img class="club-crest" src="${esc(crest)}" alt="" width="56">` : ""}
@@ -552,7 +571,7 @@ function popupHtml(feats) {
         <h3>${esc(p.name)}</h3>
         <p><span class="chip" style="background:${esc(leagueColor(p.leagueKey))}"></span>${esc(p.league)}</p>
         <p>${esc(p.venue ?? "Stadium unknown")} · ${cap}</p>
-        ${rankLine}${nearLine}
+        ${rankLine}${nearLine}${approxLine}
         ${wd ? `<p><a href="${esc(wd)}" target="_blank" rel="noopener">Wikidata ↗</a></p>` : ""}
       </div>
     </article>`;
@@ -564,25 +583,25 @@ function popupHtml(feats) {
 function closePopup() {
   if (popup) popup.remove();
   popup = null;
-  popupQids = [];
+  popupIds = [];
   setSelected(null);
 }
 
 function openPopupFor(feats) {
   if (!feats.length) return;
   if (popup) popup.remove();
-  popupQids = feats.map((f) => f.properties.qid);
+  popupIds = feats.map((f) => f.properties.id);
   popup = new maplibregl.Popup({ maxWidth: "320px" })
     .setLngLat(feats[0].geometry.coordinates)
     .setHTML(popupHtml(feats))
     .addTo(map);
-  popup.on("close", () => { popupQids = []; popup = null; });
+  popup.on("close", () => { popupIds = []; popup = null; });
 }
 
-function setSelected(qid) {
-  state.selectedQid = qid;
+function setSelected(id) {
+  state.selectedId = id;
   if (map?.getLayer("clubs-selected")) {
-    map.setFilter("clubs-selected", ["==", ["get", "qid"], qid ?? ""]);
+    map.setFilter("clubs-selected", ["==", ["get", "id"], id ?? ""]);
   }
 }
 
@@ -624,7 +643,7 @@ function renderSuggestions() {
 
   searchResults.innerHTML = results.length
     ? results.map((e, i) =>
-        `<li role="option" id="sr-${i}" aria-selected="false" class="search-row" data-qid="${esc(e.qid)}">` +
+        `<li role="option" id="sr-${i}" aria-selected="false" class="search-row" data-club="${esc(e.id)}">` +
         `<span class="swatch" style="background:${esc(leagueColor(e.leagueKey))}"></span>` +
         `<span class="sr-text"><b>${esc(e.name)}</b><small>${esc(e.venue ?? "")} · ${esc(e.league)}</small></span></li>`).join("")
     : `<li class="search-row is-empty" role="option" aria-selected="false">No clubs match “${esc(searchInput.value.trim())}”</li>`;
@@ -632,8 +651,8 @@ function renderSuggestions() {
   searchResults.hidden = false;
   searchInput.setAttribute("aria-expanded", "true");
   activeIndex = -1;
-  searchResults.querySelectorAll("[data-qid]").forEach((el) => {
-    el.addEventListener("mousedown", (ev) => { ev.preventDefault(); selectClub(el.dataset.qid); });
+  searchResults.querySelectorAll("[data-club]").forEach((el) => {
+    el.addEventListener("mousedown", (ev) => { ev.preventDefault(); selectClub(el.dataset.club); });
   });
 }
 
@@ -644,7 +663,7 @@ function scheduleRender() {
 }
 
 function moveActive(delta) {
-  const rows = [...searchResults.querySelectorAll("[data-qid]")];
+  const rows = [...searchResults.querySelectorAll("[data-club]")];
   if (!rows.length) return;
   activeIndex += delta;
   if (activeIndex < 0) activeIndex = rows.length - 1;
@@ -657,8 +676,8 @@ function moveActive(delta) {
   });
 }
 
-function selectClub(qid, { zoom = 9 } = {}) {
-  const f = byQid.get(qid);
+function selectClub(id, { zoom = 9 } = {}) {
+  const f = byId.get(id);
   if (!f) return;
   const key = f.properties.leagueKey;
   if (!state.activeLeagues.has(key)) {
@@ -666,7 +685,7 @@ function selectClub(qid, { zoom = 9 } = {}) {
     const lg = leagues.find((l) => l.key === key);
     if (lg) setCollapsed(lg.group, false);
   }
-  setSelected(qid);
+  setSelected(id);
   closeSuggestions();
   if (searchInput && window.matchMedia?.("(hover: none)").matches) searchInput.blur();
 
@@ -689,9 +708,9 @@ function wireSearch() {
       if (searchResults.hidden) renderSuggestions();
       moveActive(ev.key === "ArrowDown" ? 1 : -1);
     } else if (ev.key === "Enter") {
-      const rows = [...searchResults.querySelectorAll("[data-qid]")];
+      const rows = [...searchResults.querySelectorAll("[data-club]")];
       const row = rows[activeIndex] ?? rows[0];
-      if (row) { ev.preventDefault(); selectClub(row.dataset.qid); }
+      if (row) { ev.preventDefault(); selectClub(row.dataset.club); }
     } else if (ev.key === "Escape") {
       if (!searchResults.hidden) closeSuggestions();
       else { searchInput.value = ""; if (searchClear) searchClear.hidden = true; setSelected(null); }
@@ -785,7 +804,7 @@ function addMapLayers(data) {
     id: "clubs-selected",
     type: "circle",
     source: "clubs",
-    filter: ["==", ["get", "qid"], ""],
+    filter: ["==", ["get", "id"], ""],
     paint: {
       "circle-radius": ["interpolate", ["linear"], ["zoom"], 1.5, 8, 4, 16, 7, 26, 11, 38],
       "circle-color": "rgba(0,0,0,0)",
@@ -817,7 +836,7 @@ function addMapLayers(data) {
     source: "clubs",
     filter: leagueFilter(),
     layout: {
-      "icon-image": ["coalesce", ["image", ["concat", "club-", ["get", "qid"]]],
+      "icon-image": ["coalesce", ["image", ["concat", "club-", ["get", "id"]]],
         ["image", ["concat", "dot-", ["get", "leagueKey"]]]],
       // Crests are normalised to a CREST_SIZE long edge (see fitCrest), where
       // they previously arrived at ~250px. These stops are scaled by that same
@@ -839,10 +858,10 @@ function addMapLayers(data) {
       const box = [[e.point.x - pad, e.point.y - pad], [e.point.x + pad, e.point.y + pad]];
       const feats = map.queryRenderedFeatures(box, { layers: ["clubs", "clubs-ring"] });
       const seen = new Set();
-      const unique = feats.filter((f) => !seen.has(f.properties.qid) && seen.add(f.properties.qid))
-        .map((f) => byQid.get(f.properties.qid) ?? f);
+      const unique = feats.filter((f) => !seen.has(f.properties.id) && seen.add(f.properties.id))
+        .map((f) => byId.get(f.properties.id) ?? f);
       if (!unique.length) return;
-      setSelected(unique[0].properties.qid);
+      setSelected(unique[0].properties.id);
       openPopupFor(unique);
     });
   }
@@ -902,14 +921,16 @@ wirePanels();
 // read-only surface for the headless test suite
 window.__worldxi = {
   get state() {
-    return { on: [...state.activeLeagues], collapsed: [...state.collapsed], selected: state.selectedQid };
+    return { on: [...state.activeLeagues], collapsed: [...state.collapsed], selected: state.selectedId };
   },
   get leagues() { return leagues; },
   get stats() { return stats; },
   searchClubs,
   selectClub,
-  nearestOf: (qid) => buildNearest().get(qid),
-  imageOf: (qid) => { const i = map?.getImage(`club-${qid}`); return i ? { width: i.data.width, height: i.data.height } : null; },
-  capacityRankOf: (qid) => ranks.get(qid),
+  nearestOf: (id) => buildNearest().get(id),
+  imageOf: (id) => { const i = map?.getImage(`club-${id}`); return i ? { width: i.data.width, height: i.data.height } : null; },
+  capacityRankOf: (id) => ranks.get(id),
+  features: () => allFeatures,
+  popupHtmlFor: (feats) => popupHtml(feats),
   shownClubCount,
 };

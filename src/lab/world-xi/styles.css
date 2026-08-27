@@ -420,3 +420,9 @@ body.map-failed .map-fallback {
 @media (prefers-reduced-motion: reduce) {
   .caret { transition: none; }
 }
+
+.club-card .approx {
+  font-size: 11.5px;
+  color: rgba(240, 236, 223, 0.5);
+  font-style: italic;
+}
