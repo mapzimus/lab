@@ -1,9 +1,31 @@
 {
  "type": "FeatureCollection",
  "metadata": {
-  "generated": "2026-08-26",
+  "generated": "2026-08-27",
   "seasons": "2025-26 Europe & Saudi Arabia · 2026 Americas & Korea · 2026-27 Japan",
   "source": "Wikidata (CC0); rosters hand-curated",
+  "groups": [
+   {
+    "key": "top",
+    "label": "Top men's leagues"
+   },
+   {
+    "key": "eu",
+    "label": "More Europe — men"
+   },
+   {
+    "key": "americas",
+    "label": "Americas — men"
+   },
+   {
+    "key": "rest",
+    "label": "Asia, Africa & Pacific — men"
+   },
+   {
+    "key": "women",
+    "label": "Women"
+   }
+  ],
   "leagues": [
    {
     "key": "epl",
@@ -11,6 +33,7 @@
     "country": "England",
     "gender": "men",
     "color": "#7c5cff",
+    "group": "top",
     "count": 20
    },
    {
@@ -19,6 +42,7 @@
     "country": "Spain",
     "gender": "men",
     "color": "#ff5a3c",
+    "group": "top",
     "count": 20
    },
    {
@@ -27,6 +51,7 @@
     "country": "Germany",
     "gender": "men",
     "color": "#f0c23a",
+    "group": "top",
     "count": 18
    },
    {
@@ -35,6 +60,7 @@
     "country": "Italy",
     "gender": "men",
     "color": "#2ec4a2",
+    "group": "top",
     "count": 20
    },
    {
@@ -43,6 +69,7 @@
     "country": "France",
     "gender": "men",
     "color": "#4aa3ff",
+    "group": "top",
     "count": 18
    },
    {
@@ -51,6 +78,7 @@
     "country": "England",
     "gender": "men",
     "color": "#b39ddb",
+    "group": "eu",
     "count": 24
    },
    {
@@ -59,6 +87,7 @@
     "country": "Netherlands",
     "gender": "men",
     "color": "#ff8c1a",
+    "group": "eu",
     "count": 18
    },
    {
@@ -67,6 +96,7 @@
     "country": "Portugal",
     "gender": "men",
     "color": "#0e8f62",
+    "group": "eu",
     "count": 18
    },
    {
@@ -75,6 +105,7 @@
     "country": "Scotland",
     "gender": "men",
     "color": "#3d5aa8",
+    "group": "eu",
     "count": 12
    },
    {
@@ -83,6 +114,7 @@
     "country": "Belgium",
     "gender": "men",
     "color": "#ad1457",
+    "group": "eu",
     "count": 16
    },
    {
@@ -91,6 +123,7 @@
     "country": "Türkiye",
     "gender": "men",
     "color": "#d32f2f",
+    "group": "eu",
     "count": 18
    },
    {
@@ -99,6 +132,7 @@
     "country": "USA & Canada",
     "gender": "men",
     "color": "#ff7043",
+    "group": "americas",
     "count": 30
    },
    {
@@ -107,6 +141,7 @@
     "country": "Mexico",
     "gender": "men",
     "color": "#43a047",
+    "group": "americas",
     "count": 18
    },
    {
@@ -115,6 +150,7 @@
     "country": "Brazil",
     "gender": "men",
     "color": "#fdd835",
+    "group": "americas",
     "count": 20
    },
    {
@@ -123,6 +159,7 @@
     "country": "Argentina",
     "gender": "men",
     "color": "#8ecae6",
+    "group": "americas",
     "count": 30
    },
    {
@@ -131,6 +168,7 @@
     "country": "Saudi Arabia",
     "gender": "men",
     "color": "#0d9488",
+    "group": "rest",
     "count": 18
    },
    {
@@ -139,6 +177,7 @@
     "country": "Japan",
     "gender": "men",
     "color": "#ba68c8",
+    "group": "rest",
     "count": 20
    },
    {
@@ -147,6 +186,7 @@
     "country": "South Korea",
     "gender": "men",
     "color": "#00acc1",
+    "group": "rest",
     "count": 12
    },
    {
@@ -155,6 +195,7 @@
     "country": "England",
     "gender": "women",
     "color": "#ff7ab8",
+    "group": "women",
     "count": 12
    },
    {
@@ -163,6 +204,7 @@
     "country": "United States",
     "gender": "women",
     "color": "#9be15d",
+    "group": "women",
     "count": 16
    },
    {
@@ -171,6 +213,7 @@
     "country": "Spain",
     "gender": "women",
     "color": "#ffb300",
+    "group": "women",
     "count": 16
    },
    {
@@ -179,6 +222,7 @@
     "country": "Germany",
     "gender": "women",
     "color": "#ce93d8",
+    "group": "women",
     "count": 14
    },
    {
@@ -187,6 +231,7 @@
     "country": "Italy",
     "gender": "women",
     "color": "#66d9e8",
+    "group": "women",
     "count": 12
    },
    {
@@ -195,7 +240,143 @@
     "country": "France",
     "gender": "women",
     "color": "#ffa8a8",
+    "group": "women",
     "count": 12
+   },
+   {
+    "key": "eliteserien",
+    "label": "Eliteserien",
+    "country": "Norway",
+    "gender": "men",
+    "color": "#e57373",
+    "group": "eu",
+    "count": 16
+   },
+   {
+    "key": "allsvenskan",
+    "label": "Allsvenskan",
+    "country": "Sweden",
+    "gender": "men",
+    "color": "#4db6ac",
+    "group": "eu",
+    "count": 16
+   },
+   {
+    "key": "superliga",
+    "label": "Danish Superliga",
+    "country": "Denmark",
+    "gender": "men",
+    "color": "#c62828",
+    "group": "eu",
+    "count": 12
+   },
+   {
+    "key": "swiss",
+    "label": "Swiss Super League",
+    "country": "Switzerland",
+    "gender": "men",
+    "color": "#ef6c00",
+    "group": "eu",
+    "count": 12
+   },
+   {
+    "key": "austria",
+    "label": "Austrian Bundesliga",
+    "country": "Austria",
+    "gender": "men",
+    "color": "#8d6e63",
+    "group": "eu",
+    "count": 12
+   },
+   {
+    "key": "greece",
+    "label": "Super League Greece",
+    "country": "Greece",
+    "gender": "men",
+    "color": "#5c6bc0",
+    "group": "eu",
+    "count": 14
+   },
+   {
+    "key": "csl",
+    "label": "Chinese Super League",
+    "country": "China",
+    "gender": "men",
+    "color": "#ffa726",
+    "group": "rest",
+    "count": 16
+   },
+   {
+    "key": "egypt",
+    "label": "Egyptian Premier League",
+    "country": "Egypt",
+    "gender": "men",
+    "color": "#26a69a",
+    "group": "rest",
+    "count": 21
+   },
+   {
+    "key": "psl",
+    "label": "South African Premiership",
+    "country": "South Africa",
+    "gender": "men",
+    "color": "#7cb342",
+    "group": "rest",
+    "count": 16
+   },
+   {
+    "key": "isl",
+    "label": "Indian Super League",
+    "country": "India",
+    "gender": "men",
+    "color": "#ec407a",
+    "group": "rest",
+    "count": 14
+   },
+   {
+    "key": "aleaguem",
+    "label": "A-League Men",
+    "country": "Australia & NZ",
+    "gender": "men",
+    "color": "#42a5f5",
+    "group": "rest",
+    "count": 13
+   },
+   {
+    "key": "ligamxfem",
+    "label": "Liga MX Femenil",
+    "country": "Mexico",
+    "gender": "women",
+    "color": "#aed581",
+    "group": "women",
+    "count": 18
+   },
+   {
+    "key": "aleaguew",
+    "label": "A-League Women",
+    "country": "Australia & NZ",
+    "gender": "women",
+    "color": "#80deea",
+    "group": "women",
+    "count": 12
+   },
+   {
+    "key": "eredivisiev",
+    "label": "Eredivisie Vrouwen",
+    "country": "Netherlands",
+    "gender": "women",
+    "color": "#ffcc80",
+    "group": "women",
+    "count": 12
+   },
+   {
+    "key": "damallsvenskan",
+    "label": "Damallsvenskan",
+    "country": "Sweden",
+    "gender": "women",
+    "color": "#f48fb1",
+    "group": "women",
+    "count": 14
    }
   ]
  },
@@ -10624,6 +10805,5199 @@
     "colors": [],
     "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Racing_Club_de_Strasbourg_logo.svg/250px-Racing_Club_de_Strasbourg_logo.svg.png",
     "wikidata": "https://www.wikidata.org/wiki/Q108839634"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.1875,
+     62.46944
+    ]
+   },
+   "properties": {
+    "qid": "Q214992",
+    "name": "Aalesunds FK",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Color Line Stadion",
+    "capacity": 10778,
+    "colors": [
+     "blue",
+     "orange"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b2/Aalesunds_FK_logo.svg/250px-Aalesunds_FK_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q214992"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     14.38417,
+     67.2775
+    ]
+   },
+   "properties": {
+    "qid": "Q478167",
+    "name": "FK Bodø/Glimt",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Aspmyra Stadion",
+    "capacity": 7354,
+    "colors": [
+     "yellow",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/8d/FK_Bodo_Glimt_logo.svg/250px-FK_Bodo_Glimt_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q478167"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     10.92732,
+     59.21305
+    ]
+   },
+   "properties": {
+    "qid": "Q216131",
+    "name": "Fredrikstad FK",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Fredrikstad Stadion",
+    "capacity": 12560,
+    "colors": [
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/9/93/Fredrikstad_FK_logo.svg/250px-Fredrikstad_FK_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q216131"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     11.09222,
+     60.79556
+    ]
+   },
+   "properties": {
+    "qid": "Q1130961",
+    "name": "Hamarkameratene",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Briskeby Arena",
+    "capacity": 7600,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/4/46/Hamarkameratene_logo.svg/250px-Hamarkameratene_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1130961"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.02861,
+     58.15361
+    ]
+   },
+   "properties": {
+    "qid": "Q737947",
+    "name": "IK Start",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Sparebanken Norge Arena Kristiansand",
+    "capacity": 14563,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Start_Kristiansand_Logo.svg/250px-Start_Kristiansand_Logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q737947"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     10.78083,
+     59.89
+    ]
+   },
+   "properties": {
+    "qid": "Q3432730",
+    "name": "KFUM-Kameratene Oslo",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "KFUM Arena",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/0/0e/KFUM-Kameratene_logo.svg/250px-KFUM-Kameratene_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q3432730"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.7219,
+     63.1106
+    ]
+   },
+   "properties": {
+    "qid": "Q496190",
+    "name": "Kristiansund BK",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Q11976878",
+    "capacity": null,
+    "colors": [
+     "blue",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a6/Kristiansund_BK_logo.svg/250px-Kristiansund_BK_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q496190"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     11.06346,
+     59.96275
+    ]
+   },
+   "properties": {
+    "qid": "Q214374",
+    "name": "Lillestrøm SK",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Åråsen Stadion",
+    "capacity": 12250,
+    "colors": [
+     "yellow",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Lillestrom_SK_logo.svg/250px-Lillestrom_SK_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q214374"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.14813,
+     62.73341
+    ]
+   },
+   "properties": {
+    "qid": "Q208552",
+    "name": "Molde FK",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Aker Stadion",
+    "capacity": 11800,
+    "colors": [
+     "white",
+     "azure"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Molde_Fotball_Logo.svg/250px-Molde_Fotball_Logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q208552"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     10.405,
+     63.4125
+    ]
+   },
+   "properties": {
+    "qid": "Q186785",
+    "name": "Rosenborg BK",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Lerkendal Stadion",
+    "capacity": 21423,
+    "colors": [
+     "white",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Rosenborg_logo_RGB.svg/250px-Rosenborg_logo_RGB.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q186785"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     10.17969,
+     59.13725
+    ]
+   },
+   "properties": {
+    "qid": "Q861524",
+    "name": "Sandefjord Fotball",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Jotun Arena",
+    "capacity": 6582,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e6/Sandefjord_Fotball_logo.svg/250px-Sandefjord_Fotball_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q861524"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     11.09761,
+     59.28622
+    ]
+   },
+   "properties": {
+    "qid": "Q1151909",
+    "name": "Sarpsborg 08 FF",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Sarpsborg Stadion",
+    "capacity": 4700,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e4/Sarpsborg_08_FF_logo.svg/250px-Sarpsborg_08_FF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1151909"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     5.35694,
+     60.36639
+    ]
+   },
+   "properties": {
+    "qid": "Q205685",
+    "name": "SK Brann",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Brann Stadion",
+    "capacity": 16750,
+    "colors": [
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Brann_logo.svg/250px-Brann_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q205685"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     18.93504,
+     69.64887
+    ]
+   },
+   "properties": {
+    "qid": "Q212490",
+    "name": "Tromsø IL",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Romssa Arena",
+    "capacity": 6859,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/57/Troms%C3%B8_IL_logo.svg/250px-Troms%C3%B8_IL_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q212490"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     10.80669,
+     59.91781
+    ]
+   },
+   "properties": {
+    "qid": "Q212819",
+    "name": "Vålerenga Fotball",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Intility Arena",
+    "capacity": 16555,
+    "colors": [
+     "blue",
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/V%C3%A5lerenga_Oslo_logo.svg/250px-V%C3%A5lerenga_Oslo_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q212819"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     5.73044,
+     58.91461
+    ]
+   },
+   "properties": {
+    "qid": "Q211177",
+    "name": "Viking FK",
+    "league": "Eliteserien",
+    "leagueKey": "eliteserien",
+    "gender": "men",
+    "country": "Norway",
+    "venue": "Lyse Arena",
+    "capacity": 15400,
+    "colors": [
+     "blue"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/13/Viking_FK_logo_2020.svg/250px-Viking_FK_logo_2020.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q211177"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     18,
+     59.3725
+    ]
+   },
+   "properties": {
+    "qid": "Q221602",
+    "name": "AIK Fotboll",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Strawberry Arena",
+    "capacity": 54329,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/81/AIK_Fotboll_%28shield%29.svg/250px-AIK_Fotboll_%28shield%29.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q221602"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     11.93083,
+     57.71889
+    ]
+   },
+   "properties": {
+    "qid": "Q639723",
+    "name": "BK Häcken",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Rambergsvallen",
+    "capacity": 7000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/BK_Hacken_logo.svg/250px-BK_Hacken_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q639723"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     14.4431,
+     59.2383
+    ]
+   },
+   "properties": {
+    "qid": "Q1140767",
+    "name": "Degerfors IF",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Stora Valla",
+    "capacity": 12500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/9/90/Degerfors_IF_logo.svg/250px-Degerfors_IF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1140767"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     18.08528,
+     59.29139
+    ]
+   },
+   "properties": {
+    "qid": "Q622430",
+    "name": "Djurgårdens IF Fotboll",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "3Arena",
+    "capacity": 30001,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Djurgardens_IF_logo.svg/250px-Djurgardens_IF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q622430"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     11.98056,
+     57.70611
+    ]
+   },
+   "properties": {
+    "qid": "Q391789",
+    "name": "GAIS",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Gamla Ullevi",
+    "capacity": 18416,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a3/GAIS_logo.svg/250px-GAIS_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q391789"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     12.86639,
+     56.68417
+    ]
+   },
+   "properties": {
+    "qid": "Q584858",
+    "name": "Halmstads BK",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Örjans Vall",
+    "capacity": 10873,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/6/66/Halmstad_BK_logo.svg/250px-Halmstad_BK_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q584858"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     18.08528,
+     59.29139
+    ]
+   },
+   "properties": {
+    "qid": "Q460724",
+    "name": "Hammarby Fotboll",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "3Arena",
+    "capacity": 30001,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/0/0a/Hammarby_IF_logo.svg/250px-Hammarby_IF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q460724"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     17.85167,
+     59.36222
+    ]
+   },
+   "properties": {
+    "qid": "Q754339",
+    "name": "IF Brommapojkarna",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Grimsta IP",
+    "capacity": 4729,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/2/20/IF_Brommapojkarna_logo.svg/250px-IF_Brommapojkarna_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q754339"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     12.93433,
+     57.73457
+    ]
+   },
+   "properties": {
+    "qid": "Q211753",
+    "name": "IF Elfsborg",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Borås Arena",
+    "capacity": 16200,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/3/37/IF_Elfsborg_logo.svg/250px-IF_Elfsborg_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q211753"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     11.98056,
+     57.70611
+    ]
+   },
+   "properties": {
+    "qid": "Q201567",
+    "name": "IFK Göteborg",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Gamla Ullevi",
+    "capacity": 18416,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a6/IFK_Goteborg_logo.svg/250px-IFK_Goteborg_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q201567"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     17.64444,
+     59.85
+    ]
+   },
+   "properties": {
+    "qid": "Q1471336",
+    "name": "IK Sirius FK",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Studenternas IP",
+    "capacity": 6500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/c/cf/IK_Sirius_logo.svg/250px-IK_Sirius_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1471336"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     16.31523,
+     56.6907
+    ]
+   },
+   "properties": {
+    "qid": "Q644157",
+    "name": "Kalmar FF",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Guldfågeln Arena",
+    "capacity": 12500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/af/Kalmar_FF_logo.svg/250px-Kalmar_FF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q644157"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     12.98778,
+     55.58361
+    ]
+   },
+   "properties": {
+    "qid": "Q204881",
+    "name": "Malmö FF",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Eleda Stadion",
+    "capacity": 22500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Malmo_FF_logo.svg/250px-Malmo_FF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q204881"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     14.71667,
+     56.0125
+    ]
+   },
+   "properties": {
+    "qid": "Q749138",
+    "name": "Mjällby AIF",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Strandvallen",
+    "capacity": 7500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a5/Mjallby_AIF_logo.svg/250px-Mjallby_AIF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q749138"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     11.9801,
+     57.7062
+    ]
+   },
+   "properties": {
+    "qid": "Q297906",
+    "name": "Örgryte IS",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Gamla Ullevi",
+    "capacity": 18416,
+    "colors": [
+     "blue",
+     "red"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Orgryte_IS_logo.svg/250px-Orgryte_IS_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q297906"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     16.53056,
+     59.6275
+    ]
+   },
+   "properties": {
+    "qid": "Q1680249",
+    "name": "Västerås SK Fotboll",
+    "league": "Allsvenskan",
+    "leagueKey": "allsvenskan",
+    "gender": "men",
+    "country": "Sweden",
+    "venue": "Hitachi Energy Arena",
+    "capacity": 7044,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a0/Vasteras_SK_logo.svg/250px-Vasteras_SK_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1680249"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     10.19639,
+     56.13194
+    ]
+   },
+   "properties": {
+    "qid": "Q301431",
+    "name": "Aarhus Gymnastikforening",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "Ceres Park & Arena",
+    "capacity": 19433,
+    "colors": [
+     "blue",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/ac/AGF_Aarhus_logo.svg/250px-AGF_Aarhus_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q301431"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     12.41836,
+     55.64885
+    ]
+   },
+   "properties": {
+    "qid": "Q211906",
+    "name": "Brøndby IF",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "Brøndby Stadium",
+    "capacity": 29000,
+    "colors": [
+     "blue"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b5/Brondby_IF_logo.svg/250px-Brondby_IF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q211906"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     12.5722,
+     55.70247
+    ]
+   },
+   "properties": {
+    "qid": "Q188430",
+    "name": "F.C. Copenhagen",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "Parken Stadium",
+    "capacity": 38065,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/2/26/FC_Copenhagen_logo.svg/250px-FC_Copenhagen_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q188430"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     9.7286,
+     55.57825
+    ]
+   },
+   "properties": {
+    "qid": "Q388746",
+    "name": "FC Fredericia",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "Fredericia New Stadium",
+    "capacity": 4000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4f/FC_Fredericia_logo.svg/250px-FC_Fredericia_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q388746"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.95167,
+     56.11667
+    ]
+   },
+   "properties": {
+    "qid": "Q618520",
+    "name": "FC Midtjylland",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "MCH Arena",
+    "capacity": 11809,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/d/dd/FC_Midtjylland_logo.svg/250px-FC_Midtjylland_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q618520"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     12.35329,
+     55.81585
+    ]
+   },
+   "properties": {
+    "qid": "Q210025",
+    "name": "FC Nordsjælland",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "Right to Dream Park",
+    "capacity": 10100,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/2/23/FC_Nordsj%C3%A6lland_logo.svg/250px-FC_Nordsj%C3%A6lland_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q210025"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     10.35005,
+     55.39777
+    ]
+   },
+   "properties": {
+    "qid": "Q211912",
+    "name": "Odense Boldklub",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "Odense Stadium",
+    "capacity": 15633,
+    "colors": [
+     "blue",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Odense_Boldklub.svg/250px-Odense_Boldklub.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q211912"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     10.01028,
+     56.46583
+    ]
+   },
+   "properties": {
+    "qid": "Q729560",
+    "name": "Randers FC",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "AutoC Park Randers",
+    "capacity": 10300,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b7/Randers_FC_logo.svg/250px-Randers_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q729560"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     9.5751,
+     56.1842
+    ]
+   },
+   "properties": {
+    "qid": "Q723489",
+    "name": "Silkeborg IF",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "JYSK Park",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Silkeborg_IF_logo.svg/250px-Silkeborg_IF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q723489"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     9.48779,
+     55.26136
+    ]
+   },
+   "properties": {
+    "qid": "Q3511548",
+    "name": "Sønderjyske Fodbold",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "Sydbank Park",
+    "capacity": 10000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e9/SonderjyskE_logo.svg/250px-SonderjyskE_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q3511548"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     9.5562,
+     55.71372
+    ]
+   },
+   "properties": {
+    "qid": "Q737936",
+    "name": "Vejle Boldklub",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "Vejle Stadion",
+    "capacity": 10418,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a3/Vejle_Boldklub.png/250px-Vejle_Boldklub.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q737936"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     9.40206,
+     56.4559
+    ]
+   },
+   "properties": {
+    "qid": "Q837956",
+    "name": "Viborg FF",
+    "league": "Danish Superliga",
+    "leagueKey": "superliga",
+    "gender": "men",
+    "country": "Denmark",
+    "venue": "Evergi Viborg Arena",
+    "capacity": 10000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/f/fb/Viborg_FF_logo.svg/250px-Viborg_FF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q837956"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.465,
+     46.96278
+    ]
+   },
+   "properties": {
+    "qid": "Q190526",
+    "name": "BSC Young Boys",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "Stadion Wankdorf",
+    "capacity": 32000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/BSC_Young_Boys.svg/250px-BSC_Young_Boys.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q190526"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.62,
+     47.54139
+    ]
+   },
+   "properties": {
+    "qid": "Q189671",
+    "name": "FC Basel",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "St. Jakob-Park",
+    "capacity": 38512,
+    "colors": [
+     "red-blue"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/FC_Basel_crest.svg/250px-FC_Basel_crest.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q189671"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.625,
+     46.534
+    ]
+   },
+   "properties": {
+    "qid": "Q309456",
+    "name": "FC Lausanne-Sport",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "Stade Olympique de la Pontaise",
+    "capacity": 50000,
+    "colors": [
+     "blue-white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/FC_Lausanne-Sport_logo.svg/250px-FC_Lausanne-Sport_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q309456"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.96012,
+     46.02309
+    ]
+   },
+   "properties": {
+    "qid": "Q633521",
+    "name": "FC Lugano",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "AIL Arena",
+    "capacity": 8093,
+    "colors": [
+     "black-white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Logo_FC_Lugano_2025.svg/250px-Logo_FC_Lugano_2025.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q633521"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.30519,
+     47.03326
+    ]
+   },
+   "properties": {
+    "qid": "Q223262",
+    "name": "FC Luzern",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "thermoplan arena",
+    "capacity": 16800,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/12/FC_Luzern_crest.svg/250px-FC_Luzern_crest.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q223262"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.37639,
+     46.23333
+    ]
+   },
+   "properties": {
+    "qid": "Q321061",
+    "name": "FC Sion",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "Stade de Tourbillon",
+    "capacity": 16263,
+    "colors": [
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/FC_Sion.svg/250px-FC_Sion.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q321061"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     9.30639,
+     47.40833
+    ]
+   },
+   "properties": {
+    "qid": "Q659212",
+    "name": "FC St. Gallen",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "kybunpark",
+    "capacity": 19694,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/FC_St._Gallen_logo.svg/250px-FC_St._Gallen_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q659212"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     7.60608,
+     46.74482
+    ]
+   },
+   "properties": {
+    "qid": "Q464775",
+    "name": "FC Thun",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "Visana Stadion",
+    "capacity": 10000,
+    "colors": [
+     "red-white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/FC_Thun_Logo_2011.svg/250px-FC_Thun_Logo_2011.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q464775"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.71639,
+     47.50139
+    ]
+   },
+   "properties": {
+    "qid": "Q201969",
+    "name": "FC Winterthur",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "Stadion Schützenwiese",
+    "capacity": 8700,
+    "colors": [
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/FC_Winterthur_logo.svg/250px-FC_Winterthur_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q201969"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.5038,
+     47.38279
+    ]
+   },
+   "properties": {
+    "qid": "Q206692",
+    "name": "FC Zürich",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "Letzigrund",
+    "capacity": 25000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/FC_Zurich_Logo_2022.svg/250px-FC_Zurich_Logo_2022.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q206692"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     8.5038,
+     47.38279
+    ]
+   },
+   "properties": {
+    "qid": "Q201360",
+    "name": "Grasshopper Club Zürich",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "Letzigrund",
+    "capacity": 25000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/GC_Z%C3%BCrich_Logo.svg/250px-GC_Z%C3%BCrich_Logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q201360"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.1275,
+     46.17778
+    ]
+   },
+   "properties": {
+    "qid": "Q219235",
+    "name": "Servette FC",
+    "league": "Swiss Super League",
+    "leagueKey": "swiss",
+    "gender": "men",
+    "country": "Switzerland",
+    "venue": "Stade de Genève",
+    "capacity": 30084,
+    "colors": [
+     "garnet"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/Servette_FC_crest.svg/250px-Servette_FC_crest.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q219235"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     14.2983,
+     48.3163
+    ]
+   },
+   "properties": {
+    "qid": "Q696525",
+    "name": "F.C. Blau-Weiß Linz",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "Hofmann Personal Stadion",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/8a/FC_Blau-Wei%C3%9F_Linz_logo.svg/250px-FC_Blau-Wei%C3%9F_Linz_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q696525"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     12.99822,
+     47.81625
+    ]
+   },
+   "properties": {
+    "qid": "Q994811",
+    "name": "FC Red Bull Salzburg",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "Red Bull Arena",
+    "capacity": 31895,
+    "colors": [
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/7/77/FC_Red_Bull_Salzburg_logo.svg/250px-FC_Red_Bull_Salzburg_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q994811"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     16.38669,
+     48.16231
+    ]
+   },
+   "properties": {
+    "qid": "Q131209",
+    "name": "FK Austria Wien",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "Generali Arena",
+    "capacity": 17656,
+    "colors": [
+     "white",
+     "purple"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/FK_Austria_Wien_Logo.png/250px-FK_Austria_Wien_Logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q131209"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     15.45444,
+     47.04611
+    ]
+   },
+   "properties": {
+    "qid": "Q659780",
+    "name": "Grazer AK",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "Merkur Arena",
+    "capacity": 15400,
+    "colors": [
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/GAK_1902_Logo_Rund.svg/250px-GAK_1902_Logo_Rund.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q659780"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     14.27639,
+     48.29333
+    ]
+   },
+   "properties": {
+    "qid": "Q392310",
+    "name": "LASK Linz",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "Linzer Stadion",
+    "capacity": 18000,
+    "colors": [
+     "white",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/LASK-Logo_2023.svg/250px-LASK-Logo_2023.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q392310"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     9.6372,
+     47.3536
+    ]
+   },
+   "properties": {
+    "qid": "Q670438",
+    "name": "SC Rheindorf Altach",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "Stadion Schnabelholz",
+    "capacity": 8500,
+    "colors": [
+     "white",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/7/78/SC_Rheindorf_Altach_logo.svg/250px-SC_Rheindorf_Altach_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q670438"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     16.2653,
+     48.1981
+    ]
+   },
+   "properties": {
+    "qid": "Q131215",
+    "name": "SK Rapid Wien",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "Allianz Stadion",
+    "capacity": null,
+    "colors": [
+     "green",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/SK_Rapid_Wien_Logo.svg/250px-SK_Rapid_Wien_Logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q131215"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     15.45444,
+     47.04611
+    ]
+   },
+   "properties": {
+    "qid": "Q124007617",
+    "name": "SK Sturm Graz",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "Merkur Arena",
+    "capacity": 15400,
+    "colors": [
+     "white",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/9/91/SK_Sturm_Graz_logo.svg/250px-SK_Sturm_Graz_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q124007617"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     13.47833,
+     48.20778
+    ]
+   },
+   "properties": {
+    "qid": "Q457460",
+    "name": "SV Ried",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "BWT X Upper Austrian Arena",
+    "capacity": 7680,
+    "colors": [
+     "green",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/SV_Ried_logo.svg/250px-SV_Ried_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q457460"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     15.9772,
+     47.281
+    ]
+   },
+   "properties": {
+    "qid": "Q699746",
+    "name": "TSV Hartberg",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "Stadion Hartberg",
+    "capacity": 4500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/81/TSV_Hartberg.png/250px-TSV_Hartberg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q699746"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     14.8514,
+     46.8253
+    ]
+   },
+   "properties": {
+    "qid": "Q694484",
+    "name": "Wolfsberger AC",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "Lavanttal-Arena",
+    "capacity": 7300,
+    "colors": [
+     "white",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/c/cd/Wolfsberger_AC_logo.svg/250px-Wolfsberger_AC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q694484"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     11.41079,
+     47.25597
+    ]
+   },
+   "properties": {
+    "qid": "Q686659",
+    "name": "WSG Tirol",
+    "league": "Austrian Bundesliga",
+    "leagueKey": "austria",
+    "gender": "men",
+    "country": "Austria",
+    "venue": "Tivoli Stadion Tirol",
+    "capacity": 17400,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/85/WSG_Tirol_logo.svg/250px-WSG_Tirol_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q686659"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     23.75419,
+     37.98717
+    ]
+   },
+   "properties": {
+    "qid": "Q16245443",
+    "name": "A.E. Kifisia F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Apostolos Nikolaidis Stadium",
+    "capacity": 16003,
+    "colors": [
+     "blue",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d9/A.E._Kifisia_new_official_logo.webp/250px-A.E._Kifisia_new_official_logo.webp.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q16245443"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     23.74154,
+     38.03715
+    ]
+   },
+   "properties": {
+    "qid": "Q201584",
+    "name": "AEK Athens F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Agia Sophia Stadium",
+    "capacity": 31100,
+    "colors": [
+     "yellow",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/0/04/AEK_Athens_FC_logo.svg/250px-AEK_Athens_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q201584"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     22.9695,
+     40.60007
+    ]
+   },
+   "properties": {
+    "qid": "Q219926",
+    "name": "Aris Thessaloniki F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Kleanthis Vikelidis Stadium",
+    "capacity": 22800,
+    "colors": [
+     "yellow",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e4/Aris_Thessaloniki_F.C._logo.svg/250px-Aris_Thessaloniki_F.C._logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q219926"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     22.38868,
+     37.50268
+    ]
+   },
+   "properties": {
+    "qid": "Q757320",
+    "name": "Asteras Tripoli F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Theodoros Kolokotronis Stadium",
+    "capacity": 7616,
+    "colors": [
+     "yellow",
+     "blue"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Asteras_Tripolis_FC_logo.svg/250px-Asteras_Tripolis_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q757320"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     22.39949,
+     39.61561
+    ]
+   },
+   "properties": {
+    "qid": "Q275626",
+    "name": "Athlitiki Enosi Larissa F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "AEL FC Arena",
+    "capacity": 17118,
+    "colors": [
+     "white",
+     "crimson"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/2/25/Athlitiki_Enosi_Larissa_F.C._logo.svg/250px-Athlitiki_Enosi_Larissa_F.C._logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q275626"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     23.68976,
+     38.00486
+    ]
+   },
+   "properties": {
+    "qid": "Q757754",
+    "name": "Atromitos F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Peristeri Stadium",
+    "capacity": 10200,
+    "colors": [
+     "blue",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/e/e9/Atromitos.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q757754"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     22.88284,
+     38.4359
+    ]
+   },
+   "properties": {
+    "qid": "Q824450",
+    "name": "Levadiakos F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Levadia Municipal Stadium",
+    "capacity": 5915,
+    "colors": [
+     "green",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/APO_Levadiakos_%28logo%29.svg/250px-APO_Levadiakos_%28logo%29.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q824450"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     25.10611,
+     35.33667
+    ]
+   },
+   "properties": {
+    "qid": "Q931704",
+    "name": "OFI Crete F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Pankritio Stadium",
+    "capacity": 26240,
+    "colors": [
+     "white",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f8/OFI_Crete_F.C._logo.svg/250px-OFI_Crete_F.C._logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q931704"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     23.66454,
+     37.94617
+    ]
+   },
+   "properties": {
+    "qid": "Q19628",
+    "name": "Olympiacos F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Karaiskakis Stadium",
+    "capacity": 33334,
+    "colors": [
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/Olympiacos_FC_crest.svg/250px-Olympiacos_FC_crest.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q19628"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     23.7875,
+     38.03611
+    ]
+   },
+   "properties": {
+    "qid": "Q4122219",
+    "name": "Panathinaikos F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Olympic Stadium in Athens",
+    "capacity": 69618,
+    "colors": [
+     "green",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/84/Panathinaikos_F.C._logo.svg/250px-Panathinaikos_F.C._logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q4122219"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     21.41175,
+     38.62997
+    ]
+   },
+   "properties": {
+    "qid": "Q1460053",
+    "name": "Panetolikos F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Panetolikos Stadium",
+    "capacity": 7500,
+    "colors": [
+     "yellow",
+     "blue"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Panetolikos_new_emblem.png/250px-Panetolikos_new_emblem.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1460053"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     23.54658,
+     41.08469
+    ]
+   },
+   "properties": {
+    "qid": "Q1417287",
+    "name": "Panserraikos F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Serres Municipal Stadium",
+    "capacity": 9500,
+    "colors": [
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Panseraikos_new_emblem.png/250px-Panseraikos_new_emblem.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1417287"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     22.97242,
+     40.61384
+    ]
+   },
+   "properties": {
+    "qid": "Q204888",
+    "name": "PAOK FC",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Toumba Stadium",
+    "capacity": 28703,
+    "colors": [
+     "white",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e6/PAOK_FC_EMBLEM.png/250px-PAOK_FC_EMBLEM.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q204888"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     22.93107,
+     39.38751
+    ]
+   },
+   "properties": {
+    "qid": "Q43375974",
+    "name": "Volos N.F.C.",
+    "league": "Super League Greece",
+    "leagueKey": "greece",
+    "gender": "men",
+    "country": "Greece",
+    "venue": "Panthessaliko Stadium",
+    "capacity": 22700,
+    "colors": [
+     "blue",
+     "red"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/7/70/Volos_F.C._logo.png/250px-Volos_F.C._logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q43375974"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     116.44114,
+     39.92953
+    ]
+   },
+   "properties": {
+    "qid": "Q814738",
+    "name": "Beijing Guoan F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Workers Stadium",
+    "capacity": 66161,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a8/Beijing_Guoan_F.C.svg/250px-Beijing_Guoan_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q814738"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     103.894,
+     30.5732
+    ]
+   },
+   "properties": {
+    "qid": "Q19840468",
+    "name": "Chengdu Rongcheng F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Shuangliu Sports Centre",
+    "capacity": 25000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c4/Chengdu_Rongcheng_F.C.svg/250px-Chengdu_Rongcheng_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q19840468"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     106.79562,
+     29.70746
+    ]
+   },
+   "properties": {
+    "qid": "Q123253436",
+    "name": "Chongqing Tongliang Long F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Longxing Football Stadium",
+    "capacity": 60000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/Chongqing_Tongliang_Long_F.C.svg/250px-Chongqing_Tongliang_Long_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q123253436"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.61985,
+     38.95134
+    ]
+   },
+   "properties": {
+    "qid": "Q118904181",
+    "name": "Dalian Yingbo F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Dalian Suoyuwan Football Stadium",
+    "capacity": 63667,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/2/2f/Dalian_Yingbo_F.C.svg/250px-Dalian_Yingbo_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q118904181"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     113.725,
+     34.7167
+    ]
+   },
+   "properties": {
+    "qid": "Q507444",
+    "name": "Henan F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Zhengzhou Hanghai Stadium",
+    "capacity": 30000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d2/Henan_F.C.2023.svg/250px-Henan_F.C.2023.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q507444"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     123.32056,
+     41.80906
+    ]
+   },
+   "properties": {
+    "qid": "Q22662512",
+    "name": "Liaoning Tieren F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Tiexi Stadium",
+    "capacity": 40000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/b/be/Liaoning_Tieren_F.C.svg/250px-Liaoning_Tieren_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q22662512"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.34439,
+     36.05885
+    ]
+   },
+   "properties": {
+    "qid": "Q1192574",
+    "name": "Qingdao Hainiu F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Qingdao Tiantai Stadium",
+    "capacity": 20525,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/2/2d/Qingdao_Hainiu_F.C.svg/250px-Qingdao_Hainiu_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1192574"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.0255,
+     35.7956
+    ]
+   },
+   "properties": {
+    "qid": "Q97276157",
+    "name": "Qingdao Qingchundao F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Guzhenkou University City Sports Center",
+    "capacity": 20000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/7/70/Qingdao_West_Coast_F.C.svg/250px-Qingdao_West_Coast_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q97276157"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     117.11005,
+     36.65665
+    ]
+   },
+   "properties": {
+    "qid": "Q1046367",
+    "name": "Shandong Taishan F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Jinan Olympic Sports Center Stadium",
+    "capacity": 60000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/88/Shandong_Taishan_Football_Club.svg/250px-Shandong_Taishan_Football_Club.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1046367"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.43728,
+     31.1835
+    ]
+   },
+   "properties": {
+    "qid": "Q564216",
+    "name": "Shanghai Port F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Shanghai Stadium",
+    "capacity": 80000,
+    "colors": [
+     "red"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/Shanghai_Port_F.C.svg/250px-Shanghai_Port_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q564216"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     121.4762,
+     31.2733
+    ]
+   },
+   "properties": {
+    "qid": "Q725367",
+    "name": "Shanghai Shenhua F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Hongkou Football Stadium",
+    "capacity": 33060,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Shanghai_Shenhua_F.C.svg/250px-Shanghai_Shenhua_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q725367"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     104.30783,
+     30.61578
+    ]
+   },
+   "properties": {
+    "qid": "Q7507434",
+    "name": "Shenzhen Peng City F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Chengdu Longquanyi Football Stadium",
+    "capacity": 30800,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/7/76/Shenzhen_Peng_City_F.C.svg/250px-Shenzhen_Peng_City_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q7507434"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     117.719,
+     39.03052
+    ]
+   },
+   "properties": {
+    "qid": "Q537552",
+    "name": "Tianjin Jinmen Tiger F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "TEDA Football Stadium",
+    "capacity": 36390,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Tianjin_Jinmen_Tiger_F.C.svg/250px-Tianjin_Jinmen_Tiger_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q537552"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     114.16625,
+     30.50231
+    ]
+   },
+   "properties": {
+    "qid": "Q65062245",
+    "name": "Wuhan Three Towns F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Wuhan Sports Center",
+    "capacity": 54000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/58/Wuhan_Three_Towns_F.C.svg/250px-Wuhan_Three_Towns_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q65062245"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     102.58116,
+     24.39449
+    ]
+   },
+   "properties": {
+    "qid": "Q123376316",
+    "name": "Yunnan Yukun F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Yuxi Plateau Sports Center Stadium",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/Yunnan_Yukun_F.C.svg/250px-Yunnan_Yukun_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q123376316"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     120.129,
+     30.2683
+    ]
+   },
+   "properties": {
+    "qid": "Q79380",
+    "name": "Zhejiang Professional F.C.",
+    "league": "Chinese Super League",
+    "leagueKey": "csl",
+    "gender": "men",
+    "country": "China",
+    "venue": "Huanglong Sports Center",
+    "capacity": 51000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/Zhejiang_Professional_F.C.svg/250px-Zhejiang_Professional_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q79380"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.31233,
+     30.06911
+    ]
+   },
+   "properties": {
+    "qid": "Q223566",
+    "name": "Al Ahly SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Cairo International Stadium",
+    "capacity": 100500,
+    "colors": [
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/7/70/Al_Ahly_SC_logo.svg/250px-Al_Ahly_SC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q223566"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     29.9132,
+     31.1971
+    ]
+   },
+   "properties": {
+    "qid": "Q2084802",
+    "name": "Al Ittihad Alexandria Club",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Alexandria Stadium",
+    "capacity": 13000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/7/71/Al-Ittihad_Alexandria_Club_logo.png/250px-Al-Ittihad_Alexandria_Club_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q2084802"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     32.29139,
+     31.27111
+    ]
+   },
+   "properties": {
+    "qid": "Q286490",
+    "name": "Al Masry SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Port Said Stadium",
+    "capacity": 18000,
+    "colors": [
+     "green",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/54/Al_Masry_SC.png/250px-Al_Masry_SC.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q286490"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.297,
+     30.0512
+    ]
+   },
+   "properties": {
+    "qid": "Q2073915",
+    "name": "Al Mokawloon Al Arab SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Osman Ahmed Osman Stadium",
+    "capacity": 35000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/2/27/Al_Mokawloon_Al_Arab_SC_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q2073915"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     32.29253,
+     30.59267
+    ]
+   },
+   "properties": {
+    "qid": "Q27964149",
+    "name": "Ceramica Cleopatra FC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Suez Canal Stadium",
+    "capacity": 22000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/9/94/Ceramica_Cleopatra_FC_logo.png/250px-Ceramica_Cleopatra_FC_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q27964149"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     33.66,
+     27.36
+    ]
+   },
+   "properties": {
+    "qid": "Q2658729",
+    "name": "El Gouna FC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Khaled Bichara Stadium",
+    "capacity": 12000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/El_Gouna_FC_Logo_2017.png/250px-El_Gouna_FC_Logo_2017.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q2658729"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.446,
+     30.027
+    ]
+   },
+   "properties": {
+    "qid": "Q1877396",
+    "name": "ENPPI SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Petro Sport Stadium",
+    "capacity": 25000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/ENPPI_SC_Logo.svg/250px-ENPPI_SC_Logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1877396"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.17278,
+     30.96056
+    ]
+   },
+   "properties": {
+    "qid": "Q968592",
+    "name": "Ghazl El Mahalla SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "El Mahalla Stadium",
+    "capacity": 20000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Ghazl_El_Mahalla_SC_new_logo.png/250px-Ghazl_El_Mahalla_SC_new_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q968592"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     29.8485,
+     31.1509
+    ]
+   },
+   "properties": {
+    "qid": "Q2274220",
+    "name": "Haras El-Hodood SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Haras El Hodoud Stadium",
+    "capacity": 22000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Haras_El_Hodoud_logo_2018.png/250px-Haras_El_Hodoud_logo_2018.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q2274220"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     32.27389,
+     30.60194
+    ]
+   },
+   "properties": {
+    "qid": "Q1329368",
+    "name": "Ismaily SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Ismailia Stadium",
+    "capacity": 23525,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/c/cc/Ismaily_SC_logo.png/250px-Ismaily_SC_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1329368"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     32.26667,
+     30.58333
+    ]
+   },
+   "properties": {
+    "qid": "Q15302807",
+    "name": "Kahrbaa Ismailia",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Kahrabaa Ismailia Stadium",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Kahrabaa_Ismailia_Co.jpg/250px-Kahrabaa_Ismailia_Co.jpg",
+    "wikidata": "https://www.wikidata.org/wiki/Q15302807"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.435,
+     30.1745
+    ]
+   },
+   "properties": {
+    "qid": "Q27964157",
+    "name": "Modern SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Al Salam Stadium (Egypt)",
+    "capacity": 30000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3d/Modern_Sport_FC_logo.png/250px-Modern_Sport_FC_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q27964157"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.31222,
+     30.06917
+    ]
+   },
+   "properties": {
+    "qid": "Q27964189",
+    "name": "National Bank of Egypt SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Cairo International Stadium",
+    "capacity": 75000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/d/da/National_Bank_of_Egypt_SC_logo.png/250px-National_Bank_of_Egypt_SC_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q27964189"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     32.5425,
+     29.9575
+    ]
+   },
+   "properties": {
+    "qid": "Q2274233",
+    "name": "Petrojet FC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Suez Stadium",
+    "capacity": 25000,
+    "colors": [
+     "blue",
+     "red"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Petrojet_SC_2017.png/250px-Petrojet_SC_2017.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q2274233"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     29.7293,
+     30.9994
+    ]
+   },
+   "properties": {
+    "qid": "Q30116017",
+    "name": "Pharco FC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Borg El Arab Stadium",
+    "capacity": 86000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/5/58/Pharco_FC_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30116017"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.3737,
+     30.0199
+    ]
+   },
+   "properties": {
+    "qid": "Q18207291",
+    "name": "Pyramids FC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "30 June Stadium",
+    "capacity": 30000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/87/Pyramids_FC_%282020%29.png/250px-Pyramids_FC_%282020%29.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q18207291"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     29.9132,
+     31.1971
+    ]
+   },
+   "properties": {
+    "qid": "Q3048741",
+    "name": "Smouha SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Alexandria Stadium",
+    "capacity": 13000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3f/Smouha_SC_logo.png/250px-Smouha_SC_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q3048741"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.3676,
+     30.1111
+    ]
+   },
+   "properties": {
+    "qid": "Q2541016",
+    "name": "Tala'ea El-Gaish SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Cairo Military Academy Stadium",
+    "capacity": 22000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Tala%27ea_El_Gaish_Logo_2017.png/250px-Tala%27ea_El_Gaish_Logo_2017.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q2541016"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.3676,
+     30.1111
+    ]
+   },
+   "properties": {
+    "qid": "Q1966238",
+    "name": "Wadi Degla SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Cairo Military Academy Stadium",
+    "capacity": 22000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/0/08/Wadi_Degla_Logo.png/250px-Wadi_Degla_Logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1966238"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.31233,
+     30.06911
+    ]
+   },
+   "properties": {
+    "qid": "Q286504",
+    "name": "Zamalek SC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Cairo International Stadium",
+    "capacity": 100500,
+    "colors": [
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/ef/Zamalek_SC_logo.svg/250px-Zamalek_SC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q286504"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.31233,
+     30.06911
+    ]
+   },
+   "properties": {
+    "qid": "Q22929915",
+    "name": "ZED FC",
+    "league": "Egyptian Premier League",
+    "leagueKey": "egypt",
+    "gender": "men",
+    "country": "Egypt",
+    "venue": "Cairo International Stadium",
+    "capacity": 100500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/3/39/ZED_FC_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q22929915"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     31.0303,
+     -29.829
+    ]
+   },
+   "properties": {
+    "qid": "Q451635",
+    "name": "AmaZulu F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Moses Mabhida Stadium",
+    "capacity": 62760,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/2/26/AmaZulu_logo.svg/250px-AmaZulu_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q451635"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     18.51667,
+     -33.96194
+    ]
+   },
+   "properties": {
+    "qid": "Q5101632",
+    "name": "Chippa United F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Athlone Stadium",
+    "capacity": 34000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Chippa_United_FC_logo.png/250px-Chippa_United_FC_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q5101632"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     27.98238,
+     -26.23481
+    ]
+   },
+   "properties": {
+    "qid": "Q247731",
+    "name": "Kaizer Chiefs F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "FNB Stadium",
+    "capacity": 94736,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/16/Kaizer_Chiefs_logo.svg/250px-Kaizer_Chiefs_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q247731"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     30.9,
+     -29.97139
+    ]
+   },
+   "properties": {
+    "qid": "Q1525804",
+    "name": "Lamontville Golden Arrows F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "King Zwelithini Stadium",
+    "capacity": 10000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Lamontville_Golden_Arrows_logo.svg/250px-Lamontville_Golden_Arrows_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1525804"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     29.38333,
+     -23.85
+    ]
+   },
+   "properties": {
+    "qid": "Q28223143",
+    "name": "Magesi F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Seshego Stadium",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/Magesi_F.C._logo.png/250px-Magesi_F.C._logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q28223143"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     28.22301,
+     -25.75319
+    ]
+   },
+   "properties": {
+    "qid": "Q784965",
+    "name": "Mamelodi Sundowns F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Loftus Versfeld Stadium",
+    "capacity": 51762,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c6/Mamelodi_Sundowns_F.C.svg/250px-Mamelodi_Sundowns_F.C.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q784965"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     30.38564,
+     -29.61739
+    ]
+   },
+   "properties": {
+    "qid": "Q1899447",
+    "name": "Maritzburg United F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Harry Gwala Stadium",
+    "capacity": 12000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Durban_City_FC.png/250px-Durban_City_FC.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1899447"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     27.1607,
+     -25.5786
+    ]
+   },
+   "properties": {
+    "qid": "Q108330109",
+    "name": "Marumo Gallants F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Royal Bafokeng Stadium",
+    "capacity": 46000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Marumo_Gallants_FC.jpg/250px-Marumo_Gallants_FC.jpg",
+    "wikidata": "https://www.wikidata.org/wiki/Q108330109"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     27.22194,
+     -25.6625
+    ]
+   },
+   "properties": {
+    "qid": "Q54471055",
+    "name": "Orbit College F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Olympia Park",
+    "capacity": 32000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Orbit_College_FC_logo.jpg/250px-Orbit_College_FC_logo.jpg",
+    "wikidata": "https://www.wikidata.org/wiki/Q54471055"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     27.92289,
+     -26.23189
+    ]
+   },
+   "properties": {
+    "qid": "Q607939",
+    "name": "Orlando Pirates F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Orlando Stadium",
+    "capacity": 40000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/9/95/Orlando_Pirates_FC_logo.svg/250px-Orlando_Pirates_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q607939"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     29.46877,
+     -23.92469
+    ]
+   },
+   "properties": {
+    "qid": "Q7225920",
+    "name": "Polokwane City F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Peter Mokaba Stadium",
+    "capacity": 41733,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/0/02/Polokwane_City_FC_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q7225920"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     32.05944,
+     -28.76944
+    ]
+   },
+   "properties": {
+    "qid": "Q39057157",
+    "name": "Richards Bay F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Richards Bay Stadium",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/b/b2/Richards_Bay_F.C._logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q39057157"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     29.46877,
+     -23.92469
+    ]
+   },
+   "properties": {
+    "qid": "Q108597219",
+    "name": "Sekhukhune United F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Peter Mokaba Stadium",
+    "capacity": 43000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/1f/Sekhukhune_United_F.C._logo.png/250px-Sekhukhune_United_F.C._logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q108597219"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     26.23361,
+     -29.17417
+    ]
+   },
+   "properties": {
+    "qid": "Q135404226",
+    "name": "Siwelele F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Dr. Petrus Molemela Stadium",
+    "capacity": 22000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/15/Siwelele_F.C._logo.svg/250px-Siwelele_F.C._logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q135404226"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     18.87361,
+     -33.94
+    ]
+   },
+   "properties": {
+    "qid": "Q28129381",
+    "name": "Stellenbosch F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Danie Craven Stadium",
+    "capacity": 17000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/f/ff/Stellenbosch_FC_logo.png/250px-Stellenbosch_FC_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q28129381"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     30.929,
+     -25.461
+    ]
+   },
+   "properties": {
+    "qid": "Q60755098",
+    "name": "TS Galaxy F.C.",
+    "league": "South African Premiership",
+    "leagueKey": "psl",
+    "gender": "men",
+    "country": "South Africa",
+    "venue": "Mbombela Stadium",
+    "capacity": 43500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/6/65/TS_Galaxy.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q60755098"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     77.59347,
+     12.96956
+    ]
+   },
+   "properties": {
+    "qid": "Q16243716",
+    "name": "Bengaluru FC",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Sree Kanteerava Stadium",
+    "capacity": 40000,
+    "colors": [
+     "blue",
+     "red",
+     "white"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Bengaluru_FC_logo.svg/250px-Bengaluru_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q16243716"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     80.27167,
+     13.08556
+    ]
+   },
+   "properties": {
+    "qid": "Q17594408",
+    "name": "Chennaiyin FC",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Jawaharlal Nehru Stadium Chennai",
+    "capacity": 40000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/6/6c/Chennaiyin_FC_logo.svg/250px-Chennaiyin_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q17594408"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     88.40917,
+     22.56889
+    ]
+   },
+   "properties": {
+    "qid": "Q122981749",
+    "name": "East Bengal FC",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Salt Lake Stadium",
+    "capacity": 68000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/15/East_Bengal_FC_logo.svg/250px-East_Bengal_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q122981749"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     73.9625,
+     15.28972
+    ]
+   },
+   "properties": {
+    "qid": "Q16839398",
+    "name": "FC Goa",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Fatorda Stadium",
+    "capacity": 19000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/2/22/FC_Goa_logo.svg/250px-FC_Goa_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q16839398"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     77.23438,
+     28.58287
+    ]
+   },
+   "properties": {
+    "qid": "Q66816187",
+    "name": "Hyderabad FC",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Jawaharlal Nehru Stadium, Delhi",
+    "capacity": 60254,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/19/SC_Delhi_logo.svg/250px-SC_Delhi_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q66816187"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     85.33,
+     23.36
+    ]
+   },
+   "properties": {
+    "qid": "Q120664287",
+    "name": "Inter Kashi",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Birsa Munda Football Stadium",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/10/Inter_Kashi_logo.svg/250px-Inter_Kashi_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q120664287"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     86.19354,
+     22.80602
+    ]
+   },
+   "properties": {
+    "qid": "Q30644987",
+    "name": "Jamshedpur FC",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "JRD Tata Sports Complex",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/57/Jamshedpur_FC_logo.svg/250px-Jamshedpur_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30644987"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     76.30111,
+     9.99722
+    ]
+   },
+   "properties": {
+    "qid": "Q16842784",
+    "name": "Kerala Blasters FC",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Jawaharlal Nehru International Stadium",
+    "capacity": 60000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e7/Kerala_Blasters_FC_logo.svg/250px-Kerala_Blasters_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q16842784"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     88.40917,
+     22.56889
+    ]
+   },
+   "properties": {
+    "qid": "Q1471031",
+    "name": "Mohammedan Sporting Club",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Salt Lake Stadium",
+    "capacity": 68000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Mohammedan_SC_logo.svg/250px-Mohammedan_SC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1471031"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     88.40917,
+     22.56889
+    ]
+   },
+   "properties": {
+    "qid": "Q60762002",
+    "name": "Mohun Bagan Super Giant",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Salt Lake Stadium",
+    "capacity": 68000,
+    "colors": [
+     "green",
+     "maroon"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/3/32/Mohun_Bagan_Super_Giant.svg/250px-Mohun_Bagan_Super_Giant.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q60762002"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     73.02667,
+     19.04194
+    ]
+   },
+   "properties": {
+    "qid": "Q16845355",
+    "name": "Mumbai City FC",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "DY Patil Stadium",
+    "capacity": 45300,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/6/68/Mumbai_City_FC_logo.svg/250px-Mumbai_City_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q16845355"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     91.7603,
+     26.11567
+    ]
+   },
+   "properties": {
+    "qid": "Q16840338",
+    "name": "NorthEast United FC",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Sarusajai Stadium (Guwahati)",
+    "capacity": 30000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/NorthEast_United_FC_logo.svg/250px-NorthEast_United_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q16840338"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     85.825,
+     20.29092
+    ]
+   },
+   "properties": {
+    "qid": "Q16838244",
+    "name": "Odisha FC",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Kalinga Sports Complex, Bhubaneswar",
+    "capacity": 12000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/57/Odisha_FC_logo.svg/250px-Odisha_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q16838244"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     77.23438,
+     28.58287
+    ]
+   },
+   "properties": {
+    "qid": "Q24185095",
+    "name": "Punjab FC",
+    "league": "Indian Super League",
+    "leagueKey": "isl",
+    "gender": "men",
+    "country": "India",
+    "venue": "Jawaharlal Nehru Stadium",
+    "capacity": 60254,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/18/Punjab_FC_2025_logo.svg/250px-Punjab_FC_2025_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q24185095"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     138.56889,
+     -34.9075
+    ]
+   },
+   "properties": {
+    "qid": "Q354059",
+    "name": "Adelaide United Football Club",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Hindmarsh Stadium",
+    "capacity": 17000,
+    "colors": [
+     "red"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Adelaide_United_FC.svg/250px-Adelaide_United_FC.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q354059"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     174.8125,
+     -36.91833
+    ]
+   },
+   "properties": {
+    "qid": "Q123717355",
+    "name": "Auckland FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Mount Smart Stadium",
+    "capacity": 30000,
+    "colors": [
+     "black",
+     "electric blue"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Auckland_FC_logo.svg/250px-Auckland_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q123717355"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     153.00944,
+     -27.46472
+    ]
+   },
+   "properties": {
+    "qid": "Q839997",
+    "name": "Brisbane Roar FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Lang Park",
+    "capacity": 52500,
+    "colors": [
+     "black",
+     "orange"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/88/Brisbane_Roar_FC_logo.svg/250px-Brisbane_Roar_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q839997"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     151.33806,
+     -33.42833
+    ]
+   },
+   "properties": {
+    "qid": "Q762294",
+    "name": "Central Coast Mariners FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Central Coast Stadium",
+    "capacity": 20059,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Central_Coast_Mariners.svg/250px-Central_Coast_Mariners.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q762294"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     150.83361,
+     -34.05028
+    ]
+   },
+   "properties": {
+    "qid": "Q59773416",
+    "name": "Macarthur FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Campbelltown Stadium",
+    "capacity": 20000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/18/Macarthur_Football_Club_logo.svg/250px-Macarthur_Football_Club_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q59773416"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     144.98389,
+     -37.82528
+    ]
+   },
+   "properties": {
+    "qid": "Q748725",
+    "name": "Melbourne City FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Melbourne Rectangular Stadium",
+    "capacity": 30050,
+    "colors": [
+     "white",
+     "azure"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/0/0f/Melbourne_City_FC.svg/250px-Melbourne_City_FC.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q748725"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     144.98389,
+     -37.82528
+    ]
+   },
+   "properties": {
+    "qid": "Q316789",
+    "name": "Melbourne Victory FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Melbourne Rectangular Stadium",
+    "capacity": 30050,
+    "colors": [
+     "silver",
+     "navy blue"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/9/95/Melbourne_Victory.svg/250px-Melbourne_Victory.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q316789"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     151.72667,
+     -32.91889
+    ]
+   },
+   "properties": {
+    "qid": "Q732929",
+    "name": "Newcastle Jets FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Newcastle International Sports Centre",
+    "capacity": 33000,
+    "colors": [
+     "blue",
+     "red"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d5/Newcastle_United_Jets_Logo.svg/250px-Newcastle_United_Jets_Logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q732929"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     115.86992,
+     -31.94575
+    ]
+   },
+   "properties": {
+    "qid": "Q852033",
+    "name": "Perth Glory FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Perth Rectangular Stadium",
+    "capacity": 20441,
+    "colors": [
+     "orange",
+     "purple"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/87/Perth_Glory_FC_logo.svg/250px-Perth_Glory_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q852033"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     151.22528,
+     -33.88917
+    ]
+   },
+   "properties": {
+    "qid": "Q330143",
+    "name": "Sydney FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Sydney Football Stadium (2022)",
+    "capacity": 42500,
+    "colors": [
+     "blue",
+     "sky blue"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/Sydney_FC_Logo.svg/250px-Sydney_FC_Logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q330143"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     174.78583,
+     -41.27306
+    ]
+   },
+   "properties": {
+    "qid": "Q815890",
+    "name": "Wellington Phoenix FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Wellington Regional Stadium",
+    "capacity": 34500,
+    "colors": [
+     "yellow",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/d/de/Wellington_Phoenix_FC_logo.svg/250px-Wellington_Phoenix_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q815890"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     151.06778,
+     -33.84306
+    ]
+   },
+   "properties": {
+    "qid": "Q999035",
+    "name": "Western Sydney Wanderers FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Sydney Showground Stadium",
+    "capacity": 25000,
+    "colors": [
+     "red",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Western_Sydney_Wanderers_FC.svg/250px-Western_Sydney_Wanderers_FC.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q999035"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     144.98389,
+     -37.82528
+    ]
+   },
+   "properties": {
+    "qid": "Q59773336",
+    "name": "Western United FC",
+    "league": "A-League Men",
+    "leagueKey": "aleaguem",
+    "gender": "men",
+    "country": "Australia & NZ",
+    "venue": "Melbourne Rectangular Stadium",
+    "capacity": 30050,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Western_United_FC_logo.svg/250px-Western_United_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q59773336"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -100.95083,
+     22.13861
+    ]
+   },
+   "properties": {
+    "qid": "Q65159050",
+    "name": "Atlético San Luis Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Estadio Libertad Financiera",
+    "capacity": 25709,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b5/Atletico_San_Luis_Logo.png/250px-Atletico_San_Luis_Logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q65159050"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -103.46278,
+     20.68167
+    ]
+   },
+   "properties": {
+    "qid": "Q30115953",
+    "name": "C.D. Guadalajara Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Estadio Akron",
+    "capacity": 50850,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f0/Guadalajara_CD.svg/250px-Guadalajara_CD.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30115953"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -100.2437,
+     25.67017
+    ]
+   },
+   "properties": {
+    "qid": "Q30115952",
+    "name": "C.F. Monterrey Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Estadio Monterrey",
+    "capacity": 53500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/0/06/Rayadas-present-logo.png/250px-Rayadas-present-logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30115952"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -98.75611,
+     20.10514
+    ]
+   },
+   "properties": {
+    "qid": "Q30115941",
+    "name": "C.F. Pachuca Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Gorda hilda",
+    "capacity": 30000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/0/09/Pachuca_femenil_present_logo.png/250px-Pachuca_femenil_present_logo.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30115941"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -99.15056,
+     19.30306
+    ]
+   },
+   "properties": {
+    "qid": "Q30115940",
+    "name": "Club América Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Estadio Azteca",
+    "capacity": 115000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Club_Am%C3%A9rica_crest.svg/250px-Club_Am%C3%A9rica_crest.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30115940"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -103.40135,
+     20.71324
+    ]
+   },
+   "properties": {
+    "qid": "Q39073385",
+    "name": "Club Deportivo Guadalajara Femenil",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Estadio Akron",
+    "capacity": 3000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/F%C3%BAtbol_Club_Atlas.svg/250px-F%C3%BAtbol_Club_Atlas.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q39073385"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -101.65778,
+     21.11556
+    ]
+   },
+   "properties": {
+    "qid": "Q39073390",
+    "name": "Club León Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Estadio León",
+    "capacity": 31297,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/8f/Club_Leon_Logo.svg/250px-Club_Leon_Logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q39073390"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -102.27548,
+     21.88065
+    ]
+   },
+   "properties": {
+    "qid": "Q30115945",
+    "name": "Club Necaxa Femenil",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Victoria Stadium",
+    "capacity": 35000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/Club_Necaxa_2.svg/250px-Club_Necaxa_2.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30115945"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -98.16444,
+     19.07806
+    ]
+   },
+   "properties": {
+    "qid": "Q60774353",
+    "name": "Club Puebla Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Estadio Cuauhtémoc",
+    "capacity": 47417,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Club_Puebla_logo.svg/250px-Club_Puebla_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q60774353"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -116.99309,
+     32.50607
+    ]
+   },
+   "properties": {
+    "qid": "Q60829969",
+    "name": "Club Tijuana Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Caliente Stadium",
+    "capacity": 27333,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Club_Tijuana_logo.svg/250px-Club_Tijuana_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q60829969"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -99.19211,
+     19.33193
+    ]
+   },
+   "properties": {
+    "qid": "Q30115946",
+    "name": "Club Universidad Nacional Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Universitary Olympic Stadium",
+    "capacity": 83700,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b7/Club_Universidad_Nacional_logo.svg/250px-Club_Universidad_Nacional_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30115946"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -99.24667,
+     18.97056
+    ]
+   },
+   "properties": {
+    "qid": "Q30115950",
+    "name": "Cruz Azul Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Centenario Stadium",
+    "capacity": 15237,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Cruz_Azul_2026.png/250px-Cruz_Azul_2026.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30115950"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -99.66679,
+     19.28729
+    ]
+   },
+   "properties": {
+    "qid": "Q30115942",
+    "name": "Deportivo Toluca Femenil",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Nemesio Diez Stadium",
+    "capacity": 21091,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Club_Toluca_Logo.svg/250px-Club_Toluca_Logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30115942"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -106.46781,
+     31.75305
+    ]
+   },
+   "properties": {
+    "qid": "Q65581365",
+    "name": "FC Juárez Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Estadio Olímpico Benito Juárez",
+    "capacity": 22300,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9d/FC_Ju%C3%A1rez_logo.svg/250px-FC_Ju%C3%A1rez_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q65581365"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -106.38111,
+     23.27639
+    ]
+   },
+   "properties": {
+    "qid": "Q98097592",
+    "name": "Mazatlán F.C. Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Estadio El Encanto",
+    "capacity": 20195,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/d/da/Mazatl%C3%A1n_F.C._logo.svg/250px-Mazatl%C3%A1n_F.C._logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q98097592"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -100.36639,
+     20.57778
+    ]
+   },
+   "properties": {
+    "qid": "Q61862315",
+    "name": "Querétaro F.C. Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Corregidora Stadium",
+    "capacity": 35575,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/11/Quer%C3%A9taro_F.C._logo.svg/250px-Quer%C3%A9taro_F.C._logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q61862315"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -103.37942,
+     25.62915
+    ]
+   },
+   "properties": {
+    "qid": "Q30911549",
+    "name": "Santos Laguna Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Corona Stadium",
+    "capacity": 30000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/9/96/Santos_Laguna_logo.svg/250px-Santos_Laguna_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30911549"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -100.31206,
+     25.72281
+    ]
+   },
+   "properties": {
+    "qid": "Q30115947",
+    "name": "Tigres UANL Women",
+    "league": "Liga MX Femenil",
+    "leagueKey": "ligamxfem",
+    "gender": "women",
+    "country": "Mexico",
+    "venue": "Estadio Universitario",
+    "capacity": 45257,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/82/Tigres_UANL_logo_%28crest%29.svg/250px-Tigres_UANL_logo_%28crest%29.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q30115947"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     138.633,
+     -34.8908
+    ]
+   },
+   "properties": {
+    "qid": "Q15632679",
+    "name": "Adelaide United FC Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "Marden Sports Complex",
+    "capacity": null,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q15632679"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     153.09444,
+     -27.22917
+    ]
+   },
+   "properties": {
+    "qid": "Q15635028",
+    "name": "Brisbane Roar FC Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "A.J. Kelly Park",
+    "capacity": 1500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/88/Brisbane_Roar_FC_logo.svg/250px-Brisbane_Roar_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q15635028"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     149.03722,
+     -35.24194
+    ]
+   },
+   "properties": {
+    "qid": "Q2936203",
+    "name": "Canberra United FC Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "McKellar Park",
+    "capacity": 3500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/1/1f/Canberra_United_FC_logo.svg/250px-Canberra_United_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q2936203"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     151.33806,
+     -33.42833
+    ]
+   },
+   "properties": {
+    "qid": "Q15668112",
+    "name": "Central Coast Mariners FC W-League Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "Central Coast Stadium",
+    "capacity": 20059,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/c/cc/Central_Coast_Mariners_logo.svg/250px-Central_Coast_Mariners_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q15668112"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     144.96889,
+     -37.70444
+    ]
+   },
+   "properties": {
+    "qid": "Q20127927",
+    "name": "Melbourne City FC Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "CB Smith Reserve",
+    "capacity": 2000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/0/0f/Melbourne_City_FC.svg/250px-Melbourne_City_FC.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q20127927"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     144.965,
+     -37.84028
+    ]
+   },
+   "properties": {
+    "qid": "Q15636168",
+    "name": "Melbourne Victory FC Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "Lakeside Stadium",
+    "capacity": 15000,
+    "colors": [],
+    "crest": "https://commons.wikimedia.org/wiki/Special:FilePath/MVFC%20W-League%20Logo.jpg?width=128",
+    "wikidata": "https://www.wikidata.org/wiki/Q15636168"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     151.7604,
+     -32.93045
+    ]
+   },
+   "properties": {
+    "qid": "Q108770815",
+    "name": "Newcastle Jets FC Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "Newcastle Number 2 Sports Ground",
+    "capacity": 5000,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q108770815"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     115.86992,
+     -31.94575
+    ]
+   },
+   "properties": {
+    "qid": "Q7170853",
+    "name": "Perth Glory FC Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "Perth Rectangular Stadium",
+    "capacity": 20441,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q7170853"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     151.22528,
+     -33.88917
+    ]
+   },
+   "properties": {
+    "qid": "Q15649515",
+    "name": "Sydney FC Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "Sydney Football Stadium",
+    "capacity": 45500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/Sydney_FC_Logo.svg/250px-Sydney_FC_Logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q15649515"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     174.85667,
+     -41.14472
+    ]
+   },
+   "properties": {
+    "qid": "Q108749647",
+    "name": "Wellington Phoenix FC Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "Porirua Park",
+    "capacity": 1900,
+    "colors": [
+     "yellow",
+     "black"
+    ],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/d/de/Wellington_Phoenix_FC_logo.svg/250px-Wellington_Phoenix_FC_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q108749647"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     150.83361,
+     -34.05028
+    ]
+   },
+   "properties": {
+    "qid": "Q7988367",
+    "name": "Western Sydney Wanderers FC Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "Campbelltown Stadium",
+    "capacity": 20000,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q7988367"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     144.72669,
+     -37.71707
+    ]
+   },
+   "properties": {
+    "qid": "Q113317996",
+    "name": "Western United FC Women",
+    "league": "A-League Women",
+    "leagueKey": "aleaguew",
+    "gender": "women",
+    "country": "Australia & NZ",
+    "venue": "City Vista Recreation Reserve",
+    "capacity": null,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q113317996"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     4.38306,
+     52.06278
+    ]
+   },
+   "properties": {
+    "qid": "Q290489",
+    "name": "ADO Den Haag Vrouwen",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "WerkTalent Stadion",
+    "capacity": 15000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/ADO_Den_Haag_logo.svg/250px-ADO_Den_Haag_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q290489"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     4.92891,
+     52.31352
+    ]
+   },
+   "properties": {
+    "qid": "Q412433",
+    "name": "AFC Ajax Vrouwen",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "Sportpark De Toekomst",
+    "capacity": 5000,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q412433"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     4.74167,
+     52.6125
+    ]
+   },
+   "properties": {
+    "qid": "Q300302",
+    "name": "AZ Alkmaar Vrouwen",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "AFAS Stadion",
+    "capacity": 17023,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/AZ_Alkmaar.svg/250px-AZ_Alkmaar.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q300302"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.8375,
+     52.23667
+    ]
+   },
+   "properties": {
+    "qid": "Q1387774",
+    "name": "FC Twente Women",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "De Grolsch Veste",
+    "capacity": 30000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e3/FC_Twente.svg/250px-FC_Twente.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1387774"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     5.06735,
+     52.11984
+    ]
+   },
+   "properties": {
+    "qid": "Q1137788",
+    "name": "FC Utrecht Women",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "Sportpark Elinkwijk",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Logo_FC_Utrecht.svg/250px-Logo_FC_Utrecht.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1137788"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     4.52293,
+     51.8936
+    ]
+   },
+   "properties": {
+    "qid": "Q106310017",
+    "name": "Feyenoord Rotterdam Women",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "Sportcomplex Varkenoord",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Feyenoord_logo_since_2009.svg/250px-Feyenoord_logo_since_2009.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q106310017"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     4.85419,
+     52.34342
+    ]
+   },
+   "properties": {
+    "qid": "Q131459704",
+    "name": "HERA United Women",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "Olympic Stadium",
+    "capacity": 22288,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q131459704"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     4.75028,
+     51.595
+    ]
+   },
+   "properties": {
+    "qid": "Q125535825",
+    "name": "NAC Breda Women",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "Rat Verlegh Stadion",
+    "capacity": null,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q125535825"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     6.12087,
+     52.51718
+    ]
+   },
+   "properties": {
+    "qid": "Q2091765",
+    "name": "PEC Zwolle Vrouwen",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "Sportpark Ceintuurbaan",
+    "capacity": 3000,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q2091765"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     5.47944,
+     51.41167
+    ]
+   },
+   "properties": {
+    "qid": "Q1874991",
+    "name": "PSV Vrouwen",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "Jan Louwers Stadion",
+    "capacity": 4500,
+    "colors": [],
+    "crest": "https://commons.wikimedia.org/wiki/Special:FilePath/PSV%20Eindhoven%20-%20Philips%20Stadion%20-%20Kleedkamer%20Welkom%20-%20Cropped%20Logo.jpg?width=128",
+    "wikidata": "https://www.wikidata.org/wiki/Q1874991"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     4.52056,
+     51.91694
+    ]
+   },
+   "properties": {
+    "qid": "Q29509701",
+    "name": "SBV Excelsior Vrouwen",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "Van Donge & De Roo Stadion",
+    "capacity": 4500,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q29509701"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     5.94322,
+     52.95617
+    ]
+   },
+   "properties": {
+    "qid": "Q276848",
+    "name": "SC Heerenveen Vrouwen",
+    "league": "Eredivisie Vrouwen",
+    "leagueKey": "eredivisiev",
+    "gender": "women",
+    "country": "Netherlands",
+    "venue": "Sportpark Skoatterwâld",
+    "capacity": 3000,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q276848"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     17.99361,
+     59.35944
+    ]
+   },
+   "properties": {
+    "qid": "Q2948701",
+    "name": "AIK Fotboll Dam",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Skytteholms IP",
+    "capacity": 4000,
+    "colors": [],
+    "crest": null,
+    "wikidata": "https://www.wikidata.org/wiki/Q2948701"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     11.9306,
+     57.7192
+    ]
+   },
+   "properties": {
+    "qid": "Q1337348",
+    "name": "BK Häcken FF Women",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Nordic Wellness Arena",
+    "capacity": 6300,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/BK_Hacken_logo.svg/250px-BK_Hacken_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1337348"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     18.07889,
+     59.34528
+    ]
+   },
+   "properties": {
+    "qid": "Q511765",
+    "name": "Djurgårdens IF Dam",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Stockholm Olympic Stadium",
+    "capacity": 14500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Djurgardens_IF_logo.svg/250px-Djurgardens_IF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q511765"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     16.495,
+     59.37067
+    ]
+   },
+   "properties": {
+    "qid": "Q10489087",
+    "name": "Eskilstuna United DFF",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Tunavallen",
+    "capacity": 7800,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/8/8e/Eskilstuna_United_DFF_logo.svg/250px-Eskilstuna_United_DFF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q10489087"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     12.99556,
+     55.595
+    ]
+   },
+   "properties": {
+    "qid": "Q1807026",
+    "name": "FC Rosengård Women",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Malmö IP",
+    "capacity": 7600,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/FC_Roseng%C3%A5rd_logo.svg/250px-FC_Roseng%C3%A5rd_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1807026"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     18.085,
+     59.3064
+    ]
+   },
+   "properties": {
+    "qid": "Q2643852",
+    "name": "Hammarby IF DFF",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Hammarby IP",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/0/0a/Hammarby_IF_logo.svg/250px-Hammarby_IF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q2643852"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     17.85167,
+     59.36222
+    ]
+   },
+   "properties": {
+    "qid": "Q85768040",
+    "name": "IF Brommapojkarna Women",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Grimsta IP",
+    "capacity": 4729,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/2/20/IF_Brommapojkarna_logo.svg/250px-IF_Brommapojkarna_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q85768040"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     16.17306,
+     58.58417
+    ]
+   },
+   "properties": {
+    "qid": "Q10532837",
+    "name": "IFK Norrköping DFK",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Idrottsparken",
+    "capacity": 17234,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/IFK_Norrkoping_logo.svg/250px-IFK_Norrkoping_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q10532837"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     17.64444,
+     59.85
+    ]
+   },
+   "properties": {
+    "qid": "Q56300810",
+    "name": "IK Uppsala Fotboll Women",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Studenternas IP",
+    "capacity": 6500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c8/IK_Uppsala_logo.svg/250px-IK_Uppsala_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q56300810"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     14.13816,
+     56.01822
+    ]
+   },
+   "properties": {
+    "qid": "Q1267220",
+    "name": "Kristianstads DFF",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Vilans IP",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/a/af/Kristianstads_DFF_logo.svg/250px-Kristianstads_DFF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q1267220"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     12.98917,
+     55.58611
+    ]
+   },
+   "properties": {
+    "qid": "Q85783500",
+    "name": "Malmö FF Dam",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Malmö Stadion",
+    "capacity": 26500,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Malmo_FF_logo.svg/250px-Malmo_FF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q85783500"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     17.50425,
+     60.34667
+    ]
+   },
+   "properties": {
+    "qid": "Q7198914",
+    "name": "Piteå IF Women",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "LF Arena",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Pitea_IF_logo.svg/250px-Pitea_IF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q7198914"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     14.77639,
+     56.87972
+    ]
+   },
+   "properties": {
+    "qid": "Q33024869",
+    "name": "Växjö DFF",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Spiris Arena",
+    "capacity": 12000,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/7/7d/V%C3%A4xj%C3%B6_DFF_logo.svg/250px-V%C3%A4xj%C3%B6_DFF_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q33024869"
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     13.64008,
+     56.34428
+    ]
+   },
+   "properties": {
+    "qid": "Q7937348",
+    "name": "Vittsjö GIK Women",
+    "league": "Damallsvenskan",
+    "leagueKey": "damallsvenskan",
+    "gender": "women",
+    "country": "Sweden",
+    "venue": "Vittsjö IP",
+    "capacity": null,
+    "colors": [],
+    "crest": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f0/Vittsjo_GIK_logo.svg/250px-Vittsjo_GIK_logo.svg.png",
+    "wikidata": "https://www.wikidata.org/wiki/Q7937348"
    }
   }
  ]
