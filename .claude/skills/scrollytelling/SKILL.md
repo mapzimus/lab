@@ -72,8 +72,11 @@ render text. Use HTML markers instead — and know that **MapLibre writes
 inline `transform` and `opacity` styles onto the marker's root element**, so
 any show/hide animation must live on an *inner* wrapper element the library
 never touches. (This exact bug shipped once: labels stuck visible in every
-chapter.) Markers double as annotation: label only the ~8 cities the copy
-mentions, with the value underneath, updated per epoch.
+chapter.) Markers double as annotation. Label the cities the copy names, with the value
+underneath, updated per epoch, and give the reader place context at every
+zoom: country names across continental chapters (dimmed where they are not the
+subject, and suppressed where a city label already names the same spot), and
+named landmarks once the camera is inside one city.
 
 ## Self-contained or it isn't done
 

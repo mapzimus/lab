@@ -20,12 +20,24 @@ MapLibre globe over ~2 MB of GeoJSON committed in `data/`.
    financed lines (China's SGR/BRI railways vs. the Lobito Corridor, plus the
    AU's Trans-African Highway network), and a gravity model
    (pop·pop/distance² over top-30 2050 cities) sketching demanded corridors.
-4. **Kinshasa, ground truth** — GHSL built-up epochs 1975–2030 stacked as
-   growth-vintage rings over the Malebo Pool, with OSM river and roads.
+4. **Kinshasa, ground truth** — GHSL built-up epochs 1975 to 2030 stacked as
+   growth-vintage rings over the Malebo Pool, with OSM river and roads, and a
+   GHS-POP density surface showing that the ground built by 1975 went from 2.3
+   to 14 million people.
+
+Throughout: a floating map key that changes with every step, country names
+across the continental chapters, place labels at city zoom, and a chapter rail.
+The story closes in an **explore mode**: click any country, city or corridor
+for its numbers, shade the map by population, growth or median age, and run the
+cities through time on a slider.
+
+The page degrades honestly. With JavaScript off, or on a browser without
+WebGL, the prose, the region chart and the crossover ticker still render; only
+the maps go missing, and a banner says so.
 
 ## Pipeline
 
-`pipeline/` holds the five Python scripts that produced `data/` (run in
+`pipeline/` holds the Python scripts that produce `data/` (run in
 order; raw downloads land in `pipeline/raw/`, which is gitignored — set
 `AFRICAN_URBANIZATION_RAW` to reuse a shared download dir):
 
@@ -39,7 +51,19 @@ order; raw downloads land in `pipeline/raw/`, which is gitignored — set
 | `06_lights.py` | Harmonized DMSP/VIIRS nighttime lights 2020 (Li et al., figshare) | `lights.geojson` |
 | `07_kinshasa_density.py` | JRC GHS-POP R2023A, 1975 + 2025 | `kinshasa-density.geojson` (+ densification stats) |
 
-Python deps: `pyshp shapely numpy rasterio requests osm2geojson`.
+### Rerunning it
+
+```sh
+python3 -m pip install -r pipeline/requirements.txt
+cd pipeline && ./run_all.sh
+```
+
+`fetch_raw.py` downloads all sixteen raw inputs (about 1.5 GB, mostly GHSL
+tiles) under the exact filenames the scripts expect, skipping anything already
+present, so an interrupted run resumes. Set `AFRICAN_URBANIZATION_RAW` to keep
+them outside the repo; `pipeline/raw/` is gitignored either way. After a rerun,
+bump `DATA_VERSION` in `app.js` so browsers fetch the new files rather than
+their cached copies.
 
 ## Honesty notes
 
@@ -58,3 +82,10 @@ Python deps: `pyshp shapely numpy rasterio requests osm2geojson`.
 Natural Earth (public domain) · UN WPP/WUP (CC BY 3.0 IGO) · JRC GHSL
 (CC BY 4.0) · OpenStreetMap (ODbL, © OpenStreetMap contributors) · MapLibre
 GL JS (BSD-3-Clause, vendored in `vendor/`).
+
+## Analytics
+
+The site carries no tracker. Cloudflare Web Analytics can be switched on for
+the whole Pages project from the Cloudflare dashboard (Web Analytics, then
+enable for `mapzimus-lab`), which injects the beacon at the edge and needs no
+code here, no cookies and no consent banner.

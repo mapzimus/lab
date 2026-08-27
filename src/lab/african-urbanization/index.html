@@ -193,7 +193,16 @@
   footer.sources h3 { font-size: 15px; }
   footer.sources ul { margin: 10px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--muted); }
   footer.sources li { margin-top: 5px; }
-  footer.sources .back { display: inline-block; margin-top: 16px; font-family: var(--mono); font-size: 12px; }
+  footer.sources .byline {
+    margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line);
+  }
+  footer.sources .byline p { margin: 0; font-size: 12.5px; color: var(--muted); }
+  footer.sources .byline p b { color: var(--text); font-weight: 650; }
+  footer.sources .byline .links {
+    margin-top: 9px; display: flex; flex-wrap: wrap; gap: 8px;
+    font-family: var(--mono); font-size: 12px;
+  }
+  footer.sources .byline .links span { color: var(--dim); }
 
   /* ---------- floating map key ---------- */
   #map-legend {
@@ -700,8 +709,19 @@
       <li><b>Night lights:</b> harmonized DMSP and VIIRS global nighttime light dataset, 2020 layer (Li, Zhou, Zhao and Zhao; figshare doi:10.6084/m9.figshare.9828827, CC BY 4.0).</li>
       <li><b>Base:</b> Natural Earth (public domain). Built with MapLibre GL JS. No tiles and no backend: the whole map is about 3 MB of GeoJSON.</li>
     </ul>
-    <p class="fine">The pipeline that produced every layer ships with the page, in <code>pipeline/</code>. The projections belong to the UN and the cited authors, not to this site.</p>
-    <a class="back" href="/maps/">← more maps at mapzimus</a>
+    <p class="fine">The projections belong to the UN and the cited authors, not to this site.</p>
+    <div class="byline">
+      <p>Built by <b>Maxwell Howe</b>. Every layer on this page was produced by
+      a Python pipeline that ships with it, from public data, and can be rerun
+      from nothing.</p>
+      <p class="links">
+        <a href="https://github.com/mapzimus/lab/tree/main/src/lab/african-urbanization">Code and pipeline on GitHub</a>
+        <span>·</span>
+        <a href="mailto:mhowe.gis@gmail.com">mhowe.gis@gmail.com</a>
+        <span>·</span>
+        <a href="/maps/">More maps at mapzimus</a>
+      </p>
+    </div>
   </div>
 </footer>
 
