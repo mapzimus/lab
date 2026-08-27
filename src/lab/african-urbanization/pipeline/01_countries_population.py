@@ -11,7 +11,8 @@ Outputs:
   pop2025 / pop2050 / pop2100 (millions, medium variant) and growth multiple
 - data/population.json    — 5-year series per African country + comparators,
   annual series for crossover countries, regional aggregates, crossover years,
-  and low/medium/high fan for Nigeria and DR Congo
+  the UN's low and high band around the Africa total, and per-country median
+  age and total fertility
 """
 
 import csv
@@ -58,7 +59,7 @@ LABELED = {
 
 def load_wpp():
     med = defaultdict(dict)        # iso3 -> {year: millions}
-    fan = defaultdict(lambda: defaultdict(dict))  # iso3 -> variant -> {year: millions}
+    band = defaultdict(dict)       # variant -> {year: millions}, Africa only
     regions = defaultdict(dict)    # region name -> {year: millions}
     names = {}
     with gzip.open(RAW_DIR / "WPP2024_TotalPopulationBySex.csv.gz", "rt", encoding="utf-8-sig") as fh:
@@ -69,20 +70,23 @@ def load_wpp():
             year = int(row["Time"])
             pop_m = float(row["PopTotal"]) / 1000.0
             loc = row["Location"]
-            if variant == "Medium" and loc in REGIONS and row["LocTypeName"] in ("Region", "World", "Geographic region"):
-                regions[loc][year] = pop_m
+            if loc in REGIONS and row["LocTypeName"] in ("Region", "World", "Geographic region"):
+                if variant == "Medium":
+                    regions[loc][year] = pop_m
+                elif loc == "Africa":
+                    # The story quotes one number for 2100; the band shows the
+                    # spread the UN itself publishes around it.
+                    band[variant][year] = pop_m
                 continue
             iso3 = row["ISO3_code"]
             if not iso3:
                 continue
-            if iso3 in ("NGA", "COD") and variant in ("Low", "High"):
-                fan[iso3][variant][year] = pop_m
             if variant != "Medium":
                 continue
             if iso3 in AFRICA_ISO3 or iso3 in COMPARATOR_ISO3:
                 med[iso3][year] = pop_m
                 names[iso3] = loc
-    return med, fan, regions, names
+    return med, band, regions, names
 
 
 def crossover_year(a, b):
@@ -94,9 +98,10 @@ def crossover_year(a, b):
     return None
 
 
-def load_median_age():
-    """Median age per country from the WPP demographic indicators file."""
+def load_indicators():
+    """Median age and total fertility per country, from WPP indicators."""
     ages = defaultdict(dict)
+    tfr = {}
     with gzip.open(RAW_DIR / "WPP2024_Demographic_Indicators_Medium.csv.gz",
                    "rt", encoding="utf-8-sig") as fh:
         for row in csv.DictReader(fh):
@@ -109,11 +114,16 @@ def load_median_age():
             try:
                 ages[iso3][year] = float(row["MedianAgePop"])
             except ValueError:
-                continue
-    return ages
+                pass
+            if year == 2025:
+                try:
+                    tfr[iso3] = float(row["TFR"])
+                except ValueError:
+                    pass
+    return ages, tfr
 
 
-def build_countries(med, ages):
+def build_countries(med, ages, tfr):
     zpath = RAW_DIR / "ne_50m_admin_0_countries.zip"
     zf = zipfile.ZipFile(zpath)
     base = "ne_50m_admin_0_countries"
@@ -155,6 +165,8 @@ def build_countries(med, ages):
             props["medAge25"] = round(age[2025], 1)
         if age.get(2100):
             props["medAge100"] = round(age[2100], 1)
+        if tfr.get(iso3):
+            props["tfr"] = round(tfr[iso3], 2)
         if iso3 in LABELED:
             # Label the biggest polygon's representative point so names land
             # on the mainland, not a centroid out at sea or on an island.
@@ -167,7 +179,7 @@ def build_countries(med, ages):
 
 
 def main():
-    med, fan, regions, names = load_wpp()
+    med, band, regions, names = load_wpp()
 
     years5 = list(range(1950, 2101, 5)) + [2025]
     years5 = sorted(set(years5))
@@ -193,11 +205,11 @@ def main():
         "countries": countries,
         "regions": {k: [[y, round(v[y], 1)] for y in years5 if y in v] for k, v in regions.items()},
         "crossovers": crossovers,
-        "fan": {iso3: {var.lower(): [[y, round(s[y], 1)] for y in years5 if y in s]
-                       for var, s in variants.items()}
-                for iso3, variants in fan.items()},
+        "africaBand": {var.lower(): [[y, round(vals[y], 1)] for y in years5 if y in vals]
+                       for var, vals in band.items()},
     }
-    out["labels"] = build_countries(med, load_median_age())
+    ages, tfr = load_indicators()
+    out["labels"] = build_countries(med, ages, tfr)
     write_json(DATA_DIR / "population.json", out)
 
     for c in crossovers:
