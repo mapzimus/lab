@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-26",
+  "generatedAt": "2026-08-27",
   "news": {
     "mapsmania": [
+      {
+        "title": "The Real-Time Animated Transit Map",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/the-real-time-animated-transit-map.html",
+        "desc": ""
+      },
       {
         "title": "(MAPS) Painting By Number",
         "url": "http://googlemapsmania.blogspot.com/2026/08/maps-painting-by-number.html",
@@ -35,11 +40,6 @@
       {
         "title": "The 2026 Fall Foliage Map Has Landed",
         "url": "http://googlemapsmania.blogspot.com/2026/08/the-2026-fall-foliage-map-has-landed.html",
-        "desc": ""
-      },
-      {
-        "title": "How to Win the World Cup - From Above",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/how-to-win-world-cup-from-above.html",
         "desc": ""
       }
     ],
@@ -210,10 +210,16 @@
   ],
   "gisse": [
     {
-      "title": "ArcGIS Pro Contour labelling masks - is there a simpler approach than variable depth masking?",
-      "url": "https://gis.stackexchange.com/questions/501305/arcgis-pro-contour-labelling-masks-is-there-a-simpler-approach-than-variable-d",
+      "title": "How to implement shapefile points into the workflow of GEEDiT",
+      "url": "https://gis.stackexchange.com/questions/501309/how-to-implement-shapefile-points-into-the-workflow-of-geedit",
       "score": 0,
       "answers": 0
+    },
+    {
+      "title": "Make global customizations for all users in QGIS?",
+      "url": "https://gis.stackexchange.com/questions/501302/make-global-customizations-for-all-users-in-qgis",
+      "score": 1,
+      "answers": 1
     },
     {
       "title": "Arcade Expression not showing minimum value in dynamic text for visible rows",
@@ -222,9 +228,15 @@
       "answers": 1
     },
     {
-      "title": "Make global customizations for all users in QGIS?",
-      "url": "https://gis.stackexchange.com/questions/501302/make-global-customizations-for-all-users-in-qgis",
-      "score": 1,
+      "title": "ArcGIS Pro Contour labelling masks - is there a simpler approach than variable depth masking?",
+      "url": "https://gis.stackexchange.com/questions/501305/arcgis-pro-contour-labelling-masks-is-there-a-simpler-approach-than-variable-d",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Connect SEPAL with GEE account",
+      "url": "https://gis.stackexchange.com/questions/501306/connect-sepal-with-gee-account",
+      "score": 0,
       "answers": 0
     },
     {
@@ -246,90 +258,78 @@
       "answers": 0
     },
     {
+      "title": "How do you structure raster-processing code so the I/O can be replaced in tests?",
+      "url": "https://gis.stackexchange.com/questions/501277/how-do-you-structure-raster-processing-code-so-the-i-o-can-be-replaced-in-tests",
+      "score": 1,
+      "answers": 2
+    },
+    {
       "title": "Geofencing area spans two UTM zones",
       "url": "https://gis.stackexchange.com/questions/501286/geofencing-area-spans-two-utm-zones",
-      "score": 0,
-      "answers": 1
-    },
-    {
-      "title": "Web AppBuilder does not retain arrow line symbology from Map Viewer, while Experience Builder does",
-      "url": "https://gis.stackexchange.com/questions/501281/web-appbuilder-does-not-retain-arrow-line-symbology-from-map-viewer-while-exper",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Summing attribute values along line layer not working",
-      "url": "https://gis.stackexchange.com/questions/501290/summing-attribute-values-along-line-layer-not-working",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "QGIS 3.44.11 (Solothurn) - WhiteboxTools- stream_order file empty",
-      "url": "https://gis.stackexchange.com/questions/501276/qgis-3-44-11-solothurn-whiteboxtools-stream-order-file-empty",
       "score": 0,
       "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "UAVSAR_POLSAR_STOKES",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
-      "desc": "UAVSAR PolSAR Scene Stokes",
-      "org": "ASF"
+      "title": "SBU Microwave Radiometer (MWR) IMPACTS",
+      "url": "https://search.earthdata.nasa.gov/search?q=sbumwrimpacts",
+      "desc": "The SBU Microwave Radiometer (MWR) IMPACTS dataset consists of microwave radiometer data collected during the Investigation of Microphysics and Precipitation…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "UAVSAR_POLSAR_SLOPE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
-      "desc": "UAVSAR PolSAR Scene Slope",
-      "org": "ASF"
+      "title": "SBU Micro Rain Radar 2 (MRR2) IMPACTS",
+      "url": "https://search.earthdata.nasa.gov/search?q=sbumrr2impacts",
+      "desc": "The SBU Micro Rain Radar 2 (MRR-2) IMPACTS dataset consists of reflectivity, Doppler velocity, signal-to-noise ratio, spectral width, droplet size, Liquid Wa…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "UAVSAR_POLSAR_PAULI",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
-      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
-      "org": "ASF"
+      "title": "SBU Meteorological Station IMPACTS V1",
+      "url": "https://search.earthdata.nasa.gov/search?q=sbumetimpacts",
+      "desc": "The SBU Meteorological Station IMPACTS dataset consists of weather station data collected at two Stony Brook University (SBU) weather stations (1 mobile rada…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
-      "desc": "UAVSAR PolSAR Scene Complex",
-      "org": "ASF"
+      "title": "SBU Doppler LiDAR IMPACTS V1",
+      "url": "https://search.earthdata.nasa.gov/search?q=sbulidarimpacts",
+      "desc": "The SBU Doppler LiDAR IMPACTS dataset consists of Doppler velocity and backscatter intensity from the Stony Brook University (SBU) Doppler LiDAR.",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
-      "org": "ASF"
+      "title": "SBU Ka-band Scanning Polarimetric Radar (KASPR) IMPACTS V1",
+      "url": "https://search.earthdata.nasa.gov/search?q=sbukasprimpacts",
+      "desc": "The SBU Ka-band Scanning Polarimetric Radar (KASPR) IMPACTS dataset consists of polarimetric radar data collected by the Stony Brook University (SBU) Ka-band…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
-      "org": "ASF"
+      "title": "SBU Ceilometers IMPACTS",
+      "url": "https://search.earthdata.nasa.gov/search?q=sbuceilimpacts",
+      "desc": "The SBU Ceilometers IMPACTS dataset includes ceilometer cloud height measurements collected by the Vaisala CL51, Vaisala CT25K, and Lufft Ceilometer CHM 15k…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
-      "desc": "UAVSAR PolSAR Scene Projected",
-      "org": "ASF"
+      "title": "RSS SSMIS OCEAN PRODUCT GRIDS WEEKLY AVERAGE FROM DMSP F17 NETCDF V7",
+      "url": "https://search.earthdata.nasa.gov/search?q=rssmif17w",
+      "desc": "The RSS SSMIS Ocean Product Grids Weekly Average from DMSP F17 netCDF dataset is part of the collection of Special Sensor Microwave/Imager (SSM/I) and Specia…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "UAVSAR_POLSAR_METADATA",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
-      "desc": "UAVSAR PolSAR Scene Metadata",
-      "org": "ASF"
+      "title": "RSS SSMIS OCEAN PRODUCT GRIDS MONTHLY AVERAGE FROM DMSP F17 NETCDF V7",
+      "url": "https://search.earthdata.nasa.gov/search?q=rssmif17m",
+      "desc": "The RSS SSMIS Ocean Product Grids Monthly Average from DMSP F17 netCDF dataset is part of the collection of Special Sensor Microwave/Imager (SSM/I) and Speci…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "UAVSAR_POLSAR_KMZ",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
-      "desc": "UAVSAR PolSAR Scene KMZ",
-      "org": "ASF"
+      "title": "RSS SSMIS OCEAN PRODUCT GRIDS 3-DAY AVERAGE FROM DMSP F17 NETCDF V7",
+      "url": "https://search.earthdata.nasa.gov/search?q=rssmif17d3d",
+      "desc": "The RSS SSMIS Ocean Product Grids 3-Day Average from DMSP F17 netCDF dataset is part of the collection of Special Sensor Microwave/Imager (SSM/I) and Special…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "UAVSAR_POLSAR_INCIDENCE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
-      "desc": "UAVSAR PolSAR Scene Incidence Angle",
-      "org": "ASF"
+      "title": "RSS SSMIS OCEAN PRODUCT GRIDS DAILY FROM DMSP F17 NETCDF V7",
+      "url": "https://search.earthdata.nasa.gov/search?q=rssmif17d",
+      "desc": "The RSS SSMIS Ocean Product Grids Daily from DMSP F17 netCDF dataset is part of the collection of Special Sensor Microwave/Imager (SSM/I) and Special Sensor…",
+      "org": "GHRC_DAAC"
     }
   ],
   "datagov": [
