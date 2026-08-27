@@ -16,6 +16,9 @@ const MULT_RAMP = [0.5, "#4a6fa5", 0.85, "#39415a", 1.0, "#2c3140", 1.6, "#8a445
                    2.4, "#d06a4e", 3.4, "#f4a93a"];
 // Median age: young countries hot (the story's accent), old countries blue.
 const AGE_RAMP = [15, "#f4a93a", 22, "#c47a4e", 30, "#8a6a70", 40, "#5a5f88", 50, "#4a6fa5"];
+// Service access runs the other way: the shortfall is the subject, so the
+// countries where most people go without are the ones that burn.
+const ACCESS_RAMP = [0, "#f4a93a", 25, "#d8734a", 50, "#9c5a6b", 75, "#5f5a86", 100, "#3a4560"];
 
 const AFRICA_BOUNDS = [[-19.5, -36.5], [53.5, 38.5]];
 const WEST_AFRICA_BOUNDS = [[-18, 3], [16, 15]];
@@ -96,7 +99,7 @@ if (!webglOK()) {
   notice("This browser cannot draw maps, so the maps are missing. <b>The story below still reads on its own.</b>");
   // The chart and the ticker are plain SVG and owe nothing to WebGL.
   grab("population.json").then((p) => {
-    buildRegionChart(p.regions);
+    buildRegionChart(p.regions, p.africaBand);
     buildCrossoverTicker(p.crossovers);
   }).catch((err) => console.error(err));
 } else {
@@ -168,7 +171,7 @@ function addDeferredLayers(map, d) {
 }
 
 function boot([countries, population, cities, corExisting, corPlanned, corModel]) {
-  buildRegionChart(population.regions);
+  buildRegionChart(population.regions, population.africaBand);
   buildCrossoverTicker(population.crossovers);
 
   const map = new maplibregl.Map({
@@ -550,6 +553,7 @@ function initSteps(map) {
     "c1-2025": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2025", POP_RAMP); },
     "c1-2100": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2100", POP_RAMP); },
     "c1-multiple": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("multiple", MULT_RAMP); countriesOpacity(0.88, 0.35); },
+    "c1-momentum": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("medAge25", AGE_RAMP); },
     "c1-crossovers": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("multiple", MULT_RAMP); countriesOpacity(0.88, 0.35); },
     "ch2": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(1975, 0.85); setLabels(1975); },
     "c2-1975": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(1975, 0.85); setLabels(1975); },
@@ -563,6 +567,14 @@ function initSteps(map) {
     "c3-lights": () => {
       fly(AFRICA_BOUNDS, 5); base.c3();
       lightsOn(1); corridors(0, 0, 0, 0.4, 0.55); setCityEpoch(2050, 0);
+    },
+    "c3-services": () => {
+      fly(AFRICA_BOUNDS, 5); base.c3();
+      // The corridor lines have made their point by now, and they sit right on
+      // top of the countries this step is asking the reader to compare.
+      lightsOn(0); corridors(0, 0, 0, 0, 0);
+      setChoropleth("elec", ACCESS_RAMP); countriesOpacity(0.9, 0.25);
+      setCountryLabels("dim"); setCityEpoch(2050, 0.25);
     },
     "ch4": () => {
       fly(WEST_AFRICA_BOUNDS, 6);
@@ -646,6 +658,7 @@ function initSteps(map) {
   const METRIC_RAMPS = {
     pop2025: POP_RAMP, pop2050: POP_RAMP, pop2100: POP_RAMP,
     multiple: MULT_RAMP, medAge25: AGE_RAMP,
+    elec: ACCESS_RAMP, water: ACCESS_RAMP,
   };
   const METRIC_LEGENDS = {
     pop2025: rampLegend("People per country, 2025", POP_RAMP, fmtM),
@@ -653,6 +666,8 @@ function initSteps(map) {
     pop2100: rampLegend("People per country, 2100", POP_RAMP, fmtM),
     multiple: rampLegend("Growth, 2025 → 2100", MULT_RAMP, fmtX),
     medAge25: rampLegend("Median age, 2025", AGE_RAMP, fmtY),
+    elec: rampLegend("Electricity at home, share of people", ACCESS_RAMP, fmtPct, false),
+    water: rampLegend("Basic drinking water, share of people", ACCESS_RAMP, fmtPct, false),
   };
   const applyMetric = () => {
     const m = metricSel.value;
@@ -694,7 +709,10 @@ function initSteps(map) {
       return `<div class="pop-h">${p.name}</div><div class="pop-sub">UN WPP 2024, medium variant</div>`
         + row("2025", M(p.pop2025)) + row("2050", M(p.pop2050)) + row("2100", M(p.pop2100))
         + row("growth to 2100", "×" + p.multiple)
-        + (p.medAge25 ? row("median age 2025", p.medAge25 + " yrs") : "");
+        + (p.medAge25 ? row("median age 2025", p.medAge25 + " yrs") : "")
+        + (p.tfr ? row("children per woman", p.tfr) : "")
+        + (p.elec != null ? row("has electricity", p.elec + "%") : "")
+        + (p.water != null ? row("has basic water", p.water + "%") : "");
     }
     if (f.layer.id === "cor-model") {
       return `<div class="pop-h">${p.a} to ${p.b}</div><div class="pop-sub">modeled corridor</div>`
@@ -778,9 +796,10 @@ function initSteps(map) {
 const fmtM = (v) => (v ? `${v}M` : "0");
 const fmtX = (v) => `×${v}`;
 const fmtY = (v) => `${v} yrs`;
+const fmtPct = (v) => `${v}%`;
 
-function rampLegend(title, stops, fmt) {
-  return { title, ramp: { stops, fmt } };
+function rampLegend(title, stops, fmt, plus = true) {
+  return { title, ramp: { stops, fmt, plus } };
 }
 const ROW = (color, label, shape) => ({ color, label, shape: shape || "line" });
 const CITY_ROWS = [
@@ -796,6 +815,7 @@ const LEGENDS = {
   "c1-2025": rampLegend("People per country, 2025", POP_RAMP, fmtM),
   "c1-2100": rampLegend("People per country, 2100", POP_RAMP, fmtM),
   "c1-multiple": rampLegend("Growth, 2025 → 2100", MULT_RAMP, fmtX),
+  "c1-momentum": rampLegend("Median age, 2025", AGE_RAMP, fmtY),
   "c1-crossovers": rampLegend("Growth, 2025 → 2100", MULT_RAMP, fmtX),
   "ch2": { title: "Cities in 1975", rows: CITY_ROWS },
   "c2-1975": { title: "Cities in 1975", rows: CITY_ROWS },
@@ -814,6 +834,7 @@ const LEGENDS = {
   "c3-model": { title: "Predicted demand", rows: [
     ROW("#f4a93a", "modeled corridor, thicker pulls harder"),
     ROW("#8b93a0", "existing rail (dim)")] },
+  "c3-services": rampLegend("Electricity at home, share of people", ACCESS_RAMP, fmtPct, false),
   "c3-lights": { title: "Africa at night, 2020", rows: [
     ROW("#ffd166", "brightly lit (city cores)", "box"),
     ROW("#8a6a35", "lit (towns and sprawl)", "box")] },
@@ -837,14 +858,14 @@ function renderLegend(spec) {
   if (!spec) { el.classList.remove("on"); return; }
   let html = `<div class="lg-title">${spec.title}</div>`;
   if (spec.ramp) {
-    const { stops, fmt } = spec.ramp;
+    const { stops, fmt, plus } = spec.ramp;
     const sw = [];
     for (let i = 1; i < stops.length; i += 2) sw.push(`<i style="background:${stops[i]}"></i>`);
     const values = [];
     for (let i = 0; i < stops.length; i += 2) values.push(stops[i]);
     const picks = [0, Math.floor((values.length - 1) / 2), values.length - 1];
     html += `<div class="lg-ramp">${sw.join("")}</div><div class="lg-labels">`
-      + picks.map((i, k) => `<span>${fmt(values[i])}${k === 2 ? "+" : ""}</span>`).join("") + "</div>";
+      + picks.map((i, k) => `<span>${fmt(values[i])}${k === 2 && plus !== false ? "+" : ""}</span>`).join("") + "</div>";
   }
   if (spec.rows) {
     html += spec.rows.map((r) =>
@@ -857,10 +878,10 @@ function renderLegend(spec) {
 
 /* ---------------------------------------------------------- static widgets */
 
-function buildRegionChart(regions) {
+function buildRegionChart(regions, band) {
   const el = document.getElementById("chart-regions");
   if (!el) return;
-  const W = 390, H = 190, L = 34, R = 74, T = 12, B = 22;
+  const W = 390, H = 190, L = 34, R = 82, T = 12, B = 22;
   const series = [
     ["Africa", "#f4a93a"],
     ["Asia", "#5b6c85"],
@@ -869,22 +890,42 @@ function buildRegionChart(regions) {
     ["Northern America", "#8a7f8f"],
   ];
   const x = (yr) => L + ((yr - 1950) / 150) * (W - L - R);
-  const y = (v) => T + (1 - v / 5000) * (H - T - B);
+  // Ceiling clears Asia's mid-century peak (5.29B) and the UN high variant
+  // for Africa in 2100 (5.25B), so neither is drawn outside the plot.
+  const y = (v) => T + (1 - v / 5500) * (H - T - B);
   let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Population by region, 1950 to 2100">`;
-  for (const v of [1000, 2000, 3000, 4000]) {
+  for (const v of [1000, 2000, 3000, 4000, 5000]) {
     svg += `<line class="axis" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/>`;
     svg += `<text x="${L - 4}" y="${y(v) + 3}" text-anchor="end">${v / 1000}B</text>`;
   }
   for (const yr of [1950, 2000, 2050, 2100]) {
     svg += `<text x="${x(yr)}" y="${H - 8}" text-anchor="middle">${yr}</text>`;
   }
+  // The UN publishes a range around every projection. Drawing it stops the
+  // single Africa line from reading as a fact rather than a central estimate.
+  if (band && band.low && band.high) {
+    const top = band.high.map(([yr, v]) => `${x(yr).toFixed(1)},${y(v).toFixed(1)}`);
+    const bottom = band.low.map(([yr, v]) => `${x(yr).toFixed(1)},${y(v).toFixed(1)}`).reverse();
+    svg += `<polygon fill="#f4a93a" fill-opacity="0.14" points="${top.concat(bottom).join(" ")}"/>`;
+  }
+  // Europe, Latin America and Northern America all finish within a few
+  // hundred million of each other, so their end labels would sit on top of one
+  // another. Push each one down until it clears the label above it.
+  const tags = [];
   for (const [name, color] of series) {
     const pts = (regions[name] || []).map(([yr, v]) => `${x(yr).toFixed(1)},${y(v).toFixed(1)}`);
     if (!pts.length) continue;
     svg += `<polyline fill="none" stroke="${color}" stroke-width="${name === "Africa" ? 2.4 : 1.4}" points="${pts.join(" ")}"/>`;
     const last = regions[name][regions[name].length - 1];
     const short = { "Latin America and the Caribbean": "Lat. America", "Northern America": "N. America" }[name] || name;
-    svg += `<text class="lbl" x="${W - R + 5}" y="${y(last[1]) + 3}" fill="${color}" style="fill:${color}">${short}</text>`;
+    tags.push({ short, color, at: y(last[1]) });
+  }
+  tags.sort((a, b) => a.at - b.at);
+  let floor = -Infinity;
+  for (const t of tags) {
+    t.at = Math.max(t.at, floor + 10);
+    floor = t.at;
+    svg += `<text class="lbl" x="${W - R + 5}" y="${(t.at + 3).toFixed(1)}" fill="${t.color}" style="fill:${t.color}">${t.short}</text>`;
   }
   svg += "</svg>";
   el.innerHTML = svg;
