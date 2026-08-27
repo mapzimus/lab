@@ -53,23 +53,121 @@ function shortName(n) {
 
 /* ------------------------------------------------------------------ data */
 
-Promise.all([
+// Bumped whenever the pipeline rewrites data/. The query string lets the
+// files be cached hard while a deploy still delivers fresh ones.
+const DATA_VERSION = "2026-08-27";
+
+// The story reads perfectly as text, so the map layers it cannot show without
+// help are loaded in two waves: what chapters 1 to 3 need, then the rest.
+const CORE_FILES = [
   "countries.geojson", "population.json", "cities.geojson",
   "corridors-existing.geojson", "corridors-planned.geojson", "corridors-model.geojson",
-  "kinshasa-builtup.geojson", "kinshasa-water.geojson", "kinshasa-roads.geojson",
-  "lights.geojson", "kinshasa-density.geojson",
-].map((f) => fetch(DATA + f).then((r) => {
-  if (!r.ok) throw new Error(f + ": " + r.status);
-  return r.json();
-}))).then(boot).catch((err) => {
-  console.error(err);
-  document.getElementById("error").style.display = "grid";
-});
+];
+const DEFERRED_FILES = [
+  "lights.geojson", "kinshasa-builtup.geojson", "kinshasa-water.geojson",
+  "kinshasa-roads.geojson", "kinshasa-density.geojson",
+];
 
-function boot([countries, population, cities, corExisting, corPlanned, corModel,
-               kinBuilt, kinWater, kinRoads, lights, kinDensity]) {
-  window.__densityStats = kinDensity.stats || {};
+function grab(file) {
+  return fetch(`${DATA}${file}?v=${DATA_VERSION}`).then((r) => {
+    if (!r.ok) throw new Error(file + ": " + r.status);
+    return r.json();
+  });
+}
 
+function notice(html) {
+  const el = document.getElementById("error");
+  el.innerHTML = html;
+  el.classList.add("on");
+}
+
+// MapLibre throws on construction without WebGL, and a thrown map should never
+// take the writing down with it.
+function webglOK() {
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}
+
+if (!webglOK()) {
+  notice("This browser cannot draw maps, so the maps are missing. <b>The story below still reads on its own.</b>");
+  // The chart and the ticker are plain SVG and owe nothing to WebGL.
+  grab("population.json").then((p) => {
+    buildRegionChart(p.regions);
+    buildCrossoverTicker(p.crossovers);
+  }).catch((err) => console.error(err));
+} else {
+  Promise.all(CORE_FILES.map(grab)).then(boot).catch((err) => {
+    console.error(err);
+    notice("The map data did not load. <b>The story below still reads on its own.</b>");
+  });
+}
+
+
+/* ------------------------------------------- deferred chapter 3 and 4 layers */
+// Added under the corridor layers with beforeId so the late arrivals land in
+// exactly the stacking order they would have had if they had loaded up front.
+function addDeferredLayers(map, d) {
+  const BELOW = map.getLayer("cor-rail") ? "cor-rail" : undefined;
+  map.addSource("lights", { type: "geojson", data: d.lights });
+  map.addSource("kin-built", { type: "geojson", data: d.kinBuilt });
+  map.addSource("kin-water", { type: "geojson", data: d.kinWater });
+  map.addSource("kin-roads", { type: "geojson", data: d.kinRoads });
+  map.addSource("kin-density", { type: "geojson", data: d.kinDensity });
+
+  // Observed nighttime lights (chapter 3's reality check).
+  map.addLayer({
+    id: "lights-lit", type: "fill", source: "lights",
+    filter: ["==", ["get", "class"], "lit"],
+    paint: { "fill-color": "#8a6a35", "fill-opacity": 0, "fill-opacity-transition": { duration: 700 } },
+  }, BELOW);
+  map.addLayer({
+    id: "lights-bright", type: "fill", source: "lights",
+    filter: ["==", ["get", "class"], "bright"],
+    paint: { "fill-color": "#ffd166", "fill-opacity": 0, "fill-opacity-transition": { duration: 700 } },
+  }, BELOW);
+
+  // Kinshasa deep-dive stack (invisible until chapter 4).
+  map.addLayer({
+    id: "kin-water", type: "fill", source: "kin-water",
+    paint: { "fill-color": "#1d3242", "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
+  }, BELOW);
+  // Painter order: newest epoch first so 1975 ends up on top and each
+  // later epoch shows only as its growth ring around the older fabric.
+  [...EPOCHS].reverse().forEach((epoch) => {
+    map.addLayer({
+      id: "built-" + epoch, type: "fill", source: "kin-built",
+      filter: ["==", ["get", "epoch"], epoch],
+      paint: {
+        "fill-color": EPOCH_COLORS[epoch],
+        "fill-opacity": 0,
+        "fill-opacity-transition": { duration: 600 },
+      },
+    }, BELOW);
+  });
+  // Density bands paint over the growth rings when chapter 4 asks how many
+  // people share the ground; lowest band first so hotter bands sit on top.
+  for (const [band, color] of [[5000, "#5a3a7a"], [15000, "#95457f"], [30000, "#d5566a"], [60000, "#ff9d5c"]]) {
+    map.addLayer({
+      id: "density-" + band, type: "fill", source: "kin-density",
+      filter: ["==", ["get", "min"], band],
+      paint: { "fill-color": color, "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
+    }, BELOW);
+  }
+  map.addLayer({
+    id: "kin-roads", type: "line", source: "kin-roads",
+    paint: {
+      "line-color": ["case", ["==", ["get", "kind"], "major"], "#aeb6c2", "#7d8590"],
+      "line-width": ["case", ["==", ["get", "kind"], "major"], 1.4, 0.6],
+      "line-opacity": 0, "line-opacity-transition": { duration: 600 },
+    },
+  }, BELOW);
+}
+
+function boot([countries, population, cities, corExisting, corPlanned, corModel]) {
   buildRegionChart(population.regions);
   buildCrossoverTicker(population.crossovers);
 
@@ -95,11 +193,6 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
     map.addSource("cor-existing", { type: "geojson", data: corExisting });
     map.addSource("cor-planned", { type: "geojson", data: corPlanned });
     map.addSource("cor-model", { type: "geojson", data: corModel });
-    map.addSource("kin-built", { type: "geojson", data: kinBuilt });
-    map.addSource("kin-water", { type: "geojson", data: kinWater });
-    map.addSource("kin-roads", { type: "geojson", data: kinRoads });
-    map.addSource("lights", { type: "geojson", data: lights });
-    map.addSource("kin-density", { type: "geojson", data: kinDensity });
 
     map.addLayer({
       id: "countries-fill", type: "fill", source: "countries",
@@ -113,54 +206,6 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
     map.addLayer({
       id: "countries-line", type: "line", source: "countries",
       paint: { "line-color": "#0e1015", "line-width": 0.6, "line-opacity": 0.9 },
-    });
-
-    // Observed nighttime lights (chapter 3's reality check).
-    map.addLayer({
-      id: "lights-lit", type: "fill", source: "lights",
-      filter: ["==", ["get", "class"], "lit"],
-      paint: { "fill-color": "#8a6a35", "fill-opacity": 0, "fill-opacity-transition": { duration: 700 } },
-    });
-    map.addLayer({
-      id: "lights-bright", type: "fill", source: "lights",
-      filter: ["==", ["get", "class"], "bright"],
-      paint: { "fill-color": "#ffd166", "fill-opacity": 0, "fill-opacity-transition": { duration: 700 } },
-    });
-
-    // Kinshasa deep-dive stack (invisible until chapter 4).
-    map.addLayer({
-      id: "kin-water", type: "fill", source: "kin-water",
-      paint: { "fill-color": "#1d3242", "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
-    });
-    // Painter order: newest epoch first so 1975 ends up on top and each
-    // later epoch shows only as its growth ring around the older fabric.
-    [...EPOCHS].reverse().forEach((epoch) => {
-      map.addLayer({
-        id: "built-" + epoch, type: "fill", source: "kin-built",
-        filter: ["==", ["get", "epoch"], epoch],
-        paint: {
-          "fill-color": EPOCH_COLORS[epoch],
-          "fill-opacity": 0,
-          "fill-opacity-transition": { duration: 600 },
-        },
-      });
-    });
-    // Density bands paint over the growth rings when chapter 4 asks how many
-    // people share the ground; lowest band first so hotter bands sit on top.
-    for (const [band, color] of [[5000, "#5a3a7a"], [15000, "#95457f"], [30000, "#d5566a"], [60000, "#ff9d5c"]]) {
-      map.addLayer({
-        id: "density-" + band, type: "fill", source: "kin-density",
-        filter: ["==", ["get", "min"], band],
-        paint: { "fill-color": color, "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
-      });
-    }
-    map.addLayer({
-      id: "kin-roads", type: "line", source: "kin-roads",
-      paint: {
-        "line-color": ["case", ["==", ["get", "kind"], "major"], "#aeb6c2", "#7d8590"],
-        "line-width": ["case", ["==", ["get", "kind"], "major"], 1.4, 0.6],
-        "line-opacity": 0, "line-opacity-transition": { duration: 600 },
-      },
     });
 
     // Corridors (chapter 3).
@@ -234,7 +279,15 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
     initMarkers(map, cities);
     initCountryLabels(map, population.labels || []);
     initPlaceLabels(map);
-    initSteps(map);
+    const refreshStep = initSteps(map);
+
+    Promise.all(DEFERRED_FILES.map(grab)).then(([lights, kinBuilt, kinWater, kinRoads, kinDensity]) => {
+      addDeferredLayers(map, { lights, kinBuilt, kinWater, kinRoads, kinDensity });
+      refreshStep();
+    }).catch((err) => {
+      console.error(err);
+      notice("The night lights and Kinshasa layers did not load. <b>The rest of the story is unaffected.</b>");
+    });
   });
 }
 
@@ -382,10 +435,16 @@ function initSteps(map) {
 
   // Ambient globe rotation while the hero is on screen. A slow drift sells
   // the globe projection; any camera move or step change cancels it.
-  let spinFrame = null;
-  const spinStop = () => { if (spinFrame) { cancelAnimationFrame(spinFrame); spinFrame = null; } };
+  // The delay before the drift starts has to be cancellable too. Without that,
+  // two calls to the intro step queue two timers, spinStop can only cancel the
+  // frame of one, and the survivor pins the camera for the rest of the story.
+  let spinFrame = null, spinTimer = null;
+  const spinStop = () => {
+    if (spinFrame) { cancelAnimationFrame(spinFrame); spinFrame = null; }
+    if (spinTimer) { clearTimeout(spinTimer); spinTimer = null; }
+  };
   const spinStart = () => {
-    if (prefersStill || spinFrame) return;
+    if (prefersStill || spinFrame || spinTimer) return;
     let last = performance.now();
     const tick = (now) => {
       const c = map.getCenter();
@@ -395,7 +454,10 @@ function initSteps(map) {
       spinFrame = requestAnimationFrame(tick);
     };
     // Wait out the fly-in so the drift doesn't fight the camera animation.
-    setTimeout(() => { if (active === "intro" && !exploring) spinFrame = requestAnimationFrame(tick); }, 2400);
+    spinTimer = setTimeout(() => {
+      spinTimer = null;
+      if (active === "intro" && !exploring) spinFrame = requestAnimationFrame(tick);
+    }, 2400);
   };
 
   const setChoropleth = (prop, stops) =>
@@ -409,9 +471,12 @@ function initSteps(map) {
     map.setPaintProperty("cities", "circle-opacity", opacity);
     map.setPaintProperty("cities", "circle-stroke-opacity", opacity ? 0.6 : 0);
   };
+  // Deferred layers may not exist yet when an early step runs, and a step
+  // that touches a missing layer should simply do nothing.
   const lineOpacity = (id, v) => {
-    const prop = map.getLayer(id).type === "fill" ? "fill-opacity" : "line-opacity";
-    map.setPaintProperty(id, prop, v);
+    const layer = map.getLayer(id);
+    if (!layer) return;
+    map.setPaintProperty(id, layer.type === "fill" ? "fill-opacity" : "line-opacity", v);
   };
   const corridors = (rail, road, tah, built, model) => {
     lineOpacity("cor-rail", rail); lineOpacity("cor-road", road);
@@ -427,13 +492,11 @@ function initSteps(map) {
   };
   const hollow2100 = (v) => map.setPaintProperty("cities-2100", "circle-stroke-opacity", v);
   const lightsOn = (v) => {
-    map.setPaintProperty("lights-lit", "fill-opacity", v * 0.45);
-    map.setPaintProperty("lights-bright", "fill-opacity", v * 0.85);
+    lineOpacity("lights-lit", v * 0.45);
+    lineOpacity("lights-bright", v * 0.85);
   };
   const densityOn = (v) => {
-    for (const band of [5000, 15000, 30000, 60000]) {
-      map.setPaintProperty("density-" + band, "fill-opacity", v * 0.92);
-    }
+    for (const band of [5000, 15000, 30000, 60000]) lineOpacity("density-" + band, v * 0.92);
   };
   const hudSet = (big, sub) => {
     hud.classList.add("on");
@@ -703,6 +766,10 @@ function initSteps(map) {
   steps.intro();
   active = "intro";
   setRail("intro");
+  document.documentElement.classList.add("steps-live");
+
+  // Lets the deferred loader re-apply the step the reader is actually on.
+  return () => { if (active && steps[active]) steps[active](); };
 }
 
 /* ------------------------------------------------------ floating legend */

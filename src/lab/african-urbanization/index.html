@@ -139,29 +139,18 @@
     backdrop-filter: blur(7px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.45);
     transition: opacity 0.35s ease, transform 0.35s ease;
-    opacity: 0.45;
   }
-  .step.is-active .card, .chapter-head .card, .hero-inner { opacity: 1; }
+  /* Cards are readable by default. The dimming of inactive steps only exists
+     once the scroll engine is running, so a reader with no JavaScript, a
+     failed script or a slow connection still gets the story at full contrast. */
+  .steps-live .step .card { opacity: 0.45; }
+  .steps-live .step.is-active .card { opacity: 1; }
   .card h3 { margin: 0 0 8px; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
   .card p { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
   .card p b, .card p strong { color: var(--text); font-weight: 650; }
-  .card .stat {
-    font-family: var(--mono); font-weight: 600;
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
-  }
   .card .fine { font-size: 11.5px; color: var(--dim); margin-top: 10px; line-height: 1.45; }
   .card a { color: var(--accent2); }
 
-  /* legend rows inside cards */
-  .legend { margin-top: 12px; display: grid; gap: 5px; }
-  .legend .row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
-  .legend .row i { flex: none; width: 18px; height: 4px; border-radius: 2px; }
-  .legend .row i.dot { width: 10px; height: 10px; border-radius: 50%; }
-  .legend .row i.box { width: 12px; height: 12px; border-radius: 3px; }
-  .ramp { display: flex; height: 10px; margin-top: 12px; border-radius: 3px; overflow: hidden; }
-  .ramp i { flex: 1; }
-  .ramp-labels { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--dim); margin-top: 3px; }
 
   /* the inline SVG chart */
   .chart { margin-top: 12px; }
@@ -346,11 +335,17 @@
     #explore-panel { left: 10px; right: 10px; bottom: 14px; max-height: 55vh; overflow-y: auto; }
   }
 
+  /* A banner, not a curtain. Every failure mode here still leaves the written
+     story intact underneath, so nothing should cover it. */
   #error {
-    position: fixed; inset: 0; z-index: 5;
-    display: none; place-items: center;
-    padding: 24px; text-align: center; background: var(--bg);
+    position: fixed; top: 0; left: 0; right: 0; z-index: 5;
+    display: none;
+    padding: 10px 16px;
+    background: #2a1f16; border-bottom: 1px solid #6b4f2a;
+    color: #f0d9b5; font-size: 13px; text-align: center;
   }
+  #error.on { display: block; }
+  #error b { color: #ffd166; font-weight: 650; }
 
   @media (max-width: 640px) {
     .step { align-items: flex-end; padding: 16px 12px 22vh; min-height: 96vh; }
@@ -663,7 +658,7 @@
 </nav>
 
 <div id="explore-panel" aria-label="Map controls">
-  <div class="cap">Country shading</div>
+  <label class="cap" for="explore-metric">Country shading</label>
   <select id="explore-metric">
     <option value="off" selected>None</option>
     <option value="pop2025">Population 2025</option>
@@ -678,7 +673,7 @@
   <label><input type="checkbox" data-layer="lights"> Night lights</label>
   <label><input type="checkbox" data-layer="kinshasa" checked> Kinshasa growth</label>
   <label><input type="checkbox" data-layer="density"> Kinshasa density</label>
-  <div class="cap">Cities in year</div>
+  <label class="cap" for="explore-year">Cities in year</label>
   <div class="slider-row">
     <input type="range" id="explore-year" min="0" max="8" step="1" value="8">
     <output id="explore-year-out">2050</output>
@@ -710,7 +705,7 @@
   </div>
 </footer>
 
-<div id="error"><div><h2>Couldn't load the map data.</h2><p>Reload, or check the console.</p></div></div>
+<div id="error" role="status"></div>
 
 <script src="vendor/maplibre-gl.js"></script>
 <script src="app.js"></script>
