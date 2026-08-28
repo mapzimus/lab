@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-27",
+  "generatedAt": "2026-08-28",
   "news": {
     "mapsmania": [
+      {
+        "title": "Rename Lake Ontario Now!",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/rename-lake-ontario-now.html",
+        "desc": ""
+      },
       {
         "title": "The Real-Time Animated Transit Map",
         "url": "http://googlemapsmania.blogspot.com/2026/08/the-real-time-animated-transit-map.html",
@@ -35,11 +40,6 @@
       {
         "title": "Surfing the Jet Stream",
         "url": "http://googlemapsmania.blogspot.com/2026/08/surfing-jet-stream.html",
-        "desc": ""
-      },
-      {
-        "title": "The 2026 Fall Foliage Map Has Landed",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/the-2026-fall-foliage-map-has-landed.html",
         "desc": ""
       }
     ],
@@ -110,39 +110,55 @@
   },
   "qgis": [
     {
+      "title": "WaterQual",
+      "url": "https://plugins.qgis.org/plugins/water_qual/"
+    },
+    {
+      "title": "Layout Splines",
+      "url": "https://plugins.qgis.org/plugins/qgis_layout_splines/"
+    },
+    {
+      "title": "Optical Downloader",
+      "url": "https://plugins.qgis.org/plugins/optical_downloader/"
+    },
+    {
+      "title": "InaRISK to QGIS",
+      "url": "https://plugins.qgis.org/plugins/inarisk_to_qgis/"
+    },
+    {
+      "title": "AirEmergency",
+      "url": "https://plugins.qgis.org/plugins/AirEmergency/"
+    },
+    {
+      "title": "FinCoords",
+      "url": "https://plugins.qgis.org/plugins/FinCoords/"
+    },
+    {
       "title": "Mangrove Extraction",
       "url": "https://plugins.qgis.org/plugins/mangrove_extraction/"
     },
     {
       "title": "CoastProfile",
       "url": "https://plugins.qgis.org/plugins/coastprofile/"
-    },
-    {
-      "title": "XY Creator",
-      "url": "https://plugins.qgis.org/plugins/XY_Creator/"
-    },
-    {
-      "title": "Smart Layer Filter",
-      "url": "https://plugins.qgis.org/plugins/SmartLayerFilter/"
-    },
-    {
-      "title": "GeoBridge",
-      "url": "https://plugins.qgis.org/plugins/GeoBridge_Plugin/"
-    },
-    {
-      "title": "OpenGeoData France",
-      "url": "https://plugins.qgis.org/plugins/OpenGeoDataFR/"
-    },
-    {
-      "title": "Pobieranie Landsat",
-      "url": "https://plugins.qgis.org/plugins/pobieranie_landsat/"
-    },
-    {
-      "title": "Konwerter CAD na GIS",
-      "url": "https://plugins.qgis.org/plugins/cad_to_gis/"
     }
   ],
   "releases": [
+    {
+      "repo": "visgl/deck.gl",
+      "title": "deck.gl v9.3.11",
+      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.11",
+      "desc": "- Lock luma.gl to 9.3 minor release",
+      "publishedAt": "2026-08-28",
+      "isFresh": true
+    },
+    {
+      "repo": "qgis/QGIS",
+      "title": "QGIS final-4_2_2",
+      "url": "https://github.com/qgis/QGIS/releases/tag/final-4_2_2",
+      "desc": "https://github.com/qgis/QGIS/compare/final-4_2_1%5E...final-4_2_2",
+      "publishedAt": "2026-08-28",
+      "isFresh": true
+    },
     {
       "repo": "maplibre/maplibre-gl-js",
       "title": "maplibre-gl-js v6.6.0",
@@ -160,27 +176,11 @@
       "isFresh": true
     },
     {
-      "repo": "visgl/deck.gl",
-      "title": "deck.gl v9.3.10",
-      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.10",
-      "desc": "- fix(layers): restore SDF text outlines (#10545) - fix(core): use correct stat for updateLayersCount metric (#10469)",
-      "publishedAt": "2026-08-11",
-      "isFresh": true
-    },
-    {
       "repo": "Turfjs/turf",
       "title": "turf v7.4.0",
       "url": "https://github.com/Turfjs/turf/releases/tag/v7.4.0",
       "desc": "## What's Changed ⚠️ Due to correctness fixes, behavior across the boolean-* methods has changed.",
       "publishedAt": "2026-08-03",
-      "isFresh": true
-    },
-    {
-      "repo": "qgis/QGIS",
-      "title": "QGIS final-3_44_13",
-      "url": "https://github.com/qgis/QGIS/releases/tag/final-3_44_13",
-      "desc": "https://github.com/qgis/QGIS/compare/final-3_44_12%5E...final-3_44_13",
-      "publishedAt": "2026-07-31",
       "isFresh": true
     },
     {
@@ -210,9 +210,9 @@
   ],
   "gisse": [
     {
-      "title": "How to implement shapefile points into the workflow of GEEDiT",
-      "url": "https://gis.stackexchange.com/questions/501309/how-to-implement-shapefile-points-into-the-workflow-of-geedit",
-      "score": 0,
+      "title": "Have found the longest flow path in a watershed, but how to extract it as a polyline?",
+      "url": "https://gis.stackexchange.com/questions/501313/have-found-the-longest-flow-path-in-a-watershed-but-how-to-extract-it-as-a-poly",
+      "score": 1,
       "answers": 0
     },
     {
@@ -220,6 +220,12 @@
       "url": "https://gis.stackexchange.com/questions/501302/make-global-customizations-for-all-users-in-qgis",
       "score": 1,
       "answers": 1
+    },
+    {
+      "title": "How to implement shapefile points into the workflow of GEEDiT",
+      "url": "https://gis.stackexchange.com/questions/501309/how-to-implement-shapefile-points-into-the-workflow-of-geedit",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "Arcade Expression not showing minimum value in dynamic text for visible rows",
@@ -252,9 +258,9 @@
       "answers": 0
     },
     {
-      "title": "How to apply the Hard Light Blending mode in a QGIS layout legend?",
-      "url": "https://gis.stackexchange.com/questions/501293/how-to-apply-the-hard-light-blending-mode-in-a-qgis-layout-legend",
-      "score": 3,
+      "title": "Export vectorfiles from QGIS to edit in Design software",
+      "url": "https://gis.stackexchange.com/questions/501280/export-vectorfiles-from-qgis-to-edit-in-design-software",
+      "score": 1,
       "answers": 0
     },
     {
@@ -262,74 +268,68 @@
       "url": "https://gis.stackexchange.com/questions/501277/how-do-you-structure-raster-processing-code-so-the-i-o-can-be-replaced-in-tests",
       "score": 1,
       "answers": 2
-    },
-    {
-      "title": "Geofencing area spans two UTM zones",
-      "url": "https://gis.stackexchange.com/questions/501286/geofencing-area-spans-two-utm-zones",
-      "score": 0,
-      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "SBU Microwave Radiometer (MWR) IMPACTS",
-      "url": "https://search.earthdata.nasa.gov/search?q=sbumwrimpacts",
-      "desc": "The SBU Microwave Radiometer (MWR) IMPACTS dataset consists of microwave radiometer data collected during the Investigation of Microphysics and Precipitation…",
-      "org": "GHRC_DAAC"
+      "title": "SRB/GEWEX evapotranspiration (Penman-Monteith) L4 3 hour 0.5 degree x 0.5 degree V1 (WC_PM_ET_050) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=WC_PM_ET_050",
+      "desc": "SRB/GEWEX evapotranspiration (Penman-Monteith) L4 3 hour 0.5 degree x 0.5 degree V1 is a global, 24-year (1984-2007), satellite-derived evapotranspiration ov…",
+      "org": "GES_DISC"
     },
     {
-      "title": "SBU Micro Rain Radar 2 (MRR2) IMPACTS",
-      "url": "https://search.earthdata.nasa.gov/search?q=sbumrr2impacts",
-      "desc": "The SBU Micro Rain Radar 2 (MRR-2) IMPACTS dataset consists of reflectivity, Doppler velocity, signal-to-noise ratio, spectral width, droplet size, Liquid Wa…",
-      "org": "GHRC_DAAC"
+      "title": "TMI/TRMM precipitation and uncertainty (TMPA) L3 3 hour 0.25 degree x 0.25 degree V001 (WC_MULTISEN_PREC_025) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=WC_MULTISEN_PREC_025",
+      "desc": "TMI/TRMM precipitation and uncertainty (TMPA) L3 3 hour 0.25 degree x 0.25 degree V001 provides estimates of accumulated precipitation from the Tropical Rain…",
+      "org": "GES_DISC"
     },
     {
-      "title": "SBU Meteorological Station IMPACTS V1",
-      "url": "https://search.earthdata.nasa.gov/search?q=sbumetimpacts",
-      "desc": "The SBU Meteorological Station IMPACTS dataset consists of weather station data collected at two Stony Brook University (SBU) weather stations (1 mobile rada…",
-      "org": "GHRC_DAAC"
+      "title": "AMSR-E/Aqua surface soil moisture (LSMEM) L3 1 day 0.25 degree x 0.25 degree V001 (WC_LSMEM_SOILM_025) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=WC_LSMEM_SOILM_025",
+      "desc": "AMSR-E/Aqua surface soil moisture (LSMEM) L3 1 day 0.25 degree x 0.25 degree V001 is a global, 10-year (2002-2011) data set.",
+      "org": "GES_DISC"
     },
     {
-      "title": "SBU Doppler LiDAR IMPACTS V1",
-      "url": "https://search.earthdata.nasa.gov/search?q=sbulidarimpacts",
-      "desc": "The SBU Doppler LiDAR IMPACTS dataset consists of Doppler velocity and backscatter intensity from the Stony Brook University (SBU) Doppler LiDAR.",
-      "org": "GHRC_DAAC"
+      "title": "TROPESS CrIS-SNPP L2 Peroxyacetyl Nitrate for Reanalysis Stream, Summary Product V1 (TRPSYL2PANCRSRS) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=TRPSYL2PANCRSRS",
+      "desc": "The TROPESS CrIS-SNPP L2 Peroxyacetyl Nitrate for Reanalysis Stream, Summary Product contains the vertical distribution of the retrieved atmospheric state of…",
+      "org": "GES_DISC"
     },
     {
-      "title": "SBU Ka-band Scanning Polarimetric Radar (KASPR) IMPACTS V1",
-      "url": "https://search.earthdata.nasa.gov/search?q=sbukasprimpacts",
-      "desc": "The SBU Ka-band Scanning Polarimetric Radar (KASPR) IMPACTS dataset consists of polarimetric radar data collected by the Stony Brook University (SBU) Ka-band…",
-      "org": "GHRC_DAAC"
+      "title": "TROPESS CrIS-SNPP L2 Peroxyacetyl Nitrate for Forward Stream, Summary Product V1 (TRPSYL2PANCRSFS) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=TRPSYL2PANCRSFS",
+      "desc": "The TROPESS CrIS-SNPP L2 Peroxyacetyl Nitrate for Forward Stream, Summary Product contains the vertical distribution of the retrieved atmospheric state of pe…",
+      "org": "GES_DISC"
     },
     {
-      "title": "SBU Ceilometers IMPACTS",
-      "url": "https://search.earthdata.nasa.gov/search?q=sbuceilimpacts",
-      "desc": "The SBU Ceilometers IMPACTS dataset includes ceilometer cloud height measurements collected by the Vaisala CL51, Vaisala CT25K, and Lufft Ceilometer CHM 15k…",
-      "org": "GHRC_DAAC"
+      "title": "TROPESS CrIS-JPSS1 L2 Peroxyacetyl Nitrate for Forward Stream, Summary Product V2 (TRPSYL2PANCRS1FS) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=TRPSYL2PANCRS1FS",
+      "desc": "The TROPESS CrIS-JPSS1 L2 Peroxyacetyl Nitrate for Forward Stream, Summary Product contains the vertical distribution of the retrieved atmospheric state of p…",
+      "org": "GES_DISC"
     },
     {
-      "title": "RSS SSMIS OCEAN PRODUCT GRIDS WEEKLY AVERAGE FROM DMSP F17 NETCDF V7",
-      "url": "https://search.earthdata.nasa.gov/search?q=rssmif17w",
-      "desc": "The RSS SSMIS Ocean Product Grids Weekly Average from DMSP F17 netCDF dataset is part of the collection of Special Sensor Microwave/Imager (SSM/I) and Specia…",
-      "org": "GHRC_DAAC"
+      "title": "TROPESS CrIS-JPSS1 L2 Peroxyacetyl Nitrate for Forward Stream, Summary Product V1 (TRPSYL2PANCRS1FS) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=TRPSYL2PANCRS1FS",
+      "desc": "The TROPESS CrIS-JPSS1 L2 Peroxyacetyl Nitrate for Forward Stream, Summary Product contains the vertical distribution of the retrieved atmospheric state of p…",
+      "org": "GES_DISC"
     },
     {
-      "title": "RSS SSMIS OCEAN PRODUCT GRIDS MONTHLY AVERAGE FROM DMSP F17 NETCDF V7",
-      "url": "https://search.earthdata.nasa.gov/search?q=rssmif17m",
-      "desc": "The RSS SSMIS Ocean Product Grids Monthly Average from DMSP F17 netCDF dataset is part of the collection of Special Sensor Microwave/Imager (SSM/I) and Speci…",
-      "org": "GHRC_DAAC"
+      "title": "TROPESS OMI-Aura L2 Ozone for Forward Stream, Summary Product V2 (TRPSYL2O3OMIFS) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=TRPSYL2O3OMIFS",
+      "desc": "The TROPESS OMI-Aura L2 Ozone for Forward Stream, Summary Product contains the vertical distribution of the retrieved atmospheric state of ozone (O3), and fo…",
+      "org": "GES_DISC"
     },
     {
-      "title": "RSS SSMIS OCEAN PRODUCT GRIDS 3-DAY AVERAGE FROM DMSP F17 NETCDF V7",
-      "url": "https://search.earthdata.nasa.gov/search?q=rssmif17d3d",
-      "desc": "The RSS SSMIS Ocean Product Grids 3-Day Average from DMSP F17 netCDF dataset is part of the collection of Special Sensor Microwave/Imager (SSM/I) and Special…",
-      "org": "GHRC_DAAC"
+      "title": "TROPESS OMI-Aura L2 Ozone for Forward Stream, Summary Product V1 (TRPSYL2O3OMIFS) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=TRPSYL2O3OMIFS",
+      "desc": "The TROPESS OMI-Aura L2 Ozone for Forward Stream, Summary Product contains the vertical distribution of the retrieved atmospheric state of ozone (O3), and fo…",
+      "org": "GES_DISC"
     },
     {
-      "title": "RSS SSMIS OCEAN PRODUCT GRIDS DAILY FROM DMSP F17 NETCDF V7",
-      "url": "https://search.earthdata.nasa.gov/search?q=rssmif17d",
-      "desc": "The RSS SSMIS Ocean Product Grids Daily from DMSP F17 netCDF dataset is part of the collection of Special Sensor Microwave/Imager (SSM/I) and Special Sensor…",
-      "org": "GHRC_DAAC"
+      "title": "TROPESS CrIS-SNPP L2 Ozone for Reanalysis Stream, Summary Product V1 (TRPSYL2O3CRSRS) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=TRPSYL2O3CRSRS",
+      "desc": "The TROPESS CrIS-SNPP L2 Ozone for Reanalysis Stream, Summary Product contains the vertical distribution of the retrieved atmospheric state of ozone (O3), an…",
+      "org": "GES_DISC"
     }
   ],
   "datagov": [
