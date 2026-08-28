@@ -64,6 +64,13 @@ Other engine rules, each learned the annoying way:
 - **The active card is full opacity, inactive ones dim** (CSS class toggled
   by the same observer callback). It tells the reader which text the map is
   currently answering.
+- **Any always-open control panel needs a way to close it.** The reference
+  build shipped a free-explore panel that could not be dismissed: on a phone it
+  covered 50% of the viewport, in the mode built for looking at the map, and
+  the only exit left explore mode entirely. Collapse to a pill, default
+  collapsed on phones, and add a reset. While you are there, clear the story's
+  HUD chips on entry: an annotation about a step the reader has left is a
+  stale assertion sitting on their map.
 
 ## Text labels without a glyph server
 
@@ -95,6 +102,35 @@ requests. Consequences to design for:
   0 when the camera dives and let dedicated local layers take over.
 - **Commit the pipeline next to the page** (`pipeline/*.py`, raw downloads
   gitignored). For a portfolio piece the pipeline *is* half the exhibit.
+
+## Deriving a finding, not just a picture
+
+A chapter that shows the same shape at six dates is a slideshow. The steps
+that earn their place state something the reader could not see, and the
+pipeline is where that gets computed:
+
+- **Measure the increment, not the total.** Per-epoch stats on a cumulative
+  footprint are swamped by whatever already existed, so they barely move. The
+  question is almost always what *each* period added: in the reference build,
+  slope on the cumulative built area crept from 20% to 25% and said nothing,
+  while slope on each decade's new ground showed the flat land running out.
+- **Derive at the resolution of the thing you are explaining.** A 30 m slope
+  raster thresholded against a 92 m built-up grid produced hundreds of
+  thousands of speckle polygons: 35+ minutes of dissolving, a 1.3 MB file, and
+  false precision. Block-averaging to the coarser grid first ran in 90 seconds
+  and made a better map.
+- **Let the number kill your premise.** The slope step was planned around "the
+  old city avoided the hills". The data said the old city sits at a median 2°
+  and every later decade built steeper, which is a better story, but only
+  because the copy was written after the numbers, not before.
+- **A backdrop layer's edge must fall outside every camera it appears under**,
+  or the study-window rectangle draws a hard line across the frame. Derive
+  context layers on a wider bounding box than the story window.
+- **Measure it or do not claim it.** "The road network is still the one drawn
+  for a city a tenth the size" sat in the copy for weeks as an impression.
+  Measuring it (street length inside each epoch's footprint, per resident) both
+  proved it and surfaced the caveat that mattered: OSM has no history, so the
+  early years are generous and the real decline is steeper.
 
 ## Two visual tricks worth stealing
 

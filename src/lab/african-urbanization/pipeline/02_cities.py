@@ -11,7 +11,7 @@ Sources:
 
 Output:
 - data/cities.geojson — point per city with pop (millions) at each epoch;
-  African cities with >= 1M people by 2050, plus world benchmark cities.
+  African cities with >= 1M people by 2050.
 """
 
 import csv
@@ -21,13 +21,6 @@ from collections import defaultdict
 from common import RAW_DIR, DATA_DIR, AFRICA_ISO3, write_geojson
 
 EPOCHS = [1975, 1990, 2000, 2010, 2020, 2025, 2030, 2040, 2050]
-
-# Benchmark agglomerations for scale comparisons. UN names carry local forms
-# ("Tōkyō (Tokyo)"), so match by substring within the country.
-BENCHMARKS = {
-    ("USA", "New York"), ("JPN", "Tokyo"), ("FRA", "Paris"), ("GBR", "London"),
-}
-
 
 def match(table, iso3, city_name):
     lower = city_name.lower()
@@ -64,8 +57,11 @@ def main():
     with gzip.open(RAW_DIR / "WUP2025-cities.csv.gz", "rt", encoding="utf-8-sig") as fh:
         for row in csv.DictReader(fh):
             iso3 = row["ISO3_Code"]
-            african = iso3 in AFRICA_ISO3
-            if not african and not match(BENCHMARKS, iso3, row["City_Name"]):
+            # African cities only. Western benchmark circles used to ride along
+            # for scale, but they landed at the edge of a continental frame,
+            # too small and too far out to compare anything against. The
+            # comparisons live in the copy as numbers instead, where they work.
+            if iso3 not in AFRICA_ISO3:
                 continue
             year = int(row["Year"])
             if year not in EPOCHS:
@@ -86,19 +82,16 @@ def main():
                     "capital": row["Capital"] == "1",
                     "lat": float(row["PWCent_Latitude"]),
                     "lon": float(row["PWCent_Longitude"]),
-                    "african": african,
                 }
 
     features = []
     for key, series in cities.items():
         m = meta[key]
-        pop2050 = series.get(2050, 0.0)
-        if m["african"] and pop2050 < 1000.0:  # thousands -> 1M cutoff
+        if series.get(2050, 0.0) < 1000.0:  # thousands -> 1M cutoff
             continue
         props = {
             "name": m["name"],
             "iso3": m["iso3"],
-            "african": 1 if m["african"] else 0,
         }
         if m["capital"]:
             props["capital"] = 1
