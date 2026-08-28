@@ -24,6 +24,8 @@ const AFRICA_BOUNDS = [[-19.5, -36.5], [53.5, 38.5]];
 const WEST_AFRICA_BOUNDS = [[-18, 3], [16, 15]];
 const KINSHASA_BOUNDS = [[14.97, -4.72], [15.78, -3.98]];
 const POOL_BOUNDS = [[15.12, -4.48], [15.55, -4.05]];
+// Kinshasa out to the Atlantic, so the last step can show the whole thread.
+const MATADI_BOUNDS = [[12.15, -6.30], [15.85, -4.02]];
 
 const prefersStill = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -58,7 +60,7 @@ function shortName(n) {
 
 // Bumped whenever the pipeline rewrites data/. The query string lets the
 // files be cached hard while a deploy still delivers fresh ones.
-const DATA_VERSION = "2026-08-27";
+const DATA_VERSION = "2026-08-28";
 
 // The story reads perfectly as text, so the map layers it cannot show without
 // help are loaded in two waves: what chapters 1 to 3 need, then the rest.
@@ -68,7 +70,9 @@ const CORE_FILES = [
 ];
 const DEFERRED_FILES = [
   "lights.geojson", "kinshasa-builtup.geojson", "kinshasa-water.geojson",
-  "kinshasa-roads.geojson", "kinshasa-density.geojson",
+  "kinshasa-roads.geojson", "kinshasa-density.geojson", "kinshasa-slope.geojson",
+  "kinshasa-streets.geojson", "kinshasa-communes.geojson", "matadi-corridor.geojson",
+  "kinshasa-streets.json", "kinshasa-expansion.json",
 ];
 
 function grab(file) {
@@ -120,6 +124,10 @@ function addDeferredLayers(map, d) {
   map.addSource("kin-water", { type: "geojson", data: d.kinWater });
   map.addSource("kin-roads", { type: "geojson", data: d.kinRoads });
   map.addSource("kin-density", { type: "geojson", data: d.kinDensity });
+  map.addSource("kin-slope", { type: "geojson", data: d.kinSlope });
+  map.addSource("kin-streets", { type: "geojson", data: d.kinStreets });
+  map.addSource("kin-communes", { type: "geojson", data: d.kinCommunes });
+  map.addSource("matadi", { type: "geojson", data: d.matadi });
 
   // Observed nighttime lights (chapter 3's reality check).
   map.addLayer({
@@ -133,7 +141,16 @@ function addDeferredLayers(map, d) {
     paint: { "fill-color": "#ffd166", "fill-opacity": 0, "fill-opacity-transition": { duration: 700 } },
   }, BELOW);
 
-  // Kinshasa deep-dive stack (invisible until chapter 4).
+  // Kinshasa deep-dive stack (invisible until chapter 4). Slope sits at the
+  // bottom: it is the ground the city had to build on, so everything else
+  // paints over it.
+  for (const [cls, color] of [["steep", "#3f3529"], ["steepest", "#7d5133"]]) {
+    map.addLayer({
+      id: "slope-" + cls, type: "fill", source: "kin-slope",
+      filter: ["==", ["get", "class"], cls],
+      paint: { "fill-color": color, "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
+    }, BELOW);
+  }
   map.addLayer({
     id: "kin-water", type: "fill", source: "kin-water",
     paint: { "fill-color": "#1d3242", "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
@@ -160,6 +177,40 @@ function addDeferredLayers(map, d) {
       paint: { "fill-color": color, "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
     }, BELOW);
   }
+  // Commune outlines: orientation for a footprint most readers cannot name
+  // any part of. Hairline, because they are context and not the subject.
+  map.addLayer({
+    id: "kin-communes", type: "line", source: "kin-communes",
+    paint: {
+      "line-color": "#6f7a89", "line-width": 0.7, "line-dasharray": [2, 2],
+      "line-opacity": 0, "line-opacity-transition": { duration: 600 },
+    },
+  }, BELOW);
+  // The rest of the street grid, one class below the primary roads.
+  map.addLayer({
+    id: "kin-streets", type: "line", source: "kin-streets",
+    paint: {
+      "line-color": "#9aa6b4",
+      "line-width": ["case", ["==", ["get", "kind"], "secondary"], 1.0, 0.6],
+      "line-opacity": 0, "line-opacity-transition": { duration: 600 },
+    },
+  }, BELOW);
+  map.addLayer({
+    id: "matadi-rail", type: "line", source: "matadi",
+    filter: ["==", ["get", "kind"], "rail"],
+    paint: {
+      "line-color": "#f4a93a", "line-width": 1.6, "line-dasharray": [3, 2],
+      "line-opacity": 0, "line-opacity-transition": { duration: 600 },
+    },
+  }, BELOW);
+  map.addLayer({
+    id: "matadi-road", type: "line", source: "matadi",
+    filter: ["==", ["get", "kind"], "road"],
+    paint: {
+      "line-color": "#d8734a", "line-width": 1.8,
+      "line-opacity": 0, "line-opacity-transition": { duration: 600 },
+    },
+  }, BELOW);
   map.addLayer({
     id: "kin-roads", type: "line", source: "kin-roads",
     paint: {
@@ -284,8 +335,14 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel]
     initPlaceLabels(map);
     const refreshStep = initSteps(map);
 
-    Promise.all(DEFERRED_FILES.map(grab)).then(([lights, kinBuilt, kinWater, kinRoads, kinDensity]) => {
-      addDeferredLayers(map, { lights, kinBuilt, kinWater, kinRoads, kinDensity });
+    Promise.all(DEFERRED_FILES.map(grab)).then(([lights, kinBuilt, kinWater, kinRoads,
+      kinDensity, kinSlope, kinStreets, kinCommunes, matadi, streetStats, expansion]) => {
+      addDeferredLayers(map, { lights, kinBuilt, kinWater, kinRoads, kinDensity,
+        kinSlope, kinStreets, kinCommunes, matadi });
+      initCommuneLabels(map, kinCommunes);
+      initMatadiLabels(map, matadi);
+      buildExpansionChart(expansion);
+      buildStreetChart(streetStats);
       refreshStep();
     }).catch((err) => {
       console.error(err);
@@ -320,6 +377,10 @@ function initCountryLabels(map, labels) {
     .place-label.city .inner { font-size: 12px; font-weight: 600; color: #e7e9ec; letter-spacing: 0.04em; }
     .place-label.spot .inner { font-size: 9.5px; color: #9aa1ad; letter-spacing: 0.08em; text-transform: uppercase; }
     .place-label.water .inner { font-size: 10px; color: #7f9ec2; letter-spacing: 0.16em; text-transform: uppercase; font-style: italic; }
+    /* The sea-corridor labels carry a note under the name; without display
+       block it runs on and reads as one mangled word. */
+    .place-label small { display: block; margin-top: 2px; font-size: 9px;
+      font-weight: 400; letter-spacing: 0.02em; color: #99a0ab; }
     @media (max-width: 640px) { .country-label .inner { font-size: 8px; letter-spacing: 0.04em; } }`;
   document.head.appendChild(style);
   for (const [iso3, name, lon, lat] of labels) {
@@ -373,6 +434,60 @@ function initPlaceLabels(map) {
 
 function setPlaceLabels(on) {
   for (const el of placeMarkers) el.classList.toggle("on", !!on);
+}
+
+/* ------------------------------------------------------- commune labels */
+// The 24 communes are how Kinshasa talks about itself. Naming a few turns the
+// footprint into somewhere: Gombe is the colonial core, Masina and Kimbanseke
+// are the self-built east, Ngaliema climbs the western hills.
+// Only the ones the reader can actually see at the chapter's zoom, and only
+// where they do not collide with a place label already naming that spot.
+// Deliberately short. The inner communes are a few square kilometres each and
+// their labels piled into an unreadable stack at this zoom, so this keeps the
+// ones a reader can actually pick out: the core, the big self-built east, the
+// western hills, and the industrial spine. "Kinshasa" the commune is dropped
+// because the city label already sits there.
+const COMMUNE_LABELS = new Set([
+  "Gombe", "Ngaliema", "Limete", "Masina", "Kimbanseke",
+  "Lemba", "Kisenso", "Selembao", "Ndjili",
+]);
+let communeMarkers = [];
+
+function initCommuneLabels(map, communes) {
+  for (const f of communes.features || []) {
+    const p = f.properties;
+    if (!COMMUNE_LABELS.has(p.name) || p.lon == null) continue;
+    const el = document.createElement("div");
+    el.className = "commune-label";
+    el.innerHTML = `<span class="inner">${p.name}</span>`;
+    new maplibregl.Marker({ element: el, anchor: "center" })
+      .setLngLat([p.lon, p.lat]).addTo(map);
+    communeMarkers.push(el);
+  }
+}
+
+function setCommuneLabels(on) {
+  for (const el of communeMarkers) el.classList.toggle("on", !!on);
+}
+
+/* --------------------------------------------- labels for the sea corridor */
+let matadiMarkers = [];
+
+function initMatadiLabels(map, corridor) {
+  for (const f of corridor.features || []) {
+    if (f.properties.kind !== "place") continue;
+    const [lon, lat] = f.geometry.coordinates;
+    const el = document.createElement("div");
+    el.className = "place-label city";
+    el.innerHTML = `<span class="inner">${f.properties.name}<small>${f.properties.note}</small></span>`;
+    new maplibregl.Marker({ element: el, anchor: "center" })
+      .setLngLat([lon, lat]).addTo(map);
+    matadiMarkers.push(el);
+  }
+}
+
+function setMatadiLabels(on) {
+  for (const el of matadiMarkers) el.classList.toggle("on", !!on);
 }
 
 /* -------------------------------------------------------- HTML city labels */
@@ -501,7 +616,22 @@ function initSteps(map) {
   const densityOn = (v) => {
     for (const band of [5000, 15000, 30000, 60000]) lineOpacity("density-" + band, v * 0.92);
   };
+  const slopeOn = (v) => {
+    lineOpacity("slope-steep", v * 0.85);
+    lineOpacity("slope-steepest", v * 0.95);
+  };
+  const streetsOn = (v) => lineOpacity("kin-streets", v * 0.95);
+  const communesOn = (v) => lineOpacity("kin-communes", v * 0.75);
+  const matadiOn = (v) => {
+    lineOpacity("matadi-road", v * 0.95);
+    lineOpacity("matadi-rail", v * 0.9);
+  };
+  // The HUD chip annotates a step the story is making. In explore mode the
+  // reader drives, and the panel's own year output says which epoch is drawn,
+  // so the chip would just be a leftover assertion sitting on the map.
+  const hudOff = () => hud.classList.remove("on");
   const hudSet = (big, sub) => {
+    if (exploring) { hud.classList.remove("on"); return; }
     hud.classList.add("on");
     hudYr.textContent = big;
     hud.querySelector(".sub").textContent = sub;
@@ -536,6 +666,8 @@ function initSteps(map) {
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
       corridors(0, 0, 0, 0, 0); lightsOn(0); densityOn(0);
       setCountryLabels(false); setPlaceLabels(true);
+      slopeOn(0); streetsOn(0); communesOn(0); matadiOn(0);
+      setCommuneLabels(false); setMatadiLabels(false);
     },
   };
 
@@ -592,6 +724,28 @@ function initSteps(map) {
       fly(KINSHASA_BOUNDS, 12); base.c4();
       kinshasa(0.95, 0.35, 1975); densityOn(1);
       hudSet("×6.3", "people on the 1975 ground");
+    },
+    "c4-rings": () => {
+      fly(KINSHASA_BOUNDS, 12); base.c4();
+      kinshasa(0.95, 0.35, 2030); densityOn(0.85);
+      hudSet("83%", "of new people on old ground");
+    },
+    "c4-slope": () => {
+      fly(KINSHASA_BOUNDS, 12); base.c4();
+      slopeOn(1); kinshasa(0.9, 0.3, 2030);
+      hudSet("2.0°", "median slope of the 1975 city");
+    },
+    "c4-streets": () => {
+      fly(POOL_BOUNDS, 13); base.c4();
+      kinshasa(0.9, 0.85, 2030); streetsOn(1); communesOn(1);
+      setCommuneLabels(true);
+      hudSet("1.0 m", "of street per resident");
+    },
+    "c4-matadi": () => {
+      fly(MATADI_BOUNDS, 8); base.c4();
+      kinshasa(0.9, 0, 2030); matadiOn(1);
+      setPlaceLabels(false); setMatadiLabels(true);
+      hudOff();
     },
     "explore": () => { fly(KINSHASA_BOUNDS, 11); base.c4(); kinshasa(0.95, 0.5, 2030); },
   };
@@ -741,12 +895,38 @@ function initSteps(map) {
     map.getCanvas().style.cursor = hits.length ? "pointer" : "";
   });
 
+  // Opening state, and what Reset returns to.
+  const PANEL_DEFAULTS = { metric: "off", year: 8, layers: { kinshasa: true } };
+  const resetPanel = () => {
+    if (!panel) return;
+    metricSel.value = PANEL_DEFAULTS.metric;
+    yearSlider.value = PANEL_DEFAULTS.year;
+    yearOut.textContent = currentEpoch();
+    panel.querySelectorAll("input[data-layer]").forEach((box) => {
+      box.checked = Boolean(PANEL_DEFAULTS.layers[box.dataset.layer]);
+    });
+    applyPanel();
+  };
+  const collapseBtn = document.getElementById("explore-collapse");
+  const setCollapsed = (mini) => {
+    panel?.classList.toggle("mini", mini);
+    collapseBtn?.setAttribute("aria-expanded", String(!mini));
+  };
+  collapseBtn?.addEventListener("click", () => setCollapsed(!panel.classList.contains("mini")));
+  document.getElementById("explore-reset")?.addEventListener("click", () => {
+    if (exploring) resetPanel();
+  });
+
   document.getElementById("explore-btn")?.addEventListener("click", () => {
     exploring = true;
     spinStop();
     document.body.classList.add("exploring");
     handlers.forEach((h) => map[h].enable());
     map.addControl(nav, "top-right");
+    // The story's last epoch chip is not about anything the reader is doing now.
+    hud.classList.remove("on");
+    // A phone panel opens over half the map. Start it out of the way there.
+    setCollapsed(window.matchMedia("(max-width: 640px)").matches);
     applyPanel();
   });
   panel?.addEventListener("change", (e) => {
@@ -849,6 +1029,19 @@ const LEGENDS = {
   "c4-density": { title: "People per km², 2025", rows: [
     ROW("#5a3a7a", "5,000+", "box"), ROW("#95457f", "15,000+", "box"),
     ROW("#d5566a", "30,000+", "box"), ROW("#ff9d5c", "60,000+", "box")] },
+  "c4-rings": { title: "People per km², 2025", rows: [
+    ROW("#5a3a7a", "5,000+", "box"), ROW("#95457f", "15,000+", "box"),
+    ROW("#d5566a", "30,000+", "box"), ROW("#ff9d5c", "60,000+", "box")] },
+  "c4-slope": { title: "Ground under the city", rows: [
+    ROW("#3f3529", "slope over 10°", "box"),
+    ROW("#7d5133", "slope over 15°", "box"),
+    ROW("#ffd84d", "built by 2030", "box")] },
+  "c4-streets": { title: "The street grid", rows: [
+    ROW("#aeb6c2", "main road"), ROW("#9aa6b4", "other streets"),
+    ROW("#6f7a89", "commune boundary")] },
+  "c4-matadi": { title: "Kinshasa to the sea", rows: [
+    ROW("#d8734a", "Route Nationale 1"),
+    ROW("#f4a93a", "Matadi-Kinshasa railway")] },
   "explore": null,
 };
 
@@ -927,6 +1120,76 @@ function buildRegionChart(regions, band) {
     floor = t.at;
     svg += `<text class="lbl" x="${W - R + 5}" y="${(t.at + 3).toFixed(1)}" fill="${t.color}" style="fill:${t.color}">${t.short}</text>`;
   }
+  svg += "</svg>";
+  el.innerHTML = svg;
+}
+
+// Built ground and people, by distance from the old core. Two paired bars per
+// ring: what the ring held in 1975 against what it holds now. The shape is the
+// argument, so the two measures share a row and not a scale.
+function buildExpansionChart(data) {
+  const el = document.getElementById("chart-expansion");
+  if (!el || !data) return;
+  const W = 390, H = 210, L = 46, R = 8, T = 16, B = 26;
+  const bands = data.bands;
+  const rowH = (H - T - B) / bands.length;
+  const maxPop = Math.max(...bands.map((b) => b.pop2025));
+  const maxBuilt = Math.max(...bands.map((b) => b.built["2030"]));
+  const half = (W - L - R) / 2 - 12;
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Built ground and population by distance from the old core, 1975 and today">`;
+  svg += `<text x="${L}" y="10">built km²</text>`;
+  svg += `<text x="${L + half + 24}" y="10">people</text>`;
+  bands.forEach((b, i) => {
+    const y = T + i * rowH;
+    const h = Math.max(3, rowH - 7);
+    svg += `<text x="${L - 6}" y="${y + h / 2 + 3}" text-anchor="end">${b.from}-${b.to}km</text>`;
+    // Left: built ground then and now. Right: people then and now.
+    // Two thin bars per ring rather than one overlaid on the other: a
+    // translucent amber over a dark bar just reads as a third muddy colour,
+    // and the legend then describes something the eye is not seeing.
+    const bar = (h / 2) - 1;
+    const pairs = [
+      [L, b.built["1975"] / maxBuilt * half, b.built["2030"] / maxBuilt * half],
+      [L + half + 24, b.pop1975 / maxPop * half, b.pop2025 / maxPop * half],
+    ];
+    for (const [x0, thenW, nowW] of pairs) {
+      svg += `<rect x="${x0}" y="${y}" width="${Math.max(1, thenW).toFixed(1)}" height="${bar}" fill="#6e5f46"/>`;
+      svg += `<rect x="${x0}" y="${(y + bar + 2).toFixed(1)}" width="${Math.max(1, nowW).toFixed(1)}" height="${bar}" fill="#f4a93a"/>`;
+    }
+  });
+  svg += `<text x="${L}" y="${H - 8}" fill="#6e5f46">1975</text>`;
+  svg += `<text x="${L + 34}" y="${H - 8}" fill="#f4a93a" style="fill:#f4a93a">today</text>`;
+  svg += "</svg>";
+  el.innerHTML = svg;
+}
+
+// Metres of street per resident, epoch by epoch. One line, falling off a cliff.
+function buildStreetChart(data) {
+  const el = document.getElementById("chart-streets");
+  if (!el || !data) return;
+  const rows = data.rows.filter((r) => r.metresPerPerson != null);
+  if (!rows.length) return;
+  const W = 390, H = 150, L = 34, R = 16, T = 14, B = 24;
+  const max = Math.ceil(Math.max(...rows.map((r) => r.metresPerPerson)));
+  const x = (i) => L + (i / (rows.length - 1)) * (W - L - R);
+  const y = (v) => T + (1 - v / max) * (H - T - B);
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Metres of street per resident in Kinshasa, 1975 to 2030">`;
+  for (const v of [2, 4, 6, 8]) {
+    if (v > max) continue;
+    svg += `<line class="axis" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/>`;
+    svg += `<text x="${L - 4}" y="${y(v) + 3}" text-anchor="end">${v}m</text>`;
+  }
+  const pts = rows.map((r, i) => `${x(i).toFixed(1)},${y(r.metresPerPerson).toFixed(1)}`);
+  svg += `<polyline fill="none" stroke="#f4a93a" stroke-width="2.2" points="${pts.join(" ")}"/>`;
+  rows.forEach((r, i) => {
+    svg += `<circle cx="${x(i).toFixed(1)}" cy="${y(r.metresPerPerson).toFixed(1)}" r="2.6" fill="#f4a93a"/>`;
+    svg += `<text x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle">${r.epoch}</text>`;
+  });
+  const first = rows[0], last = rows[rows.length - 1];
+  svg += `<text class="lbl" x="${x(0) + 6}" y="${y(first.metresPerPerson) - 6}" fill="#f4a93a" style="fill:#f4a93a">${first.metresPerPerson} m</text>`;
+  svg += `<text class="lbl" x="${x(rows.length - 1) - 6}" y="${y(last.metresPerPerson) - 8}" text-anchor="end" fill="#f4a93a" style="fill:#f4a93a">${last.metresPerPerson} m</text>`;
   svg += "</svg>";
   el.innerHTML = svg;
 }

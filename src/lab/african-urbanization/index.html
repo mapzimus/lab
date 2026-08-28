@@ -152,6 +152,18 @@
   .card a { color: var(--accent2); }
 
 
+  /* Commune names: quieter than the place labels, because they are the
+     background a reader orients against rather than the subject. */
+  .commune-label { pointer-events: none; }
+  .commune-label .inner {
+    display: block; font-family: var(--mono); font-size: 8.5px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; color: #9aa2ae;
+    white-space: nowrap; text-shadow: 0 1px 4px #000, 0 0 8px rgba(0,0,0,0.9);
+    opacity: 0; transition: opacity 0.5s ease;
+  }
+  .commune-label.on .inner { opacity: 1; }
+  @media (max-width: 640px) { .commune-label .inner { font-size: 7.5px; } }
+
   /* the inline SVG chart */
   .chart { margin-top: 12px; }
   .chart svg { display: block; width: 100%; height: auto; }
@@ -317,6 +329,28 @@
   }
   #explore-panel .chips button:hover { color: var(--text); border-color: var(--accent); }
   #explore-panel .hint { margin: 12px 0 0; font-size: 11px; color: var(--dim); }
+  /* The panel has to be able to get out of the way. Collapsed it is a pill in
+     the corner; on a phone it opened over half the viewport, which is most of
+     the map the reader pressed "explore" to look at. */
+  #explore-panel .panel-head { display: flex; align-items: center; gap: 8px; }
+  #explore-panel .panel-head button {
+    font: 600 11px var(--mono); letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--muted); background: none; border: 0; padding: 2px 0; cursor: pointer;
+  }
+  #explore-panel .panel-head button:hover { color: var(--text); }
+  #explore-collapse { display: flex; align-items: center; gap: 7px; flex: 1; }
+  #explore-collapse .chev {
+    width: 0; height: 0; border-left: 5px solid currentColor;
+    border-top: 4px solid transparent; border-bottom: 4px solid transparent;
+    transform: rotate(90deg); transition: transform 0.18s ease;
+  }
+  #explore-reset { flex: none; }
+  #explore-panel #explore-body { margin-top: 10px; }
+  #explore-panel.mini { padding-bottom: 12px; }
+  #explore-panel.mini #explore-body { display: none; }
+  #explore-panel.mini #explore-collapse .chev { transform: rotate(0deg); }
+  #explore-panel.mini #explore-reset { display: none; }
+  @media (prefers-reduced-motion: reduce) { #explore-collapse .chev { transition: none; } }
   .maplibregl-popup-content {
     background: var(--sunk); color: var(--text);
     border: 1px solid var(--line); border-radius: 8px;
@@ -342,6 +376,9 @@
   body.exploring #explore-panel { display: block; }
   @media (max-width: 640px) {
     #explore-panel { left: 10px; right: 10px; bottom: 14px; max-height: 55vh; overflow-y: auto; }
+    /* Collapsed, it shrinks to the pill rather than staying a full-width bar,
+       and sits above the attribution strip instead of across it. */
+    #explore-panel.mini { right: auto; bottom: 34px; max-height: none; overflow: visible; }
   }
 
   /* A banner, not a curtain. Every failure mode here still leaves the written
@@ -681,6 +718,74 @@
     </div>
   </div>
 
+  <div class="step" data-step="c4-rings">
+    <div class="card">
+      <h3>Where the people actually went</h3>
+      <p>Measure it in rings out from the old river front and the pattern is
+      hard to miss. Built ground grew by half. The people on it grew by
+      fourteen million, and <b>83% of them are standing on ground that was
+      already built in 1975</b>. Half the city still lives within ten
+      kilometres of the colonial core.</p>
+      <div class="chart" id="chart-expansion"></div>
+      <p class="fine">Each row is a five kilometre ring. Dark is 1975, amber is
+      today. The city did spread, but the spreading is the small half of the
+      story.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c4-slope">
+    <div class="card">
+      <h3>The flat ground ran out</h3>
+      <p>There is a reason the packing happened. The old city sits on a shelf
+      of flat land by the river, at a median slope of <b>2 degrees</b>, and
+      only about one part in forty of it is steep. That land is finished. Every
+      decade since has had to build on worse ground: the growth added by 1990
+      came in at twice the slope of the old city, and roughly one part in
+      eleven of it was properly steep.</p>
+      <p>On bare tropical hillsides with no drainage, heavy rain does not run
+      off, it digs. Kinshasa loses houses and streets to erosion gullies most
+      wet seasons, and the map of where that happens is largely the map of
+      where the city had nowhere flat left to go.</p>
+      <p class="fine">Slope from the Copernicus 30 m elevation model, averaged
+      to the built-up grid. The 2030 layer is the JRC's projection and covers a
+      small area, so its slope figures move around more than the rest.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c4-streets">
+    <div class="card">
+      <h3>Streets built for a tenth of the city</h3>
+      <p>Chapter by chapter this story has shown the ground filling in. Here is
+      what did not. Counting every street inside the built-up area, the network
+      grew about <b>37%</b> between the 1975 footprint and the 2030 one. Over
+      the same stretch the city went from roughly one million people to more
+      than eleven.</p>
+      <div class="chart" id="chart-streets"></div>
+      <p>Per person, that is a fall from about nine metres of street to
+      <b>one</b>. Nothing collapsed and nothing was demolished. The city simply
+      arrived, and the streets did not.</p>
+      <p class="fine">Streets from OpenStreetMap, measured inside each epoch's
+      built footprint. OSM maps the network as it is now, so the early years
+      are generous: some of those streets were not there yet, which makes the
+      real decline steeper than the line.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c4-matadi">
+    <div class="card">
+      <h3>One road to the sea</h3>
+      <p>Zoom out and the last problem shows up. Kinshasa sits hundreds of
+      kilometres inland on a river that ocean ships cannot climb, because the
+      Livingstone Falls sit between the city and the estuary. Almost everything
+      imported for it lands at <b>Matadi</b> and finishes the journey on the
+      two lines drawn here: one national road, and one railway.</p>
+      <p>That is the whole connection between a city heading for tens of
+      millions of people and the rest of the world. Chapter 3 asked which
+      corridors a growing continent will need. This is what the question looks
+      like from the ground, for one city, today.</p>
+    </div>
+  </div>
+
   <div class="step" data-step="explore">
     <div class="card">
       <h3>Now it is yours</h3>
@@ -703,6 +808,13 @@
 </nav>
 
 <div id="explore-panel" aria-label="Map controls">
+  <div class="panel-head">
+    <button id="explore-collapse" type="button" aria-expanded="true" aria-controls="explore-body">
+      <span class="chev" aria-hidden="true"></span><span class="lbl">Filters</span>
+    </button>
+    <button id="explore-reset" type="button">Reset</button>
+  </div>
+  <div id="explore-body">
   <label class="cap" for="explore-metric">Country shading</label>
   <select id="explore-metric">
     <option value="off" selected>None</option>
@@ -734,6 +846,7 @@
   </div>
   <p class="hint">Click any country, city, or corridor for its numbers.</p>
   <button id="explore-exit" type="button">← Back to the story</button>
+  </div>
 </div>
 
 <footer class="sources">

@@ -51,6 +51,13 @@ for epoch in (1975, 2025):
 # Harmonized DMSP/VIIRS nighttime lights, 2020 layer (Li et al., CC BY 4.0).
 FILES["Harmonized_DN_NTL_2020_simVIIRS.tif"] = "https://ndownloader.figshare.com/files/57065297"
 
+# Copernicus DEM GLO-30 (ESA, free and open licence). Four 1-degree tiles cover
+# the Kinshasa window; 09_kinshasa_terrain.py mosaics them and derives slope.
+COP_DEM = "https://copernicus-dem-30m.s3.amazonaws.com"
+for tile in ("S05_00_E014", "S05_00_E015", "S04_00_E014", "S04_00_E015"):
+    stem = f"Copernicus_DSM_COG_10_{tile}_00_DEM"
+    FILES[f"{stem}.tif"] = f"{COP_DEM}/{stem}/{stem}.tif"
+
 
 def download(name, url):
     target = RAW_DIR / name

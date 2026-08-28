@@ -4,7 +4,8 @@ A scroll-driven map story in four chapters: Africa's population century (UN
 projections to 2100), the megacities rising past every Western city, the
 transportation corridors they will need, and Kinshasa's growth on the ground
 from satellite epochs. No backend, no tiles — `index.html` + `app.js` drive a
-MapLibre globe over ~2 MB of GeoJSON committed in `data/`.
+MapLibre globe over ~4 MB of GeoJSON committed in `data/`, split into a
+critical wave and a deferred one.
 
 ## Chapters
 
@@ -28,7 +29,12 @@ MapLibre globe over ~2 MB of GeoJSON committed in `data/`.
 4. **Kinshasa, ground truth** — GHSL built-up epochs 1975 to 2030 stacked as
    growth-vintage rings over the Malebo Pool, with OSM river and roads, and a
    GHS-POP density surface showing that the ground built by 1975 went from 2.3
-   to 14 million people.
+   to 14 million people. Then four measurements of what that meant: expansion
+   by distance ring (83% of the people added since 1975 stand on ground that
+   was already built), the slope the city ran out of (the 1975 city sits at a
+   median 2°, every later decade built steeper), street length per resident
+   (nine metres down to one), and the single road and railway connecting the
+   city to the sea.
 
 Throughout: a floating map key that changes with every step, country names
 across the continental chapters, place labels at city zoom, and a chapter rail.
@@ -56,6 +62,11 @@ order; raw downloads land in `pipeline/raw/`, which is gitignored — set
 | `06_lights.py` | Harmonized DMSP/VIIRS nighttime lights 2020 (Li et al., figshare) | `lights.geojson` |
 | `07_kinshasa_density.py` | JRC GHS-POP R2023A, 1975 + 2025 | `kinshasa-density.geojson` (+ densification stats) |
 | `08_services.py` | World Bank Open Data (electricity and water access) | merged into `countries.geojson` as `elec` / `water` |
+| `09_kinshasa_terrain.py` | Copernicus DEM GLO-30 + GHS-BUILT-S | `kinshasa-slope.geojson` (+ built-on-slope by epoch) |
+| `10_kinshasa_streets.py` | OpenStreetMap street network + GHS-BUILT-S | `kinshasa-streets.geojson`, `kinshasa-streets.json` |
+| `11_kinshasa_communes.py` | OpenStreetMap admin_level 7 | `kinshasa-communes.geojson` |
+| `12_kinshasa_expansion.py` | GHS-BUILT-S + GHS-POP | `kinshasa-expansion.json` (distance-ring analysis) |
+| `13_matadi_corridor.py` | OpenStreetMap road and rail | `matadi-corridor.geojson` |
 
 ### Rerunning it
 
@@ -64,9 +75,9 @@ python3 -m pip install -r pipeline/requirements.txt
 cd pipeline && ./run_all.sh
 ```
 
-`fetch_raw.py` downloads all sixteen raw inputs (about 1.5 GB, mostly GHSL
-tiles) under the exact filenames the scripts expect, skipping anything already
-present, so an interrupted run resumes. Set `AFRICAN_URBANIZATION_RAW` to keep
+`fetch_raw.py` downloads all twenty raw inputs (about 1.7 GB, mostly GHSL
+tiles and Copernicus DEM) under the exact filenames the scripts expect,
+skipping anything already present, so an interrupted run resumes. Set `AFRICAN_URBANIZATION_RAW` to keep
 them outside the repo; `pipeline/raw/` is gitignored either way. After a rerun,
 bump `DATA_VERSION` in `app.js` so browsers fetch the new files rather than
 their cached copies. That constant is the only manual step: `app.js` and the
@@ -86,14 +97,22 @@ files are fetched from JavaScript and so cannot be stamped from the HTML.
   "people without" totals multiply that share by the UN's 2025 population.
 - GHSL built-up epochs are model output from satellite archives; the 2030
   epoch is the JRC's own projection. The ≥20% built threshold trades detail
-  for legible footprints.
+  for legible footprints. The 2030 increment is small, so slope statistics
+  computed on it move around more than the earlier epochs.
+- Street length is measured from OpenStreetMap as it stands today, inside each
+  epoch's built footprint. OSM has no history here, so the early years count
+  streets that may not have existed yet: the real fall in street per person is
+  steeper than the chart shows, not shallower.
+- Slope comes from the Copernicus 30 m DEM block-averaged to roughly the 92 m
+  built-up grid. Finer classes would be false precision against a layer that
+  coarse, so only two are drawn.
 
 ## Licenses
 
 Natural Earth (public domain) · UN WPP/WUP (CC BY 3.0 IGO) · JRC GHSL
-(CC BY 4.0) · World Bank Open Data (CC BY 4.0) · OpenStreetMap (ODbL,
-© OpenStreetMap contributors) · MapLibre GL JS (BSD-3-Clause, vendored in
-`vendor/`).
+(CC BY 4.0) · Copernicus DEM (ESA, free and open) · World Bank Open Data
+(CC BY 4.0) · OpenStreetMap (ODbL, © OpenStreetMap contributors) · MapLibre
+GL JS (BSD-3-Clause, vendored in `vendor/`).
 
 ## Analytics
 
