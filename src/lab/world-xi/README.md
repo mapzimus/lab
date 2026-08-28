@@ -18,8 +18,12 @@ link and site favicon, absolute `/lab/world-xi/...` asset paths plus the
 after copying.
 
 Data: Wikidata (CC0) plus club rosters, grounds and towns read from Wikipedia.
-142 clubs in the lower US tiers have no Wikidata item, and 137 clubs are placed
+142 clubs in the lower US tiers have no Wikidata item, and 88 clubs are placed
 on their town rather than their ground; the map labels those as approximate.
+49 grounds come from OpenStreetMap, which Wikidata and Wikipedia do not carry —
+so clubs.geojson is a derived database under ODbL 1.0 and must credit
+"© OpenStreetMap contributors" (https://www.openstreetmap.org/copyright). Each
+club's `source` field says which coordinates those are.
 Crests are hotlinked from Wikipedia/Commons at runtime and remain trademarks of
 their clubs; no crest files are committed.
 Basemap: OpenFreeMap. MapLibre GL JS 5.6.1 vendored (see `vendor/README.md`).
