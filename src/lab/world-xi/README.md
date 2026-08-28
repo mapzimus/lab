@@ -2,7 +2,7 @@
 
 Hosted copy of [mapzimus/world-xi-map](https://github.com/mapzimus/world-xi-map)
 at https://mapzimus.com/lab/world-xi/ — an interactive 3D globe of every club of
-46 leagues, men's and women's, across five continents (1,041 clubs), each at its
+46 leagues, men's and women's, across five continents (1,039 clubs), each at its
 home stadium, searchable and filterable per league. That includes the whole
 United States pyramid, MLS down to the fourth tier. Only the men's big five are
 shown at first; the rest switch on from the legend.
@@ -18,7 +18,7 @@ link and site favicon, absolute `/lab/world-xi/...` asset paths plus the
 after copying.
 
 Data: Wikidata (CC0) plus club rosters, grounds and towns read from Wikipedia.
-143 clubs in the lower US tiers have no Wikidata item, and 169 clubs are placed
+142 clubs in the lower US tiers have no Wikidata item, and 137 clubs are placed
 on their town rather than their ground; the map labels those as approximate.
 Crests are hotlinked from Wikipedia/Commons at runtime and remain trademarks of
 their clubs; no crest files are committed.
