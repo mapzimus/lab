@@ -16,9 +16,11 @@ critical wave and a deferred one.
    "overtaking years" give the single year an African country's population
    passes a Western one (medium variant, lead held through 2100).
 2. **Where the megacities rise** — every African agglomeration ≥1M by 2050 as
-   a proportional circle, animating 1975 → 2050 on UN annual series, with New
-   York / Tokyo / Paris / London drawn on the same scale. 2100 outlooks are
-   hollow rings, flagged as academic projections.
+   a proportional circle, animating 1975 → 2050 on UN annual series. Western
+   comparisons live in the copy as numbers rather than as circles: drawn on a
+   continental frame they landed at the edge, too small and too far out to
+   compare anything against. 2100 outlooks are hollow rings, flagged as
+   academic projections.
 3. **Connecting a continent** — existing rail/roads (Natural Earth), the
    financed lines (China's SGR/BRI railways vs. the Lobito Corridor, plus the
    AU's Trans-African Highway network), and a gravity model

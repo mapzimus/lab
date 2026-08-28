@@ -320,7 +320,7 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel]
       paint: {
         "circle-radius": cityRadius("p1975", 3.2),
         "circle-radius-transition": { duration: 900 },
-        "circle-color": ["case", ["==", ["get", "african"], 1], "#f4a93a", "#5b6c85"],
+        "circle-color": "#f4a93a",
         "circle-opacity": 0,
         "circle-opacity-transition": { duration: 600 },
         "circle-stroke-color": "#101319",
@@ -493,7 +493,7 @@ function setMatadiLabels(on) {
 /* -------------------------------------------------------- HTML city labels */
 
 const LABEL_CITIES = ["Lagos", "Kinshasa", "Al-Qahirah (Cairo)", "Dar es Salaam",
-                      "Luanda", "Nairobi", "Abidjan", "New York City", "Tōkyō (Tokyo)"];
+                      "Luanda", "Nairobi", "Abidjan"];
 let markers = [];
 
 function initMarkers(map, cities) {
@@ -507,16 +507,13 @@ function initMarkers(map, cities) {
       text-shadow: 0 1px 4px #000, 0 0 10px rgba(0,0,0,0.9);
       transform: translateY(-11px); opacity: 0; transition: opacity 0.5s ease; }
     .city-label.on .inner { opacity: 1; }
-    .city-label small { display: block; font-weight: 400; color: #99a0ab; font-size: 9px; }
-    @media (max-width: 640px) { .city-label.bench { display: none; } }`;
+    .city-label small { display: block; font-weight: 400; color: #99a0ab; font-size: 9px; }`;
   document.head.appendChild(style);
   for (const f of cities.features) {
     const name = f.properties.name;
     if (!LABEL_CITIES.includes(name)) continue;
     const el = document.createElement("div");
-    // Benchmark labels sit at the map edges on phones and clip; CSS hides them
-    // below the phone breakpoint via the "bench" class.
-    el.className = "city-label" + (f.properties.african ? "" : " bench");
+    el.className = "city-label";
     el.dataset.name = name;
     const display = name.includes("(") ? name.match(/\(([^)]+)\)/)[1] : name;
     el.innerHTML = `<span class="inner">${display}<small></small></span>`;
@@ -984,7 +981,6 @@ function rampLegend(title, stops, fmt, plus = true) {
 const ROW = (color, label, shape) => ({ color, label, shape: shape || "line" });
 const CITY_ROWS = [
   ROW("#f4a93a", "African city, sized by people", "dot"),
-  ROW("#5b6c85", "New York · London · Paris · Tokyo", "dot"),
 ];
 const EPOCH_ROWS = (upTo) =>
   EPOCHS.filter((e) => e <= upTo).map((e) =>
