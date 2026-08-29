@@ -44,7 +44,7 @@
     --line: #333840;
     --text: #e7e9ec;
     --muted: #99a0ab;
-    --dim: #6d747e;
+    --dim: #858d99;   /* AA on --bg: the old #6d747e was 3.94:1 */
     --accent: #f4a93a;
     --accent2: #8fb8e8;
     --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -58,6 +58,14 @@
     font-family: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     font-size: 15px; line-height: 1.55;
   }
+
+  .skip-link {
+    position: absolute; left: -9999px; top: 0; z-index: 10;
+    padding: 10px 14px; background: var(--sunk); color: var(--text);
+    border: 1px solid var(--accent); border-radius: 0 0 8px 0;
+    font: 600 13px var(--mono); text-decoration: none;
+  }
+  .skip-link:focus { left: 0; }
 
   #map {
     position: fixed; inset: 0;
@@ -397,6 +405,19 @@
   #error.on { display: block; }
   #error b { color: #ffd166; font-weight: 650; }
 
+  /* Short phones (SE-class, and any phone held sideways) cannot fit a chart
+     card above 22vh of bottom padding: it grew upward past the top of its own
+     step, under the legend and the epoch chip, hiding its heading. Give the
+     card its own scroll and start it below them. */
+  @media (max-width: 640px) and (max-height: 700px) {
+    .step { padding-bottom: 10vh; }
+    .card { max-height: 72vh; overflow-y: auto; }
+    /* There is no room for floating overlays as well as a chart card on a
+       568 pixel tall screen: they landed on top of the card's own heading.
+       The card carries the same information in its text, and the legend
+       returns on any normally proportioned phone. */
+    #map-legend, #epoch-hud { display: none; }
+  }
   @media (max-width: 640px) {
     .step { align-items: flex-end; padding: 16px 12px 22vh; min-height: 96vh; }
     .card { width: 100%; padding: 14px 16px; }
@@ -409,6 +430,7 @@
 </style>
 </head>
 <body>
+<a class="skip-link" href="#sources">Skip to sources and method</a>
 
 <div id="map" aria-hidden="true"></div>
 <div id="epoch-hud"><div class="yr">1975</div><div class="sub">built-up footprint</div></div>
@@ -853,17 +875,18 @@
   <button id="explore-exit" type="button">← Back to the story</button>
 </div>
 
-<footer class="sources">
+<footer class="sources" id="sources">
   <div class="card">
     <h3>Method and sources</h3>
     <ul>
       <li><b>Population:</b> UN World Population Prospects 2024, medium variant. Regional shares, country series and crossover years are computed from the annual data.</li>
       <li><b>Cities:</b> UN World Urbanization Prospects 2025, DEGURBA city database, 1975 to 2050. The 2100 city figures come from Hoornweg and Pope, <i>Environment &amp; Urbanization</i> 29(1), 2017, and are drawn hollow because they are projections.</li>
       <li><b>Corridors:</b> Natural Earth 1:10m rail and roads; a curated project list (AU and UNECA Trans-African Highways, plus SGR and BRI lines per public financing records); a gravity model computed from the city data above. Built railways use their real alignments from OpenStreetMap. Planned corridors are schematic, city to city.</li>
-      <li><b>Kinshasa:</b> JRC Global Human Settlement Layer, GHS-BUILT-S and GHS-POP R2023A (CC BY 4.0), 3 arcsecond epochs, 20 percent built threshold. Densification compares GHS-POP 1975 with 2025 inside the 1975 footprint. River and roads © OpenStreetMap contributors (ODbL).</li>
+      <li><b>Kinshasa:</b> JRC Global Human Settlement Layer, GHS-BUILT-S and GHS-POP R2023A (CC BY 4.0), 3 arcsecond epochs, 20 percent built threshold. Densification compares GHS-POP 1975 with 2025 inside the 1975 footprint, and the distance rings measure both grids outward from the old river front. River, roads, streets, commune boundaries and the corridor to Matadi are © OpenStreetMap contributors (ODbL). Street supply per resident counts today's OSM network inside each epoch's built footprint, so the early years are generous.</li>
+      <li><b>Terrain:</b> Copernicus DEM GLO-30 (© DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under the Copernicus DEM free and open licence), block-averaged to the built-up grid before slope is derived. Two classes only, because finer ones would be false precision against a 92 metre layer.</li>
       <li><b>Services:</b> World Bank open data (CC BY 4.0), access to electricity and to basic drinking water, most recent year per country in 2015 to 2023.</li>
       <li><b>Night lights:</b> harmonized DMSP and VIIRS global nighttime light dataset, 2020 layer (Li, Zhou, Zhao and Zhao; figshare doi:10.6084/m9.figshare.9828827, CC BY 4.0).</li>
-      <li><b>Base:</b> Natural Earth (public domain). Built with MapLibre GL JS. No tiles and no backend: the whole map is about 3 MB of GeoJSON.</li>
+      <li><b>Base:</b> Natural Earth (public domain). Built with MapLibre GL JS. No tiles and no backend: the whole map is about 4 MB of GeoJSON.</li>
     </ul>
     <p class="fine">The projections belong to the UN and the cited authors, not to this site.</p>
     <div class="byline">
