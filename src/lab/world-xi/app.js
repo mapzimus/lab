@@ -134,18 +134,47 @@ const sheetCount = document.getElementById("sheet-count");
 
 /* ----------------------------------------------------------------- crests */
 
+// Drawn arithmetically rather than on a canvas, because reading a canvas back
+// is exactly what browser fingerprinting defences block — Brave's shield,
+// Firefox's resistFingerprinting, a number of privacy extensions. getImageData
+// then throws a SecurityError, and since these fallback dots are registered
+// before the club source and layers are added, the throw took the whole map
+// down with it: the globe still drew, the legend still built, and not one club
+// ever appeared. A circle needs no canvas, so this asks for nothing that can be
+// refused.
+const DOT = 48, DOT_R = 20, DOT_RING = 2, RING_RGB = [240, 236, 223]; // #f0ecdf
+
+function parseRgb(color) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(color).trim());
+  if (m) {
+    const n = parseInt(m[1], 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  const short = /^#?([0-9a-f]{3})$/i.exec(String(color).trim());
+  if (short) return [...short[1]].map((h) => parseInt(h + h, 16));
+  return [136, 136, 136];
+}
+
 function circleImage(color) {
-  const c = document.createElement("canvas");
-  c.width = c.height = 48;
-  const g = c.getContext("2d");
-  g.beginPath();
-  g.arc(24, 24, 20, 0, Math.PI * 2);
-  g.fillStyle = color;
-  g.fill();
-  g.lineWidth = 4;
-  g.strokeStyle = "#f0ecdf";
-  g.stroke();
-  return g.getImageData(0, 0, 48, 48);
+  const [r, g, b] = parseRgb(color);
+  const px = new Uint8ClampedArray(DOT * DOT * 4);
+  const c = (DOT - 1) / 2;
+  const outer = DOT_R + DOT_RING, inner = DOT_R - DOT_RING;
+  for (let y = 0; y < DOT; y++) {
+    for (let x = 0; x < DOT; x++) {
+      const d = Math.hypot(x - c, y - c);
+      // one-pixel feather on each edge, so the dot is not visibly stair-stepped
+      const alpha = Math.min(1, Math.max(0, outer + 0.5 - d));
+      if (alpha <= 0) continue;
+      const ring = Math.min(1, Math.max(0, d - (inner - 0.5)));
+      const i = (y * DOT + x) * 4;
+      px[i]     = r + (RING_RGB[0] - r) * ring;
+      px[i + 1] = g + (RING_RGB[1] - g) * ring;
+      px[i + 2] = b + (RING_RGB[2] - b) * ring;
+      px[i + 3] = alpha * 255;
+    }
+  }
+  return { width: DOT, height: DOT, data: px };
 }
 
 // A handful of crests are stored as JPEGs, or as PNGs flattened onto a solid
@@ -950,7 +979,13 @@ function addMapLayers(data) {
 
   // fallback dots exist for every league from the start, so a league switched
   // on mid-session draws immediately while its crests stream in
-  for (const lg of leagues) map.addImage(`dot-${lg.key}`, circleImage(lg.color));
+  // Defence in depth: even if an icon cannot be built, the source and layers
+  // below must still be added. A map with no fallback dots is degraded; a map
+  // with no layers shows nothing at all.
+  for (const lg of leagues) {
+    try { map.addImage(`dot-${lg.key}`, circleImage(lg.color)); }
+    catch (err) { console.warn(`fallback dot for ${lg.key} failed:`, err); }
+  }
 
   map.addSource("clubs", { type: "geojson", data });
 
@@ -1087,4 +1122,11 @@ window.__worldxi = {
   features: () => allFeatures,
   popupHtmlFor: (feats) => popupHtml(feats),
   shownClubCount,
+  // What is actually on the map, as opposed to what the data says. The two
+  // came apart once — layers absent, readout still counting clubs — so the
+  // browser check needs to be able to tell the difference.
+  mapLayers: () => {
+    try { return (map?.getStyle?.()?.layers ?? []).map((l) => l.id).filter((id) => id.startsWith("clubs")); }
+    catch { return []; }
+  },
 };
