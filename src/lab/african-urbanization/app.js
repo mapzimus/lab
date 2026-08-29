@@ -758,7 +758,10 @@ function initSteps(map) {
       if (id === active || !steps[id]) continue;
       active = id;
       if (id !== "intro") spinStop();
-      document.querySelectorAll(".step.is-active").forEach((el) => el.classList.remove("is-active"));
+      // Clear by [data-step], not .step: chapter heads carry data-step but the
+      // class .chapter-head, so a .step-scoped clear never released them and
+      // every head kept is-active for the rest of the session.
+      document.querySelectorAll("[data-step].is-active").forEach((el) => el.classList.remove("is-active"));
       entry.target.classList.add("is-active");
       setRail(id);
       renderLegend(LEGENDS[id]);

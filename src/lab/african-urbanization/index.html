@@ -348,6 +348,10 @@
   #explore-panel #explore-body { margin-top: 10px; }
   #explore-panel.mini { padding-bottom: 12px; }
   #explore-panel.mini #explore-body { display: none; }
+  /* "Back to the story" sits outside the collapsing body: collapsing the
+     filters must never strand the reader inside explore mode with no way
+     back, which is exactly what happens when the exit lives in the body. */
+  #explore-panel.mini #explore-exit { margin-top: 9px; }
   #explore-panel.mini #explore-collapse .chev { transform: rotate(0deg); }
   #explore-panel.mini #explore-reset { display: none; }
   @media (prefers-reduced-motion: reduce) { #explore-collapse .chev { transition: none; } }
@@ -845,8 +849,8 @@
     <button type="button" data-go="kinshasa">Kinshasa</button>
   </div>
   <p class="hint">Click any country, city, or corridor for its numbers.</p>
-  <button id="explore-exit" type="button">← Back to the story</button>
   </div>
+  <button id="explore-exit" type="button">← Back to the story</button>
 </div>
 
 <footer class="sources">
