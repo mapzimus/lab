@@ -2,7 +2,7 @@
 
 const DATA_URL = "/lab/world-xi/data/clubs.geojson";
 const CREST_SIZE = 128; // px, matches the thumbnails baked into clubs.geojson
-const STORE_KEY = "worldxi.v3";
+const STORE_KEY = "worldxi.v3"; // key name kept; the payload carries its own v
 const FALLBACK_TOP = ["epl", "laliga", "bundesliga", "seriea", "ligue1"];
 // Only used if a committed geojson predates metadata.groups; the pipeline is
 // the source of truth for grouping. Keep in step with GROUPS in build-data.mjs.
@@ -85,10 +85,19 @@ const store = (() => {
 
 /* ------------------------------------------------------------------ state */
 
-const state = { activeLeagues: new Set(), collapsed: new Set(), selectedId: null };
+// Three filters, two of which reach the map. `activeLeagues` is what the user
+// switched on; `gender` and `country` are facets that narrow both the list and
+// the globe, so what the legend shows is always what the globe draws. `query`
+// is transient typing and narrows the list only — it would be a nasty surprise
+// for the map to empty out while you were still spelling a word.
+const state = {
+  activeLeagues: new Set(), collapsed: new Set(), selectedId: null,
+  gender: "all", country: "", query: "",
+};
 
 let leagues = [];
 let groups = [];
+let countries = [];
 let allFeatures = [];
 const byId = new Map();
 const byCoord = new Map();
@@ -123,7 +132,13 @@ try {
 const readout = document.getElementById("readout");
 const setReadout = (text) => { if (readout) readout.textContent = text; };
 
-const legendEl = document.getElementById("legend");
+// Two elements, deliberately: `legendPanel` is the sheet the mobile bar opens
+// and closes, `legendEl` is the list inside it that buildLegend() rewrites.
+const legendPanel = document.getElementById("legend");
+const legendEl = document.getElementById("legend-list");
+const countrySelect = document.getElementById("country-filter");
+const listFilter = document.getElementById("league-filter");
+const facetSummary = document.getElementById("facet-summary");
 const statsEl = document.getElementById("stats");
 const statsBody = document.getElementById("stats-body");
 const statsToggle = document.getElementById("stats-toggle");
@@ -400,16 +415,34 @@ async function drainCrests() {
 
 /* ----------------------------------------------------------------- filter */
 
-const leagueFilter = () => ["in", ["get", "leagueKey"], ["literal", [...state.activeLeagues]]];
+// Every league carries exactly one gender and one country, so a facet is a
+// predicate over leagues rather than over 4,182 features — which is why the
+// club counts below can come straight from the metadata and still be exact.
+function matchesFacets(lg) {
+  if (state.gender !== "all" && lg.gender !== state.gender) return false;
+  if (state.country && lg.country !== state.country) return false;
+  return true;
+}
+
+// What the globe draws: switched on AND surviving the facets. A league hidden
+// by a facet keeps its own on/off state, so clearing the facet brings it back
+// exactly as the user left it.
+function visibleLeagues() {
+  return leagues.filter((l) => state.activeLeagues.has(l.key) && matchesFacets(l));
+}
+
+const leagueFilter = () =>
+  ["in", ["get", "leagueKey"], ["literal", visibleLeagues().map((l) => l.key)]];
 
 function applyFilter() {
+  const shown = new Set(visibleLeagues().map((l) => l.key));
   if (map?.getLayer("clubs")) {
     map.setFilter("clubs-ring", leagueFilter());
     map.setFilter("clubs", leagueFilter());
 
     // a popup whose clubs are all hidden no longer describes anything on screen
     if (popup && popupIds.length) {
-      const stillShown = popupIds.some((q) => state.activeLeagues.has(byId.get(q)?.properties.leagueKey));
+      const stillShown = popupIds.some((q) => shown.has(byId.get(q)?.properties.leagueKey));
       if (!stillShown) closePopup();
     }
   }
@@ -417,13 +450,28 @@ function applyFilter() {
 }
 
 function shownClubCount() {
-  return leagues.filter((l) => state.activeLeagues.has(l.key)).reduce((n, l) => n + l.count, 0);
+  return visibleLeagues().reduce((n, l) => n + l.count, 0);
+}
+
+// The facets are the one piece of state that can empty the globe without the
+// user having switched anything off, so they have to be legible from the
+// readout alone — otherwise "no clubs" reads as a bug rather than a filter.
+function facetWords() {
+  const bits = [];
+  if (state.gender !== "all") bits.push(state.gender === "women" ? "women's" : "men's");
+  if (state.country) bits.push(state.country);
+  return bits;
 }
 
 function updateShownCount() {
   const n = shownClubCount();
-  if (sheetCount) sheetCount.textContent = String(state.activeLeagues.size);
-  setReadout(n ? `${fmtNum(n)} clubs shown` : "No leagues shown — pick one from the list");
+  const on = visibleLeagues().length;
+  if (sheetCount) sheetCount.textContent = String(on);
+  const words = facetWords();
+  const suffix = words.length ? ` · ${words.join(" · ")}` : "";
+  if (n) setReadout(`${fmtNum(n)} clubs shown${suffix}`);
+  else if (words.length && state.activeLeagues.size) setReadout(`Nothing matches ${words.join(" + ")} — clear a filter`);
+  else setReadout("No leagues shown — pick one from the list");
   const reset = document.getElementById("legend-reset");
   if (reset) reset.hidden = state.activeLeagues.size > 0;
 }
@@ -450,7 +498,10 @@ let persistTimer = null;
 function persist() {
   clearTimeout(persistTimer);
   persistTimer = setTimeout(() => {
-    store.write({ v: 3, on: [...state.activeLeagues], collapsed: [...state.collapsed] });
+    store.write({
+      v: 4, on: [...state.activeLeagues], collapsed: [...state.collapsed],
+      gender: state.gender, country: state.country,
+    });
   }, 250);
 }
 
@@ -459,11 +510,17 @@ function restoreState() {
   const groupKeys = new Set(groups.map((g) => g.key));
   const saved = store.read();
 
-  if (saved && saved.v === 3 && Array.isArray(saved.on)) {
+  // v3 carried no facets; its on/collapsed sets are still valid, so read it
+  // rather than throwing the user's league choices away over a version bump.
+  if (saved && (saved.v === 3 || saved.v === 4) && Array.isArray(saved.on)) {
     // leagues added since the last visit stay off, per the "off until opened" rule
     state.activeLeagues = new Set(saved.on.filter((k) => known.has(k)));
     const collapsed = Array.isArray(saved.collapsed) ? saved.collapsed.filter((k) => groupKeys.has(k)) : [];
     state.collapsed = new Set(collapsed);
+    state.gender = ["men", "women"].includes(saved.gender) ? saved.gender : "all";
+    // a country that no longer exists in the data would hide every league with
+    // no way to tell why, so drop it rather than restore an unexplainable empty
+    state.country = countries.some((c) => c.name === saved.country) ? saved.country : "";
   } else {
     state.activeLeagues = new Set(defaultOn());
     // Open the top section and the US pyramid: the pyramid is the reason most
@@ -476,13 +533,20 @@ function restoreState() {
 function updateSectionHeader(groupKey) {
   const section = legendEl.querySelector(`[data-group="${groupKey}"]`);
   if (!section) return;
-  const inGroup = leagues.filter((l) => l.group === groupKey);
+  // Count what the section is showing, not what it contains: "3/5" beside a
+  // list of two rows is the kind of number that makes people distrust the rest.
+  const inGroup = leagues.filter((l) => l.group === groupKey && listable(l));
+  if (!inGroup.length) return;
   const on = inGroup.filter((l) => state.activeLeagues.has(l.key)).length;
   section.querySelector(".sec-count").innerHTML = `<b>${on}</b>/${inGroup.length}`;
   const all = section.querySelector(".sec-all");
   const allOn = on === inGroup.length;
   all.textContent = allOn ? "None" : "All";
   all.setAttribute("aria-label", `${allOn ? "Hide" : "Show"} all ${inGroup.length} leagues in ${groups.find((g) => g.key === groupKey)?.label}`);
+}
+
+function updateAllSectionHeaders() {
+  for (const g of groups) updateSectionHeader(g.key);
 }
 
 function setLeague(key, on) {
@@ -497,8 +561,11 @@ function setLeague(key, on) {
   persist();
 }
 
+// Acts on the rows the section is currently showing. With "Women" and Spain
+// set, All means "every Spanish women's league here", which is the whole point
+// of pairing the facets with a per-section All.
 function setGroup(groupKey, on) {
-  for (const lg of leagues.filter((l) => l.group === groupKey)) {
+  for (const lg of leagues.filter((l) => l.group === groupKey && listable(l))) {
     if (on) state.activeLeagues.add(lg.key);
     else state.activeLeagues.delete(lg.key);
     const row = legendEl.querySelector(`[data-league="${lg.key}"]`);
@@ -521,6 +588,81 @@ function setCollapsed(groupKey, collapsed) {
   persist();
 }
 
+/* ----------------------------------------------------------------- facets */
+
+// The list filter is matched against the same folded text as club search, so
+// "turkiye", "cordoba" and "dusseldorf" all find their leagues.
+function listable(lg) {
+  if (!matchesFacets(lg)) return false;
+  if (!state.query) return true;
+  const hay = fold(`${lg.label} ${lg.country} ${lg.tier ?? ""}`);
+  return state.query.split(/\s+/).every((t) => hay.includes(t));
+}
+
+// Narrowing to a handful of rows and then leaving them behind a collapsed
+// header would defeat the filter, so while any facet is set every section that
+// still has rows is open. The user's own collapse choices are untouched
+// underneath and come back when the filters clear.
+const narrowing = () => state.gender !== "all" || !!state.country || !!state.query;
+
+function buildCountryOptions() {
+  const counts = new Map();
+  for (const lg of leagues) counts.set(lg.country, (counts.get(lg.country) ?? 0) + lg.count);
+  countries = [...counts].map(([name, count]) => ({ name, count }))
+    .sort((a, b) => a.name.localeCompare(b.name, "en"));
+  if (!countrySelect) return;
+  for (const c of countries) {
+    const opt = document.createElement("option");
+    opt.value = c.name;
+    opt.textContent = `${c.name} (${fmtNum(c.count)})`;
+    countrySelect.appendChild(opt);
+  }
+}
+
+function updateFacetControls() {
+  for (const btn of document.querySelectorAll("[data-gender]")) {
+    btn.setAttribute("aria-pressed", String(btn.dataset.gender === state.gender));
+  }
+  if (countrySelect) countrySelect.value = state.country;
+  if (listFilter && listFilter.value !== state.query) listFilter.value = state.query;
+  if (facetSummary) {
+    const rows = leagues.filter(listable);
+    const clubs = rows.reduce((n, l) => n + l.count, 0);
+    facetSummary.textContent = narrowing()
+      ? `${rows.length} of ${leagues.length} leagues · ${fmtNum(clubs)} clubs`
+      : `${leagues.length} leagues · ${fmtNum(clubs)} clubs`;
+  }
+}
+
+// One mutation point for all three facets, mirroring setLeague.
+function setFacet(patch) {
+  Object.assign(state, patch);
+  updateFacetControls();
+  buildLegend();
+  // A facet change can hide the league a crest batch was fetched for, but it
+  // never changes which leagues are switched on — so crest loading follows
+  // setLeague, not this, and nothing needs releasing here.
+  applyFilter();
+  persist();
+}
+
+function clearFacets() {
+  setFacet({ gender: "all", country: "", query: "" });
+}
+
+function wireFacets() {
+  for (const btn of document.querySelectorAll("[data-gender]")) {
+    btn.addEventListener("click", () => setFacet({ gender: btn.dataset.gender }));
+  }
+  countrySelect?.addEventListener("change", () => setFacet({ country: countrySelect.value }));
+  listFilter?.addEventListener("input", () => setFacet({ query: fold(listFilter.value).trim() }));
+  listFilter?.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape" && listFilter.value) { ev.stopPropagation(); setFacet({ query: "" }); }
+  });
+}
+
+/* ----------------------------------------------------------------- legend */
+
 function buildLegend() {
   legendEl.innerHTML = "";
 
@@ -531,20 +673,23 @@ function buildLegend() {
   reset.textContent = "Show the big five";
   reset.hidden = true;
   reset.addEventListener("click", () => {
+    clearFacets();
     for (const k of defaultOn()) setLeague(k, true);
     setCollapsed("top", false);
   });
   legendEl.appendChild(reset);
 
+  let rows = 0;
   for (const group of groups) {
-    const inGroup = leagues.filter((l) => l.group === group.key);
+    const inGroup = leagues.filter((l) => l.group === group.key && listable(l));
     if (!inGroup.length) continue;
+    rows += inGroup.length;
 
     const section = document.createElement("section");
     section.className = "sec";
     section.dataset.group = group.key;
     const bodyId = `sec-${group.key}`;
-    const collapsed = state.collapsed.has(group.key);
+    const collapsed = state.collapsed.has(group.key) && !narrowing();
 
     const head = document.createElement("h2");
     head.className = "sec-head";
@@ -583,6 +728,18 @@ function buildLegend() {
       setGroup(group.key, !allOn);
     });
     updateSectionHeader(group.key);
+  }
+
+  if (!rows) {
+    const empty = document.createElement("p");
+    empty.className = "legend-empty";
+    empty.textContent = "No leagues match these filters.";
+    const clear = document.createElement("button");
+    clear.type = "button";
+    clear.className = "legend-reset";
+    clear.textContent = "Clear the filters";
+    clear.addEventListener("click", clearFacets);
+    legendEl.append(empty, clear);
   }
 }
 
@@ -710,8 +867,9 @@ function renderStats() {
   statsBody.querySelectorAll(".stat-row[data-league]").forEach((el) =>
     el.addEventListener("click", () => {
       const key = el.dataset.league;
-      setLeague(key, true);
       const lg = leagues.find((l) => l.key === key);
+      if (lg && !matchesFacets(lg)) clearFacets();
+      setLeague(key, true);
       if (lg) setCollapsed(lg.group, false);
     }));
 }
@@ -863,9 +1021,12 @@ function selectClub(id, { zoom = 9 } = {}) {
   const f = byId.get(id);
   if (!f) return;
   const key = f.properties.leagueKey;
+  const lg = leagues.find((l) => l.key === key);
+  // Flying to a club the facets are hiding would land the camera on an empty
+  // patch of globe. Search is a direct instruction, so it wins over the facets.
+  if (lg && !matchesFacets(lg)) clearFacets();
   if (!state.activeLeagues.has(key)) {
     setLeague(key, true);
-    const lg = leagues.find((l) => l.key === key);
     if (lg) setCollapsed(lg.group, false);
   }
   setSelected(id);
@@ -937,7 +1098,7 @@ function wirePanels() {
 
   function closeSheets() {
     let wasOpen = false;
-    for (const el of [legendEl, statsEl]) {
+    for (const el of [legendPanel, statsEl]) {
       if (el?.classList.contains("is-open")) wasOpen = true;
       el?.classList.remove("is-open");
     }
@@ -1015,7 +1176,10 @@ async function loadData() {
   allFeatures = data.features;
 
   buildIndexes(allFeatures);
+  buildCountryOptions();   // before restoreState: it vets a saved country against this
   restoreState();
+  wireFacets();
+  updateFacetControls();
   buildLegend();
   renderStats();
   updateShownCount();
@@ -1180,9 +1344,17 @@ wirePanels();
 // read-only surface for the headless test suite
 window.__worldxi = {
   get state() {
-    return { on: [...state.activeLeagues], collapsed: [...state.collapsed], selected: state.selectedId };
+    return {
+      on: [...state.activeLeagues], collapsed: [...state.collapsed], selected: state.selectedId,
+      gender: state.gender, country: state.country, query: state.query,
+      visible: visibleLeagues().map((l) => l.key),
+    };
   },
   get leagues() { return leagues; },
+  get countries() { return countries; },
+  setFacet,
+  setLeague,
+  mapFilter: () => leagueFilter(),
   get stats() { return stats; },
   searchClubs,
   selectClub,

@@ -22,7 +22,7 @@
     <header class="chrome panel">
       <p class="backlink"><a href="/lab/">← Lab</a></p>
       <h1>World XI</h1>
-      <p class="lede">Every club of 99 leagues at its home stadium. The big five are shown first — open a section to add more.</p>
+      <p class="lede">Every club of 99 leagues at its home stadium. The big five are shown first — filter by gender or country, or open a section to add more.</p>
     </header>
 
     <div class="search panel" role="search">
@@ -36,7 +36,27 @@
     </div>
   </div>
 
-  <aside class="legend panel" id="legend" aria-label="League filters"></aside>
+  <aside class="legend panel" id="legend" aria-label="League filters">
+    <!-- The facets are static markup, deliberately: #legend-list is rebuilt with
+         innerHTML, and a control that vanishes when the league list is redrawn
+         is worse than no control at all. -->
+    <div class="facets" id="facets">
+      <div class="facet-row" role="group" aria-label="Gender">
+        <button type="button" class="facet" data-gender="all" aria-pressed="true">All</button>
+        <button type="button" class="facet" data-gender="men" aria-pressed="false">Men</button>
+        <button type="button" class="facet" data-gender="women" aria-pressed="false">Women</button>
+      </div>
+      <label class="sr-only" for="country-filter">Country</label>
+      <select id="country-filter" class="facet-select">
+        <option value="">Every country</option>
+      </select>
+      <label class="sr-only" for="league-filter">Filter this list</label>
+      <input id="league-filter" class="facet-input" type="search" autocomplete="off"
+             spellcheck="false" placeholder="Filter this list…">
+      <p class="facet-summary" id="facet-summary"></p>
+    </div>
+    <div id="legend-list"></div>
+  </aside>
 
   <!-- One header for whichever sheet is open. It lives outside the panels
        because #legend is rebuilt with innerHTML, and a control that vanishes

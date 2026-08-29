@@ -19,12 +19,17 @@ link and site favicon, absolute `/lab/world-xi/...` asset paths plus the
 after copying.
 
 Data: Wikidata (CC0) plus club rosters, grounds and towns read from Wikipedia.
-142 clubs in the lower US tiers have no Wikidata item, and 83 clubs are placed
-on their town rather than their ground; the map labels those as approximate.
-53 grounds come from OpenStreetMap, which Wikidata and Wikipedia do not carry —
-so clubs.geojson is a derived database under ODbL 1.0 and must credit
+2,567 clubs — the lower US tiers and most NCAA programmes — have no Wikidata
+item. 2,285 clubs sit on their ground; 1,260 are placed on a college campus and
+637 on their town, and the map labels both of those as approximate. 215 grounds
+come from OpenStreetMap and 44 US addresses from the US Census Bureau geocoder
+(public domain), neither of which Wikidata or Wikipedia carry — so
+clubs.geojson is a derived database under ODbL 1.0 and must credit
 "© OpenStreetMap contributors" (https://www.openstreetmap.org/copyright). Each
 club's `source` field says which coordinates those are.
-Crests are hotlinked from Wikipedia/Commons at runtime and remain trademarks of
-their clubs; no crest files are committed.
+3,066 crests are hotlinked from Wikipedia/Commons at runtime and 391 are
+committed under `data/crests/`, taken from the leagues' and colleges' own sites;
+all remain trademarks of their clubs. 725 clubs have no crest and draw a
+league-coloured dot instead — 597 of those are UPSL and NPSL clubs whose only
+published marks sit behind a bot challenge.
 Basemap: OpenFreeMap. MapLibre GL JS 5.6.1 vendored (see `vendor/README.md`).
