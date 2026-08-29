@@ -52,10 +52,13 @@ for epoch in (1975, 2025):
 # so the streets-per-resident figure is a pattern rather than one anecdote.
 # Two epochs only: the 2020 footprint and a 1975 baseline. R10_C20 is already
 # above and covers Luanda as well as Kinshasa.
+# Several of these cities sit within half a degree of a tile edge, so the
+# measurement window crosses into the neighbour and has to read both.
 CITY_TILES = {
     "R9_C18": "Abidjan and Accra",
-    "R9_C19": "Lagos",
-    "R9_C22": "Addis Ababa",
+    "R9_C19": "Lagos, and Accra's eastern edge",
+    "R9_C22": "Addis Ababa, and Nairobi's northern edge",
+    "R8_C22": "the ground north of Addis Ababa",
     "R10_C22": "Nairobi and Dar es Salaam",
     "R6_C22": "Cairo",
 }
@@ -64,6 +67,10 @@ for tile in CITY_TILES:
         stem = f"GHS_BUILT_S_E{epoch}_GLOBE_R2023A_4326_3ss"
         FILES[f"{stem}_V1_0_{tile}.zip"] = (
             f"{GHSL}/GHS_BUILT_S_GLOBE_R2023A/{stem}/V1-0/tiles/{stem}_V1_0_{tile}.zip")
+
+# Natural Earth ocean polygon. Chapter 4 ends on Kinshasa's one link to the
+# Atlantic, and without a drawn sea the last frame was a road ending in black.
+FILES["ne_10m_ocean.zip"] = f"{NE}/10m/physical/ne_10m_ocean.zip"
 
 # Harmonized DMSP/VIIRS nighttime lights, 2020 layer (Li et al., CC BY 4.0).
 FILES["Harmonized_DN_NTL_2020_simVIIRS.tif"] = "https://ndownloader.figshare.com/files/57065297"

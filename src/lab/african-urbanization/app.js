@@ -157,6 +157,16 @@ function addDeferredLayers(map, d) {
     }, BELOW);
   }
   map.addLayer({
+    id: "matadi-ocean", type: "fill", source: "matadi",
+    filter: ["==", ["get", "kind"], "ocean"],
+    paint: { "fill-color": "#15283c", "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
+  }, BELOW);
+  map.addLayer({
+    id: "matadi-river", type: "fill", source: "matadi",
+    filter: ["==", ["get", "kind"], "river"],
+    paint: { "fill-color": "#1d3242", "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
+  }, BELOW);
+  map.addLayer({
     id: "kin-water", type: "fill", source: "kin-water",
     paint: { "fill-color": "#1d3242", "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
   }, BELOW);
@@ -201,18 +211,29 @@ function addDeferredLayers(map, d) {
     },
   }, BELOW);
   map.addLayer({
+    id: "matadi-case", type: "line", source: "matadi",
+    filter: ["in", ["get", "kind"], ["literal", ["road", "rail"]]],
+    layout: { "line-cap": "round", "line-join": "round" },
+    paint: {
+      "line-color": "#0b0e14", "line-width": 6,
+      "line-opacity": 0, "line-opacity-transition": { duration: 600 },
+    },
+  }, BELOW);
+  map.addLayer({
     id: "matadi-rail", type: "line", source: "matadi",
     filter: ["==", ["get", "kind"], "rail"],
+    layout: { "line-cap": "butt", "line-join": "round" },
     paint: {
-      "line-color": "#f4a93a", "line-width": 1.6, "line-dasharray": [3, 2],
+      "line-color": "#f4a93a", "line-width": 2.4, "line-dasharray": [2.4, 1.6],
       "line-opacity": 0, "line-opacity-transition": { duration: 600 },
     },
   }, BELOW);
   map.addLayer({
     id: "matadi-road", type: "line", source: "matadi",
     filter: ["==", ["get", "kind"], "road"],
+    layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-color": "#d8734a", "line-width": 1.8,
+      "line-color": "#ef8a55", "line-width": 2.8,
       "line-opacity": 0, "line-opacity-transition": { duration: 600 },
     },
   }, BELOW);
@@ -626,8 +647,12 @@ function initSteps(map) {
   const streetsOn = (v) => lineOpacity("kin-streets", v * 0.95);
   const communesOn = (v) => lineOpacity("kin-communes", v * 0.75);
   const matadiOn = (v) => {
-    lineOpacity("matadi-road", v * 0.95);
-    lineOpacity("matadi-rail", v * 0.9);
+    // lineOpacity sets fill-opacity when the layer is a fill.
+    lineOpacity("matadi-ocean", v);
+    lineOpacity("matadi-river", v);
+    lineOpacity("matadi-case", v * 0.85);
+    lineOpacity("matadi-road", v);
+    lineOpacity("matadi-rail", v * 0.95);
   };
   // The HUD chip annotates a step the story is making. In explore mode the
   // reader drives, and the panel's own year output says which epoch is drawn,
@@ -1058,8 +1083,10 @@ const LEGENDS = {
     ROW("#aeb6c2", "main road"), ROW("#9aa6b4", "other streets"),
     ROW("#6f7a89", "commune boundary")] },
   "c4-matadi": { title: "Kinshasa to the sea", rows: [
-    ROW("#d8734a", "Route Nationale 1"),
-    ROW("#f4a93a", "Matadi-Kinshasa railway")] },
+    ROW("#ef8a55", "Route Nationale 1"),
+    ROW("#f4a93a", "Matadi-Kinshasa railway"),
+    ROW("#1d3242", "the Congo, unnavigable here", "box"),
+    ROW("#15283c", "the Atlantic", "box")] },
   "explore": null,
 };
 
