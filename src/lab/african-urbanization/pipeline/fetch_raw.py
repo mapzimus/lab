@@ -7,7 +7,7 @@ them from their public homes so the pipeline can be rerun from nothing:
     AFRICAN_URBANIZATION_RAW=/tmp/raw python3 fetch_raw.py
 
 Files already present are left alone, so a failed run can be resumed. About
-1.5 GB in total, most of it the six GHSL built-up tiles.
+1.7 GB in total, most of it the GHSL built-up tiles.
 
 Sources and licences are listed in the page footer and the project README.
 """
@@ -47,6 +47,23 @@ for epoch in (1975, 2025):
     stem = f"GHS_POP_E{epoch}_GLOBE_R2023A_4326_3ss"
     FILES[f"{stem}_V1_0_R10_C20.zip"] = (
         f"{GHSL}/GHS_POP_GLOBE_R2023A/{stem}/V1-0/tiles/{stem}_V1_0_R10_C20.zip")
+
+# The same built-up product for the other cities 16_city_streets.py measures,
+# so the streets-per-resident figure is a pattern rather than one anecdote.
+# Two epochs only: the 2020 footprint and a 1975 baseline. R10_C20 is already
+# above and covers Luanda as well as Kinshasa.
+CITY_TILES = {
+    "R9_C18": "Abidjan and Accra",
+    "R9_C19": "Lagos",
+    "R9_C22": "Addis Ababa",
+    "R10_C22": "Nairobi and Dar es Salaam",
+    "R6_C22": "Cairo",
+}
+for tile in CITY_TILES:
+    for epoch in (1975, 2020):
+        stem = f"GHS_BUILT_S_E{epoch}_GLOBE_R2023A_4326_3ss"
+        FILES[f"{stem}_V1_0_{tile}.zip"] = (
+            f"{GHSL}/GHS_BUILT_S_GLOBE_R2023A/{stem}/V1-0/tiles/{stem}_V1_0_{tile}.zip")
 
 # Harmonized DMSP/VIIRS nighttime lights, 2020 layer (Li et al., CC BY 4.0).
 FILES["Harmonized_DN_NTL_2020_simVIIRS.tif"] = "https://ndownloader.figshare.com/files/57065297"

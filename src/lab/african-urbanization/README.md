@@ -74,7 +74,7 @@ order; raw downloads land in `pipeline/raw/`, which is gitignored — set
 | `05_kinshasa_context.py` | OpenStreetMap via Overpass | `kinshasa-water.geojson`, `kinshasa-roads.geojson` |
 | `06_lights.py` | Harmonized DMSP/VIIRS nighttime lights 2020 (Li et al., figshare) | `lights.geojson` |
 | `07_kinshasa_density.py` | JRC GHS-POP R2023A, 1975 + 2025 | `kinshasa-density.geojson` (+ densification stats) |
-| `08_services.py` | World Bank Open Data (electricity and water access) | merged into `countries.geojson` as `elec` / `water` |
+| `08_services.py` | World Bank Open Data (electricity and water access, snapshot + 2000-2022 series) | `services-trend.json`; merged into `countries.geojson` as `elec` / `water` / `elecGain` |
 | `09_kinshasa_terrain.py` | Copernicus DEM GLO-30 + GHS-BUILT-S | `kinshasa-slope.geojson` (+ built-on-slope by epoch) |
 | `10_kinshasa_streets.py` | OpenStreetMap street network + GHS-BUILT-S | `kinshasa-streets.geojson`, `kinshasa-streets.json` |
 | `11_kinshasa_communes.py` | OpenStreetMap admin_level 7 | `kinshasa-communes.geojson` |
@@ -121,6 +121,14 @@ files are fetched from JavaScript and so cannot be stamped from the HTML.
 - Electricity and water access come from the World Bank's most recent
   reported year per country, so the map mixes 2022 and 2023 observations. The
   "people without" totals multiply that share by the UN's 2025 population.
+- The **rate** is the story's actual claim, so the same indicators are also
+  built as 2000-2022 series. Electricity access went 37.7% → 58.5% while the
+  number without power rose 510M → 600M; water went 52.8% → 70.1% while the
+  number without rose 386M → 429M. Two independently collected indicators
+  showing the same shape: real progress, losing to the population it chases.
+  The series counts only the countries reporting in each year, against UN
+  population for that same year, so a late reporter cannot put a step in the
+  curve.
 - GHSL built-up epochs are model output from satellite archives; the 2030
   epoch is the JRC's own projection. The ≥20% built threshold trades detail
   for legible footprints. The 2030 increment is small, so slope statistics
