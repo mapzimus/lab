@@ -80,7 +80,7 @@ const DEFERRED_FILES = [
   "lights.geojson", "kinshasa-builtup.geojson", "kinshasa-water.geojson",
   "kinshasa-roads.geojson", "kinshasa-density.geojson", "kinshasa-slope.geojson",
   "kinshasa-streets.geojson", "kinshasa-communes.geojson", "matadi-corridor.geojson",
-  "kinshasa-streets.json", "kinshasa-expansion.json",
+  "kinshasa-streets.json", "kinshasa-expansion.json", "city-streets.json",
 ];
 
 function grab(file) {
@@ -366,13 +366,15 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
     const refreshStep = initSteps(map);
 
     Promise.all(DEFERRED_FILES.map(grab)).then(([lights, kinBuilt, kinWater, kinRoads,
-      kinDensity, kinSlope, kinStreets, kinCommunes, matadi, streetStats, expansion]) => {
+      kinDensity, kinSlope, kinStreets, kinCommunes, matadi, streetStats, expansion,
+      cityStreets]) => {
       addDeferredLayers(map, { lights, kinBuilt, kinWater, kinRoads, kinDensity,
         kinSlope, kinStreets, kinCommunes, matadi });
       initCommuneLabels(map, kinCommunes);
       initMatadiLabels(map, matadi);
       buildExpansionChart(expansion);
       buildStreetChart(streetStats);
+      buildCityStreetChart(cityStreets);
       refreshStep();
     }).catch((err) => {
       console.error(err);
@@ -780,6 +782,11 @@ function initSteps(map) {
       setCommuneLabels(true);
       hudSet("1.0 m", "of street per resident");
     },
+    "c4-cities": () => {
+      fly(KINSHASA_BOUNDS, 10); base.c4();
+      kinshasa(0.55, 0.35, 2030); streetsOn(0.4);
+      hudSet("1.18 m", "Kinshasa, thinnest of nine");
+    },
     "c4-matadi": () => {
       fly(MATADI_BOUNDS, 8, 0.56); base.c4();
       kinshasa(0.9, 0, 2030); matadiOn(1);
@@ -1085,6 +1092,9 @@ const LEGENDS = {
   "c4-streets": { title: "The street grid", rows: [
     ROW("#aeb6c2", "main road"), ROW("#9aa6b4", "other streets"),
     ROW("#6f7a89", "commune boundary")] },
+  "c4-cities": { title: "Nine cities, same measurement", rows: [
+    ROW("#f4a93a", "Kinshasa", "box"),
+    ROW("#5f6b7d", "the other eight", "box")] },
   "c4-matadi": { title: "Kinshasa to the sea", rows: [
     ROW("#ef8a55", "Route Nationale 1"),
     ROW("#f4a93a", "Matadi-Kinshasa railway"),
@@ -1282,6 +1292,38 @@ function buildServicesChart(data) {
   for (const yr of [y0, y1]) {
     svg += `<text x="${x(yr).toFixed(1)}" y="${H - 8}" text-anchor="${yr === y0 ? "start" : "end"}">${yr}</text>`;
   }
+  svg += "</svg>";
+  el.innerHTML = svg;
+}
+
+function buildCityStreetChart(data) {
+  const el = document.getElementById("chart-cities");
+  if (!el || !data || !data.cities) return;
+  const rows = data.cities
+    .map((c) => ({ city: c.city, v: (c.years["2020"] || {}).metresPerPerson }))
+    .filter((r) => r.v != null)
+    .sort((a, b) => b.v - a.v);
+  if (!rows.length) return;
+
+  const W = 390, RH = 17, T = 6, B = 18, L = 96, R = 34;
+  const H = T + rows.length * RH + B;
+  const max = Math.ceil(Math.max(...rows.map((r) => r.v)) * 2) / 2;
+  const x = (v) => L + (v / max) * (W - L - R);
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Metres of street per resident in nine African cities, 2020">`;
+  for (const v of [1, 2, 3]) {
+    if (v > max) continue;
+    svg += `<line class="axis" x1="${x(v)}" x2="${x(v)}" y1="${T}" y2="${T + rows.length * RH}"/>`;
+    svg += `<text x="${x(v)}" y="${H - 6}" text-anchor="middle">${v}m</text>`;
+  }
+  rows.forEach((r, i) => {
+    const y = T + i * RH;
+    const mine = r.city === "Kinshasa";
+    const fill = mine ? "#f4a93a" : "#5f6b7d";
+    svg += `<text x="${L - 6}" y="${y + 9}" text-anchor="end" style="fill:${mine ? "#e7e9ec" : "#99a0ab"}">${r.city}</text>`;
+    svg += `<rect x="${L}" y="${y + 2}" width="${(x(r.v) - L).toFixed(1)}" height="9" rx="1.5" fill="${fill}"/>`;
+    svg += `<text x="${(x(r.v) + 5).toFixed(1)}" y="${y + 9}" style="fill:${mine ? "#f4a93a" : "#858d99"}">${r.v.toFixed(2)}</text>`;
+  });
   svg += "</svg>";
   el.innerHTML = svg;
 }

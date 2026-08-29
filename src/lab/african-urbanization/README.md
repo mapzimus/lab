@@ -82,6 +82,7 @@ order; raw downloads land in `pipeline/raw/`, which is gitignored — set
 | `13_matadi_corridor.py` | OpenStreetMap road and rail | `matadi-corridor.geojson` |
 | `14_validate.py` | GHS-POP vs. UN WUP inside OSM commune boundaries | `validation.json` |
 | `15_corridor_coverage.py` | OpenStreetMap motorway/trunk/primary vs. the modeled corridors | `corridor-coverage.json` (+ `served` on `corridors-model.geojson`) |
+| `16_city_streets.py` | OSM streets inside GHS-BUILT-S footprints for 9 cities; UN WUP | `city-streets.json` |
 
 ### Rerunning it
 
@@ -137,6 +138,19 @@ files are fetched from JavaScript and so cannot be stamped from the HTML.
   epoch's built footprint. OSM has no history here, so the early years count
   streets that may not have existed yet: the real fall in street per person is
   steeper than the chart shows, not shallower.
+- The street figure is **not a Kinshasa anecdote**. The identical measurement
+  over nine African cities puts Kinshasa last at 1.18 m per resident against a
+  median of 1.82, and every one of the eight with a UN 1975 baseline has less
+  street per person now than then. Cairo fell least (2.50 → 1.82). Kinshasa's
+  cross-city figure is derived from a different window than
+  `kinshasa-streets.json` and lands on the same 1.18, which is a useful check
+  on both.
+- **GHSL tile edges are a trap.** A window that runs off a tile still gets a
+  transform describing the window you asked for, so array and transform
+  disassociate and the footprint silently shifts by the missing margin. Addis
+  Ababa first came back at 0.12 m per resident for this reason.
+  `16_city_streets.py` mosaics every tile a window touches and refuses to run
+  on partial coverage.
 - Slope comes from the Copernicus 30 m DEM block-averaged to roughly the 92 m
   built-up grid. Finer classes would be false precision against a layer that
   coarse, so only two are drawn.

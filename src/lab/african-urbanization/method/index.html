@@ -431,6 +431,29 @@
   for a reason the model has no opinion about. Every Overpass response is
   cached under the pipeline's raw directory, so the check reruns for free.</p>
 
+  <h3>One city, or a pattern?</h3>
+  <p>The sharpest number in the story is Kinshasa's street supply falling from
+  about nine metres per resident to one. On its own that is a single case, and
+  the fair objection is that Kinshasa is exceptional: a capital that grew
+  through state collapse and two wars.</p>
+  <p><code>16_city_streets.py</code> runs the identical measurement over nine
+  cities, chosen to span the range rather than to flatter the argument. Cairo
+  and Accra are in it precisely because they were the most likely to contradict
+  it. Every city with a UN 1975 baseline has less street per resident today
+  than it had then. Kinshasa comes last at <b>1.18 metres</b> against a median
+  of <b>1.82</b>, so it is the sharp end of a real pattern rather than a
+  typical case, and Cairo fell least, which is what a state that builds looks
+  like.</p>
+  <p>Two things make that result worth trusting. Kinshasa's figure here is
+  derived from a different window than the chapter's own, and both land on
+  1.18. And the check caught a real fault on the way: Addis Ababa first came
+  back at 0.12 metres per resident, an order of magnitude below everything
+  else, because its measurement window ran off the edge of its GHSL tile.
+  Asking for a window past a tile edge does not fail. It returns the rows that
+  exist while the transform still describes the window requested, so the
+  footprint silently shifts by the missing margin. The script now mosaics every
+  tile a window touches and refuses to run on partial coverage.</p>
+
   <h3>The numbers on the page are asserted, not typed</h3>
   <p>Every figure quoted in the story is checked against the shipped JSON and
   GeoJSON by a test script before it goes in the HTML, so the copy cannot
