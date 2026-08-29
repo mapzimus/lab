@@ -132,6 +132,60 @@ body {
 
 .legend-reset[hidden] { display: none; } /* beats the class rule below */
 
+/* ------------------------------------------------------------------ facets */
+
+/* Sticky so the escape route from a filter that hides everything stays on
+   screen, however far the list below has been scrolled. */
+.facets {
+  position: sticky;
+  top: -10px;
+  z-index: 1;
+  margin: -10px -12px 8px;
+  padding: 10px 12px 8px;
+  background: var(--panel-solid);
+  border-bottom: 1px solid var(--hair);
+}
+
+.facet-row { display: flex; gap: 4px; margin-bottom: 6px; }
+
+.facet {
+  flex: 1;
+  padding: 5px 4px;
+  background: rgba(240, 236, 223, 0.06);
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.facet[aria-pressed="true"] {
+  background: rgba(138, 184, 255, 0.18);
+  border-color: var(--link);
+  color: var(--ink);
+}
+
+.facet-select, .facet-input {
+  display: block;
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 6px 8px;
+  background: rgba(240, 236, 223, 0.06);
+  border: 1px solid var(--hair);
+  border-radius: 7px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+.facet-select { appearance: none; cursor: pointer; }
+.facet-select option { background: var(--panel-solid); color: var(--ink); }
+.facet-input::placeholder { color: var(--muted); }
+
+.facet-summary { margin: 0; font-size: 11px; color: var(--muted); }
+
+.legend-empty { margin: 12px 0 8px; font-size: 13px; color: var(--muted); }
+
+
 .legend-reset {
   display: block;
   width: 100%;
