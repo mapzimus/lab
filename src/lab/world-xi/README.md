@@ -2,11 +2,11 @@
 
 Hosted copy of [mapzimus/world-xi-map](https://github.com/mapzimus/world-xi-map)
 at https://mapzimus.com/lab/world-xi/ — an interactive 3D globe of every club of
-99 leagues, men's and women's, in 65 countries (4,182 clubs), each at its
-home stadium, searchable and filterable per league. That includes the whole
-United States pyramid, MLS down through the open amateur tiers, and all 1,634
-NCAA soccer programmes across Divisions I, II and III. Only the men's big five are
-shown at first; the rest switch on from the legend.
+99 leagues, men's and women's, in 65 countries (4,259 clubs), each at its
+home stadium, searchable and filterable by league, gender and country. That
+includes the whole United States pyramid, MLS down through the open amateur
+tiers, and all 1,711 NCAA soccer programmes across Divisions I, II and III.
+Only the men's big five are shown at first; the rest switch on from the legend.
 
 That repo is the source of truth: the data pipeline (`scripts/build-data.mjs`,
 hand-curated rosters, overrides) lives there, and `data/clubs.geojson` here is
@@ -19,17 +19,17 @@ link and site favicon, absolute `/lab/world-xi/...` asset paths plus the
 after copying.
 
 Data: Wikidata (CC0) plus club rosters, grounds and towns read from Wikipedia.
-2,567 clubs — the lower US tiers and most NCAA programmes — have no Wikidata
-item. 2,285 clubs sit on their ground; 1,260 are placed on a college campus and
+2,644 clubs — the lower US tiers and most NCAA programmes — have no Wikidata
+item. 2,285 clubs sit on their ground; 1,337 are placed on a college campus and
 637 on their town, and the map labels both of those as approximate. 215 grounds
-come from OpenStreetMap and 44 US addresses from the US Census Bureau geocoder
+come from OpenStreetMap and 46 US addresses from the US Census Bureau geocoder
 (public domain), neither of which Wikidata or Wikipedia carry — so
 clubs.geojson is a derived database under ODbL 1.0 and must credit
 "© OpenStreetMap contributors" (https://www.openstreetmap.org/copyright). Each
 club's `source` field says which coordinates those are.
-3,066 crests are hotlinked from Wikipedia/Commons at runtime and 391 are
+3,141 crests are hotlinked from Wikipedia/Commons at runtime and 396 are
 committed under `data/crests/`, taken from the leagues' and colleges' own sites;
-all remain trademarks of their clubs. 725 clubs have no crest and draw a
+all remain trademarks of their clubs. 722 clubs have no crest and draw a
 league-coloured dot instead — 597 of those are UPSL and NPSL clubs whose only
 published marks sit behind a bot challenge.
 Basemap: OpenFreeMap. MapLibre GL JS 5.6.1 vendored (see `vendor/README.md`).
