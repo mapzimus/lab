@@ -559,11 +559,17 @@ function buildLegend() {
 
 /* ------------------------------------------------------------ index build */
 
+// Anything that is not "venue" is a stand-in for a ground we could not find:
+// "city" is the club's town, "campus" is a college's campus centroid. Neither
+// is a place two clubs genuinely share, and both have to say so in the popup.
+const APPROXIMATE = { city: "the club's town", campus: "the campus" };
+const isApproximate = (p) => p.precision in APPROXIMATE;
+
 function buildIndexes(features) {
   for (const f of features) {
     const p = f.properties;
     byId.set(p.id, f);
-    if (p.precision !== "city") {
+    if (!isApproximate(p)) {
       const ck = coordKey(f.geometry.coordinates);
       if (!byCoord.has(ck)) byCoord.set(ck, []);
       byCoord.get(ck).push(f);
@@ -690,7 +696,7 @@ function popupHtml(feats) {
   // Only venue-precision clubs actually share a stadium. Clubs placed on a town
   // can land on one point too, and calling that a shared ground would invent a
   // fact — so decide here rather than trusting whoever assembled the group.
-  const sharesGround = feats.length > 1 && feats.every((f) => f.properties.precision === "venue");
+  const sharesGround = feats.length > 1 && feats.every((f) => !isApproximate(f.properties));
   const groupNote = feats.length < 2
     ? ""
     : sharesGround
@@ -704,8 +710,8 @@ function popupHtml(feats) {
     const cap = p.capacity ? `${fmtNum(p.capacity)} seats` : "capacity unknown";
     // A city-precision club sits on its town, not its ground: say so rather
     // than letting the marker imply a stadium location we do not have.
-    const approxLine = p.precision === "city"
-      ? `<p class="approx">Approximate — placed on the club's town${p.venue ? `; ${esc(p.venue)} is not mapped` : ""}</p>`
+    const approxLine = isApproximate(p)
+      ? `<p class="approx">Approximate — placed on ${APPROXIMATE[p.precision]}${p.venue ? `; ${esc(p.venue)} is not mapped` : ""}</p>`
       : "";
     const r = ranks.get(p.id);
     const rankLine = r
