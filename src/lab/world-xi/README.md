@@ -2,10 +2,10 @@
 
 Hosted copy of [mapzimus/world-xi-map](https://github.com/mapzimus/world-xi-map)
 at https://mapzimus.com/lab/world-xi/ — an interactive 3D globe of every club of
-97 leagues, men's and women's, in 65 countries (3,561 clubs), each at its
+99 leagues, men's and women's, in 65 countries (4,182 clubs), each at its
 home stadium, searchable and filterable per league. That includes the whole
-United States pyramid, MLS down through the open amateur tiers, and all 1,013
-NCAA Division I and II soccer programmes. Only the men's big five are
+United States pyramid, MLS down through the open amateur tiers, and all 1,634
+NCAA soccer programmes across Divisions I, II and III. Only the men's big five are
 shown at first; the rest switch on from the legend.
 
 That repo is the source of truth: the data pipeline (`scripts/build-data.mjs`,
