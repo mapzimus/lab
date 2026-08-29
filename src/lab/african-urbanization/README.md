@@ -1,34 +1,45 @@
 # The Century of Africa
 
-A scroll-driven map story in four chapters: Africa's population century (UN
-projections to 2100), the megacities rising past every Western city, the
-transportation corridors they will need, and Kinshasa's growth on the ground
-from satellite epochs. No backend, no tiles — `index.html` + `app.js` drive a
-MapLibre globe over ~4 MB of GeoJSON committed in `data/`, split into a
+A scroll-driven map story arguing one thing at four scales: **the arithmetic
+is locked, the systems are not.** Africa's population roughly triples this
+century and demographic momentum makes that number very hard to move; whether
+the power, water, streets and corridors arrive at the same rate is entirely
+open, and the piece measures the gap rather than asserting it.
+
+Four chapters: the population century (UN projections to 2100), the megacities
+where the load lands, the corridors that have to join them, and Kinshasa on the
+ground from satellite epochs. No backend, no tiles — `index.html` + `app.js`
+drive a MapLibre globe over ~4 MB of GeoJSON committed in `data/`, split into a
 critical wave and a deferred one.
+
+Note on framing: the piece deliberately does **not** argue that African birth
+rates are unsustainable. Chapter 1 shows why that framing fails on this data.
+Fertility is already falling across the continent and the UN expects it to keep
+falling; the growth arrives anyway because the mothers of 2050 are already
+born. Births are not the near-term lever. The building rate is.
 
 ## Chapters
 
-1. **The population century** — country choropleth stepping 2025 → 2100 →
+1. **The population century** (the locked half) — country choropleth stepping 2025 → 2100 →
    growth multiple, then a median-age map explaining the mechanism (momentum:
    the mothers of 2050 are already born). An SVG regional-totals chart carries
    the UN's own low-to-high band around the Africa line, and computed
    "overtaking years" give the single year an African country's population
    passes a Western one (medium variant, lead held through 2100).
-2. **Where the megacities rise** — every African agglomeration ≥1M by 2050 as
+2. **Where the megacities rise** (where the load lands) — every African agglomeration ≥1M by 2050 as
    a proportional circle, animating 1975 → 2050 on UN annual series. Western
    comparisons live in the copy as numbers rather than as circles: drawn on a
    continental frame they landed at the edge, too small and too far out to
    compare anything against. 2100 outlooks are hollow rings, flagged as
    academic projections.
-3. **Connecting a continent** — existing rail/roads (Natural Earth), the
+3. **Connecting a continent** (the first measured gap) — existing rail/roads (Natural Earth), the
    financed lines (China's SGR/BRI railways vs. the Lobito Corridor, plus the
    AU's Trans-African Highway network), and a gravity model
    (pop·pop/distance² over top-30 2050 cities) sketching demanded corridors.
    Closes on the constraint: nighttime lights, then electricity and water
    access from the World Bank, because a map of light is also a map of who has
    power.
-4. **Kinshasa, ground truth** — GHSL built-up epochs 1975 to 2030 stacked as
+4. **Kinshasa, ground truth** (the gap, measured in metres) — GHSL built-up epochs 1975 to 2030 stacked as
    growth-vintage rings over the Malebo Pool, with OSM river and roads, and a
    GHS-POP density surface showing that the ground built by 1975 went from 2.3
    to 14 million people. Then four measurements of what that meant: expansion
