@@ -418,6 +418,15 @@
        returns on any normally proportioned phone. */
     #map-legend, #epoch-hud { display: none; }
   }
+  /* Cards are bottom-aligned on a phone, so a card's top is set by its height
+     and a long one climbs into the floating key at top left. Capping the
+     height makes the clearance a property of the layout rather than of how
+     much copy a step happens to carry: the top lands at 16vh, clear of the key
+     on any screen this rule applies to. Screens under 700px are handled above,
+     where the key is hidden and 72vh is the deliberate cap. */
+  @media (max-width: 640px) and (min-height: 701px) {
+    .card { max-height: 62vh; overflow-y: auto; }
+  }
   @media (max-width: 640px) {
     .step { align-items: flex-end; padding: 16px 12px 22vh; min-height: 96vh; }
     .card { width: 100%; padding: 14px 16px; }
@@ -692,21 +701,19 @@
     <div class="card">
       <h3>Building fast, and still losing</h3>
       <p>Six hundred million people without power reads like failure. It is
-      not. The share of Africans with power at home climbed from <b>37.7% to
-      58.5%</b> between 2000 and 2022. Over the same period the number of
-      people without it went <b>up</b>, from 510 million to 600 million. Water
-      runs the same way: 52.8% to 70.1% access, and the number without still
-      rose.</p>
+      not. The share of Africans with power at home went from <b>37.7% to
+      58.5%</b> between 2000 and 2022, while the number without it rose from
+      510 million to 600 million. Water runs the same way: 52.8% to 70.1%
+      access, and the number without still rose.</p>
       <div class="chart" id="chart-services"></div>
-      <p>The building is real and the arithmetic is outrunning it. But a race
-      is not a verdict. The map now shades by how much each country gained
-      since 2000: <b>Kenya</b> went from 15% to 76% in those twenty-two years,
-      at 54 million people, and <b>Rwanda</b> from 6% to 51%. The people
-      arriving is arithmetic. The power arriving is a decision, taken every
+      <p>The building is real and the arithmetic is outrunning it, but a race
+      is not a verdict. The map shades by what each country gained since 2000:
+      <b>Kenya</b> went from 15% to 76% at 54 million people, <b>Rwanda</b>
+      from 6% to 51%. The people arriving is arithmetic. The power arriving is
+      a decision.</p>
+      <p class="fine">Percentage points gained, 2000 to 2022, counting only
+      countries reporting in each year against UN population for that
       year.</p>
-      <p class="fine">Percentage points of access gained, 2000 to 2022,
-      counting only the countries reporting in each year against UN population
-      for that year.</p>
     </div>
   </div>
 
