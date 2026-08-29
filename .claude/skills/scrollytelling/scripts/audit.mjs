@@ -153,14 +153,17 @@ for (const [w, h] of VIEWPORTS) {
   // Land on the densest step: the one whose card has the most content.
   await p.evaluate(() => {
     const steps = [...document.querySelectorAll("[data-step]")];
-    if (!steps.length) return;
-    const biggest = steps.reduce((a, b) =>
-      (b.textContent || "").length > (a.textContent || "").length ? b : a);
-    biggest.scrollIntoView({ behavior: "instant", block: "center" });
+    if (steps.length) steps[0].scrollIntoView({ behavior: "instant", block: "center" });
   });
-  await p.waitForTimeout(1800);
-  const m = await p.evaluate(() => {
-    const card = [...document.querySelectorAll("[data-step] .card")]
+  await p.waitForTimeout(1200);
+  // Every step, not the wordiest one. Card height is driven by rendered
+  // content, and a step whose bulk is a chart or an image carries almost no
+  // text: picking the longest string sailed straight past a card tall enough
+  // to slide under the floating legend.
+  const m = await p.evaluate(async () => {
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const measureOne = () => {
+      const card = [...document.querySelectorAll("[data-step] .card")]
       .map((c) => c.getBoundingClientRect())
       .filter((r) => r.top < innerHeight && r.bottom > 0)
       .sort((a, b) => b.height - a.height)[0];
@@ -176,20 +179,38 @@ for (const [w, h] of VIEWPORTS) {
       && Math.min(card.bottom, o.r.bottom) - Math.max(card.top, o.r.top) > 24
       && Math.min(card.right, o.r.right) - Math.max(card.left, o.r.left) > 24
     ).map((o) => o.s) : [];
+      return {
+        card: card ? { w: Math.round(card.width), h: Math.round(card.height), top: Math.round(card.top) } : null,
+        offscreen: card ? (card.right > innerWidth + 1 || card.left < -1) : false,
+        clippedTop: card ? card.top < -1 : false,
+        hits,
+      };
+    };
+
+    const steps = [...document.querySelectorAll("[data-step]")];
+    let worst = null;
+    for (const step of steps.length ? steps : [document.body]) {
+      step.scrollIntoView({ behavior: "instant", block: "center" });
+      await sleep(220);
+      const r = measureOne();
+      r.step = step.dataset.step || "(page)";
+      // A collision beats a merely tall card; otherwise the tallest wins.
+      const score = (x) => (x.hits.length ? 1e6 : 0) + (x.offscreen ? 5e5 : 0)
+        + (x.card ? x.card.h : 0);
+      if (!worst || score(r) > score(worst)) worst = r;
+    }
     return {
       overflowX: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
-      card: card ? { w: Math.round(card.width), h: Math.round(card.height), top: Math.round(card.top) } : null,
-      offscreen: card ? (card.right > innerWidth + 1 || card.left < -1) : false,
-      clippedTop: card ? card.top < -1 : false,
-      hits,
+      steps: steps.length,
+      ...worst,
     };
   });
   const label = `${w}x${h}`.padEnd(10);
   if (m.overflowX) fail(`${label} horizontal overflow`);
   else if (m.offscreen) fail(`${label} card runs off screen`, JSON.stringify(m.card));
-  else if (m.hits.length) fail(`${label} overlay covers the card`, m.hits.join(", ") + " " + JSON.stringify(m.card));
+  else if (m.hits.length) fail(`${label} overlay covers the card at "${m.step}"`, m.hits.join(", ") + " " + JSON.stringify(m.card));
   else if (errs.length) fail(`${label} page error`, errs[0].slice(0, 80));
-  else pass(`${label} card ${m.card ? m.card.w + "x" + m.card.h : "n/a"}, no overflow, no overlay collision`);
+  else pass(`${label} ${m.steps} steps, worst "${m.step}" ${m.card ? m.card.w + "x" + m.card.h : "n/a"}, no overflow, no overlay collision`);
   await p.close();
 }
 

@@ -418,6 +418,15 @@
        returns on any normally proportioned phone. */
     #map-legend, #epoch-hud { display: none; }
   }
+  /* Cards are bottom-aligned on a phone, so a card's top is set by its height
+     and a long one climbs into the floating key at top left. Capping the
+     height makes the clearance a property of the layout rather than of how
+     much copy a step happens to carry: the top lands at 16vh, clear of the key
+     on any screen this rule applies to. Screens under 700px are handled above,
+     where the key is hidden and 72vh is the deliberate cap. */
+  @media (max-width: 640px) and (min-height: 701px) {
+    .card { max-height: 62vh; overflow-y: auto; }
+  }
   @media (max-width: 640px) {
     .step { align-items: flex-end; padding: 16px 12px 22vh; min-height: 96vh; }
     .card { width: 100%; padding: 14px 16px; }
@@ -682,12 +691,29 @@
       <b>454 million</b> without a basic supply of drinking water.</p>
       <p>DR Congo is the sharpest version. It is building toward a capital of
       84 million people, and today <b>78% of Congolese have no electricity</b>
-      and two in three have no safe water. That is the shape of the whole
-      argument. The arrival of the people is arithmetic. The arrival of the
-      power and the water is a decision, taken every year, by people who can
-      also decide otherwise.</p>
+      and two in three have no safe water.</p>
       <p class="fine">World Bank open data, most recent year available for each
       country, generally 2022 or 2023.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c3-rate">
+    <div class="card">
+      <h3>Building fast, and still losing</h3>
+      <p>Six hundred million people without power reads like failure. It is
+      not. The share of Africans with power at home went from <b>37.7% to
+      58.5%</b> between 2000 and 2022, while the number without it rose from
+      510 million to 600 million. Water runs the same way: 52.8% to 70.1%
+      access, and the number without still rose.</p>
+      <div class="chart" id="chart-services"></div>
+      <p>The building is real and the arithmetic is outrunning it, but a race
+      is not a verdict. The map shades by what each country gained since 2000:
+      <b>Kenya</b> went from 15% to 76% at 54 million people, <b>Rwanda</b>
+      from 6% to 51%. The people arriving is arithmetic. The power arriving is
+      a decision.</p>
+      <p class="fine">Percentage points gained, 2000 to 2022, counting only
+      countries reporting in each year against UN population for that
+      year.</p>
     </div>
   </div>
 
@@ -839,6 +865,26 @@
     </div>
   </div>
 
+  <div class="step" data-step="c4-cities">
+    <div class="card">
+      <h3>Is Kinshasa just badly run?</h3>
+      <p>It is the fair objection, and it is testable. The same measurement
+      run over nine African cities: every street OpenStreetMap knows, inside
+      the same satellite footprint, against the same UN population.</p>
+      <div class="chart" id="chart-cities"></div>
+      <p>Kinshasa comes last, so it is not a typical case. It is the sharp end
+      of a pattern that holds everywhere it was measured. <b>Every city with a
+      1975 figure has less street per resident today than it had then</b>, and
+      the median across the nine is <b>1.82 metres</b>. Cairo fell least, from
+      2.50 to 1.82, which is what fifty years of money and a state that builds
+      looks like.</p>
+      <p class="fine">Streets from OpenStreetMap inside JRC built-up footprints,
+      against UN city population. OSM has no history, so every 1975 figure is
+      an upper bound and every fall is at least as steep as shown. Luanda has no
+      UN 1975 series, so it appears with today's figure only.</p>
+    </div>
+  </div>
+
   <div class="step" data-step="c4-matadi">
     <div class="card">
       <h3>One road to the sea</h3>
@@ -896,6 +942,7 @@
     <option value="medAge25">Median age 2025</option>
     <option value="elec">Electricity access</option>
     <option value="water">Drinking water access</option>
+    <option value="elecGain">Electrification gained since 2000</option>
   </select>
   <div class="cap">Layers</div>
   <label><input type="checkbox" data-layer="cities"> Cities</label>

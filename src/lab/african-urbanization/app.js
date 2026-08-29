@@ -19,6 +19,9 @@ const AGE_RAMP = [15, "#f4a93a", 22, "#c47a4e", 30, "#8a6a70", 40, "#5a5f88", 50
 // Service access runs the other way: the shortfall is the subject, so the
 // countries where most people go without are the ones that burn.
 const ACCESS_RAMP = [0, "#f4a93a", 25, "#d8734a", 50, "#9c5a6b", 75, "#5f5a86", 100, "#3a4560"];
+// Electrification gain since 2000 is the one metric where the bright end is
+// the good news, so it runs opposite to ACCESS_RAMP on purpose.
+const GAIN_RAMP = [0, "#2c3140", 10, "#3d3a52", 20, "#6b4a66", 35, "#c05f60", 50, "#f4a93a"];
 
 const AFRICA_BOUNDS = [[-19.5, -36.5], [53.5, 38.5]];
 const WEST_AFRICA_BOUNDS = [[-18, 3], [16, 15]];
@@ -41,9 +44,12 @@ function cityRadius(prop, k) {
   return ["*", k, ["sqrt", ["coalesce", ["get", prop], 0]]];
 }
 
-function padding() {
+// `reserve` is the share of a phone screen the card is assumed to occupy. The
+// default suits a three or four line card. A step whose card runs longer can
+// ask for more, otherwise fitBounds happily places the subject underneath it.
+function padding(reserve = 0.40) {
   const w = innerWidth, h = innerHeight;
-  if (w <= 640) return { top: 70, bottom: Math.round(h * 0.40), left: 16, right: 16 };
+  if (w <= 640) return { top: 60, bottom: Math.round(h * reserve), left: 16, right: 16 };
   return { top: 48, bottom: 48, left: 480, right: 56 };
 }
 
@@ -60,19 +66,21 @@ function shortName(n) {
 
 // Bumped whenever the pipeline rewrites data/. The query string lets the
 // files be cached hard while a deploy still delivers fresh ones.
-const DATA_VERSION = "2026-08-29";
+const DATA_VERSION = "2026-08-29c";
 
 // The story reads perfectly as text, so the map layers it cannot show without
 // help are loaded in two waves: what chapters 1 to 3 need, then the rest.
 const CORE_FILES = [
   "countries.geojson", "population.json", "cities.geojson",
   "corridors-existing.geojson", "corridors-planned.geojson", "corridors-model.geojson",
+  // 2 KB, and chapter 3 needs it, so it rides in the first wave.
+  "services-trend.json",
 ];
 const DEFERRED_FILES = [
   "lights.geojson", "kinshasa-builtup.geojson", "kinshasa-water.geojson",
   "kinshasa-roads.geojson", "kinshasa-density.geojson", "kinshasa-slope.geojson",
   "kinshasa-streets.geojson", "kinshasa-communes.geojson", "matadi-corridor.geojson",
-  "kinshasa-streets.json", "kinshasa-expansion.json",
+  "kinshasa-streets.json", "kinshasa-expansion.json", "city-streets.json",
 ];
 
 function grab(file) {
@@ -152,6 +160,16 @@ function addDeferredLayers(map, d) {
     }, BELOW);
   }
   map.addLayer({
+    id: "matadi-ocean", type: "fill", source: "matadi",
+    filter: ["==", ["get", "kind"], "ocean"],
+    paint: { "fill-color": "#15283c", "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
+  }, BELOW);
+  map.addLayer({
+    id: "matadi-river", type: "fill", source: "matadi",
+    filter: ["==", ["get", "kind"], "river"],
+    paint: { "fill-color": "#1d3242", "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
+  }, BELOW);
+  map.addLayer({
     id: "kin-water", type: "fill", source: "kin-water",
     paint: { "fill-color": "#1d3242", "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } },
   }, BELOW);
@@ -196,18 +214,29 @@ function addDeferredLayers(map, d) {
     },
   }, BELOW);
   map.addLayer({
+    id: "matadi-case", type: "line", source: "matadi",
+    filter: ["in", ["get", "kind"], ["literal", ["road", "rail"]]],
+    layout: { "line-cap": "round", "line-join": "round" },
+    paint: {
+      "line-color": "#0b0e14", "line-width": 6,
+      "line-opacity": 0, "line-opacity-transition": { duration: 600 },
+    },
+  }, BELOW);
+  map.addLayer({
     id: "matadi-rail", type: "line", source: "matadi",
     filter: ["==", ["get", "kind"], "rail"],
+    layout: { "line-cap": "butt", "line-join": "round" },
     paint: {
-      "line-color": "#f4a93a", "line-width": 1.6, "line-dasharray": [3, 2],
+      "line-color": "#f4a93a", "line-width": 2.4, "line-dasharray": [2.4, 1.6],
       "line-opacity": 0, "line-opacity-transition": { duration: 600 },
     },
   }, BELOW);
   map.addLayer({
     id: "matadi-road", type: "line", source: "matadi",
     filter: ["==", ["get", "kind"], "road"],
+    layout: { "line-cap": "round", "line-join": "round" },
     paint: {
-      "line-color": "#d8734a", "line-width": 1.8,
+      "line-color": "#ef8a55", "line-width": 2.8,
       "line-opacity": 0, "line-opacity-transition": { duration: 600 },
     },
   }, BELOW);
@@ -221,9 +250,10 @@ function addDeferredLayers(map, d) {
   }, BELOW);
 }
 
-function boot([countries, population, cities, corExisting, corPlanned, corModel]) {
+function boot([countries, population, cities, corExisting, corPlanned, corModel, servicesTrend]) {
   buildRegionChart(population.regions, population.africaBand);
   buildCrossoverTicker(population.crossovers);
+  buildServicesChart(servicesTrend);
 
   const map = new maplibregl.Map({
     container: "map",
@@ -336,13 +366,15 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel]
     const refreshStep = initSteps(map);
 
     Promise.all(DEFERRED_FILES.map(grab)).then(([lights, kinBuilt, kinWater, kinRoads,
-      kinDensity, kinSlope, kinStreets, kinCommunes, matadi, streetStats, expansion]) => {
+      kinDensity, kinSlope, kinStreets, kinCommunes, matadi, streetStats, expansion,
+      cityStreets]) => {
       addDeferredLayers(map, { lights, kinBuilt, kinWater, kinRoads, kinDensity,
         kinSlope, kinStreets, kinCommunes, matadi });
       initCommuneLabels(map, kinCommunes);
       initMatadiLabels(map, matadi);
       buildExpansionChart(expansion);
       buildStreetChart(streetStats);
+      buildCityStreetChart(cityStreets);
       refreshStep();
     }).catch((err) => {
       console.error(err);
@@ -541,9 +573,9 @@ function initSteps(map) {
   const hud = document.getElementById("epoch-hud");
   const hudYr = hud.querySelector(".yr");
 
-  const fly = (bounds, maxZoom) => {
+  const fly = (bounds, maxZoom, reserve) => {
     map.fitBounds(bounds, {
-      padding: padding(), maxZoom: maxZoom || 12,
+      padding: padding(reserve), maxZoom: maxZoom || 12,
       duration: prefersStill ? 0 : 2200, essential: true,
     });
   };
@@ -620,8 +652,12 @@ function initSteps(map) {
   const streetsOn = (v) => lineOpacity("kin-streets", v * 0.95);
   const communesOn = (v) => lineOpacity("kin-communes", v * 0.75);
   const matadiOn = (v) => {
-    lineOpacity("matadi-road", v * 0.95);
-    lineOpacity("matadi-rail", v * 0.9);
+    // lineOpacity sets fill-opacity when the layer is a fill.
+    lineOpacity("matadi-ocean", v);
+    lineOpacity("matadi-river", v);
+    lineOpacity("matadi-case", v * 0.85);
+    lineOpacity("matadi-road", v);
+    lineOpacity("matadi-rail", v * 0.95);
   };
   // The HUD chip annotates a step the story is making. In explore mode the
   // reader drives, and the panel's own year output says which epoch is drawn,
@@ -705,6 +741,14 @@ function initSteps(map) {
       setChoropleth("elec", ACCESS_RAMP); countriesOpacity(0.9, 0.25);
       setCountryLabels("dim"); setCityEpoch(2050, 0.25);
     },
+    // Same frame, different question: not who has power, but who built it.
+    // Kenya and Rwanda light up, which is the point the copy is making.
+    "c3-rate": () => {
+      fly(AFRICA_BOUNDS, 5); base.c3();
+      lightsOn(0); corridors(0, 0, 0, 0, 0);
+      setChoropleth("elecGain", GAIN_RAMP); countriesOpacity(0.9, 0.25);
+      setCountryLabels("dim"); setCityEpoch(2050, 0.25);
+    },
     "ch4": () => {
       fly(WEST_AFRICA_BOUNDS, 6);
       countriesOpacity(0.14, 0.06);
@@ -738,8 +782,13 @@ function initSteps(map) {
       setCommuneLabels(true);
       hudSet("1.0 m", "of street per resident");
     },
+    "c4-cities": () => {
+      fly(KINSHASA_BOUNDS, 10); base.c4();
+      kinshasa(0.55, 0.35, 2030); streetsOn(0.4);
+      hudSet("1.18 m", "Kinshasa, thinnest of nine");
+    },
     "c4-matadi": () => {
-      fly(MATADI_BOUNDS, 8); base.c4();
+      fly(MATADI_BOUNDS, 8, 0.56); base.c4();
       kinshasa(0.9, 0, 2030); matadiOn(1);
       setPlaceLabels(false); setMatadiLabels(true);
       hudOff();
@@ -812,7 +861,7 @@ function initSteps(map) {
   const METRIC_RAMPS = {
     pop2025: POP_RAMP, pop2050: POP_RAMP, pop2100: POP_RAMP,
     multiple: MULT_RAMP, medAge25: AGE_RAMP,
-    elec: ACCESS_RAMP, water: ACCESS_RAMP,
+    elec: ACCESS_RAMP, water: ACCESS_RAMP, elecGain: GAIN_RAMP,
   };
   const METRIC_LEGENDS = {
     pop2025: rampLegend("People per country, 2025", POP_RAMP, fmtM),
@@ -822,6 +871,7 @@ function initSteps(map) {
     medAge25: rampLegend("Median age, 2025", AGE_RAMP, fmtY),
     elec: rampLegend("Electricity at home, share of people", ACCESS_RAMP, fmtPct, false),
     water: rampLegend("Basic drinking water, share of people", ACCESS_RAMP, fmtPct, false),
+    elecGain: rampLegend("Electrification gained since 2000", GAIN_RAMP, fmtPts),
   };
   const applyMetric = () => {
     const m = metricSel.value;
@@ -866,7 +916,8 @@ function initSteps(map) {
         + (p.medAge25 ? row("median age 2025", p.medAge25 + " yrs") : "")
         + (p.tfr ? row("children per woman", p.tfr) : "")
         + (p.elec != null ? row("has electricity", p.elec + "%") : "")
-        + (p.water != null ? row("has basic water", p.water + "%") : "");
+        + (p.water != null ? row("has basic water", p.water + "%") : "")
+        + (p.elecGain != null ? row("power gained since 2000", "+" + p.elecGain + " pts") : "");
     }
     if (f.layer.id === "cor-model") {
       return `<div class="pop-h">${p.a} to ${p.b}</div><div class="pop-sub">modeled corridor</div>`
@@ -978,6 +1029,7 @@ const fmtM = (v) => (v ? `${v}M` : "0");
 const fmtX = (v) => `×${v}`;
 const fmtY = (v) => `${v} yrs`;
 const fmtPct = (v) => `${v}%`;
+const fmtPts = (v) => `+${v}`;
 
 function rampLegend(title, stops, fmt, plus = true) {
   return { title, ramp: { stops, fmt, plus } };
@@ -1015,6 +1067,7 @@ const LEGENDS = {
     ROW("#f4a93a", "modeled corridor, thicker pulls harder"),
     ROW("#8b93a0", "existing rail (dim)")] },
   "c3-services": rampLegend("Electricity at home, share of people", ACCESS_RAMP, fmtPct, false),
+  "c3-rate": rampLegend("Electrification gained, 2000 to 2022", GAIN_RAMP, fmtPts),
   "c3-lights": { title: "Africa at night, 2020", rows: [
     ROW("#ffd166", "brightly lit (city cores)", "box"),
     ROW("#8a6a35", "lit (towns and sprawl)", "box")] },
@@ -1039,9 +1092,14 @@ const LEGENDS = {
   "c4-streets": { title: "The street grid", rows: [
     ROW("#aeb6c2", "main road"), ROW("#9aa6b4", "other streets"),
     ROW("#6f7a89", "commune boundary")] },
+  "c4-cities": { title: "Nine cities, same measurement", rows: [
+    ROW("#f4a93a", "Kinshasa", "box"),
+    ROW("#5f6b7d", "the other eight", "box")] },
   "c4-matadi": { title: "Kinshasa to the sea", rows: [
-    ROW("#d8734a", "Route Nationale 1"),
-    ROW("#f4a93a", "Matadi-Kinshasa railway")] },
+    ROW("#ef8a55", "Route Nationale 1"),
+    ROW("#f4a93a", "Matadi-Kinshasa railway"),
+    ROW("#1d3242", "the Congo, unnavigable here", "box"),
+    ROW("#15283c", "the Atlantic", "box")] },
   "explore": null,
 };
 
@@ -1190,6 +1248,82 @@ function buildStreetChart(data) {
   const first = rows[0], last = rows[rows.length - 1];
   svg += `<text class="lbl" x="${x(0) + 6}" y="${y(first.metresPerPerson) - 6}" fill="#f4a93a" style="fill:#f4a93a">${first.metresPerPerson} m</text>`;
   svg += `<text class="lbl" x="${x(rows.length - 1) - 6}" y="${y(last.metresPerPerson) - 8}" text-anchor="end" fill="#f4a93a" style="fill:#f4a93a">${last.metresPerPerson} m</text>`;
+  svg += "</svg>";
+  el.innerHTML = svg;
+}
+
+function buildServicesChart(data) {
+  const el = document.getElementById("chart-services");
+  if (!el || !data || !data.series || !data.series.elec) return;
+  const rows = data.series.elec;
+  if (rows.length < 2) return;
+
+  // Two units on one frame: share left, people right. The whole point is that
+  // the two curves pull apart, so they have to share an x axis and cannot
+  // share a y one. Both scales start at zero so neither slope is exaggerated.
+  const W = 390, H = 176, L = 34, R = 44, T = 16, B = 26;
+  const years = rows.map((r) => r.year);
+  const y0 = years[0], y1 = years[years.length - 1];
+  const peak = Math.max(...rows.map((r) => r.withoutM));
+  const pplMax = Math.ceil(peak / 100) * 100;
+  const x = (yr) => L + ((yr - y0) / (y1 - y0)) * (W - L - R);
+  const yPct = (v) => T + (1 - v / 100) * (H - T - B);
+  const yPpl = (v) => T + (1 - v / pplMax) * (H - T - B);
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Share of Africans with electricity at home against the number without, ${y0} to ${y1}">`;
+  for (const v of [25, 50, 75, 100]) {
+    svg += `<line class="axis" x1="${L}" x2="${W - R}" y1="${yPct(v)}" y2="${yPct(v)}"/>`;
+    svg += `<text x="${L - 4}" y="${yPct(v) + 3}" text-anchor="end">${v}%</text>`;
+  }
+  for (const v of [200, 400, 600]) {
+    if (v > pplMax) continue;
+    svg += `<text x="${W - R + 4}" y="${yPpl(v) + 3}" style="fill:#8fb8e8">${v}M</text>`;
+  }
+  const line = (pts, color, dash) =>
+    `<polyline fill="none" stroke="${color}" stroke-width="2.2"${dash ? ` stroke-dasharray="${dash}"` : ""} points="${pts.join(" ")}"/>`;
+  svg += line(rows.map((r) => `${x(r.year).toFixed(1)},${yPct(r.accessPct).toFixed(1)}`), "#f4a93a");
+  svg += line(rows.map((r) => `${x(r.year).toFixed(1)},${yPpl(r.withoutM).toFixed(1)}`), "#8fb8e8");
+
+  const first = rows[0], last = rows[rows.length - 1];
+  svg += `<text class="lbl" x="${x(y0) + 4}" y="${yPct(first.accessPct) - 6}" style="fill:#f4a93a">${first.accessPct}%</text>`;
+  svg += `<text class="lbl" x="${x(y1) - 2}" y="${yPct(last.accessPct) - 6}" text-anchor="end" style="fill:#f4a93a">${last.accessPct}% with power</text>`;
+  svg += `<text class="lbl" x="${x(y0) + 4}" y="${yPpl(first.withoutM) - 6}" style="fill:#8fb8e8">${first.withoutM}M</text>`;
+  svg += `<text class="lbl" x="${x(y1) - 2}" y="${yPpl(last.withoutM) + 13}" text-anchor="end" style="fill:#8fb8e8">${last.withoutM}M without</text>`;
+  for (const yr of [y0, y1]) {
+    svg += `<text x="${x(yr).toFixed(1)}" y="${H - 8}" text-anchor="${yr === y0 ? "start" : "end"}">${yr}</text>`;
+  }
+  svg += "</svg>";
+  el.innerHTML = svg;
+}
+
+function buildCityStreetChart(data) {
+  const el = document.getElementById("chart-cities");
+  if (!el || !data || !data.cities) return;
+  const rows = data.cities
+    .map((c) => ({ city: c.city, v: (c.years["2020"] || {}).metresPerPerson }))
+    .filter((r) => r.v != null)
+    .sort((a, b) => b.v - a.v);
+  if (!rows.length) return;
+
+  const W = 390, RH = 17, T = 6, B = 18, L = 96, R = 34;
+  const H = T + rows.length * RH + B;
+  const max = Math.ceil(Math.max(...rows.map((r) => r.v)) * 2) / 2;
+  const x = (v) => L + (v / max) * (W - L - R);
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Metres of street per resident in nine African cities, 2020">`;
+  for (const v of [1, 2, 3]) {
+    if (v > max) continue;
+    svg += `<line class="axis" x1="${x(v)}" x2="${x(v)}" y1="${T}" y2="${T + rows.length * RH}"/>`;
+    svg += `<text x="${x(v)}" y="${H - 6}" text-anchor="middle">${v}m</text>`;
+  }
+  rows.forEach((r, i) => {
+    const y = T + i * RH;
+    const mine = r.city === "Kinshasa";
+    const fill = mine ? "#f4a93a" : "#5f6b7d";
+    svg += `<text x="${L - 6}" y="${y + 9}" text-anchor="end" style="fill:${mine ? "#e7e9ec" : "#99a0ab"}">${r.city}</text>`;
+    svg += `<rect x="${L}" y="${y + 2}" width="${(x(r.v) - L).toFixed(1)}" height="9" rx="1.5" fill="${fill}"/>`;
+    svg += `<text x="${(x(r.v) + 5).toFixed(1)}" y="${y + 9}" style="fill:${mine ? "#f4a93a" : "#858d99"}">${r.v.toFixed(2)}</text>`;
+  });
   svg += "</svg>";
   el.innerHTML = svg;
 }

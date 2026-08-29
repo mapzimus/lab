@@ -234,9 +234,14 @@
 
   <h3>World Bank Open Data</h3>
   <p>Access to electricity and to basic drinking water, as a share of
-  population, most recent reported year per country. The map therefore mixes
-  observations from different years, and the "people without" totals multiply
-  that share by the UN's 2025 population.</p>
+  population. The snapshot map is the most recent reported year per country, so
+  it mixes observations from different years, and its "people without" totals
+  multiply that share by the UN's 2025 population.</p>
+  <p>The chart is a different cut of the same indicators: the full series from
+  2000 to 2022, counting only the countries reporting in a given year and
+  pairing each year's share against UN population for that same year. Counting
+  a consistent set per year is what stops a country reporting late from putting
+  a step in either curve.</p>
 
   <h3>Natural Earth</h3>
   <p>Country outlines and the existing rail and road layer drawn in chapter
@@ -381,6 +386,22 @@
   60,000. The story's "over 60,000 per square kilometre" is a conservative
   reading of its own data.</p>
 
+  <h3>Share against absolute number</h3>
+  <p>The story claims a problem of rate, and a snapshot cannot support a claim
+  about rate. So the services indicators were rebuilt as series.</p>
+  <p>Both say the same thing independently. Electricity access across Africa
+  went from <b>37.7% to 58.5%</b> between 2000 and 2022 while the number of
+  people without it rose from <b>510 million to 600 million</b>. Water access
+  went from 52.8% to 70.1% while the number without rose from 386 million to
+  429 million. Two indicators, separately collected, both showing real and
+  large progress losing to the population it is chasing.</p>
+  <p>This is the difference between a piece that asserts a gap and one that
+  measures whether the gap is closing. It is also why the copy credits the
+  building rather than dismissing it, and why the map carries a layer for
+  electrification gained since 2000: Kenya went from 15% to 76% and Rwanda from
+  6% to 51% in the same window, which is the evidence that the number is a
+  choice and not a fate.</p>
+
   <h3>The gravity model against the road network</h3>
   <p>Chapter three runs population times population over distance squared
   across the thirty largest African cities of 2050. That is a textbook toy,
@@ -409,6 +430,29 @@
   paved, open, safe or big enough, and a corridor crossing water scores badly
   for a reason the model has no opinion about. Every Overpass response is
   cached under the pipeline's raw directory, so the check reruns for free.</p>
+
+  <h3>One city, or a pattern?</h3>
+  <p>The sharpest number in the story is Kinshasa's street supply falling from
+  about nine metres per resident to one. On its own that is a single case, and
+  the fair objection is that Kinshasa is exceptional: a capital that grew
+  through state collapse and two wars.</p>
+  <p><code>16_city_streets.py</code> runs the identical measurement over nine
+  cities, chosen to span the range rather than to flatter the argument. Cairo
+  and Accra are in it precisely because they were the most likely to contradict
+  it. Every city with a UN 1975 baseline has less street per resident today
+  than it had then. Kinshasa comes last at <b>1.18 metres</b> against a median
+  of <b>1.82</b>, so it is the sharp end of a real pattern rather than a
+  typical case, and Cairo fell least, which is what a state that builds looks
+  like.</p>
+  <p>Two things make that result worth trusting. Kinshasa's figure here is
+  derived from a different window than the chapter's own, and both land on
+  1.18. And the check caught a real fault on the way: Addis Ababa first came
+  back at 0.12 metres per resident, an order of magnitude below everything
+  else, because its measurement window ran off the edge of its GHSL tile.
+  Asking for a window past a tile edge does not fail. It returns the rows that
+  exist while the transform still describes the window requested, so the
+  footprint silently shifts by the missing margin. The script now mosaics every
+  tile a window touches and refuses to run on partial coverage.</p>
 
   <h3>The numbers on the page are asserted, not typed</h3>
   <p>Every figure quoted in the story is checked against the shipped JSON and
