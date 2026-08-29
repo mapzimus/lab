@@ -1148,13 +1148,33 @@ wirePanels();
       setReadout("The map layers failed to initialise.");
     }
   };
+  // `on`, not `once`: the fallback below replaces the style, and that second
+  // style.load is the one that has to draw the clubs.
+  map.on("style.load", startLayers);
   if (map.isStyleLoaded()) startLayers();
-  else map.once("style.load", startLayers);
 
-  // a basemap that never arrives should not leave the globe silently empty
+  // Every club layer lives inside the map's style, so until a style loads there
+  // is nothing on the globe at all. That made the whole map a hostage of one
+  // free third-party tile service: when tiles.openfreemap.org is unreachable —
+  // an outage, a filtered network, a DNS block — the page rendered no globe and
+  // no clubs, only a line of small text. The clubs are ours and do not need
+  // anybody's basemap, so if it has not arrived in time, draw them on a plain
+  // globe instead of nothing.
+  const BASEMAP_GRACE_MS = 8000;
   setTimeout(() => {
-    if (!layered) setReadout("Basemap is taking a while — the league list and search still work.");
-  }, 12000);
+    if (layered) return;
+    setReadout("Basemap unavailable — showing the clubs on a plain globe.");
+    try {
+      map.setStyle({
+        version: 8,
+        sources: {},
+        layers: [{ id: "backdrop", type: "background", paint: { "background-color": "#0d1424" } }],
+      });
+    } catch (err) {
+      console.error(err);
+      setReadout("The map layers failed to initialise.");
+    }
+  }, BASEMAP_GRACE_MS);
 })();
 
 // read-only surface for the headless test suite
