@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How The Century of Africa was made</title>
+<meta name="description" content="The sources, the judgment calls, the things that were tried and thrown away, and how the modelled figures check out against independent data.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How The Century of Africa was made">
+<meta property="og:description" content="The sources, the judgment calls, the things that were tried and thrown away, and how the modelled figures check out against independent data.">
+<meta property="og:url" content="https://mapzimus.com/lab/african-urbanization/method/">
+<meta property="og:image" content="https://mapzimus.com/lab/african-urbanization/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mapzimus.com/lab/african-urbanization/og-image.jpg">
+<link rel="icon" href="/favicon.svg">
+<style>
+  /* Same tokens and type scale as the story, so this reads as the same
+     project. No MapLibre, no data fetches: this page is text. */
+  @font-face {
+    font-family: "Archivo";
+    src: url("/fonts/archivo-var-latin.woff2") format("woff2");
+    font-weight: 100 900;
+    font-stretch: 62% 125%;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "IBM Plex Mono";
+    src: url("/fonts/plex-mono-400-latin.woff2") format("woff2");
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "IBM Plex Mono";
+    src: url("/fonts/plex-mono-600-latin.woff2") format("woff2");
+    font-weight: 600;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #101319;
+    --sunk: #181c24;
+    --line: #333840;
+    --text: #e7e9ec;
+    --muted: #99a0ab;
+    --dim: #858d99;
+    --accent: #f4a93a;
+    --accent2: #8fb8e8;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px; line-height: 1.6;
+  }
+  .skip-link {
+    position: absolute; left: -9999px; top: 0; z-index: 10;
+    padding: 10px 14px; background: var(--sunk); color: var(--text);
+    border: 1px solid var(--accent); border-radius: 0 0 8px 0;
+    font: 600 13px var(--mono); text-decoration: none;
+  }
+  .skip-link:focus { left: 0; }
+
+  .wrap { max-width: 680px; margin: 0 auto; padding: 40px 22px 80px; }
+  a { color: var(--accent2); }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent);
+  }
+  h1 {
+    margin: 14px 0 0;
+    font-size: clamp(30px, 5.4vw, 42px);
+    font-weight: 750; font-stretch: 108%;
+    line-height: 1.08; letter-spacing: -0.02em;
+  }
+  .lede { margin: 16px 0 0; font-size: 17px; color: var(--muted); }
+
+  h2 {
+    margin: 52px 0 0;
+    padding-top: 22px; border-top: 1px solid var(--line);
+    font-size: 21px; font-weight: 700; letter-spacing: -0.01em;
+  }
+  h3 {
+    margin: 30px 0 0;
+    font-size: 15px; font-weight: 700;
+    font-family: var(--mono); letter-spacing: 0.02em;
+    color: var(--accent);
+  }
+  p { margin: 12px 0 0; color: var(--muted); }
+  p b, p strong, li b, li strong { color: var(--text); font-weight: 650; }
+  ul { margin: 12px 0 0; padding-left: 20px; color: var(--muted); }
+  li { margin-top: 7px; }
+  .fine { font-size: 12.5px; color: var(--dim); line-height: 1.5; }
+  code { font-family: var(--mono); font-size: 0.92em; color: var(--text); }
+
+  .toc {
+    margin-top: 26px; padding: 14px 16px;
+    background: var(--sunk); border: 1px solid var(--line); border-radius: 10px;
+  }
+  .toc ol { margin: 0; padding-left: 20px; font-size: 13.5px; color: var(--muted); }
+  .toc li { margin-top: 4px; }
+
+  .tbl-wrap { margin-top: 14px; overflow-x: auto; }
+  table {
+    border-collapse: collapse; width: 100%; max-width: 470px;
+    font-size: 13px; font-variant-numeric: tabular-nums;
+  }
+  th, td { padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { font-family: var(--mono); font-size: 11.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--dim); }
+  td { color: var(--muted); }
+  td.num { text-align: right; font-family: var(--mono); }
+  td b { color: var(--text); }
+
+  .back {
+    margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line);
+    font-family: var(--mono); font-size: 13px;
+  }
+  .back .links { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; }
+  .back .links span { color: var(--dim); }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#sources">Skip to the sources</a>
+
+<main class="wrap">
+  <p class="kicker">Method</p>
+  <h1>How The Century of Africa was made</h1>
+  <p class="lede">The story is four chapters of maps. This is the paperwork
+  behind them: every source and what it actually measures, the judgment calls
+  and why they went the way they did, the things that were tried and thrown
+  away, and how the modelled numbers hold up against independent data.</p>
+
+  <nav class="toc" aria-label="Contents">
+    <ol>
+      <li><a href="#question">The question, and why four chapters</a></li>
+      <li><a href="#sources">Every source, and what it measures</a></li>
+      <li><a href="#decisions">The decisions</a></li>
+      <li><a href="#rejected">Tried and rejected</a></li>
+      <li><a href="#validation">Validation</a></li>
+      <li><a href="#limits">Known limits</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="question">1. The question, and why four chapters</h2>
+
+  <p>The UN expects Africa's population to roughly triple this century while
+  every other region levels off or falls. That fact is easy to state and hard
+  to feel, because it is a number about a hundred years and a continent. The
+  piece exists to make it land, and to test it at four scales, because a claim
+  that only works at one scale is not really a finding.</p>
+
+  <ul>
+    <li><b>The continent.</b> Country by country to 2100, plus the mechanism.
+    Growth is not a forecast about birth rates so much as arithmetic about
+    people already alive: the mothers of 2050 have been born. The median-age
+    map is there so the reader can see the momentum rather than take it on
+    trust.</li>
+    <li><b>The cities.</b> The same growth expressed as places. Circles sized
+    by population, running from 1975 to 2050 on the UN's annual series, so the
+    reader watches the map fill rather than reading a ranking.</li>
+    <li><b>The connections.</b> Cities that size need to reach each other.
+    This chapter asks where the demand is and whether the network meets it,
+    and it is the chapter with the most modelling in it, so it carries the
+    most testing.</li>
+    <li><b>The ground.</b> One city, Kinshasa, at satellite resolution. The
+    continental chapters are all projection. This one is measurement: what
+    actually got built, where, on what slope, with how much street.</li>
+  </ul>
+
+  <p>The order is deliberate. Each chapter is a smaller frame than the last,
+  and the last one is the only place the reader can check the story against
+  something you could walk on.</p>
+
+  <h2 id="sources">2. Every source, and what it measures</h2>
+
+  <h3>UN World Population Prospects 2024</h3>
+  <p>Country population by year, medium variant, plus the low and high
+  variants drawn as the band on the regional chart. This is an estimate built
+  from national statistics, censuses and vital registration, projected forward
+  under fertility and mortality assumptions. It is a central path, not a
+  prediction, and the overtaking years the story quotes move if you change the
+  variant.</p>
+
+  <h3>UN World Urbanization Prospects 2025, DEGURBA cities</h3>
+  <p>Agglomeration population 1975 to 2050. What it measures is a city defined
+  by a consistent settlement rule rather than by whatever each country happens
+  to call a municipality, which is why the figures sometimes differ from a
+  national statistics office. The 2100 city figures are not the UN's: they
+  come from Hoornweg and Pope (2017), sit well above any UN city horizon, and
+  are drawn hollow everywhere they appear.</p>
+
+  <h3>JRC Global Human Settlement Layer, R2023A</h3>
+  <p>Two grids, both at 3 arcseconds, both tile R10_C20. GHS-BUILT-S gives the
+  share of each cell covered by building surface, derived from the Landsat and
+  Sentinel archives. GHS-POP distributes census counts across those cells. The
+  important thing about both is that they are <b>model output</b>: nobody
+  measured Kinshasa's rooftops in 1975, an algorithm inferred them from
+  imagery. The 2030 epoch is the JRC's own projection, not an observation.</p>
+
+  <h3>Copernicus DEM GLO-30</h3>
+  <p>Ground elevation at 30 metres, from radar. Slope is derived from it here,
+  not supplied by it. Licensed free and open, with the attribution notice the
+  licence requires carried in the story footer.</p>
+
+  <h3>OpenStreetMap</h3>
+  <p>The river, the roads and streets, the commune boundaries, the real
+  alignments of built railways, the Matadi corridor, and the road network the
+  gravity model is tested against. OSM measures what mappers have mapped. In
+  Kinshasa that is good and getting better, and it is a present-day snapshot
+  with no history, which matters for one figure and is flagged where it
+  does.</p>
+
+  <h3>Harmonized DMSP and VIIRS nighttime lights, 2020</h3>
+  <p>Li, Zhou, Zhao and Zhao's harmonized series, which stitches the old DMSP
+  sensor to the newer VIIRS one so the two are comparable. It measures light
+  leaving the ground at night. It is a proxy for electrification and activity,
+  not a measurement of either.</p>
+
+  <h3>World Bank Open Data</h3>
+  <p>Access to electricity and to basic drinking water, as a share of
+  population, most recent reported year per country. The map therefore mixes
+  observations from different years, and the "people without" totals multiply
+  that share by the UN's 2025 population.</p>
+
+  <h3>Natural Earth</h3>
+  <p>Country outlines and the existing rail and road layer drawn in chapter
+  three. It is a cartographic basemap at 1:10 million, generalised for
+  drawing. That generalisation is fine for a backdrop and, as section 4
+  records, not fine for measurement.</p>
+
+  <h2 id="decisions">3. The decisions</h2>
+
+  <h3>A 20 per cent built threshold</h3>
+  <p>GHS-BUILT-S is continuous: every cell has a built fraction between zero
+  and one. Drawing it that way produces a soft grey smear with no edge, and
+  the whole point of chapter four is the edge, because the reader is being
+  shown where the city stopped in each decade. Twenty per cent is the point
+  where the footprint reads as a city rather than as a haze, and it is
+  applied identically to every epoch so the comparison between decades is
+  consistent even though the absolute area depends on the cut.</p>
+
+  <h3>Block-averaging the 30 metre DEM</h3>
+  <p>The elevation model is roughly three times finer than the built-up grid.
+  Deriving slope at 30 metres and then asking which 92 metre built cells are
+  steep mixes two resolutions and produces detail that is not really there.
+  The DEM is averaged down to the built grid first, so slope and built-up are
+  answering at the same scale. This also took the polygonize step from over
+  half an hour to about ninety seconds, and cut the layer from 1.33 MB to
+  0.31 MB, which is a real consideration on a page that ships its data.</p>
+
+  <h3>Two slope classes, not five</h3>
+  <p>Steep and steepest, at 10 and 15 degrees. Five classes would look more
+  analytical and would be false precision against a 92 metre surface. Two
+  classes is what the data can carry.</p>
+
+  <h3>Rings measured from Gombe</h3>
+  <p>The expansion analysis measures distance outward from 15.313E, 4.305S,
+  the old river front. Kinshasa did not grow from a geometric centroid, it
+  grew away from the river, and a centroid would have put the origin in
+  ground that was empty in 1975. Using the historical core means the rings
+  answer the question actually being asked: how far from the original city
+  did each decade build?</p>
+
+  <h3>Cumulative epoch masks, drawn newest first</h3>
+  <p>Each growth ring is the full built footprint at that epoch, not just the
+  increment. Drawing increments leaves gaps wherever the model revised a cell
+  between epochs, and the rings stop nesting. Cumulative masks nest by
+  construction; painting them newest first means each older, smaller footprint
+  lands on top, and the reader sees clean vintage bands.</p>
+
+  <h3>Why the Tokyo and New York circles came out</h3>
+  <p>Chapter two originally drew Western cities as comparison circles. On a
+  frame that has to hold the whole continent they sat at the edge of the
+  viewport, small, and far from anything to compare against. They made the
+  comparison harder rather than easier. The comparison is now made in the
+  copy, as numbers, where a reader can actually hold both figures at once.</p>
+
+  <h3>Why the 2100 circles are hollow</h3>
+  <p>Every other circle on that map is a UN series. The 2100 figures are one
+  academic team's projection, from a different method, well above the UN's own
+  city horizons. They are worth showing and they are not the same kind of
+  object, so they are drawn as rings rather than discs, and labelled.</p>
+
+  <h3>Why the whole thing is GeoJSON with no backend</h3>
+  <p>About 4 MB of geometry, committed, split into a critical wave and a
+  deferred one. No tile server, no API, nothing to keep running or pay for. It
+  loads from any static host and it will still work in five years, which is a
+  longer guarantee than most map stacks offer.</p>
+
+  <h2 id="rejected">4. Tried and rejected</h2>
+
+  <h3>The cumulative slope statistic</h3>
+  <p>The slope chapter began with a hypothesis: as Kinshasa ran out of flat
+  land it would be forced uphill. The first statistic computed for it was the
+  share of the <i>whole</i> built footprint on steep ground, epoch by epoch.
+  It moved from 20.7 per cent to 25.5 per cent across fifty years, which says
+  almost nothing, because each epoch is dominated by the ground already built
+  in the one before. Recomputing it per increment, on only the cells each
+  decade added, produced the actual result: the 1975 city sits at a median 2
+  degrees, and every later decade came in steeper, the 1990 expansion at
+  double the old city's slope. The copy was then rewritten to follow the
+  number rather than the hypothesis. Both statistics were correct; only one
+  was informative.</p>
+
+  <h3>Natural Earth for the corridor coverage test</h3>
+  <p>The obvious way to test the gravity model was against the road layer
+  already loaded on the page. It was tried on a single link first. Natural
+  Earth's 1:10 million network reports Lagos to Onitsha as <b>22 per cent</b>
+  served; OpenStreetMap reports <b>75 per cent</b>. The generalised basemap
+  would have produced a confidently wrong finding and there would have been
+  nothing in the output to reveal it. The test uses OSM.</p>
+
+  <h3>A slope layer derived to the camera's bounding box</h3>
+  <p>The terrain derivation was first run over exactly the area the map shows.
+  The layer then drew a hard rectangle across the map wherever the data simply
+  stopped. The derivation window is now wider than the camera, which costs
+  nothing and looks like terrain instead of like a raster.</p>
+
+  <h3>Five decimal places of GeoJSON</h3>
+  <p>Coordinates are written at three decimals, roughly 110 metres, which is
+  finer than any layer on the page resolves. The extra digits were bytes
+  spent to encode precision that was never in the source.</p>
+
+  <h2 id="validation">5. Validation</h2>
+
+  <p>Everything in chapters one to three is projection or model output, and
+  chapter four is model output too. So two independent checks were run, both
+  as scripts in the pipeline, both writing their results to committed JSON
+  that the page reads from.</p>
+
+  <h3>GHS-POP against the UN, inside real boundaries</h3>
+  <p>The JRC infers population from satellite imagery. The UN estimates the
+  same cities from national statistics. Two methods with almost nothing in
+  common, so where they agree that is evidence, and where they disagree that
+  is worth naming.</p>
+  <p><code>14_validate.py</code> sums the GHS-POP grid inside Kinshasa's 3,516
+  square kilometres of OpenStreetMap commune boundaries, which is close to the
+  footprint the UN's city figure describes, and compares the two.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <caption class="fine" style="text-align:left; padding-bottom:8px;">Kinshasa, GHS-POP summed inside commune boundaries against UN WUP 2025</caption>
+    <thead><tr><th>Year</th><th>GHS-POP</th><th>UN WUP</th><th>Ratio</th></tr></thead>
+    <tbody>
+      <tr><td><b>1975</b></td><td class="num">1.17M</td><td class="num">0.98M</td><td class="num">1.19</td></tr>
+      <tr><td><b>2025</b></td><td class="num">13.24M</td><td class="num">10.90M</td><td class="num">1.21</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>The grid runs about a fifth above the UN in both years. That is the
+  useful part: the offset is <b>stable across fifty years</b>, so the growth
+  the story describes is not an artefact of the grid drifting. A source that
+  agreed in 1975 and diverged by 2025 would have undermined the whole chapter.
+  This one does not, and the story now says on the page that its Kinshasa
+  totals carry about that much slack.</p>
+
+  <p>Brazzaville was intended as a second case and could not be run: OSM has
+  no admin_level 7 boundaries north of the Pool, so there was nothing to sum
+  inside. It is reported here rather than quietly dropped.</p>
+
+  <p>The same script re-derives the density figure the story quotes. Inside
+  the communes, the 99th percentile cell holds about 133,000 people per square
+  kilometre and the peak is roughly 298,000, with 7,249 cells at or above
+  60,000. The story's "over 60,000 per square kilometre" is a conservative
+  reading of its own data.</p>
+
+  <h3>The gravity model against the road network</h3>
+  <p>Chapter three runs population times population over distance squared
+  across the thirty largest African cities of 2050. That is a textbook toy,
+  and calling it a sketch is honest but is not a defence. So it was tested.
+  <code>15_corridor_coverage.py</code> samples 40 points along each of the 36
+  modelled links and asks whether a mapped motorway, trunk or primary road
+  passes within about 28 kilometres.</p>
+
+  <ul>
+    <li><b>20 of 36</b> modelled links already have a primary road along at
+    least four fifths of the route.</li>
+    <li>The <b>median link is 82 per cent</b> covered.</li>
+    <li>The model's highest-demand link by a wide margin, Cairo to Alexandria
+    at a score of 9,435, is <b>100 per cent</b> served. Yaoundé to Douala,
+    Accra to Kumasi and Lagos to Accra also come back fully served.</li>
+  </ul>
+
+  <p>A model whose strongest output is a corridor that has already been built
+  is not drawing noise, and that is what licenses reading the rest of it. Which
+  makes the low scores the finding rather than the failure: Luanda to Lagos at
+  8 per cent, Accra to Owerri at 35, Onitsha to Accra at 38, Dar es Salaam to
+  Kampala at 45, Cairo to Khartoum at 50. That is the gap between where the
+  traffic wants to go and where it currently can.</p>
+
+  <p class="fine">The test measures whether a route exists, not whether it is
+  paved, open, safe or big enough, and a corridor crossing water scores badly
+  for a reason the model has no opinion about. Every Overpass response is
+  cached under the pipeline's raw directory, so the check reruns for free.</p>
+
+  <h3>The numbers on the page are asserted, not typed</h3>
+  <p>Every figure quoted in the story is checked against the shipped JSON and
+  GeoJSON by a test script before it goes in the HTML, so the copy cannot
+  drift away from the data during an edit. Layout, contrast, reduced-motion
+  behaviour and small-viewport rendering are checked by an audit script driving
+  a headless browser at several viewport sizes.</p>
+
+  <h2 id="limits">6. Known limits</h2>
+
+  <ul>
+    <li>There is <b>no ground truth</b> here beyond the cross-checks above.
+    Nobody surveyed Kinshasa for this. Two models agreeing is evidence, not
+    proof.</li>
+    <li><b>OSM has no history.</b> Street length per resident counts today's
+    network inside each epoch's built footprint, so the early decades are
+    credited with streets that may not have existed. The real fall from nine
+    metres per person to one is steeper than the chart shows, not shallower.</li>
+    <li><b>The 2030 built-up epoch is a projection</b> by the JRC, and it adds
+    a small area, so statistics computed on that increment alone move around
+    more than the earlier ones.</li>
+    <li><b>The gravity model is still a demand sketch</b>, even after the
+    coverage test. It knows populations and distances. It does not know
+    terrain, borders, tariffs, gauge, politics or money.</li>
+    <li><b>Corridor geometry is schematic</b> city to city, except the built
+    railways, which use their real OSM alignments.</li>
+    <li><b>The projections belong to the UN and the cited authors</b>, not to
+    this site. The medium variant is a central path. Change the variant and
+    the crossover years move.</li>
+  </ul>
+
+  <div class="back">
+    <p><a href="../">Back to The Century of Africa</a></p>
+    <p class="links">
+      <a href="https://github.com/mapzimus/lab/tree/main/src/lab/african-urbanization">Code and pipeline on GitHub</a>
+      <span>·</span>
+      <a href="mailto:mhowe.gis@gmail.com">mhowe.gis@gmail.com</a>
+      <span>·</span>
+      <a href="/maps/">More maps at mapzimus</a>
+    </p>
+  </div>
+</main>
+<footer class="wrap" style="padding-top:0">
+  <p class="fine">Built by Maxwell Howe. Every layer in the story was produced
+  by a Python pipeline that ships with it, from public data, and can be rerun
+  from nothing.</p>
+</footer>
+</body>
+</html>

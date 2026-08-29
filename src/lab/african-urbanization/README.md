@@ -69,6 +69,8 @@ order; raw downloads land in `pipeline/raw/`, which is gitignored — set
 | `11_kinshasa_communes.py` | OpenStreetMap admin_level 7 | `kinshasa-communes.geojson` |
 | `12_kinshasa_expansion.py` | GHS-BUILT-S + GHS-POP | `kinshasa-expansion.json` (distance-ring analysis) |
 | `13_matadi_corridor.py` | OpenStreetMap road and rail | `matadi-corridor.geojson` |
+| `14_validate.py` | GHS-POP vs. UN WUP inside OSM commune boundaries | `validation.json` |
+| `15_corridor_coverage.py` | OpenStreetMap motorway/trunk/primary vs. the modeled corridors | `corridor-coverage.json` (+ `served` on `corridors-model.geojson`) |
 
 ### Rerunning it
 
@@ -94,6 +96,17 @@ files are fetched from JavaScript and so cannot be stamped from the HTML.
   above UN city horizons — always labeled and drawn hollow.
 - Corridor geometry is schematic (city-to-city), and the "modeled" network is
   a demand sketch, not an engineering or policy proposal.
+- The gravity model is **tested, not assumed**: 20 of its 36 links already
+  have a mapped OSM primary road along at least 80% of the route, the median
+  link is 82% covered, and its highest-scoring link (Cairo–Alexandria) is
+  served end to end. Coverage measures whether a route exists, not its
+  condition or capacity.
+- GHS-POP summed inside Kinshasa's OSM commune boundaries runs ~1.2× the UN
+  WUP figure in **both** 1975 (1.17M vs 0.98M) and 2025 (13.24M vs 10.90M).
+  The offset is stable across fifty years, so the growth is not an artifact
+  of the grid drifting; the page says the totals carry that much slack.
+  Brazzaville was intended as a second case and has no admin_level 7
+  boundaries in OSM, so it is skipped rather than fudged.
 - Electricity and water access come from the World Bank's most recent
   reported year per country, so the map mixes 2022 and 2023 observations. The
   "people without" totals multiply that share by the UN's 2025 population.
@@ -108,6 +121,13 @@ files are fetched from JavaScript and so cannot be stamped from the HTML.
 - Slope comes from the Copernicus 30 m DEM block-averaged to roughly the 92 m
   built-up grid. Finer classes would be false precision against a layer that
   coarse, so only two are drawn.
+
+## Method writeup
+
+`method/index.html` (live at `/lab/african-urbanization/method/`, linked from
+the story footer) documents the sources, the judgment calls and their
+reasoning, what was tried and rejected, the validation results above, and the
+known limits. It is static prose: no MapLibre, no data fetches.
 
 ## Licenses
 
