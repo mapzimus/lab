@@ -4,20 +4,19 @@ const DATA_URL = "/lab/world-xi/data/clubs.geojson";
 const CREST_SIZE = 128; // px, matches the thumbnails baked into clubs.geojson
 const STORE_KEY = "worldxi.v3"; // key name kept; the payload carries its own v
 const FALLBACK_TOP = ["epl", "laliga", "bundesliga", "seriea", "ligue1"];
-// Only used if a committed geojson predates metadata.groups; the pipeline is
-// the source of truth for grouping. Keep in step with GROUPS in build-data.mjs.
 // Only used if a stale clubs.geojson arrives with no metadata.groups; the
 // pipeline is the source of truth. Kept in step with GROUPS in build-data.mjs.
 const FALLBACK_GROUPS = [
-  { key: "top", label: "Top men's leagues" },
-  { key: "england", label: "England — the pyramid" },
-  { key: "usa", label: "United States — the pyramid" },
-  { key: "eu", label: "More Europe — men" },
-  { key: "americas", label: "Americas — men" },
-  { key: "africa", label: "Africa — men" },
-  { key: "asia", label: "Asia & Pacific — men" },
-  { key: "women", label: "Women — rest of the world" },
+  { key: "top", label: "Start here — the big five" },
+  { key: "england", label: "England" },
+  { key: "eu", label: "Europe" },
+  { key: "usa", label: "United States & Canada" },
+  { key: "ncaa", label: "NCAA college soccer" },
+  { key: "americas", label: "Latin America" },
+  { key: "asia", label: "Asia & Pacific" },
+  { key: "africa", label: "Africa" },
 ];
+const OTHER_GROUP = { key: "other", label: "Everything else" };
 
 const REDUCED_MOTION = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
@@ -483,10 +482,12 @@ function updateShownCount() {
 function normalizeGroups(meta) {
   const gs = Array.isArray(meta.groups) && meta.groups.length ? meta.groups : FALLBACK_GROUPS;
   const known = new Set(gs.map((g) => g.key));
-  for (const lg of meta.leagues) {
-    if (!lg.group || !known.has(lg.group)) lg.group = lg.gender === "women" ? "women" : "rest";
-  }
-  return gs;
+  // A league whose group this build has never heard of still has to be listed.
+  // Bucketing it by gender used to hide that; a visible "Everything else"
+  // section says plainly that something arrived the frontend does not know.
+  const orphans = meta.leagues.filter((lg) => !lg.group || !known.has(lg.group));
+  for (const lg of orphans) lg.group = OTHER_GROUP.key;
+  return orphans.length ? [...gs, OTHER_GROUP] : gs;
 }
 
 function defaultOn() {
@@ -770,7 +771,7 @@ function buildIndexes(features) {
       id: p.id, name: p.name, venue: p.venue, league: p.league, leagueKey: p.leagueKey,
       country: p.country, capacity: p.capacity, coords: f.geometry.coordinates,
       nameFold: fold(p.name),
-      haystack: fold(`${p.name} ${p.venue ?? ""} ${p.country ?? ""}`),
+      haystack: fold(`${p.name} ${(p.aka ?? []).join(" ")} ${p.venue ?? ""} ${p.country ?? ""}`),
     };
   });
 
