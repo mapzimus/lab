@@ -54,10 +54,6 @@ body {
 .chrome h1 { font-size: 22px; letter-spacing: 0.02em; }
 .lede { margin-top: 4px; font-size: 13px; color: var(--muted); }
 
-.backlink { font-size: 12px; margin-bottom: 3px; }
-.backlink a { color: var(--muted); text-decoration: none; }
-.backlink a:hover { color: var(--ink); }
-
 .search { position: relative; padding: 8px; }
 
 .search input {
@@ -358,6 +354,10 @@ body.map-failed .map-fallback {
 
 /* --------------------------------------------------------------- mobile */
 
+/* The mobile sheet header has no place in the desktop layout, where both
+   panels are simply always visible. */
+.sheet-head { display: none; }
+
 @media (max-width: 720px) {
   .rail-left {
     top: 8px;
@@ -377,6 +377,9 @@ body.map-failed .map-fallback {
   .maplibregl-ctrl-bottom-right,
   .maplibregl-ctrl-bottom-left { bottom: 58px; }
 
+  /* A fixed height rather than a max-height, so the sheet's top edge is
+     predictable and the header can sit flush on it. 46vh leaves over half the
+     screen as map, which is the point: you have to see what a filter did. */
   .legend, .stats {
     position: fixed;
     z-index: 6;
@@ -385,12 +388,68 @@ body.map-failed .map-fallback {
     bottom: 88px; /* clears the sheet bar and the attribution strip above it */
     top: auto;
     width: auto;
-    max-height: 62vh;
+    height: 46vh;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     display: none;
   }
   .legend.is-open, .stats.is-open { display: block; }
+
+  /* Sits directly on top of the open sheet: 88px of bar and attribution, plus
+     the sheet's own 46vh. */
+  .sheet-head {
+    position: fixed;
+    z-index: 7;
+    left: 8px;
+    right: 8px;
+    bottom: calc(88px + 46vh);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px 10px;
+    background: var(--panel);
+    border: 1px solid var(--hair);
+    border-bottom: 0;
+    border-radius: 12px 12px 0 0;
+    backdrop-filter: blur(6px);
+    touch-action: none; /* the drag-to-dismiss gesture is ours, not the page's */
+  }
+  /* `display: flex` above is an author rule and outranks the UA's
+     [hidden] { display: none }, so without this the header stayed on screen
+     with no sheet beneath it. */
+  .sheet-head[hidden] { display: none; }
+  .sheet-grip {
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(240, 236, 223, 0.28);
+  }
+  .sheet-title {
+    flex: 1;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(240, 236, 223, 0.62);
+    margin-top: 4px;
+  }
+  .sheet-close {
+    margin-top: 4px;
+    padding: 6px 14px;
+    min-height: 32px;
+    background: rgba(240, 236, 223, 0.1);
+    border: 1px solid var(--hair);
+    border-radius: 8px;
+    color: inherit;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
 
   .sheet-bar {
     position: fixed;

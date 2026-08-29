@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>World XI · Mapzimus Lab</title>
-  <meta name="description" content="Every club of 39 big soccer leagues — men's and women's, across five continents — plotted at its home stadium on a 3D globe.">
+  <meta name="description" content="Every club of 99 soccer leagues — men's and women's, in 65 countries, including all of NCAA soccer — plotted at its home stadium on a 3D globe.">
   <meta property="og:title" content="World XI">
   <meta property="og:description" content="Every big-league soccer club at its home stadium, on a 3D globe.">
   <meta name="theme-color" content="#0b1016">
@@ -22,7 +22,7 @@
     <header class="chrome panel">
       <p class="backlink"><a href="/lab/">← Lab</a></p>
       <h1>World XI</h1>
-      <p class="lede">Every club of 39 big leagues at its home stadium. The big five are shown first — open a section to add more.</p>
+      <p class="lede">Every club of 99 leagues at its home stadium. The big five are shown first — open a section to add more.</p>
     </header>
 
     <div class="search panel" role="search">
@@ -37,6 +37,15 @@
   </div>
 
   <aside class="legend panel" id="legend" aria-label="League filters"></aside>
+
+  <!-- One header for whichever sheet is open. It lives outside the panels
+       because #legend is rebuilt with innerHTML, and a control that vanishes
+       when the league list is redrawn is worse than no control at all. -->
+  <div class="sheet-head" id="sheet-head" hidden>
+    <span class="sheet-grip" aria-hidden="true"></span>
+    <span class="sheet-title" id="sheet-title">Leagues</span>
+    <button type="button" class="sheet-close" id="sheet-close" aria-label="Close">Done</button>
+  </div>
 
   <section class="stats panel" id="stats" aria-label="Numbers">
     <h2 class="panel-head">

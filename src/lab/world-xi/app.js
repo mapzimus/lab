@@ -927,25 +927,75 @@ function wirePanels() {
     statsBody.hidden = open;
   });
 
+  // One way in and one way out. Closing used to be possible only by pressing
+  // the same pill again, which is not discoverable, and the sheet covered 59%
+  // of a phone screen while it was up — so the map you were filtering was the
+  // thing you could no longer see.
+  const sheetHead = document.getElementById("sheet-head");
+  const sheetTitle = document.getElementById("sheet-title");
+  const sheetClose = document.getElementById("sheet-close");
+
+  function closeSheets() {
+    let wasOpen = false;
+    for (const el of [legendEl, statsEl]) {
+      if (el?.classList.contains("is-open")) wasOpen = true;
+      el?.classList.remove("is-open");
+    }
+    for (const b of document.querySelectorAll(".sheet-bar button")) b.setAttribute("aria-expanded", "false");
+    if (sheetHead) sheetHead.hidden = true;
+    return wasOpen;
+  }
+
+  function openSheet(name) {
+    closeSheets();
+    const target = document.getElementById(name);
+    if (!target) return;
+    target.classList.add("is-open");
+    document.querySelector(`.sheet-bar button[data-sheet="${name}"]`)?.setAttribute("aria-expanded", "true");
+    if (sheetHead) {
+      sheetHead.hidden = false;
+      if (sheetTitle) sheetTitle.textContent = name === "stats" ? "Numbers" : "Leagues";
+    }
+    if (name === "stats" && statsBody.hidden) statsToggle.click();
+  }
+
   for (const btn of document.querySelectorAll(".sheet-bar button[data-sheet]")) {
     btn.addEventListener("click", () => {
       const target = document.getElementById(btn.dataset.sheet);
-      const open = target.classList.contains("is-open");
-      for (const el of [legendEl, statsEl]) el?.classList.remove("is-open");
-      for (const b of document.querySelectorAll(".sheet-bar button")) b.setAttribute("aria-expanded", "false");
-      if (!open) {
-        target.classList.add("is-open");
-        btn.setAttribute("aria-expanded", "true");
-        if (btn.dataset.sheet === "stats" && statsBody.hidden) statsToggle.click();
-      }
+      if (target?.classList.contains("is-open")) closeSheets();
+      else openSheet(btn.dataset.sheet);
     });
   }
 
+  sheetClose?.addEventListener("click", closeSheets);
+
+  // Reaching for the map is the clearest possible "I am done with this panel".
+  // Both are needed: a tap on the canvas, and the drag that starts a pan — the
+  // latter is what makes the map usable while a sheet is up.
+  map.on("dragstart", closeSheets);
+  map.on("zoomstart", closeSheets);
+  document.getElementById("map")?.addEventListener("pointerdown", (ev) => {
+    if (ev.target.closest(".panel, .sheet-bar, .sheet-head, .maplibregl-popup, .maplibregl-ctrl")) return;
+    closeSheets();
+  });
+
+  // A grabber that cannot be dragged is a lie about the affordance.
+  if (sheetHead) {
+    let startY = null;
+    sheetHead.addEventListener("pointerdown", (ev) => {
+      if (ev.target.closest(".sheet-close")) return;
+      startY = ev.clientY;
+      sheetHead.setPointerCapture?.(ev.pointerId);
+    });
+    sheetHead.addEventListener("pointerup", (ev) => {
+      if (startY !== null && ev.clientY - startY > 48) closeSheets();
+      startY = null;
+    });
+    sheetHead.addEventListener("pointercancel", () => { startY = null; });
+  }
+
   document.addEventListener("keydown", (ev) => {
-    if (ev.key === "Escape") {
-      for (const el of [legendEl, statsEl]) el?.classList.remove("is-open");
-      for (const b of document.querySelectorAll(".sheet-bar button")) b.setAttribute("aria-expanded", "false");
-    }
+    if (ev.key === "Escape") closeSheets();
   });
 }
 
@@ -1098,13 +1148,33 @@ wirePanels();
       setReadout("The map layers failed to initialise.");
     }
   };
+  // `on`, not `once`: the fallback below replaces the style, and that second
+  // style.load is the one that has to draw the clubs.
+  map.on("style.load", startLayers);
   if (map.isStyleLoaded()) startLayers();
-  else map.once("style.load", startLayers);
 
-  // a basemap that never arrives should not leave the globe silently empty
+  // Every club layer lives inside the map's style, so until a style loads there
+  // is nothing on the globe at all. That made the whole map a hostage of one
+  // free third-party tile service: when tiles.openfreemap.org is unreachable —
+  // an outage, a filtered network, a DNS block — the page rendered no globe and
+  // no clubs, only a line of small text. The clubs are ours and do not need
+  // anybody's basemap, so if it has not arrived in time, draw them on a plain
+  // globe instead of nothing.
+  const BASEMAP_GRACE_MS = 8000;
   setTimeout(() => {
-    if (!layered) setReadout("Basemap is taking a while — the league list and search still work.");
-  }, 12000);
+    if (layered) return;
+    setReadout("Basemap unavailable — showing the clubs on a plain globe.");
+    try {
+      map.setStyle({
+        version: 8,
+        sources: {},
+        layers: [{ id: "backdrop", type: "background", paint: { "background-color": "#0d1424" } }],
+      });
+    } catch (err) {
+      console.error(err);
+      setReadout("The map layers failed to initialise.");
+    }
+  }, BASEMAP_GRACE_MS);
 })();
 
 // read-only surface for the headless test suite
