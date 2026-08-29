@@ -60,7 +60,7 @@ function shortName(n) {
 
 // Bumped whenever the pipeline rewrites data/. The query string lets the
 // files be cached hard while a deploy still delivers fresh ones.
-const DATA_VERSION = "2026-08-28";
+const DATA_VERSION = "2026-08-29";
 
 // The story reads perfectly as text, so the map layers it cannot show without
 // help are loaded in two waves: what chapters 1 to 3 need, then the rest.
@@ -870,7 +870,8 @@ function initSteps(map) {
     }
     if (f.layer.id === "cor-model") {
       return `<div class="pop-h">${p.a} to ${p.b}</div><div class="pop-sub">modeled corridor</div>`
-        + row("distance", p.km + " km") + row("gravity score", p.score);
+        + row("distance", p.km + " km") + row("gravity score", p.score)
+        + (p.served != null ? row("route already served", p.served + "%") : "");
     }
     // built / planned corridor lines
     return `<div class="pop-h">${p.name}</div><div class="pop-sub">${p.status}</div>` + row("backer", p.backer);

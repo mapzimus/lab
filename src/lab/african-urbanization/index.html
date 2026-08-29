@@ -629,7 +629,20 @@
       African cities of 2050 and the strongest links draw themselves. The West
       African coast. The Nile. A ladder up through the Great Lakes. Kinshasa
       reaching for Luanda.</p>
-      <p class="fine">A map of demand, not a construction plan. Terrain,
+      <p>A formula drawing lines is easy to dismiss, so here is the test. Of
+      the 36 links it demands, <b>20 already have a mapped primary road</b>
+      along at least four fifths of the route, and the median link is 82 per
+      cent covered. The strongest link it finds by a wide margin is Cairo to
+      Alexandria, which Egypt has already built and is served end to end. A
+      model whose top answer is the corridor that exists is not drawing
+      noise.</p>
+      <p>Which makes the low scores the interesting ones. Luanda to Lagos
+      comes back <b>8 per cent</b> covered, Accra to Owerri 35, Dar es Salaam
+      to Kampala 45, Cairo to Khartoum 50. That is the gap between where the
+      traffic wants to go and where it can.</p>
+      <p class="fine">Coverage counts a mapped motorway, trunk or primary road
+      from OpenStreetMap within about 28 km of the route. It measures whether a
+      road exists, not whether it is paved, open or big enough. Terrain,
       borders and money are not in the model.</p>
     </div>
   </div>
@@ -740,7 +753,10 @@
       drawn by a planner.</p>
       <p class="fine">Population per cell from the European Commission's
       GHS-POP dataset, 1975 and 2025, on the same grid as the built-ground
-      maps. The 2025 layer is modelled rather than counted.</p>
+      maps. The 2025 layer is modelled rather than counted: summed inside
+      Kinshasa's real commune boundaries it runs about a fifth above the UN's
+      figure for the city, in 1975 and today alike, so read these totals as
+      carrying that much slack.</p>
     </div>
   </div>
 
@@ -881,7 +897,7 @@
     <ul>
       <li><b>Population:</b> UN World Population Prospects 2024, medium variant. Regional shares, country series and crossover years are computed from the annual data.</li>
       <li><b>Cities:</b> UN World Urbanization Prospects 2025, DEGURBA city database, 1975 to 2050. The 2100 city figures come from Hoornweg and Pope, <i>Environment &amp; Urbanization</i> 29(1), 2017, and are drawn hollow because they are projections.</li>
-      <li><b>Corridors:</b> Natural Earth 1:10m rail and roads; a curated project list (AU and UNECA Trans-African Highways, plus SGR and BRI lines per public financing records); a gravity model computed from the city data above. Built railways use their real alignments from OpenStreetMap. Planned corridors are schematic, city to city.</li>
+      <li><b>Corridors:</b> Natural Earth 1:10m rail and roads; a curated project list (AU and UNECA Trans-African Highways, plus SGR and BRI lines per public financing records); a gravity model computed from the city data above, tested against the OpenStreetMap road network along each modelled route. Built railways use their real alignments from OpenStreetMap. Planned corridors are schematic, city to city.</li>
       <li><b>Kinshasa:</b> JRC Global Human Settlement Layer, GHS-BUILT-S and GHS-POP R2023A (CC BY 4.0), 3 arcsecond epochs, 20 percent built threshold. Densification compares GHS-POP 1975 with 2025 inside the 1975 footprint, and the distance rings measure both grids outward from the old river front. River, roads, streets, commune boundaries and the corridor to Matadi are © OpenStreetMap contributors (ODbL). Street supply per resident counts today's OSM network inside each epoch's built footprint, so the early years are generous.</li>
       <li><b>Terrain:</b> Copernicus DEM GLO-30 (© DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under the Copernicus DEM free and open licence), block-averaged to the built-up grid before slope is derived. Two classes only, because finer ones would be false precision against a 92 metre layer.</li>
       <li><b>Services:</b> World Bank open data (CC BY 4.0), access to electricity and to basic drinking water, most recent year per country in 2015 to 2023.</li>
@@ -889,6 +905,9 @@
       <li><b>Base:</b> Natural Earth (public domain). Built with MapLibre GL JS. No tiles and no backend: the whole map is about 4 MB of GeoJSON.</li>
     </ul>
     <p class="fine">The projections belong to the UN and the cited authors, not to this site.</p>
+    <p><a href="method/">How this was made</a>: the decisions behind every layer,
+    what was tried and rejected, and how the modelled figures check out against
+    independent sources.</p>
     <div class="byline">
       <p>Built by <b>Maxwell Howe</b>. Every layer on this page was produced by
       a Python pipeline that ships with it, from public data, and can be rerun
