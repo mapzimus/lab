@@ -6,12 +6,16 @@ const STORE_KEY = "worldxi.v3";
 const FALLBACK_TOP = ["epl", "laliga", "bundesliga", "seriea", "ligue1"];
 // Only used if a committed geojson predates metadata.groups; the pipeline is
 // the source of truth for grouping. Keep in step with GROUPS in build-data.mjs.
+// Only used if a stale clubs.geojson arrives with no metadata.groups; the
+// pipeline is the source of truth. Kept in step with GROUPS in build-data.mjs.
 const FALLBACK_GROUPS = [
   { key: "top", label: "Top men's leagues" },
+  { key: "england", label: "England — the pyramid" },
   { key: "usa", label: "United States — the pyramid" },
   { key: "eu", label: "More Europe — men" },
   { key: "americas", label: "Americas — men" },
-  { key: "rest", label: "Asia, Africa & Pacific — men" },
+  { key: "africa", label: "Africa — men" },
+  { key: "asia", label: "Asia & Pacific — men" },
   { key: "women", label: "Women — rest of the world" },
 ];
 
@@ -23,6 +27,18 @@ const esc = (s) =>
   String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 const httpsOnly = (url) => (/^https:\/\//.test(String(url ?? "")) ? String(url) : null);
+
+// Crests are either an absolute https URL (hotlinked from Wikimedia) or a path
+// relative to the data file, for the ones committed alongside it. Resolving
+// against DATA_URL rather than the page keeps the hosted copy working, where
+// the page lives at /lab/world-xi/ but the data is addressed absolutely.
+const crestUrl = (crest) => {
+  const v = String(crest ?? "");
+  if (!v) return null;
+  if (/^https:\/\//.test(v)) return v;
+  if (/^(?:[a-z]+:|\/\/)/i.test(v)) return null;      // no http:, data:, javascript:
+  try { return new URL(v, new URL(DATA_URL, location.href)).href; } catch { return null; }
+};
 
 // NFD strips the combining marks; the map covers letters that do not decompose
 // (ø, ł, đ, ß …) which the Scandinavian and central-European leagues need.
@@ -132,6 +148,137 @@ function circleImage(color) {
   return g.getImageData(0, 0, 48, 48);
 }
 
+// A handful of crests are stored as JPEGs, or as PNGs flattened onto a solid
+// background. Left alone they render as an opaque rectangle sitting on the
+// globe while every other crest blends into it — New England Revolution II is
+// the obvious one. Where the border is a single flat colour we can lift it back
+// out, so the crest reads the same as the transparent ones.
+//
+// The guards matter more than the fill. A crest is only de-boxed when its
+// entire 1px border is opaque AND overwhelmingly one colour, and the fill only
+// spreads through pixels matching that colour — so a logo that genuinely bleeds
+// to its edge (Blau-Weiß Linz) is left alone, and a crest whose own artwork is
+// mostly white (QPR's hoops, Galatasaray) is never touched, because its border
+// is transparent and it never enters this path at all.
+const BOX_TOLERANCE = 26;     // per-channel distance still counted as background
+const BOX_BORDER_PURITY = 0.8; // share of the opaque border that must be one colour
+
+function deboxCrest(img) {
+  const { width: w, height: h, data: d } = img;
+  if (w < 8 || h < 8) return img;
+  const at = (x, y) => (y * w + x) * 4;
+
+  const border = [];
+  for (let x = 0; x < w; x++) { border.push(at(x, 0)); border.push(at(x, h - 1)); }
+  for (let y = 1; y < h - 1; y++) { border.push(at(0, y)); border.push(at(w - 1, y)); }
+  const opaque = border.filter((o) => d[o + 3] > 240);
+  if (opaque.length / border.length < 0.9) return img;   // already blends
+
+  // Modal border colour, quantised so anti-aliasing does not split the vote.
+  const bucket = new Map();
+  for (const o of opaque) {
+    const k = `${d[o] >> 5},${d[o + 1] >> 5},${d[o + 2] >> 5}`;
+    bucket.set(k, (bucket.get(k) ?? 0) + 1);
+  }
+  const top = [...bucket.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  const inTop = opaque.filter((o) => `${d[o] >> 5},${d[o + 1] >> 5},${d[o + 2] >> 5}` === top);
+  if (inTop.length / opaque.length < BOX_BORDER_PURITY) return img;  // busy edge, not a flat plate
+  const bg = [0, 1, 2].map((c) => Math.round(inTop.reduce((s, o) => s + d[o + c], 0) / inTop.length));
+
+  const matches = (o) =>
+    Math.abs(d[o] - bg[0]) <= BOX_TOLERANCE &&
+    Math.abs(d[o + 1] - bg[1]) <= BOX_TOLERANCE &&
+    Math.abs(d[o + 2] - bg[2]) <= BOX_TOLERANCE;
+
+  // Flood from the border only: a white letter enclosed by the logo keeps its
+  // white, because the fill cannot reach it. Only alpha is touched, so undoing
+  // a fill that turns out to have eaten the logo means restoring that one plane.
+  const alpha0 = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) alpha0[i] = d[i * 4 + 3];
+  const restore = () => { for (let i = 0; i < w * h; i++) d[i * 4 + 3] = alpha0[i]; return img; };
+  const seen = new Uint8Array(w * h);
+  const stack = [];
+  for (const o of border) { const i = o / 4; if (!seen[i] && matches(o)) { seen[i] = 1; stack.push(i); } }
+  while (stack.length) {
+    const i = stack.pop();
+    const x = i % w, y = (i / w) | 0;
+    d[i * 4 + 3] = 0;
+    for (const [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) {
+      if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+      const ni = ny * w + nx;
+      if (seen[ni]) continue;
+      if (!matches(ni * 4)) continue;
+      seen[ni] = 1;
+      stack.push(ni);
+    }
+  }
+
+  // A flat plate behind a logo and the white *inside* a piece of line art look
+  // identical to the flood: Minneapolis City's crow and Orbit College's badge
+  // are drawn as dark strokes over white that reaches the edge, so lifting the
+  // background lifts the artwork with it and leaves a scatter of specks.
+  //
+  // What separates the two cases is what survives. Removing a true background
+  // leaves the crest whole — one dominant mass of ink. Eating through line art
+  // shatters it. So measure the largest surviving connected component: if the
+  // ink no longer holds together, this was not a background, and the original
+  // (boxed, but legible) crest is the better answer.
+  const alive = (i) => d[i * 4 + 3] > 128;
+  let remaining = 0;
+  for (let i = 0; i < w * h; i++) if (alive(i)) remaining++;
+  if (remaining < w * h * 0.02) return restore();
+  const comp = new Uint8Array(w * h);
+  let largest = 0;
+  for (let i0 = 0; i0 < w * h; i0++) {
+    if (comp[i0] || !alive(i0)) continue;
+    let size = 0;
+    const q = [i0];
+    comp[i0] = 1;
+    while (q.length) {
+      const i = q.pop();
+      size++;
+      const x = i % w, y = (i / w) | 0;
+      for (const [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) {
+        if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+        const ni = ny * w + nx;
+        if (comp[ni] || !alive(ni)) continue;
+        comp[ni] = 1;
+        q.push(ni);
+      }
+    }
+    if (size > largest) largest = size;
+  }
+  if (largest / remaining < 0.5) return restore();
+
+  // Some crests are drawn *for* their white plate: Minneapolis City is a black
+  // crow and black lettering, legible on white and all but invisible once the
+  // white is gone and the dark globe shows through. Where nearly all the
+  // surviving ink is dark, the plate is doing real work — keep it.
+  let dark = 0;
+  for (let i = 0; i < w * h; i++) {
+    if (!alive(i)) continue;
+    const o = i * 4;
+    if (0.2126 * d[o] + 0.7152 * d[o + 1] + 0.0722 * d[o + 2] < 70) dark++;
+  }
+  if (dark / remaining > 0.85) return restore();
+
+  // Anti-aliased edges leave a halo of part-background pixels the flood cannot
+  // claim. Fade any surviving pixel that still sits close to the background and
+  // touches a hole, so the silhouette does not come out with a hard fringe.
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = y * w + x, o = i * 4;
+      if (seen[i] || d[o + 3] === 0) continue;
+      const near = [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]
+        .some(([nx, ny]) => nx >= 0 && ny >= 0 && nx < w && ny < h && seen[ny * w + nx]);
+      if (!near) continue;
+      const dist = Math.max(Math.abs(d[o] - bg[0]), Math.abs(d[o + 1] - bg[1]), Math.abs(d[o + 2] - bg[2]));
+      if (dist < BOX_TOLERANCE * 2) d[o + 3] = Math.round(d[o + 3] * (dist / (BOX_TOLERANCE * 2)));
+    }
+  }
+  return img;
+}
+
 // Crest thumbnails arrive around 250px on their long edge. Left alone that is
 // ~4x the texture memory they need and renders the icons at roughly twice the
 // intended size, because icon-size is expressed as a fraction of CREST_SIZE.
@@ -139,7 +286,7 @@ function circleImage(color) {
 function fitCrest(source) {
   const w = source.width, h = source.height;
   const scale = Math.min(1, CREST_SIZE / Math.max(w, h));
-  if (scale === 1) return source;
+  if (scale === 1) return deboxCrest(source);
   const cw = Math.max(1, Math.round(w * scale));
   const ch = Math.max(1, Math.round(h * scale));
   const canvas = document.createElement("canvas");
@@ -149,7 +296,7 @@ function fitCrest(source) {
   g.imageSmoothingEnabled = true;
   g.imageSmoothingQuality = "high";
   g.drawImage(source, 0, 0, cw, ch);
-  return g.getImageData(0, 0, cw, ch);
+  return deboxCrest(g.getImageData(0, 0, cw, ch));
 }
 
 // Symbol tiles cache resolved icons; re-setting the (identical) layout
@@ -204,8 +351,9 @@ async function drainCrests() {
     for (;;) {
       const f = crestQueue.shift();
       if (!f) return;
-      const { id, crest } = f.properties;
-      if (map.hasImage(`club-${id}`)) continue;
+      const { id } = f.properties;
+      const crest = crestUrl(f.properties.crest);
+      if (!crest || map.hasImage(`club-${id}`)) continue;
       try {
         const img = await map.loadImage(crest);
         // the league may have been switched off while this was in flight
@@ -551,7 +699,7 @@ function popupHtml(feats) {
 
   const cards = feats.map((f) => {
     const p = f.properties;
-    const crest = httpsOnly(p.crest);
+    const crest = crestUrl(p.crest);
     const wd = httpsOnly(p.wikidata);
     const cap = p.capacity ? `${fmtNum(p.capacity)} seats` : "capacity unknown";
     // A city-precision club sits on its town, not its ground: say so rather
