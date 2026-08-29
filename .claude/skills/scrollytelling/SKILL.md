@@ -71,6 +71,16 @@ Other engine rules, each learned the annoying way:
   collapsed on phones, and add a reset. While you are there, clear the story's
   HUD chips on entry: an annotation about a step the reader has left is a
   stale assertion sitting on their map.
+- **The escape hatch must live outside the part that collapses.** The fix
+  above shipped with "back to the story" inside the collapsible body, so
+  putting the filters away hid the only way out, and phones (which open
+  collapsed) landed readers in explore mode with no exit at all. A control
+  that dismisses a mode never belongs inside the region that mode can hide.
+- **Clear active state by the attribute you observe, not by a class.** The
+  observer watched `[data-step]` but cleared `.step.is-active`. Chapter heads
+  carry `data-step` and the class `.chapter-head`, so they were marked active
+  on the way past and kept it forever. Symptomless until something else keys
+  off `.is-active`, and then baffling.
 
 ## Text labels without a glyph server
 
@@ -132,6 +142,38 @@ pipeline is where that gets computed:
   proved it and surfaced the caveat that mattered: OSM has no history, so the
   early years are generous and the real decline is steeper.
 
+## Accessibility and device range
+
+None of this shows up in a screenshot, and all of it showed up in an audit of
+the reference build after it was "finished":
+
+- **Dim text is where contrast dies.** The muted token used for fine print and
+  hints measured 3.94:1 against the background, under the 4.5:1 that WCAG AA
+  asks for body text. Headings and body copy were fine; it is always the
+  quiet grey. Measure it, do not eyeball it.
+- **Short viewports break differently from narrow ones.** A phone-width test
+  at 390x844 passed while 320x568 was broken: the chart cards are taller than
+  the gap between the bottom padding and the top of the step, so they grew
+  upward under the fixed legend, which covered their own heading. Test a
+  *short* viewport, and when there is genuinely no room, let the card scroll
+  internally and stand the floating overlays down.
+- **Give every chart `role="img"` and an `aria-label`**, a long scrolling page
+  a skip link, and every control a real accessible name (a styled `div` above
+  a `select` is not a label; use `<label for>`).
+- **Say what the map cannot.** Colour alone carries the meaning in a
+  choropleth. The legend, the card text and the popup rows are what make it
+  reachable without it.
+
+## Keep the sources footer honest as you go
+
+The footer is the part that quietly goes stale. Four layers were added to the
+reference build in one round and the sources list was not touched: the
+Copernicus DEM behind the slope layer went unattributed for two merges, which
+is a licence condition rather than a nicety, and the payload was still
+described as "about 3 MB" when it had grown to 4. **Update the footer in the
+same commit as the layer**, and once in a while grep the source list against
+what `data/` actually contains.
+
 ## Two visual tricks worth stealing
 
 - **Growth-vintage rings from epoch rasters:** make each epoch's footprint
@@ -145,38 +187,109 @@ pipeline is where that gets computed:
 ## Copy discipline
 
 Every number in the narrative must be checked against the shipped data files
-programmatically before it goes in the HTML — write a small script that reads
-`data/*.json` and prints the claims, then fix the copy to match. Drafted-from-
-memory figures were wrong four times in the reference build ("14M by 2020"
-when the dataset said 10.2M). Round to what the data supports, name variants
-("UN medium variant"), and attribute projections inline.
+programmatically before it goes in the HTML. Drafted-from-memory figures were
+wrong four times in the reference build ("14M by 2020" when the dataset said
+10.2M). Round to what the data supports, name variants ("UN medium variant"),
+and attribute projections inline.
+
+Do not write a script that *prints* the numbers for you to eyeball. Write one
+that **re-derives each claim from `data/` and asserts it**, one line per claim,
+PASS or FAIL, non-zero exit on any mismatch:
+
+```python
+check("83% on ground built by 1975", round(s["share_added_on_old_ground"]) == 83, f'{s["share_added_on_old_ground"]}%')
+check("2050: 129 cities over a million", sum(1 for c in cities if (c.get("p2050") or 0) >= 1) == 129, ...)
+```
+
+The reference build has 45 of these. They cost an hour once and then catch
+every later edit, including the ones where the *data* moves under fixed copy:
+filtering four cities out of `cities.geojson` silently changes three counts the
+narrative quotes, and only an assertion notices.
 
 ## Verification (non-negotiable before pushing)
 
-Drive the real page headless through every step and *look at the frames*:
+Two scripts, and they catch different things.
+
+**Look at the frames.** `scroll-shoot.mjs` scrolls each `[data-step]` into
+view, waits out the camera flight, screenshots, and reports console errors:
 
 ```
 node .claude/skills/scrollytelling/scripts/scroll-shoot.mjs \
   <url> <outdir> 1440 900 desktop   # then again: 390 844 phone
 ```
 
-The script (playwright-core + the preinstalled Chromium at
-`/opt/pw-browsers/chromium`) scrolls each `[data-step]` into view, waits out
-the camera flight, screenshots, and reports console errors. Read the images —
-layout bugs, stuck labels, and phantom layers are all visible in them and in
-nothing else. Test both directions if you touched boundary steps: scroll to
-the end, then screenshot a mid-story step again. Zero console errors is the
-bar. Then `npm run build && npm run check` as usual.
+Read the images. Layout bugs, stuck labels and phantom layers are visible in
+them and in nothing else. Test both directions if you touched boundary steps.
+
+**Then audit what a screenshot cannot show.** `audit.mjs` checks structure and
+accessible names, measures the contrast of every distinct text style, renders
+at five viewports from 320 to 2560 looking for overflow and overlays covering
+the card, runs the page under `prefers-reduced-motion`, and reports cold-cache
+paint and transfer. It exits non-zero on any failure:
+
+```
+node .claude/skills/scrollytelling/scripts/audit.mjs <url>
+```
+
+Both need `playwright-core` on `NODE_PATH` and use the preinstalled Chromium
+at `/opt/pw-browsers/chromium` (override with `CHROMIUM_PATH`).
+
+Zero console errors is the bar. Then `npm run build && npm run check`.
+
+### Writing your own probes: three traps
+
+- **`scroll-behavior: smooth` breaks `scrollIntoView()` assertions.** The page
+  is still animating when the assertion reads state, so it reads the wrong
+  step. Use `scrollIntoView({ behavior: "instant", block: "center" })` in
+  tests; the smooth scrolling is for readers, not for you.
+- **Never toggle a control blind inside a loop.** Clicking a collapse button
+  once per iteration just flips it back and forth. Write `setPanel(true|false)`
+  that reads current state first, then set it.
+- **A test that fails is not automatically a bug in the page.** Three of the
+  failures in the reference build's audit were the harness fighting the page.
+  Confirm the cause before you "fix" anything, and when it *is* real, add the
+  assertion that would have caught it.
+
+## Delivery on a static host
+
+Self-contained is not the same as delivered. Two things bit the reference
+build after it was already live:
+
+- **Fingerprint asset URLs at build time.** `mapzimus.com` sets a zone-level
+  Browser Cache TTL that raises any shorter `max-age` the origin sends, so the
+  `must-revalidate` on `app.js` arrived at browsers as four hours and deploys
+  looked like nothing had changed. A build pass that appends a content hash
+  (`app.js?v=8f3a1c2b`) to every local script and stylesheet in the built HTML
+  fixes it whatever the CDN does, because a changed file is a new URL and the
+  HTML itself is not cached. Skip absolute URLs, anything already carrying a
+  query, and framework bundles that are already content-hashed.
+- **That also gives you a way to verify a deploy you cannot drive.** When the
+  browser cannot reach the live host (proxied sandbox, private preview), fetch
+  each asset and hash it against your tested build. Byte equality proves the
+  deployed page behaves identically without loading it, which is stronger than
+  re-driving it anyway.
+
+Also: pipe pipeline scripts through `python3 -u`. Buffered stdout makes a slow
+script indistinguishable from a hung one, and one polygonising step in the
+reference build looked dead for 35 minutes when it was merely too slow.
 
 ## Checklist for a new piece
 
 1. Outline chapters as camera moves + the one claim each step makes.
 2. Pipeline first: produce final, budget-sized GeoJSON before any HTML.
-3. Verify every narrative number against the data files by script.
-4. Page: hero → chapter heads (full resets) → steps → sources footer.
-5. All layers added at opacity 0 with transitions; steps only set paint.
-6. Boundary steps clear the neighboring chapter's layers (scroll-up test).
-7. HTML markers with inner wrappers for any text on the map.
-8. Reduced-motion, phone padding, dimmed inactive cards.
-9. scroll-shoot both widths, read every frame, fix, repeat until clean.
-10. Catalog entry + hosted route + README, `npm run check`, PR.
+3. Make each step *derive* something, not just redraw the same shape at a new
+   date. Measure the increment, and write the copy after the numbers.
+4. Assert every narrative number against the shipped data, PASS/FAIL, in a
+   script you rerun after every edit.
+5. Page: hero → chapter heads (full resets) → steps → sources footer.
+6. All layers added at opacity 0 with transitions; steps only set paint.
+7. Boundary steps clear the neighboring chapter's layers (scroll-up test).
+8. HTML markers with inner wrappers for any text on the map.
+9. Reduced-motion, phone padding, dimmed inactive cards, and a mode's exit
+   outside anything that mode can collapse.
+10. Sources footer updated in the same commit as the layer, licence included.
+11. `scroll-shoot` both widths, read every frame; `audit.mjs` for contrast,
+    accessible names, 320-to-2560 layout and reduced motion.
+12. Fingerprint built asset URLs; verify the deploy by hashing it against the
+    build you tested.
+13. Catalog entry + hosted route + README, `npm run check`, PR.
