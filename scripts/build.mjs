@@ -594,7 +594,48 @@ function stampAssets(dir) {
   return stamped;
 }
 
+// The same staleness one layer down. src/_headers caches /lab/:project/data/*
+// for a year as immutable, which is only safe while the page asks for a
+// versioned URL — African Urbanization builds one at runtime, World XI did not,
+// so a reader who had loaded the globe once kept the old clubs.geojson for a
+// year and every data deploy silently missed them. Stamping the literal data
+// references inside each lab app.js makes the immutable promise true.
+const DATA_REF = /(["'`])((?:\.\/|\/lab\/[a-z0-9-]+\/)data\/[A-Za-z0-9._\/-]+\.(?:geojson|json|topojson|csv))\1/g;
+
+function stampDataRefs(dir) {
+  let stamped = 0;
+  const unresolved = [];
+  const walk = (d) => {
+    for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+      const full = path.join(d, entry.name);
+      if (entry.isDirectory()) { walk(full); continue; }
+      if (!entry.name.endsWith(".js")) continue;
+      const js = fs.readFileSync(full, "utf8");
+      const next = js.replace(DATA_REF, (whole, q, ref) => {
+        if (ref.includes("?")) return whole;
+        const target = ref.startsWith("/")
+          ? path.join(output, ref.slice(1))
+          : path.resolve(path.dirname(full), ref);
+        if (!path.resolve(target).startsWith(output + path.sep) || !fs.existsSync(target)) {
+          unresolved.push(`${path.relative(output, full)} -> ${ref}`);
+          return whole;
+        }
+        stamped += 1;
+        return `${q}${ref}?v=${assetHash(target)}${q}`;
+      });
+      if (next !== js) fs.writeFileSync(full, next, "utf8");
+    }
+  };
+  const labDir = path.join(output, "lab");
+  if (fs.existsSync(labDir)) walk(labDir);
+  // A literal data reference that resolves to nothing is a broken link and
+  // would also be served under the year-long immutable rule, so say so loudly.
+  for (const u of unresolved) console.warn(`WARN unstamped lab data reference: ${u}`);
+  return stamped;
+}
+
 const stampedRefs = stampAssets(output);
+const stampedData = stampDataRefs(output);
 
 const missingTools = publicTools.filter((item) => !item.hosted).map((item) => item.slug);
 console.log(
@@ -605,5 +646,6 @@ console.log(
 
 console.log(
   `Built ${Object.keys(pages).length + 3} Mapzimus pages in dist/ ` +
-    `(${catalog.length} catalog items pre-rendered, ${stampedRefs} asset references fingerprinted).`,
+    `(${catalog.length} catalog items pre-rendered, ${stampedRefs} asset references ` +
+    `and ${stampedData} lab data references fingerprinted).`,
 );
