@@ -56,9 +56,11 @@ PLACES = [
 ]
 MIN_PART_KM = 20
 CACHE = RAW_DIR / "matadi-osm"
-# The camera window for this step, a little wider than the spine so the coast
-# and the estuary both have room.
-WINDOW = box(12.05, -6.35, 15.95, -3.95)
+# Deliberately much wider than the camera. Clipping a fill to the visible
+# bounds draws a hard straight edge wherever the data stops, which the reader
+# sees as a rectangle rather than as a coastline; the slope layer in chapter 4
+# had exactly this bug. The extra open ocean costs almost no vertices.
+WINDOW = box(9.50, -8.00, 16.50, -3.20)
 
 
 def overpass(query, cache_key):

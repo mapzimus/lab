@@ -44,9 +44,12 @@ function cityRadius(prop, k) {
   return ["*", k, ["sqrt", ["coalesce", ["get", prop], 0]]];
 }
 
-function padding() {
+// `reserve` is the share of a phone screen the card is assumed to occupy. The
+// default suits a three or four line card. A step whose card runs longer can
+// ask for more, otherwise fitBounds happily places the subject underneath it.
+function padding(reserve = 0.40) {
   const w = innerWidth, h = innerHeight;
-  if (w <= 640) return { top: 70, bottom: Math.round(h * 0.40), left: 16, right: 16 };
+  if (w <= 640) return { top: 60, bottom: Math.round(h * reserve), left: 16, right: 16 };
   return { top: 48, bottom: 48, left: 480, right: 56 };
 }
 
@@ -63,7 +66,7 @@ function shortName(n) {
 
 // Bumped whenever the pipeline rewrites data/. The query string lets the
 // files be cached hard while a deploy still delivers fresh ones.
-const DATA_VERSION = "2026-08-29b";
+const DATA_VERSION = "2026-08-29c";
 
 // The story reads perfectly as text, so the map layers it cannot show without
 // help are loaded in two waves: what chapters 1 to 3 need, then the rest.
@@ -568,9 +571,9 @@ function initSteps(map) {
   const hud = document.getElementById("epoch-hud");
   const hudYr = hud.querySelector(".yr");
 
-  const fly = (bounds, maxZoom) => {
+  const fly = (bounds, maxZoom, reserve) => {
     map.fitBounds(bounds, {
-      padding: padding(), maxZoom: maxZoom || 12,
+      padding: padding(reserve), maxZoom: maxZoom || 12,
       duration: prefersStill ? 0 : 2200, essential: true,
     });
   };
@@ -778,7 +781,7 @@ function initSteps(map) {
       hudSet("1.0 m", "of street per resident");
     },
     "c4-matadi": () => {
-      fly(MATADI_BOUNDS, 8); base.c4();
+      fly(MATADI_BOUNDS, 8, 0.56); base.c4();
       kinshasa(0.9, 0, 2030); matadiOn(1);
       setPlaceLabels(false); setMatadiLabels(true);
       hudOff();
