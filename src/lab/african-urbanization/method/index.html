@@ -269,6 +269,26 @@
   half an hour to about ninety seconds, and cut the layer from 1.33 MB to
   0.31 MB, which is a real consideration on a page that ships its data.</p>
 
+  <h3>Classed colour, not a gradient</h3>
+  <p>The chapter 1 maps were first drawn with linear colour ramps stretched
+  across a global range, and the result was a continent of one colour. Half of
+  Africa's median ages fall between 15 and 22, which was a single segment of
+  that ramp, so Niger at 15.6 and Botswana at 26 came out the same orange. The
+  map looked like data and carried none.</p>
+  <p>They are now classed rather than interpolated, on Fisher-Jenks breaks
+  computed from the African values themselves, with extra classes added above
+  where the rest of the world needs somewhere to sit. Flat classes are easier
+  to compare than a gradient, and the key can name what each one means instead
+  of showing a bar with two numbers on it. <code>17_class_breaks.py</code>
+  recomputes the breaks and reports how many countries land in each class, so
+  the choice is checkable rather than a matter of taste.</p>
+  <p>Growth keeps a hard boundary at one times, because shrinking and growing
+  are different kinds of country rather than two ends of a scale, and the top
+  age classes exist so that Japan at 49.8 still reads as a different world from
+  Tunisia at 32.9. One population scale serves 2025, 2050 and 2100 rather than
+  three fitted ones, so the reader watches countries climb between steps: four
+  African countries are in the top class by 2100 and none are today.</p>
+
   <h3>Two slope classes, not five</h3>
   <p>Steep and steepest, at 10 and 15 degrees. Five classes would look more
   analytical and would be false precision against a 92 metre surface. Two

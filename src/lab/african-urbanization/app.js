@@ -10,18 +10,37 @@ const EPOCH_COLORS = {
 };
 const CITY_EPOCHS = [1975, 1990, 2000, 2010, 2020, 2025, 2030, 2040, 2050];
 
-const POP_RAMP = [0, "#242b39", 10, "#3d3a52", 25, "#5c4368", 50, "#8a4f6d",
-                  100, "#c05f60", 250, "#f0924c", 450, "#ffd166"];
-const MULT_RAMP = [0.5, "#4a6fa5", 0.85, "#39415a", 1.0, "#2c3140", 1.6, "#8a4457",
-                   2.4, "#d06a4e", 3.4, "#f4a93a"];
+// Classed, not interpolated. A linear ramp stretched across a global range
+// left the continent one flat colour: half of Africa's median ages fall
+// between 15 and 22, which was a single segment of the old ramp, so Niger and
+// Botswana came out the same orange. Breaks below are Fisher-Jenks on the
+// African values in countries.geojson (pipeline/17_class_breaks.py recomputes
+// and prints them), nudged to round numbers and extended upward where the rest
+// of the world needs somewhere to sit.
+const NO_DATA = "#1a1e26";
+
+// Growth keeps a hard boundary at x1: shrinking and growing are different
+// kinds of country, not two ends of a gradient. Jenks put its own breaks at
+// 1.81, 2.48 and 3.09, which these round to.
+const MULT_CLASSES = { breaks: [1, 1.8, 2.5, 3.1],
+  colors: ["#4a6fa5", "#5b5f8a", "#9c5570", "#d4713f", "#f7c744"] };
 // Median age: young countries hot (the story's accent), old countries blue.
-const AGE_RAMP = [15, "#f4a93a", 22, "#c47a4e", 30, "#8a6a70", 40, "#5a5f88", 50, "#4a6fa5"];
+// Jenks on Africa gives 17.4, 20.6 and 27.7; the top two classes exist so
+// Japan at 49.8 and Italy at 48.2 still read as a different world.
+const AGE_CLASSES = { breaks: [17.5, 20.5, 27.5, 35, 45],
+  colors: ["#f7c744", "#e0854a", "#b3625c", "#7d5b7d", "#5a5f92", "#4a6fa5"] };
+// One scale serves 2025, 2050 and 2100 so the reader watches countries climb
+// between steps. Roughly logarithmic, because the distribution is.
+const POP_CLASSES = { breaks: [5, 15, 40, 100, 250],
+  colors: ["#2a3040", "#45415e", "#7a4a70", "#b85a63", "#e0854a", "#f7c744"] };
 // Service access runs the other way: the shortfall is the subject, so the
 // countries where most people go without are the ones that burn.
-const ACCESS_RAMP = [0, "#f4a93a", 25, "#d8734a", 50, "#9c5a6b", 75, "#5f5a86", 100, "#3a4560"];
-// Electrification gain since 2000 is the one metric where the bright end is
-// the good news, so it runs opposite to ACCESS_RAMP on purpose.
-const GAIN_RAMP = [0, "#2c3140", 10, "#3d3a52", 20, "#6b4a66", 35, "#c05f60", 50, "#f4a93a"];
+const ACCESS_CLASSES = { breaks: [25, 50, 70, 85],
+  colors: ["#f7c744", "#e0854a", "#b3625c", "#6a5f8c", "#3f4a63"] };
+// Electrification gain is the one metric where the bright end is good news,
+// and the first class is countries that went backwards.
+const GAIN_CLASSES = { breaks: [0, 10, 25, 40],
+  colors: ["#3a4560", "#4f5170", "#8a5570", "#d4713f", "#f7c744"] };
 
 const AFRICA_BOUNDS = [[-19.5, -36.5], [53.5, 38.5]];
 const WEST_AFRICA_BOUNDS = [[-18, 3], [16, 15]];
@@ -34,10 +53,14 @@ const prefersStill = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ---------------------------------------------------------------- helpers */
 
-function ramp(prop, stops) {
-  const e = ["interpolate", ["linear"], ["coalesce", ["get", prop], -1]];
-  for (let i = 0; i < stops.length; i += 2) e.push(stops[i], stops[i + 1]);
-  return ["case", ["has", prop], e, "#1a1e26"];
+// A step expression rather than an interpolate: flat classes are far easier to
+// tell apart than a gradient, and the legend can then name what each one means.
+// The sentinel class catches both a missing property and a present-but-null
+// one, which matters because gain values are legitimately negative.
+function classed(prop, spec) {
+  const e = ["step", ["coalesce", ["get", prop], -1e6], NO_DATA, -1e5, spec.colors[0]];
+  spec.breaks.forEach((b, i) => e.push(b, spec.colors[i + 1]));
+  return e;
 }
 
 function cityRadius(prop, k) {
@@ -290,7 +313,7 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
     map.addLayer({
       id: "countries-fill", type: "fill", source: "countries",
       paint: {
-        "fill-color": ramp("pop2025", POP_RAMP),
+        "fill-color": classed("pop2025", POP_CLASSES),
         "fill-opacity": ["case", ["==", ["coalesce", ["get", "africa"], 0], 1], 0.88, 0.3],
         "fill-opacity-transition": { duration: 700 },
         "fill-color-transition": { duration: 700 },
@@ -404,13 +427,19 @@ function initCountryLabels(map, labels) {
   style.textContent = `
     .country-label { pointer-events: none; }
     .country-label .inner { display: block; font-family: "IBM Plex Mono", monospace;
-      font-size: 9.5px; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase;
-      color: #9aa1ad; white-space: nowrap; text-shadow: 0 1px 4px #000, 0 0 8px rgba(0,0,0,0.85);
+      font-size: 9.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+      color: #fff; white-space: nowrap;
+      paint-order: stroke fill;
+      -webkit-text-stroke: 2.5px rgba(9, 12, 18, 0.92);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
       opacity: 0; transition: opacity 0.5s ease; }
-    .country-label.on .inner { opacity: 0.85; }
+    .country-label.on .inner { opacity: 0.95; }
     /* Chapters 2 and 3 keep the names for orientation but drop them back so
        the cities and corridors stay the subject. */
-    .country-label.on.dim .inner { opacity: 0.42; }
+    /* Chapters 2 and 3 hold the names for orientation but pull them back so
+       the cities and corridors stay the subject. The outline goes with them,
+       otherwise a dimmed label on a bright country is worse than none. */
+    .country-label.on.dim .inner { opacity: 0.55; -webkit-text-stroke-width: 2px; }
     .place-label { pointer-events: none; }
     .place-label .inner { display: block; font-family: "IBM Plex Mono", monospace;
       white-space: nowrap; opacity: 0; transition: opacity 0.5s ease;
@@ -638,8 +667,8 @@ function initSteps(map) {
     }, 2400);
   };
 
-  const setChoropleth = (prop, stops) =>
-    map.setPaintProperty("countries-fill", "fill-color", ramp(prop, stops));
+  const setChoropleth = (prop, spec) =>
+    map.setPaintProperty("countries-fill", "fill-color", classed(prop, spec));
   const countriesOpacity = (afr, other) =>
     map.setPaintProperty("countries-fill", "fill-opacity",
       ["case", ["==", ["coalesce", ["get", "africa"], 0], 1], afr, other]);
@@ -738,19 +767,19 @@ function initSteps(map) {
   const steps = {
     "intro": () => {
       map.flyTo({ center: [12, 4], zoom: 1.6, duration: prefersStill ? 0 : 2200, essential: true });
-      setChoropleth("pop2025", POP_RAMP); countriesOpacity(0.7, 0.25);
+      setChoropleth("pop2025", POP_CLASSES); countriesOpacity(0.7, 0.25);
       setCityEpoch(null, 0); hollow2100(0); setLabels(null);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null);
       lightsOn(0); densityOn(0);
       setCountryLabels(false); setPlaceLabels(false);
       spinStart();
     },
-    "ch1": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2025", POP_RAMP); },
-    "c1-2025": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2025", POP_RAMP); },
-    "c1-2100": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2100", POP_RAMP); },
-    "c1-multiple": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("multiple", MULT_RAMP); countriesOpacity(0.88, 0.35); },
-    "c1-momentum": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("medAge25", AGE_RAMP); },
-    "c1-crossovers": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("multiple", MULT_RAMP); countriesOpacity(0.88, 0.35); },
+    "ch1": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2025", POP_CLASSES); },
+    "c1-2025": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2025", POP_CLASSES); },
+    "c1-2100": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("pop2100", POP_CLASSES); },
+    "c1-multiple": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("multiple", MULT_CLASSES); countriesOpacity(0.88, 0.35); },
+    "c1-momentum": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("medAge25", AGE_CLASSES); },
+    "c1-crossovers": () => { fly(AFRICA_BOUNDS, 5); base.c1(); setChoropleth("multiple", MULT_CLASSES); countriesOpacity(0.88, 0.35); },
     "ch2": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(1975, 0.85); setLabels(1975); },
     "c2-1975": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(1975, 0.85); setLabels(1975); },
     "c2-2025": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(2025, 0.85); setLabels(2025); },
@@ -769,7 +798,7 @@ function initSteps(map) {
       // The corridor lines have made their point by now, and they sit right on
       // top of the countries this step is asking the reader to compare.
       lightsOn(0); corridors(0, 0, 0, 0, 0);
-      setChoropleth("elec", ACCESS_RAMP); countriesOpacity(0.9, 0.25);
+      setChoropleth("elec", ACCESS_CLASSES); countriesOpacity(0.9, 0.25);
       setCountryLabels("dim"); setCityEpoch(2050, 0.25);
     },
     // Same frame, different question: not who has power, but who built it.
@@ -777,7 +806,7 @@ function initSteps(map) {
     "c3-rate": () => {
       fly(AFRICA_BOUNDS, 5); base.c3();
       lightsOn(0); corridors(0, 0, 0, 0, 0);
-      setChoropleth("elecGain", GAIN_RAMP); countriesOpacity(0.9, 0.25);
+      setChoropleth("elecGain", GAIN_CLASSES); countriesOpacity(0.9, 0.25);
       setCountryLabels("dim"); setCityEpoch(2050, 0.25);
     },
     "ch4": () => {
@@ -899,20 +928,20 @@ function initSteps(map) {
     communes: (on) => communesOn(on ? 1 : 0),
     slope: (on) => slopeOn(on ? 1 : 0),
   };
-  const METRIC_RAMPS = {
-    pop2025: POP_RAMP, pop2050: POP_RAMP, pop2100: POP_RAMP,
-    multiple: MULT_RAMP, medAge25: AGE_RAMP,
-    elec: ACCESS_RAMP, water: ACCESS_RAMP, elecGain: GAIN_RAMP,
+  const METRIC_CLASSES = {
+    pop2025: POP_CLASSES, pop2050: POP_CLASSES, pop2100: POP_CLASSES,
+    multiple: MULT_CLASSES, medAge25: AGE_CLASSES,
+    elec: ACCESS_CLASSES, water: ACCESS_CLASSES, elecGain: GAIN_CLASSES,
   };
   const METRIC_LEGENDS = {
-    pop2025: rampLegend("People per country, 2025", POP_RAMP, fmtM),
-    pop2050: rampLegend("People per country, 2050", POP_RAMP, fmtM),
-    pop2100: rampLegend("People per country, 2100", POP_RAMP, fmtM),
-    multiple: rampLegend("Growth, 2025 → 2100", MULT_RAMP, fmtX),
-    medAge25: rampLegend("Median age, 2025", AGE_RAMP, fmtY),
-    elec: rampLegend("Electricity at home, share of people", ACCESS_RAMP, fmtPct, false),
-    water: rampLegend("Basic drinking water, share of people", ACCESS_RAMP, fmtPct, false),
-    elecGain: rampLegend("Electrification gained since 2000", GAIN_RAMP, fmtPts),
+    pop2025: rampLegend("People per country, 2025", POP_CLASSES, rngM),
+    pop2050: rampLegend("People per country, 2050", POP_CLASSES, rngM),
+    pop2100: rampLegend("People per country, 2100", POP_CLASSES, rngM),
+    multiple: rampLegend("Growth, 2025 → 2100", MULT_CLASSES, rngX),
+    medAge25: rampLegend("Median age, 2025", AGE_CLASSES, rngY),
+    elec: rampLegend("Electricity at home, share of people", ACCESS_CLASSES, rngPct),
+    water: rampLegend("Basic drinking water, share of people", ACCESS_CLASSES, rngPct),
+    elecGain: rampLegend("Electrification gained since 2000", GAIN_CLASSES, rngPts),
   };
   // The choropleth says where the shortfall is; it cannot say which way the
   // number is moving. This is the one thing the series can add to a metric.
@@ -938,7 +967,7 @@ function initSteps(map) {
     renderLegend(m === "off" ? null : METRIC_LEGENDS[m]);
     showTrend(m);
     if (m === "off") { countriesOpacity(0, 0); return; }
-    setChoropleth(m, METRIC_RAMPS[m]);
+    setChoropleth(m, METRIC_CLASSES[m]);
     countriesOpacity(0.88, 0.3);
   };
 
@@ -1125,15 +1154,25 @@ function initSteps(map) {
 // A persistent key for whatever the map is currently showing. Card legends
 // scroll away with their step; this one travels with the reader.
 const fmtM = (v) => (v ? `${v}M` : "0");
-const fmtX = (v) => `×${v}`;
-const fmtY = (v) => `${v} yrs`;
-const fmtPct = (v) => `${v}%`;
-const fmtPts = (v) => `+${v}`;
+const rngM = (lo, hi) => hi == null ? `${lo}M and up` : lo == null ? `under ${hi}M` : `${lo} to ${hi}M`;
+const rngX = (lo, hi) => hi == null ? `×${lo} and up` : lo == null ? "shrinking" : `×${lo} to ×${hi}`;
+const rngY = (lo, hi) => hi == null ? `${lo} yrs and up` : lo == null ? `under ${hi} yrs` : `${lo} to ${hi} yrs`;
+const rngPct = (lo, hi) => hi == null ? `${lo}% and up` : lo == null ? `under ${hi}%` : `${lo} to ${hi}%`;
+const rngPts = (lo, hi) => hi == null ? `+${lo} points and up` : lo == null ? "lost ground" : `+${lo} to +${hi}`;
 
-function rampLegend(title, stops, fmt, plus = true) {
-  return { title, ramp: { stops, fmt, plus } };
-}
 const ROW = (color, label, shape) => ({ color, label, shape: shape || "line" });
+
+// Built from the same class object the paint expression uses, so the key can
+// never describe a classification the map is not drawing. Highest class first,
+// which is the order people read a map key in.
+function rampLegend(title, spec, rng) {
+  const { breaks, colors } = spec;
+  const rows = [];
+  for (let i = colors.length - 1; i >= 0; i--) {
+    rows.push(ROW(colors[i], rng(breaks[i - 1], breaks[i]), "box"));
+  }
+  return { title, rows };
+}
 const CITY_ROWS = [
   ROW("#f4a93a", "African city, sized by people", "dot"),
 ];
@@ -1142,12 +1181,12 @@ const EPOCH_ROWS = (upTo) =>
     ROW(EPOCH_COLORS[e], `built by ${e}${e === 2030 ? " (projected)" : ""}`, "box"));
 
 const LEGENDS = {
-  "ch1": rampLegend("People per country, 2025", POP_RAMP, fmtM),
-  "c1-2025": rampLegend("People per country, 2025", POP_RAMP, fmtM),
-  "c1-2100": rampLegend("People per country, 2100", POP_RAMP, fmtM),
-  "c1-multiple": rampLegend("Growth, 2025 → 2100", MULT_RAMP, fmtX),
-  "c1-momentum": rampLegend("Median age, 2025", AGE_RAMP, fmtY),
-  "c1-crossovers": rampLegend("Growth, 2025 → 2100", MULT_RAMP, fmtX),
+  "ch1": rampLegend("People per country, 2025", POP_CLASSES, rngM),
+  "c1-2025": rampLegend("People per country, 2025", POP_CLASSES, rngM),
+  "c1-2100": rampLegend("People per country, 2100", POP_CLASSES, rngM),
+  "c1-multiple": rampLegend("Growth, 2025 → 2100", MULT_CLASSES, rngX),
+  "c1-momentum": rampLegend("Median age, 2025", AGE_CLASSES, rngY),
+  "c1-crossovers": rampLegend("Growth, 2025 → 2100", MULT_CLASSES, rngX),
   "ch2": { title: "Cities in 1975", rows: CITY_ROWS },
   "c2-1975": { title: "Cities in 1975", rows: CITY_ROWS },
   "c2-2025": { title: "Cities in 2025", rows: CITY_ROWS },
@@ -1165,8 +1204,8 @@ const LEGENDS = {
   "c3-model": { title: "Predicted demand", rows: [
     ROW("#f4a93a", "modeled corridor, thicker pulls harder"),
     ROW("#8b93a0", "existing rail (dim)")] },
-  "c3-services": rampLegend("Electricity at home, share of people", ACCESS_RAMP, fmtPct, false),
-  "c3-rate": rampLegend("Electrification gained, 2000 to 2022", GAIN_RAMP, fmtPts),
+  "c3-services": rampLegend("Electricity at home, share of people", ACCESS_CLASSES, rngPct),
+  "c3-rate": rampLegend("Electrification gained, 2000 to 2022", GAIN_CLASSES, rngPts),
   "c3-lights": { title: "Africa at night, 2020", rows: [
     ROW("#ffd166", "brightly lit (city cores)", "box"),
     ROW("#8a6a35", "lit (towns and sprawl)", "box")] },

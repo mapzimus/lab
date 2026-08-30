@@ -255,8 +255,13 @@
   #map-legend .lg-row i.box { width: 11px; height: 11px; border-radius: 3px; }
   #map-legend .lg-row i.ring { width: 10px; height: 10px; border-radius: 50%; border: 2px solid; background: none !important; }
   @media (max-width: 640px) {
-    #map-legend { left: 10px; top: 12px; bottom: auto; width: 168px; padding: 8px 11px; }
-    #map-legend .lg-row { font-size: 10px; }
+    #map-legend { left: 10px; top: 12px; bottom: auto; width: 168px; padding: 7px 10px; }
+    /* A classed key is a list, not a bar, so it is taller than the gradient it
+       replaced and the tallest cards reach up to meet it. Tighten the rows on a
+       phone: the class labels are the point, so they stay and the padding goes. */
+    #map-legend .lg-title { font-size: 9px; margin-bottom: 5px; }
+    #map-legend .lg-row { font-size: 10px; gap: 6px; padding: 0.5px 0; line-height: 1.35; }
+    #map-legend .lg-row i.box { width: 9px; height: 9px; }
   }
   /* Exploring: the panel carries its own context; only the metric key shows. */
   body.exploring #map-legend { bottom: auto; top: 16px; }
@@ -429,9 +434,12 @@
      height makes the clearance a property of the layout rather than of how
      much copy a step happens to carry: the top lands at 16vh, clear of the key
      on any screen this rule applies to. Screens under 700px are handled above,
-     where the key is hidden and 72vh is the deliberate cap. */
+     where the key is hidden and 72vh is the deliberate cap.
+     60vh, not 62: the map key became a list of named classes rather than a
+     gradient bar, so it is taller, and the tallest card has to start below it
+     rather than 15px into it. */
   @media (max-width: 640px) and (min-height: 701px) {
-    .card { max-height: 62vh; overflow-y: auto; }
+    .card { max-height: 60vh; overflow-y: auto; }
   }
   @media (max-width: 640px) {
     .step { align-items: flex-end; padding: 16px 12px 22vh; min-height: 96vh; }
