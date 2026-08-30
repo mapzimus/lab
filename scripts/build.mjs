@@ -59,6 +59,7 @@ const hostedProjectRoutes = {
   "where-the-games-go": "/where-the-games-go/",
   "smartpicker": "/smartpicker/",
   "world-xi": "/lab/world-xi/",
+  "national-parks": "/lab/national-parks/",
 };
 
 /** vendor/apps/<dir> → public route */
