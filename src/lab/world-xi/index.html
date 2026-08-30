@@ -22,7 +22,7 @@
     <header class="chrome panel">
       <p class="backlink"><a href="/lab/">← Lab</a></p>
       <h1>World XI</h1>
-      <p class="lede">Every club of 158 leagues in 120 nations, each at its home stadium. The big five are shown first — filter by gender or country, or open a section to add more.</p>
+      <p class="lede">Every club of 158 leagues in 120 nations, each at its home stadium. The top flight of every nation is shown first — tick the box for the lower tiers, college and amateur leagues, or search a city, state or continent to fly there.</p>
     </header>
 
     <div class="search panel" role="search">
@@ -50,9 +50,12 @@
       <select id="country-filter" class="facet-select">
         <option value="">Every country</option>
       </select>
+      <label class="facet-check"><input type="checkbox" id="tier-filter">
+        Include lower tiers, college &amp; amateur</label>
       <label class="sr-only" for="league-filter">Filter this list</label>
       <input id="league-filter" class="facet-input" type="search" autocomplete="off"
              spellcheck="false" placeholder="Filter this list…">
+      <div class="focus-row" id="focus-chips" role="group" aria-label="Fly to a continent" hidden></div>
       <p class="facet-summary" id="facet-summary"></p>
     </div>
     <div id="legend-list"></div>

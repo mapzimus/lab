@@ -2,12 +2,14 @@
 
 Hosted copy of [mapzimus/world-xi-map](https://github.com/mapzimus/world-xi-map)
 at https://mapzimus.com/lab/world-xi/ — an interactive 3D globe of every club of
-158 leagues, men's and women's — the top flight of 120 nations (5,039 clubs) —
+158 leagues, men's and women's — the top flight of 120 nations (5,094 clubs) —
 each at its home stadium, searchable and filterable by league, gender and
 country. That includes the whole United States pyramid, MLS down through the
 open amateur tiers, and all 1,789 NCAA soccer programmes across Divisions I,
 II and III.
-Only the men's big five are shown at first; the rest switch on from the legend.
+Every nation's top flight is shown at first; the lower tiers, college and
+amateur leagues wait behind one checkbox, and search can fly to a continent,
+nation, US state or metro area as well as to a club.
 
 That repo is the source of truth: the data pipeline (`scripts/build-data.mjs`,
 hand-curated rosters, overrides) lives there, and `data/clubs.geojson` here is
