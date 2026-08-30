@@ -942,16 +942,25 @@ function initSteps(map) {
     countriesOpacity(0.88, 0.3);
   };
 
-  // City-scale layers are noise on a continental frame, so their rows fold
-  // away below the zoom where they resolve. State is deliberately untouched:
-  // a layer left on stays on, and its checkbox comes back still checked.
-  const DETAIL_ZOOM = 9;
-  const syncDetailGate = () => {
-    panel?.classList.toggle("zoomed-out", map.getZoom() < DETAIL_ZOOM);
+  // A layer the reader cannot see when they turn it on reads as a broken
+  // switch. These only resolve close in, so checking one from further out
+  // takes you to where it is, rather than expecting the reader to know that
+  // and zoom there first. Already close enough: left alone, so ticking a
+  // second layer never yanks the camera back.
+  const LAYER_HOME = {
+    streets: { bounds: KINSHASA_BOUNDS, maxZoom: 12, needs: 9 },
+    communes: { bounds: KINSHASA_BOUNDS, maxZoom: 12, needs: 9 },
+    slope: { bounds: KINSHASA_BOUNDS, maxZoom: 12, needs: 9 },
+    sea: { bounds: MATADI_BOUNDS, maxZoom: 8, needs: 6 },
   };
-  map.on("zoomend", syncDetailGate);
-  map.on("moveend", syncDetailGate);
-  syncDetailGate();
+  const goToLayer = (key) => {
+    const home = LAYER_HOME[key];
+    if (!home || map.getZoom() >= home.needs) return;
+    map.fitBounds(home.bounds, {
+      padding: padding(), maxZoom: home.maxZoom,
+      duration: prefersStill ? 0 : 1600, essential: true,
+    });
+  };
   const applyPanel = () => {
     applyMetric();
     panel.querySelectorAll("input[data-layer]").forEach((box) => {
@@ -1069,6 +1078,10 @@ function initSteps(map) {
   });
   panel?.addEventListener("change", (e) => {
     if (!exploring) return;
+    // Only on the way on, and only from a checkbox the reader just ticked.
+    if (e.target.matches("input[data-layer]") && e.target.checked) {
+      goToLayer(e.target.dataset.layer);
+    }
     const box = e.target.closest("input[data-layer]");
     if (box) exploreToggles[box.dataset.layer](box.checked);
     if (e.target === metricSel) applyMetric();
