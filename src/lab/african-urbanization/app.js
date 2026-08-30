@@ -886,13 +886,13 @@ function initSteps(map) {
     // The corridor no longer runs straight across the Gulf, and this is the
     // only frame in the story where the reader can see why that matters.
     "c3-gap": () => {
-      fly(GULF_COAST_BOUNDS, 6); base.c3();
+      fly(GULF_COAST_BOUNDS, 6, 0.5); base.c3();
       corridors(0.2, 0.12, 0.2, 0.25, 0.95); setCityEpoch(2050, 0.5);
     },
     // The worst-served links are interior ones now, and the card names the
     // closest and sharpest of them.
     "c3-interior": () => {
-      fly(LUANDA_KIN_BOUNDS, 6); base.c3();
+      fly(LUANDA_KIN_BOUNDS, 6, 0.5); base.c3();
       corridors(0.25, 0.15, 0.2, 0.25, 0.95); setCityEpoch(2050, 0.55);
     },
     "c3-lights": () => {
