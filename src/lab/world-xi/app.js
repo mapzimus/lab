@@ -1010,13 +1010,85 @@ function buildFocusChips() {
 // A place is a camera move, nothing more: it never switches a league on or
 // off, so what you see inside the frame is whatever your filters already
 // allow. The one exception is the country picker, which speaks for itself.
+// The panels float *over* the map, so padding the camera evenly hides whatever
+// sits under them. Framing Alaska put both its clubs behind the legend: the
+// readout said two clubs were there and the map appeared to show none. Measure
+// the panels that are actually on screen and keep the frame clear of them.
+function cameraPadding() {
+  const pad = { top: 40, bottom: 60, left: 40, right: 40 };
+  const w = window.innerWidth, h = window.innerHeight;
+  for (const [el, side] of [[legendPanel, "right"], [document.querySelector(".panel:not(.legend)"), "left"]]) {
+    if (!el) continue;
+    const cs = getComputedStyle(el);
+    if (cs.display === "none" || cs.visibility === "hidden") continue;
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) continue;
+    // A panel docked to a side reserves its width; a bottom sheet on a phone
+    // reserves its height instead.
+    if (r.height > h * 0.6) pad[side] = Math.max(pad[side], (side === "right" ? w - r.left : r.right) + 16);
+    else if (r.bottom > h * 0.6) pad.bottom = Math.max(pad.bottom, h - r.top + 16);
+  }
+  // fitBounds throws if the padding leaves no room at all; never take more
+  // than a third of each axis.
+  pad.left = Math.min(pad.left, w / 3); pad.right = Math.min(pad.right, w / 3);
+  pad.top = Math.min(pad.top, h / 3); pad.bottom = Math.min(pad.bottom, h / 3);
+  return pad;
+}
+
+// Which of a place's clubs the map is actually drawing right now. Flying to
+// Alaska framed it perfectly and showed nothing: both its clubs are UPSL, a
+// lower tier that is off by default, so the camera landed on an empty state
+// while the readout counted two. Focusing on a place has to mean seeing it.
+function clubsInPlace(place) {
+  const [w, so, e, n] = place.bbox;
+  return allFeatures.filter((f) => {
+    const [x, y] = f.geometry.coordinates;
+    return x >= w && x <= e && y >= so && y <= n;
+  });
+}
+
+// Switch on what it takes to see a place, but only when none of its clubs are
+// showing — a place you can already see never disturbs your filters. Prefer
+// its top flights; where a place has none (Alaska is all amateur), take the
+// leagues its clubs are actually in and open the tiers toggle to match.
+function revealPlace(place) {
+  const held = clubsInPlace(place);
+  if (!held.length) return [];
+  const drawn = new Set(visibleLeagues().map((l) => l.key));
+  if (held.some((f) => drawn.has(f.properties.leagueKey))) return [];
+  const lgs = [...new Set(held.map((f) => f.properties.leagueKey))]
+    .map((k) => leagues.find((l) => l.key === k)).filter(Boolean);
+  const top = lgs.filter((l) => l.topFlight);
+  const pick = top.length ? top : lgs;
+  // A gender or country facet set elsewhere would go on hiding these however
+  // many leagues we switch on — picking Japan and then flying to Alaska has to
+  // show Alaska. Reaching for a place is a direct instruction, so it wins over
+  // the facets, exactly as search already does; only a facet that would hide
+  // every one of the place's clubs is cleared.
+  const patch = {};
+  if (state.country && !pick.some((l) => l.country === state.country)) patch.country = "";
+  if (state.gender !== "all" && !pick.some((l) => l.gender === state.gender)) patch.gender = "all";
+  if (pick.some((l) => !l.topFlight) && state.tiers !== "all") patch.tiers = "all";
+  if (Object.keys(patch).length) setFacet(patch);
+  for (const l of pick) setLeague(l.key, true);
+  return pick;
+}
+
 function flyToPlace(place, { announce = true } = {}) {
   if (!map) return;
+  // fitBounds silently no-ops on a box whose west edge is exactly -180 — the
+  // camera stays where it was and the place looks empty. The pipeline already
+  // holds its boxes inside that line; this repeats it because a stale
+  // clubs.geojson would otherwise bring the bug back with it.
   const [w, so, e, n] = place.bbox;
-  map.fitBounds([[w, so], [e, n]], {
-    padding: 40, essential: true, duration: REDUCED_MOTION ? 0 : 2000,
+  map.fitBounds([[Math.max(w, -179.99), so], [Math.min(e, 179.99), n]], {
+    padding: cameraPadding(), essential: true, duration: REDUCED_MOTION ? 0 : 2000,
   });
-  if (announce) setReadout(`${place.name} · ${fmtNum(place.count)} clubs in the data here`);
+  const woken = revealPlace(place);
+  if (!announce) return;
+  setReadout(woken.length
+    ? `${place.name} · ${fmtNum(place.count)} clubs — switched on ${woken.slice(0, 2).map((l) => l.label).join(", ")}${woken.length > 2 ? ` and ${woken.length - 2} more` : ""}`
+    : `${place.name} · ${fmtNum(place.count)} clubs in the data here`);
 }
 
 const PLACE_KIND = { continent: "Continent", country: "Country", state: "US state", metro: "Metro area" };
@@ -1489,6 +1561,8 @@ window.__worldxi = {
   // came apart once — layers absent, readout still counting clubs — so the
   // browser check needs to be able to tell the difference.
   mapCenter: () => { const c = map?.getCenter?.(); return c ? [c.lng, c.lat] : null; },
+  zoom: () => map?.getZoom?.() ?? 0,
+  project: (lngLat) => { const p = map?.project?.(lngLat); return p ? { x: p.x, y: p.y } : null; },
   mapLayers: () => {
     try { return (map?.getStyle?.()?.layers ?? []).map((l) => l.id).filter((id) => id.startsWith("clubs")); }
     catch { return []; }
