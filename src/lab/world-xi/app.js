@@ -899,7 +899,12 @@ function popupHtml(feats) {
     // A city-precision club sits on its town, not its ground: say so rather
     // than letting the marker imply a stadium location we do not have.
     const approxLine = isApproximate(p)
-      ? `<p class="approx">Approximate — placed on ${APPROXIMATE[p.precision]}${p.venue ? `; ${esc(p.venue)} is not mapped` : ""}</p>`
+      ? `<p class="approx">Approximate — placed on ${APPROXIMATE[p.precision]}${
+          // `spread` means the pipeline nudged this club off the town centre so
+          // the clubs sharing it could be told apart. Saying "approximate" alone
+          // would leave the offset looking like a real position.
+          p.spread ? ", and moved a few hundred metres off it so the clubs sharing that town can be told apart" : ""
+        }${p.venue ? `; ${esc(p.venue)} is not mapped` : ""}</p>`
       : "";
     const r = ranks.get(p.id);
     const rankLine = r
