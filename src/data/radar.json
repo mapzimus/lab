@@ -1,7 +1,27 @@
 {
-  "generatedAt": "2026-08-29",
+  "generatedAt": "2026-08-30",
   "github": {
     "relevant": [
+      {
+        "name": "Query-farm/geosilo",
+        "url": "https://github.com/Query-farm/geosilo",
+        "desc": "DuckDB extension for compact geometry encoding using delta-encoded coordinates. 3-4x smaller than WKB.",
+        "stars": 25,
+        "lang": "C++",
+        "isNew": false,
+        "rank": 142.82994669594163,
+        "relevant": true
+      },
+      {
+        "name": "reearth/navara",
+        "url": "https://github.com/reearth/navara",
+        "desc": "Navara is a highly extensible 3D map engine. Load a wide range of GIS data, from satellite imagery and terrain to 3D city models and vector data, then freely layer your own visualizations on top.",
+        "stars": 61,
+        "lang": "TypeScript",
+        "isNew": false,
+        "rank": 133.58478337899652,
+        "relevant": true
+      },
       {
         "name": "reearth/ezu",
         "url": "https://github.com/reearth/ezu",
@@ -16,20 +36,20 @@
         "name": "CesiumGS/cesium",
         "url": "https://github.com/CesiumGS/cesium",
         "desc": "An open-source JavaScript library for world-class 3D globes and maps :earth_americas:",
-        "stars": 15622,
+        "stars": 15625,
         "lang": "JavaScript",
         "isNew": false,
-        "rank": 118.38752886552876,
+        "rank": 118.38769563994711,
         "relevant": true
       },
       {
         "name": "visgl/deck.gl",
         "url": "https://github.com/visgl/deck.gl",
         "desc": "WebGL2 powered visualization framework",
-        "stars": 14532,
+        "stars": 14536,
         "lang": "TypeScript",
         "isNew": false,
-        "rank": 118.32471054710416,
+        "rank": 118.32494958087624,
         "relevant": true
       },
       {
@@ -43,23 +63,33 @@
         "relevant": true
       },
       {
-        "name": "openglobus/openglobus",
-        "url": "https://github.com/openglobus/openglobus",
-        "desc": "TypeScript/JavaScript 3D maps and geospatial data visualization engine library",
-        "stars": 930,
-        "lang": "TypeScript",
+        "name": "dekart-xyz/dekart",
+        "url": "https://github.com/dekart-xyz/dekart",
+        "desc": "Open-source backend for Kepler.gl. Self-hosted alternative to CARTO and Foursquare Studio.",
+        "stars": 402,
+        "lang": "JavaScript",
         "isNew": false,
-        "rank": 115.93789936196268,
+        "rank": 115.21061009228222,
         "relevant": true
       },
       {
-        "name": "timschmidt/csgrs",
-        "url": "https://github.com/timschmidt/csgrs",
-        "desc": "Multi-modal constructive solid geometry kernel in Rust",
-        "stars": 252,
-        "lang": "Rust",
+        "name": "machineinteractive/skies-adsb",
+        "url": "https://github.com/machineinteractive/skies-adsb",
+        "desc": "skies-adsb transforms your browser into a real-time 3D air traffic display. Using unfiltered ADS-B data from an RTL-SDR receiver, explore your local air traffic, surrounding airspace, and geography with custom 3D maps you can tailor to your needs.",
+        "stars": 263,
+        "lang": "JavaScript",
         "isNew": false,
-        "rank": 114.80624104235163,
+        "rank": 114.84320785373966,
+        "relevant": true
+      },
+      {
+        "name": "gaopengbin/cesium-mcp",
+        "url": "https://github.com/gaopengbin/cesium-mcp",
+        "desc": "Protocol-agnostic CesiumJS AI control runtime for MCP, WebMCP, function calling, and browser agents.",
+        "stars": 131,
+        "lang": "JavaScript",
+        "isNew": false,
+        "rank": 114.2411478624117,
         "relevant": true
       },
       {
@@ -93,16 +123,6 @@
         "relevant": true
       },
       {
-        "name": "hosseinnarimanirad/Maptor",
-        "url": "https://github.com/hosseinnarimanirad/Maptor",
-        "desc": "Maptor (MakanNegar): Open-source .NET GIS library for spatial data processing, analysis, and visualization",
-        "stars": 22,
-        "lang": "C#",
-        "isNew": false,
-        "rank": 112.72345567203519,
-        "relevant": true
-      },
-      {
         "name": "tsevis/Hipparchus",
         "url": "https://github.com/tsevis/Hipparchus",
         "desc": "Desktop vector cartography app for clean, editable SVG maps — from live OpenStreetMap, local OSM extracts, vector tiles, Natural Earth, Overture, terrain DEM, and VIIRS night lights.",
@@ -116,10 +136,10 @@
         "name": "mapdraw/mapdraw",
         "url": "https://github.com/mapdraw/mapdraw",
         "desc": "MapDraw is a simple, powerful web-based editor for creating, viewing, and managing geographic data like paths, areas, and markers. Built with Leaflet.js, it supports interactive drawing, file import/export (GeoJSON, GPX, KML, KMZ), routing, elevation profiles, custom styling, Strava activity integration, and OpenStreetMap contributions.",
-        "stars": 66,
+        "stars": 67,
         "lang": "JavaScript",
         "isNew": false,
-        "rank": 103.65214960540165,
+        "rank": 103.66501782541248,
         "relevant": true
       },
       {
@@ -136,30 +156,40 @@
         "name": "organicmaps/organicmaps",
         "url": "https://github.com/organicmaps/organicmaps",
         "desc": "🍃 Organic Maps is a free Android & iOS offline maps app for more than 6M travelers, tourists, hikers, and cyclists. It uses crowd-sourced OpenStreetMap data and is developed with love by the community. No ads, no tracking, no data collection, no crapware. Please donate to support the development!",
-        "stars": 15241,
+        "stars": 15253,
         "lang": "C++",
         "isNew": false,
-        "rank": 88.36608391458128,
+        "rank": 88.3667674841054,
         "relevant": true
       },
       {
         "name": "python-visualization/folium",
         "url": "https://github.com/python-visualization/folium",
         "desc": "Python Data. Leaflet.js Maps.",
-        "stars": 7395,
+        "stars": 7396,
         "lang": "Python",
         "isNew": false,
-        "rank": 87.73799380497427,
+        "rank": 87.73811123740381,
         "relevant": true
       },
       {
         "name": "opengeos/GeoLibre",
         "url": "https://github.com/opengeos/GeoLibre",
         "desc": "A lightweight, cloud-native GIS platform for visualizing, exploring, and analyzing geospatial data. It runs in the web browser, on the desktop, on mobile, and inside Jupyter notebooks.",
-        "stars": 6854,
+        "stars": 6906,
         "lang": "TypeScript",
         "isNew": false,
-        "rank": 87.67201491825107,
+        "rank": 87.6785789120123,
+        "relevant": true
+      },
+      {
+        "name": "mbloch/mapshaper",
+        "url": "https://github.com/mbloch/mapshaper",
+        "desc": "Tools for editing Shapefile, GeoJSON, TopoJSON and CSV files",
+        "stars": 4170,
+        "lang": "JavaScript",
+        "isNew": false,
+        "rank": 87.24048037969166,
         "relevant": true
       },
       {
@@ -171,36 +201,6 @@
         "isNew": false,
         "rank": 87.19473210053205,
         "relevant": true
-      },
-      {
-        "name": "maplibre/martin",
-        "url": "https://github.com/maplibre/martin",
-        "desc": "Blazing fast and lightweight PostGIS, MBtiles and PMtiles tile server, tile generation, and mbtiles tooling.",
-        "stars": 3880,
-        "lang": "Rust",
-        "isNew": false,
-        "rank": 87.17788728548003,
-        "relevant": true
-      },
-      {
-        "name": "googlemaps/android-maps-utils",
-        "url": "https://github.com/googlemaps/android-maps-utils",
-        "desc": "Maps SDK for Android Utility Library",
-        "stars": 3616,
-        "lang": "Kotlin",
-        "isNew": false,
-        "rank": 87.11669701752324,
-        "relevant": true
-      },
-      {
-        "name": "maplibre/maputnik",
-        "url": "https://github.com/maplibre/maputnik",
-        "desc": "An open source visual editor for the 'MapLibre Style Specification'",
-        "stars": 2614,
-        "lang": "TypeScript",
-        "isNew": false,
-        "rank": 86.8349433864066,
-        "relevant": true
       }
     ],
     "general": [
@@ -208,100 +208,100 @@
         "name": "s1dashu/ip-as-logo-skill",
         "url": "https://github.com/s1dashu/ip-as-logo-skill",
         "desc": "A compact Agent Skill for highly simplified, rounded, subtly neo-skeuomorphic IP mascot logos.",
-        "stars": 4549,
+        "stars": 4587,
         "lang": null,
         "isNew": true,
-        "rank": 10.316022793314225,
-        "relevant": false
-      },
-      {
-        "name": "HEJustinSun/my-girlfriend-jingtian-latex",
-        "url": "https://github.com/HEJustinSun/my-girlfriend-jingtian-latex",
-        "desc": "",
-        "stars": 3864,
-        "lang": "TeX",
-        "isNew": true,
-        "rank": 10.174298996508687,
-        "relevant": false
-      },
-      {
-        "name": "b-nnett/grok-bot-0.18-reconstructed",
-        "url": "https://github.com/b-nnett/grok-bot-0.18-reconstructed",
-        "desc": "Unofficial source-oriented reconstruction and extension of Grok Bot 0.18.0 for macOS",
-        "stars": 3425,
-        "lang": "TypeScript",
-        "isNew": true,
-        "rank": 10.069574717258984,
-        "relevant": false
-      },
-      {
-        "name": "yetone/cumora",
-        "url": "https://github.com/yetone/cumora",
-        "desc": "Where agent teams gather. Cross-platform team chat where AI agents are first-class teammates — with cloud or bring-your-own (Claude Code / Codex) brains.",
-        "stars": 3243,
-        "lang": "TypeScript",
-        "isNew": true,
-        "rank": 10.022161691078237,
+        "rank": 10.323246818458461,
         "relevant": false
       },
       {
         "name": "sapientinc/PRAXIST",
         "url": "https://github.com/sapientinc/PRAXIST",
         "desc": "Autonomous research system for measurable, computer-executable research.",
-        "stars": 2912,
+        "stars": 4496,
         "lang": "Python",
         "isNew": true,
-        "rank": 9.928680969255335,
+        "rank": 10.305845775135884,
+        "relevant": false
+      },
+      {
+        "name": "HEJustinSun/my-girlfriend-jingtian-latex",
+        "url": "https://github.com/HEJustinSun/my-girlfriend-jingtian-latex",
+        "desc": "",
+        "stars": 4135,
+        "lang": "TeX",
+        "isNew": true,
+        "rank": 10.233161060171772,
+        "relevant": false
+      },
+      {
+        "name": "b-nnett/grok-bot-0.18-reconstructed",
+        "url": "https://github.com/b-nnett/grok-bot-0.18-reconstructed",
+        "desc": "Unofficial source-oriented reconstruction and extension of Grok Bot 0.18.0 for macOS",
+        "stars": 3449,
+        "lang": "TypeScript",
+        "isNew": true,
+        "rank": 10.075638190146549,
+        "relevant": false
+      },
+      {
+        "name": "yetone/cumora",
+        "url": "https://github.com/yetone/cumora",
+        "desc": "Where agent teams gather. Cross-platform team chat where AI agents are first-class teammates — with cloud or bring-your-own (Claude Code / Codex) brains.",
+        "stars": 3276,
+        "lang": "TypeScript",
+        "isNew": true,
+        "rank": 10.030952882764751,
         "relevant": false
       },
       {
         "name": "wang2122/sprix-sage-router",
         "url": "https://github.com/wang2122/sprix-sage-router",
         "desc": "Sprix AI at 屿智同行 — state-aware SELF/COLLABORATE/HANDOFF routing for A2A agent networks.",
-        "stars": 2653,
+        "stars": 2791,
         "lang": "Python",
         "isNew": true,
-        "rank": 9.847801837056833,
+        "rank": 9.891830827902247,
         "relevant": false
       },
       {
         "name": "tobi/walgit",
         "url": "https://github.com/tobi/walgit",
         "desc": "",
-        "stars": 2316,
+        "stars": 2343,
         "lang": "Rust",
         "isNew": true,
-        "rank": 9.729852067579952,
+        "rank": 9.739915214692106,
         "relevant": false
       },
       {
         "name": "duty1g/x64dbg-mcp-server",
         "url": "https://github.com/duty1g/x64dbg-mcp-server",
         "desc": "x64dbg-MCP Server is a native MCP (Model Context Protocol) plugin for x64dbg that exposes the debugger's full functionality over HTTP. Connect any MCP-compatible AI assistant and control x64dbg programmatically: set breakpoints, step through code, read memory, dump registers, and more.  Built with Zig — zero dependencies, single-binary output, cros",
-        "stars": 1715,
+        "stars": 1767,
         "lang": "Zig",
         "isNew": true,
-        "rank": 9.469034567025373,
-        "relevant": false
-      },
-      {
-        "name": "vvxw/deploy-vercel",
-        "url": "https://github.com/vvxw/deploy-vercel",
-        "desc": "Install Command：npm install",
-        "stars": 1506,
-        "lang": "JavaScript",
-        "isNew": true,
-        "rank": 9.356226504629264,
+        "rank": 9.49496452135411,
         "relevant": false
       },
       {
         "name": "amagine-ai/Amagine3D",
         "url": "https://github.com/amagine-ai/Amagine3D",
         "desc": "Amagine3D: From hardware requirements to editable 3D designs",
-        "stars": 1341,
+        "stars": 1543,
         "lang": "Python",
         "isNew": true,
-        "rank": 9.255505031665948,
+        "rank": 9.377294591999433,
+        "relevant": false
+      },
+      {
+        "name": "vvxw/deploy-vercel",
+        "url": "https://github.com/vvxw/deploy-vercel",
+        "desc": "Install Command：npm install",
+        "stars": 1531,
+        "lang": "JavaScript",
+        "isNew": true,
+        "rank": 9.37051753059317,
         "relevant": false
       }
     ]
@@ -310,23 +310,44 @@
     "models": [
       {
         "kind": "models",
+        "id": "Comfy-Org/MiniMax-H3",
+        "url": "https://huggingface.co/Comfy-Org/MiniMax-H3",
+        "likes": 1615,
+        "downloads": 21374217,
+        "rank": 85.21688271287714,
+        "relevant": true,
+        "desc": "Repackaged model files for ComfyUI."
+      },
+      {
+        "kind": "models",
         "id": "MiniMaxAI/MiniMax-H3",
         "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3",
-        "likes": 4608,
-        "downloads": 5018833,
+        "likes": 4646,
+        "downloads": 5263381,
         "pipeline": "image-text-to-video",
-        "rank": 78.72721341624904,
+        "rank": 78.63434534495774,
         "relevant": true,
         "desc": "Offical skills to improve prompt writing: skills on github"
       },
       {
         "kind": "models",
+        "id": "FastVideo/FastVideo-FastH3-4-step-Preview-v1-VSA-DataFree",
+        "url": "https://huggingface.co/FastVideo/FastVideo-FastH3-4-step-Preview-v1-VSA-DataFree",
+        "likes": 182,
+        "downloads": 0,
+        "pipeline": "text-to-video",
+        "rank": 72.32490217946086,
+        "relevant": true,
+        "desc": "FastVideo-FastH3-4-step-Preview-v1-VSA-DataFree"
+      },
+      {
+        "kind": "models",
         "id": "alibaba-pai/MiniMax-H3-Fun-Controlnet-Union",
         "url": "https://huggingface.co/alibaba-pai/MiniMax-H3-Fun-Controlnet-Union",
-        "likes": 160,
-        "downloads": 4250,
+        "likes": 162,
+        "downloads": 5538,
         "pipeline": "text-to-video",
-        "rank": 70.1136517520637,
+        "rank": 70.32437520880792,
         "relevant": true,
         "desc": "MiniMax-H3-Fun-Controlnet-Union"
       },
@@ -334,32 +355,31 @@
         "kind": "models",
         "id": "alibaba-pai/MiniMax-H3-Acc-LoRAs",
         "url": "https://huggingface.co/alibaba-pai/MiniMax-H3-Acc-LoRAs",
-        "likes": 140,
-        "downloads": 13767,
+        "likes": 151,
+        "downloads": 23734,
         "pipeline": "text-to-video",
-        "rank": 67.89843822531076,
+        "rank": 69.06368717588954,
         "relevant": true,
         "desc": "We apply Parallel Decoding Distillation (PDD) 1 to MiniMax-H3, enabling efficient video generation in only a few inference steps."
       },
       {
         "kind": "models",
-        "id": "FastVideo/FastVideo-FastH3-4-step-Preview-v1-VSA-DataFree",
-        "url": "https://huggingface.co/FastVideo/FastVideo-FastH3-4-step-Preview-v1-VSA-DataFree",
-        "likes": 128,
+        "id": "Kijai/MiniMax-H3-experimental",
+        "url": "https://huggingface.co/Kijai/MiniMax-H3-experimental",
+        "likes": 356,
         "downloads": 0,
-        "pipeline": "text-to-video",
-        "rank": 66.92117942059849,
+        "rank": 65.10533643222439,
         "relevant": true,
-        "desc": "FastVideo-FastH3-4-step-Preview-v1-VSA-DataFree"
+        "desc": "w4a8 is experimental format using 4bit weights and int8-convrot activations, at testing phase, further info here:"
       },
       {
         "kind": "models",
         "id": "Lightricks/LTX-2.5",
         "url": "https://huggingface.co/Lightricks/LTX-2.5",
-        "likes": 2086,
-        "downloads": 1044661,
+        "likes": 2218,
+        "downloads": 1137181,
         "pipeline": "image-to-video",
-        "rank": 57.43904489813091,
+        "rank": 60.49231460446401,
         "relevant": true,
         "desc": ""
       },
@@ -367,10 +387,10 @@
         "kind": "models",
         "id": "tencent/WeMM-Embedding-9B",
         "url": "https://huggingface.co/tencent/WeMM-Embedding-9B",
-        "likes": 95,
-        "downloads": 1318,
+        "likes": 99,
+        "downloads": 2103,
         "pipeline": "feature-extraction",
-        "rank": 33.46454246607914,
+        "rank": 33.9,
         "relevant": true,
         "desc": "WeMM-Embedding-9B is a universal multimodal embedding model built on Qwen3.5."
       }
@@ -380,9 +400,9 @@
         "kind": "datasets",
         "id": "wikimedia/wikipedia",
         "url": "https://huggingface.co/datasets/wikimedia/wikipedia",
-        "likes": 1388,
-        "downloads": 239320,
-        "rank": 66.98540449147524,
+        "likes": 1391,
+        "downloads": 239780,
+        "rank": 67.18727847054909,
         "relevant": true,
         "desc": ""
       },
@@ -390,9 +410,9 @@
         "kind": "datasets",
         "id": "hamzabagirsakci/turkish-court-decisions",
         "url": "https://huggingface.co/datasets/hamzabagirsakci/turkish-court-decisions",
-        "likes": 97,
-        "downloads": 2000,
-        "rank": 42.28245215138499,
+        "likes": 104,
+        "downloads": 2209,
+        "rank": 42.942378598139875,
         "relevant": true,
         "desc": "prettyname: Türk İçtihat Korpusu (11M Karar)"
       },
@@ -400,9 +420,9 @@
         "kind": "datasets",
         "id": "openbmb/Ultra-FineWeb-L1",
         "url": "https://huggingface.co/datasets/openbmb/Ultra-FineWeb-L1",
-        "likes": 180,
-        "downloads": 28685,
-        "rank": 39.31535714973837,
+        "likes": 183,
+        "downloads": 29453,
+        "rank": 39.22963564601908,
         "relevant": true,
         "desc": "📜 Ultra-FineWeb Technical Report"
       },
@@ -410,51 +430,51 @@
         "kind": "datasets",
         "id": "r0b0tlab/qwen3.8-max-glm5.2-kimi-k3-distillation",
         "url": "https://huggingface.co/datasets/r0b0tlab/qwen3.8-max-glm5.2-kimi-k3-distillation",
-        "likes": 220,
-        "downloads": 8777,
-        "rank": 37.488784547370216,
+        "likes": 226,
+        "downloads": 8938,
+        "rank": 37.41205171438625,
         "relevant": true,
         "desc": "Multi-Teacher Distillation Dataset (57,937 traces)"
       },
       {
         "kind": "datasets",
-        "id": "openai/gsm8k",
-        "url": "https://huggingface.co/datasets/openai/gsm8k",
-        "likes": 1579,
-        "downloads": 1142869,
-        "rank": 37.09731417390885,
-        "relevant": true,
-        "desc": "GSM8K (Grade School Math 8K) is a dataset of 8.5K high quality linguistically diverse grade school math word problems."
-      },
-      {
-        "kind": "datasets",
         "id": "biglam/britannica-illustrated-pages",
         "url": "https://huggingface.co/datasets/biglam/britannica-illustrated-pages",
-        "likes": 41,
-        "downloads": 4609,
-        "rank": 36.946498580795804,
+        "likes": 44,
+        "downloads": 5018,
+        "rank": 37.30642502755069,
         "relevant": true,
         "desc": "Britannica Illustrated Pages"
       },
       {
         "kind": "datasets",
-        "id": "roneneldan/TinyStories",
-        "url": "https://huggingface.co/datasets/roneneldan/TinyStories",
-        "likes": 1127,
-        "downloads": 90400,
-        "rank": 36.80461819929465,
+        "id": "openai/gsm8k",
+        "url": "https://huggingface.co/datasets/openai/gsm8k",
+        "likes": 1581,
+        "downloads": 1150292,
+        "rank": 37.29841295832331,
         "relevant": true,
-        "desc": "Dataset containing synthetically generated (by GPT-3.5 and GPT-4) short stories that only use a small vocabulary."
+        "desc": "GSM8K (Grade School Math 8K) is a dataset of 8.5K high quality linguistically diverse grade school math word problems."
       },
       {
         "kind": "datasets",
         "id": "rajpurkar/squad",
         "url": "https://huggingface.co/datasets/rajpurkar/squad",
-        "likes": 473,
-        "downloads": 209451,
-        "rank": 36.35155668334817,
+        "likes": 482,
+        "downloads": 214128,
+        "rank": 37.267894261503024,
         "relevant": true,
         "desc": "Stanford Question Answering Dataset (SQuAD) is a reading comprehension dataset, consisting of questions posed by crowdworkers on a set of Wikipedia articles, where the answer to…"
+      },
+      {
+        "kind": "datasets",
+        "id": "roneneldan/TinyStories",
+        "url": "https://huggingface.co/datasets/roneneldan/TinyStories",
+        "likes": 1128,
+        "downloads": 89326,
+        "rank": 36.80538788384994,
+        "relevant": true,
+        "desc": "Dataset containing synthetically generated (by GPT-3.5 and GPT-4) short stories that only use a small vocabulary."
       }
     ],
     "spaces": [
@@ -462,8 +482,8 @@
         "kind": "spaces",
         "id": "MiniMaxAI/MiniMax-H3-Turbo-Lora",
         "url": "https://huggingface.co/spaces/MiniMaxAI/MiniMax-H3-Turbo-Lora",
-        "likes": 302,
-        "rank": 57.862885257004606,
+        "likes": 306,
+        "rank": 57.67427675095438,
         "relevant": true,
         "desc": "MiniMax-H3 — unquantized, split across two Spaces"
       },
@@ -471,8 +491,8 @@
         "kind": "spaces",
         "id": "mrfakename/minimax-h3-ultra-fast",
         "url": "https://huggingface.co/spaces/mrfakename/minimax-h3-ultra-fast",
-        "likes": 170,
-        "rank": 56.66599222078431,
+        "likes": 177,
+        "rank": 57.000840004617785,
         "relevant": true,
         "desc": "MiniMax-H3 Ultra Fast — local conditioner + pruned NVFP4 on Blackwell"
       },
@@ -480,8 +500,8 @@
         "kind": "spaces",
         "id": "Pepe104/MiniMax-H3-Turbo-Lora-UNCENSORED",
         "url": "https://huggingface.co/spaces/Pepe104/MiniMax-H3-Turbo-Lora-UNCENSORED",
-        "likes": 38,
-        "rank": 55.182129214053,
+        "likes": 44,
+        "rank": 55.70642502755069,
         "relevant": true,
         "desc": "MiniMax-H3 — unquantized, split across two Spaces"
       },
@@ -489,8 +509,8 @@
         "kind": "spaces",
         "id": "linoyts/minimax-h3-inpainting",
         "url": "https://huggingface.co/spaces/linoyts/minimax-h3-inpainting",
-        "likes": 25,
-        "rank": 54.829946695941636,
+        "likes": 27,
+        "rank": 54.79431606268444,
         "relevant": true,
         "desc": "MiniMax-H3 — masked video and audio inpainting"
       }
@@ -500,81 +520,79 @@
         "kind": "models",
         "id": "Qwen/Qwen3.8-Flash-Next",
         "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
-        "likes": 4249,
-        "downloads": 52341,
+        "likes": 4356,
+        "downloads": 121976,
         "pipeline": "image-text-to-text",
-        "rank": 416.9567778601006,
-        "relevant": false,
-        "desc": "This repository contains model weights and configuration files for the post-trained model in the Hugging Face Transformers format."
+        "rank": 426.2783751198715,
+        "relevant": false
       },
       {
         "kind": "models",
         "id": "zai-org/GLM-5.3-Flash",
         "url": "https://huggingface.co/zai-org/GLM-5.3-Flash",
-        "likes": 1583,
-        "downloads": 189793,
+        "likes": 1684,
+        "downloads": 346516,
         "pipeline": "text-generation",
-        "rank": 157.59951035450695,
-        "relevant": false,
-        "desc": "📖 Check out the GLM-5.3-Flash blog and GLM-5 Technical report."
+        "rank": 166.4531998104147,
+        "relevant": false
       },
       {
         "kind": "models",
         "id": "zai-org/GLM-5.3",
         "url": "https://huggingface.co/zai-org/GLM-5.3",
-        "likes": 1239,
-        "downloads": 8804,
+        "likes": 1325,
+        "downloads": 50116,
         "pipeline": "text-generation",
-        "rank": 125.78684337032446,
+        "rank": 134.0450870481375,
         "relevant": false
       },
       {
         "kind": "models",
         "id": "Qwen/Qwen3.8-27B",
         "url": "https://huggingface.co/Qwen/Qwen3.8-27B",
-        "likes": 13217,
-        "downloads": 4028839,
+        "likes": 13316,
+        "downloads": 4511348,
         "pipeline": "image-text-to-text",
-        "rank": 94.14233149506883,
+        "rank": 87.44881279949006,
         "relevant": false
       },
       {
         "kind": "models",
         "id": "unsloth/Qwen3.8-Flash-Next-GGUF",
         "url": "https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF",
-        "likes": 544,
-        "downloads": 188061,
+        "likes": 594,
+        "downloads": 328195,
         "pipeline": "image-text-to-text",
-        "rank": 59.172793004553284,
+        "rank": 63.949033931457095,
         "relevant": false
       },
       {
         "kind": "models",
         "id": "unsloth/Qwen3.8-27B-GGUF",
         "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF",
-        "likes": 3171,
-        "downloads": 8363481,
-        "rank": 55.90266635729113,
+        "likes": 3216,
+        "downloads": 8839153,
+        "rank": 49.81490212180394,
+        "relevant": false
+      },
+      {
+        "kind": "models",
+        "id": "tencent/Hy4-preview",
+        "url": "https://huggingface.co/tencent/Hy4-preview",
+        "likes": 311,
+        "downloads": 2123,
+        "pipeline": "text-generation",
+        "rank": 35.68830918803688,
         "relevant": false
       },
       {
         "kind": "models",
         "id": "OBLITERATUS/Qwen3.8-27B-OBLITERATED",
         "url": "https://huggingface.co/OBLITERATUS/Qwen3.8-27B-OBLITERATED",
-        "likes": 903,
-        "downloads": 645554,
+        "likes": 940,
+        "downloads": 725757,
         "pipeline": "text-generation",
-        "rank": 37.912336860950724,
-        "relevant": false
-      },
-      {
-        "kind": "models",
-        "id": "orcarouter/Qwen3.8-27B-Uncensored-MLX",
-        "url": "https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-MLX",
-        "likes": 1201,
-        "downloads": 97508,
-        "pipeline": "image-text-to-text",
-        "rank": 32.55980893533344,
+        "rank": 33.44717924685452,
         "relevant": false
       }
     ]
@@ -592,53 +610,23 @@
         "relevant": true
       },
       {
-        "title": "Galaxium, an experimental WebGPU space explorer",
-        "url": "https://galaxium.app",
-        "hnUrl": "https://news.ycombinator.com/item?id=49420524",
-        "points": 63,
-        "comments": 19,
-        "isShow": true,
-        "rank": 35.612359947967775,
-        "relevant": true
-      },
-      {
-        "title": "Inception-style curved map for turn-by-turn directions",
-        "url": "https://www.orbify.eu/demo/",
-        "hnUrl": "https://news.ycombinator.com/item?id=49477564",
-        "points": 567,
-        "comments": 184,
+        "title": "JupyterGIS 0.16: a grammar of graphics for maps, and collaborative story maps",
+        "url": "https://blog.jupyter.org/jupytergis-0-16-new-visualization-capabilities-collaborative-story-maps-and-more-03e6b78bacc0",
+        "hnUrl": "https://news.ycombinator.com/item?id=49430745",
+        "points": 77,
+        "comments": 9,
         "isShow": false,
-        "rank": 35.50869667142204,
-        "relevant": true
-      },
-      {
-        "title": "Debian votes to allow \"responsible use of generative AI\"",
-        "url": "https://lwn.net/Articles/1091231/",
-        "hnUrl": "https://news.ycombinator.com/item?id=49489982",
-        "points": 287,
-        "comments": 226,
-        "isShow": false,
-        "rank": 34.91878497551846,
-        "relevant": true
-      },
-      {
-        "title": "Parsing the Infamous Japanese Postal CSV",
-        "url": "https://www.dampfkraft.com/posuto.html",
-        "hnUrl": "https://news.ycombinator.com/item?id=49490826",
-        "points": 14,
-        "comments": 1,
-        "isShow": false,
-        "rank": 32.35218251811136,
+        "rank": 33.78418920538096,
         "relevant": true
       },
       {
         "title": "Sesame - a local-first, open-source password manager",
         "url": "https://usesesame.app/",
         "hnUrl": "https://news.ycombinator.com/item?id=49483038",
-        "points": 55,
-        "comments": 78,
+        "points": 63,
+        "comments": 84,
         "isShow": true,
-        "rank": 25.4963760540124,
+        "rank": 25.612359947967775,
         "relevant": true
       }
     ],
@@ -647,100 +635,100 @@
         "title": "The load-bearing vocabulary of Claude",
         "url": "https://louisabraham.github.io/load-bearing/",
         "hnUrl": "https://news.ycombinator.com/item?id=49461817",
-        "points": 667,
-        "comments": 319,
+        "points": 689,
+        "comments": 321,
         "isShow": true,
-        "rank": 7.649552924951092,
+        "rank": 7.67769818147451,
         "relevant": false
       },
       {
         "title": "OpenTIE and OpenXWA, Modern Ports of Tie Fighter and X-Wing Alliance",
         "url": "https://github.com/elyosh/OpenTIE/",
         "hnUrl": "https://news.ycombinator.com/item?id=49471965",
-        "points": 219,
-        "comments": 56,
+        "points": 224,
+        "comments": 57,
         "isShow": true,
-        "rank": 6.684845361644412,
+        "rank": 6.704365036222725,
         "relevant": false
       },
       {
         "title": "We built open OpenRouter that turns usage into a better model",
         "url": "https://github.com/experientiallabs/experiential",
         "hnUrl": "https://news.ycombinator.com/item?id=49471407",
-        "points": 212,
+        "points": 220,
         "comments": 46,
         "isShow": true,
-        "rank": 6.656759206877475,
-        "relevant": false
-      },
-      {
-        "title": "GUIs should be fully keyboard-driven",
-        "url": "https://ckardaris.com/blog/2026/08/28/keyboard-driven-guis.html",
-        "hnUrl": "https://news.ycombinator.com/item?id=49479837",
-        "points": 953,
-        "comments": 469,
-        "isShow": false,
-        "rank": 5.95909674940819,
+        "rank": 6.688784547370221,
         "relevant": false
       },
       {
         "title": "My Claude quota ran out in 10 minutes, so I made a tool to find out why",
         "url": "https://github.com/kelviq/tare",
         "hnUrl": "https://news.ycombinator.com/item?id=49467551",
-        "points": 87,
-        "comments": 66,
+        "points": 88,
+        "comments": 67,
         "isShow": true,
-        "rank": 5.888965344300337,
-        "relevant": false
-      },
-      {
-        "title": "Buslens – where can I get to by bus? (UK)",
-        "url": "https://rupertlinacre.com/buslens/",
-        "hnUrl": "https://news.ycombinator.com/item?id=49445286",
-        "points": 81,
-        "comments": 55,
-        "isShow": true,
-        "rank": 5.827627704767433,
-        "relevant": false
-      },
-      {
-        "title": "Htmx 4.0",
-        "url": "https://four.htmx.org/announcements/2026-08-28-htmx-4.0.0-is-released",
-        "hnUrl": "https://news.ycombinator.com/item?id=49478178",
-        "points": 750,
-        "comments": 187,
-        "isShow": false,
-        "rank": 5.751279874008337,
-        "relevant": false
-      },
-      {
-        "title": "How much of Hacker News is about AI?",
-        "url": "https://hnstats.com",
-        "hnUrl": "https://news.ycombinator.com/item?id=49449648",
-        "points": 73,
-        "comments": 48,
-        "isShow": true,
-        "rank": 5.7384634394619525,
-        "relevant": false
-      },
-      {
-        "title": "Our decision on Cursor following its acquisition by SpaceX",
-        "url": "https://openai.com/index/our-decision-on-cursor-following-its-acquisition-by-spacex/",
-        "hnUrl": "https://news.ycombinator.com/item?id=49486172",
-        "points": 702,
-        "comments": 427,
-        "isShow": false,
-        "rank": 5.693910650039648,
+        "rank": 5.898780013289826,
         "relevant": false
       },
       {
         "title": "SubSmith – Turn your own videos into language-learning material",
         "url": "https://subsmith.app",
         "hnUrl": "https://news.ycombinator.com/item?id=49476894",
-        "points": 69,
+        "points": 74,
         "comments": 51,
         "isShow": true,
-        "rank": 5.690196080028514,
+        "rank": 5.7501225267834,
+        "relevant": false
+      },
+      {
+        "title": "California lawmakers unanimously pass Linux exemption from age-verification law",
+        "url": "https://www.tomshardware.com/software/linux/california-lawmakers-unanimously-pass-linux-exemption-from-age-verification-law-software-distributed-under-the-gpl-mit-bsd-and-apache-licenses-are-exempt",
+        "hnUrl": "https://news.ycombinator.com/item?id=49495372",
+        "points": 567,
+        "comments": 262,
+        "isShow": false,
+        "rank": 5.508696671422038,
+        "relevant": false
+      },
+      {
+        "title": "Tether: iMessage, SMS, etc. on Linux",
+        "url": "https://zackbartel.com/blog/2026/08/tether/",
+        "hnUrl": "https://news.ycombinator.com/item?id=49415386",
+        "points": 514,
+        "comments": 206,
+        "isShow": false,
+        "rank": 5.423614458082382,
+        "relevant": false
+      },
+      {
+        "title": "Restoredrill – proves your Postgres backups restore",
+        "url": "https://github.com/ahmadpiran/restoredrill",
+        "hnUrl": "https://news.ycombinator.com/item?id=49465291",
+        "points": 49,
+        "comments": 23,
+        "isShow": true,
+        "rank": 5.3979400086720375,
+        "relevant": false
+      },
+      {
+        "title": "Watches user sessions, finds bugs that matter, and fixes them",
+        "url": "https://github.com/opslane/opslane",
+        "hnUrl": "https://news.ycombinator.com/item?id=49466704",
+        "points": 40,
+        "comments": 11,
+        "isShow": true,
+        "rank": 5.225567713439471,
+        "relevant": false
+      },
+      {
+        "title": "RealDiff – runtime behavior diffing for pull requests (six languages)",
+        "url": "https://github.com/issacnitin/RealDiff",
+        "hnUrl": "https://news.ycombinator.com/item?id=49464459",
+        "points": 40,
+        "comments": 10,
+        "isShow": true,
+        "rank": 5.225567713439471,
         "relevant": false
       }
     ]
@@ -750,24 +738,24 @@
       "title": "UrbanGround: From Local Perception to Spatial Agency in a Real-Scale City",
       "url": "https://huggingface.co/papers/2608.27456",
       "desc": "Multimodal large language models (MLLMs) can interpret a street view, but urban agency depends on whether such local evidence remains useful after the agent starts to move.",
-      "upvotes": 72,
-      "rank": 83.72664572024091,
+      "upvotes": 80,
+      "rank": 83.8169700377573,
       "relevant": true
     },
     {
       "title": "Gated Recurrent Transformers: Expressive Depth through Recurrent Modulation",
       "url": "https://huggingface.co/papers/2608.15062",
       "desc": "Scaling transformer language models creates an inherent tension between expressivity and memory efficiency.",
-      "upvotes": 9,
-      "rank": 82,
+      "upvotes": 10,
+      "rank": 82.08278537031644,
       "relevant": true
     },
     {
       "title": "GameWAM: A World Action Model for Video Games",
       "url": "https://huggingface.co/papers/2608.26200",
       "desc": "Modern video games combine first-person perception, rapid visual changes, persistent world state, and heterogeneous native controls.",
-      "upvotes": 39,
-      "rank": 63.204119982655925,
+      "upvotes": 41,
+      "rank": 63.2464985807958,
       "relevant": true
     },
     {
@@ -782,8 +770,8 @@
       "title": "VGI-Bench: Probing Visual Intelligence in Video Generation Models",
       "url": "https://huggingface.co/papers/2608.19583",
       "desc": "Recent studies suggest that video generation models can exhibit certain forms of zero-shot visual reasoning through generated frames.",
-      "upvotes": 170,
-      "rank": 34.46599222078431,
+      "upvotes": 171,
+      "rank": 34.471056893815096,
       "relevant": true
     },
     {
@@ -798,8 +786,8 @@
       "title": "PAWBench: How Far Are We from Probabilistically Aligned World Modeling?",
       "url": "https://huggingface.co/papers/2608.27345",
       "desc": "Recent video generation models are increasingly framed as world models.",
-      "upvotes": 82,
-      "rank": 33.83815618475215,
+      "upvotes": 94,
+      "rank": 33.955447210577695,
       "relevant": true
     },
     {
@@ -879,49 +867,49 @@
   ],
   "itch": [
     {
-      "title": "Sink — A grande fuga do ralo [Free] [Adventure]",
-      "url": "https://sidney-silva.itch.io/sink-a-grande-fuga-do-ralo",
+      "title": "SPACE SURFER [Free]",
+      "url": "https://gregs-games.itch.io/space-surfer",
+      "desc": "Ramp off waves to fly and save people."
+    },
+    {
+      "title": "WitCup 15 [Free] [Puzzle] [Windows]",
+      "url": "https://alith.itch.io/witcup-15",
       "desc": ""
     },
     {
-      "title": "Cubey's Big Adventure [Free] [Platformer] [Windows] [Linux]",
-      "url": "https://francthe3dsnerd.itch.io/cubeys-big-adventure-full",
-      "desc": "The full version of Cubey's Big Adventure"
-    },
-    {
-      "title": "SafeHouse: Game Jam [Free] [Windows] [Android]",
-      "url": "https://asrielg.itch.io/game-jam",
-      "desc": "A killer is hiding among your neighbors. Find them before they find you."
-    },
-    {
-      "title": "Clouds Gorilla Horror V36 Revived By GTERRIER [Free] [Android]",
-      "url": "https://gterrier15.itch.io/clouds-gorilla-horror-v36-revived-by-gterrier",
+      "title": "Buraq: No Trespassing [Free] [Other] [Windows] [Linux]",
+      "url": "https://kebabero.itch.io/buraq-no-trespassing",
       "desc": ""
     },
     {
-      "title": "One Suspicious Minesweeper [Free] [Puzzle]",
-      "url": "https://debeck.itch.io/minesweeper",
-      "desc": "A Regular Minesweeper, but the 1's are acting strange..."
+      "title": "WeDidAnOopsy [Free] [Windows]",
+      "url": "https://nyhven.itch.io/wedidanoopsy",
+      "desc": "A cinematic of a game"
     },
     {
-      "title": "Helix Arena - Vortex League [Free] [Action] [Windows]",
-      "url": "https://atnegames.itch.io/helixarena",
+      "title": "The Point [Free] [Interactive Fiction] [Windows]",
+      "url": "https://bencrooks.itch.io/the-point",
+      "desc": "The journey of a mouse pointer"
+    },
+    {
+      "title": "GURT WORLD!! [Free] [Survival]",
+      "url": "https://booming-noob.itch.io/gurt-world",
       "desc": ""
     },
     {
-      "title": "SH [Free] [Windows]",
-      "url": "https://minigamesstudio.itch.io/sh",
-      "desc": ""
+      "title": "Crystalise [Free] [Adventure]",
+      "url": "https://xmorrow.itch.io/crystalise",
+      "desc": "A strange dungeon. A mysterious companion. One way out. Who will you trust?"
     },
     {
-      "title": "Light Spar [Free] [Fighting]",
-      "url": "https://bilalgamejam.itch.io/light-spar",
-      "desc": ""
+      "title": "Wired Heart [Free] [Visual Novel]",
+      "url": "https://nanavidad.itch.io/wired-heart",
+      "desc": "Os padrões corromperam meus pensamentos."
     },
     {
-      "title": "GBSV: Veronica Edition [Free] [Visual Novel]",
-      "url": "https://cubetevtech.itch.io/gbsv-veronica-edition",
-      "desc": "La tercera entrega de la serie de novelas guatemaltecas GBSV, protagonizada en esta ocasión por Verónica Cerro."
+      "title": "Goosword [Free] [Action]",
+      "url": "https://batmatthew.itch.io/goosword",
+      "desc": ""
     }
   ],
   "kaggle": []
