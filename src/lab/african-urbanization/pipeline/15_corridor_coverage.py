@@ -22,6 +22,7 @@ Outputs:
 - data/corridor-coverage.json   — the summary the page and method page quote
 """
 
+import hashlib
 import json
 import time
 
@@ -78,11 +79,15 @@ def main():
 
     rows = []
     for i, (props, geom) in enumerate(links, 1):
-        key = f"{props['a']}__{props['b']}".replace("/", "-").replace(" ", "_")
         poly = geom.buffer(BUFFER_DEG).simplify(0.05)
         ring = " ".join(f"{lat:.3f} {lon:.3f}" for lon, lat in poly.exterior.coords)
         query = (f'[out:json][timeout:180];'
                  f'way["highway"~"^(motorway|trunk|primary)$"](poly:"{ring}");out geom;')
+        # The cache key carries the query, not just the city pair. 18_land_routes
+        # moves a corridor's geometry, and a pair-keyed cache would then answer
+        # with the roads around the line the corridor used to follow.
+        pair = f"{props['a']}__{props['b']}".replace("/", "-").replace(" ", "_")
+        key = f"{pair}__{hashlib.sha256(query.encode()).hexdigest()[:10]}"
         raw = overpass(query, key)
         feats = osm2geojson.json2geojson(raw)["features"]
         lines = [shape(f["geometry"]) for f in feats

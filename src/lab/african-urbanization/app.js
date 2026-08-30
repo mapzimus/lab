@@ -43,10 +43,6 @@ const GAIN_CLASSES = { breaks: [0, 10, 25, 40],
   colors: ["#3a4560", "#4f5170", "#8a5570", "#d4713f", "#f7c744"] };
 
 const AFRICA_BOUNDS = [[-19.5, -36.5], [53.5, 38.5]];
-const WEST_AFRICA_BOUNDS = [[-18, 3], [16, 15]];
-// Abidjan to Lagos: the stretch of coast the chapter claims is becoming one
-// continuous city. It gets its own frame because the claim is about a place
-// you cannot see at continental zoom.
 // Abidjan to Lagos with a little sea and hinterland around it. Kept tight to
 // the corridor: a wider box fits by width on a phone and the strip shrinks to
 // a thread across the middle of the screen.
@@ -54,6 +50,17 @@ const GULF_BOUNDS = [[-6.0, 3.7], [5.3, 8.4]];
 // Lagos, Kinshasa and Dar es Salaam, with enough room around them that the
 // 2100 rings are not clipped by the edge of the frame.
 const GIANTS_BOUNDS = [[-3.5, -15.0], [45.0, 11.0]];
+// The approach frame for chapter 4. It has to already contain Kinshasa: the
+// heading says the chapter lands in one city, and the map opening 2,000 km
+// away in West Africa made the next step read as a jump, not a descent.
+const CONGO_BOUNDS = [[9.0, -13.5], [32.0, 6.0]];
+// Chapter 3's inherited-rail step argues from one place: DR Congo's two largest
+// cities with no line between them, the Lobito corridor running west to the
+// Atlantic and TAZARA running east to the Indian Ocean. All three are in here.
+const CONGO_RAIL_BOUNDS = [[10.5, -19.0], [41.0, 2.0]];
+// Lagos round to Luanda. The model's least-served link, and the one that used
+// to be drawn straight across the Gulf of Guinea.
+const GULF_COAST_BOUNDS = [[1.0, -11.5], [18.0, 8.5]];
 const KINSHASA_BOUNDS = [[14.97, -4.72], [15.78, -3.98]];
 const POOL_BOUNDS = [[15.12, -4.48], [15.55, -4.05]];
 // Kinshasa out to the Atlantic, so the last step can show the whole thread.
@@ -103,7 +110,7 @@ function shortName(n) {
 
 // Bumped whenever the pipeline rewrites data/. The query string lets the
 // files be cached hard while a deploy still delivers fresh ones.
-const DATA_VERSION = "2026-08-29c";
+const DATA_VERSION = "2026-08-30a";
 
 // The story reads perfectly as text, so the map layers it cannot show without
 // help are loaded in two waves: what chapters 1 to 3 need, then the rest.
@@ -664,10 +671,37 @@ function initSteps(map) {
   const hud = document.getElementById("epoch-hud");
   const hudYr = hud.querySelector(".yr");
 
+  // Globe projection punishes an off-centre subject. fitBounds honours the card
+  // reserve by moving the camera centre into it, which at continental zoom put
+  // the centre at 4W, out in the Atlantic, and left Africa sitting on the
+  // receding limb of the sphere: the whole continent read as tilted away east.
+  // So take the zoom fitBounds computes, then pull the centre most of the way
+  // back onto the subject and give up a little zoom to keep it clear of the
+  // card. Above GLOBE_FLAT MapLibre is drawing flat and none of this applies.
+  const GLOBE_FLAT = 5.4;
+  const CENTRE_PULL = 0.7;
+  const PULL_ZOOM_COST = 0.3;
+
   const fly = (bounds, maxZoom, reserve) => {
-    map.fitBounds(bounds, {
-      padding: padding(reserve), maxZoom: maxZoom || 12,
-      duration: prefersStill ? 0 : 2200, essential: true,
+    const fit = { padding: padding(reserve), maxZoom: maxZoom || 12 };
+    const move = { duration: prefersStill ? 0 : 2200, essential: true };
+    const cam = map.cameraForBounds(bounds, fit);
+    if (!cam) { map.fitBounds(bounds, { ...fit, ...move }); return; }
+    if (cam.zoom >= GLOBE_FLAT) {
+      map.flyTo({ center: cam.center, zoom: cam.zoom, ...move });
+      return;
+    }
+    // Only longitude. On a wide screen the reserve is the 480px card gutter on
+    // the left, so that is the axis the centre drifts along and the axis worth
+    // correcting. A phone reserves the bottom instead, and pulling the centre
+    // south there just slides the southern half of the continent behind the
+    // card: the tilt is cosmetic, losing half the subject is not.
+    const midLng = (bounds[0][0] + bounds[1][0]) / 2;
+    const dx = (midLng - cam.center.lng) * CENTRE_PULL;
+    map.flyTo({
+      center: [cam.center.lng + dx, cam.center.lat],
+      zoom: cam.zoom - Math.min(PULL_ZOOM_COST, Math.abs(dx) * 0.02),
+      ...move,
     });
   };
 
@@ -840,9 +874,18 @@ function initSteps(map) {
       setCityEpoch(2050, 0.85); setLabels(2050, null, "p2100"); hollow2100(0.9);
     },
     "ch3": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.9, 0.55, 0, 0, 0); setCityEpoch(2050, 0.3); },
-    "c3-existing": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.9, 0.55, 0, 0, 0); setCityEpoch(2050, 0.3); },
+    // The card argues from Kinshasa and Lubumbashi, and at continental zoom the
+    // 1,570 km of nothing between them is a thumbnail's worth of blank.
+    "c3-existing": () => { fly(CONGO_RAIL_BOUNDS, 6); base.c3(); corridors(0.9, 0.55, 0, 0, 0); setCityEpoch(2050, 0.35); },
     "c3-planned": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.55, 0.3, 0.75, 0.95, 0); setCityEpoch(2050, 0.3); },
     "c3-model": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.25, 0.15, 0.3, 0.35, 0.9); setCityEpoch(2050, 0.45); },
+    // The card names one link and its detour, so the map goes to that link.
+    // The corridor no longer runs straight across the Gulf, and this is the
+    // only frame in the story where the reader can see why that matters.
+    "c3-gap": () => {
+      fly(GULF_COAST_BOUNDS, 6); base.c3();
+      corridors(0.2, 0.12, 0.2, 0.25, 0.95); setCityEpoch(2050, 0.5);
+    },
     "c3-lights": () => {
       fly(AFRICA_BOUNDS, 5); base.c3();
       lightsOn(1); corridors(0, 0, 0, 0.4, 0.55); setCityEpoch(2050, 0);
@@ -864,7 +907,7 @@ function initSteps(map) {
       setCountryLabels("dim"); setCityEpoch(2050, 0.25);
     },
     "ch4": () => {
-      fly(WEST_AFRICA_BOUNDS, 6);
+      fly(CONGO_BOUNDS, 6);
       countriesOpacity(0.14, 0.06);
       setCityEpoch(2025, 0.5); setLabels(null); hollow2100(0);
       corridors(0, 0, 0, 0, 0); kinshasa(0, 0, null); lightsOn(0); densityOn(0);
@@ -1099,7 +1142,10 @@ function initSteps(map) {
     }
     if (f.layer.id === "cor-model") {
       return `<div class="pop-h">${p.a} to ${p.b}</div><div class="pop-sub">modeled corridor</div>`
-        + row("distance", p.km + " km") + row("gravity score", p.score)
+        + row("straight line", p.km + " km") + row("gravity score", p.score)
+        // The drawn line follows land. Where that is longer than the straight
+        // line the model scored, the difference is worth saying out loud.
+        + (p.detour > 1.01 ? row("by land", p.routeKm + " km (×" + p.detour.toFixed(2) + ")") : "")
         + (p.served != null ? row("route already served", p.served + "%") : "");
     }
     // built / planned corridor lines
@@ -1257,6 +1303,9 @@ const LEGENDS = {
     ROW("#8fb8e8", "other backers, built/building"),
     ROW("#c9a53f", "Trans-African Highway plan")] },
   "c3-model": { title: "Predicted demand", rows: [
+    ROW("#f4a93a", "modeled corridor, thicker pulls harder"),
+    ROW("#8b93a0", "existing rail (dim)")] },
+  "c3-gap": { title: "Lagos to Luanda, by land", rows: [
     ROW("#f4a93a", "modeled corridor, thicker pulls harder"),
     ROW("#8b93a0", "existing rail (dim)")] },
   "c3-services": rampLegend("Electricity at home, share of people", ACCESS_CLASSES, rngPct),
