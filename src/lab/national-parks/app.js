@@ -281,6 +281,14 @@ function setFeatureFlag(code, key, value) {
  * whole map: a filled silhouette of the country, so 63 shapes in a void become
  * 63 parks in the United States. Either way it fades out past zoom 8, where the
  * question stops being "which state" and starts being "which valley". */
+/* Why the land keeps a fill even when the basemap does load: OpenFreeMap's dark
+ * style paints its background rgb(12,12,12) and its water rgb(27,27,29). That
+ * is a 15/255 difference — invisible — and its roads and place names only
+ * arrive around zoom 7. So at the national zoom this map lives at, the basemap
+ * is a black rectangle, and without a fill of our own the coastline of the
+ * United States does not exist. The fill is stronger when the tiles never
+ * arrive, but it is never nothing, and both versions fade out as the basemap
+ * starts carrying detail of its own. */
 function addStateLayers(states, { asGround }) {
   map.addSource("states", { type: "geojson", data: states });
   const under = firstSymbolLayer();
@@ -292,7 +300,7 @@ function addStateLayers(states, { asGround }) {
       "fill-color": "#232833",
       "fill-opacity": asGround
         ? ["interpolate", ["linear"], ["zoom"], 3, 1, 11, 0.5]
-        : 0,
+        : ["interpolate", ["linear"], ["zoom"], 3, 0.5, 7, 0.16, 10, 0],
     },
   }, under);
   map.addLayer({
@@ -302,12 +310,9 @@ function addStateLayers(states, { asGround }) {
     paint: {
       "line-color": asGround ? "#4b5364" : "#6d6a5f",
       "line-width": ["interpolate", ["linear"], ["zoom"], 3, 0.6, 7, 1],
-      // With a basemap the outline is a hint that gets out of the way by zoom 8,
-      // where the tiles carry the detail. Without one it is the only geography
-      // on the page, so it stays to the end.
       "line-opacity": asGround
         ? ["interpolate", ["linear"], ["zoom"], 3, 0.9, 11, 0.45]
-        : ["interpolate", ["linear"], ["zoom"], 3, 0.5, 8, 0],
+        : ["interpolate", ["linear"], ["zoom"], 3, 0.65, 9, 0],
     },
   }, under);
 }
