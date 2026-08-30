@@ -329,6 +329,16 @@
     font: 600 12.5px var(--mono); color: var(--accent);
     min-width: 38px; text-align: right; font-variant-numeric: tabular-nums;
   }
+  /* The zoom gate swaps the detail rows for the hint and back. Both live in
+     the same slot so the panel does not jump when the reader crosses it. */
+  #explore-panel #detail-hint,
+  #explore-panel.zoomed-out #detail-group { display: none; }
+  #explore-panel.zoomed-out #detail-hint { display: block; }
+  #explore-panel #metric-trend {
+    margin: 7px 0 0; font-size: 11px; line-height: 1.45; color: var(--dim);
+    font-family: var(--mono);
+  }
+  #explore-panel #metric-trend b { color: var(--muted); font-weight: 600; }
   #explore-panel .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   #explore-panel .chips button {
     padding: 4px 9px; font-size: 11.5px; cursor: pointer;
@@ -944,12 +954,24 @@
     <option value="water">Drinking water access</option>
     <option value="elecGain">Electrification gained since 2000</option>
   </select>
+  <p id="metric-trend" hidden></p>
   <div class="cap">Layers</div>
   <label><input type="checkbox" data-layer="cities"> Cities</label>
   <label><input type="checkbox" data-layer="corridors"> Corridors</label>
   <label><input type="checkbox" data-layer="lights"> Night lights</label>
   <label><input type="checkbox" data-layer="kinshasa" checked> Kinshasa growth</label>
   <label><input type="checkbox" data-layer="density"> Kinshasa density</label>
+  <label><input type="checkbox" data-layer="sea"> Corridor to the sea</label>
+  <!-- City-scale layers. Below the zoom where they resolve they are noise, so
+       the rows fold away into the hint line and the panel stays short. The
+       hint always occupies the same place, so nothing silently disappears. -->
+  <div id="detail-group">
+    <div class="cap">Kinshasa detail</div>
+    <label><input type="checkbox" data-layer="streets"> Street grid</label>
+    <label><input type="checkbox" data-layer="communes"> Commune boundaries</label>
+    <label><input type="checkbox" data-layer="slope"> Steep ground</label>
+  </div>
+  <p id="detail-hint" class="hint">Zoom in for the street, commune and slope layers.</p>
   <label class="cap" for="explore-year">Cities in year</label>
   <div class="slider-row">
     <input type="range" id="explore-year" min="0" max="8" step="1" value="8">
@@ -961,6 +983,7 @@
     <button type="button" data-go="gulf">Gulf of Guinea</button>
     <button type="button" data-go="nile">The Nile</button>
     <button type="button" data-go="kinshasa">Kinshasa</button>
+    <button type="button" data-go="coast">The coast</button>
   </div>
   <p class="hint">Click any country, city, or corridor for its numbers.</p>
   </div>

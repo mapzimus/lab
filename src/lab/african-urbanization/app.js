@@ -254,6 +254,14 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
   buildRegionChart(population.regions, population.africaBand);
   buildCrossoverTicker(population.crossovers);
   buildServicesChart(servicesTrend);
+  servicesTrendData = servicesTrend;
+
+  // Test seam, opt-in only. The explore harness has to prove a toggle moved a
+  // real layer rather than just flipping a checkbox, and MapLibre keeps no
+  // global registry. Never set for a reader: it needs ?maphandle in the URL.
+  const exposeMap = (m) => {
+    if (location.search.includes("maphandle")) window.__map = m;
+  };
 
   const map = new maplibregl.Map({
     container: "map",
@@ -269,6 +277,7 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
     interactive: false,
   });
   map.getContainer().querySelector("canvas").setAttribute("aria-hidden", "true");
+  exposeMap(map);
 
   map.on("style.load", () => {
     map.addSource("countries", { type: "geojson", data: countries, attribution:
@@ -375,6 +384,7 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
       buildExpansionChart(expansion);
       buildStreetChart(streetStats);
       buildCityStreetChart(cityStreets);
+      cityStreetsByName = indexCityStreets(cityStreets, cities);
       refreshStep();
     }).catch((err) => {
       console.error(err);
@@ -504,6 +514,27 @@ function setCommuneLabels(on) {
 
 /* --------------------------------------------- labels for the sea corridor */
 let matadiMarkers = [];
+// Street supply per resident for the nine measured cities, keyed by the UN's
+// own name. Read by the city popup; null until the deferred wave lands.
+let cityStreetsByName = null;
+// The 2000 to 2022 services series, for the readout under the metric select.
+// initSteps() owns the panel and is not inside boot()'s closure.
+let servicesTrendData = null;
+
+function indexCityStreets(data, cities) {
+  if (!data || !cities) return null;
+  const out = {};
+  for (const c of data.cities || []) {
+    // Substring, not prefix: the UN files two of the nine as
+    // "Al-Qahirah (Cairo)" and "Adis Abeba (Addis Ababa)". A prefix match
+    // returns nothing for both, which is exactly how they fell out of the
+    // pipeline's own summary before it was caught.
+    const hit = cities.features.find((f) =>
+      (f.properties.name || "").toLowerCase().includes(c.city.toLowerCase()));
+    if (hit) out[hit.properties.name] = c;
+  }
+  return out;
+}
 
 function initMatadiLabels(map, corridor) {
   for (const f of corridor.features || []) {
@@ -844,7 +875,13 @@ function initSteps(map) {
   const yearOut = document.getElementById("explore-year-out");
   const metricSel = document.getElementById("explore-metric");
   const nav = new maplibregl.NavigationControl({ showCompass: false });
-  const popup = new maplibregl.Popup({ maxWidth: "260px" });
+  // closeOnClick defaults to true, which made the inspector work on alternate
+  // clicks only: the popup registers its own map-click listener when added,
+  // that listener runs after the handler below, so clicking a second feature
+  // re-added the popup and then immediately closed it. The handler already
+  // removes the popup when a click hits nothing, so the default is both
+  // redundant and the reason half of every inspection silently did nothing.
+  const popup = new maplibregl.Popup({ maxWidth: "260px", closeOnClick: false });
 
   const currentEpoch = () => CITY_EPOCHS[+yearSlider.value];
   const exploreToggles = {
@@ -857,6 +894,10 @@ function initSteps(map) {
     lights: (on) => lightsOn(on ? 1 : 0),
     kinshasa: (on) => kinshasa(on ? 0.95 : 0, on ? 0.5 : 0, on ? 2030 : null),
     density: (on) => densityOn(on ? 1 : 0),
+    sea: (on) => matadiOn(on ? 1 : 0),
+    streets: (on) => streetsOn(on ? 1 : 0),
+    communes: (on) => communesOn(on ? 1 : 0),
+    slope: (on) => slopeOn(on ? 1 : 0),
   };
   const METRIC_RAMPS = {
     pop2025: POP_RAMP, pop2050: POP_RAMP, pop2100: POP_RAMP,
@@ -873,14 +914,44 @@ function initSteps(map) {
     water: rampLegend("Basic drinking water, share of people", ACCESS_RAMP, fmtPct, false),
     elecGain: rampLegend("Electrification gained since 2000", GAIN_RAMP, fmtPts),
   };
+  // The choropleth says where the shortfall is; it cannot say which way the
+  // number is moving. This is the one thing the series can add to a metric.
+  const trendEl = document.getElementById("metric-trend");
+  const TREND_FOR = { elec: "elec", elecGain: "elec", water: "water" };
+  const showTrend = (metric) => {
+    if (!trendEl) return;
+    const key = TREND_FOR[metric];
+    const rows = key && servicesTrendData && servicesTrendData.series
+      ? servicesTrendData.series[key] : null;
+    if (!rows || rows.length < 2) { trendEl.hidden = true; return; }
+    const a = rows[0], b = rows[rows.length - 1];
+    const what = key === "water" ? "with water" : "with power";
+    trendEl.innerHTML = `Africa ${a.year} to ${b.year}<br>`
+      + `<b>${a.accessPct}% to ${b.accessPct}%</b> ${what}, `
+      + `<b>${a.withoutM}M to ${b.withoutM}M</b> without`;
+    trendEl.hidden = false;
+  };
+
   const applyMetric = () => {
     const m = metricSel.value;
     setCountryLabels(m === "off" ? "dim" : true);
     renderLegend(m === "off" ? null : METRIC_LEGENDS[m]);
+    showTrend(m);
     if (m === "off") { countriesOpacity(0, 0); return; }
     setChoropleth(m, METRIC_RAMPS[m]);
     countriesOpacity(0.88, 0.3);
   };
+
+  // City-scale layers are noise on a continental frame, so their rows fold
+  // away below the zoom where they resolve. State is deliberately untouched:
+  // a layer left on stays on, and its checkbox comes back still checked.
+  const DETAIL_ZOOM = 9;
+  const syncDetailGate = () => {
+    panel?.classList.toggle("zoomed-out", map.getZoom() < DETAIL_ZOOM);
+  };
+  map.on("zoomend", syncDetailGate);
+  map.on("moveend", syncDetailGate);
+  syncDetailGate();
   const applyPanel = () => {
     applyMetric();
     panel.querySelectorAll("input[data-layer]").forEach((box) => {
@@ -893,6 +964,7 @@ function initSteps(map) {
     gulf: [[[-9.5, 3.5], [7.0, 9.5]], 7],
     nile: [[[26.0, 13.0], [36.5, 32.0]], 7],
     kinshasa: [KINSHASA_BOUNDS, 12],
+    coast: [MATADI_BOUNDS, 8],
   };
 
   const M = (v) => (v >= 10 ? Math.round(v) + "M" : v.toFixed(1) + "M");
@@ -906,7 +978,21 @@ function initSteps(map) {
         .filter(([, v]) => v != null)
         .map(([y, v]) => row(y, M(v))).join("");
       const proj = p.p2100 ? row("2100 (projection)", M(p.p2100), true) : "";
-      return `<div class="pop-h">${p.name}</div><div class="pop-sub">people in the urban area</div>${rows}${proj}`;
+      // Nine cities carry the street measurement; the rest simply do not get
+      // these rows rather than getting an empty one.
+      const st = cityStreetsByName && cityStreetsByName[p.name];
+      let streets = "";
+      if (st) {
+        const then = (st.years["1975"] || {}).metresPerPerson;
+        const now = (st.years["2020"] || {}).metresPerPerson;
+        if (now != null) {
+          streets = `<div class="pop-sub">street per resident</div>`
+            + (then != null ? row("1975", then.toFixed(2) + " m") : "")
+            + row("today", now.toFixed(2) + " m")
+            + (st.fallX ? row("fall", "\u00d7" + st.fallX) : "");
+        }
+      }
+      return `<div class="pop-h">${p.name}</div><div class="pop-sub">people in the urban area</div>${rows}${proj}${streets}`;
     }
     if (f.layer.id === "countries-fill") {
       if (p.pop2025 == null) return `<div class="pop-h">${p.name}</div><div class="pop-sub">no UN series joined</div>`;

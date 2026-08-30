@@ -100,6 +100,23 @@ their cached copies. That constant is the only manual step: `app.js` and the
 vendored library are fingerprinted automatically at build time, since the data
 files are fetched from JavaScript and so cannot be stamped from the HTML.
 
+## Explore mode
+
+The story ends in a free-explore mode over the same map. Everything the
+chapters draw is reachable there: nine layer toggles (cities, corridors, night
+lights, Kinshasa growth and density, the corridor to the sea, and the street,
+commune and slope layers), country shading by any of eight measures, a year
+slider, and jump chips including the coast.
+
+Two details worth knowing if you touch it:
+
+- The three city-scale layers fold away below zoom 9, where they are noise, and
+  are replaced by a hint line so the panel never silently changes shape.
+- The popup is constructed with `closeOnClick: false`. It defaults to true,
+  which registers a close listener *after* the handler that opens the popup, so
+  clicking a second feature re-added and then immediately closed it. The
+  inspector worked on alternate clicks only until this was set.
+
 ## Honesty notes
 
 - All country/regional figures are the UN's **medium variant** — a central
