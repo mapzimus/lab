@@ -39,7 +39,10 @@ APIS = [
     "https://overpass.kumi.systems/api/interpreter",
 ]
 BUFFER_DEG = 0.22     # ~24 km either side: the query window around a link
-NEAR_DEG = 0.25       # ~27 km: how close a road must be to count as serving
+# The threshold has to be the window, not wider than it. At 0.25 a road sitting
+# 0.24 degrees off the route counted as serving but was never fetched, so the
+# measurement quietly undercounted in a band it could not see.
+NEAR_DEG = BUFFER_DEG
 SAMPLES = 40          # points along each link
 WELL_SERVED = 80      # percent, the threshold the copy quotes
 CACHE = RAW_DIR / "corridor-osm"
