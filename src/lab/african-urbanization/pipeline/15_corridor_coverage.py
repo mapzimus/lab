@@ -22,6 +22,7 @@ Outputs:
 - data/corridor-coverage.json   — the summary the page and method page quote
 """
 
+import hashlib
 import json
 import time
 
@@ -38,7 +39,10 @@ APIS = [
     "https://overpass.kumi.systems/api/interpreter",
 ]
 BUFFER_DEG = 0.22     # ~24 km either side: the query window around a link
-NEAR_DEG = 0.25       # ~27 km: how close a road must be to count as serving
+# The threshold has to be the window, not wider than it. At 0.25 a road sitting
+# 0.24 degrees off the route counted as serving but was never fetched, so the
+# measurement quietly undercounted in a band it could not see.
+NEAR_DEG = BUFFER_DEG
 SAMPLES = 40          # points along each link
 WELL_SERVED = 80      # percent, the threshold the copy quotes
 CACHE = RAW_DIR / "corridor-osm"
@@ -78,11 +82,15 @@ def main():
 
     rows = []
     for i, (props, geom) in enumerate(links, 1):
-        key = f"{props['a']}__{props['b']}".replace("/", "-").replace(" ", "_")
         poly = geom.buffer(BUFFER_DEG).simplify(0.05)
         ring = " ".join(f"{lat:.3f} {lon:.3f}" for lon, lat in poly.exterior.coords)
         query = (f'[out:json][timeout:180];'
                  f'way["highway"~"^(motorway|trunk|primary)$"](poly:"{ring}");out geom;')
+        # The cache key carries the query, not just the city pair. 18_land_routes
+        # moves a corridor's geometry, and a pair-keyed cache would then answer
+        # with the roads around the line the corridor used to follow.
+        pair = f"{props['a']}__{props['b']}".replace("/", "-").replace(" ", "_")
+        key = f"{pair}__{hashlib.sha256(query.encode()).hexdigest()[:10]}"
         raw = overpass(query, key)
         feats = osm2geojson.json2geojson(raw)["features"]
         lines = [shape(f["geometry"]) for f in feats
