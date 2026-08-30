@@ -263,6 +263,13 @@
     #map-legend .lg-row { font-size: 10px; gap: 6px; padding: 0.5px 0; line-height: 1.35; }
     #map-legend .lg-row i.box { width: 9px; height: 9px; }
   }
+  /* A short landscape window puts the bottom of a tall card exactly where a
+     bottom-left key sits, and the classed keys are list-height now. The key
+     steps clear of the card rather than the card being shortened. It stops
+     short of the right edge, which belongs to #epoch-hud. */
+  @media (min-width: 641px) and (max-height: 820px) {
+    #map-legend { left: 480px; }
+  }
   /* Exploring: the panel carries its own context; only the metric key shows. */
   body.exploring #map-legend { bottom: auto; top: 16px; }
   @media (max-width: 640px) { body.exploring #map-legend { display: none; } }
@@ -583,10 +590,21 @@
       <h3>2025: the arrival</h3>
       <p><b>Eighty-eight</b> African urban areas now clear a million people.
       Cairo is at 25 million, Lagos 13, Kinshasa 11, every one of them larger
-      than Paris or London. Follow the coast east from Abidjan and the circles
-      begin to touch: twelve cities of a million or more inside 830 km of
-      shoreline, on their way to 56 million people between them. That strip is
-      one continuous problem, not twelve separate ones.</p>
+      than Paris or London.</p>
+    </div>
+  </div>
+
+  <div class="step" data-step="c2-gulf">
+    <div class="card">
+      <h3>Where the circles start to touch</h3>
+      <p>Follow the coast east from Abidjan and the gaps close. <b>Seven
+      cities</b> of a million or more sit inside <b>811 km</b>, from Abidjan
+      through Kumasi, Accra, Lomé and Cotonou to Lagos. They hold <b>35
+      million</b> people today and reach <b>47 million</b> by 2050.</p>
+      <p>They also sit in five countries, and four of the seven are national
+      capitals. The strip is becoming one continuous urban region and nothing
+      about the way it is run matches that: each city plans its water, its
+      power and its roads alone.</p>
     </div>
   </div>
 

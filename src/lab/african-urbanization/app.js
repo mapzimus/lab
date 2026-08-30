@@ -44,6 +44,16 @@ const GAIN_CLASSES = { breaks: [0, 10, 25, 40],
 
 const AFRICA_BOUNDS = [[-19.5, -36.5], [53.5, 38.5]];
 const WEST_AFRICA_BOUNDS = [[-18, 3], [16, 15]];
+// Abidjan to Lagos: the stretch of coast the chapter claims is becoming one
+// continuous city. It gets its own frame because the claim is about a place
+// you cannot see at continental zoom.
+// Abidjan to Lagos with a little sea and hinterland around it. Kept tight to
+// the corridor: a wider box fits by width on a phone and the strip shrinks to
+// a thread across the middle of the screen.
+const GULF_BOUNDS = [[-6.0, 3.7], [5.3, 8.4]];
+// Lagos, Kinshasa and Dar es Salaam, with enough room around them that the
+// 2100 rings are not clipped by the edge of the frame.
+const GIANTS_BOUNDS = [[-3.5, -15.0], [45.0, 11.0]];
 const KINSHASA_BOUNDS = [[14.97, -4.72], [15.78, -3.98]];
 const POOL_BOUNDS = [[15.12, -4.48], [15.55, -4.05]];
 // Kinshasa out to the Atlantic, so the last step can show the whole thread.
@@ -63,7 +73,11 @@ function classed(prop, spec) {
   return e;
 }
 
-function cityRadius(prop, k) {
+// Circle radius in px = CITY_R * sqrt(millions). setLabels() offsets each
+// label by the same figure, so both have to read it from here.
+const CITY_R = 3.2;
+
+function cityRadius(prop, k = CITY_R) {
   return ["*", k, ["sqrt", ["coalesce", ["get", prop], 0]]];
 }
 
@@ -369,7 +383,7 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
       id: "cities-2100", type: "circle", source: "cities",
       filter: ["has", "p2100"],
       paint: {
-        "circle-radius": cityRadius("p2100", 3.2),
+        "circle-radius": cityRadius("p2100"),
         "circle-color": "rgba(0,0,0,0)",
         "circle-stroke-color": "#ffd166",
         "circle-stroke-width": 1.4,
@@ -380,7 +394,7 @@ function boot([countries, population, cities, corExisting, corPlanned, corModel,
     map.addLayer({
       id: "cities", type: "circle", source: "cities",
       paint: {
-        "circle-radius": cityRadius("p1975", 3.2),
+        "circle-radius": cityRadius("p1975"),
         "circle-radius-transition": { duration: 900 },
         "circle-color": "#f4a93a",
         "circle-opacity": 0,
@@ -584,8 +598,15 @@ function setMatadiLabels(on) {
 
 /* -------------------------------------------------------- HTML city labels */
 
+// Named at continental zoom, where seven labels is already the ceiling before
+// they start colliding.
 const LABEL_CITIES = ["Lagos", "Kinshasa", "Al-Qahirah (Cairo)", "Dar es Salaam",
                       "Luanda", "Nairobi", "Abidjan"];
+// The Gulf step is the one frame close enough to name the whole strip, and the
+// copy walks the reader through it city by city, so all seven get a label there.
+const GULF_CITIES = ["Abidjan", "Sekondi-Takoradi", "Kumasi", "Accra",
+                     "Lomé", "Cotonou", "Lagos"];
+const MARKER_CITIES = [...new Set([...LABEL_CITIES, ...GULF_CITIES])];
 let markers = [];
 
 function initMarkers(map, cities) {
@@ -597,13 +618,13 @@ function initMarkers(map, cities) {
     .city-label .inner { display: block; font-family: "IBM Plex Mono", monospace;
       font-size: 10.5px; font-weight: 600; color: #e7e9ec; white-space: nowrap;
       text-shadow: 0 1px 4px #000, 0 0 10px rgba(0,0,0,0.9);
-      transform: translateY(-11px); opacity: 0; transition: opacity 0.5s ease; }
+      opacity: 0; transition: opacity 0.5s ease; }
     .city-label.on .inner { opacity: 1; }
     .city-label small { display: block; font-weight: 400; color: #99a0ab; font-size: 9px; }`;
   document.head.appendChild(style);
   for (const f of cities.features) {
     const name = f.properties.name;
-    if (!LABEL_CITIES.includes(name)) continue;
+    if (!MARKER_CITIES.includes(name)) continue;
     const el = document.createElement("div");
     el.className = "city-label";
     el.dataset.name = name;
@@ -611,16 +632,26 @@ function initMarkers(map, cities) {
     el.innerHTML = `<span class="inner">${display}<small></small></span>`;
     const m = new maplibregl.Marker({ element: el, anchor: "bottom" })
       .setLngLat(f.geometry.coordinates).addTo(map);
-    markers.push({ el, props: f.properties });
+    markers.push({ el, marker: m, props: f.properties });
   }
 }
 
-function setLabels(epoch) {
-  for (const { el, props } of markers) {
+// `only` narrows the visible set for a step that has zoomed somewhere specific.
+// Left off, the continental seven show and the corridor extras stay hidden.
+function setLabels(epoch, only, clearProp) {
+  const allowed = only || LABEL_CITIES;
+  for (const { el, marker, props } of markers) {
     const pop = props["p" + epoch];
-    if (epoch && pop) {
+    if (epoch && pop && allowed.includes(props.name)) {
       el.classList.add("on");
       el.querySelector("small").textContent = pop >= 10 ? Math.round(pop) + "M" : pop.toFixed(1) + "M";
+      // Clear this city's own circle rather than a fixed nudge: Cairo's symbol
+      // is 18px across at mid-century and Dar es Salaam's is 5px in 1975, so a
+      // single offset either buries the small ones or strands the big ones.
+      // `clearProp` is for the 2100 step, where the widest thing under the label
+      // is the hollow projection ring rather than the filled 2050 circle.
+      const clear = props[clearProp] || pop;
+      marker.setOffset([0, -(CITY_R * Math.sqrt(clear) + 5)]);
     } else {
       el.classList.remove("on");
     }
@@ -674,7 +705,7 @@ function initSteps(map) {
       ["case", ["==", ["coalesce", ["get", "africa"], 0], 1], afr, other]);
 
   const setCityEpoch = (epoch, opacity) => {
-    if (epoch) map.setPaintProperty("cities", "circle-radius", cityRadius("p" + epoch, 3.2));
+    if (epoch) map.setPaintProperty("cities", "circle-radius", cityRadius("p" + epoch));
     map.setPaintProperty("cities", "circle-opacity", opacity);
     map.setPaintProperty("cities", "circle-stroke-opacity", opacity ? 0.6 : 0);
   };
@@ -783,8 +814,31 @@ function initSteps(map) {
     "ch2": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(1975, 0.85); setLabels(1975); },
     "c2-1975": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(1975, 0.85); setLabels(1975); },
     "c2-2025": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(2025, 0.85); setLabels(2025); },
+    // Holding continental zoom through a paragraph about 811 km of coastline
+    // asks the reader to take the closing gaps on trust. Country fills come up
+    // here because the point is that the strip crosses five of them.
+    "c2-gulf": () => {
+      fly(GULF_BOUNDS, 7); base.c2();
+      countriesOpacity(0.34, 0.14);
+      // Country names would sit right on top of the city names at this zoom,
+      // and the copy names the five countries anyway.
+      setCountryLabels(false);
+      // Sekondi-Takoradi is the one city the copy never names and the one whose
+      // label is long enough to run into Accra's on a phone, so it goes there.
+      setCityEpoch(2025, 0.9);
+      setLabels(2025, innerWidth <= 640
+        ? GULF_CITIES.filter(n => n !== "Sekondi-Takoradi") : GULF_CITIES);
+    },
+    // Back out to the continent: the mid-century count is a continental claim
+    // and the reader has just been up close.
     "c2-2050": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(2050, 0.85); setLabels(2050); },
-    "c2-2100": () => { fly(AFRICA_BOUNDS, 5); base.c2(); setCityEpoch(2050, 0.85); setLabels(2050); hollow2100(0.9); },
+    // In again, to the equatorial belt that holds all three cities the copy
+    // names. At continental zoom the hollow rings for Lagos, Kinshasa and Dar
+    // es Salaam are three specks a third of the frame apart.
+    "c2-2100": () => {
+      fly(GIANTS_BOUNDS, 5); base.c2();
+      setCityEpoch(2050, 0.85); setLabels(2050, null, "p2100"); hollow2100(0.9);
+    },
     "ch3": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.9, 0.55, 0, 0, 0); setCityEpoch(2050, 0.3); },
     "c3-existing": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.9, 0.55, 0, 0, 0); setCityEpoch(2050, 0.3); },
     "c3-planned": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.55, 0.3, 0.75, 0.95, 0); setCityEpoch(2050, 0.3); },
@@ -999,7 +1053,7 @@ function initSteps(map) {
 
   const GOTO = {
     continent: [AFRICA_BOUNDS, 5],
-    gulf: [[[-9.5, 3.5], [7.0, 9.5]], 7],
+    gulf: [GULF_BOUNDS, 7],
     nile: [[[26.0, 13.0], [36.5, 32.0]], 7],
     kinshasa: [KINSHASA_BOUNDS, 12],
     coast: [MATADI_BOUNDS, 8],
@@ -1190,6 +1244,7 @@ const LEGENDS = {
   "ch2": { title: "Cities in 1975", rows: CITY_ROWS },
   "c2-1975": { title: "Cities in 1975", rows: CITY_ROWS },
   "c2-2025": { title: "Cities in 2025", rows: CITY_ROWS },
+  "c2-gulf": { title: "The Gulf of Guinea, 2025", rows: CITY_ROWS },
   "c2-2050": { title: "Cities in 2050", rows: CITY_ROWS },
   "c2-2100": { title: "Cities in 2050 + 2100 outlook", rows: [
     ...CITY_ROWS, ROW("#ffd166", "2100 projection (hollow ring)", "ring")] },
