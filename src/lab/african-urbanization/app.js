@@ -61,6 +61,9 @@ const CONGO_RAIL_BOUNDS = [[10.5, -19.0], [41.0, 2.0]];
 // Lagos round to Luanda. The model's least-served link, and the one that used
 // to be drawn straight across the Gulf of Guinea.
 const GULF_COAST_BOUNDS = [[1.0, -11.5], [18.0, 8.5]];
+// Luanda and Kinshasa, 549 km apart and under half served, with Brazzaville
+// and the Angolan coast around them.
+const LUANDA_KIN_BOUNDS = [[10.5, -12.5], [21.0, -1.5]];
 const KINSHASA_BOUNDS = [[14.97, -4.72], [15.78, -3.98]];
 const POOL_BOUNDS = [[15.12, -4.48], [15.55, -4.05]];
 // Kinshasa out to the Atlantic, so the last step can show the whole thread.
@@ -886,6 +889,12 @@ function initSteps(map) {
       fly(GULF_COAST_BOUNDS, 6); base.c3();
       corridors(0.2, 0.12, 0.2, 0.25, 0.95); setCityEpoch(2050, 0.5);
     },
+    // The worst-served links are interior ones now, and the card names the
+    // closest and sharpest of them.
+    "c3-interior": () => {
+      fly(LUANDA_KIN_BOUNDS, 6); base.c3();
+      corridors(0.25, 0.15, 0.2, 0.25, 0.95); setCityEpoch(2050, 0.55);
+    },
     "c3-lights": () => {
       fly(AFRICA_BOUNDS, 5); base.c3();
       lightsOn(1); corridors(0, 0, 0, 0.4, 0.55); setCityEpoch(2050, 0);
@@ -1306,6 +1315,9 @@ const LEGENDS = {
     ROW("#f4a93a", "modeled corridor, thicker pulls harder"),
     ROW("#8b93a0", "existing rail (dim)")] },
   "c3-gap": { title: "Lagos to Luanda, by land", rows: [
+    ROW("#f4a93a", "modeled corridor, thicker pulls harder"),
+    ROW("#8b93a0", "existing rail (dim)")] },
+  "c3-interior": { title: "Luanda to Kinshasa, 48% served", rows: [
     ROW("#f4a93a", "modeled corridor, thicker pulls harder"),
     ROW("#8b93a0", "existing rail (dim)")] },
   "c3-services": rampLegend("Electricity at home, share of people", ACCESS_CLASSES, rngPct),

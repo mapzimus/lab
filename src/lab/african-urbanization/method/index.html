@@ -422,34 +422,71 @@
   6% to 51% in the same window, which is the evidence that the number is a
   choice and not a fate.</p>
 
+  <h3>Drawing the corridors on land</h3>
+  <p>A gravity model pairs cities. It has no opinion about what lies between
+  them, so drawn as straight great circles, twelve of the thirty-six links ran
+  across open water: Luanda to Lagos was <b>98.5 per cent</b> Atlantic. Five of
+  the curated Trans-African Highway lines did the same thing along the West
+  African coast.</p>
+  <p>That was not only an ugly map. The coverage test below samples points along
+  each link and asks whether a road passes nearby, so along an ocean line it was
+  measuring the sea.</p>
+  <p><code>18_land_routes.py</code> reroutes any line crossing water along a
+  land-constrained shortest path: a 0.2 degree grid over Africa, cells kept
+  where the Natural Earth land polygons reach, eight-way search with
+  great-circle edge costs, simplified afterwards at 0.08 degrees so the grid
+  staircase smooths without cutting corners across bays. The worst remaining
+  overlap with water is <b>3.1 per cent</b>, which is a coastal route hugging
+  the shore at 22 kilometre resolution.</p>
+  <p>The scores are still calculated on straight-line distance, which is the
+  textbook formulation and the thing the model is actually claiming. What the
+  routing adds is the length of the trip: Lagos to Luanda is 2,046 km apart and
+  <b>2,421 km</b> by road around the Gulf, a fifth further and across five
+  borders. Every link carries that ratio, and the corridor popups show it.</p>
+  <p class="fine">The routes are schematic. They know nothing of terrain,
+  borders, gradient or existing pavement, and they are not engineering
+  alignments. They promise only that a reader tracing one with a finger stays on
+  the continent.</p>
+
   <h3>The gravity model against the road network</h3>
   <p>Chapter three runs population times population over distance squared
   across the thirty largest African cities of 2050. That is a textbook toy,
   and calling it a sketch is honest but is not a defence. So it was tested.
   <code>15_corridor_coverage.py</code> samples 40 points along each of the 36
   modelled links and asks whether a mapped motorway, trunk or primary road
-  passes within about 28 kilometres.</p>
+  passes within about 24 kilometres. It runs after the routing above, so it
+  measures the road beside the line that is actually drawn.</p>
 
   <ul>
-    <li><b>20 of 36</b> modelled links already have a primary road along at
+    <li><b>24 of 36</b> modelled links already have a primary road along at
     least four fifths of the route.</li>
-    <li>The <b>median link is 82 per cent</b> covered.</li>
-    <li>The model's highest-demand link by a wide margin, Cairo to Alexandria
-    at a score of 9,435, is <b>100 per cent</b> served. Yaoundé to Douala,
-    Accra to Kumasi and Lagos to Accra also come back fully served.</li>
+    <li>The <b>median link is 90 per cent</b> covered.</li>
+    <li>The model's highest-demand link, Cairo to Alexandria at a score of
+    9,435, six times the next, is <b>90 per cent</b> served. Yaoundé to Douala,
+    Accra to Kumasi, Lagos to Onitsha, Lagos to Owerri and Accra to Owerri all
+    come back fully served.</li>
   </ul>
 
   <p>A model whose strongest output is a corridor that has already been built
   is not drawing noise, and that is what licenses reading the rest of it. Which
-  makes the low scores the finding rather than the failure: Luanda to Lagos at
-  8 per cent, Accra to Owerri at 35, Onitsha to Accra at 38, Dar es Salaam to
-  Kampala at 45, Cairo to Khartoum at 50. That is the gap between where the
-  traffic wants to go and where it currently can.</p>
+  makes the low scores the finding rather than the failure: <b>Dar es Salaam to
+  Kampala at 42 per cent</b>, Luanda to Kinshasa at 48, Cairo to Khartoum at
+  48, Addis Ababa to Khartoum and Kinshasa to Yaoundé at 52, Dar es Salaam to
+  Nairobi at 62. They are interior and cross-border links, not coastal ones.</p>
+
+  <p>These figures replace an earlier set that was wrong. Measured along the
+  old straight-line geometry, Luanda to Lagos came back <b>8 per cent</b>
+  served, which the story quoted as its sharpest example of unmet demand. It
+  was an artefact of sampling the Atlantic. Along the coastal road the same
+  link is <b>88 per cent</b> served, and the honest thing about it is the
+  detour, not the absence. The threshold moved too: the query fetched roads
+  within 0.22 degrees while the test counted them at 0.25, so roads in that
+  band satisfied the test but were never retrieved. Both numbers are 0.22 now.</p>
 
   <p class="fine">The test measures whether a route exists, not whether it is
-  paved, open, safe or big enough, and a corridor crossing water scores badly
-  for a reason the model has no opinion about. Every Overpass response is
-  cached under the pipeline's raw directory, so the check reruns for free.</p>
+  paved, open, safe or big enough. Every Overpass response is cached under the
+  pipeline's raw directory, keyed on the query itself so that moving a corridor
+  cannot be answered with the roads around the line it used to follow.</p>
 
   <h3>One city, or a pattern?</h3>
   <p>The sharpest number in the story is Kinshasa's street supply falling from
