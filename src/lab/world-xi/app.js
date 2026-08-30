@@ -91,12 +91,13 @@ const store = (() => {
 // for the map to empty out while you were still spelling a word.
 const state = {
   activeLeagues: new Set(), collapsed: new Set(), selectedId: null,
-  gender: "all", country: "", query: "",
+  gender: "all", country: "", query: "", tiers: "top",
 };
 
 let leagues = [];
 let groups = [];
 let countries = [];
+let places = [];
 let allFeatures = [];
 const byId = new Map();
 const byCoord = new Map();
@@ -136,6 +137,7 @@ const setReadout = (text) => { if (readout) readout.textContent = text; };
 const legendPanel = document.getElementById("legend");
 const legendEl = document.getElementById("legend-list");
 const countrySelect = document.getElementById("country-filter");
+const tierToggle = document.getElementById("tier-filter");
 const listFilter = document.getElementById("league-filter");
 const facetSummary = document.getElementById("facet-summary");
 const statsEl = document.getElementById("stats");
@@ -418,6 +420,7 @@ async function drainCrests() {
 // predicate over leagues rather than over 4,182 features — which is why the
 // club counts below can come straight from the metadata and still be exact.
 function matchesFacets(lg) {
+  if (state.tiers !== "all" && !lg.topFlight) return false;
   if (state.gender !== "all" && lg.gender !== state.gender) return false;
   if (state.country && lg.country !== state.country) return false;
   return true;
@@ -491,7 +494,9 @@ function normalizeGroups(meta) {
 }
 
 function defaultOn() {
-  const top = leagues.filter((l) => l.group === "top").map((l) => l.key);
+  // The opening view is every nation's top flight; the lower tiers, college
+  // and amateur leagues wait behind the tiers toggle.
+  const top = leagues.filter((l) => l.topFlight).map((l) => l.key);
   return top.length ? top : FALLBACK_TOP;
 }
 
@@ -501,7 +506,7 @@ function persist() {
   persistTimer = setTimeout(() => {
     store.write({
       v: 4, on: [...state.activeLeagues], collapsed: [...state.collapsed],
-      gender: state.gender, country: state.country,
+      gender: state.gender, country: state.country, tiers: state.tiers,
     });
   }, 250);
 }
@@ -522,6 +527,13 @@ function restoreState() {
     // a country that no longer exists in the data would hide every league with
     // no way to tell why, so drop it rather than restore an unexplainable empty
     state.country = countries.some((c) => c.name === saved.country) ? saved.country : "";
+    // Payloads saved before the tiers toggle existed carry no `tiers`. A
+    // returning visitor with, say, NCAA switched on must not find it silently
+    // hidden — so an old payload keeps everything eligible, and only a payload
+    // that actually chose "top" gets the narrowed default.
+    state.tiers = saved.tiers === "top" || saved.tiers === "all"
+      ? saved.tiers
+      : ([...state.activeLeagues].some((k) => leagues.some((l) => l.key === k && !l.topFlight)) ? "all" : "top");
   } else {
     state.activeLeagues = new Set(defaultOn());
     // Open the top section and the US pyramid: the pyramid is the reason most
@@ -625,6 +637,7 @@ function updateFacetControls() {
     btn.setAttribute("aria-pressed", String(btn.dataset.gender === state.gender));
   }
   if (countrySelect) countrySelect.value = state.country;
+  if (tierToggle) tierToggle.checked = state.tiers === "all";
   if (listFilter && listFilter.value !== state.query) listFilter.value = state.query;
   if (facetSummary) {
     const rows = leagues.filter(listable);
@@ -648,14 +661,31 @@ function setFacet(patch) {
 }
 
 function clearFacets() {
-  setFacet({ gender: "all", country: "", query: "" });
+  // "Clear the filters" means every filter, the tiers toggle included —
+  // search and stat rows rely on this to reveal a lower-tier club.
+  setFacet({ gender: "all", country: "", query: "", tiers: "all" });
 }
 
 function wireFacets() {
   for (const btn of document.querySelectorAll("[data-gender]")) {
     btn.addEventListener("click", () => setFacet({ gender: btn.dataset.gender }));
   }
-  countrySelect?.addEventListener("change", () => setFacet({ country: countrySelect.value }));
+  tierToggle?.addEventListener("change", () =>
+    setFacet({ tiers: tierToggle.checked ? "all" : "top" }));
+  countrySelect?.addEventListener("change", () => {
+    const name = countrySelect.value;
+    setFacet({ country: name });
+    if (!name) return;
+    // Picking a country is a statement of intent: frame its clubs, and if
+    // none of its leagues are switched on, switch its top flight on so the
+    // camera does not land on an empty patch of globe.
+    const lgs = leagues.filter((l) => l.country === name);
+    if (!lgs.some((l) => state.activeLeagues.has(l.key))) {
+      for (const l of lgs.filter((x) => x.topFlight)) setLeague(l.key, true);
+    }
+    const place = places.find((pl) => pl.kind === "country" && pl.name === name);
+    if (place) flyToPlace(place, { announce: false });
+  });
   listFilter?.addEventListener("input", () => setFacet({ query: fold(listFilter.value).trim() }));
   listFilter?.addEventListener("keydown", (ev) => {
     if (ev.key === "Escape" && listFilter.value) { ev.stopPropagation(); setFacet({ query: "" }); }
@@ -671,10 +701,10 @@ function buildLegend() {
   reset.type = "button";
   reset.id = "legend-reset";
   reset.className = "legend-reset";
-  reset.textContent = "Show the big five";
+  reset.textContent = "Show every top flight";
   reset.hidden = true;
   reset.addEventListener("click", () => {
-    clearFacets();
+    setFacet({ gender: "all", country: "", query: "", tiers: "top" });
     for (const k of defaultOn()) setLeague(k, true);
     setCollapsed("top", false);
   });
@@ -749,7 +779,11 @@ function buildLegend() {
 // Anything that is not "venue" is a stand-in for a ground we could not find:
 // "city" is the club's town, "campus" is a college's campus centroid. Neither
 // is a place two clubs genuinely share, and both have to say so in the popup.
-const APPROXIMATE = { city: "the club's town", campus: "the campus" };
+const APPROXIMATE = {
+  city: "the club's town",
+  campus: "the campus",
+  club: "the club's own map point, not a named ground",
+};
 const isApproximate = (p) => p.precision in APPROXIMATE;
 
 function buildIndexes(features) {
@@ -952,6 +986,55 @@ function setSelected(id) {
   }
 }
 
+/* ------------------------------------------------------------------ places */
+
+// One chip per continent. The container is static markup (see index.html);
+// only its contents are built here, and only when the data carries places.
+function buildFocusChips() {
+  const row = document.getElementById("focus-chips");
+  if (!row) return;
+  const continents = places.filter((pl) => pl.kind === "continent").sort((a, b) => b.count - a.count);
+  if (!continents.length) return;
+  row.hidden = false;
+  for (const pl of continents) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "focus-chip";
+    btn.textContent = pl.name;
+    btn.addEventListener("click", () => flyToPlace(pl));
+    row.appendChild(btn);
+  }
+}
+
+
+// A place is a camera move, nothing more: it never switches a league on or
+// off, so what you see inside the frame is whatever your filters already
+// allow. The one exception is the country picker, which speaks for itself.
+function flyToPlace(place, { announce = true } = {}) {
+  if (!map) return;
+  const [w, so, e, n] = place.bbox;
+  map.fitBounds([[w, so], [e, n]], {
+    padding: 40, essential: true, duration: REDUCED_MOTION ? 0 : 2000,
+  });
+  if (announce) setReadout(`${place.name} · ${fmtNum(place.count)} clubs in the data here`);
+}
+
+const PLACE_KIND = { continent: "Continent", country: "Country", state: "US state", metro: "Metro area" };
+
+function searchPlaces(query, limit = 3) {
+  const q = fold(query).trim();
+  if (!q) return [];
+  const tokens = q.split(/\s+/);
+  const hits = [];
+  for (const pl of places) {
+    const hay = fold(`${pl.name} ${PLACE_KIND[pl.kind] ?? pl.kind}`);
+    if (!tokens.every((t) => hay.includes(t))) continue;
+    hits.push({ pl, score: fold(pl.name).startsWith(q) ? 0 : 1 });
+  }
+  hits.sort((a, b) => a.score - b.score || b.pl.count - a.pl.count);
+  return hits.slice(0, limit).map((h) => h.pl);
+}
+
 /* ----------------------------------------------------------------- search */
 
 function searchClubs(query, limit = 8) {
@@ -984,16 +1067,23 @@ function closeSuggestions() {
 }
 
 function renderSuggestions() {
-  const results = searchClubs(searchInput.value);
+  const placeHits = searchPlaces(searchInput.value);
+  const results = searchClubs(searchInput.value, 8 - placeHits.length);
   if (searchClear) searchClear.hidden = !searchInput.value;
   if (!searchInput.value.trim()) return closeSuggestions();
 
-  searchResults.innerHTML = results.length
-    ? results.map((e, i) =>
-        `<li role="option" id="sr-${i}" aria-selected="false" class="search-row" data-club="${esc(e.id)}">` +
-        `<span class="swatch" style="background:${esc(leagueColor(e.leagueKey))}"></span>` +
-        `<span class="sr-text"><b>${esc(e.name)}</b><small>${esc(e.venue ?? "")} · ${esc(e.league)}</small></span></li>`).join("")
-    : `<li class="search-row is-empty" role="option" aria-selected="false">No clubs match “${esc(searchInput.value.trim())}”</li>`;
+  // Places ride above the clubs: "london" should offer Greater London before
+  // eight clubs whose names merely contain it.
+  const placeRows = placeHits.map((pl, i) =>
+    `<li role="option" id="sr-p${i}" aria-selected="false" class="search-row search-place" data-place="${esc(pl.name)}" data-place-kind="${esc(pl.kind)}">` +
+    `<span class="swatch swatch-place" aria-hidden="true">◎</span>` +
+    `<span class="sr-text"><b>${esc(pl.name)}</b><small>${esc(PLACE_KIND[pl.kind] ?? pl.kind)} · ${fmtNum(pl.count)} clubs</small></span></li>`).join("");
+  const clubRows = results.map((e, i) =>
+    `<li role="option" id="sr-${i}" aria-selected="false" class="search-row" data-club="${esc(e.id)}">` +
+    `<span class="swatch" style="background:${esc(leagueColor(e.leagueKey))}"></span>` +
+    `<span class="sr-text"><b>${esc(e.name)}</b><small>${esc(e.venue ?? "")} · ${esc(e.league)}</small></span></li>`).join("");
+  searchResults.innerHTML = placeRows + clubRows ||
+    `<li class="search-row is-empty" role="option" aria-selected="false">No clubs match “${esc(searchInput.value.trim())}”</li>`;
 
   searchResults.hidden = false;
   searchInput.setAttribute("aria-expanded", "true");
@@ -1001,6 +1091,17 @@ function renderSuggestions() {
   searchResults.querySelectorAll("[data-club]").forEach((el) => {
     el.addEventListener("mousedown", (ev) => { ev.preventDefault(); selectClub(el.dataset.club); });
   });
+  searchResults.querySelectorAll("[data-place]").forEach((el) => {
+    el.addEventListener("mousedown", (ev) => { ev.preventDefault(); selectPlace(el.dataset.place, el.dataset.placeKind); });
+  });
+}
+
+function selectPlace(name, kind) {
+  const pl = places.find((x) => x.name === name && x.kind === kind);
+  if (!pl) return;
+  closeSuggestions();
+  if (searchInput && window.matchMedia?.("(hover: none)").matches) searchInput.blur();
+  flyToPlace(pl);
 }
 
 function scheduleRender() {
@@ -1010,7 +1111,7 @@ function scheduleRender() {
 }
 
 function moveActive(delta) {
-  const rows = [...searchResults.querySelectorAll("[data-club]")];
+  const rows = [...searchResults.querySelectorAll("[data-club], [data-place]")];
   if (!rows.length) return;
   activeIndex += delta;
   if (activeIndex < 0) activeIndex = rows.length - 1;
@@ -1058,9 +1159,13 @@ function wireSearch() {
       if (searchResults.hidden) renderSuggestions();
       moveActive(ev.key === "ArrowDown" ? 1 : -1);
     } else if (ev.key === "Enter") {
-      const rows = [...searchResults.querySelectorAll("[data-club]")];
+      const rows = [...searchResults.querySelectorAll("[data-club], [data-place]")];
       const row = rows[activeIndex] ?? rows[0];
-      if (row) { ev.preventDefault(); selectClub(row.dataset.club); }
+      if (row) {
+        ev.preventDefault();
+        if (row.dataset.club) selectClub(row.dataset.club);
+        else selectPlace(row.dataset.place, row.dataset.placeKind);
+      }
     } else if (ev.key === "Escape") {
       if (!searchResults.hidden) closeSuggestions();
       else { searchInput.value = ""; if (searchClear) searchClear.hidden = true; setSelected(null); }
@@ -1178,10 +1283,17 @@ async function loadData() {
   });
 
   leagues = data.metadata.leagues;
+  // clubs.geojson is a committed artifact and can lag app.js. Without the
+  // topFlight flag the tiers toggle would silently hide every league, so a
+  // file that does not carry it makes everything eligible and the toggle
+  // becomes a no-op instead of a blackout.
+  if (!leagues.some((l) => l.topFlight)) for (const l of leagues) l.topFlight = true;
+  places = Array.isArray(data.metadata.places) ? data.metadata.places : [];
   groups = normalizeGroups(data.metadata);
   allFeatures = data.features;
 
   buildIndexes(allFeatures);
+  buildFocusChips();
   buildCountryOptions();   // before restoreState: it vets a saved country against this
   restoreState();
   wireFacets();
@@ -1352,12 +1464,15 @@ window.__worldxi = {
   get state() {
     return {
       on: [...state.activeLeagues], collapsed: [...state.collapsed], selected: state.selectedId,
-      gender: state.gender, country: state.country, query: state.query,
+      gender: state.gender, country: state.country, query: state.query, tiers: state.tiers,
       visible: visibleLeagues().map((l) => l.key),
     };
   },
   get leagues() { return leagues; },
   get countries() { return countries; },
+  get places() { return places; },
+  searchPlaces,
+  flyToPlace,
   setFacet,
   setLeague,
   mapFilter: () => leagueFilter(),
@@ -1373,6 +1488,7 @@ window.__worldxi = {
   // What is actually on the map, as opposed to what the data says. The two
   // came apart once — layers absent, readout still counting clubs — so the
   // browser check needs to be able to tell the difference.
+  mapCenter: () => { const c = map?.getCenter?.(); return c ? [c.lng, c.lat] : null; },
   mapLayers: () => {
     try { return (map?.getStyle?.()?.layers ?? []).map((l) => l.id).filter((id) => id.startsWith("clubs")); }
     catch { return []; }
