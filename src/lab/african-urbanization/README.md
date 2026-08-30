@@ -83,6 +83,7 @@ order; raw downloads land in `pipeline/raw/`, which is gitignored — set
 | `14_validate.py` | GHS-POP vs. UN WUP inside OSM commune boundaries | `validation.json` |
 | `15_corridor_coverage.py` | OpenStreetMap motorway/trunk/primary vs. the modeled corridors | `corridor-coverage.json` (+ `served` on `corridors-model.geojson`) |
 | `16_city_streets.py` | OSM streets inside GHS-BUILT-S footprints for 9 cities; UN WUP | `city-streets.json` |
+| `17_class_breaks.py` | Fisher-Jenks over `countries.geojson` (reports only, writes nothing) | choropleth class breaks used in `app.js` |
 
 ### Rerunning it
 
@@ -171,6 +172,12 @@ Two details worth knowing if you touch it:
 - Slope comes from the Copernicus 30 m DEM block-averaged to roughly the 92 m
   built-up grid. Finer classes would be false precision against a layer that
   coarse, so only two are drawn.
+- Choropleths are **classed, not interpolated**. Linear ramps across a global
+  range made chapter 1 a flat orange continent: half of Africa's median ages
+  sit between 15 and 22, one segment of the old ramp. Breaks are Fisher-Jenks
+  on the African values (`17_class_breaks.py`), extended upward so Japan at
+  49.8 still separates from Tunisia at 32.9. Growth keeps a hard boundary at
+  ×1; one population scale serves all three years so countries visibly climb.
 
 ## Method writeup
 
