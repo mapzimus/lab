@@ -58,6 +58,10 @@ const CONGO_BOUNDS = [[9.0, -13.5], [32.0, 6.0]];
 // cities with no line between them, the Lobito corridor running west to the
 // Atlantic and TAZARA running east to the Indian Ocean. All three are in here.
 const CONGO_RAIL_BOUNDS = [[10.5, -19.0], [41.0, 2.0]];
+// Every project the "who is building" card names by name: Lagos to Ibadan in
+// the west, Lobito in the south, Mombasa to Nairobi and Addis to Djibouti in
+// the east. At continental zoom the three line colours were indistinguishable.
+const BUILDING_BOUNDS = [[0.0, -16.0], [46.0, 14.0]];
 // Lagos round to Luanda. The model's least-served link, and the one that used
 // to be drawn straight across the Gulf of Guinea.
 const GULF_COAST_BOUNDS = [[1.0, -11.5], [18.0, 8.5]];
@@ -880,7 +884,7 @@ function initSteps(map) {
     // The card argues from Kinshasa and Lubumbashi, and at continental zoom the
     // 1,570 km of nothing between them is a thumbnail's worth of blank.
     "c3-existing": () => { fly(CONGO_RAIL_BOUNDS, 6); base.c3(); corridors(0.9, 0.55, 0, 0, 0); setCityEpoch(2050, 0.35); },
-    "c3-planned": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.55, 0.3, 0.75, 0.95, 0); setCityEpoch(2050, 0.3); },
+    "c3-planned": () => { fly(BUILDING_BOUNDS, 5); base.c3(); corridors(0.55, 0.3, 0.75, 0.95, 0); setCityEpoch(2050, 0.3); },
     "c3-model": () => { fly(AFRICA_BOUNDS, 5); base.c3(); corridors(0.25, 0.15, 0.3, 0.35, 0.9); setCityEpoch(2050, 0.45); },
     // The card names one link and its detour, so the map goes to that link.
     // The corridor no longer runs straight across the Gulf, and this is the

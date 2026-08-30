@@ -150,12 +150,33 @@ OVERPASS_APIS = [
 ]
 
 
+# A real alignment is only worth drawing if it actually runs between the cities
+# the card names. Without this gate the layer shipped a Lobito Corridor made of
+# seven disconnected fragments that stopped 769 km short of Lobito, under copy
+# describing a line "rebuilt from the Angolan coast" — a truncated real
+# alignment misinforms in a way an honest schematic line does not.
+SPAN_COVER = 0.8      # share of the schematic route that must have rail near it
+SPAN_NEAR = 0.3       # degrees, about 33 km
+WAYPOINT_NEAR = 0.35  # degrees: every named city has to be reached
+
+
+def spans_corridor(geom, schematic_coords):
+    """Does this geometry run the length of the corridor, and reach its ends?"""
+    from shapely.geometry import LineString, Point
+    sch = LineString(schematic_coords)
+    pts = [sch.interpolate(i / 39, normalized=True) for i in range(40)]
+    cover = sum(1 for q in pts if geom.distance(q) <= SPAN_NEAR) / len(pts)
+    ends = max(geom.distance(Point(c)) for c in schematic_coords)
+    return cover >= SPAN_COVER and ends <= WAYPOINT_NEAR, cover, ends
+
+
 def real_rail_geometry(schematic_coords):
     """Stitched OSM railway ways within a buffer of the schematic corridor.
 
     © OpenStreetMap contributors (ODbL); the page already attributes OSM.
     Returns a MultiLineString mapping, or None when the query yields nothing
-    usable (the caller keeps the schematic line).
+    usable or the result does not span the corridor (the caller keeps the
+    schematic line).
     """
     import requests
     import osm2geojson
@@ -187,6 +208,11 @@ def real_rail_geometry(schematic_coords):
     if not parts:
         return None
     simplified = unary_union(parts).simplify(0.01, preserve_topology=True)
+    ok, cover, ends = spans_corridor(simplified, schematic_coords)
+    if not ok:
+        print(f"      OSM covers {cover*100:.0f}% and stops {ends*111:.0f} km "
+              f"from a named city, keeping schematic")
+        return None
     return mapping(simplified)
 
 

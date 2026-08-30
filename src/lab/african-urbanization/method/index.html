@@ -422,6 +422,27 @@
   6% to 51% in the same window, which is the evidence that the number is a
   choice and not a fate.</p>
 
+  <h3>When a real alignment is worse than a drawn one</h3>
+  <p>Six built railways were given their real OpenStreetMap alignments rather
+  than a schematic city-to-city line, on the reasoning that a line which exists
+  should be drawn where it actually runs. Checked against the corridors they are
+  supposed to connect, five of the six did not run there.</p>
+  <p>The Lobito Corridor was the worst: <b>seven disconnected fragments</b>
+  covering a quarter of the route and stopping <b>769 km short of Lobito</b>,
+  under copy describing a line rebuilt from the Angolan coast. Addis Ababa to
+  Djibouti stopped 151 km short, TAZARA came back in fifteen pieces, Lagos to
+  Ibadan missed Lagos by 79 km. The cause is ordinary: OSM does not tag these
+  routes as one continuous <code>railway=rail</code> way, and the stitching kept
+  only merged pieces over 25 km, so the gaps became holes.</p>
+  <p><code>03_corridors.py</code> now accepts an alignment only if it has rail
+  within about 33 km of <b>80 per cent</b> of the corridor and comes within 39 km
+  of every city the corridor names. One of the six passes. The rest are drawn as
+  honest schematic lines, which reach the cities in the copy and say plainly
+  that they are diagrams.</p>
+  <p class="fine">This is a downgrade in fidelity and an upgrade in accuracy. A
+  fragmented real alignment reads as a railway with holes in it, which is a
+  claim about the world that nobody made.</p>
+
   <h3>Drawing the corridors on land</h3>
   <p>A gravity model pairs cities. It has no opinion about what lies between
   them, so drawn as straight great circles, twelve of the thirty-six links ran
@@ -534,8 +555,9 @@
     <li><b>The gravity model is still a demand sketch</b>, even after the
     coverage test. It knows populations and distances. It does not know
     terrain, borders, tariffs, gauge, politics or money.</li>
-    <li><b>Corridor geometry is schematic</b> city to city, except the built
-    railways, which use their real OSM alignments.</li>
+    <li><b>Corridor geometry is schematic</b> city to city, except where a real
+    OSM alignment spans the whole corridor. Of the six built railways only
+    Abuja to Kaduna does; the other five are drawn schematic.</li>
     <li><b>The projections belong to the UN and the cited authors</b>, not to
     this site. The medium variant is a central path. Change the variant and
     the crossover years move.</li>
