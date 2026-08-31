@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-30",
+  "generatedAt": "2026-08-31",
   "news": {
     "mapsmania": [
+      {
+        "title": "How Great is Great Britain?",
+        "url": "http://googlemapsmania.blogspot.com/2026/08/how-great-is-great-britain.html",
+        "desc": ""
+      },
       {
         "title": "15 Minute Towns Animated",
         "url": "http://googlemapsmania.blogspot.com/2026/08/15-minute-towns-animated.html",
@@ -35,11 +40,6 @@
       {
         "title": "Bending Maps, Inception Style",
         "url": "http://googlemapsmania.blogspot.com/2026/08/bending-maps-inception-style.html",
-        "desc": ""
-      },
-      {
-        "title": "The 3D Underground Map",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/the-3d-underground-map.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "WaterQual",
-      "url": "https://plugins.qgis.org/plugins/water_qual/"
+      "title": "SWMM Tools",
+      "url": "https://plugins.qgis.org/plugins/SWMM_Tools/"
     },
     {
-      "title": "Layout Splines",
-      "url": "https://plugins.qgis.org/plugins/qgis_layout_splines/"
+      "title": "Universal Vector Converter",
+      "url": "https://plugins.qgis.org/plugins/universal_vector_converter/"
     },
     {
-      "title": "Optical Downloader",
-      "url": "https://plugins.qgis.org/plugins/optical_downloader/"
+      "title": "GeoStar Selector",
+      "url": "https://plugins.qgis.org/plugins/magicwand_qgis/"
     },
     {
-      "title": "InaRISK to QGIS",
-      "url": "https://plugins.qgis.org/plugins/inarisk_to_qgis/"
+      "title": "RapidIBF-Next",
+      "url": "https://plugins.qgis.org/plugins/rapidibf_next/"
     },
     {
-      "title": "AirEmergency",
-      "url": "https://plugins.qgis.org/plugins/AirEmergency/"
+      "title": "Importance Value Index (INP), Vegetation Analysis",
+      "url": "https://plugins.qgis.org/plugins/inp_spatial_analyzer/"
     },
     {
-      "title": "FinCoords",
-      "url": "https://plugins.qgis.org/plugins/FinCoords/"
+      "title": "JPRaincloudradarDownloader",
+      "url": "https://plugins.qgis.org/plugins/JPRaincloudradarDownloader/"
     },
     {
-      "title": "Mangrove Extraction",
-      "url": "https://plugins.qgis.org/plugins/mangrove_extraction/"
+      "title": "QGC4QGIS",
+      "url": "https://plugins.qgis.org/plugins/qgc4qgis/"
     },
     {
-      "title": "CoastProfile",
-      "url": "https://plugins.qgis.org/plugins/coastprofile/"
+      "title": "QUCORE (Variable UAS Corridor Planning)",
+      "url": "https://plugins.qgis.org/plugins/QUCORE/"
     }
   ],
   "releases": [
@@ -210,15 +210,27 @@
   ],
   "gisse": [
     {
+      "title": "QGIS \"Join Attributes by Nearest\" yielding incorrect distances",
+      "url": "https://gis.stackexchange.com/questions/501321/qgis-join-attributes-by-nearest-yielding-incorrect-distances",
+      "score": 1,
+      "answers": 1
+    },
+    {
       "title": "Reconditioning DEM in QGIS",
       "url": "https://gis.stackexchange.com/questions/501320/reconditioning-dem-in-qgis",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Timeslider doesn't work in my arcgis js api 5.1 code!",
+      "url": "https://gis.stackexchange.com/questions/501324/timeslider-doesnt-work-in-my-arcgis-js-api-5-1-code",
       "score": 0,
       "answers": 0
     },
     {
       "title": "How to compute global 1000 km-radius area-weighted avg (0.625°×0.5°, 744 layers) in 1s (1-core) or 0.1s (multi-core)?",
       "url": "https://gis.stackexchange.com/questions/501319/how-to-compute-global-1000-km-radius-area-weighted-avg-0-625%c3%970-5-744-layers",
-      "score": -3,
+      "score": -4,
       "answers": 0
     },
     {
@@ -256,80 +268,68 @@
       "url": "https://gis.stackexchange.com/questions/501305/arcgis-pro-contour-labelling-masks-is-there-a-simpler-approach-than-variable-d",
       "score": 0,
       "answers": 0
-    },
-    {
-      "title": "Digital signature missing in QGIS 4.2.1 (Code Signing)",
-      "url": "https://gis.stackexchange.com/questions/501298/digital-signature-missing-in-qgis-4-2-1-code-signing",
-      "score": 2,
-      "answers": 0
-    },
-    {
-      "title": "Connect SEPAL with GEE account",
-      "url": "https://gis.stackexchange.com/questions/501306/connect-sepal-with-gee-account",
-      "score": 0,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "VIIRS/NPP Land Surface Phenology Yearly L3 Global 0.05Deg CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VNP22C2",
+      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 1, 2026 (2026/305)](https://www…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD2_G15 0.5 x 0.625 degree V1 (M2_SNDRD2_G15)",
+      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD2_G15",
+      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_STOKES",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
-      "desc": "UAVSAR PolSAR Scene Stokes",
-      "org": "ASF"
+      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD2_G13 0.5 x 0.625 degree V1 (M2_SNDRD2_G13)",
+      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD2_G13",
+      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_SLOPE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
-      "desc": "UAVSAR PolSAR Scene Slope",
-      "org": "ASF"
+      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD2_G12 0.5 x 0.625 degree V1 (M2_SNDRD2_G12)",
+      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD2_G12",
+      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_PAULI",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
-      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
-      "org": "ASF"
+      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD2_G11 0.5 x 0.625 degree V1 (M2_SNDRD2_G11)",
+      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD2_G11",
+      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
-      "desc": "UAVSAR PolSAR Scene Complex",
-      "org": "ASF"
+      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD1_G15 0.5 x 0.625 degree V1 (M2_SNDRD1_G15)",
+      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD1_G15",
+      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
-      "org": "ASF"
+      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD1_G13 0.5 x 0.625 degree V1 (M2_SNDRD1_G13)",
+      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD1_G13",
+      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
-      "org": "ASF"
+      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD1_G12 0.5 x 0.625 degree V1 (M2_SNDRD1_G12)",
+      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD1_G12",
+      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
-      "desc": "UAVSAR PolSAR Scene Projected",
-      "org": "ASF"
+      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD1_G11 0.5 x 0.625 degree V1 (M2_SNDRD1_G11)",
+      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD1_G11",
+      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_METADATA",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
-      "desc": "UAVSAR PolSAR Scene Metadata",
-      "org": "ASF"
+      "title": "METOP-B AVHRR Atmospherically Corrected Normalized Difference Vegetation Index Daily L3 Global 0.05 Deg.",
+      "url": "https://search.earthdata.nasa.gov/search?q=M1_AVH13C1",
+      "desc": "The product description in this landing page is designed to provide information about the AVHRR Atmospherically Corrected Normalized Difference Vegetation In…",
+      "org": "LAADS"
     }
   ],
   "datagov": [
