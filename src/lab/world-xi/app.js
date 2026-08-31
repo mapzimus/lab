@@ -331,7 +331,14 @@ function deboxCrest(img) {
 function fitCrest(source) {
   const w = source.width, h = source.height;
   const scale = Math.min(1, CREST_SIZE / Math.max(w, h));
-  if (scale === 1) return deboxCrest(source);
+  // deboxCrest reads pixels, so it needs ImageData — and what map.loadImage
+  // hands back is an ImageBitmap, which has width and height but no `data`.
+  // Returning it unscaled therefore threw on `d[o + 3]` for every crest already
+  // at or under CREST_SIZE, and the caller's catch turned that into a silent
+  // fallback dot. Every one of the 448 crests committed under data/crests is
+  // exactly 128px on its long edge, so not one of them has ever rendered.
+  // An image that needs no resizing still has to be read into a canvas.
+  if (scale === 1 && source.data) return deboxCrest(source);
   const cw = Math.max(1, Math.round(w * scale));
   const ch = Math.max(1, Math.round(h * scale));
   const canvas = document.createElement("canvas");
@@ -359,59 +366,123 @@ function refreshIcons() {
   }, 200);
 }
 
-const crestQueue = [];
-const crestsRequested = new Set();
-let draining = false;
+// Crests are the expensive thing on this map: each is a 128px RGBA texture, so
+// the 4,660 clubs that have one are 305 MB of pixels if they are all resident.
+// Residency used to follow the *leagues switched on*, which meant ticking
+// "include lower tiers" and pressing All loaded every one of them — on a phone
+// that is a dead tab, and on a desktop it is enough texture to lose the WebGL
+// context. Worse, `icon-opacity` fades crests out entirely below zoom 3, so at
+// the opening view all of that was loaded to draw nothing at all.
+//
+// So residency follows the *viewport* instead: only clubs on screen, only at a
+// zoom where crests are actually drawn, and never more than CREST_BUDGET at
+// once. That bounds texture memory by screen area rather than by how much data
+// the map carries, which is what makes "switch everything on" survivable.
+const CREST_BUDGET = 900;          // ≈59 MB of texture, well clear of any limit
+const CREST_MIN_ZOOM = 3;          // matches where icon-opacity starts fading in
+const CREST_MARGIN = 0.25;         // load a little beyond the edge so panning is smooth
 
-function ensureCrests(leagueKey) {
-  if (crestsRequested.has(leagueKey)) return;
-  crestsRequested.add(leagueKey);
-  for (const f of featuresByLeague.get(leagueKey) ?? []) {
-    if (f.properties.crest) crestQueue.push(f);
+const resident = new Map();        // club id -> recency tick, for images actually added
+const inFlight = new Set();
+const crestFailures = [];
+let crestTick = 0;
+let syncTimer = null;
+
+function crestsWanted() {
+  if (!map || map.getZoom() < CREST_MIN_ZOOM) return [];
+  let b;
+  try { b = map.getBounds(); } catch { return []; }
+  const padLng = (b.getEast() - b.getWest()) * CREST_MARGIN;
+  const padLat = (b.getNorth() - b.getSouth()) * CREST_MARGIN;
+  const w = b.getWest() - padLng, e = b.getEast() + padLng;
+  const so = b.getSouth() - padLat, n = b.getNorth() + padLat;
+  const on = new Set(visibleLeagues().map((l) => l.key));
+  const out = [];
+  for (const f of allFeatures) {
+    const p = f.properties;
+    if (!p.crest || !on.has(p.leagueKey)) continue;
+    const [lng, lat] = f.geometry.coordinates;
+    if (lat < so || lat > n) continue;
+    // A globe can show more than 360° of longitude at low zoom; when the bounds
+    // wrap, longitude cannot exclude anything.
+    if (e - w < 360 && (lng < w || lng > e)) continue;
+    out.push(f);
+    if (out.length > CREST_BUDGET * 3) break;   // dense view: the budget decides
   }
-  drainCrests();
+  return out;
 }
 
-// Hiding a league hands its textures back. Without this every league ever
-// opened stays resident, which is what pushed the page into the hundreds of
-// megabytes and killed tabs on phones.
-function releaseCrests(leagueKey) {
-  if (!crestsRequested.has(leagueKey)) return;
-  crestsRequested.delete(leagueKey);
-  for (let i = crestQueue.length - 1; i >= 0; i--) {
-    if (crestQueue[i].properties.leagueKey === leagueKey) crestQueue.splice(i, 1);
-  }
+function dropCrest(id) {
+  resident.delete(id);
+  const key = `club-${id}`;
+  if (map?.hasImage(key)) { try { map.removeImage(key); } catch { /* already gone */ } }
+}
+
+// Called on every camera move and whenever the filters change. Debounced: a
+// drag fires moveend once, but a zoom animation fires plenty.
+function syncCrests() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(runCrestSync, 120);
+}
+
+async function runCrestSync() {
   if (!map) return;
-  for (const f of featuresByLeague.get(leagueKey) ?? []) {
-    const id = `club-${f.properties.id}`;
-    if (map.hasImage(id)) { try { map.removeImage(id); } catch { /* already gone */ } }
+  const want = crestsWanted();
+  const keep = new Set();
+  crestTick += 1;
+  for (const f of want) {
+    const { id } = f.properties;
+    keep.add(id);
+    if (resident.has(id)) resident.set(id, crestTick);
   }
-  refreshIcons();
-}
-
-async function drainCrests() {
-  if (draining) return;
-  draining = true;
+  // Evict what is off screen, oldest first, once over budget. Anything on
+  // screen is never evicted — that would flicker the crest the user is looking
+  // at straight back off the map.
+  if (resident.size > CREST_BUDGET) {
+    const cold = [...resident.entries()].filter(([id]) => !keep.has(id))
+      .sort((a, b) => a[1] - b[1]);
+    for (const [id] of cold.slice(0, resident.size - CREST_BUDGET)) dropCrest(id);
+  }
+  const room = CREST_BUDGET - resident.size;
+  if (room <= 0) return;
+  const missing = want.filter((f) => !resident.has(f.properties.id) && !inFlight.has(f.properties.id))
+    .slice(0, room);
+  if (!missing.length) return;
+  const queue = [...missing];
   const worker = async () => {
     for (;;) {
-      const f = crestQueue.shift();
+      const f = queue.shift();
       if (!f) return;
       const { id } = f.properties;
-      const crest = crestUrl(f.properties.crest);
-      if (!crest || map.hasImage(`club-${id}`)) continue;
+      const url = crestUrl(f.properties.crest);
+      if (!url || resident.has(id)) continue;
+      inFlight.add(id);
       try {
-        const img = await map.loadImage(crest);
-        // the league may have been switched off while this was in flight
-        if (!crestsRequested.has(f.properties.leagueKey)) continue;
-        if (!map.hasImage(`club-${id}`)) map.addImage(`club-${id}`, fitCrest(img.data));
-        refreshIcons();
-      } catch { /* keep the colored-dot fallback */ }
+        const img = await map.loadImage(url);
+        // the league may have been switched off, or the camera moved away,
+        // while this was in flight
+        if (visibleLeagues().some((l) => l.key === f.properties.leagueKey)) {
+          if (!map.hasImage(`club-${id}`)) map.addImage(`club-${id}`, fitCrest(img.data));
+          resident.set(id, crestTick);
+        }
+      } catch (err) {
+        // The colored dot is a fine fallback for a crest that will not load,
+        // but swallowing the reason is how a decode bug hid 448 crests. Count
+        // them so the browser check can insist the number stays zero.
+        crestFailures.push(`${id}: ${String(err).slice(0, 120)}`);
+      } finally { inFlight.delete(id); }
     }
   };
   await Promise.allSettled(Array.from({ length: 6 }, worker));
-  draining = false;
   refreshIcons();
-  if (crestQueue.length) drainCrests();
+}
+
+// Switching a league off hands its textures back at once rather than waiting
+// for the budget to notice.
+function releaseCrests(leagueKey) {
+  if (!map) return;
+  for (const f of featuresByLeague.get(leagueKey) ?? []) dropCrest(f.properties.id);
+  refreshIcons();
 }
 
 /* ----------------------------------------------------------------- filter */
@@ -569,7 +640,7 @@ function setLeague(key, on) {
   if (row) row.setAttribute("aria-pressed", String(on));
   const lg = leagues.find((l) => l.key === key);
   if (lg) updateSectionHeader(lg.group);
-  if (on) ensureCrests(key); else releaseCrests(key);
+  if (on) syncCrests(); else releaseCrests(key);
   applyFilter();
   persist();
 }
@@ -583,10 +654,11 @@ function setGroup(groupKey, on) {
     else state.activeLeagues.delete(lg.key);
     const row = legendEl.querySelector(`[data-league="${lg.key}"]`);
     if (row) row.setAttribute("aria-pressed", String(on));
-    if (on) ensureCrests(lg.key); else releaseCrests(lg.key);
+    if (!on) releaseCrests(lg.key);
   }
   updateSectionHeader(groupKey);
   applyFilter();
+  syncCrests();
   persist();
 }
 
@@ -657,6 +729,7 @@ function setFacet(patch) {
   // never changes which leagues are switched on — so crest loading follows
   // setLeague, not this, and nothing needs releasing here.
   applyFilter();
+  syncCrests();
   persist();
 }
 
@@ -1466,8 +1539,12 @@ function addMapLayers(data) {
   });
   map.on("mouseleave", "clubs-ring", () => { map.getCanvas().style.cursor = ""; });
 
+  // Crest residency follows the camera, so every settled move re-evaluates it.
+  map.on("moveend", syncCrests);
+  map.on("zoomend", syncCrests);
+
   applyFilter();
-  for (const key of state.activeLeagues) ensureCrests(key);
+  syncCrests();
 
   if (!REDUCED_MOTION) map.easeTo({ center: [0, 40], zoom: 2.6, duration: 2500 });
   else map.jumpTo({ center: [0, 40], zoom: 2.6 });
@@ -1561,6 +1638,13 @@ window.__worldxi = {
   // came apart once — layers absent, readout still counting clubs — so the
   // browser check needs to be able to tell the difference.
   mapCenter: () => { const c = map?.getCenter?.(); return c ? [c.lng, c.lat] : null; },
+  // What the map is actually holding in texture memory, and the ceiling it is
+  // held to. The crash this bounds was invisible to every other measure: the
+  // images live GPU-side, so the JS heap stayed flat at 29 MB while 305 MB of
+  // crests piled up behind it.
+  crestsResident: () => resident.size,
+  crestBudget: () => CREST_BUDGET,
+  crestFailures: () => crestFailures.slice(0, 10),
   zoom: () => map?.getZoom?.() ?? 0,
   project: (lngLat) => { const p = map?.project?.(lngLat); return p ? { x: p.x, y: p.y } : null; },
   mapLayers: () => {
