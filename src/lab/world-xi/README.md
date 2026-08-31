@@ -2,7 +2,7 @@
 
 Hosted copy of [mapzimus/world-xi-map](https://github.com/mapzimus/world-xi-map)
 at https://mapzimus.com/lab/world-xi/ — an interactive 3D globe of every club of
-160 leagues, men's and women's — the top flight of 122 nations (5,140 clubs) —
+182 leagues, men's and women's — the top flight of 122 nations (5,522 clubs) —
 each at its home stadium, searchable and filterable by league, gender and
 country. That includes the whole United States pyramid, MLS down through the
 open amateur tiers, and all 1,789 NCAA soccer programmes across Divisions I,
