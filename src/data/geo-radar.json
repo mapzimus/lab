@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-08-31",
+  "generatedAt": "2026-09-01",
   "news": {
     "mapsmania": [
+      {
+        "title": "The Coffee Barista's Maps",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/the-coffee-baristas-maps.html",
+        "desc": ""
+      },
       {
         "title": "How Great is Great Britain?",
         "url": "http://googlemapsmania.blogspot.com/2026/08/how-great-is-great-britain.html",
@@ -35,11 +40,6 @@
       {
         "title": "Mapping 219,469 Rail Journeys",
         "url": "http://googlemapsmania.blogspot.com/2026/08/mapping-219469-rail-journeys.html",
-        "desc": ""
-      },
-      {
-        "title": "Bending Maps, Inception Style",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/bending-maps-inception-style.html",
         "desc": ""
       }
     ],
@@ -210,6 +210,24 @@
   ],
   "gisse": [
     {
+      "title": "Efficient way to fetch Open Street Map airport polygons for point locations",
+      "url": "https://gis.stackexchange.com/questions/501334/efficient-way-to-fetch-open-street-map-airport-polygons-for-point-locations",
+      "score": 1,
+      "answers": 0
+    },
+    {
+      "title": "How should multiple UTM zones be handled for a large regional geophysical grid",
+      "url": "https://gis.stackexchange.com/questions/501326/how-should-multiple-utm-zones-be-handled-for-a-large-regional-geophysical-grid",
+      "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "How should street centerlines be connected for sDNA accessibility analysis?",
+      "url": "https://gis.stackexchange.com/questions/501331/how-should-street-centerlines-be-connected-for-sdna-accessibility-analysis",
+      "score": 1,
+      "answers": 1
+    },
+    {
       "title": "QGIS \"Join Attributes by Nearest\" yielding incorrect distances",
       "url": "https://gis.stackexchange.com/questions/501321/qgis-join-attributes-by-nearest-yielding-incorrect-distances",
       "score": 1,
@@ -240,96 +258,78 @@
       "answers": 0
     },
     {
-      "title": "Have found the longest flow path in a watershed, but how to extract it as a polyline?",
-      "url": "https://gis.stackexchange.com/questions/501313/have-found-the-longest-flow-path-in-a-watershed-but-how-to-extract-it-as-a-poly",
-      "score": 1,
-      "answers": 0
-    },
-    {
       "title": "Make global customizations for all users in QGIS?",
       "url": "https://gis.stackexchange.com/questions/501302/make-global-customizations-for-all-users-in-qgis",
       "score": 1,
       "answers": 1
     },
     {
-      "title": "How to implement shapefile points into the workflow of GEEDiT",
-      "url": "https://gis.stackexchange.com/questions/501309/how-to-implement-shapefile-points-into-the-workflow-of-geedit",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Arcade Expression not showing minimum value in dynamic text for visible rows",
-      "url": "https://gis.stackexchange.com/questions/501299/arcade-expression-not-showing-minimum-value-in-dynamic-text-for-visible-rows",
-      "score": 0,
-      "answers": 1
-    },
-    {
-      "title": "ArcGIS Pro Contour labelling masks - is there a simpler approach than variable depth masking?",
-      "url": "https://gis.stackexchange.com/questions/501305/arcgis-pro-contour-labelling-masks-is-there-a-simpler-approach-than-variable-d",
-      "score": 0,
+      "title": "Have found the longest flow path in a watershed, but how to extract it as a polyline?",
+      "url": "https://gis.stackexchange.com/questions/501313/have-found-the-longest-flow-path-in-a-watershed-but-how-to-extract-it-as-a-poly",
+      "score": 1,
       "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "VIIRS/NPP Land Surface Phenology Yearly L3 Global 0.05Deg CMG V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VNP22C2",
-      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 1, 2026 (2026/305)](https://www…",
-      "org": "LPCLOUD"
+      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
+      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD2_G15 0.5 x 0.625 degree V1 (M2_SNDRD2_G15)",
-      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD2_G15",
-      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
-      "org": "GES_DISC"
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
+      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD2_G13 0.5 x 0.625 degree V1 (M2_SNDRD2_G13)",
-      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD2_G13",
-      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
-      "org": "GES_DISC"
+      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
+      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD2_G12 0.5 x 0.625 degree V1 (M2_SNDRD2_G12)",
-      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD2_G12",
-      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
-      "org": "GES_DISC"
+      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
+      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD2_G11 0.5 x 0.625 degree V1 (M2_SNDRD2_G11)",
-      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD2_G11",
-      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
-      "org": "GES_DISC"
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
+      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD1_G15 0.5 x 0.625 degree V1 (M2_SNDRD1_G15)",
-      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD1_G15",
-      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
-      "org": "GES_DISC"
+      "title": "DC-8 Meteorological and Navigation Data TC4",
+      "url": "https://search.earthdata.nasa.gov/search?q=dc8navtc4",
+      "desc": "The DC-8 Meteorological and Navigation Data CPEX-AW dataset is a subset of airborne measurements that include GPS positioning and trajectory data, aircraft o…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD1_G13 0.5 x 0.625 degree V1 (M2_SNDRD1_G13)",
-      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD1_G13",
-      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
-      "org": "GES_DISC"
+      "title": "ACCLIP WB-57 Aircraft Merge Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=ACCLIP_Merge_WB57-Aircraft_Data",
+      "desc": "ACCLIP_Merge_WB57-Aircraft_Data is the pre-generated merge files created from a variety of in-situ instrumentation collecting measurements onboard the WB-57…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD1_G12 0.5 x 0.625 degree V1 (M2_SNDRD1_G12)",
-      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD1_G12",
-      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
-      "org": "GES_DISC"
+      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) DC-8 In-Situ Trace Gas Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_TraceGas_AircraftInSitu_DC8_Data",
+      "desc": "SONEX_TraceGas_AircraftInSitu_DC8_Data is the in-situ trace gas data collected onboard the DC-8 aircraft during the SASS (Subsonics Assessment) Ozone and NOx…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "MERRA-2 Monthly Gridded Innovations and Observations SNDRD1_G11 0.5 x 0.625 degree V1 (M2_SNDRD1_G11)",
-      "url": "https://search.earthdata.nasa.gov/search?q=M2_SNDRD1_G11",
-      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
-      "org": "GES_DISC"
+      "title": "KORUS-AQ NASA Ground Site Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=KORUSAQ_Ground_NASA_Data",
+      "desc": "KORUSAQ_Ground_NASA_Data are ground site measurements collected by NASA instrumentation at the NIER-Taehwa ground site during the KORUS-AQ field campaign.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "METOP-B AVHRR Atmospherically Corrected Normalized Difference Vegetation Index Daily L3 Global 0.05 Deg.",
-      "url": "https://search.earthdata.nasa.gov/search?q=M1_AVH13C1",
-      "desc": "The product description in this landing page is designed to provide information about the AVHRR Atmospherically Corrected Normalized Difference Vegetation In…",
-      "org": "LAADS"
+      "title": "TRACE-P DC-8 In-Situ Trace Gas Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=TRACE-P_TraceGas_AircraftInSitu_DC8_Data",
+      "desc": "TRACE-P_TraceGas_AircraftInSitu_DC8_Data is the in-situ trace gas data collected onboard the DC-8 aircraft during the Transport and Chemical Evolution over t…",
+      "org": "LARC_CLOUD"
     }
   ],
   "datagov": [
