@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-01",
+  "generatedAt": "2026-09-02",
   "news": {
     "mapsmania": [
+      {
+        "title": "Movie Maps",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/movie-maps.html",
+        "desc": ""
+      },
       {
         "title": "The Coffee Barista's Maps",
         "url": "http://googlemapsmania.blogspot.com/2026/09/the-coffee-baristas-maps.html",
@@ -35,11 +40,6 @@
       {
         "title": "GTA - San Francisco",
         "url": "http://googlemapsmania.blogspot.com/2026/08/gta-san-francisco.html",
-        "desc": ""
-      },
-      {
-        "title": "Mapping 219,469 Rail Journeys",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/mapping-219469-rail-journeys.html",
         "desc": ""
       }
     ],
@@ -126,10 +126,6 @@
       "url": "https://plugins.qgis.org/plugins/rapidibf_next/"
     },
     {
-      "title": "Importance Value Index (INP), Vegetation Analysis",
-      "url": "https://plugins.qgis.org/plugins/inp_spatial_analyzer/"
-    },
-    {
       "title": "JPRaincloudradarDownloader",
       "url": "https://plugins.qgis.org/plugins/JPRaincloudradarDownloader/"
     },
@@ -140,9 +136,21 @@
     {
       "title": "QUCORE (Variable UAS Corridor Planning)",
       "url": "https://plugins.qgis.org/plugins/QUCORE/"
+    },
+    {
+      "title": "Q-GlaRe+",
+      "url": "https://plugins.qgis.org/plugins/qglare_plus/"
     }
   ],
   "releases": [
+    {
+      "repo": "maplibre/maplibre-gl-js",
+      "title": "maplibre-gl-js v6.7.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.7.0",
+      "desc": "### ✨ Features and improvements - Support the style specification's `font-faces` property, with `map.setFontFaces` and `map.getFontFaces` and improve complex…",
+      "publishedAt": "2026-09-02",
+      "isFresh": true
+    },
     {
       "repo": "visgl/deck.gl",
       "title": "deck.gl v9.3.11",
@@ -157,14 +165,6 @@
       "url": "https://github.com/qgis/QGIS/releases/tag/final-4_2_2",
       "desc": "https://github.com/qgis/QGIS/compare/final-4_2_1%5E...final-4_2_2",
       "publishedAt": "2026-08-28",
-      "isFresh": true
-    },
-    {
-      "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.6.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.6.0",
-      "desc": "### ✨ Features and improvements - Add support for `symbol-height-offset` and `symbol-height-anchor` layout properties, which raise icons and text above the map.",
-      "publishedAt": "2026-08-24",
       "isFresh": true
     },
     {
@@ -210,15 +210,39 @@
   ],
   "gisse": [
     {
-      "title": "Efficient way to fetch Open Street Map airport polygons for point locations",
-      "url": "https://gis.stackexchange.com/questions/501334/efficient-way-to-fetch-open-street-map-airport-polygons-for-point-locations",
+      "title": "JSON field becomes QVariantList when exporting GeoPackage to GeoJSON",
+      "url": "https://gis.stackexchange.com/questions/501348/json-field-becomes-qvariantlist-when-exporting-geopackage-to-geojson",
+      "score": 3,
+      "answers": 0
+    },
+    {
+      "title": "How to use Python for styling while still maintaining a theme in QGIS?",
+      "url": "https://gis.stackexchange.com/questions/501346/how-to-use-python-for-styling-while-still-maintaining-a-theme-in-qgis",
       "score": 1,
       "answers": 0
     },
     {
+      "title": "QGIS - How to group point displacement points by category",
+      "url": "https://gis.stackexchange.com/questions/501340/qgis-how-to-group-point-displacement-points-by-category",
+      "score": 2,
+      "answers": 1
+    },
+    {
+      "title": "Raster image showing up outside map",
+      "url": "https://gis.stackexchange.com/questions/501345/raster-image-showing-up-outside-map",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Efficient way to fetch OpenStreetMap airport polygons for point locations",
+      "url": "https://gis.stackexchange.com/questions/501334/efficient-way-to-fetch-openstreetmap-airport-polygons-for-point-locations",
+      "score": 1,
+      "answers": 2
+    },
+    {
       "title": "How should multiple UTM zones be handled for a large regional geophysical grid",
       "url": "https://gis.stackexchange.com/questions/501326/how-should-multiple-utm-zones-be-handled-for-a-large-regional-geophysical-grid",
-      "score": 1,
+      "score": 2,
       "answers": 1
     },
     {
@@ -226,6 +250,12 @@
       "url": "https://gis.stackexchange.com/questions/501331/how-should-street-centerlines-be-connected-for-sdna-accessibility-analysis",
       "score": 1,
       "answers": 1
+    },
+    {
+      "title": "Timeslider doesn't work in my ArcGIS JS API 5.1 code",
+      "url": "https://gis.stackexchange.com/questions/501324/timeslider-doesnt-work-in-my-arcgis-js-api-5-1-code",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "QGIS \"Join Attributes by Nearest\" yielding incorrect distances",
@@ -238,36 +268,6 @@
       "url": "https://gis.stackexchange.com/questions/501320/reconditioning-dem-in-qgis",
       "score": 0,
       "answers": 1
-    },
-    {
-      "title": "Timeslider doesn't work in my arcgis js api 5.1 code!",
-      "url": "https://gis.stackexchange.com/questions/501324/timeslider-doesnt-work-in-my-arcgis-js-api-5-1-code",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "How to compute global 1000 km-radius area-weighted avg (0.625°×0.5°, 744 layers) in 1s (1-core) or 0.1s (multi-core)?",
-      "url": "https://gis.stackexchange.com/questions/501319/how-to-compute-global-1000-km-radius-area-weighted-avg-0-625%c3%970-5-744-layers",
-      "score": -4,
-      "answers": 0
-    },
-    {
-      "title": "Land Cover Detection",
-      "url": "https://gis.stackexchange.com/questions/501318/land-cover-detection",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Make global customizations for all users in QGIS?",
-      "url": "https://gis.stackexchange.com/questions/501302/make-global-customizations-for-all-users-in-qgis",
-      "score": 1,
-      "answers": 1
-    },
-    {
-      "title": "Have found the longest flow path in a watershed, but how to extract it as a polyline?",
-      "url": "https://gis.stackexchange.com/questions/501313/have-found-the-longest-flow-path-in-a-watershed-but-how-to-extract-it-as-a-poly",
-      "score": 1,
-      "answers": 0
     }
   ],
   "nasa": [
@@ -302,34 +302,34 @@
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "DC-8 Meteorological and Navigation Data TC4",
-      "url": "https://search.earthdata.nasa.gov/search?q=dc8navtc4",
-      "desc": "The DC-8 Meteorological and Navigation Data CPEX-AW dataset is a subset of airborne measurements that include GPS positioning and trajectory data, aircraft o…",
-      "org": "GHRC_DAAC"
+      "title": "HLS Landsat Operational Land Imager Surface Reflectance and TOA Brightness Daily Global 30m v2.0",
+      "url": "https://search.earthdata.nasa.gov/search?q=HLSL30",
+      "desc": "The Harmonized Landsat Sentinel-2 (HLS) project provides consistent surface reflectance (SR) and top of atmosphere (TOA) brightness data from a virtual const…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "ACCLIP WB-57 Aircraft Merge Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=ACCLIP_Merge_WB57-Aircraft_Data",
-      "desc": "ACCLIP_Merge_WB57-Aircraft_Data is the pre-generated merge files created from a variety of in-situ instrumentation collecting measurements onboard the WB-57…",
+      "title": "HLS Sentinel-2 Multi-spectral Instrument Surface Reflectance Daily Global 30m v2.0",
+      "url": "https://search.earthdata.nasa.gov/search?q=HLSS30",
+      "desc": "The Harmonized Landsat Sentinel-2 (HLS) project provides consistent surface reflectance data from the Operational Land Imager (OLI) aboard the joint NASA/USG…",
+      "org": "LPCLOUD"
+    },
+    {
+      "title": "MAIA Level 4 Particulate Matter Product Version 001",
+      "url": "https://search.earthdata.nasa.gov/search?q=MAIA_L4_GFPM",
+      "desc": "MAIA_L4_PM_001 is the NASA Multi-Angle Imager for Aerosols (MAIA) level 4 Particulate Matter (PM) Product Version 001.",
       "org": "LARC_CLOUD"
     },
     {
-      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) DC-8 In-Situ Trace Gas Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_TraceGas_AircraftInSitu_DC8_Data",
-      "desc": "SONEX_TraceGas_AircraftInSitu_DC8_Data is the in-situ trace gas data collected onboard the DC-8 aircraft during the SASS (Subsonics Assessment) Ozone and NOx…",
-      "org": "LARC_CLOUD"
+      "title": "PACE SPEXone Level-3 Global Mapped Aerosol Over Ocean Optical Properties, FastMAPOL Algorithm Data, version 4.0",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE_SPEXONE_L3M_MAPOL_OCEAN",
+      "desc": "MAPOL_OCEAN provides simultaneous aerosol and ocean color products using the Fast Multi-Angle Polarimetric Ocean and Land algorithm (FastMAPOL).",
+      "org": "OB_CLOUD"
     },
     {
-      "title": "KORUS-AQ NASA Ground Site Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=KORUSAQ_Ground_NASA_Data",
-      "desc": "KORUSAQ_Ground_NASA_Data are ground site measurements collected by NASA instrumentation at the NIER-Taehwa ground site during the KORUS-AQ field campaign.",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "TRACE-P DC-8 In-Situ Trace Gas Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=TRACE-P_TraceGas_AircraftInSitu_DC8_Data",
-      "desc": "TRACE-P_TraceGas_AircraftInSitu_DC8_Data is the in-situ trace gas data collected onboard the DC-8 aircraft during the Transport and Chemical Evolution over t…",
-      "org": "LARC_CLOUD"
+      "title": "UAVSAR_POLSAR_STOKES",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
+      "desc": "UAVSAR PolSAR Scene Stokes",
+      "org": "ASF"
     }
   ],
   "datagov": [
