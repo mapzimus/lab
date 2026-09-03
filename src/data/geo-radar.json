@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-02",
+  "generatedAt": "2026-09-03",
   "news": {
     "mapsmania": [
+      {
+        "title": "Crawley – Welcome to Music Town, UK",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/crawley-welcome-to-music-town-uk.html",
+        "desc": ""
+      },
       {
         "title": "Movie Maps",
         "url": "http://googlemapsmania.blogspot.com/2026/09/movie-maps.html",
@@ -35,11 +40,6 @@
       {
         "title": "(MAPS) Painting By Number",
         "url": "http://googlemapsmania.blogspot.com/2026/08/maps-painting-by-number.html",
-        "desc": ""
-      },
-      {
-        "title": "GTA - San Francisco",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/gta-san-francisco.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "SWMM Tools",
-      "url": "https://plugins.qgis.org/plugins/SWMM_Tools/"
+      "title": "AI GIS AGENT",
+      "url": "https://plugins.qgis.org/plugins/ai_gis_agent/"
     },
     {
-      "title": "Universal Vector Converter",
-      "url": "https://plugins.qgis.org/plugins/universal_vector_converter/"
+      "title": "Apply Layer Styles",
+      "url": "https://plugins.qgis.org/plugins/apply_layer_styles/"
     },
     {
-      "title": "GeoStar Selector",
-      "url": "https://plugins.qgis.org/plugins/magicwand_qgis/"
+      "title": "SHP TXT Converter",
+      "url": "https://plugins.qgis.org/plugins/shp_txt_converter/"
     },
     {
-      "title": "RapidIBF-Next",
-      "url": "https://plugins.qgis.org/plugins/rapidibf_next/"
+      "title": "Lutz Sholtz - Modelo Hidrologico Mensual",
+      "url": "https://plugins.qgis.org/plugins/lutz_scholz_qgis/"
     },
     {
-      "title": "JPRaincloudradarDownloader",
-      "url": "https://plugins.qgis.org/plugins/JPRaincloudradarDownloader/"
+      "title": "KUGI",
+      "url": "https://plugins.qgis.org/plugins/kugi/"
     },
     {
-      "title": "QGC4QGIS",
-      "url": "https://plugins.qgis.org/plugins/qgc4qgis/"
+      "title": "GeoSIG Tools",
+      "url": "https://plugins.qgis.org/plugins/GeoSIG_Tools/"
     },
     {
-      "title": "QUCORE (Variable UAS Corridor Planning)",
-      "url": "https://plugins.qgis.org/plugins/QUCORE/"
+      "title": "Remove Temporary Layers",
+      "url": "https://plugins.qgis.org/plugins/remove_temp_layers/"
     },
     {
-      "title": "Q-GlaRe+",
-      "url": "https://plugins.qgis.org/plugins/qglare_plus/"
+      "title": "Tessela Estilos Prontos",
+      "url": "https://plugins.qgis.org/plugins/tessela_publico/"
     }
   ],
   "releases": [
@@ -181,7 +181,7 @@
       "url": "https://github.com/Turfjs/turf/releases/tag/v7.4.0",
       "desc": "## What's Changed ⚠️ Due to correctness fixes, behavior across the boolean-* methods has changed.",
       "publishedAt": "2026-08-03",
-      "isFresh": true
+      "isFresh": false
     },
     {
       "repo": "duckdb/duckdb",
@@ -210,22 +210,40 @@
   ],
   "gisse": [
     {
-      "title": "JSON field becomes QVariantList when exporting GeoPackage to GeoJSON",
-      "url": "https://gis.stackexchange.com/questions/501348/json-field-becomes-qvariantlist-when-exporting-geopackage-to-geojson",
-      "score": 3,
+      "title": "How to set a partially transparent color (alpha channel) for the \"noData\" color in a raster using QGIS",
+      "url": "https://gis.stackexchange.com/questions/501361/how-to-set-a-partially-transparent-color-alpha-channel-for-the-nodata-color",
+      "score": 0,
       "answers": 0
     },
     {
-      "title": "How to use Python for styling while still maintaining a theme in QGIS?",
-      "url": "https://gis.stackexchange.com/questions/501346/how-to-use-python-for-styling-while-still-maintaining-a-theme-in-qgis",
+      "title": "How to create a dynamic smooth sine wave boundary for polygon symbology in QGIS?",
+      "url": "https://gis.stackexchange.com/questions/501360/how-to-create-a-dynamic-smooth-sine-wave-boundary-for-polygon-symbology-in-qgis",
       "score": 1,
       "answers": 0
     },
     {
-      "title": "QGIS - How to group point displacement points by category",
-      "url": "https://gis.stackexchange.com/questions/501340/qgis-how-to-group-point-displacement-points-by-category",
-      "score": 2,
+      "title": "Importing Microsoft Building Footprints data into QGIS",
+      "url": "https://gis.stackexchange.com/questions/501358/importing-microsoft-building-footprints-data-into-qgis",
+      "score": 0,
       "answers": 1
+    },
+    {
+      "title": "Viewshed analysis with single layers in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501356/viewshed-analysis-with-single-layers-in-qgis",
+      "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "Print composer with multiple maps each showing a different value range from the same column",
+      "url": "https://gis.stackexchange.com/questions/501350/print-composer-with-multiple-maps-each-showing-a-different-value-range-from-the",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Significant Degredation in Google Earth Engine queue behavior",
+      "url": "https://gis.stackexchange.com/questions/501353/significant-degredation-in-google-earth-engine-queue-behavior",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "Raster image showing up outside map",
@@ -234,101 +252,83 @@
       "answers": 0
     },
     {
-      "title": "Efficient way to fetch OpenStreetMap airport polygons for point locations",
-      "url": "https://gis.stackexchange.com/questions/501334/efficient-way-to-fetch-openstreetmap-airport-polygons-for-point-locations",
-      "score": 1,
-      "answers": 2
-    },
-    {
-      "title": "How should multiple UTM zones be handled for a large regional geophysical grid",
-      "url": "https://gis.stackexchange.com/questions/501326/how-should-multiple-utm-zones-be-handled-for-a-large-regional-geophysical-grid",
-      "score": 2,
+      "title": "Grouping point displacement points by category in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501340/grouping-point-displacement-points-by-category-in-qgis",
+      "score": 4,
       "answers": 1
     },
     {
-      "title": "How should street centerlines be connected for sDNA accessibility analysis?",
-      "url": "https://gis.stackexchange.com/questions/501331/how-should-street-centerlines-be-connected-for-sdna-accessibility-analysis",
+      "title": "How to use Python for styling while still maintaining a theme in QGIS?",
+      "url": "https://gis.stackexchange.com/questions/501346/how-to-use-python-for-styling-while-still-maintaining-a-theme-in-qgis",
       "score": 1,
-      "answers": 1
-    },
-    {
-      "title": "Timeslider doesn't work in my ArcGIS JS API 5.1 code",
-      "url": "https://gis.stackexchange.com/questions/501324/timeslider-doesnt-work-in-my-arcgis-js-api-5-1-code",
-      "score": 0,
       "answers": 0
     },
     {
-      "title": "QGIS \"Join Attributes by Nearest\" yielding incorrect distances",
-      "url": "https://gis.stackexchange.com/questions/501321/qgis-join-attributes-by-nearest-yielding-incorrect-distances",
-      "score": 1,
-      "answers": 1
-    },
-    {
-      "title": "Reconditioning DEM in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501320/reconditioning-dem-in-qgis",
-      "score": 0,
-      "answers": 1
+      "title": "JSON field becomes QVariantList when exporting GeoPackage to GeoJSON",
+      "url": "https://gis.stackexchange.com/questions/501348/json-field-becomes-qvariantlist-when-exporting-geopackage-to-geojson",
+      "score": 3,
+      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "MERRA-2 Monthly Gridded Innovations and Observations AIRS_AQUA 0.5 x 0.625 degree V1 (M2_AIRS_AQUA)",
+      "url": "https://search.earthdata.nasa.gov/search?q=M2_AIRS_AQUA",
+      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
+      "org": "GES_DISC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
-      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
-      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "HLS Landsat Operational Land Imager Surface Reflectance and TOA Brightness Daily Global 30m v2.0",
-      "url": "https://search.earthdata.nasa.gov/search?q=HLSL30",
-      "desc": "The Harmonized Landsat Sentinel-2 (HLS) project provides consistent surface reflectance (SR) and top of atmosphere (TOA) brightness data from a virtual const…",
-      "org": "LPCLOUD"
-    },
-    {
-      "title": "HLS Sentinel-2 Multi-spectral Instrument Surface Reflectance Daily Global 30m v2.0",
-      "url": "https://search.earthdata.nasa.gov/search?q=HLSS30",
-      "desc": "The Harmonized Landsat Sentinel-2 (HLS) project provides consistent surface reflectance data from the Operational Land Imager (OLI) aboard the joint NASA/USG…",
-      "org": "LPCLOUD"
-    },
-    {
-      "title": "MAIA Level 4 Particulate Matter Product Version 001",
-      "url": "https://search.earthdata.nasa.gov/search?q=MAIA_L4_GFPM",
-      "desc": "MAIA_L4_PM_001 is the NASA Multi-Angle Imager for Aerosols (MAIA) level 4 Particulate Matter (PM) Product Version 001.",
+      "title": "LMOS Scientific Aviation In-Situ Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=LMOS_AircraftInSitu_ScientificAviation_Data",
+      "desc": "LMOS_AircraftInSitu_ScientificAviation_Data is the Lake Michigan Ozone Study (LMOS) in-situ data collected onboard the Scientific Aviation aircraft during th…",
       "org": "LARC_CLOUD"
     },
     {
-      "title": "PACE SPEXone Level-3 Global Mapped Aerosol Over Ocean Optical Properties, FastMAPOL Algorithm Data, version 4.0",
-      "url": "https://search.earthdata.nasa.gov/search?q=PACE_SPEXONE_L3M_MAPOL_OCEAN",
-      "desc": "MAPOL_OCEAN provides simultaneous aerosol and ocean color products using the Fast Multi-Angle Polarimetric Ocean and Land algorithm (FastMAPOL).",
-      "org": "OB_CLOUD"
+      "title": "GPM PR on TRMM Gridded Orbital Spectral Latent Heating Profiles L3 1.5 hours 0.5x0.5 degree V07 (GPM_3GSLH_TRMM)",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GSLH_TRMM",
+      "desc": "This is the new (GPM-formated) TRMM product.",
+      "org": "GES_DISC"
+    },
+    {
+      "title": "GEDI L4A Footprint Level Aboveground Biomass Density, Version 3",
+      "url": "https://search.earthdata.nasa.gov/search?q=GEDI_L4A_AGB_Density_V3_2508",
+      "desc": "This dataset contains Global Ecosystem Dynamics Investigation (GEDI) Level 4A (L4A) Version 3 predictions of the aboveground biomass density (AGBD; in Mg/ha)…",
+      "org": "ORNL_CLOUD"
     },
     {
       "title": "UAVSAR_POLSAR_STOKES",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
       "desc": "UAVSAR PolSAR Scene Stokes",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_SLOPE",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
+      "desc": "UAVSAR PolSAR Scene Slope",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_PAULI",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
+      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
+      "desc": "UAVSAR PolSAR Scene Complex",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
+      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
       "org": "ASF"
     }
   ],
