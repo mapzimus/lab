@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-03",
+  "generatedAt": "2026-09-04",
   "news": {
     "mapsmania": [
+      {
+        "title": "MapDraw: Take the Scenic Route",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/mapdraw-take-scenic-route.html",
+        "desc": ""
+      },
       {
         "title": "Crawley – Welcome to Music Town, UK",
         "url": "http://googlemapsmania.blogspot.com/2026/09/crawley-welcome-to-music-town-uk.html",
@@ -35,11 +40,6 @@
       {
         "title": "The Real-Time Animated Transit Map",
         "url": "http://googlemapsmania.blogspot.com/2026/08/the-real-time-animated-transit-map.html",
-        "desc": ""
-      },
-      {
-        "title": "(MAPS) Painting By Number",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/maps-painting-by-number.html",
         "desc": ""
       }
     ],
@@ -210,6 +210,12 @@
   ],
   "gisse": [
     {
+      "title": "Viewshed analysis with single layers in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501356/viewshed-analysis-with-single-layers-in-qgis",
+      "score": 1,
+      "answers": 1
+    },
+    {
       "title": "How to set a partially transparent color (alpha channel) for the \"noData\" color in a raster using QGIS",
       "url": "https://gis.stackexchange.com/questions/501361/how-to-set-a-partially-transparent-color-alpha-channel-for-the-nodata-color",
       "score": 0,
@@ -222,16 +228,22 @@
       "answers": 0
     },
     {
+      "title": "How to calculate statistics for raster with terra",
+      "url": "https://gis.stackexchange.com/questions/501365/how-to-calculate-statistics-for-raster-with-terra",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Importing Microsoft Building Footprints data into QGIS",
       "url": "https://gis.stackexchange.com/questions/501358/importing-microsoft-building-footprints-data-into-qgis",
       "score": 0,
       "answers": 1
     },
     {
-      "title": "Viewshed analysis with single layers in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501356/viewshed-analysis-with-single-layers-in-qgis",
-      "score": 1,
-      "answers": 1
+      "title": "QGIS 4.2.1 - 3D Symbology not showing",
+      "url": "https://gis.stackexchange.com/questions/501364/qgis-4-2-1-3d-symbology-not-showing",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "Print composer with multiple maps each showing a different value range from the same column",
@@ -246,49 +258,19 @@
       "answers": 0
     },
     {
-      "title": "Raster image showing up outside map",
-      "url": "https://gis.stackexchange.com/questions/501345/raster-image-showing-up-outside-map",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "Grouping point displacement points by category in QGIS",
       "url": "https://gis.stackexchange.com/questions/501340/grouping-point-displacement-points-by-category-in-qgis",
       "score": 4,
       "answers": 1
     },
     {
-      "title": "How to use Python for styling while still maintaining a theme in QGIS?",
-      "url": "https://gis.stackexchange.com/questions/501346/how-to-use-python-for-styling-while-still-maintaining-a-theme-in-qgis",
-      "score": 1,
-      "answers": 0
-    },
-    {
-      "title": "JSON field becomes QVariantList when exporting GeoPackage to GeoJSON",
-      "url": "https://gis.stackexchange.com/questions/501348/json-field-becomes-qvariantlist-when-exporting-geopackage-to-geojson",
-      "score": 3,
+      "title": "Raster image showing up outside map",
+      "url": "https://gis.stackexchange.com/questions/501345/raster-image-showing-up-outside-map",
+      "score": 0,
       "answers": 0
     }
   ],
   "nasa": [
-    {
-      "title": "MERRA-2 Monthly Gridded Innovations and Observations AIRS_AQUA 0.5 x 0.625 degree V1 (M2_AIRS_AQUA)",
-      "url": "https://search.earthdata.nasa.gov/search?q=M2_AIRS_AQUA",
-      "desc": "The MERRA-2 Gridded Innovations and Observations (GIO) dataset provides assimilated observations and key statistics generated during observational data assim…",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "LMOS Scientific Aviation In-Situ Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LMOS_AircraftInSitu_ScientificAviation_Data",
-      "desc": "LMOS_AircraftInSitu_ScientificAviation_Data is the Lake Michigan Ozone Study (LMOS) in-situ data collected onboard the Scientific Aviation aircraft during th…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "GPM PR on TRMM Gridded Orbital Spectral Latent Heating Profiles L3 1.5 hours 0.5x0.5 degree V07 (GPM_3GSLH_TRMM)",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GSLH_TRMM",
-      "desc": "This is the new (GPM-formated) TRMM product.",
-      "org": "GES_DISC"
-    },
     {
       "title": "GEDI L4A Footprint Level Aboveground Biomass Density, Version 3",
       "url": "https://search.earthdata.nasa.gov/search?q=GEDI_L4A_AGB_Density_V3_2508",
@@ -296,40 +278,58 @@
       "org": "ORNL_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_STOKES",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
-      "desc": "UAVSAR PolSAR Scene Stokes",
-      "org": "ASF"
+      "title": "TES/MLS Aura L2 Carbon Monoxide Special Observation V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=TML2COS",
+      "desc": "TML2COS_2 is the Tropospheric Emission Spectrometer (TES)/Aura Level 2 Atmospheric Temperatures Limb Version 2 data product.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_SLOPE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
-      "desc": "UAVSAR PolSAR Scene Slope",
-      "org": "ASF"
+      "title": "TES/MLS Aura L2 Carbon Monoxide V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=TML2CO",
+      "desc": "TML2CO_2 is the Tropospheric Emission Spectrometer (TES)/Aura Level 2 Atmospheric Temperatures Limb Version 2 data product.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_PAULI",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
-      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
-      "org": "ASF"
+      "title": "TES/Aura L3 Ozone Monthly Gridded V006",
+      "url": "https://search.earthdata.nasa.gov/search?q=TL3O3M",
+      "desc": "TL3O3M_6 is the Tropospheric Emission Spectrometer (TES)/Aura Level 3 Ozone (O3) Monthly Gridded Version 6 data product.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
-      "desc": "UAVSAR PolSAR Scene Complex",
-      "org": "ASF"
+      "title": "TES/Aura L3 Ozone Daily Gridded V006",
+      "url": "https://search.earthdata.nasa.gov/search?q=TL3O3D",
+      "desc": "TL3O3D_6 is the Tropospheric Emission Spectrometer (TES)/Aura L3 Ozone Daily Gridded Version 6 data product.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
-      "org": "ASF"
+      "title": "TES/Aura L3 HNO3 Monthly Gridded V004",
+      "url": "https://search.earthdata.nasa.gov/search?q=TL3HNOM",
+      "desc": "TL3HNOM_4 is the Tropospheric Emission Spectrometer (TES)/Aura Level 2 Atmospheric Temperatures Limb Version 4 data product.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
-      "org": "ASF"
+      "title": "TES/Aura L3 HNO3 Daily Gridded V004",
+      "url": "https://search.earthdata.nasa.gov/search?q=TL3HNOD",
+      "desc": "TL3HNOD_4 is the Tropospheric Emission Spectrometer (TES)/Aura Level 2 Atmospheric Temperatures Limb Version 4 data product.",
+      "org": "LARC_CLOUD"
+    },
+    {
+      "title": "TES/Aura L3 Deuterium Oxide Monthly Gridded V006",
+      "url": "https://search.earthdata.nasa.gov/search?q=TL3HDOM",
+      "desc": "TL3HDOM_6 is the Tropospheric Emission Spectrometer (TES)/Aura L3 Deuterium Oxide Monthly Gridded Version 6 data product.",
+      "org": "LARC_CLOUD"
+    },
+    {
+      "title": "TES/Aura L3 Deuterium Oxide Daily Gridded V006",
+      "url": "https://search.earthdata.nasa.gov/search?q=TL3HDOD",
+      "desc": "TL3HDOD_6 is the Tropospheric Emission Spectrometer (TES)/Aura Level 3 (L3) 3 Deuterium Oxide Daily Gridded Version 6 data product.",
+      "org": "LARC_CLOUD"
+    },
+    {
+      "title": "TES/Aura L3 Water Vapor Monthly Gridded V006",
+      "url": "https://search.earthdata.nasa.gov/search?q=TL3H2OM",
+      "desc": "TL3H2OM_6 is the Tropospheric Emission Spectrometer (TES)/Aura Level 3 Water Vapor Monthly Gridded Version 6 data product.",
+      "org": "LARC_CLOUD"
     }
   ],
   "datagov": [
