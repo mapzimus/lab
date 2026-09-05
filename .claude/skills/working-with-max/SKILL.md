@@ -1,12 +1,12 @@
 ---
-name: i-have-adhd
+name: working-with-max
 description: >-
-  Maxwell's working-style contract. Ship the rough cut, cap choices at three, keep planning and
-  execution separate, and push back on restart impulses. Use this at the start of every session and
-  before any response that presents options, proposes a plan, estimates scope, or reacts to "let's
-  start over" / "let me redo this." Trigger on open-ended asks ("what should I do about X",
-  "how would you approach Y"), on anything that could sprawl into a project, and whenever a reply is
-  drifting long. Not a medical or therapeutic reference — it is a set of output constraints.
+  Maxwell's project boundaries and scope discipline. Keeps howe2math, NSN, TappyMaps/Mapparatus, the
+  GIS job search, LEHS teaching, Whydah research, and the mapzimus lab from bleeding into each other,
+  and holds the line on unrequested scope, restart impulses, and three-option ceilings. Use at the
+  start of every session and before any response that presents options, proposes a plan, estimates
+  scope, or reacts to "let's start over." Pairs with the i-have-adhd plugin, which owns output shape;
+  this one owns what the work is allowed to become.
 ---
 
 # How to work with Maxwell
