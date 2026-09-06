@@ -2,245 +2,158 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <title>Bottle Game</title>
-
-  <!-- PWA: installable, offline-capable app -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0d1b2a">
-
-  <!-- iOS home-screen fallbacks (iOS ignores most manifest install behavior) -->
+  <meta name="theme-color" content="#091525">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Bottle Game">
-
-  <link rel="stylesheet" href="css/style.css?v=98">
+  <style id="flipgame-boot-shell">
+    html, body { min-height: 100%; margin: 0; background: #091525; color: #fff; }
+    body:not(.flipgame-boot-ready) > *:not(#flipgame-boot-status) { visibility: hidden; }
+    #flipgame-boot-status { visibility: visible; max-width: 34rem; margin: 12vh auto; padding: 24px;
+      border: 2px solid #f2bf58; border-radius: 14px; background: #17283c; color: #fff;
+      font: 18px/1.45 system-ui, sans-serif; text-align: center; }
+    #flipgame-boot-status button, #flipgame-boot-status a { display: inline-flex; min-height: 48px; padding: 10px 18px; border: 0; border-radius: 10px;
+      background: #4fc3f7; color: #07121e; font: inherit; font-weight: 800; }
+  </style>
 </head>
 <body>
-
-  <!-- ── Setup ───────────────────────────────────────── -->
-  <div id="setup-screen" class="screen hidden">
-    <div class="setup-card">
-      <h1 class="title-secret"><span data-secret="bottle">Bottle</span> <span data-secret="game">Game</span></h1>
-
-      <div>
-        <div class="section-label">Players — pick character &amp; color (tap Human/CPU to switch)</div>
-        <div id="player-inputs"><!-- rendered by main.js --></div>
-        <button id="add-player-btn">+ Add Player</button>
-      </div>
-
-      <div>
-        <div class="section-label">Pass direction</div>
-        <div class="direction-options">
-          <label><input type="radio" name="direction" value="1" checked> ➡ Left → Right</label>
-          <label><input type="radio" name="direction" value="-1"> ⬅ Right → Left</label>
-        </div>
-      </div>
-
-      <div>
-        <div class="section-label">CPU difficulty</div>
-        <div class="direction-options">
-          <label><input type="radio" name="difficulty" value="easy"> 🟢 Easy</label>
-          <label><input type="radio" name="difficulty" value="medium" checked> 🟡 Medium</label>
-          <label><input type="radio" name="difficulty" value="hard"> 🔴 Hard</label>
-        </div>
-      </div>
-
-      <div>
-        <div class="section-label">Feel</div>
-        <div class="direction-options">
-          <label><input type="radio" name="feel" value="forgiving"> 🟢 Forgiving</label>
-          <label><input type="radio" name="feel" value="standard" checked> 🟡 Standard</label>
-          <label><input type="radio" name="feel" value="pro"> 🔴 Pro</label>
-        </div>
-        <label class="checkbox-row"><input type="checkbox" id="flick-feedback-toggle"> Show flick feedback</label>
-      </div>
-
-      <div>
-        <div class="section-label">Starting lives</div>
-        <div class="preset-options lives-options">
-          <label><input type="radio" name="starting-lives" value="3"> 3</label>
-          <label><input type="radio" name="starting-lives" value="5"> 5</label>
-          <label><input type="radio" name="starting-lives" value="10" checked> 10</label>
-          <label><input type="radio" name="starting-lives" value="20"> 20</label>
-          <label><input type="radio" name="starting-lives" value="100"> 100</label>
-        </div>
-      </div>
-
-      <button id="start-btn">Start Game</button>
-      <button id="practice-btn">🎯 Practice (solo)</button>
-      <button id="online-btn">🌐 Online Multiplayer</button>
-      <div id="records-panel"></div>
-    </div>
+  <div id="flipgame-boot-status" role="status" aria-live="polite">
+    <strong>Starting Flipgame v1.11</strong>
+    <p>If loading pauses, reconnect and retry. Your local game data is safe.</p>
+    <a href="index.html">Retry update</a>
   </div>
+  <div id="app-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+  <div id="app-error" class="sr-only" role="alert" aria-live="assertive" aria-atomic="true"></div>
 
-  <!-- ── Character picker (overlay; edits one player row) ──
-       MUST stay ABOVE the Online lobby block: tools/sync-parrot-flip.js strips
-       everything from the lobby marker to the NEXT "<!-- ── " heading, so markup
-       placed after it vanishes from the branded build. No <h1> here either —
-       the same tool rewrites the first <h1> to the parrot brand title. -->
-  <div id="char-picker-screen" class="screen hidden" role="dialog" aria-modal="true"
-       aria-labelledby="charpick-title">
-    <div class="charpick-card">
-      <div class="charpick-head">
-        <div id="charpick-title" class="charpick-title">Choose a character</div>
-        <button type="button" id="charpick-close" class="charpick-close" aria-label="Close">✕</button>
-      </div>
-      <div id="charpick-grid" class="charpick-grid"><!-- rendered by main.js --></div>
-    </div>
-  </div>
-
-  <!-- ── Mystery box reveal (a won box hatches a random flippable) ──
-       Same placement rule as the picker above: must stay ABOVE the Online lobby
-       marker or sync-parrot-flip.js strips it. No <h1>. -->
-  <div id="mystery-screen" class="screen hidden" role="dialog" aria-modal="true"
-       aria-labelledby="mystery-headline">
-    <div class="mystery-card">
-      <div id="mystery-headline" class="mystery-headline">A new flippable appears!</div>
-      <div class="mystery-stage">
-        <div id="mystery-box" class="mystery-box" aria-hidden="true">
-          <div class="mbox-lid"></div>
-          <div class="mbox-body">?</div>
-        </div>
-        <div id="mystery-prize" class="mystery-prize">
-          <canvas id="mystery-art" class="mystery-art" width="300" height="420" aria-hidden="true"></canvas>
-        </div>
-      </div>
-      <div id="mystery-name" class="mystery-name" aria-live="polite"></div>
-      <div id="mystery-family" class="mystery-family"></div>
-      <button type="button" id="mystery-go-btn">Tap to open</button>
-      <div id="mystery-queue" class="mystery-queue"></div>
-    </div>
-  </div>
-
-  <!-- ── Online lobby ─────────────────────────────────── -->
-  <div id="online-screen" class="screen hidden">
-    <div class="setup-card online-card">
-      <h1>Online</h1>
-      <p class="online-blurb">Same rules, different devices. Create a room, share the code, take turns flicking. School-WiFi friendly (no WebRTC).</p>
-
-      <div id="online-form">
-        <div class="section-label">Your name</div>
-        <input id="online-name" type="text" maxlength="14" placeholder="Player name" class="online-input">
-
-        <div class="online-actions">
-          <button id="online-create-btn">Create Room</button>
-          <div class="online-join-row">
-            <input id="online-code" type="text" maxlength="6" placeholder="CODE" class="online-input code-input" autocomplete="off" autocapitalize="characters">
-            <button id="online-join-btn">Join</button>
+  <section id="setup-screen" class="screen hidden app-shell" data-route="setup" aria-labelledby="setup-title">
+    <header class="app-header setup-header">
+      <h1 id="setup-title" tabindex="-1"><span>Bottle</span> <span>Game</span></h1>
+      <nav class="utility-nav" aria-label="Game information">
+        <button id="stats-btn" type="button"><span aria-hidden="true">▥</span><span>Stats</span></button>
+        <button id="achievements-btn" type="button"><span aria-hidden="true">★</span><span>Achievements</span></button>
+        <button id="online-btn" type="button" class="hidden"><span aria-hidden="true">◎</span><span>Online</span></button>
+      </nav>
+    </header>
+    <main class="app-main setup-main">
+      <div class="setup-layout">
+        <section class="panel players-panel" aria-labelledby="players-heading">
+          <div class="panel-heading"><h2 id="players-heading">Players</h2><span id="player-count-label" class="context-label">2 players</span></div>
+          <div id="player-inputs" class="player-input-grid"></div>
+          <div class="add-player-row"><button id="add-player-btn" type="button">Add player</button><span id="player-limit-note" class="helper">Up to 8 players</span></div>
+        </section>
+        <section class="panel match-panel" aria-labelledby="match-heading">
+          <div class="panel-heading"><h2 id="match-heading">Match</h2></div>
+          <fieldset class="control-group"><legend>Format</legend>
+            <div class="segment-group segment-three" id="format-options">
+              <label><input type="radio" name="match-format" value="classic" checked><span>Classic</span></label>
+              <label><input type="radio" name="match-format" value="cup"><span>Cup</span></label>
+              <label id="team-format-option"><input type="radio" name="match-format" value="team-clash"><span>Team Clash</span></label>
+            </div><p id="format-summary" class="control-summary">Classic elimination. Last player standing wins.</p>
+          </fieldset>
+          <fieldset id="cup-options" class="control-group hidden"><legend>Cup length</legend>
+            <div class="segment-group"><label><input type="radio" name="cup-length" value="short" checked><span>Short</span></label><label><input type="radio" name="cup-length" value="full"><span>Full</span></label></div>
+            <p class="control-summary">Best of three heats. Lives reset and the first player rotates.</p>
+          </fieldset>
+          <fieldset id="classic-lives" class="control-group"><legend>Starting lives</legend>
+            <div class="segment-group segment-five lives-options"><label><input type="radio" name="starting-lives" value="3"><span>3</span></label><label><input type="radio" name="starting-lives" value="5"><span>5</span></label><label><input type="radio" name="starting-lives" value="10" checked><span>10</span></label><label><input type="radio" name="starting-lives" value="20"><span>20</span></label><label><input type="radio" name="starting-lives" value="100"><span>100</span></label></div>
+          </fieldset>
+          <div class="match-control-grid">
+            <fieldset class="control-group"><legend>Pass direction</legend><div class="segment-group"><label><input type="radio" name="direction" value="1" checked><span>Left to right</span></label><label><input type="radio" name="direction" value="-1"><span>Right to left</span></label></div></fieldset>
+            <fieldset class="control-group"><legend>Feel</legend><div class="segment-group segment-three"><label><input type="radio" name="feel" value="forgiving"><span>Forgiving</span></label><label><input type="radio" name="feel" value="standard" checked><span>Standard</span></label><label><input type="radio" name="feel" value="pro"><span>Pro</span></label></div></fieldset>
           </div>
-        </div>
-        <button id="online-back-btn" class="ghost-btn">← Back</button>
+          <fieldset id="difficulty-group" class="control-group hidden"><legend>CPU difficulty</legend><div class="segment-group segment-three"><label><input type="radio" name="difficulty" value="easy"><span>Easy</span></label><label><input type="radio" name="difficulty" value="medium" checked><span>Medium</span></label><label><input type="radio" name="difficulty" value="hard"><span>Hard</span></label></div></fieldset>
+          <fieldset class="control-group"><legend>Mode</legend><div class="segment-group"><label><input type="radio" name="game-mode" value="normal" checked><span>Normal</span></label><label id="insane-mode-option" class="locked-tile" aria-label="Locked"><input id="insane-mode-radio" type="radio" name="game-mode" value="insanity" disabled><span id="insane-mode-label" aria-hidden="true">🔒</span></label></div><p id="insane-mode-note" class="control-summary hidden"></p></fieldset>
+          <input id="arena-profile" type="hidden" value="">
+          <label class="check-control"><input type="checkbox" id="flick-feedback-toggle"><span>Show flick feedback</span></label>
+          <label class="check-control"><input type="checkbox" id="reduce-motion-toggle"><span>Reduce motion</span></label>
+        </section>
       </div>
+    </main>
+    <footer class="app-footer setup-footer"><button id="practice-btn" type="button" class="secondary-action">Practice</button><button id="physics-lab-btn" type="button" class="locked-tile lock-action" aria-label="Locked"><span aria-hidden="true">🔒</span></button><button id="start-btn" type="button" class="primary-action">Start Classic</button></footer>
+  </section>
 
-      <div id="online-lobby" class="hidden">
-        <div class="section-label">Room code</div>
-        <div id="online-room-code" class="room-code">----</div>
-        <div id="online-status" class="online-status"></div>
-        <div class="section-label">Players</div>
-        <div id="online-roster"></div>
-        <button id="online-start-btn" class="hidden">Start Match</button>
-        <button id="online-leave-btn" class="ghost-btn">Leave Room</button>
-      </div>
-    </div>
-  </div>
+  <section id="char-picker-screen" class="screen hidden app-shell" data-route="customize" aria-labelledby="charpick-title">
+    <header class="app-header"><button type="button" id="charpick-close" class="back-btn">Back</button><h1 id="charpick-title" tabindex="-1">Customize P1</h1></header>
+    <main class="app-main customize-main">
+      <div class="seat-switcher" aria-label="Choose player"><button type="button" id="customize-prev">Previous player</button><strong id="customize-seat">P1</strong><button type="button" id="customize-next">Next player</button></div>
+      <div class="tab-list" role="tablist" aria-label="Customization category"><button type="button" role="tab" id="customize-tab-object" aria-controls="customize-panel" aria-selected="true" data-customize-tab="object">Object</button><button type="button" role="tab" id="customize-tab-variant" aria-controls="customize-panel" aria-selected="false" tabindex="-1" data-customize-tab="variant">Variant</button><button type="button" role="tab" id="customize-tab-cosmetic" aria-controls="customize-panel" aria-selected="false" tabindex="-1" data-customize-tab="cosmetic">Cosmetic</button><button type="button" role="tab" id="customize-tab-arena" aria-controls="customize-panel" aria-selected="false" tabindex="-1" data-customize-tab="arena">Arena</button></div>
+      <p id="arena-scope-note" class="scope-note hidden">Applies to everyone</p>
+      <div id="customize-panel" role="tabpanel" aria-labelledby="customize-tab-object"><div id="charpick-grid" class="picker-grid" role="grid"></div></div>
+    </main>
+    <footer class="app-footer"><button type="button" id="customize-cancel" class="secondary-action">Cancel</button><button type="button" id="customize-apply" class="primary-action">Apply</button></footer>
+  </section>
 
-  <!-- ── Game ────────────────────────────────────────── -->
-  <div id="game-screen" class="screen hidden">
-    <canvas id="game-canvas"></canvas>
-    <div id="hud">
-      <div id="top-bar">
-        <button id="menu-btn" aria-label="Main menu">☰</button>
-        <span id="turn-banner"></span>
-        <button id="mute-btn" aria-label="Mute">🔊</button>
-        <span id="point-count"></span>
-      </div>
-      <div id="turn-timer"><div id="turn-timer-fill"></div></div>
-      <div id="streak-banner"></div>
-    </div>
-    <div id="flip-hint">Flick up to flip!</div>
-    <div id="practice-meter" class="hidden" aria-hidden="true">
-      <div class="pm-row" id="pm-power-row">
-        <div class="pm-track">
-          <div class="pm-band" id="pm-power-band"></div>
-          <div class="pm-marker" id="pm-power-marker"></div>
-        </div>
-        <div class="pm-label" id="pm-power-label">flick strength — green ≈ sweet spot</div>
-      </div>
-      <div class="pm-row hidden" id="pm-side-row">
-        <div class="pm-track pm-track-side">
-          <div class="pm-band pm-band-side" id="pm-side-band"></div>
-          <div class="pm-pad" id="pm-pad-mark" title="pad"></div>
-          <div class="pm-marker" id="pm-side-marker"></div>
-        </div>
-        <div class="pm-label" id="pm-side-label">sideways aim — diamond = pad</div>
-      </div>
-    </div>
-    <div id="player-list"></div>
-  </div>
+  <section id="mystery-screen" class="screen hidden centered-screen" role="dialog" aria-modal="true" aria-labelledby="mystery-headline"><div class="mystery-card"><h2 id="mystery-headline">A new flippable appears!</h2><div class="mystery-stage" aria-hidden="true"><div id="mystery-box" class="mystery-box"><div class="mbox-lid"></div><div class="mbox-body">?</div></div><div id="mystery-prize" class="mystery-prize"><canvas id="mystery-art" class="mystery-art" width="300" height="420"></canvas></div></div><div id="mystery-name" class="mystery-name" aria-live="polite"></div><div id="mystery-family"></div><button type="button" id="mystery-go-btn" class="primary-action">Reveal</button><div id="mystery-queue" class="helper"></div></div></section>
 
-  <!-- ── Pass-and-play handoff ────────────────────────── -->
-  <div id="pass-screen" class="screen hidden">
-    <div id="pass-card" class="pass-card">
-      <div class="pass-label">PASS TO</div>
-      <div id="pass-name"></div>
-      <button id="pass-go-btn">Tap to flip ▶</button>
-    </div>
-  </div>
+  <!-- Online lobby -->
+  <section id="online-screen" class="screen hidden app-shell" data-route="online" aria-labelledby="online-title">
+    <header class="app-header"><button id="online-back-btn" type="button" class="back-btn">Back</button><h1 id="online-title" tabindex="-1">Online</h1></header>
+    <main class="app-main narrow-main">
+      <div id="online-form" class="panel online-card"><p>Play the same match on different devices using a room code.</p><div class="field-stack"><label for="online-name">Player name</label><input id="online-name" type="text" maxlength="14" autocomplete="nickname" aria-describedby="online-name-help online-name-error"><span id="online-name-help" class="helper">14 max</span><span id="online-name-error" class="field-error"></span></div><button id="online-create-btn" type="button" class="primary-action">Create room</button><div class="field-stack"><label for="online-code">Room code</label><input id="online-code" type="text" maxlength="6" class="code-input" autocomplete="off" autocapitalize="characters"></div><button id="online-join-btn" type="button" class="primary-action">Join room</button><div id="online-action-error" class="inline-error"></div><button id="online-retry-btn" type="button" class="secondary-action hidden">Try again</button></div>
+      <div id="online-lobby" class="panel online-card hidden"><p class="eyebrow">Room code</p><div id="online-room-code" class="room-code" aria-label="Room code">----</div><button id="online-copy-btn" type="button" class="secondary-action">Copy code</button><div id="online-status" class="online-status" role="status"></div><h2>Players</h2><div id="online-roster" class="online-roster"></div><p id="online-wait-reason" class="helper">Waiting for at least 2 players</p></div>
+    </main>
+    <footer id="online-footer" class="app-footer"><button id="online-leave-btn" type="button" class="secondary-action hidden">Leave</button><button id="online-start-btn" type="button" class="primary-action hidden">Start</button></footer>
+  </section>
 
-  <!-- ── Game Over ────────────────────────────────────── -->
-  <div id="game-over" class="screen hidden">
-    <div class="game-over-card">
-      <div class="trophy-emoji">🏆</div>
-      <h2>Winner</h2>
-      <div id="winner-name"></div>
-      <div id="scoreboard"></div>
-      <div id="game-stats"></div>
-      <button id="play-again-btn">Play Again</button>
-      <button id="home-btn">Main Menu</button>
-    </div>
-  </div>
+  <section id="stats-screen" class="screen hidden app-shell" data-route="stats" aria-labelledby="stats-title">
+    <header class="app-header"><button id="stats-back-btn" type="button" class="back-btn">Back</button><h1 id="stats-title" tabindex="-1">Stats · This device</h1></header>
+    <main class="app-main stats-main"><p class="privacy-note">Stored only on this device.</p><div id="stats-storage-warning" class="storage-warning hidden" role="status" aria-live="polite"></div><div class="stats-layout">
+      <aside class="stats-rail" aria-label="Statistics filters"><details id="stats-filters" open><summary>Filters</summary>
+        <label for="stats-scope">Scope</label><select id="stats-scope"><option value="session">This session</option><option value="device" selected>Device lifetime</option><option value="import">Imported</option><option value="all">All data</option></select>
+        <fieldset><legend>Period</legend><label><input type="radio" name="stats-period" value="all" checked>All time</label><label><input type="radio" name="stats-period" value="30-days">Last 30 days</label><label><input type="radio" name="stats-period" value="20-matches">Last 20 matches</label></fieldset>
+        <label for="stats-from">From date</label><input id="stats-from" type="date">
+        <label for="stats-format">Mode / format</label><select id="stats-format"><option value="all">All</option><option value="classic">Classic</option><option value="cup">Cup</option><option value="team-clash">Team Clash</option><option value="practice">Practice</option><option value="physics-lab">Physics Lab</option></select>
+        <label for="stats-player">Player</label><select id="stats-player"><option value="all">All players</option></select>
+        <label for="stats-seat">Seat</label><select id="stats-seat"><option value="all">All seats</option></select>
+        <label for="stats-human">Player type</label><select id="stats-human"><option value="all">Human and CPU</option><option value="human">Human</option><option value="cpu">CPU</option></select>
+        <label for="stats-object">Object</label><select id="stats-object"><option value="all">All observed objects</option></select>
+        <label for="stats-variant">Variant</label><select id="stats-variant"><option value="all">All observed variants</option></select>
+        <label for="stats-cosmetic">Cosmetic</label><select id="stats-cosmetic"><option value="all">All observed cosmetics</option></select>
+        <label for="stats-arena">Arena</label><select id="stats-arena"><option value="all">All observed arenas</option></select>
+        <label for="stats-event">Event</label><select id="stats-event"><option value="all">All discovered events</option></select>
+        <label for="stats-player-count">Player count</label><select id="stats-player-count"><option value="all">Any player count</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select>
+        <label for="stats-viewport">Viewport</label><select id="stats-viewport"><option value="all">All observed viewports</option></select>
+        <label class="check-control"><input id="stats-practice" type="checkbox">Include practice</label>
+        <label class="check-control"><input id="stats-test-data" type="checkbox">Include Test Data</label>
+        <button id="stats-clear" type="button" class="secondary-action">Clear filters</button><button id="stats-apply" type="button" class="primary-action">Apply filters</button></details></aside>
+      <section class="stats-results" aria-label="Statistics results"><div class="tab-list" role="tablist" aria-label="Statistics view"><button role="tab" aria-selected="true" data-stats-tab="overview">Overview</button><button role="tab" aria-selected="false" tabindex="-1" data-stats-tab="players">Players</button><button role="tab" aria-selected="false" tabindex="-1" data-stats-tab="events">Events</button><button role="tab" aria-selected="false" tabindex="-1" data-stats-tab="distributions">Distributions</button></div><p class="observed-note">Observed results describe games recorded on this device. They are not the programmed chance of an event or outcome.</p><div id="stats-results"></div><details class="local-data"><summary>Local data</summary><div class="data-actions"><h2>Game save</h2><p>Back up this device's setup, unlocks, achievements, and Hall of Fame.</p><button id="save-export" type="button">Export .flipgame-save</button><label class="file-action">Import .flipgame-save<input id="save-import" type="file" accept=".flipgame-save,application/octet-stream,application/json"></label><div id="save-import-result" role="status" aria-live="polite" tabindex="-1"></div><h2>Statistics archive</h2><button id="stats-export-json" type="button">Export .flipstats.json</button><label for="stats-csv-type">CSV data</label><select id="stats-csv-type"><option value="flips">Flips</option><option value="matches">Matches</option><option value="player-summary" selected>Players</option><option value="event-summary">Event summaries</option></select><button id="stats-export-csv" type="button">Export CSV</button><label class="check-control"><input id="stats-export-names" type="checkbox">Include display names</label><label class="file-action">Import .flipstats.json<input id="stats-import" type="file" accept=".flipstats.json,application/json"></label><button id="stats-delete" type="button" class="danger-action">Delete local statistics</button></div><div id="stats-import-result" role="status" aria-live="polite" tabindex="-1"></div></details></section>
+    </div></main>
+  </section>
 
-  <!-- ?v= forces the browser to refetch on each release (dev server sends no
-       cache headers). Bump alongside the service-worker CACHE_NAME. -->
-  <script src="js/vendor/matter.min.js"></script>
-  <script src="js/polyfills.js?v=98"></script>
-  <script src="js/game.js?v=98"></script>
-  <script src="js/physics.js?v=98"></script>
-  <script src="js/input.js?v=98"></script>
-  <script src="js/renderer.js?v=98"></script>
-  <script src="js/audio.js?v=98"></script>
-  <script src="js/settings.js?v=98"></script>
-  <script src="js/records.js?v=98"></script>
-  <script src="js/achievements.js?v=98"></script>
-  <script src="js/cast25.js?v=98"></script>
-  <script src="js/skins.js?v=98"></script>
-  <script src="js/net.js?v=98"></script>
-  <script src="js/main.js?v=98"></script>
-  <script>
-    window.onerror = (msg, src, line) => {
-      const el = document.getElementById('err-overlay') || (() => {
-        const d = document.createElement('div');
-        d.id = 'err-overlay';
-        d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);color:#ff5252;font:14px monospace;padding:20px;z-index:9999;white-space:pre-wrap;overflow:auto;';
-        document.body.appendChild(d); return d;
-      })();
-      el.textContent += `[${src?.split('/').pop()}:${line}] ${msg}\n`;
-    };
+  <section id="achievements-screen" class="screen hidden app-shell" data-route="achievements" aria-labelledby="achievements-title">
+    <header class="app-header"><button id="achievements-back-btn" type="button" class="back-btn">Back</button><h1 id="achievements-title" tabindex="-1">Achievements</h1><span id="achievement-summary" class="context-label"></span></header>
+    <main class="app-main gallery-main"><div id="achievement-filters" class="filter-bar" aria-label="Achievement filters"><button type="button" aria-pressed="true" data-ach-filter="all">All</button><button type="button" aria-pressed="false" data-ach-filter="earned">Earned</button><button type="button" aria-pressed="false" data-ach-category="event">Events</button><button type="button" aria-pressed="false" data-ach-category="classic">Classic</button><button type="button" aria-pressed="false" data-ach-category="cup">Cup</button><button type="button" aria-pressed="false" data-ach-category="team">Team</button><button type="button" aria-pressed="false" data-ach-category="collection">Collection</button><button type="button" aria-pressed="false" data-ach-category="lab-stats">Lab/Stats</button></div><div id="achievement-grid" class="picker-grid achievement-grid" role="grid"></div><p id="achievement-empty" class="empty-state hidden">No achievements earned in this category yet.</p></main>
+  </section>
 
-    // Register the service worker for offline play — only on the deployed
-    // (non-localhost) HTTP(S) site. Skipped on localhost (dev) and file://
-    // (the bundled WebView APK, which is already fully offline).
-    if ('serviceWorker' in navigator && location.protocol.startsWith('http') &&
-        location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(reg => console.log('SW registered, scope:', reg.scope))
-          .catch(err => console.error('SW registration failed:', err));
-      });
-    }
-  </script>
+  <section id="lab-screen" class="screen hidden app-shell" data-route="physics-lab" aria-labelledby="lab-title">
+    <header class="app-header"><button id="lab-back-btn" type="button" class="back-btn">Back</button><h1 id="lab-title" tabindex="-1">Physics Lab</h1><span class="context-label">Advanced Practice</span></header>
+    <main class="app-main lab-main">
+      <section class="panel" aria-labelledby="lab-shot-title"><h2 id="lab-shot-title">Shot setup</h2><div class="lab-controls">
+        <label for="lab-object">Object</label><select id="lab-object"></select>
+        <label for="lab-variant">Variant</label><select id="lab-variant"></select>
+        <label for="lab-event">Forced event</label><select id="lab-event"><option value="">None</option></select>
+        <label for="lab-seed">Exact seed</label><input id="lab-seed" type="text" inputmode="numeric" autocomplete="off" placeholder="Random" aria-describedby="lab-seed-help"><span id="lab-seed-help" class="helper">Enter a whole number to replay the same trajectory.</span>
+      </div></section>
+      <section class="panel" aria-labelledby="lab-view-title"><h2 id="lab-view-title">View and playback</h2><div class="lab-controls">
+        <label for="lab-viewport">Viewport preset</label><select id="lab-viewport"><option value="actual">Current screen</option><option value="360x740">360 × 740</option><option value="1280x720">1280 × 720</option><option value="1920x1080">1920 × 1080</option><option value="3840x2160">3840 × 2160</option></select>
+        <label class="check-control"><input id="lab-slow-motion" type="checkbox">Slow motion</label>
+        <label class="check-control"><input id="lab-ghost" type="checkbox" checked>Show successful-shot ghost</label>
+      </div></section>
+      <section class="panel lab-explainer" aria-labelledby="lab-read-title"><h2 id="lab-read-title">Landing readout</h2><p>Landing reasons, rotations, contacts, and settling time appear after each shot.</p><div id="lab-route-readout" role="status">No shot recorded in this Lab session.</div></section>
+    </main>
+    <footer class="app-footer"><button id="lab-replay-btn" type="button" class="secondary-action" disabled>Replay successful seed</button><button id="lab-start-btn" type="button" class="primary-action">Start Lab</button></footer>
+  </section>
 
+  <section id="game-screen" class="screen hidden" aria-label="Game"><canvas id="game-canvas"></canvas><div id="hud"><div id="top-bar"><button id="menu-btn" aria-label="Main menu">☰</button><span id="turn-banner" role="status" aria-live="polite"></span><button id="mute-btn" aria-label="Mute">🔊</button><span id="point-count"></span></div><div id="streak-banner" role="status"></div><div id="mode-badge"></div><div id="event-status" class="event-status" role="status" aria-live="polite"></div><div id="lab-readout" class="lab-game-readout hidden" role="status" aria-live="polite"></div></div><div id="flip-hint">Flick up to flip!</div><div id="practice-meter" class="hidden" aria-hidden="true"><div class="pm-row" id="pm-power-row"><div class="pm-track"><div class="pm-band" id="pm-power-band"></div><div class="pm-marker" id="pm-power-marker"></div></div><div class="pm-label" id="pm-power-label">Flick strength · green is the sweet spot</div></div><div class="pm-row hidden" id="pm-side-row"><div class="pm-track"><div class="pm-band pm-band-side" id="pm-side-band"></div><div class="pm-pad" id="pm-pad-mark"></div><div class="pm-marker" id="pm-side-marker"></div></div><div class="pm-label" id="pm-side-label">Sideways aim · diamond is the pad</div></div></div><div id="player-list"></div></section>
+  <section id="pass-screen" class="screen hidden centered-screen" aria-labelledby="pass-label"><div id="pass-card" class="pass-card"><div id="pass-label" class="pass-label">Pass to</div><div id="pass-name"></div><button id="pass-go-btn" class="primary-action">Ready to flip</button></div></section>
+
+  <section id="game-over" class="screen hidden app-shell game-over-screen" data-route="game-over" aria-labelledby="game-over-title"><header class="app-header"><h1 id="game-over-title" tabindex="-1">Match complete</h1></header><main class="app-main game-over-main"><div class="result-hero"><div class="trophy-emoji" aria-hidden="true">🏆</div><div id="winner-name"></div><p id="result-summary"></p></div><div id="cup-series" class="series-markers"></div><section id="arena-draft" class="arena-draft hidden" aria-labelledby="arena-draft-title"><h2 id="arena-draft-title">Choose the next heat arena</h2><p>These modifiers affect every player equally.</p><div id="arena-draft-choices" class="arena-draft-choices" role="radiogroup" aria-label="Next heat arena"></div></section><div id="scoreboard" class="result-grid"></div><section aria-labelledby="this-match-title"><h2 id="this-match-title">This match</h2><div id="game-stats"></div></section><div id="award-notices" aria-live="polite"></div><div id="next-order" class="proposal-panel hidden" aria-live="polite"></div></main><footer class="app-footer result-footer"><button id="rotate-order-btn" type="button" class="secondary-action">Rotate first player</button><button id="shuffle-order-btn" type="button" class="secondary-action">Shuffle order</button><button id="swap-teams-btn" type="button" class="secondary-action hidden">Swap teams</button><button id="play-again-btn" type="button" class="primary-action">Same Setup</button><button id="home-btn" type="button" class="secondary-action">Main menu</button></footer></section>
+
+  <div id="version-badge" aria-label="Bottle Game version 1.11">v1.11</div>
+  <script src="js/v111-boot.js?v=111"></script>
 </body>
 </html>

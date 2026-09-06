@@ -2,14 +2,35 @@
 // Bump CACHE_NAME on every release so stale caches are purged and users get
 // the fresh build. All paths are RELATIVE so they resolve under /flipgame/
 // on GitHub Pages (the SW lives at repo root → scope is /flipgame/).
-const CACHE_NAME = 'flipgame-v98';
+const CACHE_NAME = 'flipgame-v1-11';
 
 const PRECACHE_URLS = [
   './',
   './index.html',
-  './roster.html',
   './css/style.css',
+  './js/v111-boot.js',
   './js/polyfills.js',
+  './js/v111-interfaces.js',
+  './js/v111-runtime.js',
+  './js/v111-name-policy.js',
+  './js/v111-save-backup.js',
+  './js/v111-stats.js',
+  './js/v111-platform.js',
+  './js/v111-art-platform.js',
+  './js/v111-object-manifest.js',
+  './js/v111-art-reference.js',
+  './js/v111-art-pack-a.js',
+  './js/v111-art-pack-b.js',
+  './js/v111-art-pack-c.js',
+  './js/v111-legacy-object-dynamics.js',
+  './js/v111-reaction-renderer.js',
+  './js/v111-bootstrap.js',
+  './js/v111-content-catalog.js',
+  './js/v111-cosmetic-catalog.js',
+  './js/v111-progression.js',
+  './js/v111-modes.js',
+  './js/v111-physics-events.js',
+  './js/v111-mirror-match.js',
   './js/game.js',
   './js/physics.js',
   './js/input.js',
@@ -20,6 +41,7 @@ const PRECACHE_URLS = [
   './js/achievements.js',
   './js/cast25.js',
   './js/skins.js',
+  './js/v111-network-protocol.js',
   './js/net.js',
   './js/main.js',
   './js/vendor/matter.min.js',
@@ -30,15 +52,14 @@ const PRECACHE_URLS = [
 ];
 
 self.addEventListener('install', (event) => {
-  // Cache entries INDIVIDUALLY (not addAll, which is atomic). A single 404 or
-  // flaky fetch must not abort the whole precache and leave us with no offline
-  // cache at all — better a partial cache than none.
+  // Treat the release shell as one atomic unit. If any critical asset is
+  // unavailable, installation fails and the previous complete worker/cache
+  // remains active instead of replacing it with a partial offline build.
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
-      Promise.allSettled(PRECACHE_URLS.map((u) => cache.add(u)))
-    )
+      Promise.all(PRECACHE_URLS.map((url) => cache.add(url)))
+    ).then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -73,17 +94,17 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) =>
-      cache.match(req).then((cached) => {
-        // HTML uses ?v=N cache-busting; precache stores bare paths — ignore the
-        // query when looking up so offline still hits the precache.
-        const lookup = cached || cache.match(req, { ignoreSearch: true });
-        return Promise.resolve(lookup).then((hit) => {
-          const fromNetwork = fetch(req).then((res) => {
-            if (res && res.status === 200) cache.put(req, res.clone());
-            return res;
-          }).catch(() => hit);
-          return hit || fromNetwork;
-        });
+      cache.match(req).then((exact) => {
+        // A new ?v=N URL must not be satisfied by a stale bare-path precache.
+        // Fetch it first; use ignoreSearch only if the device is offline.
+        const offlineFallback = exact || cache.match(req, { ignoreSearch: true });
+        const fromNetwork = fetch(req).then((res) => {
+          if (res && res.status === 200) cache.put(req, res.clone());
+          return res;
+        }).catch(() => offlineFallback);
+        // Exact-version hits stay stale-while-revalidate. A version miss waits
+        // for the network, preventing the previous release from running once.
+        return exact || fromNetwork;
       })
     )
   );

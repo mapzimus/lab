@@ -1,192 +1,255 @@
-// records.js — persisted hall-of-fame (localStorage). Loaded before main.js.
-// Pure read of game state — touches no rules or physics.
-const Records = (() => {
-  const KEY = 'flipgame.records.v1';
-  // The edition that is free from the start. Branded ports (Parrot Flip) swap
-  // this with the bottle — see window.FLIP_BRAND in skins.js.
-  const BASE_SKIN =
-    (typeof window !== 'undefined' && window.FLIP_BRAND && window.FLIP_BRAND.baseSkin) || 'bottle';
-  const DEFAULTS = {
-    bestStreak: 0,      // longest personal consecutive makes
-    highestStake: 0,    // highest shared stake (pointCount) ever reached
-    totalMakes: 0,
-    totalFlips: 0,
-    longestOnFire: 0,   // most bonus makes in one ON FIRE run
-    greatSaves: 0,      // lifetime tip-past-the-brink-and-recover MAKEs
-    capLands: 0,        // lifetime rare upside-down / on-cap MAKEs (worth 2)
-    mostWins: {},       // name -> win count
-    totalWins: 0,       // wins on this device, across all players — drives skin unlocks
-    unlockedSkins: [BASE_SKIN],  // flippable editions earned on this device
+// records.js -- safe local Hall-of-Fame aggregates and progression adapter.
+(function (root, factory) {
+  'use strict';
+  var Progression = root && root.FlipgameV111Progression;
+  var NamePolicy = root && root.FlipgameV111NamePolicy;
+  if (typeof module === 'object' && module.exports) {
+    Progression = require('./v111-progression.js');
+    NamePolicy = require('./v111-name-policy.js');
+  }
+  var api = factory(Progression, NamePolicy, root);
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  if (root) root.Records = api;
+})(typeof globalThis !== 'undefined' ? globalThis
+  : (typeof self !== 'undefined' ? self
+  : (typeof window !== 'undefined' ? window : this)), function (Progression, NamePolicy, root) {
+  'use strict';
+  if (!Progression) throw new Error('v111 progression must load before records.js');
+
+  var KEY = 'flipgame.records.v2';
+  var LEGACY_KEY = 'flipgame.records.v1';
+  var BASE_OBJECT = (root && root.FLIP_BRAND && root.FLIP_BRAND.baseSkin) || 'bottle';
+  var DEFAULTS = {
+    schema: 'RecordSummaryV2', version: 2,
+    bestStreak: 0, highestStake: 0, totalMakes: 0, totalFlips: 0,
+    longestOnFire: 0, greatSaves: 0, capLands: 0,
+    winnerRecords: [], qualifyingWins: 0, pendingRevealIds: [],
   };
-  let data = load();
 
-  function clone(o) { return JSON.parse(JSON.stringify(o)); }
-  function load() {
-    try {
-      const raw = localStorage.getItem(KEY);
-      const data = raw ? { ...clone(DEFAULTS), ...JSON.parse(raw) } : clone(DEFAULTS);
-      // Gold Trophy edition was replaced by Buildings — migrate any saved unlock.
-      if (Array.isArray(data.unlockedSkins)) {
-        const before = data.unlockedSkins.join(',');
-        data.unlockedSkins = [...new Set(
-          data.unlockedSkins.map((id) => id === 'trophy_gold' ? 'buildings' : id)
-        )];
-        if (data.unlockedSkins.join(',') !== before) {
-          try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {}
-        }
-      } else {
-        data.unlockedSkins = [BASE_SKIN];
-      }
-      return data;
-    } catch (e) { return clone(DEFAULTS); }
+  function clone(value) { return JSON.parse(JSON.stringify(value)); }
+  function number(value) { return Math.max(0, Number(value) || 0); }
+  function parse(raw, fallback) {
+    if (raw == null || raw === '') return fallback;
+    if (typeof raw === 'object') return raw;
+    try { return JSON.parse(raw); } catch (_) { return fallback; }
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
-
-  // ── Threshold unlocks (bare-bones ladder) ──────────────────────────────────
-  // Free bottle at 0 wins, then one character every 4 wins up to Alien at 100.
-  // No random mystery draws — the ladder order in Skins.list() is the order.
-  const WINS_PER_BOX = 4;   // kept name for main.js UI (“wins to next unlock”)
-
-  function allChars() {
-    return (typeof window !== 'undefined' && window.Skins && typeof Skins.list === 'function')
-      ? Skins.list() : [];
+  function unique(values) {
+    var seen = new Set();
+    return (Array.isArray(values) ? values : []).map(String).filter(function (id) {
+      if (!id || seen.has(id)) return false;
+      seen.add(id); return true;
+    });
   }
-  function lockedChars() { return allChars().filter((s) => !isSkinUnlocked(s.id)); }
-
-  // STRICT ladder reconcile: the collection is a pure function of totalWins.
-  // Rebuilds unlockedSkins from thresholds, which both grants anything newly
-  // earned AND drops out-of-order leftovers (legacy random mystery-box draws,
-  // retired edition ids) so the tree always unlocks in sequence.
-  // Returns the ids that were newly granted (for the reveal animation).
-  function grantEarnedUnlocks() {
-    const chars = allChars();
-    if (!chars.length) return [];
-    const wins = data.totalWins || 0;
-    const before = new Set(unlockedSkins());
-    const next = [BASE_SKIN];
-    for (const c of chars) {
-      if (c.unlock != null && wins >= c.unlock && c.id !== BASE_SKIN) next.push(c.id);
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function safeName(value) {
+    return NamePolicy && typeof NamePolicy.safeDisplay === 'function'
+      ? NamePolicy.safeDisplay(value, 'Player') : 'Player';
+  }
+  function stableLegacyPlayerId(name) {
+    var text = String(name || '').normalize ? String(name || '').normalize('NFKC') : String(name || '');
+    var hash = 2166136261;
+    for (var i = 0; i < text.length; i++) {
+      hash ^= text.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
     }
-    const newly = next.filter((id) => !before.has(id));
-    const changed = newly.length > 0 ||
-      next.length !== before.size || next.some((id) => !before.has(id)) ||
-      [...before].some((id) => !next.includes(id));
-    if (changed) {
-      data.unlockedSkins = next;
+    return 'legacy-player-' + (hash >>> 0).toString(36);
+  }
+  function normalizeWinnerRecord(entry) {
+    if (!entry || typeof entry !== 'object') return null;
+    var displayName = safeName(entry.displayName);
+    return {
+      playerId: String(entry.playerId || stableLegacyPlayerId(displayName)),
+      displayName: displayName,
+      wins: number(entry.wins),
+    };
+  }
+  function migrate(current, legacy) {
+    var source = current && typeof current === 'object' ? current : {};
+    var old = legacy && typeof legacy === 'object' ? legacy : {};
+    var records = (Array.isArray(source.winnerRecords) ? source.winnerRecords : [])
+      .map(normalizeWinnerRecord).filter(Boolean);
+    if (!records.length && old.mostWins && typeof old.mostWins === 'object') {
+      Object.keys(old.mostWins).forEach(function (displayName) {
+        records.push({ playerId: stableLegacyPlayerId(displayName), displayName: safeName(displayName), wins: number(old.mostWins[displayName]) });
+      });
+    }
+    return {
+      schema: 'RecordSummaryV2', version: 2,
+      bestStreak: Math.max(number(source.bestStreak), number(old.bestStreak)),
+      highestStake: Math.max(number(source.highestStake), number(old.highestStake)),
+      totalMakes: Math.max(number(source.totalMakes), number(old.totalMakes)),
+      totalFlips: Math.max(number(source.totalFlips), number(old.totalFlips)),
+      longestOnFire: Math.max(number(source.longestOnFire), number(old.longestOnFire)),
+      greatSaves: Math.max(number(source.greatSaves), number(old.greatSaves)),
+      capLands: Math.max(number(source.capLands), number(old.capLands)),
+      winnerRecords: records,
+      qualifyingWins: Math.max(number(source.qualifyingWins), number(old.totalWins)),
+      pendingRevealIds: unique(source.pendingRevealIds),
+    };
+  }
+  function isQualifyingPlay(context) {
+    var c = context && typeof context === 'object' ? context : {};
+    var mode = String(c.mode || c.activity || '').toLowerCase();
+    if (c.qualifying === false || c.practice || c.isPractice || c.lab || c.physicsLab ||
+        c.forced || c.isForced || c.test || c.testData || c.testMode || c.simulated || c.aiOnly ||
+        mode === 'practice' || mode === 'lab' || mode === 'physics-lab') return false;
+    if (c.qualifying === true || c.humanParticipant === true || c.hasHumanPlayer === true || Number(c.humanPlayers) > 0) return true;
+    return Array.isArray(c.players) && c.players.some(function (player) { return player && player.isAI === false; });
+  }
+
+  function createMemoryStorage(seed) {
+    var values = Object.assign({}, seed || {});
+    return {
+      getItem: function (key) { return Object.prototype.hasOwnProperty.call(values, key) ? values[key] : null; },
+      setItem: function (key, value) { values[key] = String(value); },
+      dump: function () { return clone(values); },
+    };
+  }
+
+  function createStore(options) {
+    var opts = options || {};
+    var storage = opts.storage || null;
+    var progression = opts.progression || Progression.createStore({
+      storage: storage,
+      legacyRecords: opts.legacyRecords,
+      legacyAchievements: opts.legacyAchievements,
+    });
+    var current = opts.initialState || (storage ? parse(storage.getItem(KEY), {}) : {});
+    var legacy = opts.legacyRecords || (storage ? parse(storage.getItem(LEGACY_KEY), {}) : {});
+    var data = migrate(current, legacy);
+
+    function save() { if (storage) { try { storage.setItem(KEY, JSON.stringify(data)); } catch (_) {} } }
+    function snapshot() { return clone(data); }
+    function exportState() {
+      return Object.freeze({ records: Object.freeze(snapshot()), progression: progression.exportState() });
+    }
+    function recordFlip(game, extra, context) {
+      var c = context || (extra && extra.context) || null;
+      if (!isQualifyingPlay(c)) return null;
+      var g = game || {};
+      data.totalFlips++;
+      if (g.lastResult === 'MAKE') data.totalMakes++;
+      var currentPlayer = typeof g.currentPlayer === 'function' ? g.currentPlayer() : null;
+      var streak = currentPlayer ? number(currentPlayer.streak) : number(g.streak);
+      data.bestStreak = Math.max(data.bestStreak, streak);
+      data.highestStake = Math.max(data.highestStake, number(g.pointCount));
+      data.longestOnFire = Math.max(data.longestOnFire, number(g.onFireBonus), number(g.endedFireBonus));
+      if (extra && extra.greatSave) data.greatSaves++;
+      if (extra && extra.capLand) data.capLands++;
+      save();
+      return snapshot();
+    }
+    function recordWin(nameOrContext, maybeContext) {
+      var name = typeof nameOrContext === 'string' ? nameOrContext : null;
+      var context = typeof nameOrContext === 'object' ? nameOrContext : (maybeContext || {});
+      if (name && context.displayName == null) context = Object.assign({}, context, { displayName: name });
+      var progress = progression.recordQualifyingWin(context);
+      if (!progress.qualified) return null;
+
+      var displayName = safeName(context.displayName || (context.winner && context.winner.name) || name || 'Player');
+      var playerId = String(context.playerId || context.winnerId ||
+        (context.winner && context.winner.id) || stableLegacyPlayerId(displayName));
+      var row = data.winnerRecords.find(function (entry) { return entry.playerId === playerId; });
+      if (!row) {
+        row = { playerId: playerId, displayName: displayName, wins: 0 };
+        data.winnerRecords.push(row);
+      }
+      row.displayName = displayName;
+      row.wins++;
+      data.qualifyingWins = progress.state.qualifyingWins;
+      progress.unlocked.filter(function (reward) { return reward.type === 'object'; }).forEach(function (reward) {
+        if (data.pendingRevealIds.indexOf(reward.contentId) < 0) data.pendingRevealIds.push(reward.contentId);
+      });
+      save();
+      var result = snapshot();
+      result.progression = progress.state;
+      result.unlocked = progress.unlocked.slice();
+      result.winnerWins = row.wins;
+      return result;
+    }
+    function topWinnerRecord() {
+      var best = null;
+      data.winnerRecords.forEach(function (entry) { if (!best || entry.wins > best.wins) best = entry; });
+      return best ? clone(best) : null;
+    }
+    function topWinner() {
+      var best = topWinnerRecord();
+      return best ? best.displayName + ' · ' + best.wins : '—';
+    }
+    function winnerWins(playerId) {
+      var row = data.winnerRecords.find(function (entry) { return entry.playerId === String(playerId); });
+      return row ? row.wins : 0;
+    }
+    function renderHtml() {
+      var rows = [
+        ['🏆', 'Most wins', topWinner()], ['🔥', 'Best streak', data.bestStreak],
+        ['⚡', 'Top stake', '×' + data.highestStake], ['🔥', 'Hot run', '+' + data.longestOnFire],
+        ['🧤', 'Great Saves', data.greatSaves], ['🙃', 'Cap lands', data.capLands],
+        ['✓', 'Total makes', data.totalMakes], ['Σ', 'Total flips', data.totalFlips],
+      ];
+      return '<div class="records-title">🏅 Hall of Fame</div><div class="records-grid">' +
+        rows.map(function (row) {
+          return '<div class="rec-item"><span class="rec-val">' + escapeHtml(row[2]) + '</span>' +
+            '<span class="rec-key">' + escapeHtml(row[0] + ' ' + row[1]) + '</span></div>';
+        }).join('') + '</div>';
+    }
+    function totalWins() { return progression.snapshot().qualifyingWins; }
+    function unlockedSkins() {
+      var ids = progression.snapshot().ownedObjectIds.slice();
+      if (ids.indexOf(BASE_OBJECT) < 0) ids.unshift(BASE_OBJECT);
+      return unique(ids);
+    }
+    function isSkinUnlocked(id) { return unlockedSkins().indexOf(String(id)) >= 0; }
+    function unlockSkin() { return false; } // Forced/manual unlocks do not award progression in v111.
+    function unlockAll() { return []; } // Demo/test play may not mutate progression.
+    function claimBoxes() {
+      var ids = data.pendingRevealIds.slice();
+      data.pendingRevealIds = [];
+      save();
+      return ids;
+    }
+    function pendingBoxes() { return data.pendingRevealIds.length; }
+    function winsToNextBox() { return 0; } // Deprecated: revealing progress is forbidden.
+    function syncUnlocksFromWins() { return []; }
+    function resetSkinProgress() { return false; } // v111 never relocks earned content.
+    function reset() {
+      var preservedWins = data.qualifyingWins;
+      data = clone(DEFAULTS);
+      data.qualifyingWins = preservedWins;
       save();
     }
-    return newly;
-  }
 
-  // Demo secret (title taps): unlock the whole ladder by granting the win
-  // total that earns it — the collection is a pure function of totalWins, so
-  // anything less would be revoked by the next boot reconcile.
-  function unlockAll() {
-    const need = Math.max(0, ...allChars().map((c) => c.unlock || 0));
-    if ((data.totalWins || 0) < need) data.totalWins = need;
-    return grantEarnedUnlocks();
-  }
-
-  function pendingBoxes() {
-    // How many threshold unlocks are earned but not yet in unlockedSkins.
-    const wins = data.totalWins || 0;
-    return allChars().filter((c) => c.unlock != null && wins >= c.unlock && !isSkinUnlocked(c.id)).length;
-  }
-  function winsToNextBox() {
-    const wins = data.totalWins || 0;
-    const next = allChars()
-      .filter((c) => c.unlock != null && !isSkinUnlocked(c.id))
-      .map((c) => c.unlock)
-      .sort((a, b) => a - b)[0];
-    return next == null ? 0 : Math.max(0, next - wins);
-  }
-
-  // BOOT: quietly reconcile the collection with totalWins (returning players,
-  // migrations from the random mystery-box era, branded ports).
-  function syncUnlocksFromWins() {
-    return grantEarnedUnlocks();
-  }
-
-  // GAME OVER: grant newly earned unlocks for the reveal animation.
-  function claimBoxes() {
-    if (!allChars().length) return [];
-    return grantEarnedUnlocks();
-  }
-
-  // Call AFTER each game.resolveFlip() (normal play and practice).
-  // `extra` carries display-only flip detail from main.js (e.g. greatSave).
-  // Returns a snapshot of the updated totals so achievement checks can read
-  // "lifetime count AFTER this flip" without a second load.
-  function recordFlip(g, extra) {
-    data.totalFlips++;
-    if (g.lastResult === 'MAKE') data.totalMakes++;
-    const streak = g.practice ? g.practiceStreak : (g.currentPlayer()?.streak || 0);
-    if (streak > data.bestStreak) data.bestStreak = streak;
-    if (g.pointCount > data.highestStake) data.highestStake = g.pointCount;
-    if (g.onFireBonus > data.longestOnFire) data.longestOnFire = g.onFireBonus;
-    if ((g.endedFireBonus || 0) > data.longestOnFire) data.longestOnFire = g.endedFireBonus;
-    if (extra && extra.greatSave) data.greatSaves = (data.greatSaves || 0) + 1;
-    if (extra && extra.capLand) data.capLands = (data.capLands || 0) + 1;
     save();
-    return clone(data);
-  }
-  function recordWin(name) {
-    if (!name) return clone(data);
-    data.mostWins[name] = (data.mostWins[name] || 0) + 1;
-    data.totalWins = (data.totalWins || 0) + 1;
-    save();
-    return clone(data);
-  }
-  function totalWins() { return data.totalWins || 0; }
-  function topWinner() {
-    let best = null, n = 0;
-    for (const [name, c] of Object.entries(data.mostWins)) if (c > n) { best = name; n = c; }
-    return best ? `${best} · ${n}` : '—';
-  }
-  function renderHtml() {
-    const rows = [
-      ['🏆', 'Most wins',   topWinner()],
-      ['🔥', 'Best streak', data.bestStreak],
-      ['⚡', 'Top stake',   '×' + data.highestStake],
-      ['🔥', 'Hot run',     '+' + data.longestOnFire],
-      ['🧤', 'Great Saves', data.greatSaves || 0],
-      ['🙃', 'Cap lands',   data.capLands || 0],
-      ['✓',  'Total makes', data.totalMakes],
-      ['Σ',  'Total flips', data.totalFlips],
-    ];
-    return '<div class="records-title">🏅 Hall of Fame</div><div class="records-grid">' +
-      rows.map(([icon, key, val]) =>
-        `<div class="rec-item"><span class="rec-val">${val}</span>` +
-        `<span class="rec-key">${icon} ${key}</span></div>`).join('') + '</div>';
-  }
-  function reset() { data = clone(DEFAULTS); save(); }
-
-  // ── Unlockable skins ──────────────────────────────────────────────────────
-  function unlockedSkins() {
-    if (!Array.isArray(data.unlockedSkins)) data.unlockedSkins = [BASE_SKIN];
-    if (!data.unlockedSkins.includes(BASE_SKIN)) data.unlockedSkins.unshift(BASE_SKIN);
-    return data.unlockedSkins.slice();
-  }
-  function isSkinUnlocked(id) { return unlockedSkins().includes(id); }
-  // Returns true only if this call is what newly unlocked it (for the reveal).
-  function unlockSkin(id) {
-    if (isSkinUnlocked(id)) return false;
-    data.unlockedSkins = unlockedSkins().concat(id);
-    save();
-    return true;
-  }
-  // Wipe ONLY the unlock ladder (editions + the win counter that drives it).
-  // Hall-of-fame stats stay — "start the collection over" shouldn't erase the
-  // party's records. Both fields must clear together: zeroing the skins while
-  // keeping totalWins would re-unlock everything at the next game over.
-  function resetSkinProgress() {
-    data.totalWins = 0;
-    data.unlockedSkins = [BASE_SKIN];
-    save();
+    return Object.freeze({
+      recordFlip: recordFlip, recordWin: recordWin, renderHtml: renderHtml, reset: reset,
+      totalWins: totalWins, unlockedSkins: unlockedSkins, isSkinUnlocked: isSkinUnlocked,
+      unlockSkin: unlockSkin, unlockAll: unlockAll, resetSkinProgress: resetSkinProgress,
+      syncUnlocksFromWins: syncUnlocksFromWins, claimBoxes: claimBoxes,
+      pendingBoxes: pendingBoxes, winsToNextBox: winsToNextBox, winnerWins: winnerWins,
+      topWinnerRecord: topWinnerRecord, exportState: exportState, snapshot: snapshot,
+      WINS_PER_BOX: 0,
+    });
   }
 
-  return { recordFlip, recordWin, renderHtml, reset, totalWins, unlockedSkins,
-           isSkinUnlocked, unlockSkin, unlockAll, resetSkinProgress,
-           syncUnlocksFromWins, claimBoxes, pendingBoxes, winsToNextBox,
-           WINS_PER_BOX };
-})();
+  var browserStorage = null;
+  try { browserStorage = root && root.localStorage ? root.localStorage : null; } catch (_) {}
+  var defaultStore = createStore({ storage: browserStorage });
+  return Object.freeze({
+    recordFlip: defaultStore.recordFlip, recordWin: defaultStore.recordWin,
+    renderHtml: defaultStore.renderHtml, reset: defaultStore.reset,
+    totalWins: defaultStore.totalWins, unlockedSkins: defaultStore.unlockedSkins,
+    isSkinUnlocked: defaultStore.isSkinUnlocked, unlockSkin: defaultStore.unlockSkin,
+    unlockAll: defaultStore.unlockAll, resetSkinProgress: defaultStore.resetSkinProgress,
+    syncUnlocksFromWins: defaultStore.syncUnlocksFromWins, claimBoxes: defaultStore.claimBoxes,
+    pendingBoxes: defaultStore.pendingBoxes, winsToNextBox: defaultStore.winsToNextBox,
+    winnerWins: defaultStore.winnerWins, topWinnerRecord: defaultStore.topWinnerRecord,
+    exportState: defaultStore.exportState, snapshot: defaultStore.snapshot,
+    createStore: createStore, createMemoryStorage: createMemoryStorage,
+    stableLegacyPlayerId: stableLegacyPlayerId, isQualifyingPlay: isQualifyingPlay,
+    WINS_PER_BOX: 0,
+  });
+});

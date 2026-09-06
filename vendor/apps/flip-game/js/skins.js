@@ -14,8 +14,8 @@
  *   list()            -> [{id,name,emoji,unlock}]  (includes 'bottle')
  *   hasDraw(id)       -> is there a skin-specific draw fn (false for 'bottle')
  *   draw(ctx,id,opts) -> paint skin `id`; opts: {color, slosh}
- *   unlockRule(id)    -> null (always on) | <number> (total wins needed — see Records.totalWins())
- *   preload(colors)   -> warm any sprite caches for these player colors
+ *   unlockRule(id)    -> legacy progression metadata; UI consumes lock views instead
+ *   preload(pairs)    -> warm sprite caches for selected {id,color} pairs only
  *
  * No external libraries; SVG skins bake to data: URIs, so it stays offline-safe.
  */
@@ -219,10 +219,8 @@ window.Skins = (function () {
     }
   }
 
-  // ── PNG cast sprites (retired) ─────────────────────────────────────────────
-  // AI rasters under icons/skins/<edition>/<rrggbb>.png are no longer used
-  // in-game (too 3D). Helpers remain for tools / parked editions only.
-  const pngCache = new Map();
+  // Stable flavor keys are shared by the authored building renderer and the
+  // character-name tables below. Cast art itself is rendered from SVG/FlipArt.
   const FLAVOR_HEXES = [
     '1f9bff', 'e3263c', '8ed11a', 'ff7a00', '8a3ffc', '5fcfe6',
     '3fae1a', 'ff5b86', '4f63e0', 'ffc233', 'c8203a', 'ff9ecf',
@@ -232,32 +230,6 @@ window.Skins = (function () {
     if (/^[0-9a-f]{6}$/.test(s)) return s;
     return FLAVOR_HEXES[0];
   }
-  function getPngSprite(edition, color) {
-    const hex = colorToHexKey(color);
-    const key = edition + '|' + hex;
-    let entry = pngCache.get(key);
-    if (entry) return entry;
-    entry = { img: new Image(), ready: false, failed: false };
-    entry.img.onload = () => { entry.ready = true; spriteLoaded(); };
-    entry.img.onerror = () => { entry.failed = true; spriteLoaded(); };
-    entry.img.src = 'icons/skins/' + edition + '/' + hex + '.png';
-    pngCache.set(key, entry);
-    return entry;
-  }
-  function drawPngSprite(ctx, edition, color) {
-    const spr = getPngSprite(edition, color);
-    if (spr.ready) {
-      ctx.drawImage(spr.img, SPR.destX, SPR.destY, SPR.destW, SPR.destH);
-    } else {
-      ctx.fillStyle = color || '#888';
-      ctx.beginPath(); ctx.ellipse(0, -12, 30, 52, 0, 0, Math.PI * 2); ctx.fill();
-    }
-  }
-  function preloadPngEdition(edition, colors) {
-    const list = (colors && colors.length) ? colors : FLAVOR_HEXES.map((h) => '#' + h);
-    for (const c of list) getPngSprite(edition, c);
-  }
-
   // ── Plunger skin ───────────────────────────────────────────────────────────
   // Rubber cup at the base (player-tinted, doubles as the physics contact
   // point) on a fixed wood handle, with a googly-eyed face for personality.
@@ -722,14 +694,14 @@ ${part(v.front)}
 
 
   // ── Gods skin ──────────────────────────────────────────────────────────────
-  // Mid-ladder pantheon (25 wins). Twelve deities on one shared semi-realistic
+  // Pantheon set. Twelve deities on one shared semi-realistic
   // body — sprite changes with the player's colour (see GOD_CAST). Normal flip
   // physics; Alien is the only edition that changes the sport.
   //
   // Only HISTORICAL pantheons are used — Egyptian, Greek, Roman, Norse, Aztec,
   // Celtic. Living faiths are deliberately left out: turning a currently
   // worshipped deity into a flippable game object is the sort of thing a family
-  // could reasonably object to, and it is a classroom that would absorb that.
+  // could reasonably object to, and a shared audience would absorb that.
   //
   // The cast is chosen so no two share a silhouette at game size — three animal
   // heads, two helmets, two beard-and-prop pairs, a serpent, a goggle mask,
@@ -1092,7 +1064,7 @@ ${part(v.front)}
   // keyed to FLAVORS hexes so each color summons a different looking visitor
   // (Grey, Greenie, Mantid, …).
   //
-  // Species are classroom-safe archetypes (no living-faith symbols, no
+  // Species are audience-safe archetypes (no living-faith symbols, no
   // trademarked franchise likenesses) chosen so no two share a silhouette at
   // game size.
   const ALIEN = {
@@ -1725,10 +1697,10 @@ ${crown}
   // One unlock = one character. Setup is only color/character swatches — no
   // separate People/Buildings/Pets edition picker. Each entry paints via
   // `drawAs` (the old edition drawer) using `tint` (cast key / color).
-  // Unlock cadence: free bottle, then every 3 wins; Alien species are LAST.
+  // Character ordering follows the authored catalog.
   const ALIEN_PHYSICS = {
-    gravity: 1.28,
-    frictionAir: 0.0045,
+    gravity: 0.10,
+    frictionAir: 0.0025,
     friction: 0.02,
     restitution: 0.90,
     spinScale: 0.7,
@@ -1739,8 +1711,8 @@ ${crown}
     ceiling: true,
     floorResolve: true,
     landOnTarget: true,
-    // Bigger pad; any body overlap scores (not just center/feet).
-    targetHalfWidth: 72,
+    // Large floating tractor ring: bank once, then fly through it.
+    targetHalfWidth: 96,
     requireFlip: false,
     deflector: true,
     deflectorCount: 3,
@@ -1748,13 +1720,13 @@ ${crown}
     keepWalls: true,
     minHorizRatio: 0.12,
     strictTarget: false,   // AABB overlap with pad = make (whole alien counts)
-    allowSlideIn: true,    // can still slide onto the pad after touchdown
-    hitScale: 0.90,        // nearly the full drawn pad scores
-    // TRUE bigger arena (not camera-shrink): physics world is wider/taller than
-    // the screen, camera fits wall-to-wall so the phone stays full-bleed while
-    // bank shots actually have more travel. Old arenaZoom letterboxed a
-    // postage stamp or cramped the court — expand replaces that.
-    arenaExpand: 1.18,         // desktop: mild real widen
+    allowSlideIn: false,   // portal scoring resolves in mid-air instead
+    hitScale: 0.86,
+    alienPortal: true,
+    // Phones need a wider logical court for bank shots. Desktop/large-screen
+    // screens already have that width physically, so never fit-shrink them —
+    // it made the entire Alien arena look reduced inside a large display.
+    arenaExpand: 1.0,          // desktop: true 1:1, full-size playing space
     mobileArenaExpand: 1.42,   // phone: proper bank-shot court
     arenaExpandY: 1.0,
     mobileArenaExpandY: 1.14,  // a bit more air for ceiling banks on phones
@@ -1902,13 +1874,12 @@ ${crown}
   const BUILDING_HEXES = FLAVOR_HEXES.map((h) => '#' + h);
 
   function buildCharacters() {
-    // Bare-bones ladder from js/cast25.js — free bottle, then one unlock every
-    // 4 wins up to Alien at 100. Old people/buildings/gods/cartoon casts retired.
+    // Compatibility roster from js/cast25.js; progression owns availability.
     const cast = (typeof window !== 'undefined' && window.FLIP_CAST25) || null;
     const roster = (cast && cast.ROSTER) || [
       { id: 'bottle', name: 'Bottle', emoji: '🍾', drawAs: 'bottle', unlock: null, tint: '#1f9bff', liquid: { mode: 'closed', fill: 0.32 } },
     ];
-    return roster.map((r) => ({
+    const legacy = roster.map((r) => ({
       id: r.id,
       name: r.name,
       emoji: r.emoji,
@@ -1919,6 +1890,20 @@ ${crown}
       liquid: r.liquid || null,
       physics: r.id === 'alien' || r.drawAs === 'alien' ? ALIEN_PHYSICS : null,
     }));
+    const manifest = typeof window !== 'undefined' && window.FLIP_V111_OBJECT_MANIFEST;
+    const additions = manifest && Array.isArray(manifest.objects) ? manifest.objects.map((r) => ({
+      id: r.id,
+      name: r.displayName,
+      emoji: r.emoji,
+      drawAs: r.id,
+      unlock: r.unlockAtWins,
+      tint: (r.variants && r.variants[0] && r.variants[0].color) || '#1f9bff',
+      color: (r.variants && r.variants[0] && r.variants[0].color) || '#1f9bff',
+      liquid: r.liquid || null,
+      physics: null,
+      v111Art: true,
+    })) : [];
+    return legacy.concat(additions);
   }
 
   const CHARACTERS = buildCharacters();
@@ -2001,11 +1986,37 @@ ${crown}
     },
     editionChars: (edition) => (EDITION_TO_CHARS[edition] || []).slice(),
     hasDraw: (id) => {
+      if (typeof window !== 'undefined' && window.FlipArtV111 && FlipArtV111.getObject(id)) return true;
       const drawAs = resolveDraw(id);
       return drawAs !== 'bottle' && !!drawFns[drawAs];
     },
     draw: (ctx, id, opts) => {
       const c = character(id);
+      if (c && c.v111Art && typeof window !== 'undefined' && window.FlipArtV111) {
+        const variantId = (opts && opts.variantId) || 'blue-steel';
+        const variant = FlipArtV111.getRenderVariant(id, variantId);
+        const artState = {
+          mode: 'gameplay',
+          time: (opts && opts.time) || 0,
+          reducedMotion: !!(opts && opts.reducedMotion),
+          angle: opts && opts.angle,
+          slosh: opts && opts.slosh,
+          angularVelocity: opts && opts.angularVelocity,
+          velocity: opts && opts.velocity,
+          airborne: opts && opts.airborne,
+          contact: opts && opts.contact,
+          impact: opts && opts.impact,
+          emotion: opts && opts.emotion,
+          flipSeed: opts && opts.flipSeed,
+          motionSeed: opts && opts.motionSeed,
+        };
+        ctx.save();
+        ctx.scale(0.74, 0.74);
+        ctx.translate(-variant.metrics.pivot.x, -variant.metrics.pivot.y);
+        variant.renderLocal(ctx, artState);
+        ctx.restore();
+        return;
+      }
       const drawAs = c ? c.drawAs : id;
       const f = drawFns[drawAs];
       if (!f) return;
@@ -2057,25 +2068,25 @@ ${crown}
       return playerColor || c.tint || '#1f9bff';
     },
     onSpriteLoad,
-    preload: (colors) => {
-      const tints = (colors && colors.length)
-        ? colors
-        : FLAVOR_HEXES.map((h) => '#' + h);
-      for (const c of tints) {
-        getParrotSprite(c);
-        getSingleSprite('plunger', c, plungerPalette(c), plungerBodySVG);
-        getSingleSprite('trex', c, trexPalette(c), trexBodySVG);
-        getSingleSprite('vending', c, vendPalette(c), vendBodySVG);
-        getSingleSprite('people', c, peoplePalette(c), peopleBodySVG);
-        getSingleSprite('alien', c, alienPalette(c), alienBodySVG);
-        getSingleSprite('pineapple', c, pinePalette(c), pineBodySVG);
-        getSingleSprite('gorilla', c, gorPalette(c), gorBodySVG);
-        getSingleSprite('gods', c, godPalette(c), godBodySVG);
-        getSingleSprite('buildings', c, buildingPalette(c), buildingBodySVG);
-        ['pets', 'garden', 'robots', 'ocean', 'snacks', 'cryptids'].forEach((ed) => {
-          const pack = CC[ed];
-          if (pack) getSingleSprite(ed, c, pack.palette(c), pack.bodySVG);
-        });
+    preload: (pairs) => {
+      for (const selection of Array.isArray(pairs) ? pairs : []) {
+        const id = typeof selection === 'string' ? 'bottle' : selection && selection.id;
+        const c = typeof selection === 'string' ? selection : selection && selection.color;
+        const entry = character(id);
+        const edition = entry && entry.drawAs;
+        if (!edition || entry.v111Art || edition === 'bottle') continue;
+        if (edition === 'parrot') { getParrotSprite(c); continue; }
+        if (edition === 'plunger') { getSingleSprite(edition, c, plungerPalette(c), plungerBodySVG); continue; }
+        if (edition === 'trex') { getSingleSprite(edition, c, trexPalette(c), trexBodySVG); continue; }
+        if (edition === 'vending') { getSingleSprite(edition, c, vendPalette(c), vendBodySVG); continue; }
+        if (edition === 'people') { getSingleSprite(edition, c, peoplePalette(c), peopleBodySVG); continue; }
+        if (edition === 'alien') { getSingleSprite(edition, c, alienPalette(c), alienBodySVG); continue; }
+        if (edition === 'pineapple') { getSingleSprite(edition, c, pinePalette(c), pineBodySVG); continue; }
+        if (edition === 'gorilla') { getSingleSprite(edition, c, gorPalette(c), gorBodySVG); continue; }
+        if (edition === 'gods') { getSingleSprite(edition, c, godPalette(c), godBodySVG); continue; }
+        if (edition === 'buildings') { getSingleSprite(edition, c, buildingPalette(c), buildingBodySVG); continue; }
+        const pack = CC[edition];
+        if (pack) getSingleSprite(edition, c, pack.palette(c), pack.bodySVG);
       }
     },
   };

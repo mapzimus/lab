@@ -5,7 +5,7 @@ Source for [mapzimus.com](https://mapzimus.com), the creative lab for Maxwell Ho
 Every catalog item that can run as static files is **hosted in this repo** and served as a first-party path on mapzimus.com. Snapshots live under `vendor/` (see `vendor/SOURCES.md`). The build copies them into `dist/` beside the front-door catalog.
 
 - Tools: `mapzimus.com/{slug}/` (e.g. `/coordinate-converter/`)
-- Games & maps: `/flip-game/`, `/boston-in-motion/`, `/where-the-games-go/`, `/whydah-voyage/`, `/bug-wars/`, `/transit/`, …
+- Games & maps: `/flipgame/`, `/boston-in-motion/`, `/where-the-games-go/`, `/whydah-voyage/`, `/bug-wars/`, `/transit/`, …
 - Lab experiments already in `src/lab/` stay at `/lab/…`
 
 Legacy `/max/*.html` URLs and older GitHub Pages paths redirect here. TappyMaps keeps its own domain (`tappymaps.com`); the MCAS item bank stays on `lehsmath.com`.
@@ -54,6 +54,18 @@ The committed `wrangler.jsonc` matches those settings. Preview branches use norm
 `src/data/featured.json` controls the "Featured" shelf on the homepage — an ordered list of catalog slugs. The tool count in the hero and the "last catalog refresh" date in the footer are derived from the catalog at build time.
 
 Mark only true off-site homes with `"external": true` (today: TappyMaps and the MCAS bank). Everything else must have a `hostedProjectRoutes` / `appRoutes` entry in `scripts/build.mjs`.
+
+### Flipgame release synchronization
+
+Flipgame is maintained in [`mapzimus/flipgame`](https://github.com/mapzimus/flipgame) and is published here at the canonical route [`/flipgame/`](https://mapzimus.com/flipgame/). Legacy routes such as `/flip-game/` and `/bottle-game/` redirect to that path.
+
+Approved Flipgame releases trigger a repository-scoped update of this repository. The release job checks out both repositories and runs:
+
+```sh
+node scripts/sync-flipgame.mjs --source /path/to/flipgame --source-commit "$SOURCE_SHA"
+```
+
+The synchronizer accepts only a clean checkout at the supplied commit, derives and cross-checks the `vN.N` release label across the visible badge, runtime contract, and service-worker cache, verifies the complete PWA shell, replaces only `vendor/apps/flip-game/`, removes stale files in that snapshot, and writes deterministic provenance to `vendor/apps/flip-game/.upstream.json`. It rejects non-fast-forward snapshot updates. After the resulting commit reaches `main`, the existing Cloudflare Pages Git integration builds `dist/flipgame/` and deploys it to `mapzimus.com`; no polling schedule or Cloudflare credential is needed in the Flipgame repository.
 
 ## Daily radars (dev + geospatial)
 
