@@ -65,7 +65,7 @@ Approved Flipgame releases trigger a repository-scoped update of this repository
 node scripts/sync-flipgame.mjs --source /path/to/flipgame --source-commit "$SOURCE_SHA"
 ```
 
-The synchronizer accepts only a clean checkout at the supplied commit, derives and cross-checks the `vN.N` release label across the visible badge, runtime contract, and service-worker cache, verifies the complete PWA shell, replaces only `vendor/apps/flip-game/`, removes stale files in that snapshot, and writes deterministic provenance to `vendor/apps/flip-game/.upstream.json`. It rejects non-fast-forward snapshot updates. After the resulting commit reaches `main`, the existing Cloudflare Pages Git integration builds `dist/flipgame/` and deploys it to `mapzimus.com`; no polling schedule or Cloudflare credential is needed in the Flipgame repository.
+The synchronizer accepts only a clean checkout at the supplied commit, derives and cross-checks the `vN.N` release label across the visible badge, runtime contract, and service-worker cache, verifies the complete PWA shell, replaces only `vendor/apps/flip-game/`, removes stale files in that snapshot, and writes deterministic public provenance to `vendor/apps/flip-game/release-provenance.json`. It rejects non-fast-forward snapshot updates. After the resulting commit reaches `main`, the existing Cloudflare Pages Git integration builds `dist/flipgame/` and deploys it to `mapzimus.com`; no polling schedule or Cloudflare credential is needed in the Flipgame repository.
 
 ## Daily radars (dev + geospatial)
 

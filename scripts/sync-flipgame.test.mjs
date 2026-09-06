@@ -89,7 +89,7 @@ test("sync copies only the web runtime, removes stale files, and writes determin
     expectedRelease: "v1.11",
     labRoot: fixture.lab,
   });
-  const firstMetadataText = fs.readFileSync(path.join(fixture.target, ".upstream.json"), "utf8");
+  const firstMetadataText = fs.readFileSync(path.join(fixture.target, "release-provenance.json"), "utf8");
 
   assert.equal(first.schema, "MapzimusVendorSnapshotV1");
   assert.equal(first.upstream.sourceSha, fixture.sha);
@@ -98,12 +98,12 @@ test("sync copies only the web runtime, removes stale files, and writes determin
   assert.match(first.contentSha256, /^[0-9a-f]{64}$/);
   assert.deepEqual(filesUnder(fixture.target), [
     ".nojekyll",
-    ".upstream.json",
     "css/style.css",
     "icons/icon-192.png",
     "index.html",
     "js/v111-interfaces.js",
     "manifest.json",
+    "release-provenance.json",
     "service-worker.js",
   ]);
   assert.equal(fs.existsSync(path.join(fixture.target, "README.md")), false);
@@ -116,7 +116,7 @@ test("sync copies only the web runtime, removes stale files, and writes determin
     labRoot: fixture.lab,
   });
   assert.deepEqual(second, first);
-  assert.equal(fs.readFileSync(path.join(fixture.target, ".upstream.json"), "utf8"), firstMetadataText);
+  assert.equal(fs.readFileSync(path.join(fixture.target, "release-provenance.json"), "utf8"), firstMetadataText);
 });
 
 test("sync rejects a wrong release, mismatched SHA, dirty source, and missing critical assets", async (t) => {
@@ -183,7 +183,7 @@ test("sync rejects stale or non-fast-forward source commits", (t) => {
     expectedRelease: "v1.11",
     labRoot: fixture.lab,
   }), /stale or not a descendant/);
-  assert.equal(JSON.parse(fs.readFileSync(path.join(fixture.target, ".upstream.json"))).upstream.sourceSha, newSha);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(fixture.target, "release-provenance.json"))).upstream.sourceSha, newSha);
 });
 
 test("path guards reject escapes and overlapping source/lab roots", (t) => {

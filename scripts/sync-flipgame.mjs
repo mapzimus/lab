@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const SCRIPT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SNAPSHOT_RELATIVE_PATH = path.join("vendor", "apps", "flip-game");
-const METADATA_FILE = ".upstream.json";
+const METADATA_FILE = "release-provenance.json";
 const ROOT_FILES = ["index.html", "service-worker.js", "manifest.json"];
 const OPTIONAL_ROOT_FILES = [".nojekyll"];
 const RUNTIME_DIRECTORIES = ["css", "js", "icons"];
