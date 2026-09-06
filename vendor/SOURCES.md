@@ -7,7 +7,7 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/{tool-slug}/` (55 tools) | `mapzimus/max` via the public tool shelf | Full tool library mirrored under `vendor/tools/`. |
 | `/geopuesto/` and `/geopuesto/playground/` | `mapzimus/geopuesto` | |
 | `/bug-wars/` | `mapzimus/bug-wars` | |
-| `/flip-game/` | `mapzimus/flipgame` | `1a667bf` — Bottle Game (PWA), synced from Pages `master`. Parrots unlockable skin. `/parrot-flip/` and `/grog-flip/` redirect here. |
+| `/flipgame/` | `mapzimus/flipgame` | Current checked-in snapshot predates the v1.11 release. Future approved releases are copied by `scripts/sync-flipgame.mjs`; exact deterministic provenance is stored in `vendor/apps/flip-game/.upstream.json`. Legacy `/flip-game/`, `/bottle-game/`, `/parrot-flip/`, and `/grog-flip/` paths redirect here. |
 | `/whydah-voyage/` | `mapzimus/Whydah-Unit` (`navigator/`) | Whydah's Voyage / First Sail. |
 | `/true-scale/` | `mapzimus/true-scale` | |
 | `/concord-war/` | built from `mapzimus/concord-war` | |

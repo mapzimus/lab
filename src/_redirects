@@ -7,9 +7,11 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /tool/:slug /:slug/ 301
 /tools/:slug.html /:slug/ 301
 
-# Alternate / legacy game paths
-/flipgame /flip-game/ 301
-/flipgame/* /flip-game/:splat 301
+# Alternate / legacy game paths. /flipgame/ is the canonical hosted route.
+/flipgame /flipgame/ 301
+/flip-game /flipgame/ 301
+/flip-game/ /flipgame/ 301
+/flip-game/* /flipgame/:splat 301
 /bugwars /bug-wars/ 301
 /bugwars/* /bug-wars/:splat 301
 /truescale /true-scale/ 301
@@ -20,15 +22,15 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /navigator /whydah-voyage/ 301
 /navigator/ /whydah-voyage/ 301
 # Parrots are now an unlockable skin inside the Bottle Game (full parrot port
-# lives only on whydahstory.com), so every flip-game alias points at /flip-game/.
-/parrot-flip /flip-game/ 301
-/parrot-flip/* /flip-game/:splat 301
-/grog-flip /flip-game/ 301
-/grog-flip/* /flip-game/:splat 301
-/bottle-flip /flip-game/ 301
-/bottle-flip/ /flip-game/ 301
-/bottle-game /flip-game/ 301
-/bottle-game/ /flip-game/ 301
+# lives only on whydahstory.com), so every legacy alias points at /flipgame/.
+/parrot-flip /flipgame/ 301
+/parrot-flip/* /flipgame/:splat 301
+/grog-flip /flipgame/ 301
+/grog-flip/* /flipgame/:splat 301
+/bottle-flip /flipgame/ 301
+/bottle-flip/ /flipgame/ 301
+/bottle-game /flipgame/ 301
+/bottle-game/ /flipgame/ 301
 
 # Black Sam removed from Games; curriculum copy (if any) stays under /whydah/
 /black-sam /games/ 301
@@ -36,10 +38,10 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /black-sam/* /games/ 301
 
 # Retired /games/<slug> snapshots → canonical first-party route
-/games/flip /flip-game/ 301
-/games/flip/* /flip-game/:splat 301
-/games/grog-flip /flip-game/ 301
-/games/grog-flip/* /flip-game/:splat 301
+/games/flip /flipgame/ 301
+/games/flip/* /flipgame/:splat 301
+/games/grog-flip /flipgame/ 301
+/games/grog-flip/* /flipgame/:splat 301
 
 # Motion / atlas aliases from GitHub Pages repo names
 /Motion /boston-in-motion/ 301
