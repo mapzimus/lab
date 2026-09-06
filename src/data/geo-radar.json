@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-05",
+  "generatedAt": "2026-09-06",
   "news": {
     "mapsmania": [
+      {
+        "title": "Mercator vs Equal Earth",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/mercator-vs-equal-earth.html",
+        "desc": ""
+      },
       {
         "title": "Welcome to the New World Map",
         "url": "http://googlemapsmania.blogspot.com/2026/09/welcome-to-new-world-map.html",
@@ -35,11 +40,6 @@
       {
         "title": "15 Minute Towns Animated",
         "url": "http://googlemapsmania.blogspot.com/2026/08/15-minute-towns-animated.html",
-        "desc": ""
-      },
-      {
-        "title": "Rename Lake Ontario Now!",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/rename-lake-ontario-now.html",
         "desc": ""
       }
     ],
@@ -75,38 +75,7 @@
         "desc": "From Delaware to Hawaii, discover when each state entered the Union and the geographic features that make every state unique."
       }
     ],
-    "geoworld": [
-      {
-        "title": "Infrastructure Isn’t Just Built Anymore.",
-        "url": "https://geospatialworld.net/videos/intelligent-infrastructure-aec-summit-gwf-2026/",
-        "desc": "Infrastructure was once defined by scale."
-      },
-      {
-        "title": "Strengthening Sovereignty, Economy, and Society",
-        "url": "https://geospatialworld.net/prime/interviews/strengthening-sovereignty-economy-and-society/",
-        "desc": "How should nations redefine geospatial and space sovereignty in an era of increasing dependence on global platforms, foreign satellite constellations, and in…"
-      },
-      {
-        "title": "Mapping Urban Heat Islands in Ahemedabad",
-        "url": "https://geospatialworld.net/videos/mapping-urban-heat-islands-ahmedabad/",
-        "desc": "Even though the conversations on climate change have muted due to the geopolitical situation, trade disruptions, greater defence and intelligence spending, a…"
-      },
-      {
-        "title": "HD Mapping and VPS: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence | GWF 2026",
-        "url": "https://geospatialworld.net/videos/hd-mapping-vps-geospatial-platforms-gwf-2026/",
-        "desc": "Plenary Session 5: High-Definition Mapping and Visual Positioning Systems: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence |…"
-      },
-      {
-        "title": "Space Infrastructure as a Service: Enriching Geospatial Platforms and Spatial Intelligence | GWF 2026",
-        "url": "https://geospatialworld.net/videos/space-infrastructure-as-a-service-geospatial-spatial-intelligence-gwf-2026/",
-        "desc": "Plenary Session 4 | Geospatial World Forum 2026 | Amsterdam, April 28 – May 1 This plenary session Moderate by Vaishali Dixit, VP – Americas, Geospatial Worl…"
-      },
-      {
-        "title": "Optimizing GeoAI and Digital Twins Towards Utilities and Network Management | GWF 2026",
-        "url": "https://geospatialworld.net/videos/geoai-digital-twins-utilities-network-management-gwf-2026/",
-        "desc": "Plenary Session 3 | Geospatial World Forum 2026 | Amsterdam, April 28 – May 1 This plenary panel from Geospatial World Forum 2026 brings together leaders fro…"
-      }
-    ]
+    "geoworld": []
   },
   "qgis": [
     {
@@ -144,19 +113,19 @@
   ],
   "releases": [
     {
+      "repo": "visgl/deck.gl",
+      "title": "deck.gl v9.4.0",
+      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.4.0",
+      "desc": "deck.gl v9.4 brings together a collection of completed improvements focused on performance, stability, and usability.",
+      "publishedAt": "2026-09-05",
+      "isFresh": true
+    },
+    {
       "repo": "maplibre/maplibre-gl-js",
       "title": "maplibre-gl-js v6.7.0",
       "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.7.0",
       "desc": "### ✨ Features and improvements - Support the style specification's `font-faces` property, with `map.setFontFaces` and `map.getFontFaces` and improve complex…",
       "publishedAt": "2026-09-02",
-      "isFresh": true
-    },
-    {
-      "repo": "visgl/deck.gl",
-      "title": "deck.gl v9.3.11",
-      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.11",
-      "desc": "- Lock luma.gl to 9.3 minor release",
-      "publishedAt": "2026-08-28",
       "isFresh": true
     },
     {
@@ -216,15 +185,15 @@
       "answers": 0
     },
     {
-      "title": "JSON field becomes QVariantList when exporting GeoPackage to GeoJSON",
-      "url": "https://gis.stackexchange.com/questions/501348/json-field-becomes-qvariantlist-when-exporting-geopackage-to-geojson",
-      "score": 3,
-      "answers": 1
-    },
-    {
       "title": "Viewshed analysis with single layers in QGIS",
       "url": "https://gis.stackexchange.com/questions/501356/viewshed-analysis-with-single-layers-in-qgis",
       "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "JSON field becomes QVariantList when exporting GeoPackage to GeoJSON",
+      "url": "https://gis.stackexchange.com/questions/501348/json-field-becomes-qvariantlist-when-exporting-geopackage-to-geojson",
+      "score": 3,
       "answers": 1
     },
     {
@@ -242,7 +211,7 @@
     {
       "title": "How to set a partially transparent color (alpha channel) for the \"noData\" color in a raster using QGIS",
       "url": "https://gis.stackexchange.com/questions/501361/how-to-set-a-partially-transparent-color-alpha-channel-for-the-nodata-color",
-      "score": 0,
+      "score": 1,
       "answers": 0
     },
     {
@@ -258,16 +227,16 @@
       "answers": 0
     },
     {
-      "title": "How to calculate statistics for raster with terra",
-      "url": "https://gis.stackexchange.com/questions/501365/how-to-calculate-statistics-for-raster-with-terra",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "Print composer with multiple maps each showing a different value range from the same column",
       "url": "https://gis.stackexchange.com/questions/501350/print-composer-with-multiple-maps-each-showing-a-different-value-range-from-the",
       "score": 0,
       "answers": 1
+    },
+    {
+      "title": "How to calculate statistics for raster with terra",
+      "url": "https://gis.stackexchange.com/questions/501365/how-to-calculate-statistics-for-raster-with-terra",
+      "score": 0,
+      "answers": 0
     }
   ],
   "nasa": [
@@ -392,16 +361,16 @@
   ],
   "osm": [
     {
+      "title": "weeklyOSM 841",
+      "url": "https://weeklyosm.eu/archives/18849"
+    },
+    {
       "title": "weeklyOSM 840",
       "url": "https://weeklyosm.eu/archives/18836"
     },
     {
       "title": "weeklyOSM 839",
       "url": "https://weeklyosm.eu/archives/18822"
-    },
-    {
-      "title": "weeklyOSM 838",
-      "url": "https://weeklyosm.eu/archives/18803"
     }
   ]
 }
