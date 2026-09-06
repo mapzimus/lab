@@ -28,6 +28,12 @@
 /favicon.svg
   Cache-Control: public, max-age=86400
 
+# Flipgame v1.11 is deliberately local-only and ships no telemetry. Prevent
+# Cloudflare Web Analytics from injecting a RUM beacon into its HTML while
+# retaining revalidation at the release boundary.
+/flipgame/*
+  Cache-Control: public, max-age=0, must-revalidate, no-transform
+
 # Lab project assets. The data files are addressed with a ?v= version from
 # app.js, so they can be cached hard; the code that points at them must not be,
 # or a deploy leaves readers on a stale script for hours.
