@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-06",
+  "generatedAt": "2026-09-07",
   "news": {
     "mapsmania": [
+      {
+        "title": "Geography and Genetics",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/geography-and-genetics.html",
+        "desc": ""
+      },
       {
         "title": "Mercator vs Equal Earth",
         "url": "http://googlemapsmania.blogspot.com/2026/09/mercator-vs-equal-earth.html",
@@ -35,11 +40,6 @@
       {
         "title": "How Great is Great Britain?",
         "url": "http://googlemapsmania.blogspot.com/2026/08/how-great-is-great-britain.html",
-        "desc": ""
-      },
-      {
-        "title": "15 Minute Towns Animated",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/15-minute-towns-animated.html",
         "desc": ""
       }
     ],
@@ -75,9 +75,44 @@
         "desc": "From Delaware to Hawaii, discover when each state entered the Union and the geographic features that make every state unique."
       }
     ],
-    "geoworld": []
+    "geoworld": [
+      {
+        "title": "Infrastructure Isn’t Just Built Anymore.",
+        "url": "https://geospatialworld.net/videos/intelligent-infrastructure-aec-summit-gwf-2026/",
+        "desc": "Infrastructure was once defined by scale."
+      },
+      {
+        "title": "Strengthening Sovereignty, Economy, and Society",
+        "url": "https://geospatialworld.net/prime/interviews/strengthening-sovereignty-economy-and-society/",
+        "desc": "How should nations redefine geospatial and space sovereignty in an era of increasing dependence on global platforms, foreign satellite constellations, and in…"
+      },
+      {
+        "title": "Mapping Urban Heat Islands in Ahemedabad",
+        "url": "https://geospatialworld.net/videos/mapping-urban-heat-islands-ahmedabad/",
+        "desc": "Even though the conversations on climate change have muted due to the geopolitical situation, trade disruptions, greater defence and intelligence spending, a…"
+      },
+      {
+        "title": "HD Mapping and VPS: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence | GWF 2026",
+        "url": "https://geospatialworld.net/videos/hd-mapping-vps-geospatial-platforms-gwf-2026/",
+        "desc": "Plenary Session 5: High-Definition Mapping and Visual Positioning Systems: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence |…"
+      },
+      {
+        "title": "Space Infrastructure as a Service: Enriching Geospatial Platforms and Spatial Intelligence | GWF 2026",
+        "url": "https://geospatialworld.net/videos/space-infrastructure-as-a-service-geospatial-spatial-intelligence-gwf-2026/",
+        "desc": "Plenary Session 4 | Geospatial World Forum 2026 | Amsterdam, April 28 – May 1 This plenary session Moderate by Vaishali Dixit, VP – Americas, Geospatial Worl…"
+      },
+      {
+        "title": "Optimizing GeoAI and Digital Twins Towards Utilities and Network Management | GWF 2026",
+        "url": "https://geospatialworld.net/videos/geoai-digital-twins-utilities-network-management-gwf-2026/",
+        "desc": "Plenary Session 3 | Geospatial World Forum 2026 | Amsterdam, April 28 – May 1 This plenary panel from Geospatial World Forum 2026 brings together leaders fro…"
+      }
+    ]
   },
   "qgis": [
+    {
+      "title": "RoboCOPC",
+      "url": "https://plugins.qgis.org/plugins/RoboCOPC/"
+    },
     {
       "title": "AI GIS AGENT",
       "url": "https://plugins.qgis.org/plugins/ai_gis_agent/"
@@ -105,10 +140,6 @@
     {
       "title": "Remove Temporary Layers",
       "url": "https://plugins.qgis.org/plugins/remove_temp_layers/"
-    },
-    {
-      "title": "Tessela Estilos Prontos",
-      "url": "https://plugins.qgis.org/plugins/tessela_publico/"
     }
   ],
   "releases": [
@@ -179,9 +210,33 @@
   ],
   "gisse": [
     {
+      "title": "Which skills and core tech stack are most in-demand for GIS Developers in Europe?",
+      "url": "https://gis.stackexchange.com/questions/501376/which-skills-and-core-tech-stack-are-most-in-demand-for-gis-developers-in-europe",
+      "score": -2,
+      "answers": 0
+    },
+    {
+      "title": "Help me to draw a map for my piece of land",
+      "url": "https://gis.stackexchange.com/questions/501377/help-me-to-draw-a-map-for-my-piece-of-land",
+      "score": -5,
+      "answers": 0
+    },
+    {
+      "title": "How to calculate statistics for raster with terra",
+      "url": "https://gis.stackexchange.com/questions/501365/how-to-calculate-statistics-for-raster-with-terra",
+      "score": 0,
+      "answers": 1
+    },
+    {
       "title": "Radar detection cone visualisation project (Ideally in QGIS)",
       "url": "https://gis.stackexchange.com/questions/501368/radar-detection-cone-visualisation-project-ideally-in-qgis",
       "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "How to use Python for styling while still maintaining a theme in QGIS?",
+      "url": "https://gis.stackexchange.com/questions/501346/how-to-use-python-for-styling-while-still-maintaining-a-theme-in-qgis",
+      "score": 1,
       "answers": 0
     },
     {
@@ -209,37 +264,49 @@
       "answers": 0
     },
     {
-      "title": "How to set a partially transparent color (alpha channel) for the \"noData\" color in a raster using QGIS",
-      "url": "https://gis.stackexchange.com/questions/501361/how-to-set-a-partially-transparent-color-alpha-channel-for-the-nodata-color",
-      "score": 1,
-      "answers": 0
-    },
-    {
       "title": "How to create a dynamic smooth sine wave boundary for polygon symbology in QGIS?",
       "url": "https://gis.stackexchange.com/questions/501360/how-to-create-a-dynamic-smooth-sine-wave-boundary-for-polygon-symbology-in-qgis",
       "score": 1,
       "answers": 0
-    },
-    {
-      "title": "QGIS 4.2.1 - 3D Symbology not showing",
-      "url": "https://gis.stackexchange.com/questions/501364/qgis-4-2-1-3d-symbology-not-showing",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Print composer with multiple maps each showing a different value range from the same column",
-      "url": "https://gis.stackexchange.com/questions/501350/print-composer-with-multiple-maps-each-showing-a-different-value-range-from-the",
-      "score": 0,
-      "answers": 1
-    },
-    {
-      "title": "How to calculate statistics for raster with terra",
-      "url": "https://gis.stackexchange.com/questions/501365/how-to-calculate-statistics-for-raster-with-terra",
-      "score": 0,
-      "answers": 0
     }
   ],
   "nasa": [
+    {
+      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
+      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
+      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
+      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
+      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
+      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "OPERA Land Surface Disturbance Annual from Harmonized Landsat Sentinel-2 product (Version 1)",
+      "url": "https://search.earthdata.nasa.gov/search?q=OPERA_L3_DIST-ANN-HLS_V1",
+      "desc": "The Observational Products for End-Users from Remote Sensing Analysis ([OPERA](https://www.jpl.nasa.gov/go/opera)) Land Surface Disturbance Annual from Harmo…",
+      "org": "LPCLOUD"
+    },
     {
       "title": "UAVSAR_POLSAR_STOKES",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
@@ -262,42 +329,6 @@
       "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
       "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
       "desc": "UAVSAR PolSAR Scene Complex",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
-      "desc": "UAVSAR PolSAR Scene Projected",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_METADATA",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
-      "desc": "UAVSAR PolSAR Scene Metadata",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_KMZ",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
-      "desc": "UAVSAR PolSAR Scene KMZ",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_INCIDENCE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
-      "desc": "UAVSAR PolSAR Scene Incidence Angle",
       "org": "ASF"
     }
   ],
