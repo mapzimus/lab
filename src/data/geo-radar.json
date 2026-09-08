@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-07",
+  "generatedAt": "2026-09-08",
   "news": {
     "mapsmania": [
+      {
+        "title": "Your Daily GeoGuessing Challenge!",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/your-daily-geoguessing-challenge.html",
+        "desc": ""
+      },
       {
         "title": "Geography and Genetics",
         "url": "http://googlemapsmania.blogspot.com/2026/09/geography-and-genetics.html",
@@ -35,11 +40,6 @@
       {
         "title": "The Coffee Barista's Maps",
         "url": "http://googlemapsmania.blogspot.com/2026/09/the-coffee-baristas-maps.html",
-        "desc": ""
-      },
-      {
-        "title": "How Great is Great Britain?",
-        "url": "http://googlemapsmania.blogspot.com/2026/08/how-great-is-great-britain.html",
         "desc": ""
       }
     ],
@@ -110,53 +110,53 @@
   },
   "qgis": [
     {
+      "title": "GeoClassify",
+      "url": "https://plugins.qgis.org/plugins/geoclassify/"
+    },
+    {
+      "title": "Multi Background Exporter",
+      "url": "https://plugins.qgis.org/plugins/multi_layer_exporter/"
+    },
+    {
+      "title": "India Boundary & CRS Toolkit",
+      "url": "https://plugins.qgis.org/plugins/india_boundary_toolkit/"
+    },
+    {
+      "title": "AutoNum Parcelles",
+      "url": "https://plugins.qgis.org/plugins/parcel_numbering/"
+    },
+    {
+      "title": "Spot Level & Contour Extractor Tool",
+      "url": "https://plugins.qgis.org/plugins/spot_level_contour_extractor/"
+    },
+    {
       "title": "RoboCOPC",
       "url": "https://plugins.qgis.org/plugins/RoboCOPC/"
     },
     {
-      "title": "AI GIS AGENT",
-      "url": "https://plugins.qgis.org/plugins/ai_gis_agent/"
+      "title": "Raster Area Calculator",
+      "url": "https://plugins.qgis.org/plugins/RasterAreaCalculator/"
     },
     {
-      "title": "Apply Layer Styles",
-      "url": "https://plugins.qgis.org/plugins/apply_layer_styles/"
-    },
-    {
-      "title": "SHP TXT Converter",
-      "url": "https://plugins.qgis.org/plugins/shp_txt_converter/"
-    },
-    {
-      "title": "Lutz Sholtz - Modelo Hidrologico Mensual",
-      "url": "https://plugins.qgis.org/plugins/lutz_scholz_qgis/"
-    },
-    {
-      "title": "KUGI",
-      "url": "https://plugins.qgis.org/plugins/kugi/"
-    },
-    {
-      "title": "GeoSIG Tools",
-      "url": "https://plugins.qgis.org/plugins/GeoSIG_Tools/"
-    },
-    {
-      "title": "Remove Temporary Layers",
-      "url": "https://plugins.qgis.org/plugins/remove_temp_layers/"
+      "title": "Meteo Grid Statistics",
+      "url": "https://plugins.qgis.org/plugins/meteo_grid_stats/"
     }
   ],
   "releases": [
+    {
+      "repo": "maplibre/maplibre-gl-js",
+      "title": "maplibre-gl-js v6.8.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.8.0",
+      "desc": "### ✨ Features and improvements - Add `map.getStyleUrl()`, which returns the URL the style was loaded from, or `null` when the style was given as an object (…",
+      "publishedAt": "2026-09-07",
+      "isFresh": true
+    },
     {
       "repo": "visgl/deck.gl",
       "title": "deck.gl v9.4.0",
       "url": "https://github.com/visgl/deck.gl/releases/tag/v9.4.0",
       "desc": "deck.gl v9.4 brings together a collection of completed improvements focused on performance, stability, and usability.",
       "publishedAt": "2026-09-05",
-      "isFresh": true
-    },
-    {
-      "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.7.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.7.0",
-      "desc": "### ✨ Features and improvements - Support the style specification's `font-faces` property, with `map.setFontFaces` and `map.getFontFaces` and improve complex…",
-      "publishedAt": "2026-09-02",
       "isFresh": true
     },
     {
@@ -210,15 +210,27 @@
   ],
   "gisse": [
     {
+      "title": "GDAL Raster Mosaic Count Pixel Function",
+      "url": "https://gis.stackexchange.com/questions/501386/gdal-raster-mosaic-count-pixel-function",
+      "score": 1,
+      "answers": 0
+    },
+    {
+      "title": "Determining the Number of Houses in a Local Government Area (LGA) Using GIS",
+      "url": "https://gis.stackexchange.com/questions/501385/determining-the-number-of-houses-in-a-local-government-area-lga-using-gis",
+      "score": -6,
+      "answers": 0
+    },
+    {
       "title": "Which skills and core tech stack are most in-demand for GIS Developers in Europe?",
       "url": "https://gis.stackexchange.com/questions/501376/which-skills-and-core-tech-stack-are-most-in-demand-for-gis-developers-in-europe",
-      "score": -2,
+      "score": -4,
       "answers": 0
     },
     {
       "title": "Help me to draw a map for my piece of land",
       "url": "https://gis.stackexchange.com/questions/501377/help-me-to-draw-a-map-for-my-piece-of-land",
-      "score": -5,
+      "score": -7,
       "answers": 0
     },
     {
@@ -230,7 +242,7 @@
     {
       "title": "Radar detection cone visualisation project (Ideally in QGIS)",
       "url": "https://gis.stackexchange.com/questions/501368/radar-detection-cone-visualisation-project-ideally-in-qgis",
-      "score": 0,
+      "score": -1,
       "answers": 0
     },
     {
@@ -256,80 +268,68 @@
       "url": "https://gis.stackexchange.com/questions/501358/importing-microsoft-building-footprints-data-into-qgis",
       "score": 0,
       "answers": 1
-    },
-    {
-      "title": "Raster image showing up outside map",
-      "url": "https://gis.stackexchange.com/questions/501345/raster-image-showing-up-outside-map",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "How to create a dynamic smooth sine wave boundary for polygon symbology in QGIS?",
-      "url": "https://gis.stackexchange.com/questions/501360/how-to-create-a-dynamic-smooth-sine-wave-boundary-for-polygon-symbology-in-qgis",
-      "score": 1,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "title": "AVIRIS-5 L2A Orthocorrected Surface Reflectance, Facility Instrument Collection",
+      "url": "https://search.earthdata.nasa.gov/search?q=AV5_L2A_RFL_2484",
+      "desc": "This dataset contains Level 2A (L2A) surface reflectance images from the Airborne Visible / Infrared Imaging Spectrometer-5 (AVIRIS-5) instrument.",
+      "org": "ORNL_CLOUD"
+    },
+    {
+      "title": "AVIRIS-5 L2B Greenhouse Gas Enhancements, Facility Instrument Collection",
+      "url": "https://search.earthdata.nasa.gov/search?q=AV5_L2B_GHG_2485",
+      "desc": "This dataset contains Level 2B (L2B) enhancements of greenhouse gases (GHG) derived from imagery collected by the Airborne Visible / Infrared Imaging Spectro…",
+      "org": "ORNL_CLOUD"
+    },
+    {
+      "title": "AVIRIS-5 L1B Calibrated Radiance, Facility Instrument Collection",
+      "url": "https://search.earthdata.nasa.gov/search?q=AV5_L1B_RDN_2483",
+      "desc": "This dataset contains Level 1B (L1B) calibrated radiance images as well as observational geometry and illumination parameters from the Airborne Visible / Inf…",
+      "org": "ORNL_CLOUD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL10",
+      "desc": "ATL10 contains along-track sea ice freeboard calculated for 10 km swath segments.",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
-      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL09",
+      "desc": "ATL09 contains calibrated, attenuated backscatter profiles (CAB), layer-integrated attenuated backscatter, blowing snow, and other parameters including cloud…",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
-      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL08",
+      "desc": "ATL08 contains along-track estimates of terrain height, canopy height, and canopy cover, as well as beam and reference parameters.",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Height V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL07",
+      "desc": "ATL07 contains along-track sea surface height and sea ice height for segments of variable lengths for all beams as well as fixed 10-meter segments for strong…",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
+      "title": "ATLAS/ICESat-2 L3A Land Ice Height V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL06",
+      "desc": "ATL06 contains geolocated land-ice surface heights above the WGS84 ellipsoid, plus ancillary parameters that can be used to interpret and assess the quality…",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "OPERA Land Surface Disturbance Annual from Harmonized Landsat Sentinel-2 product (Version 1)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OPERA_L3_DIST-ANN-HLS_V1",
-      "desc": "The Observational Products for End-Users from Remote Sensing Analysis ([OPERA](https://www.jpl.nasa.gov/go/opera)) Land Surface Disturbance Annual from Harmo…",
-      "org": "LPCLOUD"
+      "title": "ATLAS/ICESat-2 L2A Normalized Relative Backscatter Profiles V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL04",
+      "desc": "ATL04 contains along-track normalized relative backscatter (NRB) profiles of the atmosphere.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "UAVSAR_POLSAR_STOKES",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
-      "desc": "UAVSAR PolSAR Scene Stokes",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_SLOPE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
-      "desc": "UAVSAR PolSAR Scene Slope",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_PAULI",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
-      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
-      "org": "ASF"
-    },
-    {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
-      "desc": "UAVSAR PolSAR Scene Complex",
-      "org": "ASF"
+      "title": "ATLAS/ICESat-2 L2A Global Geolocated Photon Data V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL03",
+      "desc": "ATL03 contains height above the WGS 84 ellipsoid, latitude, longitude, and time for each photon downlinked by the Advanced Topographic Laser Altimeter System…",
+      "org": "NSIDC_CPRD"
     }
   ],
   "datagov": [
