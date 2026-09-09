@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-08",
+  "generatedAt": "2026-09-09",
   "news": {
     "mapsmania": [
+      {
+        "title": "Which Country is Bigger? The Map Decides",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/which-country-is-bigger-map-decides.html",
+        "desc": ""
+      },
       {
         "title": "Your Daily GeoGuessing Challenge!",
         "url": "http://googlemapsmania.blogspot.com/2026/09/your-daily-geoguessing-challenge.html",
@@ -35,11 +40,6 @@
       {
         "title": "Movie Maps",
         "url": "http://googlemapsmania.blogspot.com/2026/09/movie-maps.html",
-        "desc": ""
-      },
-      {
-        "title": "The Coffee Barista's Maps",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/the-coffee-baristas-maps.html",
         "desc": ""
       }
     ],
@@ -145,10 +145,10 @@
   "releases": [
     {
       "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.8.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.8.0",
-      "desc": "### ✨ Features and improvements - Add `map.getStyleUrl()`, which returns the URL the style was loaded from, or `null` when the style was given as an object (…",
-      "publishedAt": "2026-09-07",
+      "title": "maplibre-gl-js v6.9.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.9.0",
+      "desc": "### ✨ Features and improvements - Improved support for drawing the letters of Devanagari, Khmer, Burmese and the other complex scripts and also draws Arabic…",
+      "publishedAt": "2026-09-09",
       "isFresh": true
     },
     {
@@ -210,28 +210,40 @@
   ],
   "gisse": [
     {
-      "title": "GDAL Raster Mosaic Count Pixel Function",
-      "url": "https://gis.stackexchange.com/questions/501386/gdal-raster-mosaic-count-pixel-function",
+      "title": "QField QML-Plugin SVG icons pixelated when embedded with data URI",
+      "url": "https://gis.stackexchange.com/questions/501394/qfield-qml-plugin-svg-icons-pixelated-when-embedded-with-data-uri",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Simplifying a feature's geometry",
+      "url": "https://gis.stackexchange.com/questions/501393/simplifying-a-features-geometry",
       "score": 1,
       "answers": 0
     },
     {
-      "title": "Determining the Number of Houses in a Local Government Area (LGA) Using GIS",
-      "url": "https://gis.stackexchange.com/questions/501385/determining-the-number-of-houses-in-a-local-government-area-lga-using-gis",
-      "score": -6,
+      "title": "What should I use for the 'scale' parameter of geemap.ee_export_image() when exporting Sentinel 5P and MODIS data via GEE?",
+      "url": "https://gis.stackexchange.com/questions/501391/what-should-i-use-for-the-scale-parameter-of-geemap-ee-export-image-when-exp",
+      "score": 0,
       "answers": 0
     },
     {
-      "title": "Which skills and core tech stack are most in-demand for GIS Developers in Europe?",
-      "url": "https://gis.stackexchange.com/questions/501376/which-skills-and-core-tech-stack-are-most-in-demand-for-gis-developers-in-europe",
-      "score": -4,
+      "title": "Auto-connected signal handler called twice in QGIS plugin dialog",
+      "url": "https://gis.stackexchange.com/questions/501389/auto-connected-signal-handler-called-twice-in-qgis-plugin-dialog",
+      "score": 0,
       "answers": 0
     },
     {
-      "title": "Help me to draw a map for my piece of land",
-      "url": "https://gis.stackexchange.com/questions/501377/help-me-to-draw-a-map-for-my-piece-of-land",
-      "score": -7,
+      "title": "GDAL Raster Mosaic Count Pixel Function",
+      "url": "https://gis.stackexchange.com/questions/501386/gdal-raster-mosaic-count-pixel-function",
+      "score": 2,
       "answers": 0
+    },
+    {
+      "title": "Print composer with multiple maps each showing a different value range from the same column",
+      "url": "https://gis.stackexchange.com/questions/501350/print-composer-with-multiple-maps-each-showing-a-different-value-range-from-the",
+      "score": 0,
+      "answers": 1
     },
     {
       "title": "How to calculate statistics for raster with terra",
@@ -242,7 +254,7 @@
     {
       "title": "Radar detection cone visualisation project (Ideally in QGIS)",
       "url": "https://gis.stackexchange.com/questions/501368/radar-detection-cone-visualisation-project-ideally-in-qgis",
-      "score": -1,
+      "score": -2,
       "answers": 0
     },
     {
@@ -256,80 +268,68 @@
       "url": "https://gis.stackexchange.com/questions/501356/viewshed-analysis-with-single-layers-in-qgis",
       "score": 1,
       "answers": 1
-    },
-    {
-      "title": "JSON field becomes QVariantList when exporting GeoPackage to GeoJSON",
-      "url": "https://gis.stackexchange.com/questions/501348/json-field-becomes-qvariantlist-when-exporting-geopackage-to-geojson",
-      "score": 3,
-      "answers": 1
-    },
-    {
-      "title": "Importing Microsoft Building Footprints data into QGIS",
-      "url": "https://gis.stackexchange.com/questions/501358/importing-microsoft-building-footprints-data-into-qgis",
-      "score": 0,
-      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "AVIRIS-5 L2A Orthocorrected Surface Reflectance, Facility Instrument Collection",
-      "url": "https://search.earthdata.nasa.gov/search?q=AV5_L2A_RFL_2484",
-      "desc": "This dataset contains Level 2A (L2A) surface reflectance images from the Airborne Visible / Infrared Imaging Spectrometer-5 (AVIRIS-5) instrument.",
-      "org": "ORNL_CLOUD"
-    },
-    {
-      "title": "AVIRIS-5 L2B Greenhouse Gas Enhancements, Facility Instrument Collection",
-      "url": "https://search.earthdata.nasa.gov/search?q=AV5_L2B_GHG_2485",
-      "desc": "This dataset contains Level 2B (L2B) enhancements of greenhouse gases (GHG) derived from imagery collected by the Airborne Visible / Infrared Imaging Spectro…",
-      "org": "ORNL_CLOUD"
-    },
-    {
-      "title": "AVIRIS-5 L1B Calibrated Radiance, Facility Instrument Collection",
-      "url": "https://search.earthdata.nasa.gov/search?q=AV5_L1B_RDN_2483",
-      "desc": "This dataset contains Level 1B (L1B) calibrated radiance images as well as observational geometry and illumination parameters from the Airborne Visible / Inf…",
-      "org": "ORNL_CLOUD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL10",
-      "desc": "ATL10 contains along-track sea ice freeboard calculated for 10 km swath segments.",
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
+      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09",
-      "desc": "ATL09 contains calibrated, attenuated backscatter profiles (CAB), layer-integrated attenuated backscatter, blowing snow, and other parameters including cloud…",
-      "org": "NSIDC_CPRD"
+      "title": "GNSS radio occultation L2B temperature, pressure, and water vapor retrieval for TSX as contributed by JPL, version 2.0 (gnssro_tsx_jpl_l2b)",
+      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_tsx_jpl_l2b",
+      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Temperature, Pressure, and Water Vapor data from the TerraSAR-X missio…",
+      "org": "GES_DISC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08",
-      "desc": "ATL08 contains along-track estimates of terrain height, canopy height, and canopy cover, as well as beam and reference parameters.",
-      "org": "NSIDC_CPRD"
+      "title": "VIIRS/JPSS2 Downward Shortwave Radiation Daily L3 Global 1km SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ218A1",
+      "desc": "The NOAA-21 Visible Infrared Imaging Radiometer Suite (VIIRS) Downward Shortwave Radiation (DSR) gridded Level 3 product is produced at 1 kilometer pixel res…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07",
-      "desc": "ATL07 contains along-track sea surface height and sea ice height for segments of variable lengths for all beams as well as fixed 10-meter segments for strong…",
-      "org": "NSIDC_CPRD"
+      "title": "WB-57 Meteorological and Navigation Observations (METNAV) TC4",
+      "url": "https://search.earthdata.nasa.gov/search?q=wb57metnavtc4",
+      "desc": "The WB-57 Meteorological and Navigation Data TC4 dataset is a subset of airborne measurements that include GPS positioning and trajectory data, aircraft orie…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Land Ice Height V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL06",
-      "desc": "ATL06 contains geolocated land-ice surface heights above the WGS84 ellipsoid, plus ancillary parameters that can be used to interpret and assess the quality…",
-      "org": "NSIDC_CPRD"
+      "title": "Atmospheric Vertical Observations of CO₂ in the Earth’s Troposphere (AVOCET) TC4",
+      "url": "https://search.earthdata.nasa.gov/search?q=dc8avocettc4",
+      "desc": "Atmospheric Vertical Observations of CO₂ in the Earth’s Troposphere (AVOCET) TC4",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "ATLAS/ICESat-2 L2A Normalized Relative Backscatter Profiles V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL04",
-      "desc": "ATL04 contains along-track normalized relative backscatter (NRB) profiles of the atmosphere.",
-      "org": "NSIDC_CPRD"
+      "title": "ECOSTRESS Gridded Weight Percent Silica L3 Global 0.01 Degree Map V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECO_L3G_WPS",
+      "desc": "The ECOsystem Spaceborne Thermal Radiometer Experiment on Space Station (ECOSTRESS) mission acquires high-resolution thermal infrared (TIR) data on the Earth…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L2A Global Geolocated Photon Data V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL03",
-      "desc": "ATL03 contains height above the WGS 84 ellipsoid, latitude, longitude, and time for each photon downlinked by the Advanced Topographic Laser Altimeter System…",
-      "org": "NSIDC_CPRD"
+      "title": "PACE OCI Closed-Loop Ocean Simulation for Evaluation - Model Input Data, version 1",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE_OCI_MI_CLOSE",
+      "desc": "The Closed-Loop Ocean Simulation for Evaluation of ocean color retrieval algorithms (CLOSE) Model Input collection provides modeled remote sensing reflectanc…",
+      "org": "OB_CLOUD"
+    },
+    {
+      "title": "PACE OCI Level-3 Global Mapped Closed-Loop Ocean Simulation for Evaluation Data, version 3.1",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE_OCI_L3M_CLOSE",
+      "desc": "The Closed-Loop Ocean Simulation for Evaluation of ocean color retrieval algorithms (CLOSE) Level-3 mapped collection provides gridded ocean-color products g…",
+      "org": "OB_CLOUD"
+    },
+    {
+      "title": "PACE OCI Level-3 Global Binned Closed-Loop Ocean Simulation for Evaluation Data, version 3.1",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE_OCI_L3B_CLOSE",
+      "desc": "The Closed-Loop Ocean Simulation for Evaluation of ocean color retrieval algorithms (CLOSE) Level-3 binned collection provides spatially aggregated ocean-col…",
+      "org": "OB_CLOUD"
+    },
+    {
+      "title": "PACE OCI Level-2 Regional Closed-Loop Ocean Simulation for Evaluation Data, version 3.1",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE_OCI_L2_CLOSE",
+      "desc": "The Closed-Loop Ocean Simulation for Evaluation of ocean color retrieval algorithms (CLOSE) Level-2 collection provides swath-based ocean-color products retr…",
+      "org": "OB_CLOUD"
     }
   ],
   "datagov": [
