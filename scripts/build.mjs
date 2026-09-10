@@ -58,6 +58,7 @@ const hostedProjectRoutes = {
   "boston-in-motion": "/boston-in-motion/",
   "where-the-games-go": "/where-the-games-go/",
   "smartpicker": "/smartpicker/",
+  "citynario": "/citynario/",
   "world-xi": "/lab/world-xi/",
   "national-parks": "/lab/national-parks/",
 };
@@ -76,6 +77,7 @@ const appRoutes = {
   "boston-in-motion": "boston-in-motion",
   "where-the-games-go": "where-the-games-go",
   smartpicker: "smartpicker",
+  citynario: "citynario",
 };
 
 const tools = loadCatalog("tools.json");
