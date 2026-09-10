@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -32,7 +33,7 @@ function decodeText(value) {
     .replaceAll("&gt;", ">");
 }
 
-const knownCategories = new Set(["maps", "data", "design", "teaching", "math", "fun", "play", "experiments"]);
+const knownCategories = new Set(["maps", "data", "design", "classroom", "math", "soccer", "utilities", "play", "experiments"]);
 const requiredFields = ["slug", "title", "description", "category", "url"];
 
 /** First-party routes for projects hosted on-site (snapshotted under vendor/
@@ -43,20 +44,22 @@ const hostedProjectRoutes = {
   "us-fantasy-transit": "/transit/",
   "concord-civil-war": "/concord-war/",
   "bug-wars": "/bug-wars/",
-  "flip-game": "/flip-game/",
+  "flip-game": "/flipgame/",
   "whydah-voyage": "/whydah-voyage/",
-  "black-sam": "/black-sam/",
   "true-scale": "/true-scale/",
   "train-route-atlas": "/lab/train-routes/",
   "state-extremes": "/lab/state-extremes/",
   "predicting-housing-crisis": "/lab/housing-crisis/",
   "game-vault": "/lab/game-vault/",
   "detroit-rebuild": "/lab/detroit-rebuild/",
+  "african-urbanization": "/lab/african-urbanization/",
   "interstate-challenge": "/interstate-challenge/",
   "mapzimus-board": "/mapzimus-board/",
   "boston-in-motion": "/boston-in-motion/",
   "where-the-games-go": "/where-the-games-go/",
   "smartpicker": "/smartpicker/",
+  "world-xi": "/lab/world-xi/",
+  "national-parks": "/lab/national-parks/",
 };
 
 /** vendor/apps/<dir> → public route */
@@ -65,9 +68,8 @@ const appRoutes = {
   transit: "transit",
   "concord-war": "concord-war",
   "bug-wars": "bug-wars",
-  "flip-game": "flip-game",
+  "flip-game": "flipgame",
   "whydah-voyage": "whydah-voyage",
-  "black-sam": "black-sam",
   "true-scale": "true-scale",
   "interstate-challenge": "interstate-challenge",
   "mapzimus-board": "mapzimus-board",
@@ -80,7 +82,8 @@ const tools = loadCatalog("tools.json");
 const projects = loadCatalog("projects.json");
 const featuredSlugs = loadCatalog("featured.json");
 const sourceCatalog = [...tools, ...projects];
-const fieldNotes = loadCatalog("field-notes.json");
+// Field Notes dormant — page redirects home until posts return.
+// const fieldNotes = loadCatalog("field-notes.json");
 const linkGroups = loadCatalog("links.json");
 const problems = [];
 const seenSlugs = new Set();
@@ -153,18 +156,23 @@ const catalogRefresh = new Date(Date.UTC(refreshYear, refreshMonth - 1)).toLocal
 const categoryLabels = {
   maps: "Maps & GIS",
   data: "Data",
-  design: "Design & Media",
-  teaching: "Teaching",
+  design: "Design",
+  classroom: "Classroom",
   math: "Math",
-  fun: "Fun & Learning",
+  soccer: "Soccer",
+  utilities: "Utilities",
   play: "Games",
   experiments: "Experiments",
+  // Legacy aliases kept for any lingering project tags
+  teaching: "Classroom",
+  fun: "Utilities",
 };
-// One home per item: map things → Maps, playable things → Games, utility
-// tools → Tools. Lab is source-based (all projects + anything unfinished).
+// Tools = every single-page utility (including GIS).
+// Maps = first-party map projects hosted here.
+// Games = playable. Lab = every project (maps included); no tools or skills.
 const viewCategories = {
   home: null,
-  tools: ["data", "design", "teaching", "math", "fun"],
+  tools: ["maps", "data", "design", "classroom", "math", "soccer", "utilities"],
   maps: ["maps"],
   games: ["play"],
 };
@@ -198,7 +206,12 @@ function card(item, { featured = false, star = true } = {}) {
 function itemsForView(view, category) {
   return catalog.filter((item) => {
     if (view === "lab") {
-      if (item.source !== "projects" && (item.status || "live") === "live") return false;
+      // Lab = every project (maps included). No tools, no skills.
+      if (item.source !== "projects") return false;
+    } else if (view === "maps") {
+      // First-party map projects that live on this site (embeddable destinations).
+      // GIS utilities stay under Tools → Maps & GIS.
+      if (item.source !== "projects" || item.category !== "maps" || item.external) return false;
     } else {
       if (view === "tools" && item.source !== "tools") return false;
       const allowed = viewCategories[view];
@@ -217,19 +230,12 @@ function filtersHtml(view, activeCategory) {
 }
 
 // Canonical order for grouped subsections.
-const catOrder = ["maps", "data", "design", "teaching", "math", "fun", "play", "experiments"];
+const catOrder = ["maps", "data", "design", "math", "classroom", "soccer", "utilities", "play", "experiments"];
 
 /** Split a view's items into labelled groups so a long list reads as a few
-    scannable shelves instead of one wall. Maps splits tools vs projects;
-    everything else groups by category. */
+    scannable shelves instead of one wall. */
 function groupsForView(view) {
   const items = itemsForView(view, "");
-  if (view === "maps") {
-    return [
-      { key: "map-tools", label: "Map tools", items: items.filter((i) => i.source === "tools") },
-      { key: "map-projects", label: "Map projects", items: items.filter((i) => i.source === "projects") },
-    ].filter((g) => g.items.length);
-  }
   return catOrder
     .map((cat) => ({ key: cat, label: categoryLabels[cat] || cat, items: items.filter((i) => i.category === cat) }))
     .filter((g) => g.items.length);
@@ -271,11 +277,13 @@ fs.writeFileSync(
 
 const template = fs.readFileSync(path.join(source, "_template.html"), "utf8");
 const toolCategories = {
+  maps: ["Maps & GIS tools", "Coordinate converters, GeoJSON, geocoders, grids, and map utilities."],
   data: ["Data tools", "CSV wrangling, charts, converters, and small data utilities."],
-  design: ["Design tools", "Color, layout, media, and design helpers."],
-  teaching: ["Teaching tools", "Classroom helpers and interactive teaching aids."],
-  math: ["Math tools", "Calculators, solvers, and math visualizations."],
-  fun: ["Fun & learning", "Playful tools and learning experiments."],
+  design: ["Design tools", "Color, CSS, images, icons, and pattern helpers."],
+  math: ["Math tools", "Interactive explorers, graphing, geometry, and reference sheets."],
+  classroom: ["Classroom tools", "Seating, timers, groups, and probability demos for class."],
+  soccer: ["Soccer tools", "Tactics boards, lineups, training plans, and match graphics."],
+  utilities: ["Utility tools", "Unit conversion, QR codes, Markdown, and quick helpers."],
 };
 
 const utilityCount = itemsForView("tools", "").length;
@@ -286,10 +294,10 @@ const projectCount = itemsForView("lab", "").length;
 /** Home "browse by section" cards — four doors instead of the whole catalog. */
 function sectionCardsHtml() {
   const sections = [
-    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Single-page browser utilities for data, design, teaching, and math." },
-    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "GIS converters and viewers, live transit, globes, and atlases." },
+    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Single-page browser utilities — GIS, data, design, math, classroom, and soccer." },
+    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "First-party map projects you can open right here — transit, globes, atlases, stories." },
     { href: "/games/", label: "Games", category: "play", n: gamesCount, desc: "Strategy and logic games, free in the browser." },
-    { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "The bigger projects, apps, and works in progress." },
+    { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "Every project in one place — maps, games, classroom apps, and experiments." },
   ];
   return sections
     .map((s) => `<a class="section-card" href="${s.href}" data-category="${s.category}">
@@ -315,32 +323,32 @@ const pages = {
   lab: {
     path: "lab/index.html",
     title: "Lab · Mapzimus",
-    description: `The ${projectCount} projects of the Mapzimus lab: map apps, games, and experiments, including works in progress.`,
+    description: `The ${projectCount} projects of the Mapzimus lab: map apps, games, classroom apps, and experiments — no single-page tools.`,
     canonical: "https://mapzimus.com/lab/",
     eyebrow: "The lab",
-    heading: "Projects and experiments",
-    intro: `The ${projectCount} bigger builds beyond the single-page tools — map apps, games, teaching apps, and experiments, including works in progress.`,
+    heading: "Every project",
+    intro: `All ${projectCount} projects in one shelf — the map destinations from Maps, plus games, classroom apps, and experiments. Tools and skills live elsewhere.`,
     catalogHeading: "All projects",
   },
   tools: {
     path: "tools/index.html",
     title: "Browser tools · Mapzimus",
-    description: `A searchable catalog of ${utilityCount} standalone browser tools for data, design, teaching, and math.`,
+    description: `A searchable catalog of ${utilityCount} standalone browser tools for maps, data, design, math, classroom, and soccer.`,
     canonical: "https://mapzimus.com/tools/",
     eyebrow: "The tool catalog",
     heading: "Every tool, one page each",
-    intro: `${utilityCount} standalone browser tools for data, design, teaching, math, and fun. Each is a single page at its own path. Map tools live under Maps.`,
+    intro: `${utilityCount} standalone browser tools — GIS utilities, data, design, math, classroom, soccer, and everyday helpers. Each is a single page at its own path.`,
     catalogHeading: "All tools",
   },
   maps: {
     path: "maps/index.html",
     title: "Maps · Mapzimus",
-    description: `All ${mapCount} map tools and map projects from Mapzimus: converters, GIS utilities, live transit, globes, and atlases.`,
+    description: `First-party map projects from Mapzimus: live transit, globes, atlases, and spatial stories — each hosted on this site.`,
     canonical: "https://mapzimus.com/maps/",
-    eyebrow: "Maps & GIS",
-    heading: "Everything maps",
-    intro: `All ${mapCount} map things in one place — converters and GIS utilities alongside live transit, globes, transit networks, and atlases.`,
-    catalogHeading: "All maps",
+    eyebrow: "Maps",
+    heading: "Map projects",
+    intro: `${mapCount} map projects hosted here and ready to open — live transit, globes, transit networks, atlases, and spatial stories. GIS utilities live under Tools; the full project shelf is in Lab.`,
+    catalogHeading: "All map projects",
   },
   games: {
     path: "games/index.html",
@@ -507,13 +515,6 @@ const radarCards = radars.map((radar) => `<article class="card featured" data-ca
     </article>`).join("\n");
 fillStatic("radars/index.html", { RADAR_CARDS: radarCards });
 
-const publishedNotes = fieldNotes.filter((note) => note.status === "published");
-const notesHtml = publishedNotes.map((note) => `<article class="note">
-  <div class="note-meta"><time datetime="${escapeHtml(note.date)}">${escapeHtml(note.date)}</time>${(note.tags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>
-  <h2>${escapeHtml(note.title)}</h2>
-  ${note.body.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n  ")}
-</article>`).join("\n");
-fillStatic("field-notes/index.html", { NOTES: notesHtml || `<p class="empty">No notes yet.</p>` });
 
 const skills = loadCatalog("skills.json");
 const skillCards = skills.map((skill) => `<article class="skill-card">
@@ -535,7 +536,7 @@ fillStatic("skills/index.html", { SKILL_CARDS: skillCards });
 
 // ---- Sitemap ----
 
-const staticPages = ["field-notes", "radars", "radar", "geo-radar", "soccer-radar", "stocks-radar", "politics-radar", "skills", "links", "about"];
+const staticPages = ["radars", "radar", "geo-radar", "soccer-radar", "stocks-radar", "politics-radar", "skills", "links", "about"];
 const sitemapUrls = [
   ...Object.values(pages).map((page) => page.canonical),
   ...staticPages.map((s) => `https://mapzimus.com/${s}/`),
@@ -544,6 +545,99 @@ const sitemapUrls = [
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...new Set(sitemapUrls)].map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n`;
 fs.writeFileSync(path.join(output, "sitemap.xml"), sitemap, "utf8");
 
+// ---- Asset fingerprints ----
+//
+// mapzimus.com sets a zone-level Browser Cache TTL of four hours, which raises
+// any shorter max-age the origin sends. That defeats the revalidate rules in
+// src/_headers: a returning reader can be served a four-hour-old app.js against
+// freshly deployed data, which is what made deploys look like nothing changed.
+//
+// Stamping a content hash onto every local script and stylesheet reference
+// means each deploy hands out new URLs, so the stale copy is never the one the
+// page asks for. A query string rather than a renamed file, so the paths in
+// src/_headers keep matching. The HTML itself is not cached, which is what
+// makes the new references reachable straight away.
+const HASHABLE = /(<(?:script|link)\b[^>]*?\b(?:src|href)=")([^"]+\.(?:js|css))(")/gi;
+const hashes = new Map();
+
+function assetHash(file) {
+  if (!hashes.has(file)) {
+    hashes.set(file, crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex").slice(0, 8));
+  }
+  return hashes.get(file);
+}
+
+function stampAssets(dir) {
+  let stamped = 0;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      stamped += stampAssets(full);
+      continue;
+    }
+    if (!entry.name.endsWith(".html")) continue;
+    const html = fs.readFileSync(full, "utf8");
+    const next = html.replace(HASHABLE, (whole, before, ref, after) => {
+      // Leave the CDN copies of Leaflet, MapLibre and Turf alone, along with
+      // anything already carrying a query. The concord-war bundle is SvelteKit
+      // output: its chunks are already content-hashed and are resolved by the
+      // framework at runtime, so a query string there risks breaking imports.
+      if (/^(?:https?:)?\/\//.test(ref) || ref.includes("?") || ref.includes("_app/immutable/")) return whole;
+      const target = ref.startsWith("/")
+        ? path.join(output, ref.slice(1))
+        : path.resolve(path.dirname(full), ref);
+      if (!path.resolve(target).startsWith(output + path.sep) || !fs.existsSync(target)) return whole;
+      stamped += 1;
+      return `${before}${ref}?v=${assetHash(target)}${after}`;
+    });
+    if (next !== html) fs.writeFileSync(full, next, "utf8");
+  }
+  return stamped;
+}
+
+// The same staleness one layer down. src/_headers caches /lab/:project/data/*
+// for a year as immutable, which is only safe while the page asks for a
+// versioned URL — African Urbanization builds one at runtime, World XI did not,
+// so a reader who had loaded the globe once kept the old clubs.geojson for a
+// year and every data deploy silently missed them. Stamping the literal data
+// references inside each lab app.js makes the immutable promise true.
+const DATA_REF = /(["'`])((?:\.\/|\/lab\/[a-z0-9-]+\/)data\/[A-Za-z0-9._\/-]+\.(?:geojson|json|topojson|csv))\1/g;
+
+function stampDataRefs(dir) {
+  let stamped = 0;
+  const unresolved = [];
+  const walk = (d) => {
+    for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+      const full = path.join(d, entry.name);
+      if (entry.isDirectory()) { walk(full); continue; }
+      if (!entry.name.endsWith(".js")) continue;
+      const js = fs.readFileSync(full, "utf8");
+      const next = js.replace(DATA_REF, (whole, q, ref) => {
+        if (ref.includes("?")) return whole;
+        const target = ref.startsWith("/")
+          ? path.join(output, ref.slice(1))
+          : path.resolve(path.dirname(full), ref);
+        if (!path.resolve(target).startsWith(output + path.sep) || !fs.existsSync(target)) {
+          unresolved.push(`${path.relative(output, full)} -> ${ref}`);
+          return whole;
+        }
+        stamped += 1;
+        return `${q}${ref}?v=${assetHash(target)}${q}`;
+      });
+      if (next !== js) fs.writeFileSync(full, next, "utf8");
+    }
+  };
+  const labDir = path.join(output, "lab");
+  if (fs.existsSync(labDir)) walk(labDir);
+  // A literal data reference that resolves to nothing is a broken link and
+  // would also be served under the year-long immutable rule, so say so loudly.
+  for (const u of unresolved) console.warn(`WARN unstamped lab data reference: ${u}`);
+  return stamped;
+}
+
+const stampedRefs = stampAssets(output);
+const stampedData = stampDataRefs(output);
+
 const missingTools = publicTools.filter((item) => !item.hosted).map((item) => item.slug);
 console.log(
   `Built ${Object.keys(pages).length} Mapzimus pages, ${publicTools.filter((t) => t.hosted).length} hosted tools` +
@@ -551,4 +645,8 @@ console.log(
     `, and ${Object.keys(appRoutes).length} hosted apps in dist/.`,
 );
 
-console.log(`Built ${Object.keys(pages).length + 3} Mapzimus pages in dist/ (${catalog.length} catalog items pre-rendered).`);
+console.log(
+  `Built ${Object.keys(pages).length + 3} Mapzimus pages in dist/ ` +
+    `(${catalog.length} catalog items pre-rendered, ${stampedRefs} asset references ` +
+    `and ${stampedData} lab data references fingerprinted).`,
+);

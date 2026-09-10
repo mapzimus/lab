@@ -5,18 +5,21 @@
   const categoryLabels = {
     maps: "Maps & GIS",
     data: "Data",
-    design: "Design & Media",
-    teaching: "Teaching",
+    design: "Design",
+    classroom: "Classroom",
     math: "Math",
-    fun: "Fun & Learning",
+    soccer: "Soccer",
+    utilities: "Utilities",
     play: "Games",
     experiments: "Experiments",
+    teaching: "Classroom",
+    fun: "Utilities",
   };
   // Keep in sync with the same tables in scripts/build.mjs, which pre-renders
   // the browse shelves so the catalog works without JavaScript.
   const viewCategories = {
     home: null,
-    tools: ["data", "design", "teaching", "math", "fun"],
+    tools: ["maps", "data", "design", "classroom", "math", "soccer", "utilities"],
     maps: ["maps"],
     games: ["play"],
   };
@@ -90,7 +93,11 @@
   }
 
   function allowedByView(item) {
-    if (view === "lab") return item.source === "projects" || (item.status || "live") !== "live";
+    // Keep in sync with itemsForView() in scripts/build.mjs.
+    if (view === "lab") return item.source === "projects";
+    if (view === "maps") {
+      return item.source === "projects" && item.category === "maps" && !item.external;
+    }
     if (view === "tools" && item.source !== "tools") return false;
     const allowed = viewCategories[view];
     return !allowed || allowed.includes(item.category);

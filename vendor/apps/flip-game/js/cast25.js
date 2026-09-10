@@ -88,6 +88,30 @@
     `<path d="M ${x} ${y - s} L ${x + s * 0.28} ${y - s * 0.28} L ${x + s} ${y} L ${x + s * 0.28} ${y + s * 0.28} L ${x} ${y + s} L ${x - s * 0.28} ${y + s * 0.28} L ${x - s} ${y} L ${x - s * 0.28} ${y - s * 0.28} Z" fill="${col}" opacity="${op == null ? 0.9 : op}"/>`;
   const GLASS = 'rgba(216,238,250,0.22)';
   const GLASS_EDGE = '#94b2c6';
+  const finite = (value, fallback) => Number.isFinite(Number(value)) ? Number(value) : fallback;
+  const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
+
+  // All motion in this file is a pure function of the render state. Replaying
+  // a flip at the same time/seed therefore paints exactly the same frame;
+  // random-number calls cannot make contents jump between captures. Reduced
+  // motion keeps the world-level surface and freezes secondary waves, bubbles,
+  // globules and grains.
+  function contentState(opts) {
+    const reduced = !!(opts && opts.reducedMotion);
+    const time = reduced ? 0 : finite(opts && opts.time, 0);
+    const seed = (Math.trunc(finite(opts && opts.motionSeed, 0)) >>> 0) % 997;
+    return {
+      reduced,
+      time,
+      seed,
+      slosh: reduced ? 0 : clamp(finite(opts && opts.slosh, 0), -1, 1),
+    };
+  }
+
+  function seededWave(state, index, speed) {
+    if (state.reduced) return 0;
+    return Math.sin(state.time * speed + state.seed * 0.017 + index * 2.399);
+  }
   // Interior box helper for paintLiquid — svg-space rect → local center/extents.
   const IB = (x0, y0, x1, y1) => ({
     cy: Y((y0 + y1) / 2),
@@ -105,6 +129,7 @@
   function paintLiquid(ctx, opts, clipFn, box, mouthY) {
     const liq = opts.liquid;
     if (!liq) return;
+    const motion = contentState(opts);
     const angle = opts.angle || 0;
     const color = opts.color || '#1f9bff';
     const fillCol = liq.lava ? shade(color, 0.15) : color;
@@ -124,7 +149,8 @@
     clipFn();
     ctx.clip();
     ctx.rotate(-angle);
-    const tilt = Math.max(-0.28, Math.min(0.28, opts.slosh || 0));
+    const viscosity = clamp(finite(liq.viscosity, 0), 0, 0.92);
+    const tilt = Math.max(-0.28, Math.min(0.28, motion.slosh * (1 - viscosity)));
     const slope = Math.tan(tilt);
     const yL = sy - 120 * slope, yR = sy + 120 * slope;
     ctx.fillStyle = fillCol;
@@ -136,8 +162,37 @@
       ctx.fillStyle = shade(color, -0.28);
       const bh = Math.max(20, projH);
       for (const [bx, ft, br] of [[-7, 0.28, 15], [11, 0.58, 19], [-13, 0.86, 12]]) {
-        ctx.beginPath(); ctx.arc(bx, sy + bh * 2 * ft * 0.8, br, 0, Math.PI * 2); ctx.fill();
+        const index = ft * 10;
+        const driftX = seededWave(motion, index, 0.72) * 8 + motion.slosh * 5;
+        const driftY = seededWave(motion, index + 1, 0.48) * 12;
+        ctx.beginPath();
+        ctx.ellipse(bx + driftX, sy + bh * 2 * ft * 0.8 + driftY,
+          br * (1 + seededWave(motion, index + 2, 0.39) * 0.12),
+          br * (1 - seededWave(motion, index + 2, 0.39) * 0.12), 0, 0, Math.PI * 2);
+        ctx.fill();
       }
+    }
+    if (liq.bubbles || liq.sparkles) {
+      const spanY = Math.max(18, projH * 1.55);
+      const count = liq.sparkles ? 7 : 9;
+      for (let i = 0; i < count; i++) {
+        const phase = seededWave(motion, i + 11, 0.9 + (i % 3) * 0.17);
+        const bx = ((i * 37 + motion.seed * 13) % 67) - 33 + motion.slosh * (i % 2 ? 5 : -5);
+        const by = sy + 8 + ((i * 19 + motion.seed * 7) % Math.max(12, Math.round(spanY))) + phase * 5;
+        const radius = 1.5 + (i % 3);
+        ctx.globalAlpha = 0.34 + (i % 4) * 0.11;
+        if (liq.sparkles && i % 2 === 0) {
+          ctx.fillStyle = '#fff7b3';
+          ctx.beginPath();
+          ctx.moveTo(bx, by - radius * 2); ctx.lineTo(bx + radius, by);
+          ctx.lineTo(bx, by + radius * 2); ctx.lineTo(bx - radius, by); ctx.closePath(); ctx.fill();
+        } else {
+          ctx.strokeStyle = 'rgba(255,255,255,0.82)';
+          ctx.lineWidth = 1.3;
+          ctx.beginPath(); ctx.arc(bx, by, radius, 0, Math.PI * 2); ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = liq.lava ? 0.85 : 0.92;
     }
     ctx.strokeStyle = 'rgba(255,255,255,0.45)';
     ctx.lineWidth = 2;
@@ -153,7 +208,8 @@
       ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(0, my);
-      ctx.quadraticCurveTo(18 * Math.sin(angle * 2), my - 34, 8, my - 74);
+      const pourWobble = motion.reduced ? 0 : seededWave(motion, 31, 1.7) * 7;
+      ctx.quadraticCurveTo(18 * Math.sin(angle * 2) + pourWobble, my - 34, 8, my - 74);
       ctx.stroke();
       ctx.globalAlpha = 0.85;
       for (let i = 0; i < 3; i++) {
@@ -184,7 +240,7 @@ ${gloss('M 138 152 L 138 184', 3.5, 0.5)}`;
   }
   function drawKetchup(ctx, opts) {
     const c = opts.color || '#e3263c';
-    paintLiquid(ctx, Object.assign({}, opts, { color: shade(c, -0.12), liquid: { mode: 'closed', fill: 0.52 } }), () => {
+    paintLiquid(ctx, Object.assign({}, opts, { color: shade(c, -0.12), liquid: { mode: 'closed', fill: 0.52, viscosity: 0.78 } }), () => {
       ctx.beginPath();
       ctx.moveTo(X(138), Y(146));
       ctx.lineTo(X(138), Y(192));
@@ -219,7 +275,7 @@ ${gloss('M 141 176 L 141 198', 3.5, 0.5)}`;
   }
   function drawMaple(ctx, opts) {
     const c = opts.color || '#ff7a00';
-    paintLiquid(ctx, Object.assign({}, opts, { liquid: { mode: 'closed', fill: 0.46 } }), () => {
+    paintLiquid(ctx, Object.assign({}, opts, { liquid: { mode: 'closed', fill: 0.46, viscosity: 0.68 } }), () => {
       ctx.beginPath();
       ctx.moveTo(X(140), Y(174));
       ctx.lineTo(X(140), Y(204));
@@ -263,7 +319,7 @@ ${gloss('M 116 280 C 112 306 114 336 122 354', 5, 0.28)}`;
   }
   function drawHoneybear(ctx, opts) {
     const c = opts.color || '#ffc233';
-    paintLiquid(ctx, Object.assign({}, opts, { liquid: { mode: 'closed', fill: 0.52 } }), () => {
+    paintLiquid(ctx, Object.assign({}, opts, { liquid: { mode: 'closed', fill: 0.52, viscosity: 0.84 } }), () => {
       ctx.beginPath();
       ctx.moveTo(X(150), Y(243));
       ctx.bezierCurveTo(X(120), Y(243), X(105), Y(270), X(105), Y(312));
@@ -344,7 +400,7 @@ ${gloss('M 122 236 C 118 276 120 330 126 352', 5, 0.32)}`;
   }
   function drawSoap(ctx, opts) {
     const c = opts.color || '#1f9bff';
-    paintLiquid(ctx, Object.assign({}, opts, { liquid: { mode: 'closed', fill: 0.5 } }), () => {
+    paintLiquid(ctx, Object.assign({}, opts, { liquid: { mode: 'closed', fill: 0.5, viscosity: 0.28, bubbles: true } }), () => {
       ctx.beginPath();
       ctx.moveTo(X(122), Y(220));
       ctx.bezierCurveTo(X(130), Y(210), X(170), Y(210), X(178), Y(220));
@@ -380,12 +436,13 @@ ${gloss('M 124 340 C 124 316 136 300 143 288', 3.5, 0.4)}`;
   // Physics-driven sand behind the glass (piles settle toward WORLD-down).
   const SAND = '#d4b06a', SAND_LO = '#a8843e', SAND_HI = '#e8d49a';
   function paintSand(ctx, opts) {
+    const motion = contentState(opts);
     const bottom = Math.max(0, Math.min(1, opts.sandBottom == null ? 0.18 : opts.sandBottom));
     const top = 1 - bottom;
-    const flow = opts.sandFlow || 0;
+    const flow = motion.reduced ? 0 : (opts.sandFlow || 0);
     const angle = opts.angle || 0;
     const upright = Math.cos(angle) >= 0;
-    const tilt = Math.max(-0.5, Math.min(0.5, (opts.slosh || 0) * 1.3));
+    const tilt = Math.max(-0.5, Math.min(0.5, motion.slosh * 1.3));
 
     ctx.save();
     // Clip: glass interior, inset ~4 from the sprite's bulb outline.
@@ -450,7 +507,7 @@ ${gloss('M 124 340 C 124 316 136 300 143 288', 3.5, 0.4)}`;
       else { ctx.moveTo(tilt * 3, neckB); ctx.lineTo(tilt * 2, floorT + 6); }
       ctx.stroke();
       ctx.fillStyle = SAND_LO;
-      const t = Math.abs(angle) * 7 + bottom * 20;
+      const t = motion.time * 2.7 + motion.seed * 0.031 + Math.abs(angle) * 7 + bottom * 20;
       for (let i = 0; i < 4; i++) {
         const gy = flow > 0
           ? (neckT + 6 + ((t * 30 + i * 9) % 46))
@@ -697,7 +754,7 @@ ${gloss('M 118 286 C 112 308 116 334 128 350', 4.5, 0.45)}`;
   }
   function drawPotion(ctx, opts) {
     const c = opts.color || '#8a3ffc';
-    paintLiquid(ctx, Object.assign({}, opts, { liquid: { mode: 'closed', fill: 0.5 } }), () => {
+    paintLiquid(ctx, Object.assign({}, opts, { liquid: { mode: 'closed', fill: 0.5, bubbles: true, sparkles: true } }), () => {
       ctx.beginPath();
       ctx.moveTo(X(142), Y(200));
       ctx.lineTo(X(142), Y(250));
@@ -756,7 +813,7 @@ ${gloss('M 143 134 L 143 162', 3.5, 0.5)}`;
   }
   function drawCoke(ctx, opts) {
     const c = opts.color || '#c8203a';
-    paintLiquid(ctx, Object.assign({}, opts, { color: shade(c, -0.52), liquid: { mode: 'closed', fill: 0.55 } }), () => {
+    paintLiquid(ctx, Object.assign({}, opts, { color: shade(c, -0.52), liquid: { mode: 'closed', fill: 0.55, bubbles: true } }), () => {
       ctx.beginPath();
       ctx.moveTo(X(142), Y(136));
       ctx.lineTo(X(142), Y(170));

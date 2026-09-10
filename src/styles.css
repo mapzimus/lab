@@ -36,9 +36,10 @@
   --c-maps: #6aa9dd;            /* hydrographic blue */
   --c-data: #c99a63;            /* contour brown */
   --c-design: #a891e8;          /* photorevision purple */
-  --c-teaching: #7fb87a;        /* woodland green */
+  --c-classroom: #7fb87a;       /* woodland green */
   --c-math: #e0796e;            /* survey red */
-  --c-fun: #dd9a52;
+  --c-soccer: #dd9a52;          /* orange */
+  --c-utilities: #99a0a3;       /* slate */
   --c-play: #d987b1;
   --c-experiments: #6dbdb4;
   --shadow: 0 14px 28px rgba(0, 0, 0, 0.45);
@@ -59,9 +60,10 @@ html[data-theme="light"] {
   --c-maps: #22689f;
   --c-data: #8a5a28;
   --c-design: #6f56b8;
-  --c-teaching: #3c7a38;
+  --c-classroom: #3c7a38;
   --c-math: #b43a30;
-  --c-fun: #c1670f;
+  --c-soccer: #c1670f;
+  --c-utilities: #62665a;
   --c-play: #b3437e;
   --c-experiments: #22766f;
   --shadow: 0 14px 28px rgba(46, 42, 30, 0.11);
@@ -236,9 +238,12 @@ section.catalog { border-top: 1px solid var(--line); }
 .card[data-category="maps"] { --cat: var(--c-maps); }
 .card[data-category="data"] { --cat: var(--c-data); }
 .card[data-category="design"] { --cat: var(--c-design); }
-.card[data-category="teaching"] { --cat: var(--c-teaching); }
+.card[data-category="classroom"] { --cat: var(--c-classroom); }
 .card[data-category="math"] { --cat: var(--c-math); }
-.card[data-category="fun"] { --cat: var(--c-fun); }
+.card[data-category="soccer"] { --cat: var(--c-soccer); }
+.card[data-category="utilities"] { --cat: var(--c-utilities); }
+.card[data-category="teaching"] { --cat: var(--c-classroom); }
+.card[data-category="fun"] { --cat: var(--c-utilities); }
 .card[data-category="play"] { --cat: var(--c-play); }
 .card[data-category="experiments"] { --cat: var(--c-experiments); }
 

@@ -4,12 +4,11 @@ The files in this directory are deployable snapshots of projects maintained in s
 
 | Hosted route | Upstream source | Snapshot commit / notes |
 | --- | --- | --- |
-| `/{tool-slug}/` (76 tools) | `mapzimus/max` via the public tool shelf | Full tool library mirrored under `vendor/tools/`. |
+| `/{tool-slug}/` (55 tools) | `mapzimus/max` via the public tool shelf | Full tool library mirrored under `vendor/tools/`. |
 | `/geopuesto/` and `/geopuesto/playground/` | `mapzimus/geopuesto` | |
 | `/bug-wars/` | `mapzimus/bug-wars` | |
-| `/flip-game/` | `mapzimus/flipgame` | Bottle Game — bottle-flip party game (PWA). Parrots are an unlockable skin inside it. `/parrot-flip/` and `/grog-flip/` redirect here. |
+| `/flipgame/` | `mapzimus/flipgame` | Approved releases are copied by `scripts/sync-flipgame.mjs`; exact deterministic provenance is published at `vendor/apps/flip-game/release-provenance.json`. Legacy `/flip-game/`, `/bottle-game/`, `/parrot-flip/`, and `/grog-flip/` paths redirect here. |
 | `/whydah-voyage/` | `mapzimus/Whydah-Unit` (`navigator/`) | Whydah's Voyage / First Sail. |
-| `/black-sam/` | `mapzimus/Whydah-Unit` (`black-sam/`) | |
 | `/true-scale/` | `mapzimus/true-scale` | |
 | `/concord-war/` | built from `mapzimus/concord-war` | |
 | `/transit/` | `transit/` in `mapzimus/maxwellhowegis` | |

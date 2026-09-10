@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>National Park Explorer · Mapzimus Lab</title>
+  <meta name="description" content="Every boundary the National Park Service draws — all 63 national parks and the other 374 units — on one map, with acreage, visits and the date each was established.">
+  <link rel="canonical" href="https://mapzimus.com/lab/national-parks/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="National Park Explorer · Mapzimus Lab">
+  <meta property="og:description" content="Every boundary the National Park Service draws — all 63 national parks and the other 374 units — on one map, with acreage, visits and the date each was established.">
+  <meta property="og:url" content="https://mapzimus.com/lab/national-parks/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#14161c">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/national-parks/vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="/lab/national-parks/styles.css">
+  <script src="/lab/national-parks/vendor/maplibre-gl.js" defer></script>
+  <script src="/lab/national-parks/app.js" defer></script>
+</head>
+<body>
+  <div class="top">
+    <a class="back" href="/lab/">← Lab</a>
+    <div>
+      <span class="eyebrow">Mapzimus Lab experiment</span>
+      <h1>National Park Explorer</h1>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <aside class="panel">
+      <div class="panel-head">
+        <h2>All 63 national parks</h2>
+        <p class="hint">Every boundary as the National Park Service draws it. Click a park on the map or in the list.</p>
+      </div>
+
+      <div class="controls">
+        <label class="field">
+          <span class="field-label">Search</span>
+          <input type="search" id="search" placeholder="Park, state or code…" autocomplete="off" spellcheck="false">
+        </label>
+        <label class="field">
+          <span class="field-label">Sort</span>
+          <select id="sort">
+            <option value="name">Name</option>
+            <option value="visitors">Most visited</option>
+            <option value="area">Largest</option>
+            <option value="established">Oldest</option>
+            <option value="newest">Newest</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="control-row">
+        <span class="field-label">Colour by</span>
+        <div class="chips" role="group" aria-label="Colour the parks by">
+          <button type="button" class="mode" data-mode="region" aria-pressed="true">region</button>
+          <button type="button" class="mode" data-mode="visits" aria-pressed="false">visits</button>
+          <button type="button" class="mode" data-mode="established" aria-pressed="false">established</button>
+        </div>
+      </div>
+
+      <div class="control-row">
+        <span class="field-label">Region</span>
+        <div class="chips" id="regionChips" role="group" aria-label="Filter by NPS region"></div>
+      </div>
+
+      <dl class="readout" id="readout"></dl>
+
+      <div class="legend" id="legend"></div>
+
+      <label class="switch">
+        <input type="checkbox" id="unitsToggle">
+        <span>Show the other <strong>374</strong> NPS units</span>
+      </label>
+
+      <p class="status" id="status" role="status"></p>
+
+      <ul class="park-list" id="parkList"></ul>
+
+      <section class="detail" id="detail" hidden aria-live="polite"></section>
+    </aside>
+
+    <div class="map-frame">
+      <div id="map" aria-label="Map of United States national park boundaries"></div>
+      <div class="views" role="group" aria-label="Jump to a part of the country">
+        <button type="button" class="view" data-view="conus" aria-pressed="true">Lower 48</button>
+        <button type="button" class="view" data-view="alaska" aria-pressed="false">Alaska</button>
+        <button type="button" class="view" data-view="hawaii" aria-pressed="false">Hawai&#699;i</button>
+        <button type="button" class="view" data-view="virgin" aria-pressed="false">Virgin Is.</button>
+        <button type="button" class="view" data-view="samoa" aria-pressed="false">Samoa</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p><strong>Boundaries</strong> are the authoritative ones: the National Park Service's
+      <a href="https://public-nps.opendata.arcgis.com/">Land Resources Division</a> boundary service, all 437 units of it,
+      simplified to 40&nbsp;m for the parks and 80&nbsp;m for everything else so the whole country fits in two files.
+      A boundary is the <em>legislated</em> line, which is why it can enclose more ground than the acreage report
+      credits to the park — the report counts federally owned land inside the line, and inholdings are common.
+      Park-and-preserve units are drawn as the park alone, since NPS files the preserve as its own unit;
+      New River Gorge is the exception NPS draws whole.</p>
+    <p><strong>Dates, acreage and visits</strong> come from NPS's own acreage and visitor-use reports as transcribed in
+      Wikipedia's <a href="https://en.wikipedia.org/wiki/List_of_national_parks_of_the_United_States">List of national parks of the United States</a>,
+      along with the park descriptions, which are reused here under
+      <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.
+      Areas measured off the polygons are computed here on a sphere and labelled as such.
+      Rendering by <a href="https://maplibre.org/">MapLibre GL JS</a> (5.6.1, self-hosted),
+      basemap <a href="https://openfreemap.org/">OpenFreeMap</a>,
+      tiles © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.
+      No server does any GIS: the boundaries are static files and every filter runs in your browser.</p>
+  </footer>
+</body>
+</html>
