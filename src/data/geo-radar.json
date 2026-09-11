@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-10",
+  "generatedAt": "2026-09-11",
   "news": {
     "mapsmania": [
+      {
+        "title": "Mapping the Song Every City is Listening To",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/what-is-world-listening-to-today.html",
+        "desc": ""
+      },
       {
         "title": "New York's 1.67 Million Buildings Colored by Age",
         "url": "http://googlemapsmania.blogspot.com/2026/09/new-yorks-167-million-buildings-colored.html",
@@ -35,11 +40,6 @@
       {
         "title": "MapDraw: Take the Scenic Route",
         "url": "http://googlemapsmania.blogspot.com/2026/09/mapdraw-take-scenic-route.html",
-        "desc": ""
-      },
-      {
-        "title": "Crawley – Welcome to Music Town, UK",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/crawley-welcome-to-music-town-uk.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "GeoClassify",
-      "url": "https://plugins.qgis.org/plugins/geoclassify/"
+      "title": "Raster Batch Clip",
+      "url": "https://plugins.qgis.org/plugins/raster_batch_clip/"
     },
     {
-      "title": "Multi Background Exporter",
-      "url": "https://plugins.qgis.org/plugins/multi_layer_exporter/"
+      "title": "VaquerosGIS",
+      "url": "https://plugins.qgis.org/plugins/VaquerosGIS/"
     },
     {
-      "title": "India Boundary & CRS Toolkit",
-      "url": "https://plugins.qgis.org/plugins/india_boundary_toolkit/"
+      "title": "AI Agent by TerraLab",
+      "url": "https://plugins.qgis.org/plugins/AI_Agent/"
     },
     {
-      "title": "AutoNum Parcelles",
-      "url": "https://plugins.qgis.org/plugins/parcel_numbering/"
+      "title": "Forest Planner",
+      "url": "https://plugins.qgis.org/plugins/yf_forest_planner/"
     },
     {
-      "title": "Spot Level & Contour Extractor Tool",
-      "url": "https://plugins.qgis.org/plugins/spot_level_contour_extractor/"
+      "title": "SIRI CR",
+      "url": "https://plugins.qgis.org/plugins/consulta_siri/"
     },
     {
-      "title": "RoboCOPC",
-      "url": "https://plugins.qgis.org/plugins/RoboCOPC/"
+      "title": "FIC Coastal Change Analysis",
+      "url": "https://plugins.qgis.org/plugins/FIC_Coastal_Change_Analysis/"
     },
     {
-      "title": "Raster Area Calculator",
-      "url": "https://plugins.qgis.org/plugins/RasterAreaCalculator/"
+      "title": "ObjectGrow",
+      "url": "https://plugins.qgis.org/plugins/ObjectGrow/"
     },
     {
-      "title": "Meteo Grid Statistics",
-      "url": "https://plugins.qgis.org/plugins/meteo_grid_stats/"
+      "title": "EMBED-CD",
+      "url": "https://plugins.qgis.org/plugins/embed_cd_qgis/"
     }
   ],
   "releases": [
@@ -210,6 +210,24 @@
   ],
   "gisse": [
     {
+      "title": "Why is a degree of latitude longer at the poles than the equator (in WGS 84)?",
+      "url": "https://gis.stackexchange.com/questions/501401/why-is-a-degree-of-latitude-longer-at-the-poles-than-the-equator-in-wgs-84",
+      "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "Add Polygon Feature missing from Digitizing Toolbar",
+      "url": "https://gis.stackexchange.com/questions/501400/add-polygon-feature-missing-from-digitizing-toolbar",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "GEOAI Plugin in QGIS fails to install dependencies",
+      "url": "https://gis.stackexchange.com/questions/501402/geoai-plugin-in-qgis-fails-to-install-dependencies",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Simplifying a feature's geometry",
       "url": "https://gis.stackexchange.com/questions/501393/simplifying-a-features-geometry",
       "score": 1,
@@ -234,102 +252,84 @@
       "answers": 0
     },
     {
-      "title": "GDAL Raster Mosaic Count Pixel Function",
-      "url": "https://gis.stackexchange.com/questions/501386/gdal-raster-mosaic-count-pixel-function",
-      "score": 3,
-      "answers": 0
-    },
-    {
-      "title": "Source location on MAPL-EMIT GEE dataset",
-      "url": "https://gis.stackexchange.com/questions/501384/source-location-on-mapl-emit-gee-dataset",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Print composer with multiple maps each showing a different value range from the same column",
-      "url": "https://gis.stackexchange.com/questions/501350/print-composer-with-multiple-maps-each-showing-a-different-value-range-from-the",
-      "score": 0,
-      "answers": 1
-    },
-    {
-      "title": "How to calculate statistics for raster with terra",
-      "url": "https://gis.stackexchange.com/questions/501365/how-to-calculate-statistics-for-raster-with-terra",
-      "score": 1,
-      "answers": 1
-    },
-    {
       "title": "Radar detection cone visualisation project (Ideally in QGIS)",
       "url": "https://gis.stackexchange.com/questions/501368/radar-detection-cone-visualisation-project-ideally-in-qgis",
       "score": -2,
       "answers": 0
     },
     {
-      "title": "How to use Python for styling while still maintaining a theme in QGIS?",
-      "url": "https://gis.stackexchange.com/questions/501346/how-to-use-python-for-styling-while-still-maintaining-a-theme-in-qgis",
-      "score": 1,
+      "title": "GDAL Raster Mosaic Count Pixel Function",
+      "url": "https://gis.stackexchange.com/questions/501386/gdal-raster-mosaic-count-pixel-function",
+      "score": 3,
       "answers": 0
+    },
+    {
+      "title": "Connecting street centerlines for sDNA accessibility analysis",
+      "url": "https://gis.stackexchange.com/questions/501331/connecting-street-centerlines-for-sdna-accessibility-analysis",
+      "score": 1,
+      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "LMOS Surface Mobile EPA-GMAP Ozone Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LMOS_TraceGas_SurfaceMobile_EPA-GMAP_Data",
-      "desc": "LMOS_TraceGas_SurfaceMobile_EPA-GMAP_Data is the Lake Michigan Ozone Study (LMOS) trace gas surface mobile data collected via the Environmental Protection Ag…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
+      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "LMOS UC-12 Aircraft Remote Sensing Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LMOS_AircraftRemoteSensing_UC12_Data",
-      "desc": "LMOS_AircraftRemoteSensing_UC12_Data is the Lake Michigan Ozone Study (LMOS) remote sensing data collected onboard the NASA UC-12 aircraft during the LMOS fi…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
+      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "FIREX-AQ DC8 In-Situ Meteorological and Navigational Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=FIREXAQ_MetNav_AircraftInSitu_DC8_Data",
-      "desc": "FIREXAQ_MetNav_AircraftInSitu_DC8_Data are in-situ meteorological and navigational data collected onboard the DC-8 aircraft during FIREX-AQ.",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
+      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "VIIRS/JPSS2 Downward Shortwave Radiation Daily L3 Global 0.05Deg CMG V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ218C1",
-      "desc": "The NOAA-21 Visible Infrared Imaging Radiometer Suite (VIIRS) Downward Shortwave Radiation (DSR) Level 3 Climate Modeling Grid (CMG) product produced at 0.05…",
-      "org": "LPCLOUD"
+      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
+      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "VIIRS/JPSS2 Photosynthetically Active Radiation Daily L3 Global 0.05Deg CMG V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ218C2",
-      "desc": "The NOAA-21 Visible Infrared Imaging Radiometer Suite (VIIRS) Photosynthetically Active Radiation (PAR) Level 3 Climate Modeling Grid (CMG) product produced…",
-      "org": "LPCLOUD"
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
+      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "UAVSAR_POLSAR_STOKES",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
-      "desc": "UAVSAR PolSAR Scene Stokes",
-      "org": "ASF"
+      "title": "Global Pesticide Grids (PEST-CHEMGRIDS)",
+      "url": "https://search.earthdata.nasa.gov/search?q=CIESIN_SEDAC_FERMANv1_PESTG",
+      "desc": "The Global Pesticide Grids (PEST-CHEMGRIDS) includes a comprehensive database of the 20 most-used pesticide active ingredients on 6 dominant crops and 4 aggr…",
+      "org": "ESDIS"
     },
     {
-      "title": "UAVSAR_POLSAR_SLOPE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
-      "desc": "UAVSAR PolSAR Scene Slope",
-      "org": "ASF"
+      "title": "Gridded Population of the World, Version 4 (GPWv4): Population Density",
+      "url": "https://search.earthdata.nasa.gov/search?q=CIESIN_SEDAC_GPWv4_POPDENS",
+      "desc": "The Gridded Population of the World, Version 4 (GPWv4): Population Density consists of estimates of human population density based on counts consistent with…",
+      "org": "ESDIS"
     },
     {
-      "title": "UAVSAR_POLSAR_PAULI",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
-      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
-      "org": "ASF"
+      "title": "Gridded Population of the World, Version 4 (GPWv4): Population Density Adjusted to Match 2015 Revision UN WPP Country Totals, Revision 10",
+      "url": "https://search.earthdata.nasa.gov/search?q=CIESIN_SEDAC_GPWv4_APDENS_WPP_2015_R10",
+      "desc": "The Gridded Population of the World, Version 4 (GPWv4): Population Density Adjusted to Match 2015 Revision of UN WPP Country Totals, Revision 10 consists of…",
+      "org": "ESDIS"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
-      "desc": "UAVSAR PolSAR Scene Complex",
-      "org": "ASF"
+      "title": "Global Population Projection Grids Based on Shared Socioeconomic Pathways (SSPs), Downscaled 1-km Grids, 2010-2100",
+      "url": "https://search.earthdata.nasa.gov/search?q=CIESIN_SEDAC_PD_DPOPSSP",
+      "desc": "The Global Population Projection Grids Based on Shared Socioeconomic Pathways (SSPs), Downscaled 1-km Grids, 2010-2100 consists of global spatial population…",
+      "org": "ESDIS"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
-      "org": "ASF"
+      "title": "Global Annual Average PM2.5 Grids from MODIS and MISR Aerosol Optical Depth (AOD)",
+      "url": "https://search.earthdata.nasa.gov/search?q=CIESIN_SEDAC_SDEI_PM25",
+      "desc": "Global Annual PM2.5 Grids from MODIS and MISR Aerosol Optical Depth (AOD) data set represents a series of annual average grids (2001-2010) of fine particulat…",
+      "org": "ESDIS"
     }
   ],
   "datagov": [
@@ -341,37 +341,23 @@
       "rank": 13
     },
     {
-      "title": "Civil Rights Data Collection (CRDC) for the 2017-18 school year",
-      "url": "https://catalog.data.gov/dataset/civil-rights-data-collection-crdc-for-the-2017-18-school-year",
-      "desc": "The Civil Rights Data Collection, 2017-18 (CRDC 2017-18) is part of the Civil Rights Data Collection (CRDC) program; program data are available beginning with t",
-      "org": "Department of Education",
-      "rank": 5
+      "title": "IPCC AR4, AR5, and AR6 20-, 100-, and 500-year GWPs",
+      "url": "https://catalog.data.gov/dataset/ipcc-ar4-ar5-and-ar6-20-100-and-500-year-gwps",
+      "desc": "The International Panel for Climate Change (IPCC) produces regular Assessment Reports that provide global warming potentials (GWPs) for greenhouse gases (GHG) i",
+      "org": "U.S. Environmental Protection Agency",
+      "rank": 3
     },
     {
-      "title": "Civil Rights Data Collection (CRDC) for the 2015-16  school year",
-      "url": "https://catalog.data.gov/dataset/civil-rights-data-collection-crdc-for-the-2015-16-school-year",
-      "desc": "The Civil Rights Data Collection, 2015-16 (CRDC 2015-16) is part of the Civil Rights Data Collection (CRDC) program; program data are available beginning with t",
-      "org": "Department of Education",
-      "rank": 5
-    },
-    {
-      "title": "Civil Rights Data Collection (CRDC)",
-      "url": "https://catalog.data.gov/dataset/civil-rights-data-collection-crdc",
-      "desc": "Since 1968, OCR has collected civil rights data related to students' access and barriers to educational opportunity from early childhood through grade 12.",
-      "org": "Department of Education",
-      "rank": 5
+      "title": "Supply Chain Greenhouse Gas Emission Factors v1.2 by NAICS-6",
+      "url": "https://catalog.data.gov/dataset/supply-chain-greenhouse-gas-emission-factors-v1-2-by-naics-6",
+      "desc": "The datasets are comprised of greenhouse gas (GHG) emission factors (Factors) for 1,016 U.S.",
+      "org": "U.S. Environmental Protection Agency",
+      "rank": 3
     },
     {
       "title": "2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection",
       "url": "https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-by-basis-category-civil-rights-data-collection",
       "desc": "The 2015-16 tables are based on data collected from all of the nation’s school districts and schools—approximately 17,300 school districts and 96,300 schools.",
-      "org": "Department of Education",
-      "rank": 2
-    },
-    {
-      "title": "2017-18 Arrests Civil Rights Data Collection",
-      "url": "https://catalog.data.gov/dataset/2017-18-arrests-civil-rights-data-collection",
-      "desc": "This set of Excel file contains data on student referrals to law enforcement by disability and student-related arrests by disability for all states.",
       "org": "Department of Education",
       "rank": 2
     },
@@ -383,10 +369,24 @@
       "rank": 2
     },
     {
-      "title": "2013-14 Mathematics and Science Civil Rights Data Collection",
-      "url": "https://catalog.data.gov/dataset/2013-14-mathematics-and-science-civil-rights-data-collection",
-      "desc": "The 2013-14 tables are based on data collected from all of the nation’s school districts and schools—approximately 16,500 school districts and 96,500 schools.",
+      "title": "NPS Visitor Use Statistics Data Package, 2024",
+      "url": "https://catalog.data.gov/dataset/nps-visitor-use-statistics-data-package-2024",
+      "desc": "The NPS Social Science Program is responsible for coordinating visitor use statistics reporting for units administered by the NPS.",
+      "org": "Department of the Interior",
+      "rank": 2
+    },
+    {
+      "title": "2017-18 Arrests Civil Rights Data Collection",
+      "url": "https://catalog.data.gov/dataset/2017-18-arrests-civil-rights-data-collection",
+      "desc": "This set of Excel file contains data on student referrals to law enforcement by disability and student-related arrests by disability for all states.",
       "org": "Department of Education",
+      "rank": 2
+    },
+    {
+      "title": "Harmonized Tariff Schedule of the United States (2026)",
+      "url": "https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2025",
+      "desc": "This dataset is the current 2026 Harmonized Tariff Schedule plus all revisions for the current year.",
+      "org": "US International Trade Commission",
       "rank": 2
     }
   ],
