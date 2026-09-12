@@ -296,7 +296,7 @@ const projectCount = itemsForView("lab", "").length;
 /** Home "browse by section" cards — four doors instead of the whole catalog. */
 function sectionCardsHtml() {
   const sections = [
-    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Single-page browser utilities — GIS, data, design, math, classroom, and soccer." },
+    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Single-page browser utilities — GIS, data, design, classroom, and soccer." },
     { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "First-party map projects you can open right here — transit, globes, atlases, stories." },
     { href: "/games/", label: "Games", category: "play", n: gamesCount, desc: "Strategy and logic games, free in the browser." },
     { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "Every project in one place — maps, games, classroom apps, and experiments." },
@@ -315,7 +315,7 @@ const pages = {
   home: {
     path: "index.html",
     title: "Mapzimus · Browser tools, maps, and games by Maxwell Howe",
-    description: `${toolCount} free browser tools for maps, data, teaching, and math — plus games and experiments, all hosted on mapzimus.com. No accounts, no installs.`,
+    description: `${toolCount} free browser tools for maps, data, and teaching — plus games and experiments, all hosted on mapzimus.com. No accounts, no installs.`,
     canonical: "https://mapzimus.com/",
     eyebrow: "The lab of Maxwell Howe",
     heading: "Useful tools. Maps. Small games.",
@@ -335,11 +335,11 @@ const pages = {
   tools: {
     path: "tools/index.html",
     title: "Browser tools · Mapzimus",
-    description: `A searchable catalog of ${utilityCount} standalone browser tools for maps, data, design, math, classroom, and soccer.`,
+    description: `A searchable catalog of ${utilityCount} standalone browser tools for maps, data, design, classroom, and soccer.`,
     canonical: "https://mapzimus.com/tools/",
     eyebrow: "The tool catalog",
     heading: "Every tool, one page each",
-    intro: `${utilityCount} standalone browser tools — GIS utilities, data, design, math, classroom, soccer, and everyday helpers. Each is a single page at its own path.`,
+    intro: `${utilityCount} standalone browser tools — GIS utilities, data, design, classroom, soccer, and everyday helpers. Each is a single page at its own path.`,
     catalogHeading: "All tools",
   },
   maps: {
