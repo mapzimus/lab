@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Warehouse That Wasn't — Planning-Level LiDAR Study, Middleborough MA</title>
+<meta name="description" content="A planning-level terrain, wetland-risk, and earthwork study from public LiDAR on a withdrawn warehouse proposal in Middleborough, Massachusetts.">
+<link rel="canonical" href="https://maxwellhowegis.com/lidar-test/middleboro.html">
+<meta name="theme-color" content="#f4f0e6">
+<meta property="og:title" content="The Warehouse That Wasn't">
+<meta property="og:description" content="150 wooded acres, a withdrawn warehouse proposal, and what free public lidar says about the land itself.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maxwellhowegis.com/lidar-test/middleboro.html">
+<meta property="og:image" content="https://maxwellhowegis.com/lidar-test/assets/mb_hs_dtm.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9B%B0%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<nav class="projnav" aria-label="Case-study navigation"><div class="wrap"><a class="brand" href="index.html">Lidar Site Studies</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="case-links">Menu</button><div class="links" id="case-links"><a href="index.html#cases">All work</a><a href="devens.html">01 · Devens</a><a class="on" aria-current="page" href="middleboro.html">02 · Middleborough</a><a href="hopkinton.html">03 · Hopkinton</a><a href="p04.html">04 · Corridor</a><a class="nav-cta" href="mailto:mhowe.gis@gmail.com?subject=Lidar%20Site%20Studies%20parcel%20screen">Request a screen</a></div></div></nav>
+<main id="main">
+<header>
+  <div class="wrap">
+    <div class="kicker">Lidar terrain analysis · Middleborough, Massachusetts</div>
+    <h1>150 wooded acres.<br>A withdrawn warehouse.<br><span class="under">What does the land say?</span></h1>
+    <p class="lede">In 2023 a developer proposed 673,000 square feet of warehouse on forest near the
+    Route 44 / I-495 interchange, and it was withdrawn in 2024. Nobody outside that process
+    knows exactly why, but free public lidar is enough to hear most of what the land itself has
+    to say. The short version is that the dirt work here is manageable and the water is not.</p>
+    <img class="locus" src="assets/middleboro_locus.svg" alt="Location of the Middleborough study area within Massachusetts" width="480" height="300">
+    <div class="hero-actions"><a class="button" href="mailto:mhowe.gis@gmail.com?subject=Lidar%20Site%20Studies%20parcel%20screen">Request a parcel screen</a><a class="button secondary" href="index.html#services">See the service concept</a></div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Start here</div>
+    <h2>Drag the line</h2>
+    <p class="prose">Left of the line is the <b>treetop surface</b>, roughly what a camera reconstructs
+    when leaves hide the ground. Right of it is the <b>bare earth</b>, rebuilt from the laser
+    pulses that found gaps in the canopy. Both come from the same flight, the same week and
+    the same points, and the yellow rectangle marks the building pad measured below.</p>
+    <div class="swipe" id="swipe" style="--focus:81% 13%">
+      <div class="stage" id="swipeStage">
+        <img src="assets/mb_hs_dtm.jpg" alt="Bare-earth lidar hillshade" width="1530" height="1230">
+        <div class="top" id="swipeTop"><img src="assets/mb_hs_dsm.jpg" alt="Canopy surface hillshade" width="1530" height="1230"></div>
+        <div class="bar" id="swipeBar"></div>
+      </div>
+      <div class="tag left">TREETOP SURFACE (CAMERA-STYLE)</div>
+      <div class="tag right">BARE EARTH (LIDAR)</div>
+      <button class="fsbtn" id="swipeFs" aria-label="Toggle fullscreen">⛶</button>
+    </div>
+    <figure><figcaption>USGS/MassGIS lidar, flown spring 2021 · 1.5 × 1.2 km area · 0.5 m resolution</figcaption></figure>
+  </div>
+</section>
+
+<section class="raised">
+  <div class="wrap">
+    <div class="kicker">Why this parcel</div>
+    <h2>The analysis that wasn't in the hearing room</h2>
+    <p class="prose">When the warehouse proposal was argued in 2023–24, most of the technical
+    information in the room came from studies the developer commissioned. Everything on this
+    page comes from free public data and could have been on the table for either side: how much
+    land passes stated terrain screens, where water concentrates, what the neighbours might see,
+    and how conceptual grading compares. The parcel is still forest and still in play, which
+    makes this a live case study rather than a postmortem.</p>
+    <figure>
+      <img src="assets/mb_imagery_aoi.jpg" alt="Aerial imagery of the parcel today" loading="lazy" width="1600" height="1280">
+      <figcaption>The same ground today: still forest, with logistics buildings and trailer
+      yards on both sides. Basemap: Esri World Imagery; provider credits are listed in
+      <a href="methodology.html#imagery">methodology and sources</a>.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">By the numbers</div>
+    <h2>What the screen actually found</h2>
+    <div class="bignum">246 acres
+    <small>of this study area sit inside wetland and stream setbacks, so over half the land here
+    already carries regulatory constraints.</small>
+    </div>
+    <div class="stats">
+    <div class="stat hot"><div class="v">84,437 yd³</div><div class="l">LiDAR-based screening estimate for the conceptual 16-acre pad</div></div>
+    <div class="stat"><div class="v">789,453 yd³</div><div class="l">apparent earthwork if graded to the treetop surface</div></div>
+    <div class="stat"><div class="v">2.0 cm</div><div class="l">agreement with the state's published DEM from the same flight, which checks processing rather than accuracy against the ground</div></div>
+    <div class="stat"><div class="v">49.5M</div><div class="l">laser points processed for this site</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="raised">
+  <div class="wrap">
+    <div class="kicker">What it costs to get this wrong</div>
+    <h2>One pad, three surfaces</h2>
+    <p class="prose">The pad is 16.3 acres, sized for the proposed warehouses and sited by an optimization
+    pass over the constraint screens, which puts it 95.9% clear of wetlands and steep ground.
+    My first hand-drawn attempt turned out to be half swamp, which is exactly what the screens
+    are for. The pad is 69% forest with canopy to 23 m, and grading it to a level 12.82 m
+    requires:</p>
+    <div class="tablewrap" data-label="Comparison of conceptual Middleborough earthwork surfaces">
+    <table>
+      <caption>Conceptual level-pad earthwork sensitivity by input surface</caption>
+      <thead><tr><th scope="col">Surface used for the estimate</th><th scope="col">Cut</th><th scope="col">Fill</th><th scope="col">Total moved</th><th scope="col">@ $20 / yd³</th></tr></thead>
+      <tbody>
+        <tr class="ours"><td>Lidar bare earth</td><td>42,273</td><td>42,164</td><td>84,437 yd³</td><td>$1.69M</td></tr>
+        <tr><td>Treetop surface (canopy counted as ground)</td><td>775,626</td><td>13,827</td><td>789,453 yd³</td><td>$15.79M</td></tr>
+        <tr><td>10 m national DEM (all you had before 2021)</td><td>52,177</td><td>34,461</td><td>86,638 yd³</td><td>$1.73M</td></tr>
+        <tr class="delta"><td>Canopy error hiding in the treetop surface</td><td colspan="2"></td><td>705,016 yd³</td><td>≈ $14.10M</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="prose" style="margin-top:22px">The old 10-meter data is the sneakier failure. Its total looks fine, but it calls the
+    site 17,700 yd³ cut-heavy when the site actually balances, mislabels cut against fill on 7%
+    of the pad, and is locally off by up to 2.9 m. A grading plan built on it would carry a
+    haul-off that does not exist. It is worth checking where any comparison surface came from,
+    too, because the "current" national DEM has quietly been rebuilt from this same 2021 lidar,
+    which leaves the archived 2019 version as the genuine pre-2021 baseline.</p>
+    <p class="table-foot">A uniform ±10 cm vertical shift changes the modeled volume by ±8,628 yd³, or about
+    ±$173k. That is a data-accuracy sensitivity rather than a construction contingency, since
+    design, soils, water, rock and field conditions can move it much further.</p>
+    <figure>
+      <img src="assets/mb_cutfill_map.jpg" alt="Cut and fill map of the pad" loading="lazy" width="1124" height="805">
+      <figcaption>Where the dirt moves: cut in red, fill in blue, against the balanced design grade.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Site analysis from the same data</div>
+    <h2>More answers from the same flight</h2>
+    <p class="prose">The earthwork number is the headline, but one dataset answers a stack of
+    other early-stage questions:</p>
+    <div class="moat">
+      <figure>
+        <img src="assets/mb_wetrisk_map.jpg" alt="Wetland-risk discrepancy map" loading="lazy" width="1185" height="985">
+        <figcaption><b>Where does the map disagree with the terrain?</b> These are cells whose wetness signature matches the mapped wetlands but that the state
+        map calls dry, and there are 112 acres of them here, including 10 of the pad's 16.3.
+        Sandy ground drains, so this is a screening flag rather than a delineation, and it shows
+        where a wetland scientist should look first.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/mb_buildable_map.jpg" alt="Buildable land screen" loading="lazy" width="1185" height="985">
+        <figcaption><b>Where does the terrain screen pass?</b> Of 441 study-area acres, 175
+        remain after excluding the stated slopes and mapped wetland and stream buffers. Zoning,
+        access, utilities, habitat, soils, ownership and field delineation are not included.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/mb_road_profile.png" alt="Access road grade profile" loading="lazy" width="1517" height="917">
+        <figcaption><b>Can you get a road in?</b> Yes, and that is worth knowing too. The route from Route 44 to the pad's far corner
+        runs 333 m, climbs 3.2 m and never exceeds 5.1% grade. There is no terrain-grade flag at
+        this screening level, though final geometry and cost still need design.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/mb_chm_map.jpg" alt="Canopy height model" loading="lazy" width="1119" height="805">
+        <figcaption><b>What does clearing cost?</b> Tree heights for every cell. The pad carries 11.2 acres of forest, which is roughly
+        $34–67k to clear at typical rates. Stumpage revenue can offset part of that, though it
+        depends on species and market, and it is not netted here.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/mb_flowaccum_map.jpg" alt="Stormwater flow accumulation" loading="lazy" width="1600" height="1331">
+        <figcaption><b>Where does water go?</b> Runoff concentration paths on the real terrain.
+        On a parcel this wet, drainage will be a large part of permitting.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/mb_viewshed_map.jpg" alt="Viewshed before and after clearing" loading="lazy" width="1185" height="985">
+        <figcaption><b>Who will see it?</b> From the pad today nothing is visible, because the forest blocks 100% of the
+        surrounding area. After clearing that becomes 18.2%, reaching the Route 44 frontage and
+        the homes south of the parcel. A retained tree buffer on those edges is easier to plan
+        for now than to argue about later.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="raised">
+  <div class="wrap">
+    <div class="kicker">The bottom line</div>
+    <h2>What this means for the deal</h2>
+    <div class="tablewrap" data-label="Middleborough planning-level terrain subtotal">
+    <table>
+      <caption>Planning-level terrain subtotal for the conceptual pad</caption>
+      <thead><tr><th scope="col">Screening item</th><th scope="col">Estimate</th></tr></thead>
+      <tbody>
+        <tr><td>Earthwork, graded to balance</td><td>$1.69M ± $173k</td></tr>
+        <tr><td>Clearing, 11.2 forested acres</td><td>$34–67k</td></tr>
+        <tr><td>Access terrain flag</td><td>screened route is 333 m and peaks at 5.1%; final geometry not designed</td></tr>
+        <tr class="ours"><td>Terrain-screening subtotal: modeled earthwork + clearing only</td><td>≈ $1.74M</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="prose" style="margin-top:22px">The modeled terrain subtotal is lower than
+    Hopkinton's; the open questions here are regulatory and field-based. Diligence should cover:</p>
+    <ol class="method">
+      <li><b>Wetland delineation before the offer is priced.</b> The pad clears the state's
+        wetland map, but 10 of its 16.3 acres share the terrain-wetness signature of the mapped
+        wetlands, and if the field delineation moves that line the pad moves with it.</li>
+      <li><b>The vintage of any elevation data in the pro forma.</b> The pre-2021 public DEM
+        shows a 17,700 yd³ haul-off that is not really there, and older underwriting may still
+        be carrying it.</li>
+      <li><b>Vernal pools.</b> The depression screen found no candidates in or near the pad,
+        though five state-mapped potential pools sit elsewhere in the study area. Treat the pad
+        as screened clear, pending field confirmation at permitting. One limit is worth naming: a pool that held water when the lidar was flown leaves no depression in the bare-earth surface, so this screen can point to candidates but cannot establish that none are present.</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Method &amp; limits</div>
+    <h2>The numbers are checkable</h2>
+    <ol class="method">
+      <li><b>Data.</b> USGS 3DEP lidar from the 2021 Central-Eastern Massachusetts acquisition,
+        block 2, with a published accuracy of 10 cm RMSE, giving 49.5 million points for this
+        site. Wetlands and streams come from MassGIS DEP layers with 100 ft and 200 ft buffers.</li>
+      <li><b>Processing.</b> The same PDAL pipeline as Study 01 handles ground and vegetation
+        separation, the 0.5 m ground model, the treetop model and canopy heights. Same scripts
+        and different coordinates, which is most of what this study set out to prove.</li>
+      <li><b>Consistency.</b> Compared with the state-published DEM from the same flight, my
+        ground model differs by 1 mm on average and 2.0 cm RMSE over open ground. That checks
+        processing agreement rather than independent field accuracy. The pre-2021 baseline came
+        from the archived 2019 national DEM, after the "current" one turned out to have been
+        rebuilt from this lidar.</li>
+      <li><b>Volumes.</b> Cell-by-cell raster math, cross-checked in QGIS to five significant
+        figures. The cost basis is an illustrative $20/yd³ screening assumption, shown with a
+        $10–$40 sensitivity range.</li>
+      <li><b>Checking the wetness screen.</b> As an independent check, the wetness screen was
+        re-implemented from scratch in 2026: a topographic wetness index built separately on this
+        study area, scored against the DEP wetland polygons, flags 110 acres of mapped-dry ground
+        against the 112 reported here. The same test measures the trade-off, since at that
+        threshold the index catches about half of the mapped wetland while flagging roughly three
+        of every ten dry acres. That error rate is why this is a tool for aiming a wetland
+        scientist rather than replacing one, and the scoring script ships in the repository.</li>
+    </ol>
+    <p class="scope-note"><strong>Scope:</strong> a public-data demonstration for planning and
+    comparison. Mapped wetlands and terrain signatures are not field delineations, and nothing
+    here is a survey, geotechnical investigation, construction quantity, bid, or final grading
+    design. Survey-grade or construction-facing work requires licensed control and
+    project-specific oversight. Scripts and pipeline files are available on request. See the shared
+    <a href="methodology.html">method, sources, assumptions and limitations</a>.</p>
+  </div>
+</section>
+
+</main>
+<footer>
+  <div class="wrap">
+    <p class="cta">The newest free lidar here was flown in <span>2021.</span><br>
+    Anything newer takes <span>a fresh flight.</span></p>
+    <p class="contact">
+      Max Howe · MS, Geographic Information Science ·
+      <a href="mailto:mhowe.gis@gmail.com">mhowe.gis@gmail.com</a>
+    </p>
+    <div class="footer-links"><a href="methodology.html">Method, sources &amp; limitations</a><a href="index.html#services">Service concept</a><a href="https://github.com/mapzimus/ground-truth">GitHub repository</a></div>
+    <p class="footer-meta">Planning-level demonstration from public data. Not a survey, wetland delineation, engineering design, construction quantity, or bid.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>

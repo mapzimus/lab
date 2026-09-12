@@ -30,7 +30,7 @@ if (!fs.existsSync(output)) {
 // Single-page snapshots of multi-page apps: their internal links point at
 // sub-pages that were deliberately not vendored, so skip dead-link checks
 // inside them (the pages themselves are still checked as link targets).
-const SNAPSHOT_APPS = ["tappymaps", "whydah", "mcas", "savvas", "geopuesto"];
+const SNAPSHOT_APPS = ["tappymaps", "whydah", "mcas", "savvas", "geopuesto", "ground-truth"];
 
 const htmlFiles = walk(output).filter((file) => file.endsWith(".html"));
 for (const file of htmlFiles) {

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fourteen Parcels Pass the First Screen — Planning-Level LiDAR Corridor Study</title>
+<meta name="description" content="A planning-level public-data screen of 54 vacant or forested parcels near I-495, ranked under stated terrain and mapped-buffer assumptions.">
+<link rel="canonical" href="https://maxwellhowegis.com/lidar-test/p04.html">
+<meta name="theme-color" content="#f4f0e6">
+<meta property="og:title" content="Fifty-Four Parcels. Fourteen Pass the First Screen.">
+<meta property="og:description" content="A planning-level I-495 corridor screen using terrain, mapped buffers, and modeled earthwork.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maxwellhowegis.com/lidar-test/p04.html">
+<meta property="og:image" content="https://maxwellhowegis.com/lidar-test/assets/p04_corridor_map.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9B%B0%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="vendor/leaflet.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<nav class="projnav" aria-label="Case-study navigation"><div class="wrap"><a class="brand" href="index.html">Lidar Site Studies</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="case-links">Menu</button><div class="links" id="case-links"><a href="index.html#cases">All work</a><a href="devens.html">01 · Devens</a><a href="middleboro.html">02 · Middleborough</a><a href="hopkinton.html">03 · Hopkinton</a><a class="on" aria-current="page" href="p04.html">04 · Corridor</a><a class="nav-cta" href="mailto:mhowe.gis@gmail.com?subject=Lidar%20Site%20Studies%20parcel%20screen">Request a screen</a></div></div></nav>
+<main id="main">
+<header>
+  <div class="wrap">
+    <div class="kicker">Lidar corridor screen · I-495, Hopkinton–Bellingham</div>
+    <h1>Fifty-four parcels left.<br><span class="under">Fourteen pass the first screen.</span></h1>
+    <p class="lede">The first three studies each went deep on a single site. This one asks the question
+    that comes before that: <i>which sites are even worth the trouble?</i> I pulled every tax
+    parcel within 1.5&nbsp;km of a 20&nbsp;km stretch of I-495, which covers nine towns and
+    49,986 parcels, kept the vacant ones over ten acres, and ran all of them through the same
+    terrain screen. Fifty-four made it that far, and fourteen made it through.</p>
+    <div class="hero-actions"><a class="button" href="mailto:mhowe.gis@gmail.com?subject=Lidar%20Site%20Studies%20corridor%20screen">Talk through a search area</a><a class="button secondary" href="methodology.html">See assumptions</a></div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">By the numbers</div>
+    <h2>What the screen actually found</h2>
+    <div class="bignum">14 of 54
+    <small>vacant 10+ acre parcels fit one of the two conceptual pads under the stated terrain
+    and mapped-buffer settings. The other forty did not pass this first screen.</small>
+    </div>
+    <div class="stats">
+    <div class="stat"><div class="v">49,986</div><div class="l">tax parcels examined across nine towns</div></div>
+    <div class="stat"><div class="v">20 km</div><div class="l">of I-495, Hopkinton through Bellingham</div></div>
+    <div class="stat"><div class="v">54</div><div class="l">vacant or forest parcels of 10+ acres</div></div>
+    <div class="stat hot"><div class="v">$1.94/SF</div><div class="l">lowest modeled earthwork per pad SF, 87 ac in Franklin</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="raised" id="lidar">
+  <div class="wrap">
+    <div class="kicker">The map</div>
+    <h2>The ground that ranked them</h2>
+    <p class="prose">This is the surface the whole screen runs on, the 2021 MassGIS bare-earth hillshade,
+    showing all fifty-four parcels with the fourteen that passed in green and the forty that did
+    not in brown. Drag the line to compare current aerial imagery against the lidar, and click a
+    parcel, a ranking card or a brown site to stand on that terrain.</p>
+    <div class="site-picks" role="group" aria-label="Show parcels on the lidar map">
+      <button type="button" data-p04-filter="all" class="on">All 54</button>
+      <button type="button" data-p04-filter="passed">14 that passed</button>
+      <button type="button" data-p04-filter="failed">40 that did not</button>
+      <button type="button" id="p04-outlines" class="on" aria-pressed="true">Outlines on</button>
+      <button type="button" id="p04-highway" class="on" aria-pressed="true">I-495 on</button>
+    </div>
+    <label class="fail-jump">Jump to a parcel that did not pass
+      <select id="p04-fail-jump">
+        <option value="">Choose a brown parcel…</option>
+      </select>
+    </label>
+    <div class="map-swipe" id="p04-swipe">
+      <img class="map-fallback" src="assets/p04_lidar_corridor.jpg" alt="2021 lidar hillshade of the I-495 corridor with all 54 screened parcels" width="1400" height="980">
+      <div id="p04-map" class="p04-map" role="region" aria-label="Interactive lidar hillshade map of screened parcels"></div>
+      <div class="bar"></div>
+      <div class="tag left">AERIAL IMAGERY</div>
+      <div class="tag right">2021 LIDAR HILLSHADE</div>
+      <button class="fsbtn" type="button" aria-label="Open fullscreen map">⛶</button>
+    </div>
+    <p class="map-status" id="p04-status">All 54 screened parcels on 2021 lidar hillshade. Green passed; brown did not.</p>
+    <figure>
+      <figcaption>MassGIS 2021 half-meter bare-earth lidar shaded relief, the public surface used for
+      this screen, with MassGIS Level 3 parcel outlines. Aerial imagery is Esri World Imagery,
+      shown for orientation only. "No fit" is only a finding about these two pad sizes and the
+      stated wetland and slope screens.</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/p04_corridor_map.jpg" alt="Corridor map of remaining vacant parcels" loading="lazy" width="1044" height="1332">
+      <figcaption>The same screen at corridor scale. Labels mark the five cheapest pads and dots are the
+      other nine viable parcels. Extending the search south changed the picture, because the
+      rolling Hopkinton end is where dirt costs the most, and the top five all sit south of
+      Milford.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">The ranking</div>
+    <h2>The strongest five, then the full screen</h2>
+    <p class="prose">Every parcel got the same treatment: find the best possible pad position
+    inside it (two pad sizes tried), grade it to balance, apply the same illustrative $20/yd³
+    basis. "Constrained" is the share of the parcel inside wetland buffers, stream setbacks, or
+    slopes over 15%. Pad sizes are rounded; the $/SF column divides by each pad's exact area.
+    Click a card or any row to open that parcel on the lidar map.</p>
+    <div class="ranking-cards" aria-label="Five lowest modeled earthwork results">
+      <article class="rank-card" data-p04-id="pass-01" tabindex="0" role="button">
+        <img src="assets/p04_lidar_01.jpg" alt="2021 lidar hillshade of West Central Street, Franklin" width="455" height="505" loading="lazy">
+        <div class="rank">01</div><h3>West Central St</h3><p>Franklin · 87.1 acres</p><strong>$1.94 / pad SF</strong><span>7.4-acre pad · 31,047 yd³ modeled</span>
+      </article>
+      <article class="rank-card" data-p04-id="pass-02" tabindex="0" role="button">
+        <img src="assets/p04_lidar_02.jpg" alt="2021 lidar hillshade of 23 R Tulip Way, Medway" width="549" height="454" loading="lazy">
+        <div class="rank">02</div><h3>23 R Tulip Way</h3><p>Medway · 24.7 acres</p><strong>$2.24 / pad SF</strong><span>7.4-acre pad · 35,803 yd³ modeled</span>
+      </article>
+      <article class="rank-card" data-p04-id="pass-03" tabindex="0" role="button">
+        <img src="assets/p04_lidar_03.jpg" alt="2021 lidar hillshade of High Street, Bellingham" width="522" height="533" loading="lazy">
+        <div class="rank">03</div><h3>High St</h3><p>Bellingham · 33.7 acres</p><strong>$3.16 / pad SF</strong><span>7.4-acre pad · 50,468 yd³ modeled</span>
+      </article>
+      <article class="rank-card" data-p04-id="pass-04" tabindex="0" role="button">
+        <img src="assets/p04_lidar_04.jpg" alt="2021 lidar hillshade of Hartford Avenue, Bellingham" width="271" height="438" loading="lazy">
+        <div class="rank">04</div><h3>Hartford Ave</h3><p>Bellingham · 20.8 acres</p><strong>$3.58 / pad SF</strong><span>7.4-acre pad · 57,217 yd³ modeled</span>
+      </article>
+      <article class="rank-card" data-p04-id="pass-05" tabindex="0" role="button">
+        <img src="assets/p04_lidar_05.jpg" alt="2021 lidar hillshade of 4 Technology Drive, Milford" width="273" height="488" loading="lazy">
+        <div class="rank">05</div><h3>4 Technology Dr</h3><p>Milford · 18.5 acres</p><strong>$3.86 / pad SF</strong><span>7.4-acre pad · 61,756 yd³ modeled</span>
+      </article>
+    </div>
+    <details class="full-ranking">
+    <summary>View all 54 screened parcels</summary>
+    <div class="tablewrap" data-label="Full 54-parcel corridor screen">
+    <table>
+      <caption>Full public-data screen. “No fit” only describes these pad sizes and stated assumptions.</caption>
+      <thead><tr><th scope="col">#</th><th scope="col">Parcel</th><th scope="col">Town</th><th scope="col">Acres</th><th scope="col">Mapped constraints</th><th scope="col">Best conceptual pad</th><th scope="col">Modeled earthwork / pad SF (earthwork only)</th></tr></thead>
+      <tbody>
+        <tr class="ours" data-p04-id="pass-01"><td>1</td><td>0  West Central St</td><td>Franklin</td><td>87.1</td><td>59%</td><td>7.4 ac pad · 31,047 yd³ ≈ $0.62M</td><td>$1.94</td></tr>
+        <tr data-p04-id="pass-02"><td>2</td><td>23 R Tulip Way</td><td>Medway</td><td>24.7</td><td>46%</td><td>7.4 ac pad · 35,803 yd³ ≈ $0.72M</td><td>$2.24</td></tr>
+        <tr data-p04-id="pass-03"><td>3</td><td>0  High St</td><td>Bellingham</td><td>33.7</td><td>61%</td><td>7.4 ac pad · 50,468 yd³ ≈ $1.01M</td><td>$3.16</td></tr>
+        <tr data-p04-id="pass-04"><td>4</td><td>0  Hartford Av</td><td>Bellingham</td><td>20.8</td><td>53%</td><td>7.4 ac pad · 57,217 yd³ ≈ $1.14M</td><td>$3.58</td></tr>
+        <tr data-p04-id="pass-05"><td>5</td><td>4 Technology Dr</td><td>Milford</td><td>18.5</td><td>26%</td><td>7.4 ac pad · 61,756 yd³ ≈ $1.24M</td><td>$3.86</td></tr>
+        <tr data-p04-id="pass-06"><td>6</td><td>0  High St</td><td>Bellingham</td><td>47.8</td><td>29%</td><td>16.3 ac pad · 144,167 yd³ ≈ $2.88M</td><td>$4.06</td></tr>
+        <tr data-p04-id="pass-07"><td>7</td><td>0  Hixon St</td><td>Bellingham</td><td>32.1</td><td>39%</td><td>7.4 ac pad · 67,733 yd³ ≈ $1.35M</td><td>$4.24</td></tr>
+        <tr data-p04-id="pass-08"><td>8</td><td>Maple St</td><td>Milford</td><td>12.5</td><td>22%</td><td>7.4 ac pad · 81,825 yd³ ≈ $1.64M</td><td>$5.12</td></tr>
+        <tr data-p04-id="pass-09"><td>9</td><td>East Main St</td><td>Milford</td><td>119.2</td><td>76%</td><td>7.4 ac pad · 93,991 yd³ ≈ $1.88M</td><td>$5.88</td></tr>
+        <tr data-p04-id="pass-10"><td>10</td><td>0 Pine Island Road</td><td>Hopkinton</td><td>110.2</td><td>45%</td><td>16.3 ac pad · 233,019 yd³ ≈ $4.66M</td><td>$6.56</td></tr>
+        <tr data-p04-id="pass-11"><td>11</td><td>0  Farm St</td><td>Bellingham</td><td>16.3</td><td>8%</td><td>7.4 ac pad · 110,234 yd³ ≈ $2.20M</td><td>$6.90</td></tr>
+        <tr data-p04-id="pass-12"><td>12</td><td>0 Lumber Street</td><td>Hopkinton</td><td>16.5</td><td>32%</td><td>7.4 ac pad · 129,444 yd³ ≈ $2.59M</td><td>$8.10</td></tr>
+        <tr data-p04-id="pass-13"><td>13</td><td>306  Maple St</td><td>Bellingham</td><td>11.5</td><td>24%</td><td>7.4 ac pad · 141,798 yd³ ≈ $2.84M</td><td>$8.87</td></tr>
+        <tr data-p04-id="pass-14"><td>14</td><td>0 Fisher St</td><td>Holliston</td><td>17.3</td><td>47%</td><td>7.4 ac pad · 175,079 yd³ ≈ $3.50M</td><td>$10.95</td></tr>
+        <tr data-p04-id="fail-01"><td>·</td><td>Off Lumber Street</td><td>Hopkinton</td><td>11.7</td><td>50%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-02"><td>·</td><td>0 Lumber Street</td><td>Hopkinton</td><td>20.4</td><td>76%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-03"><td>·</td><td>253 Lumber Street</td><td>Hopkinton</td><td>14.3</td><td>71%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-04"><td>·</td><td>0 Granite Street</td><td>Hopkinton</td><td>29.3</td><td>71%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-05"><td>·</td><td>0 South St</td><td>Holliston</td><td>10.4</td><td>38%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-06"><td>·</td><td>Rear Purchase St</td><td>Milford</td><td>12.6</td><td>86%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-07"><td>·</td><td>Silver Hill Rd</td><td>Milford</td><td>34.6</td><td>85%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-08"><td>·</td><td>Rear Haven St</td><td>Milford</td><td>15.3</td><td>44%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-09"><td>·</td><td>400 Deer St</td><td>Milford</td><td>25.0</td><td>57%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-10"><td>·</td><td>10 Country Way</td><td>Hopkinton</td><td>10.4</td><td>52%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-11"><td>·</td><td>80 Deer St</td><td>Milford</td><td>13.3</td><td>99%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-12"><td>·</td><td>Rear Cedar St</td><td>Milford</td><td>11.5</td><td>84%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-13"><td>·</td><td>Rear Cedar St</td><td>Milford</td><td>10.4</td><td>24%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-14"><td>·</td><td>I 495</td><td>Milford</td><td>18.5</td><td>100%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-15"><td>·</td><td>Maple St</td><td>Milford</td><td>24.0</td><td>74%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-16"><td>·</td><td>Off Medway Rd</td><td>Milford</td><td>12.3</td><td>100%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-17"><td>·</td><td>0  Hartford Av</td><td>Bellingham</td><td>24.1</td><td>64%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-18"><td>·</td><td>Downey Street</td><td>Hopkinton</td><td>11.9</td><td>27%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-19"><td>·</td><td>0  Hartford Av</td><td>Bellingham</td><td>44.5</td><td>72%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-20"><td>·</td><td>187  Farm St</td><td>Bellingham</td><td>11.9</td><td>95%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-21"><td>·</td><td>0  North Main St</td><td>Bellingham</td><td>31.6</td><td>90%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-22"><td>·</td><td>0  Maple St</td><td>Bellingham</td><td>106.1</td><td>69%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-23"><td>·</td><td>0  Maple St</td><td>Bellingham</td><td>10.2</td><td>35%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-24"><td>·</td><td>0  Oak St</td><td>Bellingham</td><td>12.1</td><td>46%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-25"><td>·</td><td>36 R Alder St</td><td>Medway</td><td>35.6</td><td>100%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-26"><td>·</td><td>0  Oak Grove</td><td>Medway</td><td>13.0</td><td>44%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-27"><td>·</td><td>26  Alder St</td><td>Medway</td><td>11.3</td><td>82%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-28"><td>·</td><td>0 R Stone End Rd</td><td>Medway</td><td>25.3</td><td>84%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-29"><td>·</td><td>0  Mine Brook</td><td>Franklin</td><td>15.0</td><td>51%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-30"><td>·</td><td>0  Mine Brook</td><td>Franklin</td><td>23.0</td><td>64%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-31"><td>·</td><td>0 Old Town Road</td><td>Hopkinton</td><td>13.2</td><td>61%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-32"><td>·</td><td>300  Fisher St</td><td>Franklin</td><td>18.3</td><td>82%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-33"><td>·</td><td>0  King St</td><td>Franklin</td><td>24.4</td><td>51%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-34"><td>·</td><td>555  King St</td><td>Franklin</td><td>12.6</td><td>55%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-35"><td>·</td><td>0  Summer St</td><td>Franklin</td><td>10.4</td><td>33%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-36"><td>·</td><td>0  Uncas Pond</td><td>Franklin</td><td>15.6</td><td>14%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-37"><td>·</td><td>0 Lumber Street</td><td>Hopkinton</td><td>27.8</td><td>74%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-38"><td>·</td><td>0 Lumber Street</td><td>Hopkinton</td><td>27.5</td><td>73%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-39"><td>·</td><td>0 West Main Street</td><td>Hopkinton</td><td>10.1</td><td>62%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+        <tr data-p04-id="fail-40"><td>·</td><td>Off Teresa Road</td><td>Hopkinton</td><td>40.3</td><td>81%</td><td>no contiguous pad fits the screens</td><td>—</td></tr>
+      </tbody>
+    </table>
+    </div>
+    </details>
+    <p class="table-foot">This column is modeled earthwork only. The cross-study table on the
+    home page adds midpoint clearing to the same kind of figure, so the two are close but not the
+    same measure.</p>
+    <p class="prose" style="margin-top:22px">Put in money rather than rate, the fourteen that passed
+    run from $0.62M to $3.50M of modeled earthwork for the same 7.4-acre pad, a spread of about
+    $2.88M between the cheapest and the dearest place to put an identical building. That spread is
+    the argument for screening before anyone commissions a survey. A few things stand out beyond
+    it. The 87-acre Franklin parcel at $1.94/SF is a quarter the modeled earthwork cost of
+    anything in Hopkinton. Only two parcels can fit the full 16.3-acre
+    warehouse pad, those being 48 acres on High Street in Bellingham at $4.06/SF and Pine Island
+    Road in Hopkinton at $6.56/SF, while everything else maxes out at the 7.4-acre size. The
+    forty brown rows are not a finding that the land is worthless. They simply did not fit these
+    two pad sizes under this screen, and a smaller or differently shaped concept may produce
+    another result.</p>
+  </div>
+</section>
+
+<section class="raised">
+  <div class="wrap">
+    <div class="kicker">The same method at corridor scale</div>
+    <h2>What one highway is worth screening</h2>
+    <p class="prose">This screen covered 20 km of I-495, which runs 195.6 km in Massachusetts,
+    so the studied stretch is about a tenth of the highway. At the rate found here, 54 candidate
+    parcels and 14 that pass, the whole of I-495 would hold on the order of 530 candidates and
+    140 passing, or roughly one viable site every 1.4 km of corridor.</p>
+    <p class="prose">Treat that as arithmetic rather than a survey. The studied stretch was
+    chosen because it is where industrial development actually happens, and the northern and
+    southern ends of I-495 run through different land use, so the rate almost certainly does not
+    hold evenly along the whole road. The useful part is not the estimate. It is that the screen
+    which produced it ran on free public data, and pointing it at another corridor is a day of
+    work rather than a survey contract.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">What a table cell can't show</div>
+    <h2>Four parcels that did not pass</h2>
+    <p class="prose">The brown rows are easier to believe once you see the ground. Some are
+    almost entirely steep or inside mapped buffers; some sit against I-495. One Franklin parcel
+    is only 14% constrained on paper and still could not fit a contiguous 7.4-acre pad.</p>
+    <div class="moat">
+      <article class="fail-card" data-p04-id="fail-11" tabindex="0" role="button">
+        <img src="assets/p04_lidar_fail_deer.jpg" alt="2021 lidar hillshade of 80 Deer Street in Milford" width="1000" height="750" loading="lazy">
+        <h3>80 Deer St, Milford</h3>
+        <p>13.3 acres, 99% mapped constraints. Almost none of the parcel is outside steep ground and wetland/stream buffers.</p>
+      </article>
+      <article class="fail-card" data-p04-id="fail-14" tabindex="0" role="button">
+        <img src="assets/p04_lidar_fail_i495.jpg" alt="2021 lidar hillshade of an I-495 remnant parcel in Milford" width="1000" height="750" loading="lazy">
+        <h3>I-495 remnant, Milford</h3>
+        <p>18.5 acres, 100% constrained. Vacant on the roll; the lidar is highway, slope, and leftover scraps.</p>
+      </article>
+      <article class="fail-card" data-p04-id="fail-25" tabindex="0" role="button">
+        <img src="assets/p04_lidar_fail_alder.jpg" alt="2021 lidar hillshade of 36 R Alder Street in Medway" width="1000" height="750" loading="lazy">
+        <h3>36 R Alder St, Medway</h3>
+        <p>100% constrained in the screen. Hummocky ground and a highway embankment eat the pad window.</p>
+      </article>
+      <article class="fail-card" data-p04-id="fail-36" tabindex="0" role="button">
+        <img src="assets/p04_lidar_fail_uncas.jpg" alt="2021 lidar hillshade of the Uncas Pond parcel in Franklin" width="1000" height="750" loading="lazy">
+        <h3>Uncas Pond, Franklin</h3>
+        <p>Only 14% mapped constraints, and still no contiguous 7.4-acre pad. Shape and local relief matter as much as the percentage.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="raised">
+  <div class="wrap">
+    <div class="kicker">Method &amp; limits</div>
+    <h2>How the screen works</h2>
+    <ol class="method">
+      <li><b>Parcels.</b> MassGIS L3 tax parcels joined to assessor records for the corridor
+        towns. The screen kept parcels of 10 acres or more, classified vacant, forest or
+        developable land, carrying under $50k of building value and lying within 1.5 km of the
+        MassDOT I-495 centerline. The nine towns are Hopkinton, Holliston, Milford, Hopedale,
+        Upton, Mendon, Medway, Bellingham and Franklin.</li>
+      <li><b>Terrain.</b> The state's 2021 bare-earth lidar DEM, resampled to 1 m. Across
+        Studies 01 to 03 my point-cloud models and the state's DEM, derived from the same
+        flights, differed by 2.0 to 7.6 cm RMSE, which supports processing consistency rather
+        than independent field verification. Wetlands and streams come from DEP layers with
+        100 ft and 200 ft screening buffers.</li>
+      <li><b>The pad search.</b> The same optimizer as Study 03, run inside every parcel. Every
+        possible pad position is tested, and the largest pad is kept where at least 70% of the
+        window passes the terrain and mapped-buffer screen and 95% sits inside the parcel.</li>
+      <li><b>What a screen doesn't do.</b> There are no canopy metrics here, no
+        wetness-discrepancy or rock screens, no access routes and no zoning. Those belong to the
+        per-parcel study, run on whichever of these parcels matters to you. Costs use the same
+        $20/yd³ basis and the same caveats as the other studies.</li>
+    </ol>
+    <p class="scope-note"><strong>Scope:</strong> a public-data demonstration. "Pass" means
+    passing the stated terrain and mapped-buffer screen, not approved, permitted or confirmed
+    buildable. This does not review current title, ownership, zoning, frontage, legal access,
+    utilities, field wetlands, soils, endangered species, cultural resources, or permitting.
+    A shortlist this small is what makes a deeper study practical for the parcels that matter.
+    Scripts and pipeline files are available on request. <a href="methodology.html">Read the
+    full assumptions, sources and limitations</a>.</p>
+  </div>
+</section>
+
+</main>
+<footer>
+  <div class="wrap">
+    <p class="cta">The newest free lidar here was flown in <span>2021.</span><br>
+    Anything newer takes <span>a fresh flight.</span></p>
+    <p class="contact">
+      Max Howe · MS, Geographic Information Science ·
+      <a href="mailto:mhowe.gis@gmail.com">mhowe.gis@gmail.com</a>
+    </p>
+    <div class="footer-links"><a href="methodology.html">Method, sources &amp; limitations</a><a href="index.html#services">Service concept</a><a href="https://github.com/mapzimus/ground-truth">GitHub repository</a></div>
+    <p class="footer-meta">Planning-level demonstration from public data. Not a survey, wetland delineation, engineering design, construction quantity, or bid.</p>
+  </div>
+</footer>
+
+<script src="vendor/leaflet.js" defer></script>
+<script src="site.js" defer></script>
+<script src="p04-map.js" defer></script>
+</body>
+</html>

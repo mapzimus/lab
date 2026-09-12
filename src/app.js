@@ -5,21 +5,22 @@
   const categoryLabels = {
     maps: "Maps",
     data: "Data",
-    design: "Design",
+    everyday: "Everyday",
     classroom: "Classroom",
     soccer: "Soccer",
-    utilities: "Utilities",
     play: "Games",
     experiments: "Experiments",
+    design: "Everyday",
+    utilities: "Everyday",
     teaching: "Classroom",
-    fun: "Utilities",
+    fun: "Everyday",
     math: "Math",
   };
   // Keep in sync with the same tables in scripts/build.mjs, which pre-renders
   // the browse shelves so the catalog works without JavaScript.
   const viewCategories = {
     home: null,
-    tools: ["maps", "data", "design", "classroom", "soccer", "utilities"],
+    tools: ["maps", "data", "everyday", "soccer"],
     maps: ["maps"],
     games: ["play"],
   };
