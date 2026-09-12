@@ -11,7 +11,7 @@
     if (isDark) document.documentElement.dataset.theme = "dark";
     else delete document.documentElement.dataset.theme;
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = isDark ? "#12181c" : "#f1f2f0";
+    if (meta) meta.content = isDark ? "#141618" : "#f6f6f5";
   }
 
   document.addEventListener("DOMContentLoaded", function () {

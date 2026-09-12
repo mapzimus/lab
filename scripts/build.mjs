@@ -318,10 +318,10 @@ const projectCount = itemsForView("lab", "").length;
 /** Home "browse by section" cards — four doors instead of the whole catalog. */
 function sectionCardsHtml() {
   const sections = [
-    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Small pages that do one job. Maps, data, soccer, and everyday stuff." },
-    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "Bigger map projects you can open here. Transit, globes, stories." },
-    { href: "/games/", label: "Games", category: "play", n: gamesCount, desc: "Games that run in the browser. Nothing to download." },
-    { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "Every project on one shelf. Maps, games, classroom sites, and experiments." },
+    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Maps, data, soccer, and everyday tools." },
+    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "Transit, globes, and story maps." },
+    { href: "/games/", label: "Games", category: "play", n: gamesCount, desc: "Browser games." },
+    { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "Maps, games, classroom sites, and experiments." },
   ];
   return sections
     .map((s) => `<a class="section-card" href="${s.href}" data-category="${s.category}">
@@ -339,50 +339,50 @@ const pages = {
     title: "Mapzimus · Tools, maps, and games by Maxwell Howe",
     description: `${toolCount} free browser tools, plus maps and games. No accounts. Nothing to install.`,
     canonical: "https://mapzimus.com/",
-    eyebrow: "Maxwell Howe, Salem, Mass.",
-    heading: "Tools, maps, and a few games.",
-    intro: `Things I built and actually use. ${toolCount} small tools, plus bigger maps and games. All free.`,
-    catalogHeading: "Pick a section",
+    eyebrow: "",
+    heading: "Mapzimus",
+    intro: "Tools, maps, and games.",
+    catalogHeading: "Catalog",
   },
   lab: {
     path: "lab/index.html",
     title: "Lab · Mapzimus",
     description: `${projectCount} projects: maps, games, classroom sites, and experiments.`,
     canonical: "https://mapzimus.com/lab/",
-    eyebrow: "Projects",
-    heading: "The whole shelf",
-    intro: `All ${projectCount} projects. The maps from the Maps page are here too, plus games and classroom sites. Tools have their own page.`,
-    catalogHeading: "All projects",
+    eyebrow: "",
+    heading: "Lab",
+    intro: `${projectCount} projects.`,
+    catalogHeading: "Projects",
   },
   tools: {
     path: "tools/index.html",
     title: "Tools · Mapzimus",
     description: `${utilityCount} small browser tools for maps, data, soccer, and everyday jobs.`,
     canonical: "https://mapzimus.com/tools/",
-    eyebrow: "Tools",
-    heading: "One job per page",
-    intro: `${utilityCount} tools. Each one is a single page that runs in your browser. Nothing is uploaded. Classroom sites live under Lab.`,
-    catalogHeading: "All tools",
+    eyebrow: "",
+    heading: "Tools",
+    intro: `${utilityCount} tools.`,
+    catalogHeading: "Tools",
   },
   maps: {
     path: "maps/index.html",
     title: "Maps · Mapzimus",
     description: `${mapCount} map projects you can open here: live transit, globes, and story maps.`,
     canonical: "https://mapzimus.com/maps/",
-    eyebrow: "Maps",
-    heading: "Map projects",
-    intro: `${mapCount} maps that live on this site. Small converters and address tools are under Tools. Everything else is in Lab.`,
-    catalogHeading: "All map projects",
+    eyebrow: "",
+    heading: "Maps",
+    intro: `${mapCount} maps.`,
+    catalogHeading: "Maps",
   },
   games: {
     path: "games/index.html",
     title: "Games · Mapzimus",
     description: "Free browser games. Nothing to download.",
     canonical: "https://mapzimus.com/games/",
-    eyebrow: "Games",
+    eyebrow: "",
     heading: "Games",
-    intro: "Free games that run in the browser. Nothing to download.",
-    catalogHeading: "All games",
+    intro: `${gamesCount} games.`,
+    catalogHeading: "Games",
   },
 };
 
@@ -394,7 +394,7 @@ for (const [category, [label, blurb]] of Object.entries(toolCategories)) {
     title: `${label} · Mapzimus`,
     description: blurb,
     canonical: `https://mapzimus.com/tools/${category}/`,
-    eyebrow: "Tool category",
+    eyebrow: "",
     heading: label,
     intro: blurb,
     catalogHeading: label,
@@ -420,8 +420,8 @@ for (const [key, page] of Object.entries(pages)) {
   const browseClass = isHome ? "browse browse-home" : "browse";
   const heroActions = isHome
     ? `<div class="hero-actions" aria-label="Primary actions">
-        <a class="hero-cta" href="/tools/">Browse tools</a>
-        <a class="hero-cta quiet" href="/maps/">Browse maps</a>
+        <a class="hero-cta" href="/tools/">Tools</a>
+        <a class="hero-cta quiet" href="/maps/">Maps</a>
       </div>`
     : "";
   let html = template
