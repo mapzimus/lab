@@ -352,7 +352,7 @@ const pages = {
     eyebrow: "",
     heading: "Lab",
     intro: `${projectCount} projects.`,
-    catalogHeading: "Projects",
+    catalogHeading: "",
   },
   tools: {
     path: "tools/index.html",
@@ -362,7 +362,7 @@ const pages = {
     eyebrow: "",
     heading: "Tools",
     intro: `${utilityCount} tools.`,
-    catalogHeading: "Tools",
+    catalogHeading: "",
   },
   maps: {
     path: "maps/index.html",
@@ -372,7 +372,7 @@ const pages = {
     eyebrow: "",
     heading: "Maps",
     intro: `${mapCount} maps.`,
-    catalogHeading: "Maps",
+    catalogHeading: "",
   },
   games: {
     path: "games/index.html",
@@ -382,7 +382,7 @@ const pages = {
     eyebrow: "",
     heading: "Games",
     intro: `${gamesCount} games.`,
-    catalogHeading: "Games",
+    catalogHeading: "",
   },
 };
 
@@ -397,7 +397,7 @@ for (const [category, [label, blurb]] of Object.entries(toolCategories)) {
     eyebrow: "",
     heading: label,
     intro: blurb,
-    catalogHeading: label,
+    catalogHeading: "",
   };
 }
 
