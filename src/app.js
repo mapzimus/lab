@@ -7,19 +7,19 @@
     data: "Data",
     design: "Design",
     classroom: "Classroom",
-    math: "Math",
     soccer: "Soccer",
     utilities: "Utilities",
     play: "Games",
     experiments: "Experiments",
     teaching: "Classroom",
     fun: "Utilities",
+    math: "Math",
   };
   // Keep in sync with the same tables in scripts/build.mjs, which pre-renders
   // the browse shelves so the catalog works without JavaScript.
   const viewCategories = {
     home: null,
-    tools: ["maps", "data", "design", "classroom", "math", "soccer", "utilities"],
+    tools: ["maps", "data", "design", "classroom", "soccer", "utilities"],
     maps: ["maps"],
     games: ["play"],
   };
@@ -71,6 +71,12 @@
     return Boolean(item.external) || /^https?:\/\//i.test(item.url || "");
   }
 
+  function updatedLabel(item) {
+    if (!/^\d{4}-\d{2}$/.test(item.updated || "")) return "";
+    const parts = item.updated.split("-").map(Number);
+    return new Date(Date.UTC(parts[0], parts[1] - 1)).toLocaleString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+  }
+
   function card(item, featured) {
     const tags = (item.tags || []).slice(0, 3).map(function (tag) {
       return `<span class="tag">${escapeHtml(tag)}</span>`;
@@ -80,6 +86,12 @@
     const external = isExternalItem(item);
     const targetAttrs = external ? ' target="_blank" rel="noopener"' : "";
     const openCue = external ? "Open ↗" : "Open →";
+    const dateLabel = updatedLabel(item);
+    const footLeft = status !== "live"
+      ? `<span class="status">${escapeHtml(status)}</span>`
+      : dateLabel
+        ? `<span class="card-date">${escapeHtml(dateLabel)}</span>`
+        : "<span></span>";
     return `<article class="card${featured ? " featured" : ""}" data-slug="${escapeHtml(item.slug)}" data-category="${escapeHtml(item.category)}">
       <button class="star" type="button" aria-label="${favorite ? "Remove from" : "Add to"} favorites" aria-pressed="${favorite}">${favorite ? "★" : "☆"}</button>
       <a class="card-link" href="${escapeHtml(item.url)}"${targetAttrs}>
@@ -87,7 +99,7 @@
         <h3>${escapeHtml(item.title)}</h3>
         <p class="card-copy">${escapeHtml(item.description)}</p>
         ${featured ? "" : `<div class="card-tags">${tags}</div>`}
-        <div class="card-foot">${status === "live" ? "<span></span>" : `<span class="status">${escapeHtml(status)}</span>`}<span class="open-cue">${openCue}</span></div>
+        <div class="card-foot">${footLeft}<span class="open-cue">${openCue}</span></div>
       </a>
     </article>`;
   }

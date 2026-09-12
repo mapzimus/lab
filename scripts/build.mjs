@@ -142,6 +142,15 @@ const publicProjects = projects.map((item) => ({
   source: "projects",
 }));
 
+// One canonical order everywhere (pre-rendered shelves, catalog.json, and the
+// client-side search grid all read this array): tools A→Z for scanning, and
+// projects newest-first with works-in-progress after everything live.
+publicTools.sort((a, b) => a.title.localeCompare(b.title));
+publicProjects.sort((a, b) =>
+  (((a.status || "live") === "live" ? 0 : 1) - ((b.status || "live") === "live" ? 0 : 1)) ||
+  (b.updated || "").localeCompare(a.updated || "") ||
+  a.title.localeCompare(b.title));
+
 const catalog = [...publicTools, ...publicProjects];
 const toolCount = publicTools.length;
 const newestUpdate = sourceCatalog.map((item) => item.updated || "").sort().at(-1);
@@ -160,7 +169,6 @@ const categoryLabels = {
   data: "Data",
   design: "Design",
   classroom: "Classroom",
-  math: "Math",
   soccer: "Soccer",
   utilities: "Utilities",
   play: "Games",
@@ -168,13 +176,14 @@ const categoryLabels = {
   // Legacy aliases kept for any lingering project tags
   teaching: "Classroom",
   fun: "Utilities",
+  math: "Math",
 };
 // Tools = every single-page utility (including GIS).
 // Maps = first-party map projects hosted here.
 // Games = playable. Lab = every project (maps included); no tools or skills.
 const viewCategories = {
   home: null,
-  tools: ["maps", "data", "design", "classroom", "math", "soccer", "utilities"],
+  tools: ["maps", "data", "design", "classroom", "soccer", "utilities"],
   maps: ["maps"],
   games: ["play"],
 };
@@ -187,12 +196,24 @@ function isExternalItem(item) {
   return Boolean(item.external) || /^https?:\/\//i.test(item.url || "");
 }
 
+function updatedLabel(item) {
+  if (!/^\d{4}-\d{2}$/.test(item.updated || "")) return "";
+  const [year, month] = item.updated.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1)).toLocaleString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+}
+
 function card(item, { featured = false, star = true } = {}) {
   const tags = (item.tags || []).slice(0, 3).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join("");
   const status = item.status || "live";
   const external = isExternalItem(item);
   const targetAttrs = external ? ' target="_blank" rel="noopener"' : "";
   const openCue = external ? "Open ↗" : "Open →";
+  const dateLabel = updatedLabel(item);
+  const footLeft = status !== "live"
+    ? `<span class="status">${escapeHtml(status)}</span>`
+    : dateLabel
+      ? `<span class="card-date">${escapeHtml(dateLabel)}</span>`
+      : "<span></span>";
   return `<article class="card${featured ? " featured" : ""}" data-slug="${escapeHtml(item.slug)}" data-category="${escapeHtml(item.category)}">
       ${star ? `<button class="star" type="button" aria-label="Add to favorites" aria-pressed="false">☆</button>` : ""}
       <a class="card-link" href="${escapeHtml(item.url)}"${targetAttrs}>
@@ -200,7 +221,7 @@ function card(item, { featured = false, star = true } = {}) {
         <h3>${escapeHtml(item.title)}</h3>
         <p class="card-copy">${escapeHtml(item.description)}</p>
         ${featured ? "" : `<div class="card-tags">${tags}</div>`}
-        <div class="card-foot">${status === "live" ? "<span></span>" : `<span class="status">${escapeHtml(status)}</span>`}<span class="open-cue">${openCue}</span></div>
+        <div class="card-foot">${footLeft}<span class="open-cue">${openCue}</span></div>
       </a>
     </article>`;
 }
@@ -224,7 +245,8 @@ function itemsForView(view, category) {
 }
 
 function filtersHtml(view, activeCategory) {
-  const categories = [...new Set(itemsForView(view, "").map((item) => item.category))];
+  const categories = [...new Set(itemsForView(view, "").map((item) => item.category))]
+    .sort((a, b) => catOrder.indexOf(a) - catOrder.indexOf(b));
   if (categories.length < 2) return "";
   return [`<button class="filter" type="button" data-category="" aria-pressed="${!activeCategory}">All</button>`]
     .concat(categories.map((c) => `<button class="filter" type="button" data-category="${c}" aria-pressed="${activeCategory === c}">${escapeHtml(categoryLabels[c] || c)}</button>`))
@@ -232,7 +254,7 @@ function filtersHtml(view, activeCategory) {
 }
 
 // Canonical order for grouped subsections.
-const catOrder = ["maps", "data", "design", "math", "classroom", "soccer", "utilities", "play", "experiments"];
+const catOrder = ["maps", "data", "design", "classroom", "soccer", "utilities", "play", "experiments"];
 
 /** Split a view's items into labelled groups so a long list reads as a few
     scannable shelves instead of one wall. */
@@ -282,7 +304,6 @@ const toolCategories = {
   maps: ["Maps & GIS tools", "Coordinate converters, GeoJSON, geocoders, grids, and map utilities."],
   data: ["Data tools", "CSV wrangling, charts, converters, and small data utilities."],
   design: ["Design tools", "Color, CSS, images, icons, and pattern helpers."],
-  math: ["Math tools", "Interactive explorers, graphing, geometry, and reference sheets."],
   classroom: ["Classroom tools", "Seating, timers, groups, and probability demos for class."],
   soccer: ["Soccer tools", "Tactics boards, lineups, training plans, and match graphics."],
   utilities: ["Utility tools", "Unit conversion, QR codes, Markdown, and quick helpers."],
@@ -315,7 +336,7 @@ const pages = {
   home: {
     path: "index.html",
     title: "Mapzimus · Browser tools, maps, and games by Maxwell Howe",
-    description: `${toolCount} free browser tools for maps, data, and teaching — plus games and experiments, all hosted on mapzimus.com. No accounts, no installs.`,
+    description: `${toolCount} free browser tools for maps, data, design, and the classroom — plus games and experiments, all hosted on mapzimus.com. No accounts, no installs.`,
     canonical: "https://mapzimus.com/",
     eyebrow: "The lab of Maxwell Howe",
     heading: "Useful tools. Maps. Small games.",

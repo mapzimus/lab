@@ -259,6 +259,7 @@ section.catalog { border-top: 1px solid var(--line); }
 .tag { background: var(--well); color: var(--muted); padding: 2px 7px; font: 400 10.5px var(--mono); }
 .card-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; font: 600 11px var(--mono); letter-spacing: 0.04em; }
 .status { color: var(--cat); text-transform: uppercase; }
+.card-date { color: var(--muted); font-weight: 400; text-transform: uppercase; }
 .open-cue { color: var(--muted); }
 .card:hover .open-cue { color: var(--ink); }
 
