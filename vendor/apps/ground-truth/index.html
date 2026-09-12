@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lidar Site Studies — Terrain Intelligence for Wooded Land</title>
+  <meta name="description" content="Planning-level terrain intelligence for wooded Massachusetts parcels: public-data screening, fresh drone LiDAR, and GIS analysis before a land decision.">
+  <link rel="canonical" href="https://maxwellhowegis.com/lidar-test/">
+  <meta name="theme-color" content="#f4f0e6">
+  <meta property="og:title" content="Know What Wooded Land May Cost Before You Buy It">
+  <meta property="og:description" content="Drone LiDAR, aerial imagery, and GIS analysis for early terrain, drainage, access, clearing, and earthwork decisions.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://maxwellhowegis.com/lidar-test/">
+  <meta property="og:image" content="https://maxwellhowegis.com/lidar-test/assets/hs_dtm.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9B%B0%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Lidar Site Studies",
+    "url": "https://maxwellhowegis.com/lidar-test/",
+    "description": "A public-data demonstration of planning-level terrain intelligence for wooded Massachusetts parcels.",
+    "author": {"@type": "Person", "name": "Max Howe"}
+  }
+  </script>
+</head>
+<body class="site-home">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <nav class="projnav" aria-label="Primary navigation">
+    <div class="wrap">
+      <a class="brand" href="index.html" aria-current="page">Lidar Site Studies</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-links">Menu</button>
+      <div class="links" id="primary-links">
+        <a href="devens.html">01 · Devens</a>
+        <a href="middleboro.html">02 · Middleborough</a>
+        <a href="hopkinton.html">03 · Hopkinton</a>
+        <a href="p04.html">04 · Corridor</a>
+        <a href="methodology.html">Method</a>
+        <a class="nav-cta" href="mailto:mhowe.gis@gmail.com?subject=Lidar%20Site%20Studies%20parcel%20screen">Request a parcel screen</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="wrap">
+      <div class="kicker">Lidar terrain studies · Massachusetts</div>
+      <h1>A camera sees treetops.<br><span>Lidar sees the ground.</span></h1>
+      <p class="lede">On wooded land that gap decides the budget, because trees hide the hillside, the wet ground and the buildable pad underneath, and a surface built from photographs counts the canopy as dirt. These four Massachusetts studies measure the ground itself, using public data that anyone can download and re-run.</p>
+      <div class="hero-actions">
+        <a class="button" href="mailto:mhowe.gis@gmail.com?subject=Lidar%20Site%20Studies%20parcel%20screen">Request a parcel screen</a>
+        <a class="button secondary" href="#cases">See the four studies</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="raised" id="proof">
+      <div class="wrap">
+        <div class="kicker">Start here</div>
+        <h2>Drag the line</h2>
+        <p class="section-intro">Both sides come from the same forest, the same flight and the same laser pulses. On the left is the treetop surface, which is roughly what a camera reconstructs when leaves hide the ground. On the right is the bare earth underneath it, rebuilt from the pulses that found gaps in the canopy.</p>
+        <div class="swipe" style="--focus:51% 49%">
+          <div class="stage">
+            <img src="assets/hs_dtm.jpg" alt="Bare-earth lidar hillshade of the Devens parcel" width="1530" height="1230">
+            <div class="top"><img src="assets/hs_dsm.jpg" alt="Treetop canopy surface of the same parcel" width="1530" height="1230"></div>
+            <div class="bar"></div>
+          </div>
+          <div class="tag left">TREETOP SURFACE</div>
+          <div class="tag right">BARE EARTH</div>
+          <button class="fsbtn" type="button" aria-label="Toggle fullscreen">⛶</button>
+        </div>
+        <p class="proof-caption">This is Devens, Massachusetts, the parcel where Commonwealth Fusion Systems later built its campus. The ridge, the drainage and the flat ground only exist on one side of the line. <a href="devens.html">See the full study →</a></p>
+      </div>
+    </section>
+
+    <section id="cases">
+      <div class="wrap">
+        <div class="kicker">Four Massachusetts studies</div>
+        <h2>What each one found</h2>
+        <p class="section-intro">Every one of them ran on free public data, and together they show the kind of decision this work supports. None of them is a bid, a survey, a wetland delineation or a final design.</p>
+        <div class="case-grid">
+          <a class="card" href="devens.html">
+            <div class="thumb"><img src="assets/card_devens.jpg" alt="Canopy height model of the Devens parcel, showing trees the ground survey has to see through" loading="lazy" width="800" height="450"><span class="plate">01</span></div>
+            <div class="body"><div class="num">Devens, MA</div><h3>The pad under the forest</h3><p>Lidar caught this parcel just before construction started, so the modeled ground can be checked against the campus that actually got built.</p><div class="statline">The canopy hid <b>$5.6M</b> of earthwork that was never there</div><div class="go">VIEW STUDY →</div></div>
+          </a>
+          <a class="card" href="middleboro.html">
+            <div class="thumb"><img src="assets/card_middleboro.jpg" alt="Wetland-risk map of the Middleborough site, comparing mapped wetlands with terrain that tests wet" loading="lazy" width="800" height="450"><span class="plate">02</span></div>
+            <div class="body"><div class="num">Middleborough, MA</div><h3>The warehouse that wasn't</h3><p>The dirt work here is manageable, but the water is not, because the terrain shows wetness that the mapped wetland layers alone would miss.</p><div class="statline"><b>175 of 441 acres</b> survived the terrain screen</div><div class="go">VIEW STUDY →</div></div>
+          </a>
+          <a class="card" href="hopkinton.html">
+            <div class="thumb"><img src="assets/card_hopkinton.jpg" alt="Three candidate warehouse pads on the Hopkinton parcel, each labelled with its earthwork cost" loading="lazy" width="800" height="450"><span class="plate">03</span></div>
+            <div class="body"><div class="num">Hopkinton–Milford line</div><h3>Three pads, three price tags</h3><p>There is one building and one parcel but three places to put it, and moving the same footprint a few hundred feet changes the earthwork bill enormously.</p><div class="statline">Same building, <b>$2.5M</b> apart depending on where it sits</div><div class="go">VIEW STUDY →</div></div>
+          </a>
+          <a class="card" href="p04.html">
+            <div class="thumb"><img src="assets/card_p04.jpg" alt="I-495 corridor map with the fourteen parcels that passed the screen in green" loading="lazy" width="800" height="450"><span class="plate">04</span></div>
+            <div class="body"><div class="num">I-495 corridor</div><h3>Fifty-four parcels. Fourteen pass.</h3><p>Nine towns and every vacant parcel over ten acres within a mile of the highway, all run through the same screen.</p><div class="statline"><b>54 in, 14 out</b>, before anyone flies anything</div><div class="go">VIEW STUDY →</div></div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="paper">
+      <div class="wrap">
+        <div class="kicker">Same assumptions, three sites</div>
+        <h2>Where the money actually differs</h2>
+        <p class="section-intro">Using one conceptual grading approach makes terrain risk comparable across sites. These subtotals cover modeled earthwork and midpoint clearing only, so they are not sitework budgets.</p>
+        <div class="tablewrap" data-label="Comparison of the three detailed case studies">
+          <table>
+            <caption>Planning-level comparison of the three detailed case studies</caption>
+            <thead><tr><th scope="col">Site</th><th scope="col">Conceptual pad</th><th scope="col">Earthwork @ $20/yd³</th><th scope="col">Clearing midpoint</th><th scope="col">Access flag</th><th scope="col">Earthwork + clearing / pad SF</th></tr></thead>
+            <tbody>
+              <tr><td>01 Devens</td><td>5.3 ac / 232,600 SF</td><td>$0.49M ± $57k</td><td>$16k</td><td>21% bank requires redesign</td><td>$2.20</td></tr>
+              <tr><td>02 Middleborough</td><td>16.3 ac / 710,000 SF</td><td>$1.69M ± $173k</td><td>$50k</td><td>screened route peaks at 5.1%</td><td>$2.50</td></tr>
+              <tr class="ours"><td>03 Hopkinton</td><td>16.3 ac / 710,000 SF</td><td>$6.34M ± $173k</td><td>$68k</td><td>11% route requires redesign</td><td>$9.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-foot">Hopkinton is highlighted because it is the outlier: the same conceptual building on similar acreage costs roughly four times as much to sit down, and terrain is the only reason.</p>
+        <p class="scope-note"><strong>Not included:</strong> final grading design, topsoil stripping, shrink/swell, unsuitable soils, rock excavation, haul and disposal, retaining walls, utilities, stormwater construction, erosion control, mobilization, permitting, survey, or engineering. The $20/yd³ rate is an illustrative screening assumption; a real project needs current contractor input.</p>
+
+        <div class="kicker" style="margin-top:52px">Does the rate change the answer?</div>
+        <h2>The ranking holds at any unit cost</h2>
+        <p class="section-intro">A single assumed rate is worth little on its own, so the same three sites are run across the full $10 to $40 range. The absolute numbers move by a factor of four, which is the honest reading of a screening estimate. What does not move is the comparison.</p>
+        <div class="tablewrap" data-label="Earthwork and clearing across the unit-cost range">
+          <table>
+            <caption>Modeled earthwork plus midpoint clearing, at three unit rates</caption>
+            <thead><tr><th scope="col">Site</th><th scope="col">Modeled volume</th><th scope="col">@ $10/yd³</th><th scope="col">@ $20/yd³</th><th scope="col">@ $40/yd³</th></tr></thead>
+            <tbody>
+              <tr><td>01 Devens</td><td>24,532 yd³</td><td>$0.26M · $1.12/SF</td><td>$0.51M · $2.18/SF</td><td>$1.00M · $4.29/SF</td></tr>
+              <tr><td>02 Middleborough</td><td>84,437 yd³</td><td>$0.89M · $1.26/SF</td><td>$1.74M · $2.45/SF</td><td>$3.43M · $4.83/SF</td></tr>
+              <tr class="ours"><td>03 Hopkinton</td><td>316,993 yd³</td><td>$3.24M · $4.56/SF</td><td>$6.41M · $9.03/SF</td><td>$12.75M · $17.95/SF</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-foot">Hopkinton costs 4.06 times what Devens costs per pad square foot at $10/yd³, 4.14 times at $20, and 4.19 times at $40. The unit rate decides how large the bill is, and the terrain decides which site is cheaper. That is why a screening estimate can support a siting decision while still being the wrong number to put in a budget.</p>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="wrap">
+        <div class="kicker">Working together</div>
+        <h2>Start broad, and fly only when the decision needs it</h2>
+        <p class="section-intro">Public data can rule out a weak parcel for almost nothing, so a fresh flight is only worth paying for once a site has survived that first cut.</p>
+        <div class="service-grid">
+          <article class="service">
+            <span class="num">Step 01 · Screen</span>
+            <h3>Shortlist from public data</h3>
+            <p>Public lidar, parcel records, mapped wetlands, streams and slope are enough to say which properties deserve a closer look and which are already out.</p>
+          </article>
+          <article class="service">
+            <span class="num">Step 02 · Measure</span>
+            <h3>Fly only what survived</h3>
+            <p>Where the public elevation data is too old to trust, current lidar and imagery get collected under an FAA Part 107 flight plan with site access and ground control.</p>
+          </article>
+          <article class="service">
+            <span class="num">Step 03 · Decide</span>
+            <h3>Turn terrain into choices</h3>
+            <p>Pad locations, earthwork, access grades, drainage and clearing are compared side by side, along with the field, survey and engineering work the decision still needs.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="raised">
+      <div class="wrap">
+        <div class="kicker">Scope</div>
+        <h2>Useful early, but not a substitute for final design</h2>
+        <div class="scope-grid">
+          <article class="scope-col yes">
+            <h3>What it is for</h3>
+            <ul>
+              <li>Comparing sites and pad locations before design money is spent</li>
+              <li>Due diligence and acquisition screening</li>
+              <li>Scoping where field and professional work should focus next</li>
+            </ul>
+          </article>
+          <article class="scope-col no">
+            <h3>What it is not</h3>
+            <ul>
+              <li>A boundary survey or wetland delineation</li>
+              <li>A geotechnical investigation or drainage design</li>
+              <li>A construction quantity, bid, or stamped engineering product</li>
+            </ul>
+          </article>
+        </div>
+        <p class="status-note"><strong>Current status:</strong> Lidar Site Studies is a service concept and public-data demonstration by Max Howe. Fresh-flight work would be scoped with an FAA Part 107 remote pilot. Survey control, authoritative boundaries, civil design and stamped deliverables come from licensed partners when a project needs them. Read the <a href="methodology.html">full method, sources and limitations</a> before relying on a number.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p class="cta">Have a wooded parcel?<br><span>Start with the ground.</span></p>
+      <div class="hero-actions"><a class="button" href="mailto:mhowe.gis@gmail.com?subject=Lidar%20Site%20Studies%20parcel%20screen">Request a parcel screen</a></div>
+      <p class="contact">Max Howe · MS, Geographic Information Science · <a href="mailto:mhowe.gis@gmail.com">mhowe.gis@gmail.com</a></p>
+      <div class="footer-links"><a href="methodology.html">Method, sources &amp; limitations</a><a href="https://github.com/mapzimus/ground-truth">GitHub repository</a></div>
+      <p class="footer-meta">Public-agency data: USGS 3DEP and MassGIS. Esri World Imagery appears in selected case-study context images with credits described in the methodology.</p>
+    </div>
+  </footer>
+
+  <script src="site.js" defer></script>
+</body>
+</html>

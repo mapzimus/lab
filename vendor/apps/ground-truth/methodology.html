@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Method, Sources &amp; Limitations — Lidar Site Studies</title>
+  <meta name="description" content="How the Lidar Site Studies terrain demonstrations were built, what their numbers mean, and what still requires fieldwork or a licensed professional.">
+  <link rel="canonical" href="https://maxwellhowegis.com/lidar-test/methodology.html">
+  <meta name="theme-color" content="#f4f0e6">
+  <meta property="og:title" content="Lidar Site Studies — Method, Sources &amp; Limitations">
+  <meta property="og:description" content="A plain-English guide to the data, assumptions, checks, and boundaries behind the terrain studies.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://maxwellhowegis.com/lidar-test/methodology.html">
+  <meta property="og:image" content="https://maxwellhowegis.com/lidar-test/assets/hs_dtm.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9B%B0%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:wght@700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <nav class="projnav" aria-label="Primary navigation">
+    <div class="wrap">
+      <a class="brand" href="index.html">Lidar Site Studies</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="method-links">Menu</button>
+      <div class="links" id="method-links">
+        <a href="index.html#cases">All work</a>
+        <a href="index.html#services">How it works</a>
+        <a class="on" aria-current="page" href="methodology.html">Method &amp; limits</a>
+        <a class="nav-cta" href="mailto:mhowe.gis@gmail.com?subject=Lidar%20Site%20Studies%20parcel%20screen">Request a screen</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <header>
+      <div class="wrap">
+        <div class="kicker">Read this before relying on a number</div>
+        <h1>Useful early answers,<br><span class="under">and honest limits.</span></h1>
+        <p class="lede">This work exists to help decide where diligence money should go. The demonstrations use public data and conceptual assumptions, so they do not replace a survey, field delineation, engineering design, geotechnical investigation or contractor bid.</p>
+        <div class="hero-actions"><a class="button" href="#method">See the method</a><a class="button secondary" href="#sources">Review sources</a></div>
+      </div>
+    </header>
+
+    <section class="paper">
+      <div class="wrap">
+        <div class="kicker">The short version</div>
+        <h2>What the work can and cannot say</h2>
+        <div class="boundary-grid">
+          <article class="boundary"><h3>Good for</h3><p>Comparing parcels, finding terrain trouble, testing conceptual pad positions, identifying questions for a site visit, and deciding whether newer data is worth acquiring.</p></article>
+          <article class="boundary"><h3>Not proof of</h3><p>Property boundaries, legal access, wetland limits, zoning compliance, soil or bedrock conditions, drainage performance, permit eligibility, or final construction quantities.</p></article>
+          <article class="boundary"><h3>How to use it</h3><p>Treat a favorable result as permission to investigate rather than permission to build, and treat a poor result as a reason to question the concept rather than a final rejection of the land.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="method">
+      <div class="wrap">
+        <div class="kicker">Method</div>
+        <h2>From parcel question to decision screen</h2>
+        <ol class="method">
+          <li><b>Define the decision.</b> Confirm the parcel or search area, the target use, the approximate pad size, the timing, and the financial question the screen needs to inform.</li>
+          <li><b>Check source fitness.</b> Review acquisition dates, coverage, published metadata, coordinate systems and resolution, and decide whether the available data is current enough for the decision.</li>
+          <li><b>Build terrain surfaces.</b> Classify or use published lidar ground points for a bare-earth model, then use first returns or surface products for canopy and structures. Generate hillshade, slope, flow, roughness and canopy derivatives as needed.</li>
+          <li><b>Apply stated screens.</b> Combine terrain with mapped wetlands, hydrography, parcel information and explicit buffers. These mapped constraints are flags for diligence rather than field-confirmed jurisdictional limits.</li>
+          <li><b>Test concepts.</b> Search candidate pad positions and use cell-by-cell cut and fill math against a conceptual level grade. The result compares concepts, and it is not a grading plan.</li>
+          <li><b>Check the processing.</b> Compare outputs with published derivatives and, where practical, reproduce key calculations in a second GIS package. Agreement between products from the same flight checks processing consistency rather than absolute field accuracy.</li>
+          <li><b>Hand off the questions.</b> Identify what needs a site visit, survey control, a wetland scientist, a civil engineer, a geotechnical team, a title professional, a permitting specialist or a contractor.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="raised" id="numbers">
+      <div class="wrap">
+        <div class="kicker">Reading the numbers</div>
+        <h2>Three distinctions that matter</h2>
+        <div class="grid-3">
+          <article class="panel"><h3>Quantity</h3><p>Cut and fill are raster-based planning quantities for a simplified pad. They exclude topsoil handling, shrink/swell, unsuitable material, foundations, utilities, drainage, access grading, and design revisions unless expressly stated.</p></article>
+          <article class="panel"><h3>Unit cost</h3><p>The demonstrations use $20 per cubic yard as an illustrative comparison basis, plus a $10–$40 sensitivity range in some cases. It is not presented as a current market quote. A contractor or estimator must refresh it for a real project.</p></article>
+          <article class="panel"><h3>Data sensitivity</h3><p>The ±10 cm tests show how a uniform elevation shift changes modeled volume. That is not a construction contingency and does not cover the many design, subsurface, market, or execution risks outside the elevation model.</p></article>
+        </div>
+        <p class="scope-note">Unless a signed scope says otherwise, all case-study amounts exclude professional services, survey/control, geotechnical investigation, rock, unsuitable soil, dewatering, haul/disposal, erosion control, utilities, pavement, structures, retaining walls, permits, mitigation, mobilization, escalation, overhead, and profit.</p>
+      </div>
+    </section>
+
+    <section id="sources">
+      <div class="wrap">
+        <div class="kicker">Sources &amp; currency</div>
+        <h2>Where the demonstrations came from</h2>
+        <p class="section-intro">The lidar behind all four studies was flown in spring 2021 and is now five years old, which is the strongest single argument for commissioning a fresh flight rather than an argument against the method: everything these studies demonstrate on 2021 data runs the same way on data flown this month. Source pages were checked on August 18, 2026. A paid project would record the exact files, download dates, metadata, versions, and area of use in its delivery memo.</p>
+        <ul class="citation-list">
+          <li><b>Elevation and point clouds.</b> USGS 3D Elevation Program and MassGIS lidar terrain data. The detailed cases use the spring 2021 Central-Eastern Massachusetts acquisition, described by MassGIS as Quality Level 1 with 0.5 m DEM products. The corridor page also displays MassGIS 2021 bare-earth shaded-relief tiles of that same surface. <a href="https://www.usgs.gov/3d-elevation-program">USGS 3DEP</a> · <a href="https://www.mass.gov/info-details/massgis-data-lidar-terrain-data">MassGIS lidar terrain data</a></li>
+          <li><b>Parcel and assessor information.</b> MassGIS Level 3 property tax parcels and linked assessor extracts. These are administrative mapping records and should not be treated as surveyed ownership boundaries or title evidence. <a href="https://www.mass.gov/info-details/massgis-data-property-tax-parcels">MassGIS property tax parcels</a></li>
+          <li><b>Wetland and water screens.</b> MassDEP Wetlands (2005) and MassDEP Hydrography (1:25,000), distributed by MassGIS. MassDEP explicitly describes the wetland layer as planning-only and not a Wetlands Protection Act delineation. <a href="https://www.mass.gov/info-details/massgis-data-massdep-wetlands-2005">MassDEP wetlands data</a> · <a href="https://www.mass.gov/info-details/massgis-data-massdep-hydrography-125000">MassDEP hydrography</a></li>
+          <li><b>Road context.</b> MassDOT highway centerline information distributed through the Commonwealth's GIS catalog. Exact layer vintage must be recorded when a corridor screen is refreshed. <a href="https://www.mass.gov/info-details/massgis-data-layers">MassGIS data catalog</a></li>
+          <li><b>Imagery context.</b> Selected figures use Esri World Imagery. Credits vary by location and scale; the service includes Esri and imagery contributors identified in the live item. Images here are context only and are not the measurement source for modeled terrain. <a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9">Esri World Imagery item and credits</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="imagery">
+      <div class="wrap">
+        <div class="kicker">Acquisition choices</div>
+        <h2>Photography and lidar are complementary</h2>
+        <p class="prose">Photography is excellent for current visual conditions, documentation, inspection, and photogrammetric surfaces where the ground is visible. Under dense vegetation that surface tends to follow the canopy, because a camera cannot reconstruct what it cannot see. Lidar records some returns through canopy openings and supports a classified bare-ground model, though results still depend on point density, leaf conditions, terrain, water, sensor, control, calibration and processing.</p>
+        <p class="prose">A fresh drone mission would be planned and flown by an FAA Part 107 remote pilot under applicable airspace and operating rules, with land access and permissions addressed. <a href="https://www.faa.gov/newsroom/small-unmanned-aircraft-systems-uas-regulations-part-107">FAA Part 107 overview</a> · <a href="https://www.faa.gov/uas/commercial_operators/part_107_airspace_authorizations">FAA airspace authorizations</a></p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="kicker">Professional boundaries</div>
+        <h2>Bring in the right license at the right time</h2>
+        <p class="prose">Lidar Site Studies is currently a service concept and portfolio demonstration by Max Howe. The studies are built from public data and have not been field-surveyed or certified.</p>
+        <p class="prose">Work involving regulated land surveying or professional engineering would be scoped and delivered through appropriately licensed professionals. Massachusetts publishes the governing statutes, regulations and board guidance, and those sources control rather than this page. <a href="https://www.mass.gov/lists/statutes-and-regulations-for-engineers-and-land-surveyors">Massachusetts statutes and regulations</a> · <a href="https://www.mass.gov/orgs/board-of-registration-of-professional-engineers-and-land-surveyors">Registration board</a></p>
+        <div class="hero-actions"><a class="button" href="mailto:mhowe.gis@gmail.com?subject=Lidar%20Site%20Studies%20project%20question">Discuss a parcel</a><a class="button secondary" href="index.html#cases">Return to case studies</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p class="cta">Use the screen to ask<br><span>better questions.</span></p>
+      <p class="contact">Max Howe · MS, Geographic Information Science · <a href="mailto:mhowe.gis@gmail.com">mhowe.gis@gmail.com</a></p>
+      <div class="footer-links"><a href="index.html">Home</a><a href="index.html#services">Service concept</a><a href="https://github.com/mapzimus/ground-truth">GitHub repository</a></div>
+      <p class="footer-meta">Planning-level demonstration. Not legal, surveying, engineering, environmental, permitting, or construction advice.</p>
+    </div>
+  </footer>
+  <script src="site.js" defer></script>
+</body>
+</html>

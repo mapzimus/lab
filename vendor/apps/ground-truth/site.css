@@ -1,0 +1,1549 @@
+/* ---------------------------------------------------------------------------
+   Lidar Site Studies — "Quad Sheet"
+
+   The palette is lifted from a USGS quadrangle rather than invented: map paper
+   for the ground, contour brown for rules and numerals, vegetation green and
+   hydrography blue as the only other chroma. Cut-red appears where the analysis
+   produces it and nowhere else.
+
+   Rule of thumb throughout: brown carries interaction and data, black carries
+   language, and the maps carry the colour.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* Surfaces, lightest to deepest. Elevation is a tint, never a border alone. */
+  --paper: #f4f0e6;
+  --paper-2: #eae4d5;
+  --paper-3: #e2dac6;
+  --highlight: #f7ecc9;
+
+  /* Text, in descending importance. */
+  --ink: #1c1a15;
+  --muted: #5d584a;
+  --faint: #6b6555;
+
+  /* Rules. The hairline does most of the structural work on a light ground. */
+  --rule: #cdc3ab;
+  --rule-2: #b3a68a;
+
+  /* Contour brown is the interaction colour: links, buttons, numerals, focus.
+     Headings and body copy stay black so the brown keeps its meaning. */
+  --contour: #7a5327;
+  --contour-deep: #5e3f1d;
+
+  /* Analysis colours. Only ever used for what they mean on the maps. */
+  --cut: #9c4a2f;
+  --fill: #2e6e8e;
+  --veg: #3f6b45;
+
+  --on-accent: #f9f5ec;
+  --scrim: rgba(24, 21, 16, 0.94);
+
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: "Bitter", Georgia, "Times New Roman", serif;
+  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The faint grid is the sheet's UTM ticks. It has to stay below the threshold
+   where it reads as a texture, or it fights every hairline rule on the page. */
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 39px, rgba(122, 83, 39, 0.038) 39px 40px),
+    repeating-linear-gradient(90deg, transparent 0 39px, rgba(122, 83, 39, 0.038) 39px 40px);
+  content: "";
+  pointer-events: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: var(--contour);
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--contour-deep);
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--contour);
+  outline-offset: 4px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 200;
+  padding: 10px 14px;
+  transform: translateY(-160%);
+  background: var(--contour);
+  color: var(--on-accent);
+  font-family: var(--mono);
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.wrap {
+  width: min(100%, 1080px);
+  margin: 0 auto;
+  padding-inline: 28px;
+}
+
+.narrow {
+  max-width: 760px;
+}
+
+/* --- navigation ----------------------------------------------------------- */
+
+.projnav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--rule);
+  background: rgba(244, 240, 230, 0.96);
+  backdrop-filter: blur(10px);
+}
+
+.projnav .wrap {
+  position: relative;
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.projnav .brand {
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.005em;
+  line-height: 1.05;
+  text-decoration: none;
+}
+
+.projnav .links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.projnav .links a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  text-decoration: none;
+}
+
+.projnav .links a:hover {
+  color: var(--ink);
+  border-bottom-color: var(--rule-2);
+}
+
+/* The current page is marked, not filled — a filled chip on paper reads as a
+   button and invites a click the reader has already made. */
+.projnav .links a.on {
+  color: var(--ink);
+  border-bottom-color: var(--contour);
+  font-weight: 500;
+}
+
+.projnav .links .nav-cta {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--contour);
+  color: var(--contour);
+}
+
+.projnav .links .nav-cta:hover {
+  background: var(--contour);
+  color: var(--on-accent);
+}
+
+.nav-toggle {
+  display: none;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--rule-2);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* --- type ----------------------------------------------------------------- */
+
+header,
+.hero {
+  position: relative;
+  padding: 76px 0 58px;
+}
+
+.site-home .hero {
+  padding: 88px 0 64px;
+}
+
+/* Labels sit quietly above their heading. They are wayfinding, not accent. */
+.kicker,
+.eyebrow {
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  line-height: 1.14;
+  text-wrap: balance;
+}
+
+/* h3 stays in the body face. Card titles in the display face were competing
+   with page titles and flattening the hierarchy. */
+h3 {
+  font-family: var(--body);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h1 {
+  /* Headlines set their own breaks with <br>; this is a safety net only, so it
+     has to clear the longest authored line or it re-wraps and orphans a word. */
+  max-width: 26ch;
+  margin: 16px 0 22px;
+  font-size: clamp(34px, 4.6vw, 55px);
+}
+
+/* Must clear the longest authored line ("A camera sees treetops.", 23ch) or
+   the safety net re-wraps the headline and orphans a word. */
+.site-home h1 {
+  max-width: 25ch;
+  font-size: clamp(37px, 5.2vw, 62px);
+}
+
+h1 .under,
+h1 span,
+.accent {
+  color: var(--contour);
+}
+
+h2 {
+  margin: 12px 0 16px;
+  max-width: 26ch;
+  font-size: clamp(24px, 2.8vw, 33px);
+}
+
+h3 {
+  margin-bottom: 9px;
+  font-size: 18px;
+}
+
+.lede {
+  max-width: 58ch;
+  color: var(--muted);
+  font-size: clamp(17px, 2vw, 20px);
+  line-height: 1.5;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 19px;
+  border: 1px solid var(--contour);
+  background: var(--contour);
+  color: var(--on-accent);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.button.secondary {
+  background: transparent;
+  border-color: var(--rule-2);
+  color: var(--ink);
+}
+
+.button:hover {
+  background: var(--contour-deep);
+  border-color: var(--contour-deep);
+  color: var(--on-accent);
+  transform: translateY(-1px);
+}
+
+.button.secondary:hover {
+  border-color: var(--contour);
+  background: transparent;
+  color: var(--contour);
+}
+
+/* --- notes and qualifiers ------------------------------------------------- */
+
+.status-note,
+.scope-note {
+  max-width: 80ch;
+  margin-top: 24px;
+  padding: 15px 18px;
+  border-left: 3px solid var(--rule-2);
+  background: var(--paper-3);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+}
+
+.status-note strong,
+.scope-note strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* --- headline numbers ----------------------------------------------------- */
+
+.bignum {
+  margin: 32px 0 8px;
+}
+
+section .bignum {
+  margin-top: 24px;
+  color: var(--contour);
+  font-family: var(--mono);
+  font-size: clamp(40px, 7vw, 84px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.bignum small {
+  display: block;
+  max-width: 62ch;
+  margin-top: 12px;
+  color: var(--muted);
+  font-family: var(--body);
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.55;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+  margin-top: 44px;
+  border-top: 1px solid var(--rule-2);
+  border-left: 1px solid var(--rule);
+}
+
+.stat {
+  padding: 20px 18px;
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.stat .v {
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat .l {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.stat.hot {
+  background: var(--highlight);
+}
+
+.stat.hot .v {
+  color: var(--contour);
+}
+
+/* --- sections ------------------------------------------------------------- */
+
+section {
+  padding: 68px 0;
+}
+
+/* Two tinted variants exist for historical reasons and are deliberately the
+   same surface: alternating tint is the only rhythm this page needs. */
+section.paper,
+section.raised {
+  background: var(--paper-2);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+section.paper + section.raised,
+section.raised + section.paper,
+section.raised + section.raised,
+section.paper + section.paper {
+  border-top: 0;
+}
+
+section.paper .status-note,
+section.raised .status-note,
+section.paper .scope-note,
+section.raised .scope-note {
+  background: var(--paper-3);
+}
+
+.section-intro {
+  max-width: 64ch;
+  color: var(--muted);
+  font-size: 16.5px;
+}
+
+/* On the homepage the swipe is an explainer, not the main subject — keep it
+   inside one screen so the studies below stay discoverable. */
+#proof .swipe {
+  max-width: 880px;
+  margin-inline: auto;
+}
+
+.proof-caption {
+  max-width: 68ch;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.proof-caption a {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.prose {
+  max-width: 68ch;
+  font-size: 16.5px;
+}
+
+.prose + .prose {
+  margin-top: 16px;
+}
+
+/* --- panel grids ---------------------------------------------------------- */
+
+.grid-3,
+.service-grid,
+.boundary-grid,
+.scope-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 32px;
+}
+
+.scope-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.panel,
+.service,
+.boundary {
+  padding: 24px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+
+section.paper .panel,
+section.raised .panel,
+section.paper .service,
+section.raised .service,
+section.paper .boundary,
+section.raised .boundary {
+  background: var(--paper);
+}
+
+.panel p,
+.service p,
+.boundary p {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+/* Numbering is only used where the content genuinely is a sequence. */
+.service .num {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--contour);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+/* A scope column is a claim about what the work is, so the rule above it is
+   coloured by the claim: blue for what it covers, red for what it does not. */
+.scope-col {
+  padding: 22px 22px 24px;
+  border-top: 2px solid var(--rule-2);
+  background: var(--paper);
+}
+
+section:not(.paper):not(.raised) .scope-col {
+  background: var(--paper-2);
+}
+
+.scope-col.yes {
+  border-top-color: var(--fill);
+}
+
+.scope-col.no {
+  border-top-color: var(--cut);
+}
+
+.scope-col h3 {
+  font-size: 15px;
+}
+
+.scope-col ul {
+  margin-top: 12px;
+  list-style: none;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.scope-col li {
+  position: relative;
+  padding: 6px 0 6px 18px;
+}
+
+.scope-col li::before {
+  position: absolute;
+  left: 0;
+  color: var(--rule-2);
+  content: "\2014";
+}
+
+/* --- study cards ---------------------------------------------------------- */
+
+.case-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 36px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  border-color: var(--contour);
+}
+
+/* The four hillshades read as near-identical grey at thumbnail size, so the
+   numeral — not the image — is what makes a card recognisable at a glance. */
+.card .thumb {
+  position: relative;
+}
+
+.card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-bottom: 1px solid var(--rule);
+  object-fit: cover;
+}
+
+.card .plate {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  padding: 5px 14px 4px;
+  background: var(--paper-2);
+  border-top: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  color: var(--contour);
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.card .body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 20px 20px 22px;
+}
+
+.card .num {
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.card h3 {
+  margin: 9px 0 8px;
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.card p {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.card .statline {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.card .statline b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.card .go {
+  margin-top: 14px;
+  color: var(--contour);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+}
+
+.card:hover .go {
+  text-decoration: underline;
+}
+
+/* --- figures -------------------------------------------------------------- */
+
+figure {
+  margin-top: 32px;
+}
+
+figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule-2);
+}
+
+figure img[data-lightbox] {
+  cursor: zoom-in;
+}
+
+figcaption {
+  max-width: 78ch;
+  padding: 10px 2px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+figcaption b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.locus {
+  display: block;
+  width: min(100%, 300px);
+  margin-top: 26px;
+  border: 1px solid var(--rule-2);
+}
+
+.moat {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 28px;
+  margin-top: 34px;
+}
+
+.moat figure {
+  margin: 0;
+}
+
+/* --- swipe comparison ----------------------------------------------------- */
+
+.swipe {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 5 / 4;
+  margin-top: 34px;
+  border: 1px solid var(--rule-2);
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.swipe .stage {
+  position: absolute;
+  inset: 0;
+}
+
+.swipe .stage > img,
+.swipe .top img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--focus, 50% 50%);
+  pointer-events: none;
+}
+
+.swipe .top {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Paper-coloured, not brown: the divider sits on greyscale hillshade and needs
+   to separate two near-identical images, which luminance does and hue doesn't. */
+.swipe .bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px rgba(24, 21, 16, 0.45);
+  pointer-events: none;
+}
+
+.swipe .bar::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 9px 11px;
+  transform: translate(-50%, -50%);
+  border-radius: 2px;
+  background: var(--paper);
+  box-shadow: 0 1px 4px rgba(24, 21, 16, 0.4);
+  color: var(--ink);
+  content: "\25C2 \25B8";
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tag {
+  position: absolute;
+  top: 12px;
+  padding: 5px 10px;
+  background: rgba(24, 21, 16, 0.82);
+  color: var(--on-accent);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+
+.tag.left { left: 12px; }
+
+.tag.right {
+  right: 12px;
+  background: rgba(122, 83, 39, 0.92);
+  color: var(--on-accent);
+}
+
+.fsbtn {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
+  min-width: 46px;
+  min-height: 46px;
+  border: 1px solid rgba(249, 245, 236, 0.5);
+  background: rgba(24, 21, 16, 0.86);
+  color: var(--on-accent);
+  font-family: var(--mono);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.swipe.fs {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+  height: 100dvh;
+  margin: 0;
+  border: 0;
+  background: #14120e;
+}
+
+/* --- corridor map --------------------------------------------------------- */
+
+.site-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.site-picks button {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--rule-2);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.site-picks button:hover {
+  border-color: var(--contour);
+}
+
+.site-picks button.on,
+.rank-card.on {
+  border-color: var(--contour);
+  background: var(--highlight);
+}
+
+.map-swipe {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 5 / 4;
+  margin-top: 22px;
+  border: 1px solid var(--rule-2);
+  background: #241f18;
+}
+
+.map-swipe.fs {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+  height: 100dvh;
+  margin: 0;
+  border: 0;
+  aspect-ratio: auto;
+  background: #14120e;
+}
+
+.map-swipe .p04-map,
+.map-swipe .map-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.map-swipe .map-fallback {
+  object-fit: cover;
+}
+
+.map-swipe .p04-map {
+  z-index: 1;
+}
+
+.map-swipe .tag,
+.map-swipe .fsbtn {
+  z-index: 7;
+}
+
+.map-swipe .bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 6;
+  width: 2px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px rgba(24, 21, 16, 0.45);
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.map-swipe .bar::before {
+  position: absolute;
+  inset: 0 -16px;
+  content: "";
+}
+
+.map-swipe .bar::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 9px 11px;
+  transform: translate(-50%, -50%);
+  border-radius: 2px;
+  background: var(--paper);
+  box-shadow: 0 1px 4px rgba(24, 21, 16, 0.4);
+  color: var(--ink);
+  content: "\25C2 \25B8";
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.map-swipe .leaflet-container {
+  font-family: var(--body);
+  background: #241f18;
+}
+
+.map-swipe .leaflet-top {
+  top: 46px;
+}
+
+.map-swipe .leaflet-control-attribution {
+  max-width: min(100%, 52ch);
+  background: rgba(24, 21, 16, 0.82);
+  color: #ddd5c4;
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.map-swipe .leaflet-control-attribution a {
+  color: #e8b66a;
+}
+
+.map-status {
+  margin-top: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.fail-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  margin-top: 16px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.fail-jump select {
+  min-height: 40px;
+  min-width: min(100%, 280px);
+  padding: 0 10px;
+  border: 1px solid var(--rule-2);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.fail-card {
+  cursor: pointer;
+}
+
+.fail-card img {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--rule-2);
+}
+
+.fail-card h3 {
+  margin-top: 12px;
+  font-size: 18px;
+}
+
+.fail-card p {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+tr[data-p04-id] {
+  cursor: pointer;
+}
+
+/* --- tables --------------------------------------------------------------- */
+
+.tablewrap {
+  max-width: 100%;
+  margin-top: 28px;
+  overflow-x: auto;
+  border: 1px solid transparent;
+}
+
+.tablewrap:focus-visible {
+  border-color: var(--contour);
+}
+
+table {
+  width: 100%;
+  min-width: 580px;
+  border-collapse: collapse;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+caption {
+  padding: 0 0 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--rule);
+  text-align: right;
+}
+
+th:first-child,
+td:first-child {
+  text-align: left;
+}
+
+thead th {
+  border-bottom: 1px solid var(--rule-2);
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+td {
+  font-family: var(--mono);
+}
+
+tbody tr:last-child td {
+  border-bottom: 1px solid var(--rule-2);
+}
+
+/* The row that carries the finding, and the row that carries the error. */
+tr.ours td {
+  background: var(--highlight);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+tr.delta td {
+  color: var(--cut);
+  font-weight: 600;
+}
+
+.table-foot {
+  max-width: 82ch;
+  margin-top: 14px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* --- corridor ranking ----------------------------------------------------- */
+
+.ranking-cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.rank-card {
+  padding: 18px;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.rank-card:first-child {
+  background: var(--highlight);
+}
+
+.rank-card img {
+  display: block;
+  width: 100%;
+  height: 88px;
+  margin-bottom: 12px;
+  border: 1px solid var(--rule-2);
+  object-fit: cover;
+}
+
+.rank-card .rank {
+  color: var(--contour);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.rank-card h3 {
+  margin: 10px 0 6px;
+  font-size: 16px;
+}
+
+.rank-card p {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.rank-card strong,
+.rank-card span {
+  display: block;
+}
+
+.rank-card strong {
+  margin-top: 14px;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.rank-card span {
+  margin-top: 5px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.full-ranking {
+  margin-top: 24px;
+}
+
+.full-ranking > summary {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  padding: 0 16px;
+  border: 1px solid var(--rule-2);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.full-ranking > summary:hover {
+  border-color: var(--contour);
+  color: var(--contour);
+}
+
+/* --- method lists --------------------------------------------------------- */
+
+ol.method {
+  max-width: 70ch;
+  margin: 24px 0 0 20px;
+  font-size: 16px;
+}
+
+ol.method li {
+  margin-bottom: 14px;
+  padding-left: 6px;
+}
+
+ol.method li::marker {
+  color: var(--contour);
+  font-family: var(--mono);
+  font-size: 14px;
+}
+
+ol.method b {
+  font-family: var(--mono);
+  font-size: 15px;
+}
+
+.note {
+  max-width: 74ch;
+  margin-top: 26px;
+  padding: 12px 16px;
+  border-left: 3px solid var(--rule-2);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+}
+
+.citation-list {
+  display: grid;
+  gap: 18px;
+  max-width: 80ch;
+  margin-top: 28px;
+}
+
+.citation-list li {
+  margin-left: 20px;
+  padding-left: 4px;
+}
+
+/* --- footer --------------------------------------------------------------- */
+
+footer {
+  padding: 62px 0 80px;
+  border-top: 1px solid var(--rule-2);
+  background: var(--paper-2);
+}
+
+/* Like h1, this is a safety net, not the break: the lines are authored with
+   <br>. It has to clear the longest of them ("The newest free lidar here was
+   flown in 2021.", 45ch) or it re-wraps and orphans a word. */
+footer .cta {
+  max-width: 46ch;
+  font-family: var(--display);
+  font-size: clamp(25px, 3.4vw, 37px);
+  font-weight: 700;
+  letter-spacing: -0.005em;
+  line-height: 1.16;
+}
+
+footer .cta span {
+  color: var(--contour);
+}
+
+footer .contact,
+.footer-meta {
+  max-width: 82ch;
+  margin-top: 22px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 18px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+
+/* --- lightbox ------------------------------------------------------------- */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  padding: 56px 12px 16px;
+  align-items: center;
+  justify-content: center;
+  background: var(--scrim);
+}
+
+.lightbox.open {
+  display: flex;
+}
+
+.lightbox-inner {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* The stage owns the gestures. Putting touch-action on the image instead means the
+   browser swallows the pinch before the handler sees it, which is what previously
+   left these maps stuck at fit-to-screen on a phone. */
+.lb-stage {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  min-height: 0;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  cursor: zoom-in;
+}
+
+.lb-stage.zoomed {
+  cursor: grab;
+}
+
+.lb-stage.zoomed:active {
+  cursor: grabbing;
+}
+
+.lightbox img {
+  max-width: 100%;
+  max-height: 100%;
+  border: 1px solid rgba(249, 245, 236, 0.25);
+  object-fit: contain;
+  transform-origin: center center;
+  transition: transform 0.12s ease-out;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.lb-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.lb-bar button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(249, 245, 236, 0.35);
+  background: transparent;
+  color: var(--on-accent);
+  font-family: var(--mono);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.lb-bar button:hover {
+  border-color: var(--on-accent);
+}
+
+.lb-level {
+  min-width: 5ch;
+  color: #ddd5c4;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-align: center;
+}
+
+.lightbox .cap {
+  max-width: 88ch;
+  color: #ddd5c4;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-align: center;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  min-width: 48px;
+  min-height: 48px;
+  border: 1px solid rgba(249, 245, 236, 0.35);
+  background: transparent;
+  color: var(--on-accent);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* --- responsive ----------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .grid-3,
+  .service-grid,
+  .boundary-grid,
+  .scope-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ranking-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .wrap {
+    padding-inline: 20px;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .projnav .links {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
+    padding: 10px 20px 18px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--paper);
+  }
+
+  .projnav .links.open {
+    display: flex;
+  }
+
+  .projnav .links a {
+    min-height: 46px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .projnav .links a.on {
+    border-bottom-color: var(--contour);
+  }
+
+  .projnav .links .nav-cta {
+    justify-content: center;
+    margin-top: 10px;
+    border: 1px solid var(--contour);
+  }
+
+  header,
+  .hero,
+  .site-home .hero {
+    padding: 52px 0 44px;
+  }
+
+  h1,
+  .site-home h1 {
+    max-width: 100%;
+    font-size: clamp(32px, 9vw, 44px);
+  }
+
+  h2 {
+    font-size: clamp(25px, 7vw, 31px);
+  }
+
+  .lede {
+    font-size: 17px;
+  }
+
+  section {
+    padding: 52px 0;
+  }
+
+  .case-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card h3 {
+    font-size: 20px;
+  }
+
+  section .bignum {
+    font-size: clamp(38px, 13vw, 58px);
+  }
+
+  .swipe,
+  .map-swipe {
+    height: min(62vh, 520px);
+    aspect-ratio: auto;
+  }
+
+  .map-swipe.fs,
+  .swipe.fs {
+    height: 100dvh;
+  }
+
+  .tag {
+    max-width: 45%;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+  }
+
+  .tablewrap::before {
+    display: block;
+    position: sticky;
+    left: 0;
+    width: max-content;
+    margin: 0 0 10px;
+    color: var(--faint);
+    content: attr(data-scroll-hint);
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  .ranking-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .locus {
+    width: min(100%, 210px);
+  }
+
+  footer {
+    padding: 52px 0 64px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+
+  .lightbox img {
+    transition: none !important;
+  }
+}

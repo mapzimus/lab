@@ -4,7 +4,7 @@ The files in this directory are deployable snapshots of projects maintained in s
 
 | Hosted route | Upstream source | Snapshot commit / notes |
 | --- | --- | --- |
-| `/{tool-slug}/` (42 tools) | `mapzimus/max` via the public tool shelf | Full tool library mirrored under `vendor/tools/`. Classroom math tools moved to lehsmath.com and redirect there. |
+| `/{tool-slug}/` (39 tools) | `mapzimus/max` via the public tool shelf | Full tool library mirrored under `vendor/tools/`. Math and leftover classroom tools moved to lehsmath.com and redirect there. |
 | `/geopuesto/` and `/geopuesto/playground/` | `mapzimus/geopuesto` | |
 | `/bug-wars/` | `mapzimus/bug-wars` | |
 | `/flipgame/` | `mapzimus/flipgame` | Approved releases are copied by `scripts/sync-flipgame.mjs`; exact deterministic provenance is published at `vendor/apps/flip-game/release-provenance.json`. Legacy `/flip-game/`, `/bottle-game/`, `/parrot-flip/`, and `/grog-flip/` paths redirect here. |
@@ -17,6 +17,8 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/boston-in-motion/` | `mapzimus/Motion` | `4df1ff7` — was `mapzimus.github.io/Motion/`. Static client only (`css/`, `js/`, `index.html`). |
 | `/where-the-games-go/` | `mapzimus/where-the-games-go` (`public/`) | `2cbec72` — was `mapzimus.github.io/where-the-games-go/`. |
 | `/smartpicker/` | `mapzimus/smartpicker` | `5c6f298` — was `mapzimus.github.io/smartpicker/`. |
+| `/citynario/` | `mapzimus/Citynario` | Static Next export. |
+| `/ground-truth/` | `mapzimus/ground-truth` | Lidar / wooded-land site studies. |
 
 Documentation, source-only scripts, Android wrappers, and other non-deployable files are omitted from the snapshots.
 

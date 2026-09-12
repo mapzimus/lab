@@ -1,0 +1,23 @@
+name: Notify portfolio of push
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    # Needs a fine-grained PAT (contents: read/write on maxwellhowegis)
+    # stored as the PORTFOLIO_SYNC_TOKEN secret. Without it, the portfolio
+    # still catches up via its hourly scheduled sync.
+    if: ${{ vars.PORTFOLIO_SYNC_ENABLED != 'off' }}
+    steps:
+      - name: Send repository_dispatch to maxwellhowegis
+        env:
+          GH_TOKEN: ${{ secrets.PORTFOLIO_SYNC_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "PORTFOLIO_SYNC_TOKEN not set — skipping instant sync (hourly schedule will catch up)."
+            exit 0
+          fi
+          gh api repos/mapzimus/maxwellhowegis/dispatches -f event_type=ground-truth-push

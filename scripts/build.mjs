@@ -33,7 +33,7 @@ function decodeText(value) {
     .replaceAll("&gt;", ">");
 }
 
-const knownCategories = new Set(["maps", "data", "design", "classroom", "math", "soccer", "utilities", "play", "experiments"]);
+const knownCategories = new Set(["maps", "data", "design", "classroom", "math", "soccer", "utilities", "everyday", "play", "experiments"]);
 const requiredFields = ["slug", "title", "description", "category", "url"];
 
 /** First-party routes for projects hosted on-site (snapshotted under vendor/
@@ -59,6 +59,7 @@ const hostedProjectRoutes = {
   "where-the-games-go": "/where-the-games-go/",
   "smartpicker": "/smartpicker/",
   "citynario": "/citynario/",
+  "ground-truth": "/ground-truth/",
   "world-xi": "/lab/world-xi/",
   "national-parks": "/lab/national-parks/",
 };
@@ -78,6 +79,7 @@ const appRoutes = {
   "where-the-games-go": "where-the-games-go",
   smartpicker: "smartpicker",
   citynario: "citynario",
+  "ground-truth": "ground-truth",
 };
 
 const tools = loadCatalog("tools.json");
@@ -167,15 +169,16 @@ const catalogRefresh = new Date(Date.UTC(refreshYear, refreshMonth - 1)).toLocal
 const categoryLabels = {
   maps: "Maps",
   data: "Data",
-  design: "Design",
+  everyday: "Everyday",
   classroom: "Classroom",
   soccer: "Soccer",
-  utilities: "Utilities",
   play: "Games",
   experiments: "Experiments",
   // Legacy aliases kept for any lingering project tags
+  design: "Everyday",
+  utilities: "Everyday",
   teaching: "Classroom",
-  fun: "Utilities",
+  fun: "Everyday",
   math: "Math",
 };
 // Tools = every single-page utility (including GIS).
@@ -183,7 +186,7 @@ const categoryLabels = {
 // Games = playable. Lab = every project (maps included); no tools or skills.
 const viewCategories = {
   home: null,
-  tools: ["maps", "data", "design", "classroom", "soccer", "utilities"],
+  tools: ["maps", "data", "everyday", "soccer"],
   maps: ["maps"],
   games: ["play"],
 };
@@ -254,7 +257,7 @@ function filtersHtml(view, activeCategory) {
 }
 
 // Canonical order for grouped subsections.
-const catOrder = ["maps", "data", "design", "classroom", "soccer", "utilities", "play", "experiments"];
+const catOrder = ["maps", "data", "everyday", "soccer", "classroom", "play", "experiments"];
 
 /** Split a view's items into labelled groups so a long list reads as a few
     scannable shelves instead of one wall. */
@@ -303,10 +306,8 @@ const template = fs.readFileSync(path.join(source, "_template.html"), "utf8");
 const toolCategories = {
   maps: ["Map tools", "Turn addresses into points, color a spreadsheet on a map, or convert a location."],
   data: ["Data tools", "Open a spreadsheet, make a chart, or hide private columns."],
-  design: ["Design tools", "Colors, pictures, icons, and patterns."],
-  classroom: ["Classroom tools", "Timers, groups, seating charts, and a probability demo."],
+  everyday: ["Everyday tools", "Colors, pictures, QR codes, units, and a seating chart."],
   soccer: ["Soccer tools", "Tactics boards, lineups, training plans, and match graphics."],
-  utilities: ["Everyday tools", "Unit conversion, QR codes, Markdown, and a vacation quiz."],
 };
 
 const utilityCount = itemsForView("tools", "").length;
@@ -317,7 +318,7 @@ const projectCount = itemsForView("lab", "").length;
 /** Home "browse by section" cards — four doors instead of the whole catalog. */
 function sectionCardsHtml() {
   const sections = [
-    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Small pages that do one job. Maps, data, classroom, soccer, and everyday stuff." },
+    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Small pages that do one job. Maps, data, soccer, and everyday stuff." },
     { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "Bigger map projects you can open here. Transit, globes, stories." },
     { href: "/games/", label: "Games", category: "play", n: gamesCount, desc: "Games that run in the browser. Nothing to download." },
     { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "Every project on one shelf. Maps, games, classroom sites, and experiments." },
@@ -356,11 +357,11 @@ const pages = {
   tools: {
     path: "tools/index.html",
     title: "Tools · Mapzimus",
-    description: `${utilityCount} small browser tools for maps, data, classroom, soccer, and everyday jobs.`,
+    description: `${utilityCount} small browser tools for maps, data, soccer, and everyday jobs.`,
     canonical: "https://mapzimus.com/tools/",
     eyebrow: "Tools",
     heading: "One job per page",
-    intro: `${utilityCount} tools. Each one is a single page that runs in your browser. Nothing is uploaded.`,
+    intro: `${utilityCount} tools. Each one is a single page that runs in your browser. Nothing is uploaded. Classroom sites live under Lab.`,
     catalogHeading: "All tools",
   },
   maps: {

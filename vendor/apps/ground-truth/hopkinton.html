@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three Pads, Three Price Tags — Planning-Level LiDAR Study, Hopkinton MA</title>
+<meta name="description" content="A planning-level siting and earthwork study from public LiDAR on rolling wooded land at the Hopkinton–Milford line, Massachusetts.">
+<link rel="canonical" href="https://maxwellhowegis.com/lidar-test/hopkinton.html">
+<meta name="theme-color" content="#f4f0e6">
+<meta property="og:title" content="Three Pads, Three Price Tags">
+<meta property="og:description" content="One building and one parcel, but three places to put it, with a $2.5M spread in modeled earthwork between them.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maxwellhowegis.com/lidar-test/hopkinton.html">
+<meta property="og:image" content="https://maxwellhowegis.com/lidar-test/assets/hk_hs_dtm.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9B%B0%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@700&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<nav class="projnav" aria-label="Case-study navigation"><div class="wrap"><a class="brand" href="index.html">Lidar Site Studies</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="case-links">Menu</button><div class="links" id="case-links"><a href="index.html#cases">All work</a><a href="devens.html">01 · Devens</a><a href="middleboro.html">02 · Middleborough</a><a class="on" aria-current="page" href="hopkinton.html">03 · Hopkinton</a><a href="p04.html">04 · Corridor</a><a class="nav-cta" href="mailto:mhowe.gis@gmail.com?subject=Lidar%20Site%20Studies%20parcel%20screen">Request a screen</a></div></div></nav>
+<main id="main">
+<header>
+  <div class="wrap">
+    <div class="kicker">Lidar terrain analysis · Hopkinton–Milford line, Massachusetts</div>
+    <h1>Same warehouse.<br>Three spots.<br><span class="under">Three price tags.</span></h1>
+    <p class="lede">This is rolling glacial forest along I-495, where Greater Boston's warehouses actually
+    get built. On land like this the question isn't whether you can build, it's where the dirt
+    math hurts least. I tested every position the same 16-acre pad could take in this study
+    area, then priced the grading for the three best, and they come out $2.5M apart on one
+    parcel for one building.</p>
+    <img class="locus" src="assets/hopkinton_locus.svg" alt="Location of the Hopkinton study area within Massachusetts" width="480" height="300">
+    <div class="hero-actions"><a class="button" href="mailto:mhowe.gis@gmail.com?subject=Lidar%20Site%20Studies%20parcel%20screen">Request a parcel screen</a><a class="button secondary" href="methodology.html">See assumptions</a></div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Start here</div>
+    <h2>Drag the line</h2>
+    <p class="prose">Left of the line is the <b>treetop surface</b>, roughly what a camera reconstructs
+    when leaves hide the ground. Right of it is the <b>bare earth</b>, rebuilt from the laser
+    pulses that found gaps in the canopy. Both come from the same flight, the same week and
+    the same points, and the yellow rectangle marks the conceptual pad measured below.</p>
+    <div class="swipe" id="swipe" style="--focus:58% 18%">
+      <div class="stage" id="swipeStage">
+        <img src="assets/hk_hs_dtm.jpg" alt="Bare-earth lidar hillshade" width="1530" height="1230">
+        <div class="top" id="swipeTop"><img src="assets/hk_hs_dsm.jpg" alt="Canopy surface hillshade" width="1530" height="1230"></div>
+        <div class="bar" id="swipeBar"></div>
+      </div>
+      <div class="tag left">TREETOP SURFACE (CAMERA-STYLE)</div>
+      <div class="tag right">BARE EARTH (LIDAR)</div>
+      <button class="fsbtn" id="swipeFs" aria-label="Toggle fullscreen">⛶</button>
+    </div>
+    <figure><figcaption>USGS/MassGIS lidar, flown spring 2021 · 1.5 × 1.2 km area · 0.5 m resolution</figcaption></figure>
+  </div>
+</section>
+
+<section class="raised">
+  <div class="wrap">
+    <div class="kicker">Why this parcel</div>
+    <h2>The corridor where the buildings actually land</h2>
+    <p class="prose">The I-495 belt between Hopkinton and Milford holds the state's densest concentration
+    of industrial space, and the next building goes on land like this, which is rolling, wooded
+    and highway-adjacent. On flat ground earthwork is a line item, but on glacial till it is a
+    siting decision worth millions, and it interacts with everything else, because the flattest
+    dirt here sits closest to the wetlands. This is also the site where the building-versus-tree
+    problem got real, since canopy height alone can't tell a subdivision from a forest, so the
+    pad search uses the lidar's building classification to stay out of people's backyards.</p>
+    <figure>
+      <img src="assets/hk_imagery_aoi.jpg" alt="Aerial imagery of the corridor today" loading="lazy" width="1600" height="1280">
+      <figcaption>The same ground today: subdivision west of I-495, the wooded block east of it
+      where the candidate pads sit. Esri World Imagery; provider credits and source links are
+      listed in the <a href="methodology.html#sources">methodology</a>.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">By the numbers</div>
+    <h2>What the difference is worth</h2>
+    <div class="bignum">$2.5M
+    <small>is the spread in modeled earthwork between the three best pad locations. Same
+    building, same search area, different dirt.</small>
+    </div>
+    <div class="stats">
+    <div class="stat hot"><div class="v">316,993 yd³</div><div class="l">planning-level earthwork at the selected conceptual pad</div></div>
+    <div class="stat"><div class="v">1,578,538 yd³</div><div class="l">apparent earthwork if graded to the treetop surface</div></div>
+    <div class="stat"><div class="v">7.6 cm</div><div class="l">agreement with the state's published DEM from the same flight, which checks processing rather than accuracy against the ground</div></div>
+    <div class="stat"><div class="v">41.8M</div><div class="l">laser points processed for this site</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="raised">
+  <div class="wrap">
+    <div class="kicker">Where the building should sit</div>
+    <h2>Three pads, three price tags</h2>
+    <p class="prose">Every position the pad could take in the study area was screened, and the three best
+    were priced. The cheapest dirt is not the answer, because P3 grades for $3.96M but fails
+    half its constraint screen, the flattest ground here sitting next to the wetlands. P1 costs
+    more to grade and clears 76% of the constraint screen, which is why it carries the rest of
+    this page.</p>
+    <figure>
+      <img src="assets/hk_pads_overview.jpg" alt="Three candidate pads with grading costs" loading="lazy" width="1185" height="987">
+      <figcaption>The three priced candidates. Cheap dirt is usually cheap for a reason, and here it is
+      the constraint screen rather than the grading bill that rules P3 out.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">What it costs to get this wrong</div>
+    <h2>One pad, three surfaces</h2>
+    <p class="prose">The selected pad, P1, is 16.3 acres and 93% forested. It sits on the cleanest ground
+    in the search area and still needs real dirt work, because on glacial till everything does.
+    Grading it to a level 140.29 m requires:</p>
+    <div class="tablewrap" data-label="Planning-level earthwork comparison">
+    <table>
+      <caption>Modeled quantities for one conceptual level pad. Screening estimates, not construction quantities or bids.</caption>
+      <thead><tr><th scope="col">Surface used for the estimate</th><th scope="col">Cut</th><th scope="col">Fill</th><th scope="col">Total moved</th><th scope="col">Illustrative cost at $20 / yd³</th></tr></thead>
+      <tbody>
+        <tr class="ours"><td>Lidar bare earth</td><td>158,621</td><td>158,372</td><td>316,993 yd³</td><td>$6.34M</td></tr>
+        <tr><td>Treetop surface (canopy counted as ground)</td><td>1,558,073</td><td>20,465</td><td>1,578,538 yd³</td><td>$31.57M</td></tr>
+        <tr><td>10 m national DEM, 2019 archive (pre-lidar)</td><td>184,217</td><td>117,330</td><td>301,547 yd³</td><td>$6.03M</td></tr>
+        <tr class="delta"><td>Canopy error hiding in the treetop surface</td><td colspan="2"></td><td>1,261,545 yd³</td><td>≈ $25.23M</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="prose" style="margin-top:22px">Rolling terrain is where coarse old data fails hardest. The 2019 national DEM runs
+    77 cm high on average inside this pad, over a metre RMSE, and while its <b>total</b> looks
+    close it splits that total wrong, predicting a 66,900 yd³ surplus to haul away from a site
+    that actually balances to within 250 yd³. At $20 a yard that is a $1.3M phantom line item,
+    and the error grows with every hill the parcel has.</p>
+    <p class="table-foot">A ±10 cm data-sensitivity test changes the modeled volume by about ±8,628 yd³, or
+    ±$173k at the illustrative unit rate. That shows how vertical uncertainty moves a screening
+    result. It is not a construction contingency, and it does not cover design changes, soils,
+    haul, mobilisation, rock, dewatering, escalation or contractor pricing.</p>
+    <figure>
+      <img src="assets/hk_cutfill_map.jpg" alt="Cut and fill map of the pad" loading="lazy" width="1124" height="805">
+      <figcaption>Where the dirt moves: cut in red, fill in blue, against the balanced design grade.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Site analysis from the same data</div>
+    <h2>More answers from the same flight</h2>
+    <p class="prose">The earthwork number is the headline, but one dataset answers a stack of
+    other early-stage questions:</p>
+    <div class="moat">
+      <figure>
+        <img src="assets/hk_roughness_map.jpg" alt="Rock and till risk indicator" loading="lazy" width="1126" height="805">
+        <figcaption><b>Is the cheap dirt hiding rock?</b> Micro-relief under the canopy flags boulder fields and shallow ledge, which is one of
+        the few screens that can <i>raise</i> an estimate. All three pads are clean at the
+        surface, under 1% flagged. Subsurface ledge stays invisible to lidar, so test pits remain
+        on the diligence list.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/hk_buildable_map.jpg" alt="Buildable land screen" loading="lazy" width="1185" height="985">
+        <figcaption><b>Where can you build?</b> Slope and wetland/stream setback screens on mapped ground leave 176 of 443 acres.
+        That is a shortlist rather than a buildability opinion, since zoning, access, utilities,
+        field wetlands, soils, title and permitting all sit outside it.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/hk_road_profile.png" alt="Access road grade profile" loading="lazy" width="1517" height="917">
+        <figcaption><b>Can you get a road in?</b> Not cheaply from the east, because the direct route climbs 15.9 m in 361 m and holds
+        11% grade for a stretch, over the usual 8% limit. The driveway needs a longer contour
+        route, which is a cost the flat parcels never mention.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/hk_flowaccum_map.jpg" alt="Stormwater flow accumulation" loading="lazy" width="1600" height="1331">
+        <figcaption><b>Where does water go?</b> Runoff concentration on the real terrain. On rolling till every pad decision moves
+        water somewhere new, so this is the map the drainage engineer starts from.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/hk_chm_map.jpg" alt="Canopy height model" loading="lazy" width="1119" height="805">
+        <figcaption><b>What does clearing cost?</b> Tree heights for every cell. The selected pad carries 15.1 acres of forest, which is
+        roughly $45–91k to clear at typical rates. Stumpage revenue can offset part of that,
+        though it depends on species and market, and it is not netted here.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/hk_viewshed_map.jpg" alt="Viewshed before and after clearing" loading="lazy" width="1185" height="985">
+        <figcaption><b>Who will see it?</b> From the pad today the forest blocks the view entirely. After clearing, 17.8% of the
+        surrounding area can see it, including homes across I-495 that currently can't see the
+        site at all. A retained buffer along the west edge is easier to plan for now than to
+        argue about later.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="raised">
+  <div class="wrap">
+    <div class="kicker">The bottom line</div>
+    <h2>What this means for the deal</h2>
+    <div class="tablewrap" data-label="Planning-level deal screen">
+    <table>
+      <caption>Selected screening outputs. Costs are illustrative and exclude professional design, contractor pricing, and the items noted below.</caption>
+      <thead><tr><th scope="col">Screening item</th><th scope="col">Planning-level result</th></tr></thead>
+      <tbody>
+        <tr><td>Modeled earthwork at the conceptual pad, graded to balance</td><td>$6.34M; ±$173k data-sensitivity band</td></tr>
+        <tr><td>Clearing, 15.1 forested acres</td><td>$45–91k</td></tr>
+        <tr><td>Access</td><td>361 m route climbs 16 m, peaks at 11%, so contour or regrade</td></tr>
+        <tr><td>Stormwater basin land take (pre-design screening)</td><td>a natural low 300 m east stores the first-flush volume at 1 m stage, consuming about 2.3 ac</td></tr>
+        <tr class="ours"><td>Terrain-screening subtotal</td><td>≈ $6.41M + access work</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="prose" style="margin-top:22px">On rolling till, earthwork is the biggest lever in the deal. A purchase agreement
+    would want to cover three things:</p>
+    <ol class="method">
+      <li><b>Siting flexibility.</b> The grading bill swings $2.5M across the three viable pad
+        positions, so locking the building location before running the dirt math leaves a lot of
+        that on the table.</li>
+      <li><b>Geotech before reliance.</b> The surface rock screen is clean, but subsurface ledge
+        is invisible to lidar, so budget for test pits.</li>
+      <li><b>Vernal pools.</b> The depression screen found no candidates in or near any pad,
+        though three state-mapped potential pools sit elsewhere in the study area. Treat it as
+        screened clear, pending field confirmation at permitting. One limit is worth naming: a pool that held water when the lidar was flown leaves no depression in the bare-earth surface, so this screen can point to candidates but cannot establish that none are present. The basin
+        sizing above is screening-level, and the design belongs to the civil engineer.</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Method &amp; limits</div>
+    <h2>The numbers are checkable</h2>
+    <ol class="method">
+      <li><b>Data.</b> USGS 3DEP lidar from the 2021 Central-Eastern Massachusetts acquisition,
+        block 1, with a published accuracy of 10 cm RMSE, giving 41.8 million points for this
+        site. Wetlands and streams come from MassGIS DEP layers with 100 ft and 200 ft buffers.</li>
+      <li><b>Processing.</b> The same PDAL pipeline as Studies 01 and 02, on its third run,
+        producing the ground model, treetop model and canopy heights, plus the lidar's building
+        classification as an exclusion mask for the pad search.</li>
+      <li><b>Consistency.</b> My ground model and the state's DEM, both from the same flight,
+        differ by 3 mm on average and 7.6 cm RMSE over open ground. That agreement checks
+        processing rather than independent field accuracy. The pre-2021 comparison uses the
+        archived December 2019 national DEM rather than the current one, which was later rebuilt
+        from this lidar.</li>
+      <li><b>Volumes.</b> Cell-by-cell raster math, cross-checked against an independent QGIS
+        implementation, which agrees to six significant figures: cut 158,620.7 against 158,621
+        yd³ and fill 158,372.0 against 158,372. The cost basis is an illustrative $20/yd³
+        screening assumption with a $10–$40 sensitivity range.</li>
+    </ol>
+    <p class="scope-note"><strong>Scope:</strong> a public-data demonstration for planning and
+    comparison. Not included: survey and control, engineering, geotechnical work, rock
+    excavation, unsuitable soil, drainage design, erosion control, utilities, pavement,
+    retaining walls, permits, mitigation, mobilisation, haul and disposal, escalation, or
+    contractor markup. A client engagement would confirm current data, scope, control and
+    licensed-professional needs before any quantity is relied on. Scripts and pipeline files
+    are available on request. <a href="methodology.html">Read the full assumptions, sources
+    and limitations</a>.</p>
+  </div>
+</section>
+
+</main>
+<footer>
+  <div class="wrap">
+    <p class="cta">The newest free lidar here was flown in <span>2021.</span><br>
+    Anything newer takes <span>a fresh flight.</span></p>
+    <p class="contact">
+      Max Howe · MS, Geographic Information Science ·
+      <a href="mailto:mhowe.gis@gmail.com">mhowe.gis@gmail.com</a>
+    </p>
+    <div class="footer-links"><a href="methodology.html">Method, sources &amp; limitations</a><a href="index.html#services">Service concept</a><a href="https://github.com/mapzimus/ground-truth">GitHub repository</a></div>
+    <p class="footer-meta">Planning-level demonstration from public data. Not a survey, wetland delineation, engineering design, construction quantity, or bid.</p>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>
