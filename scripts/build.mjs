@@ -62,6 +62,7 @@ const hostedProjectRoutes = {
   "ground-truth": "/ground-truth/",
   "world-xi": "/lab/world-xi/",
   "national-parks": "/lab/national-parks/",
+  "vacation-selector": "/vacation-selector/",
 };
 
 /** vendor/apps/<dir> → public route */
@@ -477,7 +478,7 @@ const placeholderTemplate = `<!doctype html>
 </html>
 `;
 
-for (const item of publicTools) {
+function writeToolFormatPage(item) {
   const input = path.join(hostedToolSource, `${item.slug}.html`);
   let html;
   if (fs.existsSync(input)) {
@@ -497,6 +498,11 @@ for (const item of publicTools) {
   const target = path.join(output, item.slug, "index.html");
   fs.mkdirSync(path.dirname(target), { recursive: true });
   fs.writeFileSync(target, html, "utf8");
+}
+
+for (const item of publicTools) writeToolFormatPage(item);
+for (const item of publicProjects.filter((project) => project.slug === "vacation-selector")) {
+  writeToolFormatPage(item);
 }
 
 for (const [sourceName, route] of Object.entries(appRoutes)) {

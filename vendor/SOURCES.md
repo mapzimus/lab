@@ -4,7 +4,7 @@ The files in this directory are deployable snapshots of projects maintained in s
 
 | Hosted route | Upstream source | Snapshot commit / notes |
 | --- | --- | --- |
-| `/{tool-slug}/` (39 tools) | `mapzimus/max` via the public tool shelf | Full tool library mirrored under `vendor/tools/`. Math and leftover classroom tools moved to lehsmath.com and redirect there. |
+| `/{tool-slug}/` (38 tools) | `mapzimus/max` via the public tool shelf | Full tool library mirrored under `vendor/tools/`. Math and leftover classroom tools moved to lehsmath.com and redirect there. Vacation Selector is cataloged as a Lab experiment and still served from this snapshot. |
 | `/geopuesto/` and `/geopuesto/playground/` | `mapzimus/geopuesto` | |
 | `/bug-wars/` | `mapzimus/bug-wars` | |
 | `/flipgame/` | `mapzimus/flipgame` | Approved releases are copied by `scripts/sync-flipgame.mjs`; exact deterministic provenance is published at `vendor/apps/flip-game/release-provenance.json`. Legacy `/flip-game/`, `/bottle-game/`, `/parrot-flip/`, and `/grog-flip/` paths redirect here. |
