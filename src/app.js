@@ -3,7 +3,7 @@
 
   const view = document.body.dataset.view || "home";
   const categoryLabels = {
-    maps: "Maps & GIS",
+    maps: "Maps",
     data: "Data",
     design: "Design",
     classroom: "Classroom",

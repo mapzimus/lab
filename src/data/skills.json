@@ -3,7 +3,7 @@
     "slug": "globe-maps",
     "title": "Globe Maps",
     "tagline": "3D globe web maps with MapLibre GL",
-    "description": "Teaches Claude to build interactive 3D globe maps — or convert existing flat Leaflet/Mercator maps to the globe presentation — with MapLibre GL JS.",
+    "description": "Teaches Claude to build spinning 3D globe maps, or turn a flat Leaflet map into one, with MapLibre.",
     "teaches": [
       "Globe projection setup: projection, atmosphere, and light in a MapLibre v5 style",
       "The gotchas: line densification, [lng, lat] order, style.load vs load, CSP worker/connect-src, vendoring, headless WebGL testing",
@@ -20,7 +20,7 @@
     "slug": "turf-analysis",
     "title": "Turf Analysis",
     "tagline": "Client-side GIS in the browser",
-    "description": "Teaches Claude browser-side spatial analysis with Turf.js — buffers, spatial joins, Voronoi, hex binning, clustering, interpolation, and geodesic measurement, with no server.",
+    "description": "Teaches Claude to measure, buffer, and cluster map data in the browser with Turf.js. No server.",
     "teaches": [
       "The GeoJSON-in, GeoJSON-out pipeline: Turf computes, the map library draws",
       "A pick-the-function table across measurement, transformation, joins, grids, and interpolation",
@@ -37,7 +37,7 @@
     "slug": "spherical-geometry",
     "title": "Spherical Geometry",
     "tagline": "Exact geodesy as 3D vectors",
-    "description": "Teaches Claude exact sphere math for maps — great circles, loxodromes, small circles, isoazimuthals, antipodes, cross-track distance — rendered without antimeridian or polar artifacts. Ships a battle-tested geometry kernel.",
+    "description": "Teaches Claude exact earth-curve math for maps: shortest paths, constant-bearing lines, and circles that wrap the planet.",
     "teaches": [
       "The discipline: compute as unit vectors, convert to lat/lon at the edge, split at ±180°",
       "One-liner constructions: great circles as plane normals, midpoints, equidistant loci, antipodes",
@@ -54,7 +54,7 @@
     "slug": "map-csp",
     "title": "Map CSP",
     "tagline": "Maps under a strict Content-Security-Policy",
-    "description": "Teaches Claude to run Leaflet, MapLibre GL, Turf, and Globe.gl on locked-down sites — the exact CSP directives each library needs, the vendoring pattern, and Cloudflare Pages _headers tricks.",
+    "description": "Teaches Claude to run Leaflet and MapLibre on a locked-down site, including the exact security headers each library needs.",
     "teaches": [
       "A per-library directive table: tile hosts, MapLibre's blob: workers, fonts",
       "The vendoring convention: self-hosted libraries with versioned, licensed READMEs",
@@ -71,7 +71,7 @@
     "slug": "choropleth",
     "title": "Choropleth",
     "tagline": "Area maps that don't lie",
-    "description": "Teaches Claude to make statistically honest, cartographically clean choropleths in geopandas or QGIS — projection choice, normalization, classification, FIPS joins, color ramps, and no-data handling.",
+    "description": "Teaches Claude to color regions by a number without lying. Projection, rates instead of raw counts, and honest no-data.",
     "teaches": [
       "Projection-first: EPSG:5070 for the US, Equal Earth for the world, and why Mercator lies",
       "Normalize, never map raw counts — and FIPS/GEOID as strings with zfill",
@@ -88,7 +88,7 @@
     "slug": "census-data",
     "title": "Census Data",
     "tagline": "ACS, TIGER, and GEOIDs decoded",
-    "description": "Teaches Claude to pull US Census numbers and shapes the reliable way — ACS/Decennial API queries, variable-code decoding, the geography hierarchy, TIGER vs cartographic boundaries, and joins that don't leak.",
+    "description": "Teaches Claude to pull US Census numbers and shapes the reliable way, then join them without dropping leading zeros.",
     "teaches": [
       "API query anatomy: datasets, get/for/in, and decoding B19013_001E-style variable codes",
       "The geography hierarchy with GEOID digit counts, from state to block group",
@@ -105,7 +105,7 @@
     "slug": "overpass-osm",
     "title": "Overpass OSM",
     "tagline": "Getting features out of OpenStreetMap",
-    "description": "Teaches Claude to extract OSM features — Overpass queries that don't time out, route-relation stitching, bulk Geofabrik extracts, and ODbL compliance.",
+    "description": "Teaches Claude to pull cafes, rail lines, or building footprints out of OpenStreetMap without the query timing out.",
     "teaches": [
       "Overpass QL anatomy: area-first bounding, nwr tag filters, out center vs geom",
       "The route-relation pattern: pulling named train/bus/hiking routes and stitching members",
@@ -122,7 +122,7 @@
     "slug": "map-poster",
     "title": "Map Poster",
     "tagline": "The last mile: map to share-ready graphic",
-    "description": "Teaches Claude the finishing pass that turns a correct map into a striking one — QGIS print layouts, social-media dimensions, SVG-to-Illustrator handoff, typography, and attribution conventions.",
+    "description": "Teaches Claude the last mile from a correct map to a picture you can post or print.",
     "teaches": [
       "Canvas-first sizing for Instagram, stories, and print, with DPI rules",
       "The QGIS print-layout workflow and the SVG → Illustrator handoff",
