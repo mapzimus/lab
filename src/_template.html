@@ -64,23 +64,21 @@
 
   <main>
     <section class="hero">
-      <span class="coord coord-ne" aria-hidden="true">42°31′ N</span>
-      <span class="coord coord-sw" aria-hidden="true">70°54′ W · SALEM, MASS.</span>
       <div class="eyebrow">{{EYEBROW}}</div>
       <h1>{{HEADING}}</h1>
       <p>{{INTRO}}</p>
       {{HERO_ACTIONS}}
       <div class="trust-row" aria-label="Site facts">
         <span>{{TOOL_COUNT}} browser tools</span>
-        <span>Free — no accounts</span>
+        <span>Free, no accounts</span>
         <span>No installs, no tracking</span>
       </div>
     </section>
 
     <section class="featured" id="featuredSection" aria-labelledby="featuredHeading"{{FEATURED_ATTR}}>
       <div class="section-heading">
-        <div><span class="eyebrow">Start here</span><h2 id="featuredHeading">Featured</h2></div>
-        <p>A short list of favorites, updated now and then.</p>
+        <div><span class="eyebrow">Featured</span><h2 id="featuredHeading">A few I like right now</h2></div>
+        <p>The newest maps, plus a couple of tools I still open myself.</p>
       </div>
       <div class="featured-grid" id="featuredGrid">{{FEATURED_CARDS}}</div>
     </section>
@@ -91,20 +89,20 @@
         <p id="resultCount" aria-live="polite">{{RESULT_COUNT}}</p>
       </div>
       <div class="catalog-controls">
-        <label class="search-field"><span class="visually-hidden">Search the catalog</span><input id="searchInput" type="search" placeholder="Search everything by name, tag, or what it does…" autocomplete="off"><kbd>/</kbd></label>
+        <label class="search-field"><span class="visually-hidden">Search the catalog</span><input id="searchInput" type="search" placeholder="Search by name or what it does" autocomplete="off"><kbd>/</kbd></label>
         <div class="filters" id="filters" role="group" aria-label="Filter by category">{{FILTERS}}</div>
         <button class="quiet-button" id="favoritesButton" type="button" aria-pressed="false">★ Favorites</button>
       </div>
       <div class="{{BROWSE_CLASS}}" id="browse">{{BROWSE}}</div>
       <div class="catalog-grid" id="catalogGrid" hidden></div>
       <div class="empty" id="emptyState" hidden>No matches. Try a shorter search or a different category.</div>
-      <noscript><div class="empty">Search and filters need JavaScript, but every card above is a plain link — everything still works.</div></noscript>
+      <noscript><div class="empty">Search and filters need JavaScript. Every card above is still a plain link.</div></noscript>
     </section>
   </main>
 
   <footer>
     <div class="footer-main">
-      <p>Mapzimus is the lab of Maxwell Howe — browser tools, maps, and games, all free.<br>Professional GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
+      <p>Mapzimus is Maxwell Howe's site for free tools, maps, and games.<br>Hire-me GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
       <nav class="footer-nav" aria-label="Secondary">
         <a href="/radars/">Radars</a>
         <a href="/skills/">Skills</a>
@@ -112,7 +110,7 @@
         <a href="/about/">About</a>
       </nav>
     </div>
-    <p class="footer-note">MAPZIMUS QUADRANGLE · CATALOG EDITION {{CATALOG_REFRESH}} · STATIC SITE · NO TRACKING</p>
+    <p class="footer-note">Updated {{CATALOG_REFRESH}} · static site · no tracking</p>
   </footer>
 </div>
 </body>

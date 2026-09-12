@@ -165,7 +165,7 @@ const catalogRefresh = new Date(Date.UTC(refreshYear, refreshMonth - 1)).toLocal
 // same structures client-side for search/filter/favorites) ----
 
 const categoryLabels = {
-  maps: "Maps & GIS",
+  maps: "Maps",
   data: "Data",
   design: "Design",
   classroom: "Classroom",
@@ -301,12 +301,12 @@ fs.writeFileSync(
 
 const template = fs.readFileSync(path.join(source, "_template.html"), "utf8");
 const toolCategories = {
-  maps: ["Maps & GIS tools", "Coordinate converters, GeoJSON, geocoders, grids, and map utilities."],
-  data: ["Data tools", "CSV wrangling, charts, converters, and small data utilities."],
-  design: ["Design tools", "Color, CSS, images, icons, and pattern helpers."],
-  classroom: ["Classroom tools", "Seating, timers, groups, and probability demos for class."],
+  maps: ["Map tools", "Turn addresses into points, color a spreadsheet on a map, or convert a location."],
+  data: ["Data tools", "Open a spreadsheet, make a chart, or hide private columns."],
+  design: ["Design tools", "Colors, pictures, icons, and patterns."],
+  classroom: ["Classroom tools", "Timers, groups, seating charts, and a probability demo."],
   soccer: ["Soccer tools", "Tactics boards, lineups, training plans, and match graphics."],
-  utilities: ["Utility tools", "Unit conversion, QR codes, Markdown, and quick helpers."],
+  utilities: ["Everyday tools", "Unit conversion, QR codes, Markdown, and a vacation quiz."],
 };
 
 const utilityCount = itemsForView("tools", "").length;
@@ -317,10 +317,10 @@ const projectCount = itemsForView("lab", "").length;
 /** Home "browse by section" cards — four doors instead of the whole catalog. */
 function sectionCardsHtml() {
   const sections = [
-    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Single-page browser utilities — GIS, data, design, classroom, and soccer." },
-    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "First-party map projects you can open right here — transit, globes, atlases, stories." },
-    { href: "/games/", label: "Games", category: "play", n: gamesCount, desc: "Strategy and logic games, free in the browser." },
-    { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "Every project in one place — maps, games, classroom apps, and experiments." },
+    { href: "/tools/", label: "Tools", category: "data", n: utilityCount, desc: "Small pages that do one job. Maps, data, classroom, soccer, and everyday stuff." },
+    { href: "/maps/", label: "Maps", category: "maps", n: mapCount, desc: "Bigger map projects you can open here. Transit, globes, stories." },
+    { href: "/games/", label: "Games", category: "play", n: gamesCount, desc: "Games that run in the browser. Nothing to download." },
+    { href: "/lab/", label: "Lab", category: "experiments", n: projectCount, desc: "Every project on one shelf. Maps, games, classroom sites, and experiments." },
   ];
   return sections
     .map((s) => `<a class="section-card" href="${s.href}" data-category="${s.category}">
@@ -335,52 +335,52 @@ function sectionCardsHtml() {
 const pages = {
   home: {
     path: "index.html",
-    title: "Mapzimus · Browser tools, maps, and games by Maxwell Howe",
-    description: `${toolCount} free browser tools for maps, data, design, and the classroom — plus games and experiments, all hosted on mapzimus.com. No accounts, no installs.`,
+    title: "Mapzimus · Tools, maps, and games by Maxwell Howe",
+    description: `${toolCount} free browser tools, plus maps and games. No accounts. Nothing to install.`,
     canonical: "https://mapzimus.com/",
-    eyebrow: "The lab of Maxwell Howe",
-    heading: "Useful tools. Maps. Small games.",
-    intro: `Everything I build for fun and everyday use lives here: ${toolCount} browser tools, plus maps, games, and experiments — each at a first-party mapzimus.com path.`,
-    catalogHeading: "Browse by section",
+    eyebrow: "Maxwell Howe, Salem, Mass.",
+    heading: "Tools, maps, and a few games.",
+    intro: `Things I built and actually use. ${toolCount} small tools, plus bigger maps and games. All free.`,
+    catalogHeading: "Pick a section",
   },
   lab: {
     path: "lab/index.html",
     title: "Lab · Mapzimus",
-    description: `The ${projectCount} projects of the Mapzimus lab: map apps, games, classroom apps, and experiments — no single-page tools.`,
+    description: `${projectCount} projects: maps, games, classroom sites, and experiments.`,
     canonical: "https://mapzimus.com/lab/",
-    eyebrow: "The lab",
-    heading: "Every project",
-    intro: `All ${projectCount} projects in one shelf — the map destinations from Maps, plus games, classroom apps, and experiments. Tools and skills live elsewhere.`,
+    eyebrow: "Projects",
+    heading: "The whole shelf",
+    intro: `All ${projectCount} projects. The maps from the Maps page are here too, plus games and classroom sites. Tools have their own page.`,
     catalogHeading: "All projects",
   },
   tools: {
     path: "tools/index.html",
-    title: "Browser tools · Mapzimus",
-    description: `A searchable catalog of ${utilityCount} standalone browser tools for maps, data, design, classroom, and soccer.`,
+    title: "Tools · Mapzimus",
+    description: `${utilityCount} small browser tools for maps, data, classroom, soccer, and everyday jobs.`,
     canonical: "https://mapzimus.com/tools/",
-    eyebrow: "The tool catalog",
-    heading: "Every tool, one page each",
-    intro: `${utilityCount} standalone browser tools — GIS utilities, data, design, classroom, soccer, and everyday helpers. Each is a single page at its own path.`,
+    eyebrow: "Tools",
+    heading: "One job per page",
+    intro: `${utilityCount} tools. Each one is a single page that runs in your browser. Nothing is uploaded.`,
     catalogHeading: "All tools",
   },
   maps: {
     path: "maps/index.html",
     title: "Maps · Mapzimus",
-    description: `First-party map projects from Mapzimus: live transit, globes, atlases, and spatial stories — each hosted on this site.`,
+    description: `${mapCount} map projects you can open here: live transit, globes, and story maps.`,
     canonical: "https://mapzimus.com/maps/",
     eyebrow: "Maps",
     heading: "Map projects",
-    intro: `${mapCount} map projects hosted here and ready to open — live transit, globes, transit networks, atlases, and spatial stories. GIS utilities live under Tools; the full project shelf is in Lab.`,
+    intro: `${mapCount} maps that live on this site. Small converters and address tools are under Tools. Everything else is in Lab.`,
     catalogHeading: "All map projects",
   },
   games: {
     path: "games/index.html",
     title: "Games · Mapzimus",
-    description: "Free browser games from Mapzimus — strategy and logic, no downloads.",
+    description: "Free browser games. Nothing to download.",
     canonical: "https://mapzimus.com/games/",
-    eyebrow: "Playable",
+    eyebrow: "Games",
     heading: "Games",
-    intro: "Actual games, made to be played — free in the browser, nothing to download.",
+    intro: "Free games that run in the browser. Nothing to download.",
     catalogHeading: "All games",
   },
 };

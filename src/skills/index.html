@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Skills · Mapzimus</title>
-  <meta name="description" content="Downloadable Claude skills from the Mapzimus lab — packaged know-how for maps, GIS, and cartography that any Claude session can install and use.">
+  <meta name="description" content="Downloadable Claude skills for maps and cartography. Install once, then Claude knows the setup and the usual mistakes.">
   <link rel="canonical" href="https://mapzimus.com/skills/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Skills · Mapzimus">
@@ -64,11 +64,9 @@
 
   <main>
     <section class="hero">
-      <span class="coord coord-ne" aria-hidden="true">42°31′ N</span>
-      <span class="coord coord-sw" aria-hidden="true">70°54′ W · SALEM, MASS.</span>
       <div class="eyebrow">For Claude users</div>
       <h1>Skills</h1>
-      <p>Packaged know-how for Claude: install a skill once and every future session knows how to do the thing — the setup, the gotchas, the working starter code. Distilled from real builds in this lab.</p>
+      <p>Install a skill once. After that, Claude already knows the setup, the usual mistakes, and a starter page. These came out of real builds on this site.</p>
     </section>
 
     <section class="skill-list" id="skills" aria-label="Available skills">{{SKILL_CARDS}}</section>
@@ -78,20 +76,20 @@
       <div class="install-cols">
         <div>
           <h3>Claude.ai / Claude apps</h3>
-          <p>Download the <code>.skill</code> file, then upload it in a chat or in your Capabilities settings and choose <strong>Save skill</strong>. It becomes part of your profile — available in every conversation.</p>
+          <p>Download the <code>.skill</code> file, then upload it in a chat or in your Capabilities settings and choose <strong>Save skill</strong>. It stays on your profile for every conversation.</p>
         </div>
         <div>
           <h3>Claude Code</h3>
           <p>A <code>.skill</code> file is just a zip of the skill folder. Unzip it into <code>~/.claude/skills/</code> for every project, or commit it to a repo's <code>.claude/skills/</code> to share it with everyone who works there.</p>
         </div>
       </div>
-      <p class="install-note">After installing you rarely invoke a skill by name — Claude reads the description and reaches for it when your request matches. Skills are plain instructions and reference files; open the zip and read them.</p>
+      <p class="install-note">You rarely have to name a skill. Claude reads the description and uses it when the request matches. Skills are plain files; open the zip and read them.</p>
     </section>
   </main>
 
   <footer>
-    <p>Mapzimus is the lab of Maxwell Howe — browser tools, maps, and games, all free.<br>Professional GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
-    <p class="footer-note">MAPZIMUS QUADRANGLE · STATIC SITE · NO TRACKING</p>
+    <p>Mapzimus is Maxwell Howe's site for free tools, maps, and games.<br>Hire-me GIS work is at <a href="https://maxwellhowegis.com">maxwellhowegis.com</a>.</p>
+    <p class="footer-note">static site · no tracking</p>
   </footer>
 </div>
 </body>
