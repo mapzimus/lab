@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-13",
+  "generatedAt": "2026-09-14",
   "news": {
     "mapsmania": [
+      {
+        "title": "GeoGuessr Gets an Antipodean Time Machine",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/geoguessr-gets-antipodean-time-machine.html",
+        "desc": ""
+      },
       {
         "title": "PIxel City Maps Are Here",
         "url": "http://googlemapsmania.blogspot.com/2026/09/pixel-city-maps-are-here.html",
@@ -35,11 +40,6 @@
       {
         "title": "Mercator vs Equal Earth",
         "url": "http://googlemapsmania.blogspot.com/2026/09/mercator-vs-equal-earth.html",
-        "desc": ""
-      },
-      {
-        "title": "Welcome to the New World Map",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/welcome-to-new-world-map.html",
         "desc": ""
       }
     ],
@@ -145,10 +145,10 @@
   "releases": [
     {
       "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.9.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.9.0",
-      "desc": "### ✨ Features and improvements - Improved support for drawing the letters of Devanagari, Khmer, Burmese and the other complex scripts and also draws Arabic…",
-      "publishedAt": "2026-09-09",
+      "title": "maplibre-gl-js v6.9.1",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.9.1",
+      "desc": "### ✨ Features and improvements - Stop the scale control forcing a synchronous layout and rewriting its DOM on every frame of a pan or zoom ([#8403](https://…",
+      "publishedAt": "2026-09-14",
       "isFresh": true
     },
     {
@@ -210,9 +210,15 @@
   ],
   "gisse": [
     {
-      "title": "Why is degree of latitude longer at the poles than the equator in WGS 84?",
-      "url": "https://gis.stackexchange.com/questions/501401/why-is-degree-of-latitude-longer-at-the-poles-than-the-equator-in-wgs-84",
-      "score": 3,
+      "title": "Raster layers in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
+      "url": "https://gis.stackexchange.com/questions/501429/raster-layers-in-equal-earth-projections-for-americas-epsg8858-and-asia-pacif",
+      "score": -3,
+      "answers": 1
+    },
+    {
+      "title": "Why is a degree of latitude longer at the poles than the equator in WGS 84?",
+      "url": "https://gis.stackexchange.com/questions/501401/why-is-a-degree-of-latitude-longer-at-the-poles-than-the-equator-in-wgs-84",
+      "score": 4,
       "answers": 2
     },
     {
@@ -246,9 +252,9 @@
       "answers": 0
     },
     {
-      "title": "GEOAI Plugin in QGIS fails to install dependencies",
-      "url": "https://gis.stackexchange.com/questions/501402/geoai-plugin-in-qgis-fails-to-install-dependencies",
-      "score": 0,
+      "title": "ArcGIS Pro: Apply a layer field alias to the attribute table",
+      "url": "https://gis.stackexchange.com/questions/501412/arcgis-pro-apply-a-layer-field-alias-to-the-attribute-table",
+      "score": -3,
       "answers": 0
     },
     {
@@ -258,78 +264,72 @@
       "answers": 0
     },
     {
-      "title": "Simplifying a feature's geometry",
-      "url": "https://gis.stackexchange.com/questions/501393/simplifying-a-features-geometry",
-      "score": 1,
-      "answers": 0
-    },
-    {
-      "title": "Auto-connected signal handler called twice in QGIS plugin dialog",
-      "url": "https://gis.stackexchange.com/questions/501389/auto-connected-signal-handler-called-twice-in-qgis-plugin-dialog",
+      "title": "GEOAI Plugin in QGIS fails to install dependencies",
+      "url": "https://gis.stackexchange.com/questions/501402/geoai-plugin-in-qgis-fails-to-install-dependencies",
       "score": 0,
-      "answers": 1
+      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "UAVSAR_POLSAR_STOKES",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_STOKES",
-      "desc": "UAVSAR PolSAR Scene Stokes",
+      "title": "NISAR Provisional Radar Raw Signal Calibration Data (Version 1)",
+      "url": "https://search.earthdata.nasa.gov/search?q=NISAR_L0B_CRSD_PROVISIONAL_V1",
+      "desc": "NASA-ISRO Synthetic Aperture Radar (NISAR) Provisional Level 0B Radar Raw Signal Calibration Data",
       "org": "ASF"
     },
     {
-      "title": "UAVSAR_POLSAR_SLOPE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_SLOPE",
-      "desc": "UAVSAR PolSAR Scene Slope",
-      "org": "ASF"
+      "title": "GPM MHS on METOP-A (GPROF) Radiometer Precipitation Profiling L3 1 day 0.25 degree x 0.25 degree V07 (GPM_3GPROFMETOPAMHS_DAY_CLIM)",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFMETOPAMHS_DAY_CLIM",
+      "desc": "Version 07 is the current version of the data set.",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_PAULI",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_PAULI",
-      "desc": "UAVSAR PolSAR Scene Pauli Decomposition",
-      "org": "ASF"
+      "title": "GPM MHS on METOP-A (GPROF) Radiometer Precipitation Profiling L3 1 month 0.25 degree x 0.25 degree V07 (GPM_3GPROFMETOPAMHS_CLIM)",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFMETOPAMHS_CLIM",
+      "desc": "Version 07 is the current version of the data set.",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_SLANT",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_SLANT",
-      "desc": "UAVSAR PolSAR Scene Complex",
-      "org": "ASF"
+      "title": "GPM AMSR-2 on GCOM-W1 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 day 0.25 degree x 0.25 degree V07 (GPM_3GPROFGCOMW1AM…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFGCOMW1AMSR2_DAY_CLIM",
+      "desc": "Version 07 is the current version of the data set.",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_5X5",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_5X5",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 5x5",
-      "org": "ASF"
+      "title": "GPM AMSR-2 on GCOM-W1 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 month 0.25 degree x 0.25 degree V07 (GPM_3GPROFGCOMW1…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFGCOMW1AMSR2_CLIM",
+      "desc": "Version 07 is the current version of the data set.",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD_3X3",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD_3X3",
-      "desc": "UAVSAR PolSAR Scene Projected Multilook 3x3",
-      "org": "ASF"
+      "title": "GPM SSMIS on F19 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 day 0.25 degree x 0.25 degree V07 (GPM_3GPROFF19SSMIS_DAY_…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFF19SSMIS_DAY_CLIM",
+      "desc": "Version 07 is the current version of the data set.",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_ML_COMPLEX_GRD",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_ML_CMPLX_GRD",
-      "desc": "UAVSAR PolSAR Scene Projected",
-      "org": "ASF"
+      "title": "GPM SSMIS on F19 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 month 0.25 degree x 0.25 degree V07 (GPM_3GPROFF19SSMIS_CLIM)",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFF19SSMIS_CLIM",
+      "desc": "Version 07 is the current version of the data set.",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_METADATA",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_META",
-      "desc": "UAVSAR PolSAR Scene Metadata",
-      "org": "ASF"
+      "title": "GPM SSMIS on F18 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 day 0.25 degree x 0.25 degree V07 (GPM_3GPROFF18SSMIS_DAY_…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFF18SSMIS_DAY_CLIM",
+      "desc": "Version 07 is the current version of the data set.",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_KMZ",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_KMZ",
-      "desc": "UAVSAR PolSAR Scene KMZ",
-      "org": "ASF"
+      "title": "GPM SSMIS on F18 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 month 0.25 degree x 0.25 degree V07 (GPM_3GPROFF18SSMIS_CLIM)",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFF18SSMIS_CLIM",
+      "desc": "Version 07 is the current version of the data set.",
+      "org": "GES_DISC"
     },
     {
-      "title": "UAVSAR_POLSAR_INCIDENCE",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POL_INC",
-      "desc": "UAVSAR PolSAR Scene Incidence Angle",
-      "org": "ASF"
+      "title": "GPM SSMIS on F17 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 day 0.25 degree x 0.25 degree V07 (GPM_3GPROFF17SSMIS_DAY_…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFF17SSMIS_DAY_CLIM",
+      "desc": "Version 07 is the current version of the data set.",
+      "org": "GES_DISC"
     }
   ],
   "datagov": [
