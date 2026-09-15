@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-14",
+  "generatedAt": "2026-09-15",
   "news": {
     "mapsmania": [
+      {
+        "title": "Blowing Up the World Becomes More Fun",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/blowing-up-world-becomes-more-fun.html",
+        "desc": ""
+      },
       {
         "title": "GeoGuessr Gets an Antipodean Time Machine",
         "url": "http://googlemapsmania.blogspot.com/2026/09/geoguessr-gets-antipodean-time-machine.html",
@@ -35,11 +40,6 @@
       {
         "title": "Geography and Genetics",
         "url": "http://googlemapsmania.blogspot.com/2026/09/geography-and-genetics.html",
-        "desc": ""
-      },
-      {
-        "title": "Mercator vs Equal Earth",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/mercator-vs-equal-earth.html",
         "desc": ""
       }
     ],
@@ -110,6 +110,10 @@
   },
   "qgis": [
     {
+      "title": "SVG to QGIS Style",
+      "url": "https://plugins.qgis.org/plugins/svgtoqgisstyle/"
+    },
+    {
       "title": "Layer CRS Display",
       "url": "https://plugins.qgis.org/plugins/layer_crs_display/"
     },
@@ -136,10 +140,6 @@
     {
       "title": "FIC Coastal Change Analysis",
       "url": "https://plugins.qgis.org/plugins/FIC_Coastal_Change_Analysis/"
-    },
-    {
-      "title": "ObjectGrow",
-      "url": "https://plugins.qgis.org/plugins/ObjectGrow/"
     }
   ],
   "releases": [
@@ -212,8 +212,20 @@
     {
       "title": "Raster layers in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
       "url": "https://gis.stackexchange.com/questions/501429/raster-layers-in-equal-earth-projections-for-americas-epsg8858-and-asia-pacif",
-      "score": -3,
+      "score": 1,
       "answers": 1
+    },
+    {
+      "title": "Layout grids in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
+      "url": "https://gis.stackexchange.com/questions/501433/layout-grids-in-equal-earth-projections-for-americas-epsg8858-and-asia-pacifi",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Satellite basemap for South Korea for building analysis (EPSG:3857)",
+      "url": "https://gis.stackexchange.com/questions/501432/satellite-basemap-for-south-korea-for-building-analysis-epsg3857",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "Why is a degree of latitude longer at the poles than the equator in WGS 84?",
@@ -252,84 +264,72 @@
       "answers": 0
     },
     {
-      "title": "ArcGIS Pro: Apply a layer field alias to the attribute table",
-      "url": "https://gis.stackexchange.com/questions/501412/arcgis-pro-apply-a-layer-field-alias-to-the-attribute-table",
-      "score": -3,
-      "answers": 0
-    },
-    {
       "title": "Add Polygon Feature missing from Digitizing Toolbar",
       "url": "https://gis.stackexchange.com/questions/501400/add-polygon-feature-missing-from-digitizing-toolbar",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "GEOAI Plugin in QGIS fails to install dependencies",
-      "url": "https://gis.stackexchange.com/questions/501402/geoai-plugin-in-qgis-fails-to-install-dependencies",
       "score": 0,
       "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "NISAR Provisional Radar Raw Signal Calibration Data (Version 1)",
-      "url": "https://search.earthdata.nasa.gov/search?q=NISAR_L0B_CRSD_PROVISIONAL_V1",
-      "desc": "NASA-ISRO Synthetic Aperture Radar (NISAR) Provisional Level 0B Radar Raw Signal Calibration Data",
-      "org": "ASF"
+      "title": "PACE-PAX CIRPAS Twin Otter Analysis Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE-PAX_Analysis_CIRPAS-TO_Data",
+      "desc": "PACE-PAX_Analysis_CIRPAS-TO_Data is the analysis data collected onboard the Twin Otter aircraft flying the CIRPAS suite of instruments during the Plankton, A…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "GPM MHS on METOP-A (GPROF) Radiometer Precipitation Profiling L3 1 day 0.25 degree x 0.25 degree V07 (GPM_3GPROFMETOPAMHS_DAY_CLIM)",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFMETOPAMHS_DAY_CLIM",
-      "desc": "Version 07 is the current version of the data set.",
-      "org": "GES_DISC"
+      "title": "PACE-PAX CIRPAS Twin Otter In-Situ Aerosol Retrieval Algorithm (ISARA) Analysis Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE-PAX_Analysis_ISARA_Data",
+      "desc": "PACE-PAX_Analysis_ISARA_Data is the In-Situ Aerosol Retrieval Algorithm (ISARA) analysis data collected onboard the Twin Otter aircraft flying the CIRPAS sui…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "GPM MHS on METOP-A (GPROF) Radiometer Precipitation Profiling L3 1 month 0.25 degree x 0.25 degree V07 (GPM_3GPROFMETOPAMHS_CLIM)",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFMETOPAMHS_CLIM",
-      "desc": "Version 07 is the current version of the data set.",
-      "org": "GES_DISC"
+      "title": "LISTOS University of Maryland Cessna Aircraft In-Situ Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_AircraftInSitu_UMDAircraft_Data",
+      "desc": "LISTOS_AircraftInSitu_UMDAircraft_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) in-situ data collected onboard the University of Maryland C…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "GPM AMSR-2 on GCOM-W1 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 day 0.25 degree x 0.25 degree V07 (GPM_3GPROFGCOMW1AM…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFGCOMW1AMSR2_DAY_CLIM",
-      "desc": "Version 07 is the current version of the data set.",
-      "org": "GES_DISC"
+      "title": "ABoVE: AirSWOT Water Masks from Color-Infrared Imagery over Alaska and Canada, 2017",
+      "url": "https://search.earthdata.nasa.gov/search?q=ABoVE_AirSWOT_Water_Mask_1707",
+      "desc": "This dataset provides 1) a conservative open water mask for future water surface elevation (WSE) extraction from the co-registered AirSWOT Ka-band interferom…",
+      "org": "ORNL_CLOUD"
     },
     {
-      "title": "GPM AMSR-2 on GCOM-W1 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 month 0.25 degree x 0.25 degree V07 (GPM_3GPROFGCOMW1…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFGCOMW1AMSR2_CLIM",
-      "desc": "Version 07 is the current version of the data set.",
-      "org": "GES_DISC"
+      "title": "LISTOS NASA Aircraft Remote Sensing Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_AircraftRemoteSensing_NASAAircraft_Data",
+      "desc": "LISTOS_AircraftRemoteSensing_NASAAircraft_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) remote sensing data collected onboard the NASA airc…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "GPM SSMIS on F19 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 day 0.25 degree x 0.25 degree V07 (GPM_3GPROFF19SSMIS_DAY_…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFF19SSMIS_DAY_CLIM",
-      "desc": "Version 07 is the current version of the data set.",
-      "org": "GES_DISC"
+      "title": "ATLAS/ICESat-2 L3B Gridded Antarctic and Arctic Land Ice Height Change V006",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL15",
+      "desc": "This data set contains land ice height changes and change rates for the Antarctic ice sheet and regions around the Arctic gridded at multiple spatial and tem…",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "GPM SSMIS on F19 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 month 0.25 degree x 0.25 degree V07 (GPM_3GPROFF19SSMIS_CLIM)",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFF19SSMIS_CLIM",
-      "desc": "Version 07 is the current version of the data set.",
-      "org": "GES_DISC"
+      "title": "ATLAS/ICESat-2 L3B Gridded Antarctic and Arctic Land Ice Height V006",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL14",
+      "desc": "This data set contains a high-resolution (100 m) gridded digital elevation model (DEM) for the Antarctic ice sheet and regions around the Arctic.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "GPM SSMIS on F18 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 day 0.25 degree x 0.25 degree V07 (GPM_3GPROFF18SSMIS_DAY_…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFF18SSMIS_DAY_CLIM",
-      "desc": "Version 07 is the current version of the data set.",
-      "org": "GES_DISC"
+      "title": "ABLE-2A Ground Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=ABLE-2A_Ground_Data",
+      "desc": "ABLE-2A_Ground_Data is the ground site data collected during the Amazon Boundary Layer Experiment - 2A (ABLE-2A) suborbital campaign.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "GPM SSMIS on F18 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 month 0.25 degree x 0.25 degree V07 (GPM_3GPROFF18SSMIS_CLIM)",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFF18SSMIS_CLIM",
-      "desc": "Version 07 is the current version of the data set.",
-      "org": "GES_DISC"
+      "title": "PACE-PAX CIRPAS Twin Otter Laser Imaging Nephelometer (LI Neph) Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE-PAX_LiNeph_AircraftInSitu_CIRPAS-TO_Data",
+      "desc": "PACE-PAX_LiNeph_AircraftInSitu_CIRPAS-TO_Data is the Laser Imaging Nephelometer (LI Neph) data collected onboard the Twin Otter aircraft flying the CIRPAS su…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "GPM SSMIS on F17 (GPROF) Climate-based Radiometer Precipitation Profiling L3 1 day 0.25 degree x 0.25 degree V07 (GPM_3GPROFF17SSMIS_DAY_…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3GPROFF17SSMIS_DAY_CLIM",
-      "desc": "Version 07 is the current version of the data set.",
-      "org": "GES_DISC"
+      "title": "PACE-PAX CIRPAS Twin Otter In-Situ Aerosol Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE-PAX_LARGE-Aerosol_AircraftInSitu_CIRPAS-TO_Data",
+      "desc": "PACE-PAX_LARGE-Aerosol_AircraftInSitu_CIRPAS-TO_Data is the in-situ aerosol data collected onboard the Twin Otter aircraft flying the CIRPAS suite of instrum…",
+      "org": "LARC_CLOUD"
     }
   ],
   "datagov": [
