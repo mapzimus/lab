@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-15",
+  "generatedAt": "2026-09-16",
   "news": {
     "mapsmania": [
+      {
+        "title": "170,000 Movies - One Interactive Map",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/170000-movies-one-interactive-map.html",
+        "desc": ""
+      },
       {
         "title": "Blowing Up the World Becomes More Fun",
         "url": "http://googlemapsmania.blogspot.com/2026/09/blowing-up-world-becomes-more-fun.html",
@@ -35,11 +40,6 @@
       {
         "title": "Your Daily GeoGuessing Challenge!",
         "url": "http://googlemapsmania.blogspot.com/2026/09/your-daily-geoguessing-challenge.html",
-        "desc": ""
-      },
-      {
-        "title": "Geography and Genetics",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/geography-and-genetics.html",
         "desc": ""
       }
     ],
@@ -110,45 +110,45 @@
   },
   "qgis": [
     {
+      "title": "OpenTopography Point Elevation",
+      "url": "https://plugins.qgis.org/plugins/opentopography_point_elevation/"
+    },
+    {
+      "title": "Scratch-X",
+      "url": "https://plugins.qgis.org/plugins/ScratchX/"
+    },
+    {
+      "title": "GISPublisher",
+      "url": "https://plugins.qgis.org/plugins/GISPublisher/"
+    },
+    {
+      "title": "WigglePlot",
+      "url": "https://plugins.qgis.org/plugins/wiggleplot/"
+    },
+    {
+      "title": "Scout - AI Geospatial Catalog",
+      "url": "https://plugins.qgis.org/plugins/scout_qgis/"
+    },
+    {
+      "title": "HydroGeomorphology Tools for QGIS",
+      "url": "https://plugins.qgis.org/plugins/inest/"
+    },
+    {
+      "title": "Acervo SIG - CPRM",
+      "url": "https://plugins.qgis.org/plugins/acervo_cprm/"
+    },
+    {
       "title": "SVG to QGIS Style",
       "url": "https://plugins.qgis.org/plugins/svgtoqgisstyle/"
-    },
-    {
-      "title": "Layer CRS Display",
-      "url": "https://plugins.qgis.org/plugins/layer_crs_display/"
-    },
-    {
-      "title": "Raster Batch Clip",
-      "url": "https://plugins.qgis.org/plugins/raster_batch_clip/"
-    },
-    {
-      "title": "VaquerosGIS",
-      "url": "https://plugins.qgis.org/plugins/VaquerosGIS/"
-    },
-    {
-      "title": "AI Agent by TerraLab",
-      "url": "https://plugins.qgis.org/plugins/AI_Agent/"
-    },
-    {
-      "title": "Forest Planner",
-      "url": "https://plugins.qgis.org/plugins/yf_forest_planner/"
-    },
-    {
-      "title": "SIRI CR",
-      "url": "https://plugins.qgis.org/plugins/consulta_siri/"
-    },
-    {
-      "title": "FIC Coastal Change Analysis",
-      "url": "https://plugins.qgis.org/plugins/FIC_Coastal_Change_Analysis/"
     }
   ],
   "releases": [
     {
       "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.9.1",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.9.1",
-      "desc": "### ✨ Features and improvements - Stop the scale control forcing a synchronous layout and rewriting its DOM on every frame of a pan or zoom ([#8403](https://…",
-      "publishedAt": "2026-09-14",
+      "title": "maplibre-gl-js v6.10.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.10.0",
+      "desc": "### ✨ Features and improvements - Show the sky in globe view, fading out with altitude instead of with the globe to mercator transition ([#8464](https://gith…",
+      "publishedAt": "2026-09-15",
       "isFresh": true
     },
     {
@@ -212,12 +212,24 @@
     {
       "title": "Raster layers in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
       "url": "https://gis.stackexchange.com/questions/501429/raster-layers-in-equal-earth-projections-for-americas-epsg8858-and-asia-pacif",
-      "score": 1,
+      "score": 2,
       "answers": 1
     },
     {
-      "title": "Layout grids in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
-      "url": "https://gis.stackexchange.com/questions/501433/layout-grids-in-equal-earth-projections-for-americas-epsg8858-and-asia-pacifi",
+      "title": "Bash completion for GDAL not working",
+      "url": "https://gis.stackexchange.com/questions/501437/bash-completion-for-gdal-not-working",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "ArcGIS Pro symbology: how do I set the label field to a certain attribute?",
+      "url": "https://gis.stackexchange.com/questions/501434/arcgis-pro-symbology-how-do-i-set-the-label-field-to-a-certain-attribute",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Tile Imagery Layer pulled from ArcGIS Online - correct syntax",
+      "url": "https://gis.stackexchange.com/questions/501435/tile-imagery-layer-pulled-from-arcgis-online-correct-syntax",
       "score": 0,
       "answers": 0
     },
@@ -228,16 +240,16 @@
       "answers": 0
     },
     {
-      "title": "Why is a degree of latitude longer at the poles than the equator in WGS 84?",
-      "url": "https://gis.stackexchange.com/questions/501401/why-is-a-degree-of-latitude-longer-at-the-poles-than-the-equator-in-wgs-84",
-      "score": 4,
-      "answers": 2
+      "title": "Layout grids in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
+      "url": "https://gis.stackexchange.com/questions/501433/layout-grids-in-equal-earth-projections-for-americas-epsg8858-and-asia-pacifi",
+      "score": 0,
+      "answers": 0
     },
     {
-      "title": "QGIS - Opposite of vector (join attributes by location) - remove duplicate features",
-      "url": "https://gis.stackexchange.com/questions/501419/qgis-opposite-of-vector-join-attributes-by-location-remove-duplicate-featu",
-      "score": 0,
-      "answers": 1
+      "title": "Why is a degree of latitude longer at the poles than the equator in WGS 84?",
+      "url": "https://gis.stackexchange.com/questions/501401/why-is-a-degree-of-latitude-longer-at-the-poles-than-the-equator-in-wgs-84",
+      "score": 5,
+      "answers": 2
     },
     {
       "title": "Automatically generating file path of shapefile location using ArcGIS Pro",
@@ -246,90 +258,78 @@
       "answers": 1
     },
     {
-      "title": "Least Cost Path in QGIS; plugin crashing and GRASS tools not visible",
-      "url": "https://gis.stackexchange.com/questions/501414/least-cost-path-in-qgis-plugin-crashing-and-grass-tools-not-visible",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Over fill during hydro conditioning?",
-      "url": "https://gis.stackexchange.com/questions/501407/over-fill-during-hydro-conditioning",
+      "title": "QGIS - Opposite of vector (join attributes by location) - remove duplicate features",
+      "url": "https://gis.stackexchange.com/questions/501419/qgis-opposite-of-vector-join-attributes-by-location-remove-duplicate-featu",
       "score": 0,
       "answers": 1
     },
     {
-      "title": "ArcGIS Online not showing rows from GPKG",
-      "url": "https://gis.stackexchange.com/questions/501413/arcgis-online-not-showing-rows-from-gpkg",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Add Polygon Feature missing from Digitizing Toolbar",
-      "url": "https://gis.stackexchange.com/questions/501400/add-polygon-feature-missing-from-digitizing-toolbar",
-      "score": 0,
+      "title": "GDAL Raster Mosaic Count Pixel Function",
+      "url": "https://gis.stackexchange.com/questions/501386/gdal-raster-mosaic-count-pixel-function",
+      "score": 3,
       "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "PACE-PAX CIRPAS Twin Otter Analysis Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=PACE-PAX_Analysis_CIRPAS-TO_Data",
-      "desc": "PACE-PAX_Analysis_CIRPAS-TO_Data is the analysis data collected onboard the Twin Otter aircraft flying the CIRPAS suite of instruments during the Plankton, A…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
+      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "PACE-PAX CIRPAS Twin Otter In-Situ Aerosol Retrieval Algorithm (ISARA) Analysis Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=PACE-PAX_Analysis_ISARA_Data",
-      "desc": "PACE-PAX_Analysis_ISARA_Data is the In-Situ Aerosol Retrieval Algorithm (ISARA) analysis data collected onboard the Twin Otter aircraft flying the CIRPAS sui…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
+      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "LISTOS University of Maryland Cessna Aircraft In-Situ Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_AircraftInSitu_UMDAircraft_Data",
-      "desc": "LISTOS_AircraftInSitu_UMDAircraft_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) in-situ data collected onboard the University of Maryland C…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
+      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "ABoVE: AirSWOT Water Masks from Color-Infrared Imagery over Alaska and Canada, 2017",
-      "url": "https://search.earthdata.nasa.gov/search?q=ABoVE_AirSWOT_Water_Mask_1707",
-      "desc": "This dataset provides 1) a conservative open water mask for future water surface elevation (WSE) extraction from the co-registered AirSWOT Ka-band interferom…",
+      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
+      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
+      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "GNSS radio occultation L2B temperature, pressure, and water vapor retrieval for CNOFS as contributed by UCAR, version 2.0 (gnssro_cnofs_u…",
+      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_cnofs_ucar_l2b",
+      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Temperature, Pressure, and Water Vapor data from the Communication/Nav…",
+      "org": "GES_DISC"
+    },
+    {
+      "title": "Pre-Delta-X: Total Suspended Solids of Surface Water across MRD, LA, USA, 2015-2016",
+      "url": "https://search.earthdata.nasa.gov/search?q=PreDeltaX_TSS_Concentration_1802",
+      "desc": "This dataset contains the total suspended solids (TSS) concentration of in situ water samples collected at selected sites across the Atchafalaya and Terrebon…",
       "org": "ORNL_CLOUD"
     },
     {
-      "title": "LISTOS NASA Aircraft Remote Sensing Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_AircraftRemoteSensing_NASAAircraft_Data",
-      "desc": "LISTOS_AircraftRemoteSensing_NASAAircraft_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) remote sensing data collected onboard the NASA airc…",
-      "org": "LARC_CLOUD"
+      "title": "Delta-X: Total Suspended Solids Concentration across MRD, LA, USA, 2021, Version 2",
+      "url": "https://search.earthdata.nasa.gov/search?q=DeltaX_TSS_Concentration_V2_2075",
+      "desc": "This dataset provides measurements of total suspended solids concentrations (TSS) of surface waters in the Atchafalaya River and Terrebonne Basins during the…",
+      "org": "ORNL_CLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3B Gridded Antarctic and Arctic Land Ice Height Change V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL15",
-      "desc": "This data set contains land ice height changes and change rates for the Antarctic ice sheet and regions around the Arctic gridded at multiple spatial and tem…",
-      "org": "NSIDC_CPRD"
+      "title": "Delta-X: Particulate Organic Carbon Concentration from Water Samples, MRD, LA, 2021",
+      "url": "https://search.earthdata.nasa.gov/search?q=DeltaX_Insitu_POC_2073",
+      "desc": "This dataset provides measurements of particulate organic carbon (POC) concentrations made on water samples collected during 2021 in surface waters of the At…",
+      "org": "ORNL_CLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3B Gridded Antarctic and Arctic Land Ice Height V006",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL14",
-      "desc": "This data set contains a high-resolution (100 m) gridded digital elevation model (DEM) for the Antarctic ice sheet and regions around the Arctic.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ABLE-2A Ground Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=ABLE-2A_Ground_Data",
-      "desc": "ABLE-2A_Ground_Data is the ground site data collected during the Amazon Boundary Layer Experiment - 2A (ABLE-2A) suborbital campaign.",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "PACE-PAX CIRPAS Twin Otter Laser Imaging Nephelometer (LI Neph) Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=PACE-PAX_LiNeph_AircraftInSitu_CIRPAS-TO_Data",
-      "desc": "PACE-PAX_LiNeph_AircraftInSitu_CIRPAS-TO_Data is the Laser Imaging Nephelometer (LI Neph) data collected onboard the Twin Otter aircraft flying the CIRPAS su…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "PACE-PAX CIRPAS Twin Otter In-Situ Aerosol Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=PACE-PAX_LARGE-Aerosol_AircraftInSitu_CIRPAS-TO_Data",
-      "desc": "PACE-PAX_LARGE-Aerosol_AircraftInSitu_CIRPAS-TO_Data is the in-situ aerosol data collected onboard the Twin Otter aircraft flying the CIRPAS suite of instrum…",
-      "org": "LARC_CLOUD"
+      "title": "CO2 and CH4 Fluxes from Waterbodies, Yukon-Kuskokwim Delta, Alaska, 2016-2019",
+      "url": "https://search.earthdata.nasa.gov/search?q=CH4_CO2_WaterBodies_YK_Delta_2178",
+      "desc": "This dataset provides estimates of carbon dioxide (CO2) and methane (CH4) diffusive fluxes from waterbodies, and watershed landcover data for the central-int…",
+      "org": "ORNL_CLOUD"
     }
   ],
   "datagov": [
@@ -339,6 +339,13 @@
       "desc": "The Inventory of Owned and Leased Properties (IOLP) allows users to search properties owned and leased by the General Services Administration (GSA) across the U",
       "org": "General Services Administration",
       "rank": 13
+    },
+    {
+      "title": "Civil Rights Data Collection (CRDC) for the 2017-18 school year",
+      "url": "https://catalog.data.gov/dataset/civil-rights-data-collection-crdc-for-the-2017-18-school-year",
+      "desc": "The Civil Rights Data Collection, 2017-18 (CRDC 2017-18) is part of the Civil Rights Data Collection (CRDC) program; program data are available beginning with t",
+      "org": "Department of Education",
+      "rank": 5
     },
     {
       "title": "IPCC AR4, AR5, and AR6 20-, 100-, and 500-year GWPs",
@@ -380,13 +387,6 @@
       "url": "https://catalog.data.gov/dataset/2017-18-arrests-civil-rights-data-collection",
       "desc": "This set of Excel file contains data on student referrals to law enforcement by disability and student-related arrests by disability for all states.",
       "org": "Department of Education",
-      "rank": 2
-    },
-    {
-      "title": "Harmonized Tariff Schedule of the United States (2026)",
-      "url": "https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2025",
-      "desc": "This dataset is the current 2026 Harmonized Tariff Schedule plus all revisions for the current year.",
-      "org": "US International Trade Commission",
       "rank": 2
     }
   ],
