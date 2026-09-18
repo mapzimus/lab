@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-17",
+  "generatedAt": "2026-09-18",
   "news": {
     "mapsmania": [
+      {
+        "title": "Mapping the Last Ice Age",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/mapping-last-ice-age.html",
+        "desc": ""
+      },
       {
         "title": "Where’s the Perfect Weather?",
         "url": "http://googlemapsmania.blogspot.com/2026/09/wheres-perfect-weather.html",
@@ -35,11 +40,6 @@
       {
         "title": "New York's 1.67 Million Buildings Colored by Age",
         "url": "http://googlemapsmania.blogspot.com/2026/09/new-yorks-167-million-buildings-colored.html",
-        "desc": ""
-      },
-      {
-        "title": "Which Country is Bigger? The Map Decides",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/which-country-is-bigger-map-decides.html",
         "desc": ""
       }
     ],
@@ -110,6 +110,14 @@
   },
   "qgis": [
     {
+      "title": "Repoliner - репозитории модулей",
+      "url": "https://plugins.qgis.org/plugins/repoliner/"
+    },
+    {
+      "title": "YAAP(Yet Another Animation Plugin)",
+      "url": "https://plugins.qgis.org/plugins/YAAP_yet_another_animation_plugin/"
+    },
+    {
       "title": "Analisi territoriale",
       "url": "https://plugins.qgis.org/plugins/territorial_suite/"
     },
@@ -122,24 +130,16 @@
       "url": "https://plugins.qgis.org/plugins/landxml_surface_tools/"
     },
     {
-      "title": "OpenTopography Point Elevation",
-      "url": "https://plugins.qgis.org/plugins/opentopography_point_elevation/"
+      "title": "NISAR Processor",
+      "url": "https://plugins.qgis.org/plugins/NISAR_Processor/"
     },
     {
-      "title": "Scratch-X",
-      "url": "https://plugins.qgis.org/plugins/ScratchX/"
+      "title": "KICT SWAT-K 2026",
+      "url": "https://plugins.qgis.org/plugins/swat_k/"
     },
     {
-      "title": "GISPublisher",
-      "url": "https://plugins.qgis.org/plugins/GISPublisher/"
-    },
-    {
-      "title": "WigglePlot",
-      "url": "https://plugins.qgis.org/plugins/wiggleplot/"
-    },
-    {
-      "title": "Scout - AI Geospatial Catalog",
-      "url": "https://plugins.qgis.org/plugins/scout_qgis/"
+      "title": "Inpaint AI Cloud",
+      "url": "https://plugins.qgis.org/plugins/InpaintAI/"
     }
   ],
   "releases": [
@@ -173,7 +173,7 @@
       "url": "https://github.com/OSGeo/gdal/releases/tag/v3.13.3",
       "desc": "Bug fix release. See release notes: https://github.com/OSGeo/gdal/blob/v3.13.3/NEWS.md",
       "publishedAt": "2026-08-18",
-      "isFresh": true
+      "isFresh": false
     },
     {
       "repo": "Turfjs/turf",
@@ -216,22 +216,28 @@
       "answers": 0
     },
     {
+      "title": "Tile Imagery Layer pulled from ArcGIS Online - correct syntax",
+      "url": "https://gis.stackexchange.com/questions/501435/tile-imagery-layer-pulled-from-arcgis-online-correct-syntax",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Raster layers in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
       "url": "https://gis.stackexchange.com/questions/501429/raster-layers-in-equal-earth-projections-for-americas-epsg8858-and-asia-pacif",
       "score": 2,
       "answers": 1
     },
     {
-      "title": "Bash completion for GDAL not working",
-      "url": "https://gis.stackexchange.com/questions/501437/bash-completion-for-gdal-not-working",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "Why is a degree of latitude longer at the poles than the equator in WGS 84?",
       "url": "https://gis.stackexchange.com/questions/501401/why-is-a-degree-of-latitude-longer-at-the-poles-than-the-equator-in-wgs-84",
       "score": 6,
       "answers": 2
+    },
+    {
+      "title": "Bash completion for GDAL not working",
+      "url": "https://gis.stackexchange.com/questions/501437/bash-completion-for-gdal-not-working",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "ArcGIS Pro symbology: how do I set the label field to a certain attribute?",
@@ -242,12 +248,6 @@
     {
       "title": "Satellite basemap for South Korea for building analysis (EPSG:3857)",
       "url": "https://gis.stackexchange.com/questions/501432/satellite-basemap-for-south-korea-for-building-analysis-epsg3857",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Tile Imagery Layer pulled from ArcGIS Online - correct syntax",
-      "url": "https://gis.stackexchange.com/questions/501435/tile-imagery-layer-pulled-from-arcgis-online-correct-syntax",
       "score": 0,
       "answers": 0
     },
@@ -272,64 +272,64 @@
   ],
   "nasa": [
     {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
-      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "TEMPO science data processing reference data V01",
-      "url": "https://search.earthdata.nasa.gov/search?q=TEMPO_Auxiliary",
-      "desc": "The Tropospheric Emissions: Monitoring of Pollution (TEMPO) science data processing reference data is a collection of time-independent reference data that ar…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "GNSS radio occultation L2B temperature, pressure, and water vapor retrieval for COSMIC1 as contributed by ROMSAF, version 2.0 (gnssro_cos…",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_cosmic1_romsaf_l2b",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Temperature, Pressure, and Water Vapor data from the Constellation Obs…",
+      "title": "GNSS radio occultation L2A bending angle, refractivity, and dry pressure for CNOFS as contributed by UCAR, version 2.0 (gnssro_cnofs_ucar…",
+      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_cnofs_ucar_l2a",
+      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Bending Angle, Refractivity, and Dry Pressure data from the Communicat…",
       "org": "GES_DISC"
     },
     {
-      "title": "GNSS radio occultation L1B excess phase and amplitude for METOP as contributed by EUMETSAT, version 2.0 (gnssro_metop_eumetsat_l1b)",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_metop_eumetsat_l1b",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Excess Phase and Amplitude data from the Meteorological operational sa…",
+      "title": "UAVSAR Polarimetric Synthetic Aperture Radar (PolSAR) Product",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POLSAR",
+      "desc": "The Uninhabited Aerial Vehicle Synthetic Aperture Radar (UAVSAR) is an airborne polarimetric radar instrument developed and operated by the Jet Propulsion La…",
+      "org": "ASF"
+    },
+    {
+      "title": "UAVSAR Repeat Pass Interferometric (RPI) Synthetic Aperture Radar Product",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_RPI",
+      "desc": "The Uninhabited Aerial Vehicle Synthetic Aperture Radar (UAVSAR) is an airborne polarimetric radar instrument developed and operated by the Jet Propulsion La…",
+      "org": "ASF"
+    },
+    {
+      "title": "WLDAS Noah-MP 3.6 Land Surface Model L4 Daily 0.01 degree x 0.01 degree Version D1.0 (WLDAS_NOAHMP001_DA1) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=WLDAS_NOAHMP001_DA1",
+      "desc": "The Western Land Data Assimilation System (WLDAS), developed at Goddard Space Flight Center (GSFC) and funded by the NASA Western Water Applications Office,…",
       "org": "GES_DISC"
     },
     {
-      "title": "GNSS radio occultation L1B excess phase and amplitude for PAZ as contributed by UCAR, version 2.0 (gnssro_paz_ucar_l1b)",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_paz_ucar_l1b",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Excess Phase and Amplitude data from the PAZ (which is Spanish for “pe…",
+      "title": "SRB/GEWEX evapotranspiration (Penman-Monteith) L4 3 hour 0.5 degree x 0.5 degree V1 (WC_PM_ET_050) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=WC_PM_ET_050",
+      "desc": "SRB/GEWEX evapotranspiration (Penman-Monteith) L4 3 hour 0.5 degree x 0.5 degree V1 is a global, 24-year (1984-2007), satellite-derived evapotranspiration ov…",
       "org": "GES_DISC"
     },
     {
-      "title": "GNSS radio occultation L1B excess phase and amplitude for COSMIC1 as contributed by UCAR, version 2.0 (gnssro_cosmic1_ucar_l1b)",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_cosmic1_ucar_l1b",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Excess Phase and Amplitude data from the Constellation Observing Syste…",
+      "title": "TMI/TRMM precipitation and uncertainty (TMPA) L3 3 hour 0.25 degree x 0.25 degree V001 (WC_MULTISEN_PREC_025) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=WC_MULTISEN_PREC_025",
+      "desc": "TMI/TRMM precipitation and uncertainty (TMPA) L3 3 hour 0.25 degree x 0.25 degree V001 provides estimates of accumulated precipitation from the Tropical Rain…",
       "org": "GES_DISC"
     },
     {
-      "title": "ABoVE: Post-Fire and Unburned Vegetation Community and Field Data, NWT, Canada, 2017",
-      "url": "https://search.earthdata.nasa.gov/search?q=ABoVE_NWT_2017_Field_Data_1771",
-      "desc": "This dataset provides vegetation community characteristics, soil moisture, and biophysical data collected in 2017 from 11 study sites in the ABoVE Study area.",
-      "org": "ORNL_CLOUD"
+      "title": "AMSR-E/Aqua surface soil moisture (LSMEM) L3 1 day 0.25 degree x 0.25 degree V001 (WC_LSMEM_SOILM_025) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=WC_LSMEM_SOILM_025",
+      "desc": "AMSR-E/Aqua surface soil moisture (LSMEM) L3 1 day 0.25 degree x 0.25 degree V001 is a global, 10-year (2002-2011) data set.",
+      "org": "GES_DISC"
+    },
+    {
+      "title": "VISSR/SMS-2 Level 1 Atmospheric and Oceanographic Image Processing System (AOIPS) Data V001 (VISSRSMS2L1AOIPS) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=VISSRSMS2L1AOIPS",
+      "desc": "VISSRSMS2L1AOIPS is the Visible Infrared Spin-Scan Radiometer (VISSR) Level 1 Atmospheric and Oceanographic Image Processing System (AOIPS) data product from…",
+      "org": "GES_DISC"
+    },
+    {
+      "title": "VISSR/SMS-1 Level 1 Experimenter History Data V001 (VISSRSMS1L1EHT) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=VISSRSMS1L1EHT",
+      "desc": "VISSRSMS1L1EHT is the Visible Infrared Spin-Scan Radiometer (VISSR) Level 1 Experimenter History Tape (EHT) data product from the first Synchronous Meteorolo…",
+      "org": "GES_DISC"
+    },
+    {
+      "title": "VISSR/SMS-1 Level 1 Atmospheric and Oceanographic Image Processing System (AOIPS) Data V001 (VISSRSMS1L1AOIPS) at GES DISC",
+      "url": "https://search.earthdata.nasa.gov/search?q=VISSRSMS1L1AOIPS",
+      "desc": "VISSRSMS1L1AOIPS is the Visible Infrared Spin-Scan Radiometer (VISSR) Level 1 Atmospheric and Oceanographic Image Processing System (AOIPS) data product from…",
+      "org": "GES_DISC"
     }
   ],
   "datagov": [
