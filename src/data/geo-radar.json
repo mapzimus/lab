@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-18",
+  "generatedAt": "2026-09-19",
   "news": {
     "mapsmania": [
+      {
+        "title": "GeoWhisperer - See How the World Has Changed",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/geowhisperer-see-how-world-has-changed.html",
+        "desc": ""
+      },
       {
         "title": "Mapping the Last Ice Age",
         "url": "http://googlemapsmania.blogspot.com/2026/09/mapping-last-ice-age.html",
@@ -35,11 +40,6 @@
       {
         "title": "Mapping the Song Every City is Listening To",
         "url": "http://googlemapsmania.blogspot.com/2026/09/what-is-world-listening-to-today.html",
-        "desc": ""
-      },
-      {
-        "title": "New York's 1.67 Million Buildings Colored by Age",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/new-yorks-167-million-buildings-colored.html",
         "desc": ""
       }
     ],
@@ -210,14 +210,14 @@
   ],
   "gisse": [
     {
-      "title": "Crop collar of USGS maps and stitch together with GDAL",
-      "url": "https://gis.stackexchange.com/questions/501440/crop-collar-of-usgs-maps-and-stitch-together-with-gdal",
+      "title": "Bash completion for GDAL not working",
+      "url": "https://gis.stackexchange.com/questions/501437/bash-completion-for-gdal-not-working",
       "score": 0,
-      "answers": 0
+      "answers": 1
     },
     {
-      "title": "Tile Imagery Layer pulled from ArcGIS Online - correct syntax",
-      "url": "https://gis.stackexchange.com/questions/501435/tile-imagery-layer-pulled-from-arcgis-online-correct-syntax",
+      "title": "Crop collar of USGS maps and stitch together with GDAL",
+      "url": "https://gis.stackexchange.com/questions/501440/crop-collar-of-usgs-maps-and-stitch-together-with-gdal",
       "score": 0,
       "answers": 0
     },
@@ -228,26 +228,32 @@
       "answers": 1
     },
     {
+      "title": "Tile Imagery Layer pulled from ArcGIS Online - correct syntax",
+      "url": "https://gis.stackexchange.com/questions/501435/tile-imagery-layer-pulled-from-arcgis-online-correct-syntax",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Why is a degree of latitude longer at the poles than the equator in WGS 84?",
       "url": "https://gis.stackexchange.com/questions/501401/why-is-a-degree-of-latitude-longer-at-the-poles-than-the-equator-in-wgs-84",
       "score": 6,
       "answers": 2
     },
     {
-      "title": "Bash completion for GDAL not working",
-      "url": "https://gis.stackexchange.com/questions/501437/bash-completion-for-gdal-not-working",
+      "title": "Add Polygon Feature missing from Digitizing Toolbar",
+      "url": "https://gis.stackexchange.com/questions/501400/add-polygon-feature-missing-from-digitizing-toolbar",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Satellite basemap for South Korea for building analysis (EPSG:3857)",
+      "url": "https://gis.stackexchange.com/questions/501432/satellite-basemap-for-south-korea-for-building-analysis-epsg3857",
       "score": 0,
       "answers": 0
     },
     {
       "title": "ArcGIS Pro symbology: how do I set the label field to a certain attribute?",
       "url": "https://gis.stackexchange.com/questions/501434/arcgis-pro-symbology-how-do-i-set-the-label-field-to-a-certain-attribute",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Satellite basemap for South Korea for building analysis (EPSG:3857)",
-      "url": "https://gis.stackexchange.com/questions/501432/satellite-basemap-for-south-korea-for-building-analysis-epsg3857",
       "score": 0,
       "answers": 0
     },
@@ -262,73 +268,67 @@
       "url": "https://gis.stackexchange.com/questions/501410/automatically-generating-file-path-of-shapefile-location-using-arcgis-pro",
       "score": 0,
       "answers": 1
-    },
-    {
-      "title": "QGIS - Opposite of vector (join attributes by location) - remove duplicate features",
-      "url": "https://gis.stackexchange.com/questions/501419/qgis-opposite-of-vector-join-attributes-by-location-remove-duplicate-featu",
-      "score": 0,
-      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "GNSS radio occultation L2A bending angle, refractivity, and dry pressure for CNOFS as contributed by UCAR, version 2.0 (gnssro_cnofs_ucar…",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_cnofs_ucar_l2a",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Bending Angle, Refractivity, and Dry Pressure data from the Communicat…",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "UAVSAR Polarimetric Synthetic Aperture Radar (PolSAR) Product",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_POLSAR",
-      "desc": "The Uninhabited Aerial Vehicle Synthetic Aperture Radar (UAVSAR) is an airborne polarimetric radar instrument developed and operated by the Jet Propulsion La…",
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Version 3",
       "org": "ASF"
     },
     {
-      "title": "UAVSAR Repeat Pass Interferometric (RPI) Synthetic Aperture Radar Product",
-      "url": "https://search.earthdata.nasa.gov/search?q=UAVSAR_RPI",
-      "desc": "The Uninhabited Aerial Vehicle Synthetic Aperture Radar (UAVSAR) is an airborne polarimetric radar instrument developed and operated by the Jet Propulsion La…",
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Data Quality Information Version 3",
       "org": "ASF"
     },
     {
-      "title": "WLDAS Noah-MP 3.6 Land Surface Model L4 Daily 0.01 degree x 0.01 degree Version D1.0 (WLDAS_NOAHMP001_DA1) at GES DISC",
-      "url": "https://search.earthdata.nasa.gov/search?q=WLDAS_NOAHMP001_DA1",
-      "desc": "The Western Land Data Assimilation System (WLDAS), developed at Goddard Space Flight Center (GSFC) and funded by the NASA Western Water Applications Office,…",
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Metadata Version 3",
+      "org": "ASF"
+    },
+    {
+      "title": "Global Navigation Satellite System (GNSS) IGS Real-Time Combination Solution Summary of Real-Time Analysis Center (AC) Submissions from N…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_RT_comb_soln_sum_AC_subm",
+      "desc": "This derived product set consists of Global Navigation Satellite System satellite and receiver clock combination product (30-second granularity, daily files,…",
+      "org": "CDDIS"
+    },
+    {
+      "title": "Global Navigation Satellite System (GNSS) IGS Decoded Orbit Solution (30-second) from IGS Real-Time Product Streams from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_decd_orbit_soln_30sec_IGS_RT_strms",
+      "desc": "This derived product set consists of Global Navigation Satellite System satellite orbit products (daily files, generated daily) from the real-time IGS analys…",
+      "org": "CDDIS"
+    },
+    {
+      "title": "Global Navigation Satellite System (GNSS) IGS Decoded Clock Solution (10-second) from IGS Real-Time Product Streams from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_decd_clk_soln_10sec_IGS_RT_strms",
+      "desc": "This derived product set consists of Global Navigation Satellite System satellite and receiver clock products (10-second granularity, daily files, generated…",
+      "org": "CDDIS"
+    },
+    {
+      "title": "GNSS radio occultation L2A bending angle, refractivity, and dry pressure for PAZ as contributed by JPL, version 2.0 (gnssro_paz_jpl_l2a)",
+      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_paz_jpl_l2a",
+      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Bending Angle, Refractivity, and Dry Pressure data from the PAZ (which…",
       "org": "GES_DISC"
     },
     {
-      "title": "SRB/GEWEX evapotranspiration (Penman-Monteith) L4 3 hour 0.5 degree x 0.5 degree V1 (WC_PM_ET_050) at GES DISC",
-      "url": "https://search.earthdata.nasa.gov/search?q=WC_PM_ET_050",
-      "desc": "SRB/GEWEX evapotranspiration (Penman-Monteith) L4 3 hour 0.5 degree x 0.5 degree V1 is a global, 24-year (1984-2007), satellite-derived evapotranspiration ov…",
+      "title": "GNSS radio occultation L2B temperature, pressure, and water vapor retrieval for COSMIC1 as contributed by UCAR, version 2.0 (gnssro_cosmi…",
+      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_cosmic1_ucar_l2b",
+      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Temperature, Pressure, and Water Vapor data from the Constellation Obs…",
       "org": "GES_DISC"
     },
     {
-      "title": "TMI/TRMM precipitation and uncertainty (TMPA) L3 3 hour 0.25 degree x 0.25 degree V001 (WC_MULTISEN_PREC_025) at GES DISC",
-      "url": "https://search.earthdata.nasa.gov/search?q=WC_MULTISEN_PREC_025",
-      "desc": "TMI/TRMM precipitation and uncertainty (TMPA) L3 3 hour 0.25 degree x 0.25 degree V001 provides estimates of accumulated precipitation from the Tropical Rain…",
+      "title": "GNSS radio occultation L2B temperature, pressure, and water vapor retrieval for TSX as contributed by UCAR, version 2.0 (gnssro_tsx_ucar_…",
+      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_tsx_ucar_l2b",
+      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Temperature, Pressure, and Water Vapor data from the TerraSAR-X missio…",
       "org": "GES_DISC"
     },
     {
-      "title": "AMSR-E/Aqua surface soil moisture (LSMEM) L3 1 day 0.25 degree x 0.25 degree V001 (WC_LSMEM_SOILM_025) at GES DISC",
-      "url": "https://search.earthdata.nasa.gov/search?q=WC_LSMEM_SOILM_025",
-      "desc": "AMSR-E/Aqua surface soil moisture (LSMEM) L3 1 day 0.25 degree x 0.25 degree V001 is a global, 10-year (2002-2011) data set.",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "VISSR/SMS-2 Level 1 Atmospheric and Oceanographic Image Processing System (AOIPS) Data V001 (VISSRSMS2L1AOIPS) at GES DISC",
-      "url": "https://search.earthdata.nasa.gov/search?q=VISSRSMS2L1AOIPS",
-      "desc": "VISSRSMS2L1AOIPS is the Visible Infrared Spin-Scan Radiometer (VISSR) Level 1 Atmospheric and Oceanographic Image Processing System (AOIPS) data product from…",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "VISSR/SMS-1 Level 1 Experimenter History Data V001 (VISSRSMS1L1EHT) at GES DISC",
-      "url": "https://search.earthdata.nasa.gov/search?q=VISSRSMS1L1EHT",
-      "desc": "VISSRSMS1L1EHT is the Visible Infrared Spin-Scan Radiometer (VISSR) Level 1 Experimenter History Tape (EHT) data product from the first Synchronous Meteorolo…",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "VISSR/SMS-1 Level 1 Atmospheric and Oceanographic Image Processing System (AOIPS) Data V001 (VISSRSMS1L1AOIPS) at GES DISC",
-      "url": "https://search.earthdata.nasa.gov/search?q=VISSRSMS1L1AOIPS",
-      "desc": "VISSRSMS1L1AOIPS is the Visible Infrared Spin-Scan Radiometer (VISSR) Level 1 Atmospheric and Oceanographic Image Processing System (AOIPS) data product from…",
+      "title": "GNSS radio occultation L2B temperature, pressure, and water vapor retrieval for TSX as contributed by JPL, version 2.0 (gnssro_tsx_jpl_l2b)",
+      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_tsx_jpl_l2b",
+      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Temperature, Pressure, and Water Vapor data from the TerraSAR-X missio…",
       "org": "GES_DISC"
     }
   ],
