@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-19",
+  "generatedAt": "2026-09-20",
   "news": {
     "mapsmania": [
       {
@@ -210,6 +210,12 @@
   ],
   "gisse": [
     {
+      "title": "Blink raster layer automatically",
+      "url": "https://gis.stackexchange.com/questions/501454/blink-raster-layer-automatically",
+      "score": 2,
+      "answers": 2
+    },
+    {
       "title": "Bash completion for GDAL not working",
       "url": "https://gis.stackexchange.com/questions/501437/bash-completion-for-gdal-not-working",
       "score": 0,
@@ -228,16 +234,16 @@
       "answers": 1
     },
     {
-      "title": "Tile Imagery Layer pulled from ArcGIS Online - correct syntax",
-      "url": "https://gis.stackexchange.com/questions/501435/tile-imagery-layer-pulled-from-arcgis-online-correct-syntax",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "Why is a degree of latitude longer at the poles than the equator in WGS 84?",
       "url": "https://gis.stackexchange.com/questions/501401/why-is-a-degree-of-latitude-longer-at-the-poles-than-the-equator-in-wgs-84",
       "score": 6,
       "answers": 2
+    },
+    {
+      "title": "Tile Imagery Layer pulled from ArcGIS Online - correct syntax",
+      "url": "https://gis.stackexchange.com/questions/501435/tile-imagery-layer-pulled-from-arcgis-online-correct-syntax",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "Add Polygon Feature missing from Digitizing Toolbar",
@@ -262,12 +268,6 @@
       "url": "https://gis.stackexchange.com/questions/501433/layout-grids-in-equal-earth-projections-for-americas-epsg8858-and-asia-pacifi",
       "score": 0,
       "answers": 0
-    },
-    {
-      "title": "Automatically generating file path of shapefile location using ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501410/automatically-generating-file-path-of-shapefile-location-using-arcgis-pro",
-      "score": 0,
-      "answers": 1
     }
   ],
   "nasa": [
@@ -290,6 +290,36 @@
       "org": "ASF"
     },
     {
+      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
+      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
+      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
+      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
+      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
+      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
       "title": "Global Navigation Satellite System (GNSS) IGS Real-Time Combination Solution Summary of Real-Time Analysis Center (AC) Submissions from N…",
       "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_RT_comb_soln_sum_AC_subm",
       "desc": "This derived product set consists of Global Navigation Satellite System satellite and receiver clock combination product (30-second granularity, daily files,…",
@@ -300,36 +330,6 @@
       "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_decd_orbit_soln_30sec_IGS_RT_strms",
       "desc": "This derived product set consists of Global Navigation Satellite System satellite orbit products (daily files, generated daily) from the real-time IGS analys…",
       "org": "CDDIS"
-    },
-    {
-      "title": "Global Navigation Satellite System (GNSS) IGS Decoded Clock Solution (10-second) from IGS Real-Time Product Streams from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_decd_clk_soln_10sec_IGS_RT_strms",
-      "desc": "This derived product set consists of Global Navigation Satellite System satellite and receiver clock products (10-second granularity, daily files, generated…",
-      "org": "CDDIS"
-    },
-    {
-      "title": "GNSS radio occultation L2A bending angle, refractivity, and dry pressure for PAZ as contributed by JPL, version 2.0 (gnssro_paz_jpl_l2a)",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_paz_jpl_l2a",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Bending Angle, Refractivity, and Dry Pressure data from the PAZ (which…",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "GNSS radio occultation L2B temperature, pressure, and water vapor retrieval for COSMIC1 as contributed by UCAR, version 2.0 (gnssro_cosmi…",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_cosmic1_ucar_l2b",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Temperature, Pressure, and Water Vapor data from the Constellation Obs…",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "GNSS radio occultation L2B temperature, pressure, and water vapor retrieval for TSX as contributed by UCAR, version 2.0 (gnssro_tsx_ucar_…",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_tsx_ucar_l2b",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Temperature, Pressure, and Water Vapor data from the TerraSAR-X missio…",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "GNSS radio occultation L2B temperature, pressure, and water vapor retrieval for TSX as contributed by JPL, version 2.0 (gnssro_tsx_jpl_l2b)",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_tsx_jpl_l2b",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Temperature, Pressure, and Water Vapor data from the TerraSAR-X missio…",
-      "org": "GES_DISC"
     }
   ],
   "datagov": [
@@ -392,16 +392,16 @@
   ],
   "osm": [
     {
+      "title": "weeklyOSM 843",
+      "url": "https://weeklyosm.eu/archives/18880"
+    },
+    {
       "title": "weeklyOSM 842",
       "url": "https://weeklyosm.eu/archives/18872"
     },
     {
       "title": "weeklyOSM 841",
       "url": "https://weeklyosm.eu/archives/18849"
-    },
-    {
-      "title": "weeklyOSM 840",
-      "url": "https://weeklyosm.eu/archives/18836"
     }
   ]
 }
