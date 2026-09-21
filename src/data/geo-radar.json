@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-20",
+  "generatedAt": "2026-09-21",
   "news": {
     "mapsmania": [
+      {
+        "title": "The 540 Million Year History of the USA",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/the-540-million-year-history-of-usa.html",
+        "desc": ""
+      },
       {
         "title": "GeoWhisperer - See How the World Has Changed",
         "url": "http://googlemapsmania.blogspot.com/2026/09/geowhisperer-see-how-world-has-changed.html",
@@ -35,11 +40,6 @@
       {
         "title": "PIxel City Maps Are Here",
         "url": "http://googlemapsmania.blogspot.com/2026/09/pixel-city-maps-are-here.html",
-        "desc": ""
-      },
-      {
-        "title": "Mapping the Song Every City is Listening To",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/what-is-world-listening-to-today.html",
         "desc": ""
       }
     ],
@@ -210,22 +210,28 @@
   ],
   "gisse": [
     {
-      "title": "Blink raster layer automatically",
-      "url": "https://gis.stackexchange.com/questions/501454/blink-raster-layer-automatically",
-      "score": 2,
-      "answers": 2
-    },
-    {
-      "title": "Bash completion for GDAL not working",
-      "url": "https://gis.stackexchange.com/questions/501437/bash-completion-for-gdal-not-working",
-      "score": 0,
-      "answers": 1
+      "title": "Equivalent of ArcGIS \"Flicker Layer\" for blinking raster layer automatically in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501454/equivalent-of-arcgis-flicker-layer-for-blinking-raster-layer-automatically-in",
+      "score": 4,
+      "answers": 3
     },
     {
       "title": "Crop collar of USGS maps and stitch together with GDAL",
       "url": "https://gis.stackexchange.com/questions/501440/crop-collar-of-usgs-maps-and-stitch-together-with-gdal",
       "score": 0,
       "answers": 0
+    },
+    {
+      "title": "Setting label field to certain attribute for symbology using ArcGIS Pro",
+      "url": "https://gis.stackexchange.com/questions/501434/setting-label-field-to-certain-attribute-for-symbology-using-arcgis-pro",
+      "score": 1,
+      "answers": 0
+    },
+    {
+      "title": "Bash completion for GDAL not working",
+      "url": "https://gis.stackexchange.com/questions/501437/bash-completion-for-gdal-not-working",
+      "score": 0,
+      "answers": 1
     },
     {
       "title": "Raster layers in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
@@ -252,42 +258,36 @@
       "answers": 1
     },
     {
+      "title": "GDAL Raster Mosaic Count Pixel Function",
+      "url": "https://gis.stackexchange.com/questions/501386/gdal-raster-mosaic-count-pixel-function",
+      "score": 3,
+      "answers": 1
+    },
+    {
       "title": "Satellite basemap for South Korea for building analysis (EPSG:3857)",
       "url": "https://gis.stackexchange.com/questions/501432/satellite-basemap-for-south-korea-for-building-analysis-epsg3857",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "ArcGIS Pro symbology: how do I set the label field to a certain attribute?",
-      "url": "https://gis.stackexchange.com/questions/501434/arcgis-pro-symbology-how-do-i-set-the-label-field-to-a-certain-attribute",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Layout grids in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
-      "url": "https://gis.stackexchange.com/questions/501433/layout-grids-in-equal-earth-projections-for-americas-epsg8858-and-asia-pacifi",
       "score": 0,
       "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
-      "desc": "SMAP Level 1A Radar Receive Only Product Version 3",
-      "org": "ASF"
+      "title": "EMIT L2A Surface Reflectance and Uncertainty 60 m V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=EMITL2ARFL",
+      "desc": "The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).",
+      "org": "LPCLOUD"
     },
     {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003",
-      "desc": "SMAP Level 1A Radar Receive Only Data Quality Information Version 3",
-      "org": "ASF"
+      "title": "EMIT L2A Masks 60 m V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=EMITL2AMASK",
+      "desc": "The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).",
+      "org": "LPCLOUD"
     },
     {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003",
-      "desc": "SMAP Level 1A Radar Receive Only Product Metadata Version 3",
-      "org": "ASF"
+      "title": "LISTOS Yale Coastal Ground Site Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_YaleCoastal_Data",
+      "desc": "LISTOS_Ground_YaleCoastal_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at the Yale Coastal ground site during t…",
+      "org": "LARC_CLOUD"
     },
     {
       "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
@@ -320,16 +320,16 @@
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "Global Navigation Satellite System (GNSS) IGS Real-Time Combination Solution Summary of Real-Time Analysis Center (AC) Submissions from N…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_RT_comb_soln_sum_AC_subm",
-      "desc": "This derived product set consists of Global Navigation Satellite System satellite and receiver clock combination product (30-second granularity, daily files,…",
-      "org": "CDDIS"
+      "title": "LISTOS Outer Island Ground Site Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_OuterIsland_Data",
+      "desc": "LISTOS_Ground_OuterIsland_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at the Outer Island ground site during t…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Global Navigation Satellite System (GNSS) IGS Decoded Orbit Solution (30-second) from IGS Real-Time Product Streams from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_decd_orbit_soln_30sec_IGS_RT_strms",
-      "desc": "This derived product set consists of Global Navigation Satellite System satellite orbit products (daily files, generated daily) from the real-time IGS analys…",
-      "org": "CDDIS"
+      "title": "LISTOS Ground Data at Miscellaneous Ground Sites",
+      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_Other_Data",
+      "desc": "LISTOS_Ground_Other_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at a collection of ground sites during the LIS…",
+      "org": "LARC_CLOUD"
     }
   ],
   "datagov": [
