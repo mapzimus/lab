@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-21",
+  "generatedAt": "2026-09-22",
   "news": {
     "mapsmania": [
+      {
+        "title": "The US Deportation Map",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/the-us-deportation-map.html",
+        "desc": ""
+      },
       {
         "title": "The 540 Million Year History of the USA",
         "url": "http://googlemapsmania.blogspot.com/2026/09/the-540-million-year-history-of-usa.html",
@@ -35,11 +40,6 @@
       {
         "title": "GeoGuessr Gets an Antipodean Time Machine",
         "url": "http://googlemapsmania.blogspot.com/2026/09/geoguessr-gets-antipodean-time-machine.html",
-        "desc": ""
-      },
-      {
-        "title": "PIxel City Maps Are Here",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/pixel-city-maps-are-here.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "Repoliner - репозитории модулей",
-      "url": "https://plugins.qgis.org/plugins/repoliner/"
+      "title": "Multipoint Line Naming",
+      "url": "https://plugins.qgis.org/plugins/multiline_labelling/"
     },
     {
-      "title": "YAAP(Yet Another Animation Plugin)",
-      "url": "https://plugins.qgis.org/plugins/YAAP_yet_another_animation_plugin/"
+      "title": "Stormwater Drainage Plot and Design",
+      "url": "https://plugins.qgis.org/plugins/stormwater_drainage_plot_design/"
     },
     {
-      "title": "Analisi territoriale",
-      "url": "https://plugins.qgis.org/plugins/territorial_suite/"
+      "title": "Recalculo RTK a Coordenadas Ajustadas",
+      "url": "https://plugins.qgis.org/plugins/recalculo_rtk/"
     },
     {
-      "title": "SeaState US",
-      "url": "https://plugins.qgis.org/plugins/seastate/"
+      "title": "QMD Tools Explorer",
+      "url": "https://plugins.qgis.org/plugins/qmd_tools_explorer/"
     },
     {
-      "title": "LandXML Surface Tools",
-      "url": "https://plugins.qgis.org/plugins/landxml_surface_tools/"
+      "title": "GeoVisual Lineament — Experimental Validation v7.2.3",
+      "url": "https://plugins.qgis.org/plugins/GeoVisualLineament/"
     },
     {
-      "title": "NISAR Processor",
-      "url": "https://plugins.qgis.org/plugins/NISAR_Processor/"
+      "title": "Exel to Feature (Coordinate Transformation)",
+      "url": "https://plugins.qgis.org/plugins/axel_to_feature_etf/"
     },
     {
-      "title": "KICT SWAT-K 2026",
-      "url": "https://plugins.qgis.org/plugins/swat_k/"
+      "title": "Coastal Inundation Under Climate Change",
+      "url": "https://plugins.qgis.org/plugins/CoastalInundation_Under_ClimateChange/"
     },
     {
-      "title": "Inpaint AI Cloud",
-      "url": "https://plugins.qgis.org/plugins/InpaintAI/"
+      "title": "Wake",
+      "url": "https://plugins.qgis.org/plugins/wake/"
     }
   ],
   "releases": [
@@ -210,6 +210,18 @@
   ],
   "gisse": [
     {
+      "title": "Google Earth Where is a KMZ file that I edited in the field located on my phone?",
+      "url": "https://gis.stackexchange.com/questions/501465/google-earth-where-is-a-kmz-file-that-i-edited-in-the-field-located-on-my-phone",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Remove specific coordinates in map layout grid in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501462/remove-specific-coordinates-in-map-layout-grid-in-qgis",
+      "score": 1,
+      "answers": 2
+    },
+    {
       "title": "Equivalent of ArcGIS \"Flicker Layer\" for blinking raster layer automatically in QGIS",
       "url": "https://gis.stackexchange.com/questions/501454/equivalent-of-arcgis-flicker-layer-for-blinking-raster-layer-automatically-in",
       "score": 4,
@@ -228,6 +240,12 @@
       "answers": 0
     },
     {
+      "title": "Why is a degree of latitude longer at the poles than the equator in WGS 84?",
+      "url": "https://gis.stackexchange.com/questions/501401/why-is-a-degree-of-latitude-longer-at-the-poles-than-the-equator-in-wgs-84",
+      "score": 6,
+      "answers": 2
+    },
+    {
       "title": "Bash completion for GDAL not working",
       "url": "https://gis.stackexchange.com/questions/501437/bash-completion-for-gdal-not-working",
       "score": 0,
@@ -240,54 +258,36 @@
       "answers": 1
     },
     {
-      "title": "Why is a degree of latitude longer at the poles than the equator in WGS 84?",
-      "url": "https://gis.stackexchange.com/questions/501401/why-is-a-degree-of-latitude-longer-at-the-poles-than-the-equator-in-wgs-84",
-      "score": 6,
-      "answers": 2
-    },
-    {
-      "title": "Tile Imagery Layer pulled from ArcGIS Online - correct syntax",
-      "url": "https://gis.stackexchange.com/questions/501435/tile-imagery-layer-pulled-from-arcgis-online-correct-syntax",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "Add Polygon Feature missing from Digitizing Toolbar",
       "url": "https://gis.stackexchange.com/questions/501400/add-polygon-feature-missing-from-digitizing-toolbar",
       "score": 0,
       "answers": 1
     },
     {
-      "title": "GDAL Raster Mosaic Count Pixel Function",
-      "url": "https://gis.stackexchange.com/questions/501386/gdal-raster-mosaic-count-pixel-function",
-      "score": 3,
-      "answers": 1
-    },
-    {
-      "title": "Satellite basemap for South Korea for building analysis (EPSG:3857)",
-      "url": "https://gis.stackexchange.com/questions/501432/satellite-basemap-for-south-korea-for-building-analysis-epsg3857",
+      "title": "Tile Imagery Layer pulled from ArcGIS Online - correct syntax",
+      "url": "https://gis.stackexchange.com/questions/501435/tile-imagery-layer-pulled-from-arcgis-online-correct-syntax",
       "score": 0,
       "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "EMIT L2A Surface Reflectance and Uncertainty 60 m V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=EMITL2ARFL",
-      "desc": "The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).",
-      "org": "LPCLOUD"
+      "title": "Global Navigation Satellite System (GNSS) IGS Final Analysis Center (AC) Earth Rotation Parameters (ERP) Product from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_AC_ERP_prod",
+      "desc": "This derived product set consists of Global Navigation Satellite System Final Earth Rotation Parameter (ERP) Product from the NASA Crustal Dynamics Data Info…",
+      "org": "CDDIS"
     },
     {
-      "title": "EMIT L2A Masks 60 m V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=EMITL2AMASK",
-      "desc": "The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).",
-      "org": "LPCLOUD"
+      "title": "NOAA20 VIIRS Deep Blue Level 3 Monthly Aerosol Data, 1x1 Degree Grid - V2.1",
+      "url": "https://search.earthdata.nasa.gov/search?q=AERDB_M3_VIIRS_NOAA20",
+      "desc": "The Visible Infrared Imaging Radiometer Suite (VIIRS) NASA standard Level 3 (L3) monthly Deep Blue Aerosol Products from the Joint Polar Satellite System (JP…",
+      "org": "LAADS"
     },
     {
-      "title": "LISTOS Yale Coastal Ground Site Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_YaleCoastal_Data",
-      "desc": "LISTOS_Ground_YaleCoastal_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at the Yale Coastal ground site during t…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
+      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
       "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
@@ -320,16 +320,16 @@
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "LISTOS Outer Island Ground Site Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_OuterIsland_Data",
-      "desc": "LISTOS_Ground_OuterIsland_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at the Outer Island ground site during t…",
-      "org": "LARC_CLOUD"
+      "title": "VIIRS/NOAA21 Deep Blue Aerosol L2 6-Min Swath 6 km - V2.1",
+      "url": "https://search.earthdata.nasa.gov/search?q=AERDB_L2_VIIRS_NOAA21",
+      "desc": "The Visible Infrared Imaging Radiometer Suite (VIIRS) NASA standard Level 2 (L2) Deep Blue Aerosol Products from the Joint Polar Satellite System (JPSS) seri…",
+      "org": "LAADS"
     },
     {
-      "title": "LISTOS Ground Data at Miscellaneous Ground Sites",
-      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_Other_Data",
-      "desc": "LISTOS_Ground_Other_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at a collection of ground sites during the LIS…",
-      "org": "LARC_CLOUD"
+      "title": "OCO-3 Level 2 geolocated XCO2 retrievals results, physical model, Retrospective Processing V11r (OCO3_L2_Standard)",
+      "url": "https://search.earthdata.nasa.gov/search?q=OCO3_L2_Standard",
+      "desc": "Version 11r is the current version of the data set.",
+      "org": "GES_DISC"
     }
   ],
   "datagov": [
