@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-22",
+  "generatedAt": "2026-09-23",
   "news": {
     "mapsmania": [
+      {
+        "title": "The World Drawn by 3,000 People",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/the-world-drawn-by-3000-people.html",
+        "desc": ""
+      },
       {
         "title": "The US Deportation Map",
         "url": "http://googlemapsmania.blogspot.com/2026/09/the-us-deportation-map.html",
@@ -35,11 +40,6 @@
       {
         "title": "Blowing Up the World Becomes More Fun",
         "url": "http://googlemapsmania.blogspot.com/2026/09/blowing-up-world-becomes-more-fun.html",
-        "desc": ""
-      },
-      {
-        "title": "GeoGuessr Gets an Antipodean Time Machine",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/geoguessr-gets-antipodean-time-machine.html",
         "desc": ""
       }
     ],
@@ -130,25 +130,25 @@
       "url": "https://plugins.qgis.org/plugins/GeoVisualLineament/"
     },
     {
-      "title": "Exel to Feature (Coordinate Transformation)",
-      "url": "https://plugins.qgis.org/plugins/axel_to_feature_etf/"
-    },
-    {
       "title": "Coastal Inundation Under Climate Change",
       "url": "https://plugins.qgis.org/plugins/CoastalInundation_Under_ClimateChange/"
     },
     {
       "title": "Wake",
       "url": "https://plugins.qgis.org/plugins/wake/"
+    },
+    {
+      "title": "Quick Raster Statistics",
+      "url": "https://plugins.qgis.org/plugins/Quick_Raster_Statistics/"
     }
   ],
   "releases": [
     {
       "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.10.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.10.0",
-      "desc": "### ✨ Features and improvements - Show the sky in globe view, fading out with altitude instead of with the globe to mercator transition ([#8464](https://gith…",
-      "publishedAt": "2026-09-15",
+      "title": "maplibre-gl-js v6.11.1",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.11.1",
+      "desc": "### 🐞 Bug fixes - Fix missing promoteId when merging queued updateData diffs in geojson source ([#8500](https://github.com/maplibre/maplibre-gl-js/pull/8500…",
+      "publishedAt": "2026-09-23",
       "isFresh": true
     },
     {
@@ -213,13 +213,19 @@
       "title": "Google Earth Where is a KMZ file that I edited in the field located on my phone?",
       "url": "https://gis.stackexchange.com/questions/501465/google-earth-where-is-a-kmz-file-that-i-edited-in-the-field-located-on-my-phone",
       "score": 0,
-      "answers": 0
+      "answers": 1
     },
     {
-      "title": "Remove specific coordinates in map layout grid in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501462/remove-specific-coordinates-in-map-layout-grid-in-qgis",
-      "score": 1,
+      "title": "Removing specific coordinates in map layout grid in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501462/removing-specific-coordinates-in-map-layout-grid-in-qgis",
+      "score": 4,
       "answers": 2
+    },
+    {
+      "title": "Discrepancy between how Add Spatial Join runs in ArcGIS Pro and outside in a script?",
+      "url": "https://gis.stackexchange.com/questions/501469/discrepancy-between-how-add-spatial-join-runs-in-arcgis-pro-and-outside-in-a-scr",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "Equivalent of ArcGIS \"Flicker Layer\" for blinking raster layer automatically in QGIS",
@@ -262,56 +268,50 @@
       "url": "https://gis.stackexchange.com/questions/501400/add-polygon-feature-missing-from-digitizing-toolbar",
       "score": 0,
       "answers": 1
-    },
-    {
-      "title": "Tile Imagery Layer pulled from ArcGIS Online - correct syntax",
-      "url": "https://gis.stackexchange.com/questions/501435/tile-imagery-layer-pulled-from-arcgis-online-correct-syntax",
-      "score": 0,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "Global Navigation Satellite System (GNSS) IGS Final Analysis Center (AC) Earth Rotation Parameters (ERP) Product from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_AC_ERP_prod",
-      "desc": "This derived product set consists of Global Navigation Satellite System Final Earth Rotation Parameter (ERP) Product from the NASA Crustal Dynamics Data Info…",
+      "title": "COWVR STP-H8 Antenna and Microwave Brightness Temperatures Version 10.0",
+      "url": "https://search.earthdata.nasa.gov/search?q=COWVR_STPH8_L1_TSDR_V10.0",
+      "desc": "This dataset includes satellite-based observations of calibrated, geo-located antenna temperature and brightness temperatures, along with the sensor telemetr…",
+      "org": "POCLOUD"
+    },
+    {
+      "title": "Ground-Based Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) IDS Ionospheric Product from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=DORIS_IDS_ion_prods",
+      "desc": "Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) Ionospheric Product from the NASA Crustal Dynamics Data Information System (CDDIS).",
       "org": "CDDIS"
     },
     {
-      "title": "NOAA20 VIIRS Deep Blue Level 3 Monthly Aerosol Data, 1x1 Degree Grid - V2.1",
-      "url": "https://search.earthdata.nasa.gov/search?q=AERDB_M3_VIIRS_NOAA20",
-      "desc": "The Visible Infrared Imaging Radiometer Suite (VIIRS) NASA standard Level 3 (L3) monthly Deep Blue Aerosol Products from the Joint Polar Satellite System (JP…",
-      "org": "LAADS"
+      "title": "TEMPEST STP-H8 Antenna and Microwave Brightness Temperatures Version 10.0",
+      "url": "https://search.earthdata.nasa.gov/search?q=TEMPEST_STPH8_L1_TSDR_V10.0",
+      "desc": "This dataset includes satellite-based observations of calibrated, geo-located antenna temperature and brightness temperatures, along with the sensor telemetr…",
+      "org": "POCLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
-      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "COWVR STP-H8 Surface Wind Vector and Column-Integrated Atmospheric Water Measurements Version 10.0",
+      "url": "https://search.earthdata.nasa.gov/search?q=COWVR_STPH8_L2_EDR_V10.0",
+      "desc": "This dataset includes satellite-based observations of surface wind vectors, precipitable water vapor, and integrated cloud liquid water, as well as the micro…",
+      "org": "POCLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "ECOSTRESS/OCO-3 Co-Located Observations Version 2.0",
+      "url": "https://search.earthdata.nasa.gov/search?q=ECOCO3",
+      "desc": "The ECOSTRESS/OCO-3 (“ECOCO3”) data set consists of spatially and temporally co-located observations from the ECOsystem Spaceborne Thermal Radiometer Experim…",
+      "org": "GES_DISC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
-      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "Ground-Based Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) IDS Earth Orientation Parameters (EOP) Time Series…",
+      "url": "https://search.earthdata.nasa.gov/search?q=DORIS_IDS_EOP_prod",
+      "desc": "Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) Earth Orientation Parameters Time Series Product from the NASA Crustal Dynamics Dat…",
+      "org": "CDDIS"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
-      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "Ground-Based Doppler Orbitography by Radiopositioning Integrated on Satellite (DORIS) IDS Satellite Orbit Product from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=DORIS_IDS_orbit_prod",
+      "desc": "Doppler Orbitography by Radiopositioning Integrated on Satellite (DORIS) Satellite Orbit Product from the NASA Crustal Dynamics Data Information System (CDDIS).",
+      "org": "CDDIS"
     },
     {
       "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
@@ -320,16 +320,16 @@
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "VIIRS/NOAA21 Deep Blue Aerosol L2 6-Min Swath 6 km - V2.1",
-      "url": "https://search.earthdata.nasa.gov/search?q=AERDB_L2_VIIRS_NOAA21",
-      "desc": "The Visible Infrared Imaging Radiometer Suite (VIIRS) NASA standard Level 2 (L2) Deep Blue Aerosol Products from the Joint Polar Satellite System (JPSS) seri…",
-      "org": "LAADS"
+      "title": "Ground-Based Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) IDS Coordinates of the Terrestrial Reference Frame…",
+      "url": "https://search.earthdata.nasa.gov/search?q=DORIS_IDS_geocntr_prod",
+      "desc": "Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) Geocenter Time Series Product from the NASA Crustal Dynamics Data Information Syste…",
+      "org": "CDDIS"
     },
     {
-      "title": "OCO-3 Level 2 geolocated XCO2 retrievals results, physical model, Retrospective Processing V11r (OCO3_L2_Standard)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OCO3_L2_Standard",
-      "desc": "Version 11r is the current version of the data set.",
-      "org": "GES_DISC"
+      "title": "VIIRS/JPSS2 Photosynthetically Active Radiation Daily L3 Global 0.05Deg CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ218C2",
+      "desc": "The NOAA-21 Visible Infrared Imaging Radiometer Suite (VIIRS) Photosynthetically Active Radiation (PAR) Level 3 Climate Modeling Grid (CMG) product produced…",
+      "org": "LPCLOUD"
     }
   ],
   "datagov": [
