@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-23",
+  "generatedAt": "2026-09-24",
   "news": {
     "mapsmania": [
+      {
+        "title": "Building Age Maps: From NYC to LA",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/building-age-maps-from-nyc-to-la.html",
+        "desc": ""
+      },
       {
         "title": "The World Drawn by 3,000 People",
         "url": "http://googlemapsmania.blogspot.com/2026/09/the-world-drawn-by-3000-people.html",
@@ -35,11 +40,6 @@
       {
         "title": "170,000 Movies - One Interactive Map",
         "url": "http://googlemapsmania.blogspot.com/2026/09/170000-movies-one-interactive-map.html",
-        "desc": ""
-      },
-      {
-        "title": "Blowing Up the World Becomes More Fun",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/blowing-up-world-becomes-more-fun.html",
         "desc": ""
       }
     ],
@@ -145,10 +145,10 @@
   "releases": [
     {
       "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.11.1",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.11.1",
-      "desc": "### 🐞 Bug fixes - Fix missing promoteId when merging queued updateData diffs in geojson source ([#8500](https://github.com/maplibre/maplibre-gl-js/pull/8500…",
-      "publishedAt": "2026-09-23",
+      "title": "maplibre-gl-js v6.11.2",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.11.2",
+      "desc": "### ✨ Features and improvements - Improve rendering performance by uploading each tile's projection data once per frame instead of before every draw call ([#…",
+      "publishedAt": "2026-09-24",
       "isFresh": true
     },
     {
@@ -210,10 +210,10 @@
   ],
   "gisse": [
     {
-      "title": "Google Earth Where is a KMZ file that I edited in the field located on my phone?",
-      "url": "https://gis.stackexchange.com/questions/501465/google-earth-where-is-a-kmz-file-that-i-edited-in-the-field-located-on-my-phone",
-      "score": 0,
-      "answers": 1
+      "title": "Spectral indices fall outside the normal range",
+      "url": "https://gis.stackexchange.com/questions/501477/spectral-indices-fall-outside-the-normal-range",
+      "score": 3,
+      "answers": 0
     },
     {
       "title": "Removing specific coordinates in map layout grid in QGIS",
@@ -222,27 +222,27 @@
       "answers": 2
     },
     {
-      "title": "Discrepancy between how Add Spatial Join runs in ArcGIS Pro and outside in a script?",
-      "url": "https://gis.stackexchange.com/questions/501469/discrepancy-between-how-add-spatial-join-runs-in-arcgis-pro-and-outside-in-a-scr",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "Equivalent of ArcGIS \"Flicker Layer\" for blinking raster layer automatically in QGIS",
       "url": "https://gis.stackexchange.com/questions/501454/equivalent-of-arcgis-flicker-layer-for-blinking-raster-layer-automatically-in",
       "score": 4,
       "answers": 3
     },
     {
-      "title": "Crop collar of USGS maps and stitch together with GDAL",
-      "url": "https://gis.stackexchange.com/questions/501440/crop-collar-of-usgs-maps-and-stitch-together-with-gdal",
+      "title": "Google Earth Where is a KMZ file that I edited in the field located on my phone?",
+      "url": "https://gis.stackexchange.com/questions/501465/google-earth-where-is-a-kmz-file-that-i-edited-in-the-field-located-on-my-phone",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Discrepancy between how Add Spatial Join runs in ArcGIS Pro and outside in a script?",
+      "url": "https://gis.stackexchange.com/questions/501469/discrepancy-between-how-add-spatial-join-runs-in-arcgis-pro-and-outside-in-a-scr",
       "score": 0,
       "answers": 0
     },
     {
-      "title": "Setting label field to certain attribute for symbology using ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501434/setting-label-field-to-certain-attribute-for-symbology-using-arcgis-pro",
-      "score": 1,
+      "title": "Crop collar of USGS maps and stitch together with GDAL",
+      "url": "https://gis.stackexchange.com/questions/501440/crop-collar-of-usgs-maps-and-stitch-together-with-gdal",
+      "score": 0,
       "answers": 0
     },
     {
@@ -252,10 +252,10 @@
       "answers": 2
     },
     {
-      "title": "Bash completion for GDAL not working",
-      "url": "https://gis.stackexchange.com/questions/501437/bash-completion-for-gdal-not-working",
-      "score": 0,
-      "answers": 1
+      "title": "Setting label field to certain attribute for symbology using ArcGIS Pro",
+      "url": "https://gis.stackexchange.com/questions/501434/setting-label-field-to-certain-attribute-for-symbology-using-arcgis-pro",
+      "score": 1,
+      "answers": 0
     },
     {
       "title": "Raster layers in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
@@ -264,72 +264,72 @@
       "answers": 1
     },
     {
-      "title": "Add Polygon Feature missing from Digitizing Toolbar",
-      "url": "https://gis.stackexchange.com/questions/501400/add-polygon-feature-missing-from-digitizing-toolbar",
+      "title": "Least Cost Path in QGIS; plugin crashing and GRASS tools not visible",
+      "url": "https://gis.stackexchange.com/questions/501414/least-cost-path-in-qgis-plugin-crashing-and-grass-tools-not-visible",
       "score": 0,
       "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "COWVR STP-H8 Antenna and Microwave Brightness Temperatures Version 10.0",
-      "url": "https://search.earthdata.nasa.gov/search?q=COWVR_STPH8_L1_TSDR_V10.0",
-      "desc": "This dataset includes satellite-based observations of calibrated, geo-located antenna temperature and brightness temperatures, along with the sensor telemetr…",
-      "org": "POCLOUD"
+      "title": "MISR Level 1B2 Terrain Product subset for the VBBE region V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=VBEMIB2T",
+      "desc": "VBEMIB2T_003 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 1B2 Terrain Product subset for the VBBE region version 3.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) IDS Ionospheric Product from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=DORIS_IDS_ion_prods",
-      "desc": "Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) Ionospheric Product from the NASA Crustal Dynamics Data Information System (CDDIS).",
-      "org": "CDDIS"
+      "title": "MISR Level 2 TOA/Cloud Stereo Product subset for the VBBE region V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VBEMI2ST",
+      "desc": "VBEMI2ST_002 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 2 TOA/Cloud Stereo Product subset for the VBBE region version 2.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "TEMPEST STP-H8 Antenna and Microwave Brightness Temperatures Version 10.0",
-      "url": "https://search.earthdata.nasa.gov/search?q=TEMPEST_STPH8_L1_TSDR_V10.0",
-      "desc": "This dataset includes satellite-based observations of calibrated, geo-located antenna temperature and brightness temperatures, along with the sensor telemetr…",
-      "org": "POCLOUD"
+      "title": "MISR Level 3 Component Global Radiance Product covering a day subset for the UAE region V004",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAEMRDRD",
+      "desc": "UAEMRDRD_004 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 3 Component Global Radiance Product covering a day subset for the UAE region version 4.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "COWVR STP-H8 Surface Wind Vector and Column-Integrated Atmospheric Water Measurements Version 10.0",
-      "url": "https://search.earthdata.nasa.gov/search?q=COWVR_STPH8_L2_EDR_V10.0",
-      "desc": "This dataset includes satellite-based observations of surface wind vectors, precipitable water vapor, and integrated cloud liquid water, as well as the micro…",
-      "org": "POCLOUD"
+      "title": "MISR Level 3 Component Global Aerosol Product covering a day subset for the UAE region V004",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAEMRDAE",
+      "desc": "UAEMRDAE_004 is the Multi-angle Imaging SpecrtroRadiometer (MISR) Level 3 Component Global Aerosol Product covering a day subset for the UAE region version 4.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "ECOSTRESS/OCO-3 Co-Located Observations Version 2.0",
-      "url": "https://search.earthdata.nasa.gov/search?q=ECOCO3",
-      "desc": "The ECOSTRESS/OCO-3 (“ECOCO3”) data set consists of spatially and temporally co-located observations from the ECOsystem Spaceborne Thermal Radiometer Experim…",
-      "org": "GES_DISC"
+      "title": "MISR Level 2 TOA/Cloud Classifier parameters subset for the UAE region V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAEMITCL",
+      "desc": "UAEMITCL_003 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 2 TOA/Cloud Classifier parameters subset for the UAE region version 3.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) IDS Earth Orientation Parameters (EOP) Time Series…",
-      "url": "https://search.earthdata.nasa.gov/search?q=DORIS_IDS_EOP_prod",
-      "desc": "Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) Earth Orientation Parameters Time Series Product from the NASA Crustal Dynamics Dat…",
-      "org": "CDDIS"
+      "title": "MISR Level 2 TOA/Cloud Albedo parameters subset for the UAE region V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAEMITAL",
+      "desc": "UAEMITAL_002 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 2 TOA/Cloud Albedo parameters subset for the UAE region version 2.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based Doppler Orbitography by Radiopositioning Integrated on Satellite (DORIS) IDS Satellite Orbit Product from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=DORIS_IDS_orbit_prod",
-      "desc": "Doppler Orbitography by Radiopositioning Integrated on Satellite (DORIS) Satellite Orbit Product from the NASA Crustal Dynamics Data Information System (CDDIS).",
-      "org": "CDDIS"
+      "title": "MISR radiometric camera-by-camera Cloud Mask subset for the UAE region V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAEMIRCM",
+      "desc": "UAEMIRCM_003 is the Multi-angle Imaging SpectroRadiometer (MISR) radiometric camera-by-camera Cloud Mask subset for the UAE region version 3.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "MISR radiometric camera-by-camera Cloud Mask subset for the UAE region V004",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAEMIRCM",
+      "desc": "UAEMIRCM_004 is the Multi-angle Imaging SpectroRadiometer (MISR) radiometric camera-by-camera Cloud Mask subset for the UAE region version 4.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) IDS Coordinates of the Terrestrial Reference Frame…",
-      "url": "https://search.earthdata.nasa.gov/search?q=DORIS_IDS_geocntr_prod",
-      "desc": "Doppler Orbitography and Radiopositioning Integrated by Satellite (DORIS) Geocenter Time Series Product from the NASA Crustal Dynamics Data Information Syste…",
-      "org": "CDDIS"
+      "title": "MISR Level 1B2 Terrain Data subset for the UAE region V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAEMIB2T",
+      "desc": "UAEMIB2T_002 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 1B2 Terrain Data subset for the UAE region version 2 data product.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "VIIRS/JPSS2 Photosynthetically Active Radiation Daily L3 Global 0.05Deg CMG V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ218C2",
-      "desc": "The NOAA-21 Visible Infrared Imaging Radiometer Suite (VIIRS) Photosynthetically Active Radiation (PAR) Level 3 Climate Modeling Grid (CMG) product produced…",
-      "org": "LPCLOUD"
+      "title": "MISR Level 1B2 Terrain Data subset for the UAE region V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=UAEMIB2T",
+      "desc": "UAEMIB2T_003 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 1B2 Terrain Data subset for the UAE region version 3 data product.",
+      "org": "LARC_CLOUD"
     }
   ],
   "datagov": [
