@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-25",
+  "generatedAt": "2026-09-26",
   "news": {
     "mapsmania": [
+      {
+        "title": "Kingdom Conquest Games",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/kingdom-conquest-games.html",
+        "desc": ""
+      },
       {
         "title": "Shine a Light",
         "url": "http://googlemapsmania.blogspot.com/2026/09/shine-light.html",
@@ -35,11 +40,6 @@
       {
         "title": "Mapping the Last Ice Age",
         "url": "http://googlemapsmania.blogspot.com/2026/09/mapping-last-ice-age.html",
-        "desc": ""
-      },
-      {
-        "title": "Where’s the Perfect Weather?",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/wheres-perfect-weather.html",
         "desc": ""
       }
     ],
@@ -210,20 +210,14 @@
   ],
   "gisse": [
     {
-      "title": "Why are contours from WhiteboxTools offset from the DEM?",
-      "url": "https://gis.stackexchange.com/questions/501483/why-are-contours-from-whiteboxtools-offset-from-the-dem",
-      "score": 0,
-      "answers": 1
-    },
-    {
       "title": "Spectral indices fall outside the normal range",
       "url": "https://gis.stackexchange.com/questions/501477/spectral-indices-fall-outside-the-normal-range",
       "score": 3,
-      "answers": 0
+      "answers": 1
     },
     {
-      "title": "Discrepancy between how Add Spatial Join runs in ArcGIS Pro and outside in a script?",
-      "url": "https://gis.stackexchange.com/questions/501469/discrepancy-between-how-add-spatial-join-runs-in-arcgis-pro-and-outside-in-a-scr",
+      "title": "Why are contours from WhiteboxTools offset from the DEM?",
+      "url": "https://gis.stackexchange.com/questions/501483/why-are-contours-from-whiteboxtools-offset-from-the-dem",
       "score": 0,
       "answers": 1
     },
@@ -238,6 +232,12 @@
       "url": "https://gis.stackexchange.com/questions/501454/equivalent-of-arcgis-flicker-layer-for-blinking-raster-layer-automatically-in",
       "score": 4,
       "answers": 3
+    },
+    {
+      "title": "Discrepancy between how Add Spatial Join runs in ArcGIS Pro and outside in a script?",
+      "url": "https://gis.stackexchange.com/questions/501469/discrepancy-between-how-add-spatial-join-runs-in-arcgis-pro-and-outside-in-a-scr",
+      "score": 0,
+      "answers": 1
     },
     {
       "title": "Google Earth Where is a KMZ file that I edited in the field located on my phone?",
@@ -258,78 +258,78 @@
       "answers": 2
     },
     {
-      "title": "Setting label field to certain attribute for symbology using ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501434/setting-label-field-to-certain-attribute-for-symbology-using-arcgis-pro",
-      "score": 1,
-      "answers": 0
-    },
-    {
       "title": "Raster layers in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
       "url": "https://gis.stackexchange.com/questions/501429/raster-layers-in-equal-earth-projections-for-americas-epsg8858-and-asia-pacif",
       "score": 2,
       "answers": 1
+    },
+    {
+      "title": "Setting label field to certain attribute for symbology using ArcGIS Pro",
+      "url": "https://gis.stackexchange.com/questions/501434/setting-label-field-to-certain-attribute-for-symbology-using-arcgis-pro",
+      "score": 1,
+      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "GNSS radio occultation L2B temperature, pressure, and water vapor retrieval for GRACE as contributed by UCAR, version 2.0 (gnssro_grace_u…",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_grace_ucar_l2b",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Temperature, Pressure, and Water Vapor data from the GRACE (Gravity Re…",
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Version 3",
+      "org": "ASF"
+    },
+    {
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Data Quality Information Version 3",
+      "org": "ASF"
+    },
+    {
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Metadata Version 3",
+      "org": "ASF"
+    },
+    {
+      "title": "SBUV/Nimbus-7 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUVN07L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SBUVN07L2",
+      "desc": "The Solar Backscattered Ultraviolet (SBUV) from Nimbus-7 Level-2 daily product (SBUVN07L2) contains ozone nadir profile and total column data from retrievals…",
       "org": "GES_DISC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
-      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "SBUV2/NOAA-9 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N09L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N09L2",
+      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-9 Level-2 daily product (SBUV2N09L2) contains ozone nadir profile and total column data from retriev…",
+      "org": "GES_DISC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "SBUV2/NOAA-11 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N11L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N11L2",
+      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-11 Level-2 daily product (SBUV2N11L2) contains ozone nadir profile and total column data from retrie…",
+      "org": "GES_DISC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
-      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "SBUV2/NOAA-14 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N14L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N14L2",
+      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-14 Level-2 daily product (SBUV2N14L2) contains ozone nadir profile and total column data from retrie…",
+      "org": "GES_DISC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
-      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "SBUV2/NOAA-16 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N16L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N16L2",
+      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-16 Level-2 daily product (SBUV2N16L2) contains ozone nadir profile and total column data from retrie…",
+      "org": "GES_DISC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "SBUV2/NOAA-17 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N17L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N17L2",
+      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-17 Level-2 daily product (SBUV2N17L2) contains ozone nadir profile and total column data from retrie…",
+      "org": "GES_DISC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ASTER Global Emissivity Dataset, Monthly, 0.05 deg, HDF5 V041",
-      "url": "https://search.earthdata.nasa.gov/search?q=AG5KMMOH",
-      "desc": "The Terra Advanced Spaceborne Thermal Emission and Reflection Radiometer (ASTER) Global Emissivity Dataset (GED) is a collection of monthly files (see known…",
-      "org": "LPCLOUD"
-    },
-    {
-      "title": "ASTER Global Emissivity Dataset, 1 kilometer, HDF5 V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=AG1km",
-      "desc": "The Terra Advanced Spaceborne Thermal Emission and Reflection Radiometer (ASTER) Global Emissivity Dataset (GED) land surface temperature and emissivity (LST…",
-      "org": "LPCLOUD"
-    },
-    {
-      "title": "MODIS/Aqua L0 PDS Data, 5-Min Swath - NRT",
-      "url": "https://search.earthdata.nasa.gov/search?q=MYD00F",
-      "desc": "MODIS/Aqua Near Real Time (NRT) L0 PDS Data 5-Min Swath.",
-      "org": "LANCEMODIS"
+      "title": "SBUV2/NOAA-19 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N19L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N19L2",
+      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-19 Level-2 daily product (SBUV2N19L2) contains ozone nadir profile and total column data from retrie…",
+      "org": "GES_DISC"
     }
   ],
   "datagov": [
