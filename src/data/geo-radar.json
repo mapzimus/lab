@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-27",
+  "generatedAt": "2026-09-28",
   "news": {
     "mapsmania": [
+      {
+        "title": "Using AI to Annotate Vintage Maps",
+        "url": "http://googlemapsmania.blogspot.com/2026/09/using-ai-to-annotate-vintage-maps.html",
+        "desc": ""
+      },
       {
         "title": "Kingdom Conquest Games",
         "url": "http://googlemapsmania.blogspot.com/2026/09/kingdom-conquest-games.html",
@@ -35,11 +40,6 @@
       {
         "title": "GeoWhisperer - See How the World Has Changed",
         "url": "http://googlemapsmania.blogspot.com/2026/09/geowhisperer-see-how-world-has-changed.html",
-        "desc": ""
-      },
-      {
-        "title": "Mapping the Last Ice Age",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/mapping-last-ice-age.html",
         "desc": ""
       }
     ],
@@ -110,6 +110,18 @@
   },
   "qgis": [
     {
+      "title": "Definition Queries (Layer Filters)",
+      "url": "https://plugins.qgis.org/plugins/definition_queries/"
+    },
+    {
+      "title": "StarShoal",
+      "url": "https://plugins.qgis.org/plugins/starshoal/"
+    },
+    {
+      "title": "PlanetX",
+      "url": "https://plugins.qgis.org/plugins/planetx/"
+    },
+    {
       "title": "Overlap Analyzer",
       "url": "https://plugins.qgis.org/plugins/overlap_analyzer/"
     },
@@ -128,21 +140,17 @@
     {
       "title": "GeoDip",
       "url": "https://plugins.qgis.org/plugins/geodip/"
-    },
-    {
-      "title": "go3streetview",
-      "url": "https://plugins.qgis.org/plugins/go3streetview/"
-    },
-    {
-      "title": "auto_terminal",
-      "url": "https://plugins.qgis.org/plugins/auto_terminal/"
-    },
-    {
-      "title": "CAD Text Extractor",
-      "url": "https://plugins.qgis.org/plugins/cad_text_extractor_cte/"
     }
   ],
   "releases": [
+    {
+      "repo": "duckdb/duckdb",
+      "title": "duckdb v1.5.6",
+      "url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.6",
+      "desc": "This is a bug fix release for various issues discovered after we released v1.5.5 ## What's Changed * Use relative includes in unity build sources for cache r…",
+      "publishedAt": "2026-09-28",
+      "isFresh": true
+    },
     {
       "repo": "qgis/QGIS",
       "title": "QGIS final-3_44_15",
@@ -184,14 +192,6 @@
       "isFresh": false
     },
     {
-      "repo": "duckdb/duckdb",
-      "title": "duckdb v1.5.5",
-      "url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.5",
-      "desc": "This is a bug fix release for various issues discovered after we released v1.5.4.",
-      "publishedAt": "2026-07-22",
-      "isFresh": false
-    },
-    {
       "repo": "felt/tippecanoe",
       "title": "tippecanoe 2.79.0",
       "url": "https://github.com/felt/tippecanoe/releases/tag/2.79.0",
@@ -210,10 +210,34 @@
   ],
   "gisse": [
     {
+      "title": "Simplifying Roads in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501494/simplifying-roads-in-qgis",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "QGIS Migration from Version 3.44.8 to 4.2.1; Problems with qgis_global_settings.ini",
+      "url": "https://gis.stackexchange.com/questions/501493/qgis-migration-from-version-3-44-8-to-4-2-1-problems-with-qgis-global-settings",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Missing ‘Synchronize with map canvas’ tick box in QGIS layout item properties",
+      "url": "https://gis.stackexchange.com/questions/501495/missing-synchronize-with-map-canvas-tick-box-in-qgis-layout-item-properties",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Google Earth Engine: exported *.tiff files are \"unsupported or corrupted\"",
+      "url": "https://gis.stackexchange.com/questions/501491/google-earth-engine-exported-tiff-files-are-unsupported-or-corrupted",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Spectral indices fall outside the normal range",
       "url": "https://gis.stackexchange.com/questions/501477/spectral-indices-fall-outside-the-normal-range",
-      "score": 3,
-      "answers": 1
+      "score": 2,
+      "answers": 2
     },
     {
       "title": "Why are contours from WhiteboxTools offset from the DEM?",
@@ -236,7 +260,7 @@
     {
       "title": "Discrepancy between how Add Spatial Join runs in ArcGIS Pro and outside in a script?",
       "url": "https://gis.stackexchange.com/questions/501469/discrepancy-between-how-add-spatial-join-runs-in-arcgis-pro-and-outside-in-a-scr",
-      "score": 0,
+      "score": -1,
       "answers": 1
     },
     {
@@ -244,50 +268,44 @@
       "url": "https://gis.stackexchange.com/questions/501465/google-earth-where-is-a-kmz-file-that-i-edited-in-the-field-located-on-my-phone",
       "score": 0,
       "answers": 1
-    },
-    {
-      "title": "Crop collar of USGS maps and stitch together with GDAL",
-      "url": "https://gis.stackexchange.com/questions/501440/crop-collar-of-usgs-maps-and-stitch-together-with-gdal",
-      "score": 0,
-      "answers": 1
-    },
-    {
-      "title": "Why is a degree of latitude longer at the poles than the equator in WGS 84?",
-      "url": "https://gis.stackexchange.com/questions/501401/why-is-a-degree-of-latitude-longer-at-the-poles-than-the-equator-in-wgs-84",
-      "score": 6,
-      "answers": 2
-    },
-    {
-      "title": "Raster layers in Equal Earth projections for Americas (EPSG:8858) and Asia-Pacific (EPSG:8859) in QGIS are truncated",
-      "url": "https://gis.stackexchange.com/questions/501429/raster-layers-in-equal-earth-projections-for-americas-epsg8858-and-asia-pacif",
-      "score": 2,
-      "answers": 1
-    },
-    {
-      "title": "Setting label field to certain attribute for symbology using ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501434/setting-label-field-to-certain-attribute-for-symbology-using-arcgis-pro",
-      "score": 1,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
-      "desc": "SMAP Level 1A Radar Receive Only Product Version 3",
-      "org": "ASF"
+      "title": "General Archive Information from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=CDDIS_gen_info",
+      "desc": "The Crustal Dynamics Data Information System (CDDIS) supports the space geodesy and geodynamics community through NASA's Space Geodesy Project as well as NAS…",
+      "org": "CDDIS"
     },
     {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003",
-      "desc": "SMAP Level 1A Radar Receive Only Data Quality Information Version 3",
-      "org": "ASF"
+      "title": "Aeolus CalVal DAWN Wind Profiles",
+      "url": "https://search.earthdata.nasa.gov/search?q=Aeolus-CalVal-DAWN_DC8",
+      "desc": "AEOLUS-CALVAL-DAWN_DC8 is the Aeolus CalVal DAWN (Doppler Aerosol WiNd) Lidar Wind Profiles data product.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003",
-      "desc": "SMAP Level 1A Radar Receive Only Product Metadata Version 3",
-      "org": "ASF"
+      "title": "MODIS/Aqua Temperature and Water Vapor Profiles 5-Min L2 Swath 5km - NRT",
+      "url": "https://search.earthdata.nasa.gov/search?q=MYD07_L2",
+      "desc": "The level-2 MODIS Temperature and Water Vapor Profile Product MYD07_L2 consists of 30 gridded parameters related to atmospheric stability, atmospheric temper…",
+      "org": "LANCEMODIS"
+    },
+    {
+      "title": "MODIS/Terra Temperature and Water Vapor Profiles 5-Min L2 Swath 5km - NRT",
+      "url": "https://search.earthdata.nasa.gov/search?q=MOD07_L2",
+      "desc": "The level-2 MODIS Temperature and Water Vapor Profile Product MOD07_L2 consists of 30 gridded parameters related to atmospheric stability, atmospheric temper…",
+      "org": "LANCEMODIS"
+    },
+    {
+      "title": "GNSS radio occultation L2B temperature, pressure, and water vapor retrieval for METOP as contributed by ROMSAF, version 2.0 (gnssro_metop…",
+      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_metop_romsaf_l2b",
+      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Temperature, Pressure, and Water Vapor data from the Meteorological op…",
+      "org": "GES_DISC"
+    },
+    {
+      "title": "GNSS radio occultation L2A bending angle, refractivity, and dry pressure for SACC as contributed by UCAR, V2.0 (gnssro_sacc_ucar_l2a)",
+      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_sacc_ucar_l2a",
+      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Bending Angle, Refractivity, and Dry Pressure data from the Satélite d…",
+      "org": "GES_DISC"
     },
     {
       "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
@@ -312,24 +330,6 @@
       "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
       "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
       "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "SBUV/Nimbus-7 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUVN07L2)",
-      "url": "https://search.earthdata.nasa.gov/search?q=SBUVN07L2",
-      "desc": "The Solar Backscattered Ultraviolet (SBUV) from Nimbus-7 Level-2 daily product (SBUVN07L2) contains ozone nadir profile and total column data from retrievals…",
-      "org": "GES_DISC"
     }
   ],
   "datagov": [
