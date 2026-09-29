@@ -1,7 +1,17 @@
 {
-  "generatedAt": "2026-09-28",
+  "generatedAt": "2026-09-29",
   "github": {
     "relevant": [
+      {
+        "name": "developmentseed/lonboard",
+        "url": "https://github.com/developmentseed/lonboard",
+        "desc": "Fast, interactive geospatial data visualization in Jupyter.",
+        "stars": 963,
+        "lang": "Python",
+        "isNew": false,
+        "rank": 145.96815406780567,
+        "relevant": true
+      },
       {
         "name": "eurostat/gridviz",
         "url": "https://github.com/eurostat/gridviz",
@@ -13,43 +23,73 @@
         "relevant": true
       },
       {
+        "name": "flukelaster/SIAHRA",
+        "url": "https://github.com/flukelaster/SIAHRA",
+        "desc": "3D geospatial hazard-intelligence platform for Thailand — real-time flood, rainfall, dam and earthquake monitoring on an interactive provincial digital terrain.",
+        "stars": 30,
+        "lang": "TypeScript",
+        "isNew": false,
+        "rank": 132.98272338766856,
+        "relevant": true
+      },
+      {
+        "name": "muimsd/map-gl-offline",
+        "url": "https://github.com/muimsd/map-gl-offline",
+        "desc": "A TypeScript npm package for MapLibre GL JS and Mapbox GL JS to enable offline tiles.",
+        "stars": 27,
+        "lang": "TypeScript",
+        "isNew": false,
+        "rank": 132.89431606268442,
+        "relevant": true
+      },
+      {
+        "name": "CesiumGS/cesium",
+        "url": "https://github.com/CesiumGS/cesium",
+        "desc": "An open-source JavaScript library for world-class 3D globes and maps :earth_americas:",
+        "stars": 15785,
+        "lang": "JavaScript",
+        "isNew": false,
+        "rank": 118.39654419693869,
+        "relevant": true
+      },
+      {
         "name": "visgl/deck.gl",
         "url": "https://github.com/visgl/deck.gl",
         "desc": "WebGL2 powered visualization framework",
-        "stars": 14615,
+        "stars": 14619,
         "lang": "TypeScript",
         "isNew": false,
-        "rank": 118.32965706868896,
+        "rank": 118.32989474524368,
         "relevant": true
       },
       {
         "name": "mapbox/mapbox-gl-js",
         "url": "https://github.com/mapbox/mapbox-gl-js",
         "desc": "Interactive, thoroughly customizable maps in the browser, powered by vector tiles and WebGL",
-        "stars": 12423,
+        "stars": 12425,
         "lang": "TypeScript",
         "isNew": false,
-        "rank": 118.188522885441,
+        "rank": 118.1886626985542,
         "relevant": true
       },
       {
-        "name": "NASA-AMMOS/3DTilesRendererJS",
-        "url": "https://github.com/NASA-AMMOS/3DTilesRendererJS",
-        "desc": "Renderer for 3D Tiles in Javascript using three.js, Babylon.js, and r3f",
-        "stars": 2476,
-        "lang": "JavaScript",
+        "name": "joewdavies/awesome-frontend-gis",
+        "url": "https://github.com/joewdavies/awesome-frontend-gis",
+        "desc": "Geospatial resources for web development :earth_africa: 🗺️",
+        "stars": 865,
+        "lang": null,
         "isNew": false,
-        "rank": 116.78785201317167,
+        "rank": 115.8750357840347,
         "relevant": true
       },
       {
-        "name": "dekart-xyz/dekart",
-        "url": "https://github.com/dekart-xyz/dekart",
-        "desc": "Open-source backend for Kepler.gl. Self-hosted alternative to CARTO and Foursquare Studio.",
-        "stars": 422,
-        "lang": "JavaScript",
+        "name": "mapillary/mapillary-js",
+        "url": "https://github.com/mapillary/mapillary-js",
+        "desc": "Interactive, extendable street imagery map experiences in the browser, powered by WebGL",
+        "stars": 519,
+        "lang": "TypeScript",
         "isNew": false,
-        "rank": 115.25268073475009,
+        "rank": 115.43200668726959,
         "relevant": true
       },
       {
@@ -73,46 +113,6 @@
         "relevant": true
       },
       {
-        "name": "jaakla/openmapstack-skills",
-        "url": "https://github.com/jaakla/openmapstack-skills",
-        "desc": "AI-agent skill for reproducible, validated GIS analysis — from authoritative data discovery to interactive maps, on an open-first geospatial stack (OSM, Overture, STAC, DuckDB, PostGIS, QGIS, MapLibre).",
-        "stars": 74,
-        "lang": "Python",
-        "isNew": false,
-        "rank": 113.7501225267834,
-        "relevant": true
-      },
-      {
-        "name": "sxp-studio/subjective-zero",
-        "url": "https://github.com/sxp-studio/subjective-zero",
-        "desc": "The agentic node editor for live visual effects",
-        "stars": 73,
-        "lang": "Swift",
-        "isNew": false,
-        "rank": 113.73846343946195,
-        "relevant": true
-      },
-      {
-        "name": "idescat/visual",
-        "url": "https://github.com/idescat/visual",
-        "desc": "Visual is a Javascript library for data visualization developed by the Statistical Institute of Catalonia (Idescat). It is based on popular open source solutions. Visual offers a simple interface that encapsulates the complexity of these solutions for the most common chart types.",
-        "stars": 64,
-        "lang": "JavaScript",
-        "isNew": false,
-        "rank": 113.6258267132857,
-        "relevant": true
-      },
-      {
-        "name": "ingelibre/ingecad",
-        "url": "https://github.com/ingelibre/ingecad",
-        "desc": "Free 2D DWG/DXF CAD for Linux in the spirit of classic AutoCAD — keyboard drafting with acad.pgp aliases, faithful DWG round-trip, paper space and dimensions, plus surveying and terrain plugins (points, construction chart, contours, profiles, earthworks, UTM georeferencing, global DEM, satellite imagery, Google Earth KML)",
-        "stars": 27,
-        "lang": "Python",
-        "isNew": false,
-        "rank": 112.89431606268444,
-        "relevant": true
-      },
-      {
         "name": "tsevis/Hipparchus",
         "url": "https://github.com/tsevis/Hipparchus",
         "desc": "Desktop vector cartography app for clean, editable SVG maps — from live OpenStreetMap, local OSM extracts, vector tiles, Natural Earth, Overture, terrain DEM, and VIIRS night lights.",
@@ -133,73 +133,73 @@
         "relevant": true
       },
       {
-        "name": "Aurtechmx/openlidarviewer",
-        "url": "https://github.com/Aurtechmx/openlidarviewer",
-        "desc": "Browser-based LiDAR and point-cloud viewer - measure, classify, profile, and export, entirely client-side on WebGPU with a WebGL2 fallback. Runs locally, no upload.",
-        "stars": 23,
-        "lang": "TypeScript",
-        "isNew": false,
-        "rank": 102.76042248342321,
-        "relevant": true
-      },
-      {
-        "name": "Leaflet/Leaflet",
-        "url": "https://github.com/Leaflet/Leaflet",
-        "desc": "🍃 JavaScript library for mobile-friendly interactive maps 🇺🇦",
-        "stars": 45677,
-        "lang": "JavaScript",
-        "isNew": false,
-        "rank": 89.31941416035392,
-        "relevant": true
-      },
-      {
         "name": "organicmaps/organicmaps",
         "url": "https://github.com/organicmaps/organicmaps",
         "desc": "🍃 Organic Maps is a free Android & iOS offline maps app for more than 6M travelers, tourists, hikers, and cyclists. It uses crowd-sourced OpenStreetMap data and is developed with love by the community. No ads, no tracking, no data collection, no crapware. Please donate to support the development!",
-        "stars": 15527,
+        "stars": 15536,
         "lang": "C++",
         "isNew": false,
-        "rank": 88.38223104476062,
+        "rank": 88.38273433147512,
         "relevant": true
       },
       {
         "name": "opengeos/GeoLibre",
         "url": "https://github.com/opengeos/GeoLibre",
         "desc": "A lightweight, cloud-native GIS platform for visualizing, exploring, and analyzing geospatial data. It runs in the web browser, on the desktop, on mobile, and inside Jupyter notebooks.",
-        "stars": 7717,
+        "stars": 7733,
         "lang": "TypeScript",
         "isNew": false,
-        "rank": 87.77500954847076,
+        "rank": 87.77680833547409,
+        "relevant": true
+      },
+      {
+        "name": "graphhopper/graphhopper",
+        "url": "https://github.com/graphhopper/graphhopper",
+        "desc": "Open source routing engine for OpenStreetMap. Use it as Java library or standalone web server.",
+        "stars": 6716,
+        "lang": "Java",
+        "isNew": false,
+        "rank": 87.65435069659739,
+        "relevant": true
+      },
+      {
+        "name": "sacridini/Awesome-Geospatial",
+        "url": "https://github.com/sacridini/Awesome-Geospatial",
+        "desc": "Long list of geospatial tools and resources",
+        "stars": 5308,
+        "lang": null,
+        "isNew": false,
+        "rank": 87.45002545068232,
         "relevant": true
       },
       {
         "name": "mapnik/mapnik",
         "url": "https://github.com/mapnik/mapnik",
         "desc": "Mapnik is an open source toolkit for developing mapping applications",
-        "stars": 3962,
+        "stars": 3963,
         "lang": "C++",
         "isNew": false,
-        "rank": 87.19604814466838,
-        "relevant": true
-      },
-      {
-        "name": "maplibre/martin",
-        "url": "https://github.com/maplibre/martin",
-        "desc": "Blazing fast and lightweight PostGIS, MBtiles and PMtiles tile server, tile generation, and mbtiles tooling.",
-        "stars": 3951,
-        "lang": "Rust",
-        "isNew": false,
-        "rank": 87.19363387183118,
+        "rank": 87.19626729162647,
         "relevant": true
       },
       {
         "name": "maplibre/maputnik",
         "url": "https://github.com/maplibre/maputnik",
         "desc": "An open source visual editor for the 'MapLibre Style Specification'",
-        "stars": 2646,
+        "stars": 2647,
         "lang": "TypeScript",
         "isNew": false,
-        "rank": 86.8455078826027,
+        "rank": 86.84583596153533,
+        "relevant": true
+      },
+      {
+        "name": "maplibre/maplibre-native",
+        "url": "https://github.com/maplibre/maplibre-native",
+        "desc": "MapLibre Native - Interactive vector tile maps for iOS, Android and other platforms.",
+        "stars": 2238,
+        "lang": "C++",
+        "isNew": false,
+        "rank": 86.70010818715807,
         "relevant": true
       }
     ],
@@ -208,100 +208,100 @@
         "name": "NandhaKishorM/laya",
         "url": "https://github.com/NandhaKishorM/laya",
         "desc": "Non-autoregressive System 1 decision engine. Typed choice, score and yes/no decisions over any text in a single forward pass, in 100+ languages, with a router that picks the right checkpoint per request.",
-        "stars": 27600,
+        "stars": 28423,
         "lang": "Python",
         "isNew": true,
-        "rank": 11.88184963417496,
+        "rank": 11.907370388962542,
         "relevant": false
       },
       {
         "name": "browser-use/jev-ultrafast",
         "url": "https://github.com/browser-use/jev-ultrafast",
         "desc": "Fastest and cheapest web agent",
-        "stars": 21102,
+        "stars": 21355,
         "lang": "Python",
         "isNew": true,
-        "rank": 11.64868839787808,
+        "rank": 11.659039824371742,
         "relevant": false
       },
       {
         "name": "jaredpalmer/kev",
         "url": "https://github.com/jaredpalmer/kev",
         "desc": "Jev-like family of decision models built on top of Qwen3.5/3.8 you can train and run on your own",
-        "stars": 7621,
+        "stars": 7855,
         "lang": "Python",
         "isNew": true,
-        "rank": 10.764137888872297,
+        "rank": 10.790402949557787,
         "relevant": false
       },
       {
         "name": "tamaratran/fast-jev-compaction",
         "url": "https://github.com/tamaratran/fast-jev-compaction",
         "desc": "Claude Code plugin that replaces the compaction summary with Jev decisions: every tool call and result is scored in one fast request, stale ones are dropped or truncated, everything kept stays verbatim.",
-        "stars": 7112,
+        "stars": 7184,
         "lang": "TypeScript",
         "isNew": true,
-        "rank": 10.704105617395701,
+        "rank": 10.71285354494049,
         "relevant": false
       },
       {
         "name": "zai-org/ZCode",
         "url": "https://github.com/zai-org/ZCode",
         "desc": "Z.ai's coding agent harness. Powerful, intelligent, extensible.",
-        "stars": 7031,
+        "stars": 7159,
         "lang": "TypeScript",
         "isNew": true,
-        "rank": 10.694157724131431,
-        "relevant": false
-      },
-      {
-        "name": "jev-chat/jev-chat-jarvis",
-        "url": "https://github.com/jev-chat/jev-chat-jarvis",
-        "desc": "装在手机上的对话副驾：在 QQ / X / 飞书里读懂对方、给出候选回复、一键填入输入框，发不发由你。非侵入，只读屏幕，不 hook 不改包。",
-        "stars": 6914,
-        "lang": "Kotlin",
-        "isNew": true,
-        "rank": 10.679584368890659,
+        "rank": 10.70982604461571,
         "relevant": false
       },
       {
         "name": "mizorewww/laya-mlx",
         "url": "https://github.com/mizorewww/laya-mlx",
         "desc": "Native MLX runtime for Laya typed decision models — 7–14 ms short decisions on M3 Max. No text generation, PyTorch, or cloud API.",
-        "stars": 6562,
+        "stars": 6622,
         "lang": "Python",
         "isNew": true,
-        "rank": 10.634204808513847,
+        "rank": 10.642109510093777,
         "relevant": false
       },
       {
         "name": "robbietilton/Compositor",
         "url": "https://github.com/robbietilton/Compositor",
         "desc": "The Photoshop alternative for Mac",
-        "stars": 5976,
+        "stars": 6411,
         "lang": "Swift",
         "isNew": true,
-        "rank": 10.552966511667364,
+        "rank": 10.613987027364214,
         "relevant": false
       },
       {
         "name": "Mak5er/AirCard",
         "url": "https://github.com/Mak5er/AirCard",
         "desc": "Apple Wallet Card Skinner for iOS 18+ (No Jailbreak Required)",
-        "stars": 4692,
+        "stars": 4987,
         "lang": "Swift",
         "isNew": true,
-        "rank": 10.34290110842499,
+        "rank": 10.39585288961301,
+        "relevant": false
+      },
+      {
+        "name": "cdyforever/how-to-live-better",
+        "url": "https://github.com/cdyforever/how-to-live-better",
+        "desc": "《高性价比人生指南》全书 528 条的在线单页阅读版：手机可读、可搜索、零依赖、支持离线",
+        "stars": 4841,
+        "lang": "HTML",
+        "isNew": true,
+        "rank": 10.370049570211428,
         "relevant": false
       },
       {
         "name": "TheoLeeCJ/SemIf-OpenJev",
         "url": "https://github.com/TheoLeeCJ/SemIf-OpenJev",
         "desc": "Semantic ifs from open models, on a 3090 at home. Independent; not affiliated with Jev or TypeSafe.",
-        "stars": 4509,
+        "stars": 4564,
         "lang": "Python",
         "isNew": true,
-        "rank": 10.308353083755922,
+        "rank": 10.318881563740636,
         "relevant": false
       }
     ]
@@ -312,55 +312,55 @@
         "kind": "models",
         "id": "XingChen-AGI/TeleOCR",
         "url": "https://huggingface.co/XingChen-AGI/TeleOCR",
-        "likes": 715,
-        "downloads": 27904,
+        "likes": 860,
+        "downloads": 30354,
         "pipeline": "image-text-to-text",
-        "rank": 86.40982604461571,
+        "rank": 98.47000630290731,
         "relevant": true,
         "desc": "TeleOCR: Navigating Document Parsing Across Digital and Camera-Captured Documents"
       },
       {
         "kind": "models",
+        "id": "akatz-ai/MiniMax-H3-Character-Swap-LoRA",
+        "url": "https://huggingface.co/akatz-ai/MiniMax-H3-Character-Swap-LoRA",
+        "likes": 148,
+        "downloads": 5890,
+        "pipeline": "video-to-video",
+        "rank": 88.74637253682455,
+        "relevant": true,
+        "desc": "MiniMax H3 Character Swap LoRA v1"
+      },
+      {
+        "kind": "models",
         "id": "prism-ml/Ternary-Bonsai-2-27B-gguf",
         "url": "https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf",
-        "likes": 2229,
-        "downloads": 3457124,
+        "likes": 2258,
+        "downloads": 3581027,
         "pipeline": "text-generation",
-        "rank": 73.79660972609632,
+        "rank": 64.10783246184073,
         "relevant": true,
         "desc": "Full 27B-class reasoning in ternary transformer weights, for llama.cpp (CUDA, Metal, CPU)"
       },
       {
         "kind": "models",
-        "id": "MiniMaxAI/MiniMax-H3",
-        "url": "https://huggingface.co/MiniMaxAI/MiniMax-H3",
-        "likes": 5748,
-        "downloads": 3627177,
-        "pipeline": "image-text-to-video",
-        "rank": 70.31918461729195,
+        "id": "Lightricks/LTX-2.5",
+        "url": "https://huggingface.co/Lightricks/LTX-2.5",
+        "likes": 5519,
+        "downloads": 1589098,
+        "pipeline": "image-to-video",
+        "rank": 62.6838781554584,
         "relevant": true,
-        "desc": "Offical skills to improve prompt writing: skills on github"
+        "desc": ""
       },
       {
         "kind": "models",
         "id": "Comfy-Org/Qwen-Image-2.1",
         "url": "https://huggingface.co/Comfy-Org/Qwen-Image-2.1",
-        "likes": 819,
-        "downloads": 4351753,
-        "rank": 61.82762770476744,
+        "likes": 846,
+        "downloads": 4699089,
+        "rank": 51.65576682066141,
         "relevant": true,
         "desc": "Repackaged model files for ComfyUI."
-      },
-      {
-        "kind": "models",
-        "id": "Lightricks/LTX-2.5",
-        "url": "https://huggingface.co/Lightricks/LTX-2.5",
-        "likes": 5406,
-        "downloads": 1595377,
-        "pipeline": "image-to-video",
-        "rank": 61.56591273915125,
-        "relevant": true,
-        "desc": ""
       }
     ],
     "datasets": [
@@ -368,9 +368,9 @@
         "kind": "datasets",
         "id": "XiaomiMiMo/MiMo-V2.6-RL-oss",
         "url": "https://huggingface.co/datasets/XiaomiMiMo/MiMo-V2.6-RL-oss",
-        "likes": 507,
-        "downloads": 22597,
-        "rank": 85.21172742456784,
+        "likes": 541,
+        "downloads": 40036,
+        "rank": 88.46799857307678,
         "relevant": true,
         "desc": "RL training environments for LLM agents."
       },
@@ -378,9 +378,9 @@
         "kind": "datasets",
         "id": "wikimedia/wikipedia",
         "url": "https://huggingface.co/datasets/wikimedia/wikipedia",
-        "likes": 1582,
-        "downloads": 278210,
-        "rank": 73.59896182972471,
+        "likes": 1590,
+        "downloads": 278922,
+        "rank": 73.20334035929316,
         "relevant": true,
         "desc": ""
       },
@@ -388,61 +388,61 @@
         "kind": "datasets",
         "id": "secemp9/arxiv-complete",
         "url": "https://huggingface.co/datasets/secemp9/arxiv-complete",
-        "likes": 494,
-        "downloads": 98613,
-        "rank": 49.88921039786714,
+        "likes": 504,
+        "downloads": 104376,
+        "rank": 45.80658275623732,
         "relevant": true,
         "desc": "A snapshot of arXiv's metadata, version history, submission files and rendered"
       },
       {
         "kind": "datasets",
-        "id": "openai/gsm8k",
-        "url": "https://huggingface.co/datasets/openai/gsm8k",
-        "likes": 1798,
-        "downloads": 1155481,
-        "rank": 39.510062326691106,
-        "relevant": true,
-        "desc": "GSM8K (Grade School Math 8K) is a dataset of 8.5K high quality linguistically diverse grade school math word problems."
-      },
-      {
-        "kind": "datasets",
-        "id": "FineEnvs/SmolDataEnvs",
-        "url": "https://huggingface.co/datasets/FineEnvs/SmolDataEnvs",
-        "likes": 53,
-        "downloads": 2460,
-        "rank": 38.764787519645935,
-        "relevant": true,
-        "desc": "5.5K+ RL tasks for hill-climbing small models in code and data science."
-      },
-      {
-        "kind": "datasets",
-        "id": "nyu-mll/glue",
-        "url": "https://huggingface.co/datasets/nyu-mll/glue",
-        "likes": 1107,
-        "downloads": 795396,
-        "rank": 38.48907952078482,
-        "relevant": true,
-        "desc": "GLUE, the General Language Understanding Evaluation benchmark (https://gluebenchmark.com/) is a collection of resources for training, evaluating, and analyzing natural language…"
-      },
-      {
-        "kind": "datasets",
         "id": "espnet/yodas3",
         "url": "https://huggingface.co/datasets/espnet/yodas3",
-        "likes": 47,
-        "downloads": 7064,
-        "rank": 37.96248247475118,
+        "likes": 66,
+        "downloads": 17831,
+        "rank": 39.95214960540165,
         "relevant": true,
         "desc": "YODAS v3 is a large web-crawled dataset containing over 1.1 million hours of audio that were originally released under a CC-BY-3.0 license."
       },
       {
         "kind": "datasets",
+        "id": "FineEnvs/SmolDataEnvs",
+        "url": "https://huggingface.co/datasets/FineEnvs/SmolDataEnvs",
+        "likes": 59,
+        "downloads": 2965,
+        "rank": 39.456302500767286,
+        "relevant": true,
+        "desc": "5.5K+ RL tasks for hill-climbing small models in code and data science."
+      },
+      {
+        "kind": "datasets",
+        "id": "openai/gsm8k",
+        "url": "https://huggingface.co/datasets/openai/gsm8k",
+        "likes": 1829,
+        "downloads": 1151587,
+        "rank": 39.42490217946086,
+        "relevant": true,
+        "desc": "GSM8K (Grade School Math 8K) is a dataset of 8.5K high quality linguistically diverse grade school math word problems."
+      },
+      {
+        "kind": "datasets",
         "id": "LocalLLaMA/typed-decisions",
         "url": "https://huggingface.co/datasets/LocalLLaMA/typed-decisions",
-        "likes": 57,
-        "downloads": 16449,
-        "rank": 37.826855987125874,
+        "likes": 66,
+        "downloads": 17946,
+        "rank": 38.752149605401655,
         "relevant": true,
-        "desc": "A benchmark for typed probabilistic decisions over shared state."
+        "desc": "A benchmark for typed probabilistic decisions."
+      },
+      {
+        "kind": "datasets",
+        "id": "nyu-mll/glue",
+        "url": "https://huggingface.co/datasets/nyu-mll/glue",
+        "likes": 1110,
+        "downloads": 756434,
+        "rank": 37.89142811788173,
+        "relevant": true,
+        "desc": "GLUE, the General Language Understanding Evaluation benchmark (https://gluebenchmark.com/) is a collection of resources for training, evaluating, and analyzing natural language…"
       }
     ],
     "spaces": [
@@ -450,8 +450,8 @@
         "kind": "spaces",
         "id": "Pepe104/MiniMax-H3-Turbo-Lora-UNCENSORED",
         "url": "https://huggingface.co/spaces/Pepe104/MiniMax-H3-Turbo-Lora-UNCENSORED",
-        "likes": 826,
-        "rank": 75.3350110191051,
+        "likes": 862,
+        "rank": 73.37202159143041,
         "relevant": true,
         "desc": "MiniMax-H3 — unquantized, split across two Spaces"
       },
@@ -459,8 +459,8 @@
         "kind": "spaces",
         "id": "observantdistressed/minimax-h3",
         "url": "https://huggingface.co/spaces/observantdistressed/minimax-h3",
-        "likes": 190,
-        "rank": 63.86206673449546,
+        "likes": 203,
+        "rank": 63.9192603348518,
         "relevant": true,
         "desc": "MiniMax-H3 — unquantized, split across two Spaces"
       },
@@ -468,8 +468,8 @@
         "kind": "spaces",
         "id": "webml-community/ternary-bonsai-2-webgpu-kernels",
         "url": "https://huggingface.co/spaces/webml-community/ternary-bonsai-2-webgpu-kernels",
-        "likes": 144,
-        "rank": 37.22273600446995,
+        "likes": 146,
+        "rank": 36.434634669496354,
         "relevant": true,
         "desc": ""
       }
@@ -479,431 +479,370 @@
         "kind": "models",
         "id": "convaiinnovations/laya",
         "url": "https://huggingface.co/convaiinnovations/laya",
-        "likes": 4272,
+        "likes": 4478,
         "downloads": 0,
         "pipeline": "text-classification",
-        "rank": 248.76146578563439,
+        "rank": 197.2023621248894,
         "relevant": false,
         "desc": "Multilingual, non-autoregressive System 1 decision model."
       },
       {
         "kind": "models",
-        "id": "abenzerps/Qwen-Image-2.1-Uncensored-GGUF",
-        "url": "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF",
-        "likes": 2230,
-        "downloads": 1062921,
-        "pipeline": "text-to-image",
-        "rank": 148.69699914056767,
-        "relevant": false,
-        "desc": "The uncensored GGUFs are now available!"
-      },
-      {
-        "kind": "models",
         "id": "Edge0/Audio8-ASR-Infinite",
         "url": "https://huggingface.co/Edge0/Audio8-ASR-Infinite",
-        "likes": 1367,
-        "downloads": 19963,
+        "likes": 1479,
+        "downloads": 23674,
         "pipeline": "automatic-speech-recognition",
-        "rank": 127.97217219476819,
+        "rank": 136.34052343078991,
         "relevant": false,
         "desc": "Audio8 ASR Infinite is a native streaming speech recognition model built to be"
       },
       {
         "kind": "models",
+        "id": "abenzerps/Qwen-Image-2.1-Uncensored-GGUF",
+        "url": "https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF",
+        "likes": 2392,
+        "downloads": 1152523,
+        "pipeline": "text-to-image",
+        "rank": 118.95788539722687,
+        "relevant": false,
+        "desc": "The uncensored GGUFs are now available!"
+      },
+      {
+        "kind": "models",
         "id": "Qwen/Qwen-Image-2.1",
         "url": "https://huggingface.co/Qwen/Qwen-Image-2.1",
-        "likes": 2575,
-        "downloads": 58693,
+        "likes": 2644,
+        "downloads": 64362,
         "pipeline": "text-to-image",
-        "rank": 110.32189171737555,
+        "rank": 82.24485135274242,
         "relevant": false,
         "desc": "We are excited to open-source Qwen-Image-2.1, a unified text-to-image generation and image editing model in the Qwen family."
       },
       {
         "kind": "models",
+        "id": "Contrastive-LM/CLM-v0.1-8B",
+        "url": "https://huggingface.co/Contrastive-LM/CLM-v0.1-8B",
+        "likes": 517,
+        "downloads": 1910,
+        "pipeline": "text-ranking",
+        "rank": 56.328659519490465,
+        "relevant": false
+      },
+      {
+        "kind": "models",
         "id": "XingChen-AGI/Xing4.0-29B-A4B",
         "url": "https://huggingface.co/XingChen-AGI/Xing4.0-29B-A4B",
-        "likes": 1798,
-        "downloads": 45834,
+        "likes": 1807,
+        "downloads": 46557,
         "pipeline": "text-generation",
-        "rank": 76.7100623266911,
+        "rank": 54.414396852278685,
         "relevant": false
       },
       {
         "kind": "models",
-        "id": "XiaomiMiMo/MiMo-V2.6-Pro-RL",
-        "url": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Pro-RL",
-        "likes": 580,
-        "downloads": 76518,
-        "pipeline": "text-generation",
-        "rank": 62.12835226478066,
+        "id": "nvidia/Nemotron-3-Diarization",
+        "url": "https://huggingface.co/nvidia/Nemotron-3-Diarization",
+        "likes": 504,
+        "downloads": 30931,
+        "pipeline": "voice-activity-detection",
+        "rank": 54.00658275623732,
         "relevant": false
       },
       {
         "kind": "models",
-        "id": "XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B",
-        "url": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B",
-        "likes": 545,
-        "downloads": 9994,
+        "id": "TaichuAI/ZDTaichu5.0-9B",
+        "url": "https://huggingface.co/TaichuAI/ZDTaichu5.0-9B",
+        "likes": 1947,
+        "downloads": 11836,
         "pipeline": "image-text-to-text",
-        "rank": 58.77438528540947,
-        "relevant": false
-      },
-      {
-        "kind": "models",
-        "id": "XiaomiMiMo/MiMo-V2.6-Flash-RL",
-        "url": "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Flash-RL",
-        "likes": 510,
-        "downloads": 28842,
-        "pipeline": "text-generation",
-        "rank": 55.71684180026942,
+        "rank": 46.2791779050852,
         "relevant": false
       }
     ]
   },
   "hackernews": {
-    "relevant": [
-      {
-        "title": "Hacker Atlas - A map of what Hacker News talks about",
-        "url": "https://hackeratlas.com/",
-        "hnUrl": "https://news.ycombinator.com/item?id=49844497",
-        "points": 86,
-        "comments": 28,
-        "isShow": true,
-        "rank": 35.87903850523724,
-        "relevant": true
-      },
-      {
-        "title": "Doom or Bloom, map your AI worldview",
-        "url": "https://www.doom-or-bloom.com",
-        "hnUrl": "https://news.ycombinator.com/item?id=49846953",
-        "points": 56,
-        "comments": 48,
-        "isShow": true,
-        "rank": 35.51174971134498,
-        "relevant": true
-      },
-      {
-        "title": "37,500 border drawings: a map of the world as people remember it",
-        "url": "https://www.habibicode.org/thedrawnworld",
-        "hnUrl": "https://news.ycombinator.com/item?id=49875142",
-        "points": 151,
-        "comments": 31,
-        "isShow": false,
-        "rank": 34.363687175889545,
-        "relevant": true
-      },
-      {
-        "title": "Solving a corn puzzle with CP-SAT",
-        "url": "https://thill.me/2026/07/16/corn-puzzle-sat-solver.html",
-        "hnUrl": "https://news.ycombinator.com/item?id=49870760",
-        "points": 16,
-        "comments": 5,
-        "isShow": false,
-        "rank": 32.460897842756545,
-        "relevant": true
-      },
-      {
-        "title": "Ekselio – Loveable for finance workflows (local first)",
-        "url": "https://www.gptbeyond.com/try?home=1",
-        "hnUrl": "https://news.ycombinator.com/item?id=49849986",
-        "points": 41,
-        "comments": 12,
-        "isShow": true,
-        "rank": 25.2464985807958,
-        "relevant": true
-      },
-      {
-        "title": "Cf: The Agentic CLI for the Cloudflare API",
-        "url": "https://blog.cloudflare.com/cloudflare-cf-cli-launch/",
-        "hnUrl": "https://news.ycombinator.com/item?id=49879577",
-        "points": 50,
-        "comments": 22,
-        "isShow": false,
-        "rank": 23.415140352195873,
-        "relevant": true
-      }
-    ],
+    "relevant": [],
     "general": [
       {
         "title": "Reladraw – A diagram language where you decide where to place things",
         "url": "https://github.com/reladraw/reladraw",
         "hnUrl": "https://news.ycombinator.com/item?id=49858513",
-        "points": 401,
-        "comments": 118,
+        "points": 405,
+        "comments": 119,
         "isShow": true,
-        "rank": 7.20845210616894,
+        "rank": 7.2170520671543885,
         "relevant": false
       },
       {
         "title": "Lofi Cities – Pixel-art city nights with browser-generated lofi",
         "url": "https://loficities.com/",
         "hnUrl": "https://news.ycombinator.com/item?id=49869574",
-        "points": 304,
-        "comments": 132,
+        "points": 312,
+        "comments": 135,
         "isShow": true,
-        "rank": 6.968599678693572,
-        "relevant": false
-      },
-      {
-        "title": "Jev Plays Pokémon Red",
-        "url": "https://jev-pokemon.vercel.app/",
-        "hnUrl": "https://news.ycombinator.com/item?id=49845172",
-        "points": 278,
-        "comments": 122,
-        "isShow": true,
-        "rank": 6.891208406547195,
-        "relevant": false
-      },
-      {
-        "title": "When did Google get so weird?",
-        "url": "https://sancho.bearblog.dev/google-weird/",
-        "hnUrl": "https://news.ycombinator.com/item?id=49870367",
-        "points": 1758,
-        "comments": 964,
-        "isShow": false,
-        "rank": 6.490531678914922,
-        "relevant": false
-      },
-      {
-        "title": "TinyAIArena watch AI agents battle it out",
-        "url": "https://tinyaiarena.com/",
-        "hnUrl": "https://news.ycombinator.com/item?id=49867775",
-        "points": 117,
-        "comments": 45,
-        "isShow": true,
-        "rank": 6.143764014612251,
-        "relevant": false
-      },
-      {
-        "title": "PaperMono, e-ink fridge magnet shopping list with mobile web page",
-        "url": "https://github.com/seamusc/papermono-shopping-list",
-        "hnUrl": "https://news.ycombinator.com/item?id=49875801",
-        "points": 102,
-        "comments": 50,
-        "isShow": true,
-        "rank": 6.025674449410344,
-        "relevant": false
-      },
-      {
-        "title": "Hntui – A TUI for Hacker News",
-        "url": "https://github.com/ahmd-sh/hntui",
-        "hnUrl": "https://news.ycombinator.com/item?id=49876760",
-        "points": 102,
-        "comments": 64,
-        "isShow": true,
-        "rank": 6.025674449410344,
-        "relevant": false
-      },
-      {
-        "title": "Owed a billion dollars in Nvidia stock",
-        "url": "https://colo.to/nvidia-stock-narrative.html",
-        "hnUrl": "https://news.ycombinator.com/item?id=49872723",
-        "points": 1027,
-        "comments": 430,
-        "isShow": false,
-        "rank": 6.023986229318514,
+        "rank": 6.991088675092897,
         "relevant": false
       },
       {
         "title": "HN.watch – Videos of all Hacker News posts",
         "url": "https://hn.watch/",
         "hnUrl": "https://news.ycombinator.com/item?id=49879401",
-        "points": 100,
-        "comments": 34,
+        "points": 204,
+        "comments": 96,
         "isShow": true,
-        "rank": 6.008642747565285,
+        "rank": 6.623507722111508,
+        "relevant": false
+      },
+      {
+        "title": "Destroy Any Website with Stickman",
+        "url": "https://destroy.spritefusion.com/",
+        "hnUrl": "https://news.ycombinator.com/item?id=49880601",
+        "points": 161,
+        "comments": 37,
+        "isShow": true,
+        "rank": 6.4190300290852615,
+        "relevant": false
+      },
+      {
+        "title": "PaperMono, e-ink fridge magnet shopping list with mobile web page",
+        "url": "https://github.com/seamusc/papermono-shopping-list",
+        "hnUrl": "https://news.ycombinator.com/item?id=49875801",
+        "points": 145,
+        "comments": 61,
+        "isShow": true,
+        "rank": 6.328705711568874,
         "relevant": false
       },
       {
         "title": "Free alternative to graphics design giants",
         "url": "https://scissor.studio/",
         "hnUrl": "https://news.ycombinator.com/item?id=49875308",
-        "points": 79,
-        "comments": 37,
+        "points": 129,
+        "comments": 50,
         "isShow": true,
-        "rank": 5.8061799739838875,
+        "rank": 6.227886704613674,
+        "relevant": false
+      },
+      {
+        "title": "TinyAIArena watch AI agents battle it out",
+        "url": "https://tinyaiarena.com/",
+        "hnUrl": "https://news.ycombinator.com/item?id=49867775",
+        "points": 118,
+        "comments": 45,
+        "isShow": true,
+        "rank": 6.151093922785062,
+        "relevant": false
+      },
+      {
+        "title": "Hntui – A TUI for Hacker News",
+        "url": "https://github.com/ahmd-sh/hntui",
+        "hnUrl": "https://news.ycombinator.com/item?id=49876760",
+        "points": 111,
+        "comments": 65,
+        "isShow": true,
+        "rank": 6.098436045340363,
+        "relevant": false
+      },
+      {
+        "title": "Pac-Bench – How well can models one-shot a Pac-Man game?",
+        "url": "https://jonclegg.github.io/pacman-bakeoff/",
+        "hnUrl": "https://news.ycombinator.com/item?id=49885493",
+        "points": 77,
+        "comments": 47,
+        "isShow": true,
+        "rank": 5.784189205380961,
+        "relevant": false
+      },
+      {
+        "title": "A Claude Code skill to analyze your chess games",
+        "url": "https://github.com/brumar/chess-postmortem-skills",
+        "hnUrl": "https://news.ycombinator.com/item?id=49857528",
+        "points": 75,
+        "comments": 56,
+        "isShow": true,
+        "rank": 5.761627184561583,
         "relevant": false
       }
     ]
   },
   "papers": [
     {
-      "title": "Enhancing Photogrammetric Digital Surface Models with Pretrained Diffusion Models and Multimodal Conditioning",
-      "url": "https://huggingface.co/papers/2609.31199",
-      "desc": "Large-scale Digital Surface Models (DSMs) can be produced cost-effectively from satellite images via stereo-photogrammetry.",
-      "upvotes": 8,
-      "rank": 111.90848501887865,
-      "relevant": true
-    },
-    {
-      "title": "LightMIS: Ultra-Lightweight Medical Image Segmentation Without a Stage-Wise Decoder",
-      "url": "https://huggingface.co/papers/2609.28327",
-      "desc": "We present LightMIS, a scalable family of ultra-lightweight convolutional networks for 2D binary medical image segmentation without a learned stage-wise decoder.",
+      "title": "DISCO: Distributed Long Context Scaling with Grounding-Reasoning Disaggregation",
+      "url": "https://huggingface.co/papers/2609.33485",
+      "desc": "While Large Language Models (LLMs) advertise million-token context windows, reasoning quality often collapses as inputs grow -- a phenomenon termed context rot.",
       "upvotes": 2,
-      "rank": 70.95424250943933,
+      "rank": 80.95424250943933,
       "relevant": true
     },
     {
-      "title": "TrackEverything: Long Horizon Dense Tracking via De-Duplicating 3D Scene Representations",
-      "url": "https://huggingface.co/papers/2609.30222",
-      "desc": "Existing point tracking models face a fundamental tradeoff: they can either track a sparse set of query points over long horizons, or track all points across only short clips.",
-      "upvotes": 7,
-      "rank": 61.80617997398389,
-      "relevant": true
-    },
-    {
-      "title": "World Action Agent: Harnessing VLMs for Robot Manipulation via World Action Rehearsal",
-      "url": "https://huggingface.co/papers/2609.29964",
-      "desc": "General-purpose vision-language models (VLMs) bring broad knowledge and spatial reasoning to robot manipulation, yet existing systems either use them indirectly, to predict constraints or write progra",
-      "upvotes": 7,
-      "rank": 61.80617997398389,
-      "relevant": true
-    },
-    {
-      "title": "Paragraph Boundaries Are Not White Space:Compression Depth as the Signature of Hierarchical Structure",
-      "url": "https://huggingface.co/papers/2609.23551",
-      "desc": "Standard positional encodings represent position as a one-dimensional reading-order coordinate, but reading order alone does not determine hierarchical textual structure.",
+      "title": "SMAT: Simple and Efficient Merge-Aware Training",
+      "url": "https://huggingface.co/papers/2609.33437",
+      "desc": "Model merging integrates the capabilities of multiple experts without joint retraining, but standard expert training optimizes task loss alone and does not guarantee good performance after merging.",
       "upvotes": 2,
-      "rank": 50.954242509439325,
+      "rank": 60.954242509439325,
       "relevant": true
     },
     {
-      "title": "InternW0-Δ: A World Action Model Bridging Predictive Dynamics and Actions with 20K+ Hours of Open Data",
-      "url": "https://huggingface.co/papers/2609.31394",
-      "desc": "World Action Models (WAMs) jointly model visual dynamics and action generation for generalist robot manipulation.",
-      "upvotes": 17,
-      "rank": 32.51054501020661,
+      "title": "When Privacy Moves ML-Mediated Decisions On Device: Information and Incentive Misalignment in Auctions",
+      "url": "https://huggingface.co/papers/2609.33312",
+      "desc": "Moving ML-mediated decision making onto privacy-preserving clients decentralises the economic decision along with the inference.",
+      "upvotes": 1,
+      "rank": 50.60205999132796,
       "relevant": true
     },
     {
-      "title": "Just Ask Jev: Reinforcement Learning for Calibrated Decisions as a Zero-Shot Detector of AI Alignment Failures",
-      "url": "https://huggingface.co/papers/2609.29429",
-      "desc": "Detectors of alignment failures screen deployed language models and score alignment benchmarks.",
-      "upvotes": 10,
-      "rank": 32.08278537031645,
+      "title": "VisionHOPE: Visual Backbones as Self-Modifying Learning Systems",
+      "url": "https://huggingface.co/papers/2609.33325",
+      "desc": "Visual backbones have evolved from Convolutional Neural Networks (CNNs) with local aggregation to Vision Transformers (ViTs) with global interactions, State-Space Models (SSMs) with input-dependent st",
+      "upvotes": 106,
+      "rank": 34.05876755537042,
       "relevant": true
     },
     {
-      "title": "IterSynth: Rethinking Deep Search Agents via Role-Decoupled Iterative Synthesis",
-      "url": "https://huggingface.co/papers/2609.29444",
-      "desc": "Deep search requires LLM agents to decompose complex queries, search for evidence, and synthesize grounded answers, yet existing ReAct-style agents suffer from two limitations: role coupling, where on",
-      "upvotes": 9,
-      "rank": 32,
+      "title": "SentZero: An Enhanced Sentence-Centric Vision-Language Pretraining for Multi-Task Zero-Shot Chest X-Ray Analysis",
+      "url": "https://huggingface.co/papers/2609.34479",
+      "desc": "Vision-language (VL) pretraining using paired chest X-ray (CXR) images and radiology reports has shown strong potential for medical image understanding.",
+      "upvotes": 25,
+      "rank": 32.829946695941636,
       "relevant": true
     },
     {
-      "title": "RGBD20K: A Large-Scale Benchmark for RGB-D Semantic Segmentation",
-      "url": "https://huggingface.co/papers/2609.29028",
-      "desc": "In this paper, we propose RGBD20K, a novel dataset for facilitating the development of more robust and general RGB-D semantic segmentation by encompassing abundant categories and high-quality annotations.",
-      "upvotes": 8,
-      "rank": 31.90848501887865,
+      "title": "WideSWE: Can Coding Agents Coordinate Changes Across Repositories?",
+      "url": "https://huggingface.co/papers/2609.33382",
+      "desc": "Coding-agent evaluation has progressed from resolving individual issues to carrying out long-horizon development, yet task completion is still largely assessed within a single codebase.",
+      "upvotes": 16,
+      "rank": 32.460897842756545,
       "relevant": true
     },
     {
-      "title": "FoMo: Forking Moment in Generative Trajectory as a Perceptual Distance",
-      "url": "https://huggingface.co/papers/2609.25716",
-      "desc": "Reference-based image quality assessment (IQA) metrics aim to reflect how humans perceive the perceptual distance between a pair of images.",
-      "upvotes": 7,
-      "rank": 31.806179973983888,
+      "title": "FlowTool: Controlling Tool Parameter in Image Retouching via Flow Matching",
+      "url": "https://huggingface.co/papers/2609.35673",
+      "desc": "Tool-based image editing (image retouching) is commonly formulated with autoregressive multimodal large language models (MLLMs) that sequentially generate reasoning, tool selections, and parameter values.",
+      "upvotes": 15,
+      "rank": 32.40823996531185,
+      "relevant": true
+    },
+    {
+      "title": "Structured Residual Connectivity Matters for Diffusion Transformers",
+      "url": "https://huggingface.co/papers/2609.33203",
+      "desc": "Diffusion Transformers (DiTs) have established themselves as a scalable backbone for high-fidelity image synthesis.",
+      "upvotes": 15,
+      "rank": 32.40823996531185,
+      "relevant": true
+    },
+    {
+      "title": "Hard Vision, Easy Vision: What GPT-6 Astra Reveals Across Computer Vision",
+      "url": "https://huggingface.co/papers/2609.35718",
+      "desc": "Frontier general-purpose systems are rapidly expanding beyond visual understanding into capabilities traditionally handled by dedicated computer-vision models.",
+      "upvotes": 13,
+      "rank": 32.292256071356476,
+      "relevant": true
+    },
+    {
+      "title": "Imprint Reader: From Weight-Update Readout to Behavioral Intervention",
+      "url": "https://huggingface.co/papers/2609.35261",
+      "desc": "As language models take a growing role in AI development, a natural aspiration is for them to reflect on their own learning process, as humans do, and use that reflection to improve themselves.",
+      "upvotes": 11,
+      "rank": 32.15836249209525,
       "relevant": true
     }
   ],
   "arxiv": [
     {
-      "title": "Enhancing Photogrammetric Digital Surface Models with Pretrained Diffusion Models and Multimodal Conditioning",
-      "url": "http://arxiv.org/abs/2609.31199v1",
-      "desc": "Large-scale Digital Surface Models (DSMs) can be produced cost-effectively from satellite images via stereo-photogrammetry.",
-      "rank": 110
-    },
-    {
-      "title": "Guiding End-to-End Driving Models with Endpoint-Constrained Trajectory Optimization",
-      "url": "http://arxiv.org/abs/2609.31383v1",
-      "desc": "End-to-end driving policies are commonly trained through open-loop behavior cloning, yet they must ultimately operate in closed-loop when deployed on a vehicle, creating a fundamental mismatch between",
+      "title": "DiMoP: Diffusion-Driven Motion Representation Learning With Frame-Level Pseudo-Classification for Skeleton-Based Action Recognition",
+      "url": "http://arxiv.org/abs/2609.35444v1",
+      "desc": "Robust skeleton-based action recognition requires representations that capture a wide spectrum of motions, from subtle to moderate and strong ones.",
       "rank": 60
     },
     {
-      "title": "SatNav: A Scalable Benchmark for Long-Horizon UAV Vision-Language Navigation from Satellite Imagery",
-      "url": "http://arxiv.org/abs/2609.31507v1",
-      "desc": "Urban uncrewed aerial vehicle (UAV) vision-language navigation (VLN) requires agents to follow instructions across extended urban spaces, inherently demanding long-term memory and geospatial grounding.",
+      "title": "PDMD: Projected Distribution Matching Distillation for Video Diffusion Models",
+      "url": "http://arxiv.org/abs/2609.35768v1",
+      "desc": "Modern video diffusion models require tens of denoising evaluations over long spatiotemporal token sequences.",
       "rank": 50
     },
     {
-      "title": "WeaveAgent: A Two-Stage Tool-Routing Agent for Ultra-High-Resolution Remote Sensing Imagery",
-      "url": "http://arxiv.org/abs/2609.31234v1",
-      "desc": "Problem. Ultra-high-resolution (UHR) remote sensing with vague user intents has two bottlenecks: visual tokens are expensive, and tool calling must be format-reliable (pretrained models emit zero tool calls zero-shot).",
+      "title": "Remote Sensing Sparse-View 3D Gaussian Splatting via Depth Image-Based Rendering",
+      "url": "http://arxiv.org/abs/2609.35612v1",
+      "desc": "Remote sensing novel view synthesis under sparse observations remains challenging due to insufficient geometric constraints and limited cross-view supervision.",
       "rank": 50
     },
     {
-      "title": "ReG-SAM: Reference Graph-Driven SAM for 2D Foundational Vessel Segmentation",
-      "url": "http://arxiv.org/abs/2609.31160v1",
-      "desc": "Vessel segmentation in medical images is essential for many clinical tasks, ranging from diagnosis to treatment planning.",
+      "title": "ReVA: A Scene-Centric Dataset Beyond Repetition for Remote Sensing Video Question Answering",
+      "url": "http://arxiv.org/abs/2609.35507v1",
+      "desc": "Multimodal Large Language Models (MLLMs) have demonstrated remarkable advances in remote sensing.",
       "rank": 50
     },
     {
-      "title": "OC-GS: Gaussian Splatting for Irregular Turntable Capture",
-      "url": "http://arxiv.org/abs/2609.31572v1",
-      "desc": "Uneven rotation and dropped frames make equal-angle assumptions unreliable for turntable reconstruction.",
+      "title": "Adaptive Safety Filtering for Frozen ACC Policies via Conformal Residual Calibration",
+      "url": "http://arxiv.org/abs/2609.35415v1",
+      "desc": "Frozen adaptive cruise control (ACC) policies can violate constraints when deployment dynamics differ from their training conditions.",
+      "rank": 50
+    },
+    {
+      "title": "Spectral Super-Resolution using Spatial-Spectral Residual Operator Networks",
+      "url": "http://arxiv.org/abs/2609.35410v1",
+      "desc": "Spectral super-resolution of multispectral satellite images can enable high temporal- and spatial-resolution hyperspectral satellite imagery at a modest cost, significantly increasing the applicabilit",
+      "rank": 50
+    },
+    {
+      "title": "FurE: Efficient Instance-Specific 3D Fur Reconstruction without Animal-Fur Datasets",
+      "url": "http://arxiv.org/abs/2609.35770v1",
+      "desc": "Realistic and editable animal fur reconstruction from multi-view images is challenging due to fine-scale detail, self-occlusion and obfuscation, and, unlike human hair, the lack of animal-fur datasets.",
       "rank": 30
     },
     {
-      "title": "Structured Reasoning Agentic Framework for Interpretable Critical View of Safety Assessment",
-      "url": "http://arxiv.org/abs/2609.31524v1",
-      "desc": "Surgical scene understanding is critical for computer-assisted intervention, yet laparoscopic cholecystectomy remains challenged by the complex anatomy of the hepatocystic triangle and the risk of bile duct injury.",
-      "rank": 30
-    },
-    {
-      "title": "Forensic Twins: Self-Supervised Residual Learning for AI-Generated Image Forensics",
-      "url": "http://arxiv.org/abs/2609.31514v1",
-      "desc": "Detectors of AI-generated images are typically trained using samples from all Generative AI architectures they must catch, and struggle as soon as a new architecture emerges.",
+      "title": "InfiniHand: Streaming World-Space Hand Motion Estimation from Egocentric Video",
+      "url": "http://arxiv.org/abs/2609.35743v1",
+      "desc": "World-space hand motion estimation from egocentric video requires recovering 3D articulated hand geometry while tracking camera egomotion.",
       "rank": 30
     }
   ],
   "itch": [
     {
-      "title": "TrackRush [Free] [Racing] [Windows]",
-      "url": "https://tangzeer.itch.io/trackrush",
-      "desc": "TrackRush jeu débutant Unity"
+      "title": "A Mirror's Curse SFW [Free] [Interactive Fiction]",
+      "url": "https://amaty.itch.io/a-mirrors-curse-sfw",
+      "desc": "A SFW Transgender Transformation Game"
     },
     {
-      "title": "Happy LIttle World [Free] [Action]",
-      "url": "https://urban1098.itch.io/happy-little-world",
-      "desc": ""
+      "title": "Treacherous Trials [Free] [Platformer] [Windows] [macOS]",
+      "url": "https://gdcolon.itch.io/treacheroustrials",
+      "desc": "A platformer game about demons, flashing colors, and almost ten circles."
     },
     {
-      "title": "Sarem [Free] [Adventure] [Windows]",
-      "url": "https://maxingam-palace.itch.io/sarem",
-      "desc": "Pre-Alpha of the game"
+      "title": "Highschool J [Free] [Visual Novel]",
+      "url": "https://umigamestudios.itch.io/highschool-j",
+      "desc": "if god were just a high school student..."
     },
     {
-      "title": "CHRONO;CONVERGENCE: The Divergence Crypt [Free] [Action]",
-      "url": "https://nim2325.itch.io/chronoconvergence-the-divergence-crypt",
-      "desc": "C:\\Users\\HP\\.gemini\\antigravity-ide\\scratch\\fear-and-hunger-rpg\\chrono-convergence-itchio.zip"
+      "title": "Game About Botting in an MMORPG [Free] [Simulation] [Windows]",
+      "url": "https://yaxworks.itch.io/game-about-botting-in-an-mmorpg",
+      "desc": "Idle Incremental Single Player Game."
     },
     {
-      "title": "Raccoon Cyberpunk [Free] [Platformer]",
-      "url": "https://hector0122.itch.io/raccoon-cyberpunk",
-      "desc": "A fast-paced cyberpunk pixel-art action game featuring a ruthless raccoon."
+      "title": "priiism (demo) [Free] [Puzzle] [Windows] [macOS]",
+      "url": "https://transmutrix.itch.io/priiism",
+      "desc": "an exploratory puzzle game about light and color"
     },
     {
-      "title": "ViewerStudio Forest Demo [Free] [Other]",
-      "url": "https://viewerstudio.itch.io/viewerstudio-forest-demo",
-      "desc": "A small interactive showcase of new Gaussian Splat, collision, audio and infopoint features — entirely browser-based."
+      "title": "THRORBS [Free] [Action]",
+      "url": "https://managore.itch.io/throrbs",
+      "desc": "a game about having a little bit, but not too much"
     },
     {
-      "title": "Soviet Mall Director [$12.99] [Platformer]",
-      "url": "https://richardjm.itch.io/soviet-mall-director",
-      "desc": ""
+      "title": "SPLOOB [Free] [Puzzle]",
+      "url": "https://mors-games.itch.io/sploob",
+      "desc": "Falling squishy blob game."
     },
     {
-      "title": "Norkus Last Rating (Alpha) [Free] [Visual Novel] [Windows]",
-      "url": "https://rg-g.itch.io/norkus-last-rating-alpha",
-      "desc": "\"A world where fairy tale borders on horror, Gods have despaired of humanity, and every choice has a price.\""
+      "title": "TUMBLESTORM [Free] [Simulation]",
+      "url": "https://keqh.itch.io/tumblestorm",
+      "desc": "A physics bingo incremental game. Spin the drum, tumble the balls, storm the cards."
     },
     {
-      "title": "Heavenly Order [Free] [Visual Novel]",
-      "url": "https://sweetsyrupdev.itch.io/heavenly-order",
-      "desc": "Isekai Corruption Harem Visual Novel"
+      "title": "Rags of Racs [Free] [Action] [Windows]",
+      "url": "https://dhelangan.itch.io/ragsofracs",
+      "desc": "A top-down action roguelite where raccoons escort their getaway trolley through a supermarket while stealing everything."
     }
   ],
   "kaggle": []
