@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-09-30",
+  "generatedAt": "2026-10-01",
   "news": {
     "mapsmania": [
+      {
+        "title": "Providing Global Relief",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/providing-global-relief.html",
+        "desc": ""
+      },
       {
         "title": "The El Niño Forcast Map",
         "url": "http://googlemapsmania.blogspot.com/2026/09/the-el-nino-forcast-map.html",
@@ -35,11 +40,6 @@
       {
         "title": "The World Drawn by 3,000 People",
         "url": "http://googlemapsmania.blogspot.com/2026/09/the-world-drawn-by-3000-people.html",
-        "desc": ""
-      },
-      {
-        "title": "The US Deportation Map",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/the-us-deportation-map.html",
         "desc": ""
       }
     ],
@@ -210,6 +210,18 @@
   ],
   "gisse": [
     {
+      "title": "Copying points to second layer based on spreadsheet list of events at those points in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501507/copying-points-to-second-layer-based-on-spreadsheet-list-of-events-at-those-poin",
+      "score": 3,
+      "answers": 1
+    },
+    {
+      "title": "Making two dimensional WKT with 2 decimal places in QGIS Field Calculator",
+      "url": "https://gis.stackexchange.com/questions/501510/making-two-dimensional-wkt-with-2-decimal-places-in-qgis-field-calculator",
+      "score": 2,
+      "answers": 2
+    },
+    {
       "title": "Information about other layers are shown (WMS) in QGIS",
       "url": "https://gis.stackexchange.com/questions/501514/information-about-other-layers-are-shown-wms-in-qgis",
       "score": 0,
@@ -222,21 +234,9 @@
       "answers": 0
     },
     {
-      "title": "Making two dimensional WKT with 2 decimal places in QGIS Field Calculator",
-      "url": "https://gis.stackexchange.com/questions/501510/making-two-dimensional-wkt-with-2-decimal-places-in-qgis-field-calculator",
-      "score": 1,
-      "answers": 2
-    },
-    {
       "title": "Getting MapTiler quantized mesh working with CesiumJS",
       "url": "https://gis.stackexchange.com/questions/501511/getting-maptiler-quantized-mesh-working-with-cesiumjs",
       "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Copying points to second layer based on spreadsheet list of events at those points in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501507/copying-points-to-second-layer-based-on-spreadsheet-list-of-events-at-those-poin",
-      "score": 2,
       "answers": 0
     },
     {
@@ -244,12 +244,6 @@
       "url": "https://gis.stackexchange.com/questions/501500/slope-derived-from-filled-dem-coming-out-somewhat-nonsensical",
       "score": 4,
       "answers": 1
-    },
-    {
-      "title": "Incorrectly rendered tiles in QGIS 4.2.2",
-      "url": "https://gis.stackexchange.com/questions/501506/incorrectly-rendered-tiles-in-qgis-4-2-2",
-      "score": 3,
-      "answers": 0
     },
     {
       "title": "Hatched fills do not line up",
@@ -264,6 +258,12 @@
       "answers": 1
     },
     {
+      "title": "Incorrectly rendered tiles in QGIS 4.2.2",
+      "url": "https://gis.stackexchange.com/questions/501506/incorrectly-rendered-tiles-in-qgis-4-2-2",
+      "score": 3,
+      "answers": 0
+    },
+    {
       "title": "Problems with qgis_global_settings.ini after QGIS migration from 3 to 4",
       "url": "https://gis.stackexchange.com/questions/501493/problems-with-qgis-global-settings-ini-after-qgis-migration-from-3-to-4",
       "score": 1,
@@ -272,40 +272,46 @@
   ],
   "nasa": [
     {
-      "title": "CPEX-CV DC-8 Aircraft In-situ Cloud Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=CPEXCV_Cloud_AircraftInSitu_DC8_Data",
-      "desc": "CPEXCV_Cloud_AircraftInSitu_DC8_Data is the in-situ cloud data collected during the Convective Processes Experiment - Cabo Verde (CPEX-CV) onboard the DC-8 a…",
-      "org": "LARC_CLOUD"
+      "title": "GNSS radio occultation L1B excess phase and amplitude for TSX as contributed by JPL, version 2.0 (gnssro_tsx_jpl_l1b)",
+      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_tsx_jpl_l1b",
+      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Excess Phase and Amplitude data from the TerraSAR-X mission as contrib…",
+      "org": "GES_DISC"
     },
     {
-      "title": "CPEX-CV HALO Aerosol and Water Vapor Profiles and Images",
-      "url": "https://search.earthdata.nasa.gov/search?q=CPEXCV-HALO_DC8",
-      "desc": "CPEXCV-HALO_DC8 is the High Altitude Lidar Observatory (HALO) image and h5 data files collected during the Convective Processes Experiment - Cabo Verde (CPEX…",
-      "org": "LARC_CLOUD"
+      "title": "GNSS radio occultation L1B excess phase and amplitude for SPIRE as contributed by UCAR, version 2.0 (gnssro_spire_ucar_l1b)",
+      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_spire_ucar_l1b",
+      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Excess Phase and Amplitude data from the Spire as contributed by the U…",
+      "org": "GES_DISC"
     },
     {
-      "title": "PRISM: L1B Calibrated Radiance for PACE-PAX, 2024",
-      "url": "https://search.earthdata.nasa.gov/search?q=PRISM_L1B_PACEPAX_2024_2515",
-      "desc": "This dataset holds Level 1B (L1B) calibrated radiance data collected by the Portable Remote Imaging SpectroMeter (PRISM) instrument deployed on a NASA ER-2 a…",
-      "org": "ORNL_CLOUD"
+      "title": "Ground-Based Global Navigation Satellite System (GNSS)-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN)…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GD_GLONASS_dly_EOP",
+      "desc": "This product contains a time series of Earth orientation parameters from the IERS Bulletin A for the GLONASS constellation of satellites.",
+      "org": "CDDIS"
     },
     {
-      "title": "CPEX-CV DAWN Doppler Aerosol WiNd Lidar",
-      "url": "https://search.earthdata.nasa.gov/search?q=CPEXCV-DAWN_DC8",
-      "desc": "CPEXCV-DAWN_DC8 are the Doppler Aerosol WiNd lidar (DAWN) image and NetCDF data files collected during the Convective Processes Experiment - Cabo Verde (CPEX…",
-      "org": "LARC_CLOUD"
+      "title": "Ground-Based GNSS-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN) GLONASS daily accumulated real-time…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GD_GLONASS_Daily_POD_60sec_Orbits",
+      "desc": "This product contains a time series of position and velocity components for healthy satellites in the GLONASS constellation that are accumulated every minute…",
+      "org": "CDDIS"
     },
     {
-      "title": "CPEX-CV Merge Data Files",
-      "url": "https://search.earthdata.nasa.gov/search?q=CPEXCV_Merge_Data",
-      "desc": "CPEXCV_Merge_Data are pre-generated aircraft merge data files created utilizing data collected during the Convective Processes Experiment - Cabo Verde (CPEX-…",
-      "org": "LARC_CLOUD"
+      "title": "Global Navigation Satellite System (GNSS) Earth Rotation Parameters (ERP) products from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_ERP_prod",
+      "desc": "Earth Rotation Parameters (ERPs) derived from analysis of Global Navigation Satellite System (GNSS) data.",
+      "org": "CDDIS"
     },
     {
-      "title": "CPEX-AW DAWN Doppler Aerosol WiNd Lidar",
-      "url": "https://search.earthdata.nasa.gov/search?q=CPEXAW-DAWN_DC8",
-      "desc": "CPEXAW-DAWN_DC8 are the Doppler Aerosol WiNd lidar (DAWN) image and NetCDF data files collected during the Convective Processes Experiment - Aerosols & Winds…",
-      "org": "LARC_CLOUD"
+      "title": "SMAP/SMOS L3 Radiometer 9 km EASE-Grid Soil Moisture V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=NSIDC-0800",
+      "desc": "The Soil Moisture Active Passive (SMAP, launched in 2015) and the Soil Moisture and Ocean Salinity (SMOS, launched in 2009) missions are each L-band satellit…",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "SMOS-Based SMAP L2 Radiometer Half-Orbit 9 km EASE-Grid Soil Moisture V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=NSIDC-0799",
+      "desc": "The Soil Moisture Active Passive (SMAP, launched in 2015) and the Soil Moisture and Ocean Salinity (SMOS, launched in 2009) missions are each L-band satellit…",
+      "org": "NSIDC_CPRD"
     },
     {
       "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
@@ -323,12 +329,6 @@
       "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
       "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
       "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
-      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
       "org": "NSIDC_CPRD"
     }
   ],
