@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-01",
+  "generatedAt": "2026-10-02",
   "news": {
     "mapsmania": [
+      {
+        "title": "Map Pac-Man is Back!",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/map-pac-man-is-back.html",
+        "desc": ""
+      },
       {
         "title": "Providing Global Relief",
         "url": "http://googlemapsmania.blogspot.com/2026/10/providing-global-relief.html",
@@ -35,11 +40,6 @@
       {
         "title": "Building Age Maps: From NYC to LA",
         "url": "http://googlemapsmania.blogspot.com/2026/09/building-age-maps-from-nyc-to-la.html",
-        "desc": ""
-      },
-      {
-        "title": "The World Drawn by 3,000 People",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/the-world-drawn-by-3000-people.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "roadnetwork",
-      "url": "https://plugins.qgis.org/plugins/roadnetwork/"
+      "title": "Layer Finder",
+      "url": "https://plugins.qgis.org/plugins/LayerFinder/"
     },
     {
-      "title": "Definition Queries (Layer Filters)",
-      "url": "https://plugins.qgis.org/plugins/definition_queries/"
+      "title": "Earth Engine Catalog Query",
+      "url": "https://plugins.qgis.org/plugins/ee_s5p_plugin/"
     },
     {
-      "title": "StarShoal",
-      "url": "https://plugins.qgis.org/plugins/starshoal/"
+      "title": "OpenPlanetaryMap Tile Loader",
+      "url": "https://plugins.qgis.org/plugins/opmtileloader/"
     },
     {
-      "title": "DrawSeq",
-      "url": "https://plugins.qgis.org/plugins/DrawSeq/"
+      "title": "RemoteSense Toolkit",
+      "url": "https://plugins.qgis.org/plugins/RemoteSenseToolkit/"
     },
     {
-      "title": "EloteSat Tamaulipas",
-      "url": "https://plugins.qgis.org/plugins/elotesat/"
+      "title": "WetSpass-M Modern",
+      "url": "https://plugins.qgis.org/plugins/wetspass_modern/"
     },
     {
-      "title": "Cross Section Generator",
-      "url": "https://plugins.qgis.org/plugins/csg/"
+      "title": "Snap Nodes Circle",
+      "url": "https://plugins.qgis.org/plugins/snap_nodes_circle/"
     },
     {
-      "title": "GeosysAI Sync",
-      "url": "https://plugins.qgis.org/plugins/geosys_sync/"
+      "title": "Universal Search",
+      "url": "https://plugins.qgis.org/plugins/universal_search/"
     },
     {
-      "title": "QuickClip",
-      "url": "https://plugins.qgis.org/plugins/QuickClip/"
+      "title": "Catálogo Multiespectral por Área de Interesse",
+      "url": "https://plugins.qgis.org/plugins/usgs_catalogo_qgis/"
     }
   ],
   "releases": [
@@ -210,6 +210,18 @@
   ],
   "gisse": [
     {
+      "title": "Aggegate binary compliance raster to neighbourhood polygon census tract to calculate total compliant population",
+      "url": "https://gis.stackexchange.com/questions/501519/aggegate-binary-compliance-raster-to-neighbourhood-polygon-census-tract-to-calcu",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Problem with adding ArcGIS vector tile layer to QGIS",
+      "url": "https://gis.stackexchange.com/questions/501508/problem-with-adding-arcgis-vector-tile-layer-to-qgis",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Copying points to second layer based on spreadsheet list of events at those points in QGIS",
       "url": "https://gis.stackexchange.com/questions/501507/copying-points-to-second-layer-based-on-spreadsheet-list-of-events-at-those-poin",
       "score": 3,
@@ -228,26 +240,14 @@
       "answers": 0
     },
     {
-      "title": "Problem with adding ArcGIS vector tile layer to QGIS",
-      "url": "https://gis.stackexchange.com/questions/501508/problem-with-adding-arcgis-vector-tile-layer-to-qgis",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Getting MapTiler quantized mesh working with CesiumJS",
-      "url": "https://gis.stackexchange.com/questions/501511/getting-maptiler-quantized-mesh-working-with-cesiumjs",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "Slope derived from filled DEM coming out somewhat nonsensical",
       "url": "https://gis.stackexchange.com/questions/501500/slope-derived-from-filled-dem-coming-out-somewhat-nonsensical",
       "score": 4,
       "answers": 1
     },
     {
-      "title": "Hatched fills do not line up",
-      "url": "https://gis.stackexchange.com/questions/501504/hatched-fills-do-not-line-up",
+      "title": "Getting MapTiler quantized mesh working with CesiumJS",
+      "url": "https://gis.stackexchange.com/questions/501511/getting-maptiler-quantized-mesh-working-with-cesiumjs",
       "score": 0,
       "answers": 0
     },
@@ -258,9 +258,9 @@
       "answers": 1
     },
     {
-      "title": "Incorrectly rendered tiles in QGIS 4.2.2",
-      "url": "https://gis.stackexchange.com/questions/501506/incorrectly-rendered-tiles-in-qgis-4-2-2",
-      "score": 3,
+      "title": "Hatched fills do not line up",
+      "url": "https://gis.stackexchange.com/questions/501504/hatched-fills-do-not-line-up",
+      "score": 0,
       "answers": 0
     },
     {
@@ -272,46 +272,40 @@
   ],
   "nasa": [
     {
-      "title": "GNSS radio occultation L1B excess phase and amplitude for TSX as contributed by JPL, version 2.0 (gnssro_tsx_jpl_l1b)",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_tsx_jpl_l1b",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Excess Phase and Amplitude data from the TerraSAR-X mission as contrib…",
-      "org": "GES_DISC"
+      "title": "LISTOS Yale Coastal Ground Site Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_YaleCoastal_Data",
+      "desc": "LISTOS_Ground_YaleCoastal_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at the Yale Coastal ground site during t…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "GNSS radio occultation L1B excess phase and amplitude for SPIRE as contributed by UCAR, version 2.0 (gnssro_spire_ucar_l1b)",
-      "url": "https://search.earthdata.nasa.gov/search?q=gnssro_spire_ucar_l1b",
-      "desc": "This dataset provides Global Navigation Satellite System (GNSS) Radio Occultation (RO) Excess Phase and Amplitude data from the Spire as contributed by the U…",
-      "org": "GES_DISC"
+      "title": "LISTOS Westport Ground Site Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_Westport_Data",
+      "desc": "LISTOS_Ground_Westport_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) Wesport ground site data collected during the LISTOS field campaign.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS)-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN)…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GD_GLONASS_dly_EOP",
-      "desc": "This product contains a time series of Earth orientation parameters from the IERS Bulletin A for the GLONASS constellation of satellites.",
-      "org": "CDDIS"
+      "title": "ASTER Global Digital Elevation Model NetCDF V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=ASTGTM_NC",
+      "desc": "The Terra Advanced Spaceborne Thermal Emission and Reflection Radiometer (ASTER) Global Digital Elevation Model (GDEM) Version 3 (ASTGTM) provides a global d…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "Ground-Based GNSS-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN) GLONASS daily accumulated real-time…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GD_GLONASS_Daily_POD_60sec_Orbits",
-      "desc": "This product contains a time series of position and velocity components for healthy satellites in the GLONASS constellation that are accumulated every minute…",
-      "org": "CDDIS"
+      "title": "LISTOS Hammonasset Ground Site Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_Hammonasset_Data",
+      "desc": "LISTOS_Ground_Hammonasset_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at the Hammonasset ground site during th…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Global Navigation Satellite System (GNSS) Earth Rotation Parameters (ERP) products from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_ERP_prod",
-      "desc": "Earth Rotation Parameters (ERPs) derived from analysis of Global Navigation Satellite System (GNSS) data.",
-      "org": "CDDIS"
+      "title": "LISTOS Flax Pond Ground Site Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_FlaxPond_Data",
+      "desc": "LISTOS_Ground_FlaxPond_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at the Flax Pond ground site during the LIS…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "SMAP/SMOS L3 Radiometer 9 km EASE-Grid Soil Moisture V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=NSIDC-0800",
-      "desc": "The Soil Moisture Active Passive (SMAP, launched in 2015) and the Soil Moisture and Ocean Salinity (SMOS, launched in 2009) missions are each L-band satellit…",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "SMOS-Based SMAP L2 Radiometer Half-Orbit 9 km EASE-Grid Soil Moisture V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=NSIDC-0799",
-      "desc": "The Soil Moisture Active Passive (SMAP, launched in 2015) and the Soil Moisture and Ocean Salinity (SMOS, launched in 2009) missions are each L-band satellit…",
-      "org": "NSIDC_CPRD"
+      "title": "NAAMES Sonde Meteorological InSitu Data, Version 1",
+      "url": "https://search.earthdata.nasa.gov/search?q=NAAMES_Met_SondeInSitu_Data",
+      "desc": "NAAMES_Met_SondeInSitu_Data are meteorological radiosonde measurements collected via radiosonde launches during the North Atlantic Aerosols and Marine Ecosys…",
+      "org": "LARC_CLOUD"
     },
     {
       "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
@@ -329,6 +323,12 @@
       "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
       "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
       "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
+      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
       "org": "NSIDC_CPRD"
     }
   ],
@@ -393,15 +393,15 @@
   "osm": [
     {
       "title": "weeklyOSM 844",
-      "url": "https://weeklyosm.eu/archives/18886"
+      "url": "https://weeklyosm.eu/archives/0844/"
     },
     {
       "title": "weeklyOSM 843",
-      "url": "https://weeklyosm.eu/archives/18880"
+      "url": "https://weeklyosm.eu/archives/0843/"
     },
     {
       "title": "weeklyOSM 842",
-      "url": "https://weeklyosm.eu/archives/18872"
+      "url": "https://weeklyosm.eu/archives/0842/"
     }
   ]
 }
