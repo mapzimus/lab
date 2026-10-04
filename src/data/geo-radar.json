@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-03",
+  "generatedAt": "2026-10-04",
   "news": {
     "mapsmania": [
       {
@@ -144,6 +144,14 @@
   ],
   "releases": [
     {
+      "repo": "maplibre/maplibre-gl-js",
+      "title": "maplibre-gl-js v6.12.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.12.0",
+      "desc": "### ✨ Features and improvements - Add a `zoomToUserAccuracy` option to `GeolocateControlOptions` to allow control over map zoom adjustments in line with the…",
+      "publishedAt": "2026-10-03",
+      "isFresh": true
+    },
+    {
       "repo": "duckdb/duckdb",
       "title": "duckdb v1.5.6",
       "url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.6",
@@ -157,14 +165,6 @@
       "url": "https://github.com/qgis/QGIS/releases/tag/final-3_44_15",
       "desc": "https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15",
       "publishedAt": "2026-09-25",
-      "isFresh": true
-    },
-    {
-      "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.11.2",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.11.2",
-      "desc": "### ✨ Features and improvements - Improve rendering performance by uploading each tile's projection data once per frame instead of before every draw call ([#…",
-      "publishedAt": "2026-09-24",
       "isFresh": true
     },
     {
@@ -210,16 +210,16 @@
   ],
   "gisse": [
     {
-      "title": "With gdal CLI commands is everything that is not a command name, considered an argument?",
-      "url": "https://gis.stackexchange.com/questions/501521/with-gdal-cli-commands-is-everything-that-is-not-a-command-name-considered-an-a",
-      "score": 0,
-      "answers": 0
+      "title": "Converting OSMAnd address to QGIS",
+      "url": "https://gis.stackexchange.com/questions/501524/converting-osmand-address-to-qgis",
+      "score": 1,
+      "answers": 1
     },
     {
-      "title": "Aggegate binary compliance raster to neighbourhood polygon census tract to calculate total compliant population",
-      "url": "https://gis.stackexchange.com/questions/501519/aggegate-binary-compliance-raster-to-neighbourhood-polygon-census-tract-to-calcu",
-      "score": 0,
-      "answers": 0
+      "title": "With gdal CLI commands is everything that is not a command name, considered an argument?",
+      "url": "https://gis.stackexchange.com/questions/501521/with-gdal-cli-commands-is-everything-that-is-not-a-command-name-considered-an-a",
+      "score": 2,
+      "answers": 1
     },
     {
       "title": "Slope derived from filled DEM coming out somewhat nonsensical",
@@ -228,8 +228,8 @@
       "answers": 1
     },
     {
-      "title": "Problem with adding ArcGIS vector tile layer to QGIS",
-      "url": "https://gis.stackexchange.com/questions/501508/problem-with-adding-arcgis-vector-tile-layer-to-qgis",
+      "title": "Aggegate binary compliance raster to neighbourhood polygon census tract to calculate total compliant population",
+      "url": "https://gis.stackexchange.com/questions/501519/aggegate-binary-compliance-raster-to-neighbourhood-polygon-census-tract-to-calcu",
       "score": 0,
       "answers": 0
     },
@@ -238,6 +238,12 @@
       "url": "https://gis.stackexchange.com/questions/501507/copying-points-to-second-layer-based-on-spreadsheet-list-of-events-at-those-poin",
       "score": 3,
       "answers": 1
+    },
+    {
+      "title": "Problem with adding ArcGIS vector tile layer to QGIS",
+      "url": "https://gis.stackexchange.com/questions/501508/problem-with-adding-arcgis-vector-tile-layer-to-qgis",
+      "score": 0,
+      "answers": 0
     },
     {
       "title": "Making two dimensional WKT with 2 decimal places in QGIS Field Calculator",
@@ -262,15 +268,45 @@
       "url": "https://gis.stackexchange.com/questions/501495/missing-synchronize-with-map-canvas-tick-box-in-qgis-layout-item-properties",
       "score": 2,
       "answers": 1
-    },
-    {
-      "title": "Hatched fills do not line up",
-      "url": "https://gis.stackexchange.com/questions/501504/hatched-fills-do-not-line-up",
-      "score": 0,
-      "answers": 0
     }
   ],
   "nasa": [
+    {
+      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
+      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
+      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
+      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
+      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
+      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
+      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
     {
       "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
       "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
@@ -294,42 +330,6 @@
       "url": "https://search.earthdata.nasa.gov/search?q=MCD19A3D",
       "desc": "The MCD19A3D Version 6.1 data product is a Moderate Resolution Imaging Spectroradiometer (MODIS) Terra and Aqua combined Bidirectional Reflectance Distributi…",
       "org": "LPCLOUD"
-    },
-    {
-      "title": "LISTOS CCNY Ground Site Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_CCNY_Data",
-      "desc": "LISTOS_Ground_CCNY_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at the CCNY ground site during the LISTOS field…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "LISTOS Outer Island Ground Site Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_OuterIsland_Data",
-      "desc": "LISTOS_Ground_OuterIsland_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at the Outer Island ground site during t…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "LISTOS NASA Aircraft Meteorological and Navigational Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_MetNav_AircraftInSitu_NASAAircraft_Data",
-      "desc": "LISTOS_MetNav_AircraftInSitu_NASAAircraft_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) in-situ meteorological and navigational data collec…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "LISTOS Ground Data at Miscellaneous Ground Sites",
-      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_Other_Data",
-      "desc": "LISTOS_Ground_Other_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at a collection of ground sites during the LIS…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "LISTOS NASA Aircraft Remote Sensing Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_AircraftRemoteSensing_NASAAircraft_Data",
-      "desc": "LISTOS_AircraftRemoteSensing_NASAAircraft_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) remote sensing data collected onboard the NASA airc…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "LISTOS Bronx Pfizer Ground Site Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=LISTOS_Ground_BronxPfizer_Data",
-      "desc": "LISTOS_Ground_BronxPfizer_Data is the Long Island Sound Tropospheric Ozone Study (LISTOS) ground site data collected at the Bronx Pfizer ground site during t…",
-      "org": "LARC_CLOUD"
     }
   ],
   "datagov": [
@@ -392,16 +392,16 @@
   ],
   "osm": [
     {
+      "title": "weeklyOSM 845",
+      "url": "https://weeklyosm.eu/archives/0845/"
+    },
+    {
       "title": "weeklyOSM 844",
       "url": "https://weeklyosm.eu/archives/0844/"
     },
     {
       "title": "weeklyOSM 843",
       "url": "https://weeklyosm.eu/archives/0843/"
-    },
-    {
-      "title": "weeklyOSM 842",
-      "url": "https://weeklyosm.eu/archives/0842/"
     }
   ]
 }
