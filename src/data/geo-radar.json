@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-04",
+  "generatedAt": "2026-10-05",
   "news": {
     "mapsmania": [
+      {
+        "title": "Preparing for the #30DayMapChallenge",
+        "url": "http://googlemapsmania.blogspot.com/2025/10/preparing-for-30daychallenge.html",
+        "desc": ""
+      },
       {
         "title": "A Year of Lightning",
         "url": "http://googlemapsmania.blogspot.com/2026/10/a-year-of-lightning.html",
@@ -35,11 +40,6 @@
       {
         "title": "Kingdom Conquest Games",
         "url": "http://googlemapsmania.blogspot.com/2026/09/kingdom-conquest-games.html",
-        "desc": ""
-      },
-      {
-        "title": "Shine a Light",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/shine-light.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "Layer Finder",
-      "url": "https://plugins.qgis.org/plugins/LayerFinder/"
+      "title": "Geodata: Markhöjd direkt (Lantmäteriet)",
+      "url": "https://plugins.qgis.org/plugins/markhojd_direkt/"
     },
     {
-      "title": "Earth Engine Catalog Query",
-      "url": "https://plugins.qgis.org/plugins/ee_s5p_plugin/"
+      "title": "Análise 3-30-300",
+      "url": "https://plugins.qgis.org/plugins/QGIS_330300/"
     },
     {
-      "title": "OpenPlanetaryMap Tile Loader",
-      "url": "https://plugins.qgis.org/plugins/opmtileloader/"
+      "title": "QGIS Python IDE Pro",
+      "url": "https://plugins.qgis.org/plugins/qgis_python_ide/"
     },
     {
-      "title": "RemoteSense Toolkit",
-      "url": "https://plugins.qgis.org/plugins/RemoteSenseToolkit/"
+      "title": "Attribute Rules Manager",
+      "url": "https://plugins.qgis.org/plugins/attribute_rules/"
     },
     {
-      "title": "WetSpass-M Modern",
-      "url": "https://plugins.qgis.org/plugins/wetspass_modern/"
+      "title": "Contour Labeler",
+      "url": "https://plugins.qgis.org/plugins/contour_labeler/"
     },
     {
-      "title": "Snap Nodes Circle",
-      "url": "https://plugins.qgis.org/plugins/snap_nodes_circle/"
+      "title": "Morizon Next",
+      "url": "https://plugins.qgis.org/plugins/morizon_next/"
     },
     {
-      "title": "Universal Search",
-      "url": "https://plugins.qgis.org/plugins/universal_search/"
+      "title": "Subtypes and Domains Manager",
+      "url": "https://plugins.qgis.org/plugins/subtypes_domains/"
     },
     {
-      "title": "Catálogo Multiespectral por Área de Interesse",
-      "url": "https://plugins.qgis.org/plugins/usgs_catalogo_qgis/"
+      "title": "Check, Define & Convert CRS v2",
+      "url": "https://plugins.qgis.org/plugins/crs_tools_v2/"
     }
   ],
   "releases": [
@@ -210,6 +210,18 @@
   ],
   "gisse": [
     {
+      "title": "How to safely remove stored PostgreSQL credentials from a QGIS project file and force user login on open?",
+      "url": "https://gis.stackexchange.com/questions/501534/how-to-safely-remove-stored-postgresql-credentials-from-a-qgis-project-file-and",
+      "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "ArcPy CalculateField fails for AGOL hosted feature layer's date field",
+      "url": "https://gis.stackexchange.com/questions/501526/arcpy-calculatefield-fails-for-agol-hosted-feature-layers-date-field",
+      "score": 0,
+      "answers": 1
+    },
+    {
       "title": "Converting OSMAnd address to QGIS",
       "url": "https://gis.stackexchange.com/questions/501524/converting-osmand-address-to-qgis",
       "score": 1,
@@ -220,6 +232,18 @@
       "url": "https://gis.stackexchange.com/questions/501521/with-gdal-cli-commands-is-everything-that-is-not-a-command-name-considered-an-a",
       "score": 2,
       "answers": 1
+    },
+    {
+      "title": "Information about other layers are shown (WMS) in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501514/information-about-other-layers-are-shown-wms-in-qgis",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Getting MapTiler quantized mesh working with CesiumJS",
+      "url": "https://gis.stackexchange.com/questions/501511/getting-maptiler-quantized-mesh-working-with-cesiumjs",
+      "score": 0,
+      "answers": 2
     },
     {
       "title": "Slope derived from filled DEM coming out somewhat nonsensical",
@@ -240,95 +264,71 @@
       "answers": 1
     },
     {
-      "title": "Problem with adding ArcGIS vector tile layer to QGIS",
-      "url": "https://gis.stackexchange.com/questions/501508/problem-with-adding-arcgis-vector-tile-layer-to-qgis",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "Making two dimensional WKT with 2 decimal places in QGIS Field Calculator",
       "url": "https://gis.stackexchange.com/questions/501510/making-two-dimensional-wkt-with-2-decimal-places-in-qgis-field-calculator",
       "score": 2,
       "answers": 2
-    },
-    {
-      "title": "Information about other layers are shown (WMS) in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501514/information-about-other-layers-are-shown-wms-in-qgis",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Getting MapTiler quantized mesh working with CesiumJS",
-      "url": "https://gis.stackexchange.com/questions/501511/getting-maptiler-quantized-mesh-working-with-cesiumjs",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Missing ‘Synchronize with map canvas’ tick box in QGIS layout item properties",
-      "url": "https://gis.stackexchange.com/questions/501495/missing-synchronize-with-map-canvas-tick-box-in-qgis-layout-item-properties",
-      "score": 2,
-      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
-      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "VIIRS/NPP Moderate Resolution Terrain Corrected Geolocation 6-Min L1 Swath 750m Light V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VNP03MODLL",
+      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "VIIRS/NPP Burned Area Monthly L4 Global 500m SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VNP64A1",
+      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
-      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "VIIRS/NPP FILDA-2 Fire Modified Combustion Efficiency Product 6-min L2 Swath 375 V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VNP47IMG",
+      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
-      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "VIIRS/NPP FILDA-2 Fire Modified Combustion Efficiency Product 6-min L2 Swath 750 V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VNP47MOD",
+      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "VIIRS/NPP BRDF/Albedo Nadir BRDF-Adjusted Ref Daily L3 Global 1km SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VNP43MA4",
+      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "VIIRS/NPP BRDF/Albedo Albedo Daily L3 Global 1km SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VNP43MA3",
+      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
-      "desc": "SMAP Level 1A Radar Receive Only Product Version 3",
-      "org": "ASF"
+      "title": "VIIRS/NPP BRDF/Albedo Quality Daily L3 Global 1km SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VNP43MA2",
+      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003",
-      "desc": "SMAP Level 1A Radar Receive Only Data Quality Information Version 3",
-      "org": "ASF"
+      "title": "VIIRS/NPP BRDF/Albedo Model Parameters Daily L3 Global 1km SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VNP43MA1",
+      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003",
-      "desc": "SMAP Level 1A Radar Receive Only Product Metadata Version 3",
-      "org": "ASF"
+      "title": "VIIRS/NPP BRDF/Albedo Nadir BRDF-Adjusted Ref Daily L3 Global 500m SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VNP43IA4",
+      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "MODIS/Terra+Aqua BRDF Model Parameters Daily L3 Global 1km SIN Grid V061",
-      "url": "https://search.earthdata.nasa.gov/search?q=MCD19A3D",
-      "desc": "The MCD19A3D Version 6.1 data product is a Moderate Resolution Imaging Spectroradiometer (MODIS) Terra and Aqua combined Bidirectional Reflectance Distributi…",
+      "title": "VIIRS/NPP BRDF/Albedo Albedo Daily L3 Global 500m SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VNP43IA3",
+      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
       "org": "LPCLOUD"
     }
   ],
