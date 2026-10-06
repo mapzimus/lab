@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-05",
+  "generatedAt": "2026-10-06",
   "news": {
     "mapsmania": [
+      {
+        "title": "Alternative History Maps",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/alternative-history-maps.html",
+        "desc": ""
+      },
       {
         "title": "Preparing for the #30DayMapChallenge",
         "url": "http://googlemapsmania.blogspot.com/2025/10/preparing-for-30daychallenge.html",
@@ -35,11 +40,6 @@
       {
         "title": "Using AI to Annotate Vintage Maps",
         "url": "http://googlemapsmania.blogspot.com/2026/09/using-ai-to-annotate-vintage-maps.html",
-        "desc": ""
-      },
-      {
-        "title": "Kingdom Conquest Games",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/kingdom-conquest-games.html",
         "desc": ""
       }
     ],
@@ -173,7 +173,7 @@
       "url": "https://github.com/visgl/deck.gl/releases/tag/v9.4.0",
       "desc": "deck.gl v9.4 brings together a collection of completed improvements focused on performance, stability, and usability.",
       "publishedAt": "2026-09-05",
-      "isFresh": true
+      "isFresh": false
     },
     {
       "repo": "OSGeo/gdal",
@@ -210,15 +210,33 @@
   ],
   "gisse": [
     {
-      "title": "How to safely remove stored PostgreSQL credentials from a QGIS project file and force user login on open?",
-      "url": "https://gis.stackexchange.com/questions/501534/how-to-safely-remove-stored-postgresql-credentials-from-a-qgis-project-file-and",
+      "title": "Joining point attributes to line in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis",
       "score": 1,
       "answers": 1
+    },
+    {
+      "title": "Converting large GeoJSON file to shapefile while preserving UTF-8 attribute encoding with ogr2ogr",
+      "url": "https://gis.stackexchange.com/questions/501540/converting-large-geojson-file-to-shapefile-while-preserving-utf-8-attribute-enco",
+      "score": 2,
+      "answers": 0
     },
     {
       "title": "ArcPy CalculateField fails for AGOL hosted feature layer's date field",
       "url": "https://gis.stackexchange.com/questions/501526/arcpy-calculatefield-fails-for-agol-hosted-feature-layers-date-field",
       "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Aligning Raster Datasets in ArcGIS Pro",
+      "url": "https://gis.stackexchange.com/questions/501541/aligning-raster-datasets-in-arcgis-pro",
+      "score": 2,
+      "answers": 0
+    },
+    {
+      "title": "How to safely remove stored PostgreSQL credentials from a QGIS project file and force user login on open?",
+      "url": "https://gis.stackexchange.com/questions/501534/how-to-safely-remove-stored-postgresql-credentials-from-a-qgis-project-file-and",
+      "score": 1,
       "answers": 1
     },
     {
@@ -240,96 +258,78 @@
       "answers": 1
     },
     {
-      "title": "Getting MapTiler quantized mesh working with CesiumJS",
-      "url": "https://gis.stackexchange.com/questions/501511/getting-maptiler-quantized-mesh-working-with-cesiumjs",
-      "score": 0,
-      "answers": 2
-    },
-    {
       "title": "Slope derived from filled DEM coming out somewhat nonsensical",
       "url": "https://gis.stackexchange.com/questions/501500/slope-derived-from-filled-dem-coming-out-somewhat-nonsensical",
       "score": 4,
       "answers": 1
     },
     {
-      "title": "Aggegate binary compliance raster to neighbourhood polygon census tract to calculate total compliant population",
-      "url": "https://gis.stackexchange.com/questions/501519/aggegate-binary-compliance-raster-to-neighbourhood-polygon-census-tract-to-calcu",
+      "title": "Getting MapTiler quantized mesh working with CesiumJS",
+      "url": "https://gis.stackexchange.com/questions/501511/getting-maptiler-quantized-mesh-working-with-cesiumjs",
       "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Copying points to second layer based on spreadsheet list of events at those points in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501507/copying-points-to-second-layer-based-on-spreadsheet-list-of-events-at-those-poin",
-      "score": 3,
-      "answers": 1
-    },
-    {
-      "title": "Making two dimensional WKT with 2 decimal places in QGIS Field Calculator",
-      "url": "https://gis.stackexchange.com/questions/501510/making-two-dimensional-wkt-with-2-decimal-places-in-qgis-field-calculator",
-      "score": 2,
       "answers": 2
     }
   ],
   "nasa": [
     {
-      "title": "VIIRS/NPP Moderate Resolution Terrain Corrected Geolocation 6-Min L1 Swath 750m Light V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VNP03MODLL",
-      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "title": "VIIRS/JPSS2 BRDF/Albedo Parameter 2 Band M10 Daily L3 Global 30 ArcSec CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ243D23",
+      "desc": "The NOAA-21 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Model Parameter 2 Band M10 pr…",
       "org": "LPCLOUD"
     },
     {
-      "title": "VIIRS/NPP Burned Area Monthly L4 Global 500m SIN Grid V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VNP64A1",
-      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "title": "VIIRS/JPSS1 BRDF/Albedo Valid Observation Band M8 Daily L3 Global 30ArcSec CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D48",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Valid Observation Band M8 pro…",
       "org": "LPCLOUD"
     },
     {
-      "title": "VIIRS/NPP FILDA-2 Fire Modified Combustion Efficiency Product 6-min L2 Swath 375 V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VNP47IMG",
-      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "title": "VIIRS/JPSS1 BRDF/Albedo Valid Observation Band M10 Daily L3 Global 30ArcSec CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D49",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Valid Observation Band M10 pr…",
       "org": "LPCLOUD"
     },
     {
-      "title": "VIIRS/NPP FILDA-2 Fire Modified Combustion Efficiency Product 6-min L2 Swath 750 V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VNP47MOD",
-      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "title": "VIIRS/JPSS1 BRDF/Albedo Valid Observation Band M11 Daily L3 Global 30ArcSec CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D50",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Valid Observation Band M11 pr…",
       "org": "LPCLOUD"
     },
     {
-      "title": "VIIRS/NPP BRDF/Albedo Nadir BRDF-Adjusted Ref Daily L3 Global 1km SIN Grid V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VNP43MA4",
-      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
+      "title": "VIIRS/JPSS1 BRDF/Albedo Parameter 2 Band M11 Daily L3 Global 30 ArcSec CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D26",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Model Parameter 2 Band M11 pr…",
       "org": "LPCLOUD"
     },
     {
-      "title": "VIIRS/NPP BRDF/Albedo Albedo Daily L3 Global 1km SIN Grid V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VNP43MA3",
-      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
-      "org": "LPCLOUD"
+      "title": "GLAS/ICESat L1A Global Engineering Data (HDF5) V033",
+      "url": "https://search.earthdata.nasa.gov/search?q=GLAH03",
+      "desc": "Level-1A global engineering data (GLAH03) include satellite housekeeping data used to calibrate data values for GLA01 and GLA02.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "VIIRS/NPP BRDF/Albedo Quality Daily L3 Global 1km SIN Grid V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VNP43MA2",
-      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
-      "org": "LPCLOUD"
+      "title": "GLAS/ICESat L1A Global Atmosphere Data (HDF5) V033",
+      "url": "https://search.earthdata.nasa.gov/search?q=GLAH02",
+      "desc": "GLAH02 Level-1A atmospheric data include the normalized relative backscatter for the 532 nm and 1064 nm channels, and low-level instrument corrections such a…",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "VIIRS/NPP BRDF/Albedo Model Parameters Daily L3 Global 1km SIN Grid V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VNP43MA1",
-      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
-      "org": "LPCLOUD"
+      "title": "GLAS/ICESat L1A Global Altimetry Data (HDF5) V033",
+      "url": "https://search.earthdata.nasa.gov/search?q=GLAH01",
+      "desc": "Level-1A altimetry data (GLAH01) include the transmitted and received waveform from the altimeter.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "VIIRS/NPP BRDF/Albedo Nadir BRDF-Adjusted Ref Daily L3 Global 500m SIN Grid V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VNP43IA4",
-      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
-      "org": "LPCLOUD"
+      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
+      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "VIIRS/NPP BRDF/Albedo Albedo Daily L3 Global 500m SIN Grid V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VNP43IA3",
-      "desc": "The delivery of all Suomi National Polar-orbiting Partnership (Suomi NPP) VIIRS science data products [will cease on November 2, 2026 (2026/306)](https://www…",
-      "org": "LPCLOUD"
+      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
+      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     }
   ],
   "datagov": [
