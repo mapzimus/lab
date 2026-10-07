@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-06",
+  "generatedAt": "2026-10-07",
   "news": {
     "mapsmania": [
+      {
+        "title": "Find Movies - by Location & Period!",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/find-movies-by-location-period.html",
+        "desc": ""
+      },
       {
         "title": "Alternative History Maps",
         "url": "http://googlemapsmania.blogspot.com/2026/10/alternative-history-maps.html",
@@ -35,11 +40,6 @@
       {
         "title": "The Satellites of Mars",
         "url": "http://googlemapsmania.blogspot.com/2026/09/the-satellites-of-mars.html",
-        "desc": ""
-      },
-      {
-        "title": "Using AI to Annotate Vintage Maps",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/using-ai-to-annotate-vintage-maps.html",
         "desc": ""
       }
     ],
@@ -75,38 +75,7 @@
         "desc": "From Delaware to Hawaii, discover when each state entered the Union and the geographic features that make every state unique."
       }
     ],
-    "geoworld": [
-      {
-        "title": "Infrastructure Isn’t Just Built Anymore.",
-        "url": "https://geospatialworld.net/videos/intelligent-infrastructure-aec-summit-gwf-2026/",
-        "desc": "Infrastructure was once defined by scale."
-      },
-      {
-        "title": "Strengthening Sovereignty, Economy, and Society",
-        "url": "https://geospatialworld.net/prime/interviews/strengthening-sovereignty-economy-and-society/",
-        "desc": "How should nations redefine geospatial and space sovereignty in an era of increasing dependence on global platforms, foreign satellite constellations, and in…"
-      },
-      {
-        "title": "Mapping Urban Heat Islands in Ahemedabad",
-        "url": "https://geospatialworld.net/videos/mapping-urban-heat-islands-ahmedabad/",
-        "desc": "Even though the conversations on climate change have muted due to the geopolitical situation, trade disruptions, greater defence and intelligence spending, a…"
-      },
-      {
-        "title": "HD Mapping and VPS: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence | GWF 2026",
-        "url": "https://geospatialworld.net/videos/hd-mapping-vps-geospatial-platforms-gwf-2026/",
-        "desc": "Plenary Session 5: High-Definition Mapping and Visual Positioning Systems: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence |…"
-      },
-      {
-        "title": "Space Infrastructure as a Service: Enriching Geospatial Platforms and Spatial Intelligence | GWF 2026",
-        "url": "https://geospatialworld.net/videos/space-infrastructure-as-a-service-geospatial-spatial-intelligence-gwf-2026/",
-        "desc": "Plenary Session 4 | Geospatial World Forum 2026 | Amsterdam, April 28 – May 1 This plenary session Moderate by Vaishali Dixit, VP – Americas, Geospatial Worl…"
-      },
-      {
-        "title": "Optimizing GeoAI and Digital Twins Towards Utilities and Network Management | GWF 2026",
-        "url": "https://geospatialworld.net/videos/geoai-digital-twins-utilities-network-management-gwf-2026/",
-        "desc": "Plenary Session 3 | Geospatial World Forum 2026 | Amsterdam, April 28 – May 1 This plenary panel from Geospatial World Forum 2026 brings together leaders fro…"
-      }
-    ]
+    "geoworld": []
   },
   "qgis": [
     {
@@ -145,10 +114,10 @@
   "releases": [
     {
       "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.12.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.12.0",
-      "desc": "### ✨ Features and improvements - Add a `zoomToUserAccuracy` option to `GeolocateControlOptions` to allow control over map zoom adjustments in line with the…",
-      "publishedAt": "2026-10-03",
+      "title": "maplibre-gl-js v6.13.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.13.0",
+      "desc": "### ✨ Features and improvements - Let the globe center reach the poles, where it stopped at 85.05° ([#8629](https://github.com/maplibre/maplibre-gl-js/pull/8…",
+      "publishedAt": "2026-10-06",
       "isFresh": true
     },
     {
@@ -210,9 +179,21 @@
   ],
   "gisse": [
     {
+      "title": "Are positional arguments considered operands in gdal CLI modernization?",
+      "url": "https://gis.stackexchange.com/questions/501549/are-positional-arguments-considered-operands-in-gdal-cli-modernization",
+      "score": -1,
+      "answers": 1
+    },
+    {
       "title": "Joining point attributes to line in QGIS",
       "url": "https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis",
-      "score": 1,
+      "score": 2,
+      "answers": 1
+    },
+    {
+      "title": "Aligning Raster Datasets in ArcGIS Pro",
+      "url": "https://gis.stackexchange.com/questions/501541/aligning-raster-datasets-in-arcgis-pro",
+      "score": 2,
       "answers": 1
     },
     {
@@ -222,21 +203,15 @@
       "answers": 0
     },
     {
-      "title": "ArcPy CalculateField fails for AGOL hosted feature layer's date field",
-      "url": "https://gis.stackexchange.com/questions/501526/arcpy-calculatefield-fails-for-agol-hosted-feature-layers-date-field",
-      "score": 0,
-      "answers": 1
-    },
-    {
-      "title": "Aligning Raster Datasets in ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501541/aligning-raster-datasets-in-arcgis-pro",
-      "score": 2,
-      "answers": 0
-    },
-    {
       "title": "How to safely remove stored PostgreSQL credentials from a QGIS project file and force user login on open?",
       "url": "https://gis.stackexchange.com/questions/501534/how-to-safely-remove-stored-postgresql-credentials-from-a-qgis-project-file-and",
       "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "ArcPy CalculateField fails for AGOL hosted feature layer's date field",
+      "url": "https://gis.stackexchange.com/questions/501526/arcpy-calculatefield-fails-for-agol-hosted-feature-layers-date-field",
+      "score": 0,
       "answers": 1
     },
     {
@@ -252,84 +227,78 @@
       "answers": 1
     },
     {
-      "title": "Information about other layers are shown (WMS) in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501514/information-about-other-layers-are-shown-wms-in-qgis",
-      "score": 0,
-      "answers": 1
-    },
-    {
       "title": "Slope derived from filled DEM coming out somewhat nonsensical",
       "url": "https://gis.stackexchange.com/questions/501500/slope-derived-from-filled-dem-coming-out-somewhat-nonsensical",
       "score": 4,
       "answers": 1
     },
     {
-      "title": "Getting MapTiler quantized mesh working with CesiumJS",
-      "url": "https://gis.stackexchange.com/questions/501511/getting-maptiler-quantized-mesh-working-with-cesiumjs",
+      "title": "Information about other layers are shown (WMS) in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501514/information-about-other-layers-are-shown-wms-in-qgis",
       "score": 0,
-      "answers": 2
+      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "VIIRS/JPSS2 BRDF/Albedo Parameter 2 Band M10 Daily L3 Global 30 ArcSec CMG V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ243D23",
-      "desc": "The NOAA-21 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Model Parameter 2 Band M10 pr…",
-      "org": "LPCLOUD"
-    },
-    {
-      "title": "VIIRS/JPSS1 BRDF/Albedo Valid Observation Band M8 Daily L3 Global 30ArcSec CMG V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D48",
-      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Valid Observation Band M8 pro…",
-      "org": "LPCLOUD"
-    },
-    {
-      "title": "VIIRS/JPSS1 BRDF/Albedo Valid Observation Band M10 Daily L3 Global 30ArcSec CMG V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D49",
-      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Valid Observation Band M10 pr…",
-      "org": "LPCLOUD"
-    },
-    {
-      "title": "VIIRS/JPSS1 BRDF/Albedo Valid Observation Band M11 Daily L3 Global 30ArcSec CMG V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D50",
-      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Valid Observation Band M11 pr…",
-      "org": "LPCLOUD"
-    },
-    {
-      "title": "VIIRS/JPSS1 BRDF/Albedo Parameter 2 Band M11 Daily L3 Global 30 ArcSec CMG V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D26",
-      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Model Parameter 2 Band M11 pr…",
-      "org": "LPCLOUD"
-    },
-    {
-      "title": "GLAS/ICESat L1A Global Engineering Data (HDF5) V033",
-      "url": "https://search.earthdata.nasa.gov/search?q=GLAH03",
-      "desc": "Level-1A global engineering data (GLAH03) include satellite housekeeping data used to calibrate data values for GLA01 and GLA02.",
+      "title": "LVIS Classic L1B Geolocated Return Energy Waveforms V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=LVISC1B",
+      "desc": "This data set contains Level-1B geolocated return energy waveforms collected by the NASA Land, Vegetation, and Ice Sensor (LVIS) Facility, an imaging lidar a…",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "GLAS/ICESat L1A Global Atmosphere Data (HDF5) V033",
-      "url": "https://search.earthdata.nasa.gov/search?q=GLAH02",
-      "desc": "GLAH02 Level-1A atmospheric data include the normalized relative backscatter for the 532 nm and 1064 nm channels, and low-level instrument corrections such a…",
+      "title": "Ground-Based Global Navigation Satellite System (GNSS) Satellite-Based Augmentation System (SBAS) Broadcast Ephemeris Data (daily files)…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_dly_30sec_SBAS_bdcst_ephem",
+      "desc": "This dataset consists of ground-based Global Navigation Satellite System (GNSS) Satellite-Based Augmentation System (SBAS) Broadcast Ephemeris Data (daily fi…",
+      "org": "CDDIS"
+    },
+    {
+      "title": "LVIS Facility L2 Geolocated Surface Elevation and Canopy Height Product V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=LVISF2",
+      "desc": "This data set contains Level-2 geolocated surface elevation and canopy height measurements collected by the NASA Land, Vegetation, and Ice Sensor (LVIS) Faci…",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "GLAS/ICESat L1A Global Altimetry Data (HDF5) V033",
-      "url": "https://search.earthdata.nasa.gov/search?q=GLAH01",
-      "desc": "Level-1A altimetry data (GLAH01) include the transmitted and received waveform from the altimeter.",
+      "title": "GLAS/ICESat L2 Global Planetary Boundary Layer and Elevated Aerosol Layer Heights (HDF5) V033",
+      "url": "https://search.earthdata.nasa.gov/search?q=GLAH08",
+      "desc": "GLAH08 Level-2 planetary boundary layer (PBL) and elevated aerosol layer heights data contains PBL heights, ground detection heights, and top and bottom heig…",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
-      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
+      "title": "GLAS/ICESat L1B Global Backscatter Data (HDF5) V033",
+      "url": "https://search.earthdata.nasa.gov/search?q=GLAH07",
+      "desc": "GLAH07 Level-1B global backscatter data are provided at full instrument resolution.",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "title": "GLAS/ICESat L1B Global Elevation Data (HDF5) V034",
+      "url": "https://search.earthdata.nasa.gov/search?q=GLAH06",
+      "desc": "GLAH06 Level-1B Global Elevation is a product that is analogous to the geodetic data records distributed for radar altimetry missions.",
       "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "GLAS/ICESat L1B Global Waveform-based Range Corrections Data (HDF5) V034",
+      "url": "https://search.earthdata.nasa.gov/search?q=GLAH05",
+      "desc": "GLAH05 Level-1B waveform parameterization data include output parameters from the waveform characterization procedure and other parameters required to calcul…",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "Geostationary Earth Orbit Land Surface Temperature Hourly North and South America 4 km V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=GEOLST4KHR",
+      "desc": "The NASA Making Earth System Data Records for Use in Research Environments ([MEaSUREs](https://www.earthdata.nasa.gov/about/competitive-programs/measures)) G…",
+      "org": "LPCLOUD"
+    },
+    {
+      "title": "Ground-Based Global Navigation Satellite System (GNSS) Quasi-Zenith Satellite System (QZSS) Broadcast Ephemeris Data (daily files) from N…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_dly_30sec_QZSS_bdcst_ephem",
+      "desc": "This dataset consists of ground-based Global Navigation Satellite System (GNSS) Quasi-Zenith Satellite System (QZSS) Broadcast Ephemeris Data (daily files) f…",
+      "org": "CDDIS"
+    },
+    {
+      "title": "Ground-Based Global Navigation Satellite System (GNSS) Observation Data (30-second sampling, daily, 24 hour files) from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_dly_30sec_obs_data",
+      "desc": "This dataset consists of ground-based Global Navigation Satellite System (GNSS) Observation Data (30-second sampling, daily 24 hour files) from the NASA Crus…",
+      "org": "CDDIS"
     }
   ],
   "datagov": [
@@ -339,13 +308,6 @@
       "desc": "The Inventory of Owned and Leased Properties (IOLP) allows users to search properties owned and leased by the General Services Administration (GSA) across the U",
       "org": "General Services Administration",
       "rank": 13
-    },
-    {
-      "title": "Civil Rights Data Collection (CRDC) for the 2017-18 school year",
-      "url": "https://catalog.data.gov/dataset/civil-rights-data-collection-crdc-for-the-2017-18-school-year",
-      "desc": "The Civil Rights Data Collection, 2017-18 (CRDC 2017-18) is part of the Civil Rights Data Collection (CRDC) program; program data are available beginning with t",
-      "org": "Department of Education",
-      "rank": 5
     },
     {
       "title": "IPCC AR4, AR5, and AR6 20-, 100-, and 500-year GWPs",
@@ -387,6 +349,13 @@
       "url": "https://catalog.data.gov/dataset/2017-18-arrests-civil-rights-data-collection",
       "desc": "This set of Excel file contains data on student referrals to law enforcement by disability and student-related arrests by disability for all states.",
       "org": "Department of Education",
+      "rank": 2
+    },
+    {
+      "title": "Harmonized Tariff Schedule of the United States (2026)",
+      "url": "https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2025",
+      "desc": "This dataset is the current 2026 Harmonized Tariff Schedule plus all revisions for the current year.",
+      "org": "US International Trade Commission",
       "rank": 2
     }
   ],
