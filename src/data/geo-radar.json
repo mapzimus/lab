@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-07",
+  "generatedAt": "2026-10-08",
   "news": {
     "mapsmania": [
+      {
+        "title": "GeoFactGuessr",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/geofactguessr.html",
+        "desc": ""
+      },
       {
         "title": "Find Movies - by Location & Period!",
         "url": "http://googlemapsmania.blogspot.com/2026/10/find-movies-by-location-period.html",
@@ -35,11 +40,6 @@
       {
         "title": "The El Niño Forcast Map",
         "url": "http://googlemapsmania.blogspot.com/2026/09/the-el-nino-forcast-map.html",
-        "desc": ""
-      },
-      {
-        "title": "The Satellites of Mars",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/the-satellites-of-mars.html",
         "desc": ""
       }
     ],
@@ -75,40 +75,71 @@
         "desc": "From Delaware to Hawaii, discover when each state entered the Union and the geographic features that make every state unique."
       }
     ],
-    "geoworld": []
+    "geoworld": [
+      {
+        "title": "Geospatial World Becomes EuroGeographics’ First Observer Member",
+        "url": "https://geospatialworld.net/news/geospatial-world-becomes-eurogeographics-first-observer-member/",
+        "desc": "New Delhi, 28th September 2026 — Geospatial World has become the first Observer Member of EuroGeographics, marking an important step in strengthening interna…"
+      },
+      {
+        "title": "From Data Deluge to Decision: Dr Abhay Swarup Mittal on Building Sovereign Intelligence at Aetosky",
+        "url": "https://geospatialworld.net/videos/exclusive-videos-interviews/from-data-deluge-to-decision-dr-abhay-swarup-mittal-on-building-sovereign-intelligence-at-aetosky/",
+        "desc": "In conversation with Dr Abhay Swarup Mittal, Founder and CEO of Aetosky group of companies on the founding story of Aetosky, building sovereign intelligence…"
+      },
+      {
+        "title": "Infrastructure Isn’t Just Built Anymore.",
+        "url": "https://geospatialworld.net/videos/intelligent-infrastructure-aec-summit-gwf-2026/",
+        "desc": "Infrastructure was once defined by scale."
+      },
+      {
+        "title": "Strengthening Sovereignty, Economy, and Society",
+        "url": "https://geospatialworld.net/prime/interviews/strengthening-sovereignty-economy-and-society/",
+        "desc": "How should nations redefine geospatial and space sovereignty in an era of increasing dependence on global platforms, foreign satellite constellations, and in…"
+      },
+      {
+        "title": "Mapping Urban Heat Islands in Ahemedabad",
+        "url": "https://geospatialworld.net/videos/mapping-urban-heat-islands-ahmedabad/",
+        "desc": "Even though the conversations on climate change have muted due to the geopolitical situation, trade disruptions, greater defence and intelligence spending, a…"
+      },
+      {
+        "title": "HD Mapping and VPS: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence | GWF 2026",
+        "url": "https://geospatialworld.net/videos/hd-mapping-vps-geospatial-platforms-gwf-2026/",
+        "desc": "Plenary Session 5: High-Definition Mapping and Visual Positioning Systems: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence |…"
+      }
+    ]
   },
   "qgis": [
     {
-      "title": "Geodata: Markhöjd direkt (Lantmäteriet)",
-      "url": "https://plugins.qgis.org/plugins/markhojd_direkt/"
+      "title": "CBERSFuse",
+      "url": "https://plugins.qgis.org/plugins/cbers4a_wpm/"
     },
     {
-      "title": "Análise 3-30-300",
-      "url": "https://plugins.qgis.org/plugins/QGIS_330300/"
+      "title": "GeoServer Manager",
+      "url": "https://plugins.qgis.org/plugins/geoserver_manager/"
     },
     {
-      "title": "QGIS Python IDE Pro",
-      "url": "https://plugins.qgis.org/plugins/qgis_python_ide/"
+      "title": "Ukiyo-e Relief",
+      "url": "https://plugins.qgis.org/plugins/ukiyoe_relief/"
     },
     {
-      "title": "Attribute Rules Manager",
-      "url": "https://plugins.qgis.org/plugins/attribute_rules/"
+      "title": "VMS Analysis",
+      "url": "https://plugins.qgis.org/plugins/VMS_Analysis/"
     },
     {
-      "title": "Contour Labeler",
-      "url": "https://plugins.qgis.org/plugins/contour_labeler/"
+      "title": "Cave LRUD 2D/3D Mapper",
+      "url": "https://plugins.qgis.org/plugins/cave_lrud_mapper/"
     },
     {
-      "title": "Morizon Next",
-      "url": "https://plugins.qgis.org/plugins/morizon_next/"
+      "title": "Portolan Registry",
+      "url": "https://plugins.qgis.org/plugins/portolan_registry_qgis/"
     },
     {
-      "title": "Subtypes and Domains Manager",
-      "url": "https://plugins.qgis.org/plugins/subtypes_domains/"
+      "title": "Geodata: Vektor (Lantmäteriet)",
+      "url": "https://plugins.qgis.org/plugins/lm_stac_karta_vektor/"
     },
     {
-      "title": "Check, Define & Convert CRS v2",
-      "url": "https://plugins.qgis.org/plugins/crs_tools_v2/"
+      "title": "Vértices Virtuais Toolbox",
+      "url": "https://plugins.qgis.org/plugins/vertices_virtuais_toolbox/"
     }
   ],
   "releases": [
@@ -179,6 +210,24 @@
   ],
   "gisse": [
     {
+      "title": "Grib flow mesh is stretched larger than the input dem",
+      "url": "https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem",
+      "score": 0,
+      "answers": 1
+    },
+    {
+      "title": "Converting multiple GeoTIFF to MBTiles or PMTiles",
+      "url": "https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Making symbol based on attribute condition in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501553/making-symbol-based-on-attribute-condition-in-qgis",
+      "score": 2,
+      "answers": 0
+    },
+    {
       "title": "Are positional arguments considered operands in gdal CLI modernization?",
       "url": "https://gis.stackexchange.com/questions/501549/are-positional-arguments-considered-operands-in-gdal-cli-modernization",
       "score": -1,
@@ -197,16 +246,16 @@
       "answers": 1
     },
     {
-      "title": "Converting large GeoJSON file to shapefile while preserving UTF-8 attribute encoding with ogr2ogr",
-      "url": "https://gis.stackexchange.com/questions/501540/converting-large-geojson-file-to-shapefile-while-preserving-utf-8-attribute-enco",
-      "score": 2,
-      "answers": 0
-    },
-    {
       "title": "How to safely remove stored PostgreSQL credentials from a QGIS project file and force user login on open?",
       "url": "https://gis.stackexchange.com/questions/501534/how-to-safely-remove-stored-postgresql-credentials-from-a-qgis-project-file-and",
       "score": 1,
       "answers": 1
+    },
+    {
+      "title": "Converting large GeoJSON file to shapefile while preserving UTF-8 attribute encoding with ogr2ogr",
+      "url": "https://gis.stackexchange.com/questions/501540/converting-large-geojson-file-to-shapefile-while-preserving-utf-8-attribute-enco",
+      "score": 2,
+      "answers": 0
     },
     {
       "title": "ArcPy CalculateField fails for AGOL hosted feature layer's date field",
@@ -219,86 +268,68 @@
       "url": "https://gis.stackexchange.com/questions/501524/converting-osmand-address-to-qgis",
       "score": 1,
       "answers": 1
-    },
-    {
-      "title": "With gdal CLI commands is everything that is not a command name, considered an argument?",
-      "url": "https://gis.stackexchange.com/questions/501521/with-gdal-cli-commands-is-everything-that-is-not-a-command-name-considered-an-a",
-      "score": 2,
-      "answers": 1
-    },
-    {
-      "title": "Slope derived from filled DEM coming out somewhat nonsensical",
-      "url": "https://gis.stackexchange.com/questions/501500/slope-derived-from-filled-dem-coming-out-somewhat-nonsensical",
-      "score": 4,
-      "answers": 1
-    },
-    {
-      "title": "Information about other layers are shown (WMS) in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501514/information-about-other-layers-are-shown-wms-in-qgis",
-      "score": 0,
-      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "LVIS Classic L1B Geolocated Return Energy Waveforms V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=LVISC1B",
-      "desc": "This data set contains Level-1B geolocated return energy waveforms collected by the NASA Land, Vegetation, and Ice Sensor (LVIS) Facility, an imaging lidar a…",
+      "title": "SnowEx23 Laser Snow Microstructure Specific Surface Area Data V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=SNEX23_SSA",
+      "desc": "This data set contains vertical profiles of snow reflectance and specific surface area (SSA) from the Fairbanks region of central Alaska (the Bonanza Creek E…",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS) Satellite-Based Augmentation System (SBAS) Broadcast Ephemeris Data (daily files)…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_dly_30sec_SBAS_bdcst_ephem",
-      "desc": "This dataset consists of ground-based Global Navigation Satellite System (GNSS) Satellite-Based Augmentation System (SBAS) Broadcast Ephemeris Data (daily fi…",
-      "org": "CDDIS"
-    },
-    {
-      "title": "LVIS Facility L2 Geolocated Surface Elevation and Canopy Height Product V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=LVISF2",
-      "desc": "This data set contains Level-2 geolocated surface elevation and canopy height measurements collected by the NASA Land, Vegetation, and Ice Sensor (LVIS) Faci…",
+      "title": "IceBridge DMS L3 Ames Stereo Pipeline Photogrammetric DEM V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=IODEM3",
+      "desc": "This data set represents a collection of digital elevation models (DEMs) that were created using the NASA Ames Stereo Pipeline.",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "GLAS/ICESat L2 Global Planetary Boundary Layer and Elevated Aerosol Layer Heights (HDF5) V033",
-      "url": "https://search.earthdata.nasa.gov/search?q=GLAH08",
-      "desc": "GLAH08 Level-2 planetary boundary layer (PBL) and elevated aerosol layer heights data contains PBL heights, ground detection heights, and top and bottom heig…",
+      "title": "DISCOVER-AQ Colorado Deployment Mobile Platform Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_Ground_Mobile_Data",
+      "desc": "DISCOVERAQ_Colorado_Ground_Mobile_Data contains data collected via the Princeton Mobile Lab and NASA Langley LARGE Mobile Lab during the Colorado (Denver) de…",
+      "org": "LARC_CLOUD"
+    },
+    {
+      "title": "IceBridge MCoRDS L1B Geolocated Radar Echo Strength Profiles V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=IRMCR1B",
+      "desc": "This data set contains radar echograms taken from the Center for Remote Sensing of Ice Sheets (CReSIS) ultra Multichannel Coherent Radar Depth Sounder (MCoRD…",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "GLAS/ICESat L1B Global Backscatter Data (HDF5) V033",
-      "url": "https://search.earthdata.nasa.gov/search?q=GLAH07",
-      "desc": "GLAH07 Level-1B global backscatter data are provided at full instrument resolution.",
-      "org": "NSIDC_CPRD"
+      "title": "DISCOVER-AQ Colorado Deployment Colorado Department of Public Health and Environment Ground Site Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_Ground_CDPHE_Data",
+      "desc": "DISCOVERAQ_Colorado_Ground_CDPHE_Data contains data collected by the Colorado Department of Public Health and Environment (CDPHE) at ground sites around the…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "GLAS/ICESat L1B Global Elevation Data (HDF5) V034",
-      "url": "https://search.earthdata.nasa.gov/search?q=GLAH06",
-      "desc": "GLAH06 Level-1B Global Elevation is a product that is analogous to the geodetic data records distributed for radar altimetry missions.",
-      "org": "NSIDC_CPRD"
+      "title": "DISCOVER-AQ Colorado Deployment Ozonesonde Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_Ozonesondes_Data",
+      "desc": "DISCOVERAQ_Colorado_Ozonesondes_Data contains data collected via ozonesonde launches at the Platteville ground site during the Colorado (Denver) deployment o…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "GLAS/ICESat L1B Global Waveform-based Range Corrections Data (HDF5) V034",
-      "url": "https://search.earthdata.nasa.gov/search?q=GLAH05",
-      "desc": "GLAH05 Level-1B waveform parameterization data include output parameters from the waveform characterization procedure and other parameters required to calcul…",
-      "org": "NSIDC_CPRD"
+      "title": "DISCOVER-AQ Colorado Deployment Ancillary Model Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_Model_Data",
+      "desc": "DISCOVERAQ_Colorado_Model_Data contains ancillary model analysis collected during the Colorado (Denver) deployment of NASA's DISCOVER-AQ field study and feat…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Geostationary Earth Orbit Land Surface Temperature Hourly North and South America 4 km V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=GEOLST4KHR",
-      "desc": "The NASA Making Earth System Data Records for Use in Research Environments ([MEaSUREs](https://www.earthdata.nasa.gov/about/competitive-programs/measures)) G…",
-      "org": "LPCLOUD"
+      "title": "DISCOVER-AQ Colorado Deployment P-3B Aircraft Merged Data Files",
+      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_Merge_Data",
+      "desc": "DISCOVERAQ_Colorado_Merge_Data contains pre-generated merged data files created from measurements obtained onboard the P-3B aircraft during the Colorado (Den…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS) Quasi-Zenith Satellite System (QZSS) Broadcast Ephemeris Data (daily files) from N…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_dly_30sec_QZSS_bdcst_ephem",
-      "desc": "This dataset consists of ground-based Global Navigation Satellite System (GNSS) Quasi-Zenith Satellite System (QZSS) Broadcast Ephemeris Data (daily files) f…",
-      "org": "CDDIS"
+      "title": "DISCOVER-AQ Colorado Deployment B200 Aircraft Remotely Sensed High Spectral Resolution Lidar (HSRL-2) Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_AircraftRemoteSensing_B200_HSRL2_Data",
+      "desc": "DISCOVERAQ_Colorado_AircraftRemoteSensing_B200_HSRL2_Data contains remotely sensed data collected by the High Spectral Resolution Lidar-2 (HSRL-2) onboard NA…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS) Observation Data (30-second sampling, daily, 24 hour files) from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_dly_30sec_obs_data",
-      "desc": "This dataset consists of ground-based Global Navigation Satellite System (GNSS) Observation Data (30-second sampling, daily 24 hour files) from the NASA Crus…",
-      "org": "CDDIS"
+      "title": "DISCOVER-AQ Colorado Deployment B-200 Aircraft In Situ Meteorological and Navigational Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_MetNav_AircraftInSitu_B200_Data",
+      "desc": "DISCOVERAQ_Colorado_MetNav_AircraftInSitu_B200_Data contains in situ meteorological and navigational data collected onboard NASA's B-200 aircraft during the…",
+      "org": "LARC_CLOUD"
     }
   ],
   "datagov": [
