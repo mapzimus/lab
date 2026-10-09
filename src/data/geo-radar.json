@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-08",
+  "generatedAt": "2026-10-09",
   "news": {
     "mapsmania": [
+      {
+        "title": "Animated Map Videos",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/animated-map-videos.html",
+        "desc": ""
+      },
       {
         "title": "GeoFactGuessr",
         "url": "http://googlemapsmania.blogspot.com/2026/10/geofactguessr.html",
@@ -35,11 +40,6 @@
       {
         "title": "Providing Global Relief",
         "url": "http://googlemapsmania.blogspot.com/2026/10/providing-global-relief.html",
-        "desc": ""
-      },
-      {
-        "title": "The El Niño Forcast Map",
-        "url": "http://googlemapsmania.blogspot.com/2026/09/the-el-nino-forcast-map.html",
         "desc": ""
       }
     ],
@@ -114,6 +114,14 @@
       "url": "https://plugins.qgis.org/plugins/cbers4a_wpm/"
     },
     {
+      "title": "Consulta SICAR",
+      "url": "https://plugins.qgis.org/plugins/sicar_consulta/"
+    },
+    {
+      "title": "Exact Raster Boundary updated",
+      "url": "https://plugins.qgis.org/plugins/ExactRasterBoundary_updated/"
+    },
+    {
       "title": "GeoServer Manager",
       "url": "https://plugins.qgis.org/plugins/geoserver_manager/"
     },
@@ -132,14 +140,6 @@
     {
       "title": "Portolan Registry",
       "url": "https://plugins.qgis.org/plugins/portolan_registry_qgis/"
-    },
-    {
-      "title": "Geodata: Vektor (Lantmäteriet)",
-      "url": "https://plugins.qgis.org/plugins/lm_stac_karta_vektor/"
-    },
-    {
-      "title": "Vértices Virtuais Toolbox",
-      "url": "https://plugins.qgis.org/plugins/vertices_virtuais_toolbox/"
     }
   ],
   "releases": [
@@ -210,16 +210,22 @@
   ],
   "gisse": [
     {
-      "title": "Grib flow mesh is stretched larger than the input dem",
-      "url": "https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem",
+      "title": "Creating four types legends in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501561/creating-four-types-legends-in-qgis",
       "score": 0,
-      "answers": 1
+      "answers": 0
     },
     {
       "title": "Converting multiple GeoTIFF to MBTiles or PMTiles",
       "url": "https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles",
-      "score": 0,
+      "score": 2,
       "answers": 0
+    },
+    {
+      "title": "Grib flow mesh is stretched larger than the input DEM in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis",
+      "score": 2,
+      "answers": 1
     },
     {
       "title": "Making symbol based on attribute condition in QGIS",
@@ -228,15 +234,21 @@
       "answers": 0
     },
     {
-      "title": "Are positional arguments considered operands in gdal CLI modernization?",
-      "url": "https://gis.stackexchange.com/questions/501549/are-positional-arguments-considered-operands-in-gdal-cli-modernization",
-      "score": -1,
+      "title": "Converting large GeoJSON file to shapefile while preserving UTF-8 attribute encoding with ogr2ogr",
+      "url": "https://gis.stackexchange.com/questions/501540/converting-large-geojson-file-to-shapefile-while-preserving-utf-8-attribute-enco",
+      "score": 2,
       "answers": 1
     },
     {
       "title": "Joining point attributes to line in QGIS",
       "url": "https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis",
       "score": 2,
+      "answers": 1
+    },
+    {
+      "title": "Are positional arguments considered operands in gdal CLI modernization?",
+      "url": "https://gis.stackexchange.com/questions/501549/are-positional-arguments-considered-operands-in-gdal-cli-modernization",
+      "score": 0,
       "answers": 1
     },
     {
@@ -252,84 +264,72 @@
       "answers": 1
     },
     {
-      "title": "Converting large GeoJSON file to shapefile while preserving UTF-8 attribute encoding with ogr2ogr",
-      "url": "https://gis.stackexchange.com/questions/501540/converting-large-geojson-file-to-shapefile-while-preserving-utf-8-attribute-enco",
-      "score": 2,
-      "answers": 0
-    },
-    {
       "title": "ArcPy CalculateField fails for AGOL hosted feature layer's date field",
       "url": "https://gis.stackexchange.com/questions/501526/arcpy-calculatefield-fails-for-agol-hosted-feature-layers-date-field",
       "score": 0,
-      "answers": 1
-    },
-    {
-      "title": "Converting OSMAnd address to QGIS",
-      "url": "https://gis.stackexchange.com/questions/501524/converting-osmand-address-to-qgis",
-      "score": 1,
       "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "SnowEx23 Laser Snow Microstructure Specific Surface Area Data V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=SNEX23_SSA",
-      "desc": "This data set contains vertical profiles of snow reflectance and specific surface area (SSA) from the Fairbanks region of central Alaska (the Bonanza Creek E…",
-      "org": "NSIDC_CPRD"
+      "title": "VIIRS/JPSS1 DNB BRDF/Albedo Nadir BRDF-Adjusted Ref Daily L3 Global 1km SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143DNBA4",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Day/Night Band (DNB) Nadir Bidirectional Reflectance Distribution Function (BRDF) Adjusted Refl…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "IceBridge DMS L3 Ames Stereo Pipeline Photogrammetric DEM V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=IODEM3",
-      "desc": "This data set represents a collection of digital elevation models (DEMs) that were created using the NASA Ames Stereo Pipeline.",
-      "org": "NSIDC_CPRD"
+      "title": "VIIRS/JPSS1 DNB BRDF/Albedo Albedo Daily L3 Global 1km SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143DNBA3",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Day/Night Band (DNB) Bidirectional Reflectance Distribution Function (BRDF) and Albedo (VJ143DN…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "DISCOVER-AQ Colorado Deployment Mobile Platform Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_Ground_Mobile_Data",
-      "desc": "DISCOVERAQ_Colorado_Ground_Mobile_Data contains data collected via the Princeton Mobile Lab and NASA Langley LARGE Mobile Lab during the Colorado (Denver) de…",
-      "org": "LARC_CLOUD"
+      "title": "VIIRS/JPSS1 DNB BRDF/Albedo Quality Daily L3 Global 1km SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143DNBA2",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Day/Night Band (DNB) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Quality…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "IceBridge MCoRDS L1B Geolocated Radar Echo Strength Profiles V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=IRMCR1B",
-      "desc": "This data set contains radar echograms taken from the Center for Remote Sensing of Ice Sheets (CReSIS) ultra Multichannel Coherent Radar Depth Sounder (MCoRD…",
-      "org": "NSIDC_CPRD"
+      "title": "VIIRS/JPSS1 DNB BRDF/Albedo Model Parameters Daily L3 Global 1km SIN Grid V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143DNBA1",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Day/Night Band (DNB) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Model Pa…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "DISCOVER-AQ Colorado Deployment Colorado Department of Public Health and Environment Ground Site Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_Ground_CDPHE_Data",
-      "desc": "DISCOVERAQ_Colorado_Ground_CDPHE_Data contains data collected by the Colorado Department of Public Health and Environment (CDPHE) at ground sites around the…",
-      "org": "LARC_CLOUD"
+      "title": "VIIRS/JPSS1 BRDF/Albedo NBAR at Solar Noon DNB Daily L3 Global 30ArcSec CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D89",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Nadir BRDF-Adjusted Reflectan…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "DISCOVER-AQ Colorado Deployment Ozonesonde Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_Ozonesondes_Data",
-      "desc": "DISCOVERAQ_Colorado_Ozonesondes_Data contains data collected via ozonesonde launches at the Platteville ground site during the Colorado (Denver) deployment o…",
-      "org": "LARC_CLOUD"
+      "title": "VIIRS/JPSS1 BRDF/Albedo NBAR at Solar Noon Band M11 Daily L3 Global 30ArcSec CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D88",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Nadir BRDF-Adjusted Reflectan…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "DISCOVER-AQ Colorado Deployment Ancillary Model Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_Model_Data",
-      "desc": "DISCOVERAQ_Colorado_Model_Data contains ancillary model analysis collected during the Colorado (Denver) deployment of NASA's DISCOVER-AQ field study and feat…",
-      "org": "LARC_CLOUD"
+      "title": "VIIRS/JPSS1 BRDF/Albedo NBAR at Solar Noon Band M10 Daily L3 Global 30ArcSec CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D87",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Nadir BRDF-Adjusted Reflectan…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "DISCOVER-AQ Colorado Deployment P-3B Aircraft Merged Data Files",
-      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_Merge_Data",
-      "desc": "DISCOVERAQ_Colorado_Merge_Data contains pre-generated merged data files created from measurements obtained onboard the P-3B aircraft during the Colorado (Den…",
-      "org": "LARC_CLOUD"
+      "title": "VIIRS/JPSS1 BRDF/Albedo NBAR at Solar Noon Band M8 Daily L3 Global 30ArcSec CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D86",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Nadir BRDF-Adjusted Reflectan…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "DISCOVER-AQ Colorado Deployment B200 Aircraft Remotely Sensed High Spectral Resolution Lidar (HSRL-2) Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_AircraftRemoteSensing_B200_HSRL2_Data",
-      "desc": "DISCOVERAQ_Colorado_AircraftRemoteSensing_B200_HSRL2_Data contains remotely sensed data collected by the High Spectral Resolution Lidar-2 (HSRL-2) onboard NA…",
-      "org": "LARC_CLOUD"
+      "title": "VIIRS/JPSS1 BRDF/Albedo NBAR at Solar Noon Band M7 Daily L3 Global 30ArcSec CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D85",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Nadir BRDF-Adjusted Reflectan…",
+      "org": "LPCLOUD"
     },
     {
-      "title": "DISCOVER-AQ Colorado Deployment B-200 Aircraft In Situ Meteorological and Navigational Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_Colorado_MetNav_AircraftInSitu_B200_Data",
-      "desc": "DISCOVERAQ_Colorado_MetNav_AircraftInSitu_B200_Data contains in situ meteorological and navigational data collected onboard NASA's B-200 aircraft during the…",
-      "org": "LARC_CLOUD"
+      "title": "VIIRS/JPSS1 BRDF/Albedo NBAR at Solar Noon Band M5 Daily L3 Global 30ArcSec CMG V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ143D84",
+      "desc": "The NOAA-20 Visible Infrared Imaging Radiometer Suite (VIIRS) Bidirectional Reflectance Distribution Function (BRDF) and Albedo Nadir BRDF-Adjusted Reflectan…",
+      "org": "LPCLOUD"
     }
   ],
   "datagov": [
@@ -348,24 +348,17 @@
       "rank": 3
     },
     {
-      "title": "Supply Chain Greenhouse Gas Emission Factors v1.2 by NAICS-6",
-      "url": "https://catalog.data.gov/dataset/supply-chain-greenhouse-gas-emission-factors-v1-2-by-naics-6",
-      "desc": "The datasets are comprised of greenhouse gas (GHG) emission factors (Factors) for 1,016 U.S.",
-      "org": "U.S. Environmental Protection Agency",
-      "rank": 3
+      "title": "Baby Names from Social Security Card Applications - National Data",
+      "url": "https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-data",
+      "desc": "The data (name, year of birth, sex, and number) are from a 100 percent sample of Social Security card applications for 1880 on.",
+      "org": "Social Security Administration",
+      "rank": 2
     },
     {
       "title": "2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection",
       "url": "https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-by-basis-category-civil-rights-data-collection",
       "desc": "The 2015-16 tables are based on data collected from all of the nation’s school districts and schools—approximately 17,300 school districts and 96,300 schools.",
       "org": "Department of Education",
-      "rank": 2
-    },
-    {
-      "title": "Baby Names from Social Security Card Applications - National Data",
-      "url": "https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-data",
-      "desc": "The data (name, year of birth, sex, and number) are from a 100 percent sample of Social Security card applications for 1880 on.",
-      "org": "Social Security Administration",
       "rank": 2
     },
     {
