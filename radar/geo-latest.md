@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-10
+# Mapzimus Geospatial Radar — 2026-10-11
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Mapping the Cosmos](http://googlemapsmania.blogspot.com/2026/10/mapping-cosmos.html)
 - [Animated Map Videos](http://googlemapsmania.blogspot.com/2026/10/animated-map-videos.html)
 - [GeoFactGuessr](http://googlemapsmania.blogspot.com/2026/10/geofactguessr.html)
 - [Find Movies - by Location & Period!](http://googlemapsmania.blogspot.com/2026/10/find-movies-by-location-period.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Preparing for the #30DayMapChallenge](http://googlemapsmania.blogspot.com/2025/10/preparing-for-30daychallenge.html)
 - [A Year of Lightning](http://googlemapsmania.blogspot.com/2026/10/a-year-of-lightning.html)
 - [Map Pac-Man is Back!](http://googlemapsmania.blogspot.com/2026/10/map-pac-man-is-back.html)
-- [Providing Global Relief](http://googlemapsmania.blogspot.com/2026/10/providing-global-relief.html)
 
 ## Geography Realm
 
@@ -54,7 +54,7 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 ## GIS Stack Exchange — hot questions
 
 - [Creating four types legends in QGIS](https://gis.stackexchange.com/questions/501561/creating-four-types-legends-in-qgis) (▲ 0 · 0 answers)
-- [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 2 · 1 answers)
+- [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 3 · 1 answers)
 - [Converting multiple GeoTIFF to MBTiles or PMTiles](https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles) (▲ 2 · 0 answers)
 - [Making symbol based on attribute condition in QGIS](https://gis.stackexchange.com/questions/501553/making-symbol-based-on-attribute-condition-in-qgis) (▲ 2 · 0 answers)
 - [Joining point attributes to line in QGIS](https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis) (▲ 2 · 1 answers)
@@ -69,13 +69,13 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
+- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
 - [TROPESS Chemical Reanalysis O3 Increment 6-Hourly 3-dimensional Product V1 (TRPSCRO3I6H3D)](https://search.earthdata.nasa.gov/search?q=TRPSCRO3I6H3D) — The TROPESS Chemical Reanalysis O3 Increment 6-Hourly 3-dimensional Product contains the ozone increment by data assimilation.
-- [TRMM (TMPA/3B43) Rainfall Estimate L3 1 month 0.25 degree x 0.25 degree V7 (TRMM_3B43)](https://search.earthdata.nasa.gov/search?q=TRMM_3B43) — TMPA (3B43) dataset have been discontinued as of Dec.
-- [TRMM (TMPA) Precipitation L3 1 day 0.25 degree x 0.25 degree V7 (TRMM_3B42_Daily)](https://search.earthdata.nasa.gov/search?q=TRMM_3B42_Daily) — TMPA (3B42_Daily) dataset have been discontinued as of Dec.
-- [Smerge-Noah-CCI root zone soil moisture 0-40 cm L4 daily 0.125 x 0.125 degree V2.0 (SMERGE_RZSM0_40CM)](https://search.earthdata.nasa.gov/search?q=SMERGE_RZSM0_40CM) — Smerge-Noah-CCI root zone soil moisture 0-40 cm L4 daily 0.125 x 0.125 degree V2.0 is a multi-decadal root-zone soil moisture product.
-- [OMI/Aura Surface UVB Irradiance and Erythemal Dose Daily L3 Global Gridded 1.0 degree x 1.0 degree V3 (OMUVBd)](https://search.earthdata.nasa.gov/search?q=OMUVBd) — This is Level-3 daily global gridded Aura-OMI Spectral Surface UVB Irradiance and Erythemal Dose product (OMUVBd).
-- [OMI/Aura TOMS-Like Ozone and Radiative Cloud Fraction L3 1 day 0.25 degree x 0.25 degree V3 (OMTO3e)](https://search.earthdata.nasa.gov/search?q=OMTO3e) — The OMI science team produces this Level-3 Aura/OMI Global TOMS-Like Total Column Ozone gridded product OMTO3e (0.25deg Lat/Lon grids).
-- [OMI/Aura TOMS-Like Ozone, Aerosol Index, Cloud Radiance Fraction L3 1 day 1 degree x 1 degree V3 (OMTO3d)](https://search.earthdata.nasa.gov/search?q=OMTO3d) — The OMI science team produces this Level-3 daily global TOMS-Like Total Column Ozone gridded product OMTO3d (1 deg Lat/Lon grids).
 
 ## Data.gov — new geodata
 
@@ -89,6 +89,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## OSM pulse
 
+- [weeklyOSM 846](https://weeklyosm.eu/archives/0846/)
 - [weeklyOSM 845](https://weeklyosm.eu/archives/0845/)
 - [weeklyOSM 844](https://weeklyosm.eu/archives/0844/)
-- [weeklyOSM 843](https://weeklyosm.eu/archives/0843/)
