@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-11",
+  "generatedAt": "2026-10-12",
   "news": {
     "mapsmania": [
+      {
+        "title": "The World is Your War Zone",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/the-world-is-your-war-zone.html",
+        "desc": ""
+      },
       {
         "title": "Mapping the Cosmos",
         "url": "http://googlemapsmania.blogspot.com/2026/10/mapping-cosmos.html",
@@ -35,11 +40,6 @@
       {
         "title": "A Year of Lightning",
         "url": "http://googlemapsmania.blogspot.com/2026/10/a-year-of-lightning.html",
-        "desc": ""
-      },
-      {
-        "title": "Map Pac-Man is Back!",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/map-pac-man-is-back.html",
         "desc": ""
       }
     ],
@@ -110,6 +110,14 @@
   },
   "qgis": [
     {
+      "title": "Terrain Viewer",
+      "url": "https://plugins.qgis.org/plugins/terrain_viewer/"
+    },
+    {
+      "title": "GEE Image Downloader",
+      "url": "https://plugins.qgis.org/plugins/gee_image_downloader/"
+    },
+    {
       "title": "CBERSFuse",
       "url": "https://plugins.qgis.org/plugins/cbers4a_wpm/"
     },
@@ -132,23 +140,15 @@
     {
       "title": "VMS Analysis",
       "url": "https://plugins.qgis.org/plugins/VMS_Analysis/"
-    },
-    {
-      "title": "Cave LRUD 2D/3D Mapper",
-      "url": "https://plugins.qgis.org/plugins/cave_lrud_mapper/"
-    },
-    {
-      "title": "Portolan Registry",
-      "url": "https://plugins.qgis.org/plugins/portolan_registry_qgis/"
     }
   ],
   "releases": [
     {
       "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.13.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.13.0",
-      "desc": "### ✨ Features and improvements - Let the globe center reach the poles, where it stopped at 85.05° ([#8629](https://github.com/maplibre/maplibre-gl-js/pull/8…",
-      "publishedAt": "2026-10-06",
+      "title": "maplibre-gl-js v6.14.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.14.0",
+      "desc": "### ✨ Features and improvements - Allow calling `new Map({ globalState: { ...",
+      "publishedAt": "2026-10-11",
       "isFresh": true
     },
     {
@@ -210,9 +210,15 @@
   ],
   "gisse": [
     {
-      "title": "Creating four types legends in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501561/creating-four-types-legends-in-qgis",
-      "score": 0,
+      "title": "How do I create this dark green (\"V\") line symbology?",
+      "url": "https://gis.stackexchange.com/questions/501567/how-do-i-create-this-dark-green-v-line-symbology",
+      "score": 2,
+      "answers": 1
+    },
+    {
+      "title": "Converting multiple GeoTIFF to MBTiles or PMTiles",
+      "url": "https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles",
+      "score": 2,
       "answers": 0
     },
     {
@@ -222,9 +228,9 @@
       "answers": 1
     },
     {
-      "title": "Converting multiple GeoTIFF to MBTiles or PMTiles",
-      "url": "https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles",
-      "score": 2,
+      "title": "Creating four types legends in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501561/creating-four-types-legends-in-qgis",
+      "score": 0,
       "answers": 0
     },
     {
@@ -252,21 +258,15 @@
       "answers": 1
     },
     {
-      "title": "Aligning Raster Datasets in ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501541/aligning-raster-datasets-in-arcgis-pro",
-      "score": 2,
-      "answers": 1
-    },
-    {
       "title": "How to safely remove stored PostgreSQL credentials from a QGIS project file and force user login on open?",
       "url": "https://gis.stackexchange.com/questions/501534/how-to-safely-remove-stored-postgresql-credentials-from-a-qgis-project-file-and",
       "score": 1,
       "answers": 1
     },
     {
-      "title": "ArcPy CalculateField fails for AGOL hosted feature layer's date field",
-      "url": "https://gis.stackexchange.com/questions/501526/arcpy-calculatefield-fails-for-agol-hosted-feature-layers-date-field",
-      "score": 0,
+      "title": "Aligning Raster Datasets in ArcGIS Pro",
+      "url": "https://gis.stackexchange.com/questions/501541/aligning-raster-datasets-in-arcgis-pro",
+      "score": 2,
       "answers": 1
     }
   ],

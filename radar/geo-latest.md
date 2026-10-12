@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-11
+# Mapzimus Geospatial Radar — 2026-10-12
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [The World is Your War Zone](http://googlemapsmania.blogspot.com/2026/10/the-world-is-your-war-zone.html)
 - [Mapping the Cosmos](http://googlemapsmania.blogspot.com/2026/10/mapping-cosmos.html)
 - [Animated Map Videos](http://googlemapsmania.blogspot.com/2026/10/animated-map-videos.html)
 - [GeoFactGuessr](http://googlemapsmania.blogspot.com/2026/10/geofactguessr.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Alternative History Maps](http://googlemapsmania.blogspot.com/2026/10/alternative-history-maps.html)
 - [Preparing for the #30DayMapChallenge](http://googlemapsmania.blogspot.com/2025/10/preparing-for-30daychallenge.html)
 - [A Year of Lightning](http://googlemapsmania.blogspot.com/2026/10/a-year-of-lightning.html)
-- [Map Pac-Man is Back!](http://googlemapsmania.blogspot.com/2026/10/map-pac-man-is-back.html)
 
 ## Geography Realm
 
@@ -31,18 +31,18 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
+- [Terrain Viewer](https://plugins.qgis.org/plugins/terrain_viewer/)
+- [GEE Image Downloader](https://plugins.qgis.org/plugins/gee_image_downloader/)
 - [CBERSFuse](https://plugins.qgis.org/plugins/cbers4a_wpm/)
 - [Consulta SICAR](https://plugins.qgis.org/plugins/sicar_consulta/)
 - [Exact Raster Boundary updated](https://plugins.qgis.org/plugins/ExactRasterBoundary_updated/)
 - [GeoServer Manager](https://plugins.qgis.org/plugins/geoserver_manager/)
 - [Ukiyo-e Relief](https://plugins.qgis.org/plugins/ukiyoe_relief/)
 - [VMS Analysis](https://plugins.qgis.org/plugins/VMS_Analysis/)
-- [Cave LRUD 2D/3D Mapper](https://plugins.qgis.org/plugins/cave_lrud_mapper/)
-- [Portolan Registry](https://plugins.qgis.org/plugins/portolan_registry_qgis/)
 
 ## Library releases
 
-- [maplibre-gl-js v6.13.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.13.0) (2026-10-06) — ### ✨ Features and improvements - Let the globe center reach the poles, where it stopped at 85.05° ([#8629](https://github.com/maplibre/maplibre-gl-js/pull/8…
+- [maplibre-gl-js v6.14.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.14.0) (2026-10-11) — ### ✨ Features and improvements - Allow calling `new Map({ globalState: { ...
 - [duckdb v1.5.6](https://github.com/duckdb/duckdb/releases/tag/v1.5.6) (2026-09-28) — This is a bug fix release for various issues discovered after we released v1.5.5 ## What's Changed * Use relative includes in unity build sources for cache r…
 - [QGIS final-3_44_15](https://github.com/qgis/QGIS/releases/tag/final-3_44_15) (2026-09-25) — https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15
 - [deck.gl v9.4.0](https://github.com/visgl/deck.gl/releases/tag/v9.4.0) (2026-09-05) — deck.gl v9.4 brings together a collection of completed improvements focused on performance, stability, and usability.
@@ -53,16 +53,16 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Creating four types legends in QGIS](https://gis.stackexchange.com/questions/501561/creating-four-types-legends-in-qgis) (▲ 0 · 0 answers)
-- [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 3 · 1 answers)
+- [How do I create this dark green ("V") line symbology?](https://gis.stackexchange.com/questions/501567/how-do-i-create-this-dark-green-v-line-symbology) (▲ 2 · 1 answers)
 - [Converting multiple GeoTIFF to MBTiles or PMTiles](https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles) (▲ 2 · 0 answers)
+- [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 3 · 1 answers)
+- [Creating four types legends in QGIS](https://gis.stackexchange.com/questions/501561/creating-four-types-legends-in-qgis) (▲ 0 · 0 answers)
 - [Making symbol based on attribute condition in QGIS](https://gis.stackexchange.com/questions/501553/making-symbol-based-on-attribute-condition-in-qgis) (▲ 2 · 0 answers)
 - [Joining point attributes to line in QGIS](https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis) (▲ 2 · 1 answers)
 - [Converting large GeoJSON file to shapefile while preserving UTF-8 attribute encoding with ogr2ogr](https://gis.stackexchange.com/questions/501540/converting-large-geojson-file-to-shapefile-while-preserving-utf-8-attribute-enco) (▲ 2 · 1 answers)
 - [Are positional arguments considered operands in gdal CLI modernization?](https://gis.stackexchange.com/questions/501549/are-positional-arguments-considered-operands-in-gdal-cli-modernization) (▲ 0 · 1 answers)
-- [Aligning Raster Datasets in ArcGIS Pro](https://gis.stackexchange.com/questions/501541/aligning-raster-datasets-in-arcgis-pro) (▲ 2 · 1 answers)
 - [How to safely remove stored PostgreSQL credentials from a QGIS project file and force user login on open?](https://gis.stackexchange.com/questions/501534/how-to-safely-remove-stored-postgresql-credentials-from-a-qgis-project-file-and) (▲ 1 · 1 answers)
-- [ArcPy CalculateField fails for AGOL hosted feature layer's date field](https://gis.stackexchange.com/questions/501526/arcpy-calculatefield-fails-for-agol-hosted-feature-layers-date-field) (▲ 0 · 1 answers)
+- [Aligning Raster Datasets in ArcGIS Pro](https://gis.stackexchange.com/questions/501541/aligning-raster-datasets-in-arcgis-pro) (▲ 2 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
 
