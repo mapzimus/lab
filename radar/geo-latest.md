@@ -1,4 +1,4 @@
-# Mapzimus Geospatial Radar — 2026-10-12
+# Mapzimus Geospatial Radar — 2026-10-13
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
@@ -13,12 +13,12 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## Geography Realm
 
+- [Good Governance Needs a Strong Code of Conduct](https://www.geographyrealm.com/good-governance-code-of-conduct/) — Editorial: Most geographers either work for government agencies or do substantial business with them.
 - [Alaska’s Coastline is Longer Than All the Other 49 States Combined](https://www.geographyrealm.com/alaskas-coastline-is-longer-than-all-the-other-49-states-combined/) — Alaska has the longest U.S.
 - [Geography Facts about the World’s Continents](https://www.geographyrealm.com/continents/) — How many continents are there?
 - [X is Longitude, Y is Latitude](https://www.geographyrealm.com/x-longitude-y-latitude/) — Why is X longitude and Y latitude in GIS?
 - [Unique Geography Facts About Every U.S.](https://www.geographyrealm.com/only-state-geography-facts/) — From Alaska's Arctic coastline to Delaware's colonial hundreds, discover the geographic features and characteristics that make every U.S.
 - [Highest Point in Every U.S.](https://www.geographyrealm.com/highest-point-in-every-u-s-state/) — Every U.S. state's highest point, from Denali to Britton Hill, with elevations, maps, and geographic facts.
-- [States in Order of Admission to the United States of America](https://www.geographyrealm.com/states-in-order-of-admission-to-the-united-states-of-america/) — From Delaware to Hawaii, discover when each state entered the Union and the geographic features that make every state unique.
 
 ## Geospatial World
 
@@ -33,12 +33,12 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 - [Terrain Viewer](https://plugins.qgis.org/plugins/terrain_viewer/)
 - [GEE Image Downloader](https://plugins.qgis.org/plugins/gee_image_downloader/)
-- [CBERSFuse](https://plugins.qgis.org/plugins/cbers4a_wpm/)
-- [Consulta SICAR](https://plugins.qgis.org/plugins/sicar_consulta/)
-- [Exact Raster Boundary updated](https://plugins.qgis.org/plugins/ExactRasterBoundary_updated/)
-- [GeoServer Manager](https://plugins.qgis.org/plugins/geoserver_manager/)
-- [Ukiyo-e Relief](https://plugins.qgis.org/plugins/ukiyoe_relief/)
-- [VMS Analysis](https://plugins.qgis.org/plugins/VMS_Analysis/)
+- [GeoFly QGIS](https://plugins.qgis.org/plugins/geofly_qgis/)
+- [HyperSpectral Processer](https://plugins.qgis.org/plugins/hyperspatial_processing/)
+- [Datacube Viewer](https://plugins.qgis.org/plugins/datacube_viewer/)
+- [CS Map Sheets](https://plugins.qgis.org/plugins/csmap_sheets/)
+- [PlotBridge Mangrove](https://plugins.qgis.org/plugins/plotbridge_mangrove/)
+- [LineShortener — Encurtar linhas](https://plugins.qgis.org/plugins/line_shortener/)
 
 ## Library releases
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [How do I create this dark green ("V") line symbology?](https://gis.stackexchange.com/questions/501567/how-do-i-create-this-dark-green-v-line-symbology) (▲ 2 · 1 answers)
+- [Issue with alignment of legend labels in QGIS Print layout](https://gis.stackexchange.com/questions/501570/issue-with-alignment-of-legend-labels-in-qgis-print-layout) (▲ 1 · 0 answers)
+- [Extracting data (or even converting) from WMS to shapefile in QGIS](https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis) (▲ 2 · 0 answers)
+- [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
 - [Converting multiple GeoTIFF to MBTiles or PMTiles](https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles) (▲ 2 · 0 answers)
 - [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 3 · 1 answers)
 - [Creating four types legends in QGIS](https://gis.stackexchange.com/questions/501561/creating-four-types-legends-in-qgis) (▲ 0 · 0 answers)
-- [Making symbol based on attribute condition in QGIS](https://gis.stackexchange.com/questions/501553/making-symbol-based-on-attribute-condition-in-qgis) (▲ 2 · 0 answers)
 - [Joining point attributes to line in QGIS](https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis) (▲ 2 · 1 answers)
+- [Making symbol based on attribute condition in QGIS](https://gis.stackexchange.com/questions/501553/making-symbol-based-on-attribute-condition-in-qgis) (▲ 2 · 0 answers)
 - [Converting large GeoJSON file to shapefile while preserving UTF-8 attribute encoding with ogr2ogr](https://gis.stackexchange.com/questions/501540/converting-large-geojson-file-to-shapefile-while-preserving-utf-8-attribute-enco) (▲ 2 · 1 answers)
 - [Are positional arguments considered operands in gdal CLI modernization?](https://gis.stackexchange.com/questions/501549/are-positional-arguments-considered-operands-in-gdal-cli-modernization) (▲ 0 · 1 answers)
-- [How to safely remove stored PostgreSQL credentials from a QGIS project file and force user login on open?](https://gis.stackexchange.com/questions/501534/how-to-safely-remove-stored-postgresql-credentials-from-a-qgis-project-file-and) (▲ 1 · 1 answers)
-- [Aligning Raster Datasets in ArcGIS Pro](https://gis.stackexchange.com/questions/501541/aligning-raster-datasets-in-arcgis-pro) (▲ 2 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
 
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
-- [TROPESS Chemical Reanalysis O3 Increment 6-Hourly 3-dimensional Product V1 (TRPSCRO3I6H3D)](https://search.earthdata.nasa.gov/search?q=TRPSCRO3I6H3D) — The TROPESS Chemical Reanalysis O3 Increment 6-Hourly 3-dimensional Product contains the ozone increment by data assimilation.
+- [Ground-Based Global Navigation Satellite System (GNSS) High-rate Beidou Broadcast Ephemeris Data (sub-hourly files) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_hghrt_Beidou_bdcst_ephem_sub_hrly) — This dataset consists of ground-based Global Navigation Satellite System (GNSS) Beidou Broadcast Ephemeris Data (sub-hourly files) from the NASA Crustal Dyna…
+- [GHRSST Level 4 OSTIA Global Historical Reprocessed Foundation Sea Surface Temperature Analysis produced by the UK Meteorological Office](https://search.earthdata.nasa.gov/search?q=OSTIA-UKMO-L4-GLOB-REP-v2.0) — The Operational Sea Surface Temperature and Sea Ice Analysis Reprocessed (OSTIA-REP) is a GHRSST reprocessed Level-4 sea surface temperature and ice-concentr…
+- [IceBridge-Related DMS-Derived L4 Sea Ice Surface Cover Classification Orthorectified Images V001](https://search.earthdata.nasa.gov/search?q=RDSISCO4) — This data set contains reprocessed, orthorectified images depicting labels that indicate the sea ice surface category, created by processing IceBridge DMS L0…
+- [Level-4 9ka Greenland Ice Sheet Balance Velocity V001](https://search.earthdata.nasa.gov/search?q=RDGBV4) — This data set contains calculated balance velocity of the Greenland Ice Sheet during the last three quarters of the Holocene epoch (9ka).
+- [IceBridge Radar L3 Tomographic Ice Thickness V002](https://search.earthdata.nasa.gov/search?q=IRTIT3) — This data set contains Level-3 tomographic ice thickness measurements and ice thickness errors over areas of Greenland and Antarctica.
+- [IceBridge MCoRDS L3 Gridded Ice Thickness, Surface, and Bottom V002](https://search.earthdata.nasa.gov/search?q=IRMCR3) — This data set contains products from depth sounder measurements over Greenland and Antarctica taken from the Multichannel Coherent Radar Depth Sounder (MCoRDS).
+- [IceBridge Ku-Band Radar L1B Geolocated Radar Echo Strength Profiles V002](https://search.earthdata.nasa.gov/search?q=IRKUB1B) — This data set contains elevation and surface measurements over Greenland, the Arctic, and Antarctica, as well as flight path charts and echogram images acqui…
 
 ## Data.gov — new geodata
 

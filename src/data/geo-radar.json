@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-12",
+  "generatedAt": "2026-10-13",
   "news": {
     "mapsmania": [
       {
@@ -45,6 +45,11 @@
     ],
     "georealm": [
       {
+        "title": "Good Governance Needs a Strong Code of Conduct",
+        "url": "https://www.geographyrealm.com/good-governance-code-of-conduct/",
+        "desc": "Editorial: Most geographers either work for government agencies or do substantial business with them."
+      },
+      {
         "title": "Alaska’s Coastline is Longer Than All the Other 49 States Combined",
         "url": "https://www.geographyrealm.com/alaskas-coastline-is-longer-than-all-the-other-49-states-combined/",
         "desc": "Alaska has the longest U.S."
@@ -68,11 +73,6 @@
         "title": "Highest Point in Every U.S.",
         "url": "https://www.geographyrealm.com/highest-point-in-every-u-s-state/",
         "desc": "Every U.S. state's highest point, from Denali to Britton Hill, with elevations, maps, and geographic facts."
-      },
-      {
-        "title": "States in Order of Admission to the United States of America",
-        "url": "https://www.geographyrealm.com/states-in-order-of-admission-to-the-united-states-of-america/",
-        "desc": "From Delaware to Hawaii, discover when each state entered the Union and the geographic features that make every state unique."
       }
     ],
     "geoworld": [
@@ -118,28 +118,28 @@
       "url": "https://plugins.qgis.org/plugins/gee_image_downloader/"
     },
     {
-      "title": "CBERSFuse",
-      "url": "https://plugins.qgis.org/plugins/cbers4a_wpm/"
+      "title": "GeoFly QGIS",
+      "url": "https://plugins.qgis.org/plugins/geofly_qgis/"
     },
     {
-      "title": "Consulta SICAR",
-      "url": "https://plugins.qgis.org/plugins/sicar_consulta/"
+      "title": "HyperSpectral Processer",
+      "url": "https://plugins.qgis.org/plugins/hyperspatial_processing/"
     },
     {
-      "title": "Exact Raster Boundary updated",
-      "url": "https://plugins.qgis.org/plugins/ExactRasterBoundary_updated/"
+      "title": "Datacube Viewer",
+      "url": "https://plugins.qgis.org/plugins/datacube_viewer/"
     },
     {
-      "title": "GeoServer Manager",
-      "url": "https://plugins.qgis.org/plugins/geoserver_manager/"
+      "title": "CS Map Sheets",
+      "url": "https://plugins.qgis.org/plugins/csmap_sheets/"
     },
     {
-      "title": "Ukiyo-e Relief",
-      "url": "https://plugins.qgis.org/plugins/ukiyoe_relief/"
+      "title": "PlotBridge Mangrove",
+      "url": "https://plugins.qgis.org/plugins/plotbridge_mangrove/"
     },
     {
-      "title": "VMS Analysis",
-      "url": "https://plugins.qgis.org/plugins/VMS_Analysis/"
+      "title": "LineShortener — Encurtar linhas",
+      "url": "https://plugins.qgis.org/plugins/line_shortener/"
     }
   ],
   "releases": [
@@ -210,9 +210,21 @@
   ],
   "gisse": [
     {
-      "title": "How do I create this dark green (\"V\") line symbology?",
-      "url": "https://gis.stackexchange.com/questions/501567/how-do-i-create-this-dark-green-v-line-symbology",
+      "title": "Issue with alignment of legend labels in QGIS Print layout",
+      "url": "https://gis.stackexchange.com/questions/501570/issue-with-alignment-of-legend-labels-in-qgis-print-layout",
+      "score": 1,
+      "answers": 0
+    },
+    {
+      "title": "Extracting data (or even converting) from WMS to shapefile in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis",
       "score": 2,
+      "answers": 0
+    },
+    {
+      "title": "Creating this dark green (\"V\") line symbology in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis",
+      "score": 4,
       "answers": 1
     },
     {
@@ -234,16 +246,16 @@
       "answers": 0
     },
     {
-      "title": "Making symbol based on attribute condition in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501553/making-symbol-based-on-attribute-condition-in-qgis",
-      "score": 2,
-      "answers": 0
-    },
-    {
       "title": "Joining point attributes to line in QGIS",
       "url": "https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis",
       "score": 2,
       "answers": 1
+    },
+    {
+      "title": "Making symbol based on attribute condition in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501553/making-symbol-based-on-attribute-condition-in-qgis",
+      "score": 2,
+      "answers": 0
     },
     {
       "title": "Converting large GeoJSON file to shapefile while preserving UTF-8 attribute encoding with ogr2ogr",
@@ -255,18 +267,6 @@
       "title": "Are positional arguments considered operands in gdal CLI modernization?",
       "url": "https://gis.stackexchange.com/questions/501549/are-positional-arguments-considered-operands-in-gdal-cli-modernization",
       "score": 0,
-      "answers": 1
-    },
-    {
-      "title": "How to safely remove stored PostgreSQL credentials from a QGIS project file and force user login on open?",
-      "url": "https://gis.stackexchange.com/questions/501534/how-to-safely-remove-stored-postgresql-credentials-from-a-qgis-project-file-and",
-      "score": 1,
-      "answers": 1
-    },
-    {
-      "title": "Aligning Raster Datasets in ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501541/aligning-raster-datasets-in-arcgis-pro",
-      "score": 2,
       "answers": 1
     }
   ],
@@ -290,46 +290,46 @@
       "org": "ASF"
     },
     {
-      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
-      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
+      "title": "Ground-Based Global Navigation Satellite System (GNSS) High-rate Beidou Broadcast Ephemeris Data (sub-hourly files) from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_hghrt_Beidou_bdcst_ephem_sub_hrly",
+      "desc": "This dataset consists of ground-based Global Navigation Satellite System (GNSS) Beidou Broadcast Ephemeris Data (sub-hourly files) from the NASA Crustal Dyna…",
+      "org": "CDDIS"
+    },
+    {
+      "title": "GHRSST Level 4 OSTIA Global Historical Reprocessed Foundation Sea Surface Temperature Analysis produced by the UK Meteorological Office",
+      "url": "https://search.earthdata.nasa.gov/search?q=OSTIA-UKMO-L4-GLOB-REP-v2.0",
+      "desc": "The Operational Sea Surface Temperature and Sea Ice Analysis Reprocessed (OSTIA-REP) is a GHRSST reprocessed Level-4 sea surface temperature and ice-concentr…",
+      "org": "POCLOUD"
+    },
+    {
+      "title": "IceBridge-Related DMS-Derived L4 Sea Ice Surface Cover Classification Orthorectified Images V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=RDSISCO4",
+      "desc": "This data set contains reprocessed, orthorectified images depicting labels that indicate the sea ice surface category, created by processing IceBridge DMS L0…",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "title": "Level-4 9ka Greenland Ice Sheet Balance Velocity V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=RDGBV4",
+      "desc": "This data set contains calculated balance velocity of the Greenland Ice Sheet during the last three quarters of the Holocene epoch (9ka).",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
-      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "title": "IceBridge Radar L3 Tomographic Ice Thickness V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=IRTIT3",
+      "desc": "This data set contains Level-3 tomographic ice thickness measurements and ice thickness errors over areas of Greenland and Antarctica.",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
-      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "title": "IceBridge MCoRDS L3 Gridded Ice Thickness, Surface, and Bottom V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=IRMCR3",
+      "desc": "This data set contains products from depth sounder measurements over Greenland and Antarctica taken from the Multichannel Coherent Radar Depth Sounder (MCoRDS).",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "title": "IceBridge Ku-Band Radar L1B Geolocated Radar Echo Strength Profiles V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=IRKUB1B",
+      "desc": "This data set contains elevation and surface measurements over Greenland, the Arctic, and Antarctica, as well as flight path charts and echogram images acqui…",
       "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "TROPESS Chemical Reanalysis O3 Increment 6-Hourly 3-dimensional Product V1 (TRPSCRO3I6H3D)",
-      "url": "https://search.earthdata.nasa.gov/search?q=TRPSCRO3I6H3D",
-      "desc": "The TROPESS Chemical Reanalysis O3 Increment 6-Hourly 3-dimensional Product contains the ozone increment by data assimilation.",
-      "org": "GES_DISC"
     }
   ],
   "datagov": [
