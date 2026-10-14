@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-13
+# Mapzimus Geospatial Radar — 2026-10-14
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [The New Age of Building Age Maps Has Begun](http://googlemapsmania.blogspot.com/2026/10/the-new-age-of-building-age-maps-has.html)
 - [The World is Your War Zone](http://googlemapsmania.blogspot.com/2026/10/the-world-is-your-war-zone.html)
 - [Mapping the Cosmos](http://googlemapsmania.blogspot.com/2026/10/mapping-cosmos.html)
 - [Animated Map Videos](http://googlemapsmania.blogspot.com/2026/10/animated-map-videos.html)
@@ -9,11 +10,10 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Find Movies - by Location & Period!](http://googlemapsmania.blogspot.com/2026/10/find-movies-by-location-period.html)
 - [Alternative History Maps](http://googlemapsmania.blogspot.com/2026/10/alternative-history-maps.html)
 - [Preparing for the #30DayMapChallenge](http://googlemapsmania.blogspot.com/2025/10/preparing-for-30daychallenge.html)
-- [A Year of Lightning](http://googlemapsmania.blogspot.com/2026/10/a-year-of-lightning.html)
 
 ## Geography Realm
 
-- [Good Governance Needs a Strong Code of Conduct](https://www.geographyrealm.com/good-governance-code-of-conduct/) — Editorial: Most geographers either work for government agencies or do substantial business with them.
+- [Good Governance Needs a Strong Code of Conduct](https://www.geographyrealm.com/good-governance-code-of-conduct/) — Editorial: Most geographers work for government agencies or do substantial business with them, so how those agencies are governed is our business too.
 - [Alaska’s Coastline is Longer Than All the Other 49 States Combined](https://www.geographyrealm.com/alaskas-coastline-is-longer-than-all-the-other-49-states-combined/) — Alaska has the longest U.S.
 - [Geography Facts about the World’s Continents](https://www.geographyrealm.com/continents/) — How many continents are there?
 - [X is Longitude, Y is Latitude](https://www.geographyrealm.com/x-longitude-y-latitude/) — Why is X longitude and Y latitude in GIS?
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Issue with alignment of legend labels in QGIS Print layout](https://gis.stackexchange.com/questions/501570/issue-with-alignment-of-legend-labels-in-qgis-print-layout) (▲ 1 · 0 answers)
-- [Extracting data (or even converting) from WMS to shapefile in QGIS](https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis) (▲ 2 · 0 answers)
+- [Multi map views is not properly saved in QGIS](https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis) (▲ 1 · 0 answers)
+- [Issue with alignment of legend labels in QGIS Print layout](https://gis.stackexchange.com/questions/501570/issue-with-alignment-of-legend-labels-in-qgis-print-layout) (▲ 1 · 1 answers)
+- [Filtering GetCapabilities request using keyword](https://gis.stackexchange.com/questions/501574/filtering-getcapabilities-request-using-keyword) (▲ 1 · 1 answers)
+- [Orfeo fails to map paths in QGIS 3.44.2](https://gis.stackexchange.com/questions/501583/orfeo-fails-to-map-paths-in-qgis-3-44-2) (▲ 1 · 0 answers)
 - [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
+- [Extracting data (or even converting) from WMS to shapefile in QGIS](https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis) (▲ 3 · 0 answers)
 - [Converting multiple GeoTIFF to MBTiles or PMTiles](https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles) (▲ 2 · 0 answers)
 - [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 3 · 1 answers)
 - [Creating four types legends in QGIS](https://gis.stackexchange.com/questions/501561/creating-four-types-legends-in-qgis) (▲ 0 · 0 answers)
 - [Joining point attributes to line in QGIS](https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis) (▲ 2 · 1 answers)
-- [Making symbol based on attribute condition in QGIS](https://gis.stackexchange.com/questions/501553/making-symbol-based-on-attribute-condition-in-qgis) (▲ 2 · 0 answers)
-- [Converting large GeoJSON file to shapefile while preserving UTF-8 attribute encoding with ogr2ogr](https://gis.stackexchange.com/questions/501540/converting-large-geojson-file-to-shapefile-while-preserving-utf-8-attribute-enco) (▲ 2 · 1 answers)
-- [Are positional arguments considered operands in gdal CLI modernization?](https://gis.stackexchange.com/questions/501549/are-positional-arguments-considered-operands-in-gdal-cli-modernization) (▲ 0 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
 
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [Ground-Based Global Navigation Satellite System (GNSS) High-rate Beidou Broadcast Ephemeris Data (sub-hourly files) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_hghrt_Beidou_bdcst_ephem_sub_hrly) — This dataset consists of ground-based Global Navigation Satellite System (GNSS) Beidou Broadcast Ephemeris Data (sub-hourly files) from the NASA Crustal Dyna…
-- [GHRSST Level 4 OSTIA Global Historical Reprocessed Foundation Sea Surface Temperature Analysis produced by the UK Meteorological Office](https://search.earthdata.nasa.gov/search?q=OSTIA-UKMO-L4-GLOB-REP-v2.0) — The Operational Sea Surface Temperature and Sea Ice Analysis Reprocessed (OSTIA-REP) is a GHRSST reprocessed Level-4 sea surface temperature and ice-concentr…
-- [IceBridge-Related DMS-Derived L4 Sea Ice Surface Cover Classification Orthorectified Images V001](https://search.earthdata.nasa.gov/search?q=RDSISCO4) — This data set contains reprocessed, orthorectified images depicting labels that indicate the sea ice surface category, created by processing IceBridge DMS L0…
-- [Level-4 9ka Greenland Ice Sheet Balance Velocity V001](https://search.earthdata.nasa.gov/search?q=RDGBV4) — This data set contains calculated balance velocity of the Greenland Ice Sheet during the last three quarters of the Holocene epoch (9ka).
-- [IceBridge Radar L3 Tomographic Ice Thickness V002](https://search.earthdata.nasa.gov/search?q=IRTIT3) — This data set contains Level-3 tomographic ice thickness measurements and ice thickness errors over areas of Greenland and Antarctica.
-- [IceBridge MCoRDS L3 Gridded Ice Thickness, Surface, and Bottom V002](https://search.earthdata.nasa.gov/search?q=IRMCR3) — This data set contains products from depth sounder measurements over Greenland and Antarctica taken from the Multichannel Coherent Radar Depth Sounder (MCoRDS).
-- [IceBridge Ku-Band Radar L1B Geolocated Radar Echo Strength Profiles V002](https://search.earthdata.nasa.gov/search?q=IRKUB1B) — This data set contains elevation and surface measurements over Greenland, the Arctic, and Antarctica, as well as flight path charts and echogram images acqui…
+- [SWOT Level 2 Nadir Altimeter Operational Geophysical Data Record with Waveforms, GPS, NRT, Version D](https://search.earthdata.nasa.gov/search?q=SWOT_L2_NALT_OGDR_NRTGPS_D) — The value-added SWOT Level 2 Near Real Time GPS Nadir Altimeter Operational Geophysical Data Record (NRT GPS OGDR) Version D dataset produced by the Surface…
+- [Ground-Based Global Navigation Satellite System (GNSS) Galileo Broadcast Ephemeris Data (sub-hourly files) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_hghrt_Galileo_bdcst_ephem) — This dataset consists of ground-based Global Navigation Satellite System (GNSS) Galileo Broadcast Ephemeris Data (sub-hourly files) from the NASA Crustal Dyn…
+- [Ground-Based Global Navigation Satellite System (GNSS) Observation Data (1-second sampling, sub-hourly files) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_hghrt_data_obs) — This dataset consists of ground-based Global Navigation Satellite System (GNSS) Observation Data (1-second sampling, sub-hourly files) from the NASA Crustal…
+- [SMAPVEX16 Manitoba PALS Brightness Temperature and Soil Moisture Data V001](https://search.earthdata.nasa.gov/search?q=SV16M_PLTBSM) — This product contains data derived from permanent in situ soil stations and observations by the Passive Active L-band System (PALS) microwave aircraft instru…
+- [SMAPVEX16 Iowa PALS Brightness Temperature and Soil Moisture Data V001](https://search.earthdata.nasa.gov/search?q=SV16I_PLTBSM) — This product contains data derived from permanent in situ soil stations and observations by the Passive Active L-band System (PALS) microwave aircraft instru…
+- [SMAPVEX15 PALS Brightness Temperature Data V001](https://search.earthdata.nasa.gov/search?q=SV15PLTB) — This data set contains brightness temperatures obtained by the Passive Active L-band System (PALS) aircraft instrument.
+- [SMAPVEX12 PALS Brightness Temperature Data V001](https://search.earthdata.nasa.gov/search?q=SV12PLTB) — This data set contains brightness temperatures obtained by the Passive Active L-band System (PALS) aircraft instrument.
 
 ## Data.gov — new geodata
 
