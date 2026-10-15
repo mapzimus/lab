@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-14",
+  "generatedAt": "2026-10-15",
   "news": {
     "mapsmania": [
+      {
+        "title": "Travel Blogging & Mapping",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/travel-blogging-mapping.html",
+        "desc": ""
+      },
       {
         "title": "The New Age of Building Age Maps Has Begun",
         "url": "http://googlemapsmania.blogspot.com/2026/10/the-new-age-of-building-age-maps-has.html",
@@ -35,11 +40,6 @@
       {
         "title": "Alternative History Maps",
         "url": "http://googlemapsmania.blogspot.com/2026/10/alternative-history-maps.html",
-        "desc": ""
-      },
-      {
-        "title": "Preparing for the #30DayMapChallenge",
-        "url": "http://googlemapsmania.blogspot.com/2025/10/preparing-for-30daychallenge.html",
         "desc": ""
       }
     ],
@@ -77,6 +77,11 @@
     ],
     "geoworld": [
       {
+        "title": "First Principles First: Need to Calibrate Data Access for Disaster Resilience",
+        "url": "https://geospatialworld.net/prime/business-and-industry-trends/first-principles-first-need-to-calibrate-data-access-for-disaster-resilience/",
+        "desc": "Every year on October 13, the United Nations marks the International Day for Disaster Risk Reduction, a date the General Assembly fixed in 2009 after first s…"
+      },
+      {
         "title": "Geospatial World Becomes EuroGeographics’ First Observer Member",
         "url": "https://geospatialworld.net/news/geospatial-world-becomes-eurogeographics-first-observer-member/",
         "desc": "New Delhi, 28th September 2026 — Geospatial World has become the first Observer Member of EuroGeographics, marking an important step in strengthening interna…"
@@ -100,46 +105,41 @@
         "title": "Mapping Urban Heat Islands in Ahemedabad",
         "url": "https://geospatialworld.net/videos/mapping-urban-heat-islands-ahmedabad/",
         "desc": "Even though the conversations on climate change have muted due to the geopolitical situation, trade disruptions, greater defence and intelligence spending, a…"
-      },
-      {
-        "title": "HD Mapping and VPS: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence | GWF 2026",
-        "url": "https://geospatialworld.net/videos/hd-mapping-vps-geospatial-platforms-gwf-2026/",
-        "desc": "Plenary Session 5: High-Definition Mapping and Visual Positioning Systems: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence |…"
       }
     ]
   },
   "qgis": [
     {
-      "title": "Terrain Viewer",
-      "url": "https://plugins.qgis.org/plugins/terrain_viewer/"
+      "title": "Map Algebra Calculator",
+      "url": "https://plugins.qgis.org/plugins/mapalgebra_calculator/"
     },
     {
-      "title": "GEE Image Downloader",
-      "url": "https://plugins.qgis.org/plugins/gee_image_downloader/"
+      "title": "Seismic Interpreter",
+      "url": "https://plugins.qgis.org/plugins/seismic_interpreter/"
     },
     {
-      "title": "GeoFly QGIS",
-      "url": "https://plugins.qgis.org/plugins/geofly_qgis/"
+      "title": "Peau du Monde | postProcessor",
+      "url": "https://plugins.qgis.org/plugins/pdm_postprocess/"
     },
     {
-      "title": "HyperSpectral Processer",
-      "url": "https://plugins.qgis.org/plugins/hyperspatial_processing/"
+      "title": "FortyGuard Heatmap",
+      "url": "https://plugins.qgis.org/plugins/fortyguard_heatmap/"
     },
     {
-      "title": "Datacube Viewer",
-      "url": "https://plugins.qgis.org/plugins/datacube_viewer/"
+      "title": "Vector Class Manager",
+      "url": "https://plugins.qgis.org/plugins/VectorClassManager/"
     },
     {
-      "title": "CS Map Sheets",
-      "url": "https://plugins.qgis.org/plugins/csmap_sheets/"
+      "title": "Ver Coordenadas",
+      "url": "https://plugins.qgis.org/plugins/ver_coordenadas/"
     },
     {
-      "title": "PlotBridge Mangrove",
-      "url": "https://plugins.qgis.org/plugins/plotbridge_mangrove/"
+      "title": "BSY CAR",
+      "url": "https://plugins.qgis.org/plugins/bsy_car/"
     },
     {
-      "title": "LineShortener — Encurtar linhas",
-      "url": "https://plugins.qgis.org/plugins/line_shortener/"
+      "title": "Draw Catchments",
+      "url": "https://plugins.qgis.org/plugins/draw_catchments/"
     }
   ],
   "releases": [
@@ -210,16 +210,28 @@
   ],
   "gisse": [
     {
-      "title": "Multi map views is not properly saved in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis",
-      "score": 1,
+      "title": "Need to find out if my street is public or Private",
+      "url": "https://gis.stackexchange.com/questions/501591/need-to-find-out-if-my-street-is-public-or-private",
+      "score": -2,
       "answers": 0
+    },
+    {
+      "title": "Creating this dark green (\"V\") line symbology in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis",
+      "score": 4,
+      "answers": 1
     },
     {
       "title": "Issue with alignment of legend labels in QGIS Print layout",
       "url": "https://gis.stackexchange.com/questions/501570/issue-with-alignment-of-legend-labels-in-qgis-print-layout",
       "score": 1,
       "answers": 1
+    },
+    {
+      "title": "Multi map views is not properly saved in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis",
+      "score": 1,
+      "answers": 0
     },
     {
       "title": "Filtering GetCapabilities request using keyword",
@@ -232,12 +244,6 @@
       "url": "https://gis.stackexchange.com/questions/501583/orfeo-fails-to-map-paths-in-qgis-3-44-2",
       "score": 1,
       "answers": 0
-    },
-    {
-      "title": "Creating this dark green (\"V\") line symbology in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis",
-      "score": 4,
-      "answers": 1
     },
     {
       "title": "Extracting data (or even converting) from WMS to shapefile in QGIS",
@@ -256,12 +262,6 @@
       "url": "https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis",
       "score": 3,
       "answers": 1
-    },
-    {
-      "title": "Creating four types legends in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501561/creating-four-types-legends-in-qgis",
-      "score": 0,
-      "answers": 0
     },
     {
       "title": "Joining point attributes to line in QGIS",
@@ -290,46 +290,46 @@
       "org": "ASF"
     },
     {
-      "title": "SWOT Level 2 Nadir Altimeter Operational Geophysical Data Record with Waveforms, GPS, NRT, Version D",
-      "url": "https://search.earthdata.nasa.gov/search?q=SWOT_L2_NALT_OGDR_NRTGPS_D",
-      "desc": "The value-added SWOT Level 2 Near Real Time GPS Nadir Altimeter Operational Geophysical Data Record (NRT GPS OGDR) Version D dataset produced by the Surface…",
-      "org": "POCLOUD"
-    },
-    {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS) Galileo Broadcast Ephemeris Data (sub-hourly files) from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_hghrt_Galileo_bdcst_ephem",
-      "desc": "This dataset consists of ground-based Global Navigation Satellite System (GNSS) Galileo Broadcast Ephemeris Data (sub-hourly files) from the NASA Crustal Dyn…",
+      "title": "Global Navigation Satellite System (GNSS) IGS Final Combined Satellite and Receiver Clock Solution (5 minute resolution, daily files, gen…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_sat_rcvr_clk_soln_5min",
+      "desc": "This derived product set consists of Global Navigation Satellite System Final Satellite and Receiver Clock Product (5-minute granularity, daily files, genera…",
       "org": "CDDIS"
     },
     {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS) Observation Data (1-second sampling, sub-hourly files) from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_hghrt_data_obs",
-      "desc": "This dataset consists of ground-based Global Navigation Satellite System (GNSS) Observation Data (1-second sampling, sub-hourly files) from the NASA Crustal…",
+      "title": "Global Navigation Satellite System (GNSS) IGS Final Combined Orbit Solution Summary Product from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_orbit_soln_sum",
+      "desc": "This derived product set consists of Global Navigation Satellite System Final Orbit/Reference Frame Product Summary from the NASA Crustal Dynamics Data Infor…",
       "org": "CDDIS"
     },
     {
-      "title": "SMAPVEX16 Manitoba PALS Brightness Temperature and Soil Moisture Data V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=SV16M_PLTBSM",
-      "desc": "This product contains data derived from permanent in situ soil stations and observations by the Passive Active L-band System (PALS) microwave aircraft instru…",
-      "org": "NSIDC_CPRD"
+      "title": "Global Navigation Satellite System (GNSS) IGS Final Analysis Center (AC) Clock Solution Product (daily files, generated weekly) from NASA…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_AC_clk_soln_prod",
+      "desc": "This derived product set consists of Global Navigation Satellite System Final Satellite and Receiver Clock Product (30-second granularity, daily files, gener…",
+      "org": "CDDIS"
     },
     {
-      "title": "SMAPVEX16 Iowa PALS Brightness Temperature and Soil Moisture Data V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=SV16I_PLTBSM",
-      "desc": "This product contains data derived from permanent in situ soil stations and observations by the Passive Active L-band System (PALS) microwave aircraft instru…",
-      "org": "NSIDC_CPRD"
+      "title": "Global Navigation Satellite System (GNSS) IGS Daily Ionosphere Vertical Total Electron Content (VTEC) Comparison Product from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_dly_ion_vert_TEC_comp",
+      "desc": "This derived product set consists of Global Navigation Satellite System Ionosphere Vertical Total Electron Content (VTEC) comparison product (daily files) fr…",
+      "org": "CDDIS"
     },
     {
-      "title": "SMAPVEX15 PALS Brightness Temperature Data V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=SV15PLTB",
-      "desc": "This data set contains brightness temperatures obtained by the Passive Active L-band System (PALS) aircraft instrument.",
-      "org": "NSIDC_CPRD"
+      "title": "Global Navigation Satellite System (GNSS) IGS Combined Rapid Clock Solution Comparison Summary Product from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_comb_rpd_clk_sol_comp_sum",
+      "desc": "This derived product set consists of Global Navigation Satellite System Rapid Clock Product Summary from the NASA Crustal Dynamics Data Information System (C…",
+      "org": "CDDIS"
     },
     {
-      "title": "SMAPVEX12 PALS Brightness Temperature Data V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=SV12PLTB",
-      "desc": "This data set contains brightness temperatures obtained by the Passive Active L-band System (PALS) aircraft instrument.",
-      "org": "NSIDC_CPRD"
+      "title": "OMI/Aura NO2 Total and Tropospheric Column Daily L2 Global Gridded 0.25 degree x 0.25 degree V004 (OMNO2G)",
+      "url": "https://search.earthdata.nasa.gov/search?q=OMNO2G",
+      "desc": "This Level-2G daily global gridded product OMNO2G is based on the pixel level OMI Level-2 NO2 product OMNO2.",
+      "org": "GES_DISC"
+    },
+    {
+      "title": "Global Navigation Satellite System (GNSS) International Terrestrial Reference Frame (ITRF) 2020 products (IGS20) from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_2020_prod",
+      "desc": "These data-derived products are the International GNSS Service (IGS) Analysis Centers' (AC) contribution to the International Terrestrial Reference Frame (IT…",
+      "org": "CDDIS"
     }
   ],
   "datagov": [

@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-14
+# Mapzimus Geospatial Radar — 2026-10-15
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Travel Blogging & Mapping](http://googlemapsmania.blogspot.com/2026/10/travel-blogging-mapping.html)
 - [The New Age of Building Age Maps Has Begun](http://googlemapsmania.blogspot.com/2026/10/the-new-age-of-building-age-maps-has.html)
 - [The World is Your War Zone](http://googlemapsmania.blogspot.com/2026/10/the-world-is-your-war-zone.html)
 - [Mapping the Cosmos](http://googlemapsmania.blogspot.com/2026/10/mapping-cosmos.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [GeoFactGuessr](http://googlemapsmania.blogspot.com/2026/10/geofactguessr.html)
 - [Find Movies - by Location & Period!](http://googlemapsmania.blogspot.com/2026/10/find-movies-by-location-period.html)
 - [Alternative History Maps](http://googlemapsmania.blogspot.com/2026/10/alternative-history-maps.html)
-- [Preparing for the #30DayMapChallenge](http://googlemapsmania.blogspot.com/2025/10/preparing-for-30daychallenge.html)
 
 ## Geography Realm
 
@@ -22,23 +22,23 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## Geospatial World
 
+- [First Principles First: Need to Calibrate Data Access for Disaster Resilience](https://geospatialworld.net/prime/business-and-industry-trends/first-principles-first-need-to-calibrate-data-access-for-disaster-resilience/) — Every year on October 13, the United Nations marks the International Day for Disaster Risk Reduction, a date the General Assembly fixed in 2009 after first s…
 - [Geospatial World Becomes EuroGeographics’ First Observer Member](https://geospatialworld.net/news/geospatial-world-becomes-eurogeographics-first-observer-member/) — New Delhi, 28th September 2026 — Geospatial World has become the first Observer Member of EuroGeographics, marking an important step in strengthening interna…
 - [From Data Deluge to Decision: Dr Abhay Swarup Mittal on Building Sovereign Intelligence at Aetosky](https://geospatialworld.net/videos/exclusive-videos-interviews/from-data-deluge-to-decision-dr-abhay-swarup-mittal-on-building-sovereign-intelligence-at-aetosky/) — In conversation with Dr Abhay Swarup Mittal, Founder and CEO of Aetosky group of companies on the founding story of Aetosky, building sovereign intelligence…
 - [Infrastructure Isn’t Just Built Anymore.](https://geospatialworld.net/videos/intelligent-infrastructure-aec-summit-gwf-2026/) — Infrastructure was once defined by scale.
 - [Strengthening Sovereignty, Economy, and Society](https://geospatialworld.net/prime/interviews/strengthening-sovereignty-economy-and-society/) — How should nations redefine geospatial and space sovereignty in an era of increasing dependence on global platforms, foreign satellite constellations, and in…
 - [Mapping Urban Heat Islands in Ahemedabad](https://geospatialworld.net/videos/mapping-urban-heat-islands-ahmedabad/) — Even though the conversations on climate change have muted due to the geopolitical situation, trade disruptions, greater defence and intelligence spending, a…
-- [HD Mapping and VPS: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence | GWF 2026](https://geospatialworld.net/videos/hd-mapping-vps-geospatial-platforms-gwf-2026/) — Plenary Session 5: High-Definition Mapping and Visual Positioning Systems: NextGen Geospatial Platforms for Business Enterprises and Location Intelligence |…
 
 ## QGIS — new & updated plugins
 
-- [Terrain Viewer](https://plugins.qgis.org/plugins/terrain_viewer/)
-- [GEE Image Downloader](https://plugins.qgis.org/plugins/gee_image_downloader/)
-- [GeoFly QGIS](https://plugins.qgis.org/plugins/geofly_qgis/)
-- [HyperSpectral Processer](https://plugins.qgis.org/plugins/hyperspatial_processing/)
-- [Datacube Viewer](https://plugins.qgis.org/plugins/datacube_viewer/)
-- [CS Map Sheets](https://plugins.qgis.org/plugins/csmap_sheets/)
-- [PlotBridge Mangrove](https://plugins.qgis.org/plugins/plotbridge_mangrove/)
-- [LineShortener — Encurtar linhas](https://plugins.qgis.org/plugins/line_shortener/)
+- [Map Algebra Calculator](https://plugins.qgis.org/plugins/mapalgebra_calculator/)
+- [Seismic Interpreter](https://plugins.qgis.org/plugins/seismic_interpreter/)
+- [Peau du Monde | postProcessor](https://plugins.qgis.org/plugins/pdm_postprocess/)
+- [FortyGuard Heatmap](https://plugins.qgis.org/plugins/fortyguard_heatmap/)
+- [Vector Class Manager](https://plugins.qgis.org/plugins/VectorClassManager/)
+- [Ver Coordenadas](https://plugins.qgis.org/plugins/ver_coordenadas/)
+- [BSY CAR](https://plugins.qgis.org/plugins/bsy_car/)
+- [Draw Catchments](https://plugins.qgis.org/plugins/draw_catchments/)
 
 ## Library releases
 
@@ -53,15 +53,15 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Multi map views is not properly saved in QGIS](https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis) (▲ 1 · 0 answers)
+- [Need to find out if my street is public or Private](https://gis.stackexchange.com/questions/501591/need-to-find-out-if-my-street-is-public-or-private) (▲ -2 · 0 answers)
+- [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
 - [Issue with alignment of legend labels in QGIS Print layout](https://gis.stackexchange.com/questions/501570/issue-with-alignment-of-legend-labels-in-qgis-print-layout) (▲ 1 · 1 answers)
+- [Multi map views is not properly saved in QGIS](https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis) (▲ 1 · 0 answers)
 - [Filtering GetCapabilities request using keyword](https://gis.stackexchange.com/questions/501574/filtering-getcapabilities-request-using-keyword) (▲ 1 · 1 answers)
 - [Orfeo fails to map paths in QGIS 3.44.2](https://gis.stackexchange.com/questions/501583/orfeo-fails-to-map-paths-in-qgis-3-44-2) (▲ 1 · 0 answers)
-- [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
 - [Extracting data (or even converting) from WMS to shapefile in QGIS](https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis) (▲ 3 · 0 answers)
 - [Converting multiple GeoTIFF to MBTiles or PMTiles](https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles) (▲ 2 · 0 answers)
 - [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 3 · 1 answers)
-- [Creating four types legends in QGIS](https://gis.stackexchange.com/questions/501561/creating-four-types-legends-in-qgis) (▲ 0 · 0 answers)
 - [Joining point attributes to line in QGIS](https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis) (▲ 2 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
@@ -69,13 +69,13 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [SWOT Level 2 Nadir Altimeter Operational Geophysical Data Record with Waveforms, GPS, NRT, Version D](https://search.earthdata.nasa.gov/search?q=SWOT_L2_NALT_OGDR_NRTGPS_D) — The value-added SWOT Level 2 Near Real Time GPS Nadir Altimeter Operational Geophysical Data Record (NRT GPS OGDR) Version D dataset produced by the Surface…
-- [Ground-Based Global Navigation Satellite System (GNSS) Galileo Broadcast Ephemeris Data (sub-hourly files) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_hghrt_Galileo_bdcst_ephem) — This dataset consists of ground-based Global Navigation Satellite System (GNSS) Galileo Broadcast Ephemeris Data (sub-hourly files) from the NASA Crustal Dyn…
-- [Ground-Based Global Navigation Satellite System (GNSS) Observation Data (1-second sampling, sub-hourly files) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_hghrt_data_obs) — This dataset consists of ground-based Global Navigation Satellite System (GNSS) Observation Data (1-second sampling, sub-hourly files) from the NASA Crustal…
-- [SMAPVEX16 Manitoba PALS Brightness Temperature and Soil Moisture Data V001](https://search.earthdata.nasa.gov/search?q=SV16M_PLTBSM) — This product contains data derived from permanent in situ soil stations and observations by the Passive Active L-band System (PALS) microwave aircraft instru…
-- [SMAPVEX16 Iowa PALS Brightness Temperature and Soil Moisture Data V001](https://search.earthdata.nasa.gov/search?q=SV16I_PLTBSM) — This product contains data derived from permanent in situ soil stations and observations by the Passive Active L-band System (PALS) microwave aircraft instru…
-- [SMAPVEX15 PALS Brightness Temperature Data V001](https://search.earthdata.nasa.gov/search?q=SV15PLTB) — This data set contains brightness temperatures obtained by the Passive Active L-band System (PALS) aircraft instrument.
-- [SMAPVEX12 PALS Brightness Temperature Data V001](https://search.earthdata.nasa.gov/search?q=SV12PLTB) — This data set contains brightness temperatures obtained by the Passive Active L-band System (PALS) aircraft instrument.
+- [Global Navigation Satellite System (GNSS) IGS Final Combined Satellite and Receiver Clock Solution (5 minute resolution, daily files, gen…](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_sat_rcvr_clk_soln_5min) — This derived product set consists of Global Navigation Satellite System Final Satellite and Receiver Clock Product (5-minute granularity, daily files, genera…
+- [Global Navigation Satellite System (GNSS) IGS Final Combined Orbit Solution Summary Product from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_orbit_soln_sum) — This derived product set consists of Global Navigation Satellite System Final Orbit/Reference Frame Product Summary from the NASA Crustal Dynamics Data Infor…
+- [Global Navigation Satellite System (GNSS) IGS Final Analysis Center (AC) Clock Solution Product (daily files, generated weekly) from NASA…](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_AC_clk_soln_prod) — This derived product set consists of Global Navigation Satellite System Final Satellite and Receiver Clock Product (30-second granularity, daily files, gener…
+- [Global Navigation Satellite System (GNSS) IGS Daily Ionosphere Vertical Total Electron Content (VTEC) Comparison Product from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_dly_ion_vert_TEC_comp) — This derived product set consists of Global Navigation Satellite System Ionosphere Vertical Total Electron Content (VTEC) comparison product (daily files) fr…
+- [Global Navigation Satellite System (GNSS) IGS Combined Rapid Clock Solution Comparison Summary Product from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_comb_rpd_clk_sol_comp_sum) — This derived product set consists of Global Navigation Satellite System Rapid Clock Product Summary from the NASA Crustal Dynamics Data Information System (C…
+- [OMI/Aura NO2 Total and Tropospheric Column Daily L2 Global Gridded 0.25 degree x 0.25 degree V004 (OMNO2G)](https://search.earthdata.nasa.gov/search?q=OMNO2G) — This Level-2G daily global gridded product OMNO2G is based on the pixel level OMI Level-2 NO2 product OMNO2.
+- [Global Navigation Satellite System (GNSS) International Terrestrial Reference Frame (ITRF) 2020 products (IGS20) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_2020_prod) — These data-derived products are the International GNSS Service (IGS) Analysis Centers' (AC) contribution to the International Terrestrial Reference Frame (IT…
 
 ## Data.gov — new geodata
 
