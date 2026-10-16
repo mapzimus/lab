@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-15",
+  "generatedAt": "2026-10-16",
   "news": {
     "mapsmania": [
+      {
+        "title": "What America Looks Like After 700 Meters of Sea Level Rise",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/what-america-looks-like-after-700.html",
+        "desc": ""
+      },
       {
         "title": "Travel Blogging & Mapping",
         "url": "http://googlemapsmania.blogspot.com/2026/10/travel-blogging-mapping.html",
@@ -35,11 +40,6 @@
       {
         "title": "Find Movies - by Location & Period!",
         "url": "http://googlemapsmania.blogspot.com/2026/10/find-movies-by-location-period.html",
-        "desc": ""
-      },
-      {
-        "title": "Alternative History Maps",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/alternative-history-maps.html",
         "desc": ""
       }
     ],
@@ -210,6 +210,12 @@
   ],
   "gisse": [
     {
+      "title": "Finding the land area east and west of meridian",
+      "url": "https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Need to find out if my street is public or Private",
       "url": "https://gis.stackexchange.com/questions/501591/need-to-find-out-if-my-street-is-public-or-private",
       "score": -2,
@@ -228,16 +234,16 @@
       "answers": 1
     },
     {
-      "title": "Multi map views is not properly saved in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis",
-      "score": 1,
-      "answers": 0
-    },
-    {
       "title": "Filtering GetCapabilities request using keyword",
       "url": "https://gis.stackexchange.com/questions/501574/filtering-getcapabilities-request-using-keyword",
       "score": 1,
       "answers": 1
+    },
+    {
+      "title": "Multi map views is not properly saved in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis",
+      "score": 1,
+      "answers": 0
     },
     {
       "title": "Orfeo fails to map paths in QGIS 3.44.2",
@@ -262,15 +268,45 @@
       "url": "https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis",
       "score": 3,
       "answers": 1
-    },
-    {
-      "title": "Joining point attributes to line in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis",
-      "score": 2,
-      "answers": 1
     }
   ],
   "nasa": [
+    {
+      "title": "VIIRS/JPSS2 Day/Night Band Resolution Terrain Corrected Geolocation 6-Min L1 Swath 750 m NRT",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ203DNB_NRT",
+      "desc": "The Near Real Time (NRT) VIIRS/JPSS2 Day/Night Band Resolution Terrain Corrected Geolocation 6-Min L1 Swath 750m, short-name VJ203DNB_NRT is the Joint Polar-…",
+      "org": "LANCEMODIS"
+    },
+    {
+      "title": "VIIRS/JPSS2 Moderate Resolution 6-Min L1B Swath 750 m NRT",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ202MOD_NRT",
+      "desc": "The Near Real Time (NRT) VIIRS/JPSS2 Moderate Resolution 6-Min L1B Swath 750m, short-name VJ202MOD_NRT is the Joint Polar-orbiting Satellite System-2 (JPSS-2…",
+      "org": "LANCEMODIS"
+    },
+    {
+      "title": "VIIRS/JPSS2 Imagery Resolution 6-Min L1B Swath 375m NRT",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ202IMG_NRT",
+      "desc": "The VIIRS/JPSS2 Imagery Resolution 6-Min L1B Swath 375m Near Real Time (NRT), short-name VJ202IMG_NRT is platform-derived NASA VIIRS L1B calibrated radiances…",
+      "org": "LANCEMODIS"
+    },
+    {
+      "title": "VIIRS/JPSS2 Day/Night Band 6-Min L1B Swath 750m NRT",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ202DNB_NRT",
+      "desc": "The Near Real Time (NRT) VIIRS Level 1 and Level 2 swath (VJ202DNB_NRT) product is single NASA VIIRS panchromatic Day-Night band (DNB) calibrated radiance pr…",
+      "org": "LANCEMODIS"
+    },
+    {
+      "title": "Global Biomass Projections and Forest Carbon Sequestration Potential, 2020-2100",
+      "url": "https://search.earthdata.nasa.gov/search?q=Global_Forests_Future_Carbon_2522",
+      "desc": "This dataset provides annual global projections of live vegetation biomass and forest carbon sequestration potential through 2100 at 1-km resolution under re…",
+      "org": "ORNL_CLOUD"
+    },
+    {
+      "title": "VIIRS/JPSS2 Moderate-Resolution Dual Gain Bands Calibrated Radiance 6-Min L1B Swath 750 m NRT",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ202GDC_NRT",
+      "desc": "The Near Real Time (NRT) VIIRS/JPSS2 Moderate-Resolution Dual Gain Bands Calibrated Radiance 6-Min L1B Swath 750m product (VJ202GDC_NRT) contains unaggregate…",
+      "org": "LANCEMODIS"
+    },
     {
       "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
       "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
@@ -290,45 +326,9 @@
       "org": "ASF"
     },
     {
-      "title": "Global Navigation Satellite System (GNSS) IGS Final Combined Satellite and Receiver Clock Solution (5 minute resolution, daily files, gen…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_sat_rcvr_clk_soln_5min",
-      "desc": "This derived product set consists of Global Navigation Satellite System Final Satellite and Receiver Clock Product (5-minute granularity, daily files, genera…",
-      "org": "CDDIS"
-    },
-    {
-      "title": "Global Navigation Satellite System (GNSS) IGS Final Combined Orbit Solution Summary Product from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_orbit_soln_sum",
-      "desc": "This derived product set consists of Global Navigation Satellite System Final Orbit/Reference Frame Product Summary from the NASA Crustal Dynamics Data Infor…",
-      "org": "CDDIS"
-    },
-    {
-      "title": "Global Navigation Satellite System (GNSS) IGS Final Analysis Center (AC) Clock Solution Product (daily files, generated weekly) from NASA…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_AC_clk_soln_prod",
-      "desc": "This derived product set consists of Global Navigation Satellite System Final Satellite and Receiver Clock Product (30-second granularity, daily files, gener…",
-      "org": "CDDIS"
-    },
-    {
-      "title": "Global Navigation Satellite System (GNSS) IGS Daily Ionosphere Vertical Total Electron Content (VTEC) Comparison Product from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_dly_ion_vert_TEC_comp",
-      "desc": "This derived product set consists of Global Navigation Satellite System Ionosphere Vertical Total Electron Content (VTEC) comparison product (daily files) fr…",
-      "org": "CDDIS"
-    },
-    {
-      "title": "Global Navigation Satellite System (GNSS) IGS Combined Rapid Clock Solution Comparison Summary Product from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_comb_rpd_clk_sol_comp_sum",
-      "desc": "This derived product set consists of Global Navigation Satellite System Rapid Clock Product Summary from the NASA Crustal Dynamics Data Information System (C…",
-      "org": "CDDIS"
-    },
-    {
-      "title": "OMI/Aura NO2 Total and Tropospheric Column Daily L2 Global Gridded 0.25 degree x 0.25 degree V004 (OMNO2G)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMNO2G",
-      "desc": "This Level-2G daily global gridded product OMNO2G is based on the pixel level OMI Level-2 NO2 product OMNO2.",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "Global Navigation Satellite System (GNSS) International Terrestrial Reference Frame (ITRF) 2020 products (IGS20) from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_2020_prod",
-      "desc": "These data-derived products are the International GNSS Service (IGS) Analysis Centers' (AC) contribution to the International Terrestrial Reference Frame (IT…",
+      "title": "Global Navigation Satellite System (GNSS) IGS Final Combined Station Positions/Velocities Product from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_sta_pos_veloc",
+      "desc": "This derived product set consists of Global Navigation Satellite System Final Combined Station Positions/Velocities Product available from the Crustal Dynami…",
       "org": "CDDIS"
     }
   ],
@@ -341,24 +341,17 @@
       "rank": 13
     },
     {
-      "title": "IPCC AR4, AR5, and AR6 20-, 100-, and 500-year GWPs",
-      "url": "https://catalog.data.gov/dataset/ipcc-ar4-ar5-and-ar6-20-100-and-500-year-gwps",
-      "desc": "The International Panel for Climate Change (IPCC) produces regular Assessment Reports that provide global warming potentials (GWPs) for greenhouse gases (GHG) i",
-      "org": "U.S. Environmental Protection Agency",
-      "rank": 3
+      "title": "2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection",
+      "url": "https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-by-basis-category-civil-rights-data-collection",
+      "desc": "The 2015-16 tables are based on data collected from all of the nation’s school districts and schools—approximately 17,300 school districts and 96,300 schools.",
+      "org": "Department of Education",
+      "rank": 2
     },
     {
       "title": "Baby Names from Social Security Card Applications - National Data",
       "url": "https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-data",
       "desc": "The data (name, year of birth, sex, and number) are from a 100 percent sample of Social Security card applications for 1880 on.",
       "org": "Social Security Administration",
-      "rank": 2
-    },
-    {
-      "title": "2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection",
-      "url": "https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-by-basis-category-civil-rights-data-collection",
-      "desc": "The 2015-16 tables are based on data collected from all of the nation’s school districts and schools—approximately 17,300 school districts and 96,300 schools.",
-      "org": "Department of Education",
       "rank": 2
     },
     {
@@ -369,6 +362,13 @@
       "rank": 2
     },
     {
+      "title": "Harmonized Tariff Schedule of the United States (2026)",
+      "url": "https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2025",
+      "desc": "This dataset is the current 2026 Harmonized Tariff Schedule plus all revisions for the current year.",
+      "org": "US International Trade Commission",
+      "rank": 2
+    },
+    {
       "title": "2017-18 Arrests Civil Rights Data Collection",
       "url": "https://catalog.data.gov/dataset/2017-18-arrests-civil-rights-data-collection",
       "desc": "This set of Excel file contains data on student referrals to law enforcement by disability and student-related arrests by disability for all states.",
@@ -376,10 +376,10 @@
       "rank": 2
     },
     {
-      "title": "Harmonized Tariff Schedule of the United States (2026)",
-      "url": "https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2025",
-      "desc": "This dataset is the current 2026 Harmonized Tariff Schedule plus all revisions for the current year.",
-      "org": "US International Trade Commission",
+      "title": "College Scorecard",
+      "url": "https://catalog.data.gov/dataset/college-scorecard",
+      "desc": "Download the data that appears on the College Scorecard, as well as supporting data on student completion, debt and repayment, earnings, and more.",
+      "org": "Department of Education",
       "rank": 2
     }
   ],

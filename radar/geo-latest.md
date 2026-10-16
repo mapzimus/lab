@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-15
+# Mapzimus Geospatial Radar — 2026-10-16
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [What America Looks Like After 700 Meters of Sea Level Rise](http://googlemapsmania.blogspot.com/2026/10/what-america-looks-like-after-700.html)
 - [Travel Blogging & Mapping](http://googlemapsmania.blogspot.com/2026/10/travel-blogging-mapping.html)
 - [The New Age of Building Age Maps Has Begun](http://googlemapsmania.blogspot.com/2026/10/the-new-age-of-building-age-maps-has.html)
 - [The World is Your War Zone](http://googlemapsmania.blogspot.com/2026/10/the-world-is-your-war-zone.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Animated Map Videos](http://googlemapsmania.blogspot.com/2026/10/animated-map-videos.html)
 - [GeoFactGuessr](http://googlemapsmania.blogspot.com/2026/10/geofactguessr.html)
 - [Find Movies - by Location & Period!](http://googlemapsmania.blogspot.com/2026/10/find-movies-by-location-period.html)
-- [Alternative History Maps](http://googlemapsmania.blogspot.com/2026/10/alternative-history-maps.html)
 
 ## Geography Realm
 
@@ -53,39 +53,39 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
+- [Finding the land area east and west of meridian](https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian) (▲ 0 · 0 answers)
 - [Need to find out if my street is public or Private](https://gis.stackexchange.com/questions/501591/need-to-find-out-if-my-street-is-public-or-private) (▲ -2 · 0 answers)
 - [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
 - [Issue with alignment of legend labels in QGIS Print layout](https://gis.stackexchange.com/questions/501570/issue-with-alignment-of-legend-labels-in-qgis-print-layout) (▲ 1 · 1 answers)
-- [Multi map views is not properly saved in QGIS](https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis) (▲ 1 · 0 answers)
 - [Filtering GetCapabilities request using keyword](https://gis.stackexchange.com/questions/501574/filtering-getcapabilities-request-using-keyword) (▲ 1 · 1 answers)
+- [Multi map views is not properly saved in QGIS](https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis) (▲ 1 · 0 answers)
 - [Orfeo fails to map paths in QGIS 3.44.2](https://gis.stackexchange.com/questions/501583/orfeo-fails-to-map-paths-in-qgis-3-44-2) (▲ 1 · 0 answers)
 - [Extracting data (or even converting) from WMS to shapefile in QGIS](https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis) (▲ 3 · 0 answers)
 - [Converting multiple GeoTIFF to MBTiles or PMTiles](https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles) (▲ 2 · 0 answers)
 - [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 3 · 1 answers)
-- [Joining point attributes to line in QGIS](https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis) (▲ 2 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
 
+- [VIIRS/JPSS2 Day/Night Band Resolution Terrain Corrected Geolocation 6-Min L1 Swath 750 m NRT](https://search.earthdata.nasa.gov/search?q=VJ203DNB_NRT) — The Near Real Time (NRT) VIIRS/JPSS2 Day/Night Band Resolution Terrain Corrected Geolocation 6-Min L1 Swath 750m, short-name VJ203DNB_NRT is the Joint Polar-…
+- [VIIRS/JPSS2 Moderate Resolution 6-Min L1B Swath 750 m NRT](https://search.earthdata.nasa.gov/search?q=VJ202MOD_NRT) — The Near Real Time (NRT) VIIRS/JPSS2 Moderate Resolution 6-Min L1B Swath 750m, short-name VJ202MOD_NRT is the Joint Polar-orbiting Satellite System-2 (JPSS-2…
+- [VIIRS/JPSS2 Imagery Resolution 6-Min L1B Swath 375m NRT](https://search.earthdata.nasa.gov/search?q=VJ202IMG_NRT) — The VIIRS/JPSS2 Imagery Resolution 6-Min L1B Swath 375m Near Real Time (NRT), short-name VJ202IMG_NRT is platform-derived NASA VIIRS L1B calibrated radiances…
+- [VIIRS/JPSS2 Day/Night Band 6-Min L1B Swath 750m NRT](https://search.earthdata.nasa.gov/search?q=VJ202DNB_NRT) — The Near Real Time (NRT) VIIRS Level 1 and Level 2 swath (VJ202DNB_NRT) product is single NASA VIIRS panchromatic Day-Night band (DNB) calibrated radiance pr…
+- [Global Biomass Projections and Forest Carbon Sequestration Potential, 2020-2100](https://search.earthdata.nasa.gov/search?q=Global_Forests_Future_Carbon_2522) — This dataset provides annual global projections of live vegetation biomass and forest carbon sequestration potential through 2100 at 1-km resolution under re…
+- [VIIRS/JPSS2 Moderate-Resolution Dual Gain Bands Calibrated Radiance 6-Min L1B Swath 750 m NRT](https://search.earthdata.nasa.gov/search?q=VJ202GDC_NRT) — The Near Real Time (NRT) VIIRS/JPSS2 Moderate-Resolution Dual Gain Bands Calibrated Radiance 6-Min L1B Swath 750m product (VJ202GDC_NRT) contains unaggregate…
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [Global Navigation Satellite System (GNSS) IGS Final Combined Satellite and Receiver Clock Solution (5 minute resolution, daily files, gen…](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_sat_rcvr_clk_soln_5min) — This derived product set consists of Global Navigation Satellite System Final Satellite and Receiver Clock Product (5-minute granularity, daily files, genera…
-- [Global Navigation Satellite System (GNSS) IGS Final Combined Orbit Solution Summary Product from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_orbit_soln_sum) — This derived product set consists of Global Navigation Satellite System Final Orbit/Reference Frame Product Summary from the NASA Crustal Dynamics Data Infor…
-- [Global Navigation Satellite System (GNSS) IGS Final Analysis Center (AC) Clock Solution Product (daily files, generated weekly) from NASA…](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_AC_clk_soln_prod) — This derived product set consists of Global Navigation Satellite System Final Satellite and Receiver Clock Product (30-second granularity, daily files, gener…
-- [Global Navigation Satellite System (GNSS) IGS Daily Ionosphere Vertical Total Electron Content (VTEC) Comparison Product from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_dly_ion_vert_TEC_comp) — This derived product set consists of Global Navigation Satellite System Ionosphere Vertical Total Electron Content (VTEC) comparison product (daily files) fr…
-- [Global Navigation Satellite System (GNSS) IGS Combined Rapid Clock Solution Comparison Summary Product from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_comb_rpd_clk_sol_comp_sum) — This derived product set consists of Global Navigation Satellite System Rapid Clock Product Summary from the NASA Crustal Dynamics Data Information System (C…
-- [OMI/Aura NO2 Total and Tropospheric Column Daily L2 Global Gridded 0.25 degree x 0.25 degree V004 (OMNO2G)](https://search.earthdata.nasa.gov/search?q=OMNO2G) — This Level-2G daily global gridded product OMNO2G is based on the pixel level OMI Level-2 NO2 product OMNO2.
-- [Global Navigation Satellite System (GNSS) International Terrestrial Reference Frame (ITRF) 2020 products (IGS20) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_2020_prod) — These data-derived products are the International GNSS Service (IGS) Analysis Centers' (AC) contribution to the International Terrestrial Reference Frame (IT…
+- [Global Navigation Satellite System (GNSS) IGS Final Combined Station Positions/Velocities Product from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_sta_pos_veloc) — This derived product set consists of Global Navigation Satellite System Final Combined Station Positions/Velocities Product available from the Crustal Dynami…
 
 ## Data.gov — new geodata
 
 - [Inventory of Owned and Leased Properties (IOLP)](https://catalog.data.gov/dataset/inventory-of-owned-and-leased-properties-iolp) — The Inventory of Owned and Leased Properties (IOLP) allows users to search properties owned and leased by the General Services Administration (GSA) across the U
-- [IPCC AR4, AR5, and AR6 20-, 100-, and 500-year GWPs](https://catalog.data.gov/dataset/ipcc-ar4-ar5-and-ar6-20-100-and-500-year-gwps) — The International Panel for Climate Change (IPCC) produces regular Assessment Reports that provide global warming potentials (GWPs) for greenhouse gases (GHG) i
-- [Baby Names from Social Security Card Applications - National Data](https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-data) — The data (name, year of birth, sex, and number) are from a 100 percent sample of Social Security card applications for 1880 on.
 - [2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection](https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-by-basis-category-civil-rights-data-collection) — The 2015-16 tables are based on data collected from all of the nation’s school districts and schools—approximately 17,300 school districts and 96,300 schools.
+- [Baby Names from Social Security Card Applications - National Data](https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-data) — The data (name, year of birth, sex, and number) are from a 100 percent sample of Social Security card applications for 1880 on.
 - [NPS Visitor Use Statistics Data Package, 2024](https://catalog.data.gov/dataset/nps-visitor-use-statistics-data-package-2024) — The NPS Social Science Program is responsible for coordinating visitor use statistics reporting for units administered by the NPS.
-- [2017-18 Arrests Civil Rights Data Collection](https://catalog.data.gov/dataset/2017-18-arrests-civil-rights-data-collection) — This set of Excel file contains data on student referrals to law enforcement by disability and student-related arrests by disability for all states.
 - [Harmonized Tariff Schedule of the United States (2026)](https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2025) — This dataset is the current 2026 Harmonized Tariff Schedule plus all revisions for the current year.
+- [2017-18 Arrests Civil Rights Data Collection](https://catalog.data.gov/dataset/2017-18-arrests-civil-rights-data-collection) — This set of Excel file contains data on student referrals to law enforcement by disability and student-related arrests by disability for all states.
+- [College Scorecard](https://catalog.data.gov/dataset/college-scorecard) — Download the data that appears on the College Scorecard, as well as supporting data on student completion, debt and repayment, earnings, and more.
 
 ## OSM pulse
 
