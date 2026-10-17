@@ -41,6 +41,10 @@ INK = (240, 239, 236)
 MUTED = (150, 158, 172)
 OLD_CITY = (128, 134, 146)
 PERSON_OFF = (52, 58, 70)
+# (name, lon, lat, millions today, millions 2100, when the ring starts growing)
+END_CITIES = [("Kinshasa", 15.3276, -4.3869, 10.9, 83.5, 76.0),
+              ("Lagos", 3.3074, 6.5725, 12.7, 88.3, 78.8),
+              ("Dar es Salaam", 39.2094, -6.8339, 7.7, 73.7, 79.4)]
 ROW_Y = 470                                # top of the row of ten, map-box pixels
 ROAD_DIM = (96, 104, 118)
 
@@ -72,17 +76,18 @@ BEATS = [
     (62.6, 66.4, "Blue is everything built since. By 2000: 5 million."),
     (66.4, 70.2, "By 2020: 10 million people."),
     (70.2, 74.0, "The main roads are still mostly the ones built for 1 million."),
-    (74.0, 77.8, "By 2100, Kinshasa could have 84 million people."),
-    (77.8, 82.0, "The people are coming either way. Power, water and roads are a choice."),
-    (82.0, 86.0, None),
+    (74.0, 78.4, "By 2100, Kinshasa could have 84 million people. As many as all of Germany."),
+    (78.4, 82.6, "Lagos and Dar es Salaam could get just as big. No city that size has ever existed."),
+    (82.6, 86.8, "The people are coming either way. Power, water and roads are a choice."),
+    (86.8, 89.8, None),
 ]
 DURATION = BEATS[-1][1]
 
 # The under-a-minute cut (--short): stretches of the full timeline played back
 # to back, cut where a sentence changes. Drops Nigeria, the median-age pair,
-# the orange map and the share-rising line, the roads line, and part of the
-# end card. 59.4 s.
-SHORT = [(0.0, 9.4), (22.4, 38.2), (46.6, 70.2), (74.0, 84.6)]
+# the orange map and the share-rising line, "let's zoom in", the roads line,
+# and part of the end card. 59.8 s.
+SHORT = [(0.0, 9.4), (22.4, 38.2), (46.6, 55.4), (59.0, 70.2), (74.0, 88.6)]
 SHORT_TEXT = {21.8: "Where will everyone live?",   # their setup lines are cut
               46.6: "Power is spreading, but people arrive faster. 600 million Africans still have none."}
 
@@ -414,12 +419,19 @@ def draw_map(D, s, cam):
             circle(x, y, r, a)
             if c["name"] and p >= 8:
                 labels.append((x / SS + r / SS + 6, y / SS, f"{c['name']} {p:.0f} M", 22, a))
-    a = window(s, 76.2, DURATION + 1, 0.8)           # Kinshasa's 2100 size, on the city scale
-    if a > 0:
-        (x, y), = px([laea(15.3276, -4.3869)])
-        r = math.sqrt(83.5) * 8.5 * SS * ease((s - 76.2) / 1.2)
-        circle(x, y, r, a)
-        labels.append((x / SS + r / SS + 8, y / SS, "Kinshasa 84 M", 22, a))
+    # 2100: solid circle = people today, outline = the projection it grows to.
+    for name, lon, lat, now, later, t0 in END_CITIES:
+        a = window(s, t0 - 0.6, DURATION + 1, 0.6)
+        if a <= 0 or close:
+            continue
+        (x, y), = px([laea(lon, lat)])
+        g = ease((s - t0) / 1.8)
+        p = now + (later - now) * g
+        r0, r = math.sqrt(now) * 8.5 * SS, math.sqrt(p) * 8.5 * SS
+        circle(x, y, r0, a)
+        if g > 0:
+            d.ellipse((x - r, y - r, x + r, y + r), outline=mix(AFRICA, BLUE, a), width=3 * SS)
+        labels.append((x / SS, y / SS + r / SS + 8, f"{name}\n{now:.0f} M today → {p:.0f} M", 24, a, "ma"))
 
     a = show_people(s)                              # ten people, bright = has it
     if a > 0:
@@ -441,12 +453,13 @@ def render(D, s, cam, F, overrides=None):
     canvas.paste(m, BOX[:2])
     d = ImageDraw.Draw(canvas)
 
-    for x, y, text, size, a in labels:              # numbers sit on the places they describe
+    for x, y, text, size, a, *anchor in labels:     # numbers sit on the places they describe
         if a <= 0:
             continue
         fnt = F["label22"] if size == 22 else F["label24"]
         x, y = x + BOX[0], y + BOX[1]
-        anchor = "lm" if "\n" not in text and text not in ("Kinshasa", "Brazzaville") else "mm"
+        anchor = anchor[0] if anchor else (
+            "lm" if "\n" not in text and text not in ("Kinshasa", "Brazzaville") else "mm")
         d.multiline_text((x, y), text, font=fnt, fill=mix(WATER, INK, a), anchor=anchor, align="center",
                          stroke_width=4, stroke_fill=WATER, spacing=2)
 
@@ -513,7 +526,9 @@ def main():
             max(ax.max() - ax.min(), (ay.max() - ay.min()) * bw / bh) * 1.04)
     kx, ky = laea(15.36, -4.36)
     kin = (float(kx), float(ky), 90.0)
-    cam = Camera([(0, full), (55.6, full), (58.8, kin), (74.2, kin), (77.0, full), (DURATION, full)])
+    ex, ey = laea(21.5, 0.5)                      # the ending: Lagos to Dar es Salaam, spread out
+    end = (float(ex), float(ey), 6400.0)
+    cam = Camera([(0, full), (55.6, full), (58.8, kin), (74.2, kin), (77.0, end), (DURATION, end)])
 
     if args.stills:
         for t in (float(v) for v in args.stills.split(",")):
