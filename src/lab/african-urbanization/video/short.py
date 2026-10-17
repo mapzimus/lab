@@ -8,6 +8,7 @@ validator (all pairs, dark mode, against WATER): CVD and contrast pass.
 Everything is drawn from the GeoJSON in ../data.
 
     python video/short.py                  # -> video/out/century_of_africa.mp4
+    python video/short.py --short          # -> video/out/century_of_africa_short.mp4 (58.8 s)
     python video/short.py --stills 1,6,19,31,44,58,70
 """
 
@@ -39,6 +40,8 @@ AFRICA = (54, 61, 74)
 INK = (240, 239, 236)
 MUTED = (150, 158, 172)
 OLD_CITY = (128, 134, 146)
+PERSON_OFF = (52, 58, 70)
+ROW_Y = 470                                # top of the row of ten, map-box pixels
 ROAD_DIM = (96, 104, 118)
 
 BLUE = (0x39, 0x87, 0xE5)                  # people (dark-mode slot 1)
@@ -60,19 +63,37 @@ BEATS = [
     (25.2, 29.8, "In 1975, just 6 African cities had over a million people."),
     (29.8, 33.6, "Today, 88 do."),
     (33.6, 38.2, "By 2050, 129 cities."),
-    (38.2, 42.2, "Every one of them needs power."),
-    (42.2, 46.2, "In the orange countries, most people have no electricity at home."),
-    (46.2, 50.0, "600 million Africans live without power. That number is still going up."),
-    (50.0, 53.6, "Let's zoom in on one city: Kinshasa."),
-    (53.6, 57.2, "Gray is what was built by 1975. Kinshasa had about 1 million people."),
-    (57.2, 61.0, "Blue is everything built since. By 2000: 5 million."),
-    (61.0, 64.8, "By 2020: 10 million people."),
-    (64.8, 68.6, "The main roads are still mostly the ones built for 1 million."),
-    (68.6, 72.4, "By 2100, Kinshasa could have 84 million people."),
-    (72.4, 76.6, "The people are coming either way. Power, water and roads are a choice."),
-    (76.6, 80.6, None),
+    (38.2, 42.2, "Cities need power. In the orange countries, most people have none at home."),
+    (42.2, 46.6, "Good news: since 2000, Africans with power went from 4 in 10 to 6 in 10."),
+    (46.6, 51.0, "Bad news: there are so many more people that 600 million still have none. More than in 2000."),
+    (51.0, 55.4, "Clean water, same story: 7 in 10 have it now, but 429 million still don't."),
+    (55.4, 59.0, "Let's zoom in on one city: Kinshasa."),
+    (59.0, 62.6, "Gray is what was built by 1975. Kinshasa had about 1 million people."),
+    (62.6, 66.4, "Blue is everything built since. By 2000: 5 million."),
+    (66.4, 70.2, "By 2020: 10 million people."),
+    (70.2, 74.0, "The main roads are still mostly the ones built for 1 million."),
+    (74.0, 77.8, "By 2100, Kinshasa could have 84 million people."),
+    (77.8, 82.0, "The people are coming either way. Power, water and roads are a choice."),
+    (82.0, 86.0, None),
 ]
 DURATION = BEATS[-1][1]
+
+# The under-a-minute cut (--short): stretches of the full timeline played back
+# to back, cut where a sentence changes. Drops Nigeria, the median-age pair,
+# the orange map and the share-rising line, the roads line, and part of the
+# end card. 59.4 s.
+SHORT = [(0.0, 9.4), (22.4, 38.2), (46.6, 70.2), (74.0, 84.6)]
+SHORT_TEXT = {21.8: "Where will everyone live?",   # their setup lines are cut
+              46.6: "Power is spreading, but people arrive faster. 600 million Africans still have none."}
+
+
+def source_time(t, segments):
+    """Output seconds -> seconds on the full timeline."""
+    for a, b in segments:
+        if t < b - a:
+            return a + t
+        t -= b - a
+    return segments[-1][1]
 
 FONT_DIRS = [Path("C:/Windows/Fonts"), Path("/usr/share/fonts/opentype/inter"),
              Path("/usr/share/fonts/truetype/dejavu")]
@@ -179,7 +200,9 @@ def interp(series: dict[int, float], year: float) -> float | None:
 
 POP_YEAR = [(3.8, 2025), (8.6, 2100)]
 CITY_YEAR = [(25.2, 1975), (28.4, 1975), (30.0, 2025), (33.4, 2025), (35.2, 2050)]
-KIN_YEAR = [(57.2, 1975), (58.6, 2000), (61.0, 2000), (62.4, 2020)]
+KIN_YEAR = [(62.6, 1975), (64.0, 2000), (66.4, 2000), (67.8, 2020)]
+SHARE_YEAR = [(42.8, 2000), (45.6, 2022)]          # "4 in 10 to 6 in 10"
+COUNT_YEAR = [(47.0, 2000), (49.6, 2022)]                   # re-run per beat, from 2000
 
 
 def show_pop(s):
@@ -195,17 +218,38 @@ def show_cities(s):
 
 
 def show_power(s):
-    return window(s, 38.6, 50.6, 0.8)
+    return window(s, 38.6, 42.8, 0.8)
+
+
+def show_people(s):
+    """The row of ten people (power, then water)."""
+    return window(s, 42.2, 55.6, 0.5)
+
+
+def services(D, s):
+    """(kind, people with it out of 10, millions without, year) for the row of ten."""
+    if s < 46.6:
+        y = keyed(SHARE_YEAR, s)
+        return "power", interp(D["svc"]["elec"]["pct"], y) / 10, None, y
+    kind = "power" if s < 51.0 else "water"
+    y = keyed(COUNT_YEAR, s if kind == "power" else s - 4.0)
+    ser = D["svc"][{"power": "elec", "water": "water"}[kind]]
+    return kind, interp(ser["pct"], y) / 10, interp(ser["without"], y), y
+
+
+D_GLOBAL = None                            # set in main(); year_label reads the series
 
 
 def year_label(s):
     """The year drawn on the map while something is moving through time."""
     if 3.6 <= s < 13.6:
         return int(round(keyed(POP_YEAR, s))), window(s, 3.6, 13.6, 0.3)
+    if 42.2 <= s < 55.4:
+        return int(round(services(D_GLOBAL, s)[3])), window(s, 42.2, 55.4, 0.3)
     if 25.2 <= s < 38.2:
         return int(round(keyed(CITY_YEAR, s))), window(s, 25.2, 38.2, 0.3)
-    if 53.6 <= s < 64.8:
-        return int(round(keyed(KIN_YEAR, s))), window(s, 53.6, 64.8, 0.3)
+    if 59.0 <= s < 70.2:
+        return int(round(keyed(KIN_YEAR, s))), window(s, 59.0, 70.2, 0.3)
     return None, 0.0
 
 
@@ -218,6 +262,7 @@ def load():
     built = json.loads((DATA / "kinshasa-builtup.geojson").read_text(encoding="utf-8"))["features"]
     water = json.loads((DATA / "kinshasa-water.geojson").read_text(encoding="utf-8"))["features"]
     roads = json.loads((DATA / "kinshasa-roads.geojson").read_text(encoding="utf-8"))["features"]
+    trend = json.loads((DATA / "services-trend.json").read_text(encoding="utf-8"))["series"]
 
     shapes = []
     for f in countries:
@@ -247,6 +292,8 @@ def load():
         "built": sorted(((f["properties"]["epoch"], rings(f["geometry"])) for f in built), reverse=True),
         "water": [r for f in water for r in rings(f["geometry"])],
         "roads": [ln for f in roads for ln in lines(f["geometry"])],
+        "svc": {k: {"pct": {e["year"]: e["accessPct"] for e in trend[k]},
+               "without": {e["year"]: e["withoutM"] for e in trend[k]}} for k in ("elec", "water")},
     }
 
 
@@ -325,7 +372,7 @@ def draw_map(D, s, cam):
         for r in D["water"]:
             if len(r) > 2:
                 d.polygon(px(r), fill=WATER)
-        hi = window(s, 64.8, 68.8, 0.4)
+        hi = window(s, 70.2, 74.2, 0.4)
         for ln in D["roads"]:
             d.line(px(ln), fill=mix(mix(AFRICA, ROAD_DIM, f), INK, hi), width=int((2 + 2 * hi) * SS))
         if wkm < 400:
@@ -367,16 +414,28 @@ def draw_map(D, s, cam):
             circle(x, y, r, a)
             if c["name"] and p >= 8:
                 labels.append((x / SS + r / SS + 6, y / SS, f"{c['name']} {p:.0f} M", 22, a))
-    a = window(s, 70.8, DURATION + 1, 0.8)           # Kinshasa's 2100 size, on the city scale
+    a = window(s, 76.2, DURATION + 1, 0.8)           # Kinshasa's 2100 size, on the city scale
     if a > 0:
         (x, y), = px([laea(15.3276, -4.3869)])
-        r = math.sqrt(83.5) * 8.5 * SS * ease((s - 70.8) / 1.2)
+        r = math.sqrt(83.5) * 8.5 * SS * ease((s - 76.2) / 1.2)
         circle(x, y, r, a)
         labels.append((x / SS + r / SS + 8, y / SS, "Kinshasa 84 M", 22, a))
+
+    a = show_people(s)                              # ten people, bright = has it
+    if a > 0:
+        img = Image.blend(img, Image.new("RGB", img.size, WATER), 0.78 * a)
+        d = ImageDraw.Draw(img)
+        _, have, _, _ = services(D, s)
+        for i in range(10):
+            col = mix(WATER, mix(PERSON_OFF, INK, have - i), a)
+            cx_, top = (90 + i * 100) * SS, ROW_Y * SS
+            d.ellipse((cx_ - 17 * SS, top, cx_ + 17 * SS, top + 34 * SS), fill=col)
+            d.rounded_rectangle((cx_ - 28 * SS, top + 42 * SS, cx_ + 28 * SS, top + 118 * SS),
+                                radius=22 * SS, fill=col)
     return img.resize((bw, bh), Image.LANCZOS), labels
 
 
-def render(D, s, cam, F):
+def render(D, s, cam, F, overrides=None):
     canvas = Image.new("RGB", (W, H), WATER)
     m, labels = draw_map(D, s, cam)
     canvas.paste(m, BOX[:2])
@@ -391,6 +450,19 @@ def render(D, s, cam, F):
         d.multiline_text((x, y), text, font=fnt, fill=mix(WATER, INK, a), anchor=anchor, align="center",
                          stroke_width=4, stroke_fill=WATER, spacing=2)
 
+    a = show_people(s)
+    if a > 0:                                       # captions for the row of ten
+        kind, _, without, _ = services(D, s)
+        what = "power at home" if kind == "power" else "clean water"
+        c, cm = mix(WATER, INK, a), mix(WATER, MUTED, a)
+        y0 = BOX[1] + ROW_Y + 150
+        d.text((W / 2, y0), f"Each person = 1 in 10 Africans. Bright = has {what}.",
+               font=F["label24"], fill=cm, anchor="mt")
+        if without is not None:
+            d.text((W / 2, BOX[1] + ROW_Y - 150), f"{without:.0f} M", font=F["year"], fill=c, anchor="ms")
+            d.text((W / 2, BOX[1] + ROW_Y - 120), f"Africans without {what}", font=F["label24"],
+                   fill=cm, anchor="mt")
+
     year, ya = year_label(s)
     if year:
         d.text((44, BOX[3] - 40), str(year), font=F["year"], fill=mix(WATER, INK, ya), anchor="ls",
@@ -398,6 +470,7 @@ def render(D, s, cam, F):
 
     # The one sentence, cross-fading between beats.
     for start, end, text in BEATS:
+        text = (overrides or {}).get(start, text)
         if start <= s < end or (end == DURATION and s >= end):
             a = window(s, start, end, FADE) if start > 0 else min(1.0, (end - s) / FADE)
             if end == DURATION:
@@ -421,9 +494,11 @@ def render(D, s, cam, F):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stills", help="comma-separated seconds: write PNGs only")
+    ap.add_argument("--short", action="store_true", help="the under-a-minute cut")
     args = ap.parse_args()
     OUT.mkdir(exist_ok=True)
-    D = load()
+    global D_GLOBAL
+    D = D_GLOBAL = load()
     F = {"text": font("bold", 56), "url": font("bold", 40), "small": font("body", 20),
          "label22": font("label", 24), "label24": font("label", 28), "year": font("clock", 120)}
 
@@ -438,7 +513,7 @@ def main():
             max(ax.max() - ax.min(), (ay.max() - ay.min()) * bw / bh) * 1.04)
     kx, ky = laea(15.36, -4.36)
     kin = (float(kx), float(ky), 90.0)
-    cam = Camera([(0, full), (50.2, full), (53.4, kin), (68.8, kin), (71.6, full), (DURATION, full)])
+    cam = Camera([(0, full), (55.6, full), (58.8, kin), (74.2, kin), (77.0, full), (DURATION, full)])
 
     if args.stills:
         for t in (float(v) for v in args.stills.split(",")):
@@ -446,15 +521,17 @@ def main():
             print("still", t)
         return
 
-    mp4 = OUT / "century_of_africa.mp4"
+    segments = SHORT if args.short else [(0.0, DURATION)]
+    overrides = SHORT_TEXT if args.short else None
+    mp4 = OUT / ("century_of_africa_short.mp4" if args.short else "century_of_africa.mp4")
     ff = subprocess.Popen([
         "ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
         "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-",
         "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-preset", "slow",
         "-movflags", "+faststart", str(mp4)], stdin=subprocess.PIPE)
-    n = int(DURATION * FPS)
+    n = int(round(sum(b - a for a, b in segments) * FPS))
     for f in range(n):
-        ff.stdin.write(render(D, f / FPS, cam, F).tobytes())
+        ff.stdin.write(render(D, source_time(f / FPS, segments), cam, F, overrides).tobytes())
         if f % 300 == 0:
             print(f"  frame {f}/{n}", flush=True)
     ff.stdin.close()
