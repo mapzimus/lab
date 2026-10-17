@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-16
+# Mapzimus Geospatial Radar — 2026-10-17
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [What is Your Walk Score?](http://googlemapsmania.blogspot.com/2026/10/what-is-your-walk-score.html)
 - [What America Looks Like After 700 Meters of Sea Level Rise](http://googlemapsmania.blogspot.com/2026/10/what-america-looks-like-after-700.html)
 - [Travel Blogging & Mapping](http://googlemapsmania.blogspot.com/2026/10/travel-blogging-mapping.html)
 - [The New Age of Building Age Maps Has Begun](http://googlemapsmania.blogspot.com/2026/10/the-new-age-of-building-age-maps-has.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Mapping the Cosmos](http://googlemapsmania.blogspot.com/2026/10/mapping-cosmos.html)
 - [Animated Map Videos](http://googlemapsmania.blogspot.com/2026/10/animated-map-videos.html)
 - [GeoFactGuessr](http://googlemapsmania.blogspot.com/2026/10/geofactguessr.html)
-- [Find Movies - by Location & Period!](http://googlemapsmania.blogspot.com/2026/10/find-movies-by-location-period.html)
 
 ## Geography Realm
 
@@ -37,8 +37,8 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [FortyGuard Heatmap](https://plugins.qgis.org/plugins/fortyguard_heatmap/)
 - [Vector Class Manager](https://plugins.qgis.org/plugins/VectorClassManager/)
 - [Ver Coordenadas](https://plugins.qgis.org/plugins/ver_coordenadas/)
-- [BSY CAR](https://plugins.qgis.org/plugins/bsy_car/)
 - [Draw Catchments](https://plugins.qgis.org/plugins/draw_catchments/)
+- [CADex](https://plugins.qgis.org/plugins/cadex/)
 
 ## Library releases
 
@@ -53,7 +53,7 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Finding the land area east and west of meridian](https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian) (▲ 0 · 0 answers)
+- [Finding the land area east and west of meridian](https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian) (▲ -1 · 0 answers)
 - [Need to find out if my street is public or Private](https://gis.stackexchange.com/questions/501591/need-to-find-out-if-my-street-is-public-or-private) (▲ -2 · 0 answers)
 - [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
 - [Issue with alignment of legend labels in QGIS Print layout](https://gis.stackexchange.com/questions/501570/issue-with-alignment-of-legend-labels-in-qgis-print-layout) (▲ 1 · 1 answers)
@@ -61,21 +61,21 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Multi map views is not properly saved in QGIS](https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis) (▲ 1 · 0 answers)
 - [Orfeo fails to map paths in QGIS 3.44.2](https://gis.stackexchange.com/questions/501583/orfeo-fails-to-map-paths-in-qgis-3-44-2) (▲ 1 · 0 answers)
 - [Extracting data (or even converting) from WMS to shapefile in QGIS](https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis) (▲ 3 · 0 answers)
-- [Converting multiple GeoTIFF to MBTiles or PMTiles](https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles) (▲ 2 · 0 answers)
 - [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 3 · 1 answers)
+- [Converting multiple GeoTIFF to MBTiles or PMTiles](https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles) (▲ 2 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [VIIRS/JPSS2 Day/Night Band Resolution Terrain Corrected Geolocation 6-Min L1 Swath 750 m NRT](https://search.earthdata.nasa.gov/search?q=VJ203DNB_NRT) — The Near Real Time (NRT) VIIRS/JPSS2 Day/Night Band Resolution Terrain Corrected Geolocation 6-Min L1 Swath 750m, short-name VJ203DNB_NRT is the Joint Polar-…
-- [VIIRS/JPSS2 Moderate Resolution 6-Min L1B Swath 750 m NRT](https://search.earthdata.nasa.gov/search?q=VJ202MOD_NRT) — The Near Real Time (NRT) VIIRS/JPSS2 Moderate Resolution 6-Min L1B Swath 750m, short-name VJ202MOD_NRT is the Joint Polar-orbiting Satellite System-2 (JPSS-2…
-- [VIIRS/JPSS2 Imagery Resolution 6-Min L1B Swath 375m NRT](https://search.earthdata.nasa.gov/search?q=VJ202IMG_NRT) — The VIIRS/JPSS2 Imagery Resolution 6-Min L1B Swath 375m Near Real Time (NRT), short-name VJ202IMG_NRT is platform-derived NASA VIIRS L1B calibrated radiances…
-- [VIIRS/JPSS2 Day/Night Band 6-Min L1B Swath 750m NRT](https://search.earthdata.nasa.gov/search?q=VJ202DNB_NRT) — The Near Real Time (NRT) VIIRS Level 1 and Level 2 swath (VJ202DNB_NRT) product is single NASA VIIRS panchromatic Day-Night band (DNB) calibrated radiance pr…
-- [Global Biomass Projections and Forest Carbon Sequestration Potential, 2020-2100](https://search.earthdata.nasa.gov/search?q=Global_Forests_Future_Carbon_2522) — This dataset provides annual global projections of live vegetation biomass and forest carbon sequestration potential through 2100 at 1-km resolution under re…
-- [VIIRS/JPSS2 Moderate-Resolution Dual Gain Bands Calibrated Radiance 6-Min L1B Swath 750 m NRT](https://search.earthdata.nasa.gov/search?q=VJ202GDC_NRT) — The Near Real Time (NRT) VIIRS/JPSS2 Moderate-Resolution Dual Gain Bands Calibrated Radiance 6-Min L1B Swath 750m product (VJ202GDC_NRT) contains unaggregate…
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [Global Navigation Satellite System (GNSS) IGS Final Combined Station Positions/Velocities Product from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_sta_pos_veloc) — This derived product set consists of Global Navigation Satellite System Final Combined Station Positions/Velocities Product available from the Crustal Dynami…
+- [Mid-Atlantic Lightning Mapping Array (MALMA)](https://search.earthdata.nasa.gov/search?q=malma) — The Mid-Atlantic Lightning Mapping Array (MALMA) dataset collection is used to validate the Lightning Imaging Sensor (LIS) on the International Space Station…
+- [Wallops Flight Facility Lightning Mapping Array (LMA)](https://search.earthdata.nasa.gov/search?q=wfflma) — The Wallops Island Flight Facility Lightning Mapping Array (WFFLMA) dataset collection is used to validate the Lightning Imaging Sensor (LIS) on the Internat…
+- [EMIT L2B Fractional Cover and Uncertainty 60 m V001](https://search.earthdata.nasa.gov/search?q=EMITL2BFRCOV) — The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.
+- [EMIT L2B Estimated Methane Plume Complexes 60 m V002](https://search.earthdata.nasa.gov/search?q=EMITL2BCH4PLM) — The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.
+- [EMIT L2B Estimated Carbon Dioxide Plume Complexes 60 m V002](https://search.earthdata.nasa.gov/search?q=EMITL2BCO2PLM) — The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.
+- [EMIT L2B Methane Enhancement Data 60 m V003](https://search.earthdata.nasa.gov/search?q=EMITL2BCH4ENH) — The Earth Surface Mineral Dust Source Investigation ([EMIT](https://earth.jpl.nasa.gov/emit/)) is an Earth Ventures-Instrument (EVI-4) Mission aboard the Int…
+- [EMIT L2B Carbon Dioxide Enhancement Data 60 m V002](https://search.earthdata.nasa.gov/search?q=EMITL2BCO2ENH) — The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.
 
 ## Data.gov — new geodata
 

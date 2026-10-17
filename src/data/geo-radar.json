@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-16",
+  "generatedAt": "2026-10-17",
   "news": {
     "mapsmania": [
+      {
+        "title": "What is Your Walk Score?",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/what-is-your-walk-score.html",
+        "desc": ""
+      },
       {
         "title": "What America Looks Like After 700 Meters of Sea Level Rise",
         "url": "http://googlemapsmania.blogspot.com/2026/10/what-america-looks-like-after-700.html",
@@ -35,11 +40,6 @@
       {
         "title": "GeoFactGuessr",
         "url": "http://googlemapsmania.blogspot.com/2026/10/geofactguessr.html",
-        "desc": ""
-      },
-      {
-        "title": "Find Movies - by Location & Period!",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/find-movies-by-location-period.html",
         "desc": ""
       }
     ],
@@ -134,12 +134,12 @@
       "url": "https://plugins.qgis.org/plugins/ver_coordenadas/"
     },
     {
-      "title": "BSY CAR",
-      "url": "https://plugins.qgis.org/plugins/bsy_car/"
-    },
-    {
       "title": "Draw Catchments",
       "url": "https://plugins.qgis.org/plugins/draw_catchments/"
+    },
+    {
+      "title": "CADex",
+      "url": "https://plugins.qgis.org/plugins/cadex/"
     }
   ],
   "releases": [
@@ -212,7 +212,7 @@
     {
       "title": "Finding the land area east and west of meridian",
       "url": "https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian",
-      "score": 0,
+      "score": -1,
       "answers": 0
     },
     {
@@ -258,55 +258,19 @@
       "answers": 0
     },
     {
-      "title": "Converting multiple GeoTIFF to MBTiles or PMTiles",
-      "url": "https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles",
-      "score": 2,
-      "answers": 0
-    },
-    {
       "title": "Grib flow mesh is stretched larger than the input DEM in QGIS",
       "url": "https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis",
       "score": 3,
       "answers": 1
+    },
+    {
+      "title": "Converting multiple GeoTIFF to MBTiles or PMTiles",
+      "url": "https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles",
+      "score": 2,
+      "answers": 0
     }
   ],
   "nasa": [
-    {
-      "title": "VIIRS/JPSS2 Day/Night Band Resolution Terrain Corrected Geolocation 6-Min L1 Swath 750 m NRT",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ203DNB_NRT",
-      "desc": "The Near Real Time (NRT) VIIRS/JPSS2 Day/Night Band Resolution Terrain Corrected Geolocation 6-Min L1 Swath 750m, short-name VJ203DNB_NRT is the Joint Polar-…",
-      "org": "LANCEMODIS"
-    },
-    {
-      "title": "VIIRS/JPSS2 Moderate Resolution 6-Min L1B Swath 750 m NRT",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ202MOD_NRT",
-      "desc": "The Near Real Time (NRT) VIIRS/JPSS2 Moderate Resolution 6-Min L1B Swath 750m, short-name VJ202MOD_NRT is the Joint Polar-orbiting Satellite System-2 (JPSS-2…",
-      "org": "LANCEMODIS"
-    },
-    {
-      "title": "VIIRS/JPSS2 Imagery Resolution 6-Min L1B Swath 375m NRT",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ202IMG_NRT",
-      "desc": "The VIIRS/JPSS2 Imagery Resolution 6-Min L1B Swath 375m Near Real Time (NRT), short-name VJ202IMG_NRT is platform-derived NASA VIIRS L1B calibrated radiances…",
-      "org": "LANCEMODIS"
-    },
-    {
-      "title": "VIIRS/JPSS2 Day/Night Band 6-Min L1B Swath 750m NRT",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ202DNB_NRT",
-      "desc": "The Near Real Time (NRT) VIIRS Level 1 and Level 2 swath (VJ202DNB_NRT) product is single NASA VIIRS panchromatic Day-Night band (DNB) calibrated radiance pr…",
-      "org": "LANCEMODIS"
-    },
-    {
-      "title": "Global Biomass Projections and Forest Carbon Sequestration Potential, 2020-2100",
-      "url": "https://search.earthdata.nasa.gov/search?q=Global_Forests_Future_Carbon_2522",
-      "desc": "This dataset provides annual global projections of live vegetation biomass and forest carbon sequestration potential through 2100 at 1-km resolution under re…",
-      "org": "ORNL_CLOUD"
-    },
-    {
-      "title": "VIIRS/JPSS2 Moderate-Resolution Dual Gain Bands Calibrated Radiance 6-Min L1B Swath 750 m NRT",
-      "url": "https://search.earthdata.nasa.gov/search?q=VJ202GDC_NRT",
-      "desc": "The Near Real Time (NRT) VIIRS/JPSS2 Moderate-Resolution Dual Gain Bands Calibrated Radiance 6-Min L1B Swath 750m product (VJ202GDC_NRT) contains unaggregate…",
-      "org": "LANCEMODIS"
-    },
     {
       "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
       "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
@@ -326,10 +290,46 @@
       "org": "ASF"
     },
     {
-      "title": "Global Navigation Satellite System (GNSS) IGS Final Combined Station Positions/Velocities Product from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_fnl_comb_sta_pos_veloc",
-      "desc": "This derived product set consists of Global Navigation Satellite System Final Combined Station Positions/Velocities Product available from the Crustal Dynami…",
-      "org": "CDDIS"
+      "title": "Mid-Atlantic Lightning Mapping Array (MALMA)",
+      "url": "https://search.earthdata.nasa.gov/search?q=malma",
+      "desc": "The Mid-Atlantic Lightning Mapping Array (MALMA) dataset collection is used to validate the Lightning Imaging Sensor (LIS) on the International Space Station…",
+      "org": "GHRC_DAAC"
+    },
+    {
+      "title": "Wallops Flight Facility Lightning Mapping Array (LMA)",
+      "url": "https://search.earthdata.nasa.gov/search?q=wfflma",
+      "desc": "The Wallops Island Flight Facility Lightning Mapping Array (WFFLMA) dataset collection is used to validate the Lightning Imaging Sensor (LIS) on the Internat…",
+      "org": "GHRC_DAAC"
+    },
+    {
+      "title": "EMIT L2B Fractional Cover and Uncertainty 60 m V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=EMITL2BFRCOV",
+      "desc": "The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.",
+      "org": "LPCLOUD"
+    },
+    {
+      "title": "EMIT L2B Estimated Methane Plume Complexes 60 m V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=EMITL2BCH4PLM",
+      "desc": "The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.",
+      "org": "LPCLOUD"
+    },
+    {
+      "title": "EMIT L2B Estimated Carbon Dioxide Plume Complexes 60 m V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=EMITL2BCO2PLM",
+      "desc": "The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.",
+      "org": "LPCLOUD"
+    },
+    {
+      "title": "EMIT L2B Methane Enhancement Data 60 m V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=EMITL2BCH4ENH",
+      "desc": "The Earth Surface Mineral Dust Source Investigation ([EMIT](https://earth.jpl.nasa.gov/emit/)) is an Earth Ventures-Instrument (EVI-4) Mission aboard the Int…",
+      "org": "LPCLOUD"
+    },
+    {
+      "title": "EMIT L2B Carbon Dioxide Enhancement Data 60 m V002",
+      "url": "https://search.earthdata.nasa.gov/search?q=EMITL2BCO2ENH",
+      "desc": "The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.",
+      "org": "LPCLOUD"
     }
   ],
   "datagov": [
