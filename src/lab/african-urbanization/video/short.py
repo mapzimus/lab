@@ -1,12 +1,14 @@
 """The Century of Africa as a 9:16 short (TikTok / Reels / Shorts), no audio.
 
-Same look as my-osrm's drive-time reels: dark map, title on top, a big
-counter underneath, a progress bar and the credits, all inside Instagram's
-safe zone. One file serves all three apps. Everything is drawn from the
-GeoJSON in ../data, so the video and the web story can't disagree.
+One sentence on screen at a time, right under the map, so the eye never has
+to choose between the picture and the words. Each scene uses one colour for
+one meaning (blue = people, green = half under 18, orange = no power), and
+the sentence names it. Those three were checked with the dataviz skill's
+validator (all pairs, dark mode, against WATER): CVD and contrast pass.
+Everything is drawn from the GeoJSON in ../data.
 
     python video/short.py                  # -> video/out/century_of_africa.mp4
-    python video/short.py --stills 2,15,25,35,46,56
+    python video/short.py --stills 1,6,19,31,44,58,70
 """
 
 from __future__ import annotations
@@ -25,41 +27,60 @@ DATA = HERE.parent / "data"
 OUT = HERE / "out"
 
 W, H = 1080, 1920
-BOX = (30, 400, 1050, 1300)                # map box; reels keep UI clear of it
-TITLE_Y = 236
-HUD_Y = 1325
+BOX = (0, 250, 1080, 1190)                 # full-width map; reel UI stays clear
+TEXT_Y = 1222                              # the one place to read
 FPS = 30
 SS = 2                                     # map supersampling
-DURATION = 58.0
-FADE = 0.35                                # text cross-fade, seconds
+FADE = 0.3                                 # sentence cross-fade, seconds
 
 WATER = (13, 17, 23)
-LAND = (33, 38, 48)
-AFRICA = (48, 55, 68)
-EDGE = (13, 17, 23)
-INK = (236, 239, 244)
+LAND = (30, 35, 44)
+AFRICA = (54, 61, 74)
+INK = (240, 239, 236)
 MUTED = (150, 158, 172)
-ROAD = (150, 156, 168)
+OLD_CITY = (128, 134, 146)
+ROAD_DIM = (96, 104, 118)
 
-# The reel ramp (deep violet -> teal), and an amber one for electricity.
-RAMP = [(60, 40, 130), (72, 80, 210), (60, 140, 245), (35, 185, 225), (30, 215, 185), (160, 235, 140)]
-AMBER = [(52, 40, 34), (110, 70, 30), (180, 110, 30), (235, 170, 40), (255, 225, 110)]
-EPOCH_COLORS = {1975: "#6e5f46", 1990: "#8a713f", 2000: "#a98738",
-                2010: "#c99e33", 2020: "#e8b52e", 2030: "#ffd84d"}
+BLUE = (0x39, 0x87, 0xE5)                  # people (dark-mode slot 1)
+ORANGE = (0xD9, 0x59, 0x26)                # no electricity (slot 2)
+GREEN = (0x19, 0x9E, 0x70)                 # half under 18 (slot 3)
 
+TOP_COUNTRIES = {"NGA": "Nigeria", "ETH": "Ethiopia", "EGY": "Egypt", "COD": "DR Congo", "TZA": "Tanzania"}
 LABEL_CITIES = {"Al-Qahirah (Cairo)": "Cairo", "Lagos": "Lagos", "Kinshasa": "Kinshasa",
-                "Luanda": "Luanda", "Dar es Salaam": "Dar es Salaam",
-                "Ādīs Ᾱbeba (Addis Ababa)": "Addis Ababa", "Johannesburg": "Johannesburg",
-                "Al-Kharṭūm (Khartoum)": "Khartoum", "Abidjan": "Abidjan"}
-LEFT = {"Abidjan", "Luanda", "Kinshasa"}
+                "Luanda": "Luanda", "Dar es Salaam": "Dar es Salaam"}
+
+# (start, end, sentence). The last entry is the end card.
+BEATS = [
+    (0.0, 3.6, "1 in 5 people on Earth lives in Africa."),
+    (3.6, 9.4, "By 2100, it will be more than 1 in 3."),
+    (9.4, 13.6, "Nigeria alone will pass the USA around 2057."),
+    (13.6, 17.6, "Why is everyone so sure? The parents of 2050 are already born."),
+    (17.6, 21.8, "In the green countries, half of all people are under 18."),
+    (21.8, 25.2, "So the growth is coming. Where will everyone live?"),
+    (25.2, 29.8, "In 1975, just 6 African cities had over a million people."),
+    (29.8, 33.6, "Today, 88 do."),
+    (33.6, 38.2, "By 2050, 129 cities."),
+    (38.2, 42.2, "Every one of them needs power."),
+    (42.2, 46.2, "In the orange countries, most people have no electricity at home."),
+    (46.2, 50.0, "600 million Africans live without power. That number is still going up."),
+    (50.0, 53.6, "Let's zoom in on one city: Kinshasa."),
+    (53.6, 57.2, "Gray is what was built by 1975. Kinshasa had about 1 million people."),
+    (57.2, 61.0, "Blue is everything built since. By 2000: 5 million."),
+    (61.0, 64.8, "By 2020: 10 million people."),
+    (64.8, 68.6, "The main roads are still mostly the ones built for 1 million."),
+    (68.6, 72.4, "By 2100, Kinshasa could have 84 million people."),
+    (72.4, 76.6, "The people are coming either way. Power, water and roads are a choice."),
+    (76.6, 80.6, None),
+]
+DURATION = BEATS[-1][1]
 
 FONT_DIRS = [Path("C:/Windows/Fonts"), Path("/usr/share/fonts/opentype/inter"),
              Path("/usr/share/fonts/truetype/dejavu")]
 FONTS = {  # role: candidates, Windows (as in my-osrm) first, then Inter, then DejaVu
-    "title": ["segoeuib.ttf", "Inter-Bold.otf", "DejaVuSans-Bold.ttf"],
+    "bold": ["segoeuib.ttf", "Inter-Bold.otf", "DejaVuSans-Bold.ttf"],
     "body": ["segoeui.ttf", "Inter-Regular.otf", "DejaVuSans.ttf"],
     "label": ["segoeuib.ttf", "Inter-SemiBold.otf", "DejaVuSans-Bold.ttf"],
-    "clock": ["bahnschrift.ttf", "InterDisplay-Medium.otf", "DejaVuSans.ttf"],
+    "clock": ["bahnschrift.ttf", "InterDisplay-SemiBold.otf", "DejaVuSans-Bold.ttf"],
 }
 
 
@@ -127,11 +148,19 @@ def ease(u):
     return u * u * (3 - 2 * u)
 
 
-def lerp_color(ramp, t):
-    t = min(max(t, 0.0), 1.0) * (len(ramp) - 1)
-    i = min(int(t), len(ramp) - 2)
-    f = t - i
-    return tuple(int(a + (b - a) * f) for a, b in zip(ramp[i], ramp[i + 1]))
+def keyed(keys, s):
+    """Value from (seconds, value) keyframes, eased per segment, held at the ends."""
+    if s <= keys[0][0]:
+        return keys[0][1]
+    for (s0, v0), (s1, v1) in zip(keys, keys[1:]):
+        if s <= s1:
+            return v0 + (v1 - v0) * ease((s - s0) / (s1 - s0))
+    return keys[-1][1]
+
+
+def window(s, a, b, f=0.6):
+    """0 -> 1 over f seconds after a, back to 0 over f seconds before b."""
+    return max(0.0, min(1.0, (s - a) / f, (b - s) / f))
 
 
 def mix(a, b, f):
@@ -139,15 +168,45 @@ def mix(a, b, f):
     return tuple(int(x + (y - x) * f) for x, y in zip(a, b))
 
 
-def hexrgb(h):
-    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
-
-
 def interp(series: dict[int, float], year: float) -> float | None:
     ys = sorted(y for y, v in series.items() if v is not None)
     if not ys or year < ys[0]:
         return None
     return float(np.interp(year, ys, [series[y] for y in ys]))
+
+
+# ---------------------------------------------------------------- timeline
+
+POP_YEAR = [(3.8, 2025), (8.6, 2100)]
+CITY_YEAR = [(25.2, 1975), (28.4, 1975), (30.0, 2025), (33.4, 2025), (35.2, 2050)]
+KIN_YEAR = [(57.2, 1975), (58.6, 2000), (61.0, 2000), (62.4, 2020)]
+
+
+def show_pop(s):
+    return window(s, 0.0, 14.2, 0.4)
+
+
+def show_young(s):
+    return window(s, 14.0, 22.4, 0.8)
+
+
+def show_cities(s):
+    return window(s, 25.2, 38.6)
+
+
+def show_power(s):
+    return window(s, 38.6, 50.6, 0.8)
+
+
+def year_label(s):
+    """The year drawn on the map while something is moving through time."""
+    if 3.6 <= s < 13.6:
+        return int(round(keyed(POP_YEAR, s))), window(s, 3.6, 13.6, 0.3)
+    if 25.2 <= s < 38.2:
+        return int(round(keyed(CITY_YEAR, s))), window(s, 25.2, 38.2, 0.3)
+    if 53.6 <= s < 64.8:
+        return int(round(keyed(KIN_YEAR, s))), window(s, 53.6, 64.8, 0.3)
+    return None, 0.0
 
 
 # ---------------------------------------------------------------- data
@@ -159,17 +218,19 @@ def load():
     built = json.loads((DATA / "kinshasa-builtup.geojson").read_text(encoding="utf-8"))["features"]
     water = json.loads((DATA / "kinshasa-water.geojson").read_text(encoding="utf-8"))["features"]
     roads = json.loads((DATA / "kinshasa-roads.geojson").read_text(encoding="utf-8"))["features"]
-    elec = json.loads((DATA / "services-trend.json").read_text(encoding="utf-8"))["series"]["elec"]
 
     shapes = []
     for f in countries:
-        lon_c, lat_c = _centroid(f["geometry"])
+        lon_c, lat_c = _anchor(f["geometry"])
         if not (-35 <= lon_c <= 75 and -45 <= lat_c <= 50):   # near side of the globe only
             continue
         p = f["properties"]
-        series = pop["countries"].get(p.get("iso3"), {}).get("series", [])
-        shapes.append({"rings": rings(f["geometry"]), "africa": bool(p.get("africa")),
-                       "pop": dict(series), "age": p.get("medAge25"), "elec": p.get("elec")})
+        ax, ay = laea(lon_c, lat_c)
+        shapes.append({"iso": p.get("iso3"), "rings": rings(f["geometry"]), "africa": bool(p.get("africa")),
+                       "pop": dict(pop["countries"].get(p.get("iso3"), {}).get("series", [])),
+                       "young": (p.get("medAge25") or 99) < 18,
+                       "dark": p.get("elec") is not None and p["elec"] < 50,
+                       "x": float(ax), "y": float(ay)})
     for s in shapes:
         allpts = np.vstack(s["rings"])
         s["bbox"] = (*allpts.min(0), *allpts.max(0))
@@ -181,129 +242,19 @@ def load():
         city_list.append({"name": LABEL_CITIES.get(p["name"]), "x": float(x), "y": float(y),
                           "pop": {int(k[1:]): v for k, v in p.items()
                                   if k.startswith("p") and k[1:].isdigit() and int(k[1:]) <= 2050}})
-    kin = next(f["properties"] for f in cities if f["properties"]["name"] == "Kinshasa")
-    kin_pop = {int(k[1:]): v for k, v in kin.items() if k.startswith("p") and k[1:].isdigit()}
-
-    regions = {k: dict(v) for k, v in pop["regions"].items()}
     return {
-        "shapes": shapes, "cities": city_list, "kin_pop": kin_pop, "regions": regions,
+        "shapes": shapes, "cities": city_list,
         "built": sorted(((f["properties"]["epoch"], rings(f["geometry"])) for f in built), reverse=True),
         "water": [r for f in water for r in rings(f["geometry"])],
-        "roads": [l for f in roads for l in lines(f["geometry"])],
-        "elec": {e["year"]: e["withoutM"] for e in elec},
+        "roads": [ln for f in roads for ln in lines(f["geometry"])],
     }
 
 
-def _centroid(geom):
+def _anchor(geom):
+    """Mean of the largest polygon's outer ring: keeps circles off islands."""
     polys = [geom["coordinates"]] if geom["type"] == "Polygon" else geom["coordinates"]
-    pts = np.vstack([np.asarray(p[0]) for p in polys])
-    return float(pts[:, 0].mean()), float(pts[:, 1].mean())
-
-
-# ---------------------------------------------------------------- scenes
-
-# (start, end, chapter, title, subtitle, caption)
-SCENES = [
-    (0.0, 12.0, 0, "Africa triples this century.",
-     "Countries shaded by population, 2025 to 2100.",
-     "UN World Population Prospects 2024, medium variant."),
-    (12.0, 19.0, 0, "And it's already locked in.",
-     "Median age by country. The parents of 2050 are already born.",
-     "Birth rates are falling everywhere. Momentum carries the growth anyway."),
-    (19.0, 31.0, 1, "Where the people land.",
-     "Every African city that reaches a million people by 2050.",
-     "UN World Urbanization Prospects 2025."),
-    (31.0, 38.0, 2, "The power isn't keeping up.",
-     "Share of people with electricity at home.",
-     "Access rose from 38% to 59% since 2000. The number without still grew."),
-    (38.0, 50.0, 3, "Kinshasa, seen from space.",
-     "Built ground by decade, on streets drawn for a city of one million.",
-     "Built-up area: EU Global Human Settlement Layer. Roads: OpenStreetMap."),
-    (50.0, DURATION, 3, "The people are arithmetic.",
-     "Whether the power, water and roads arrive is a decision.",
-     "2100 city figure: Hoornweg & Pope projection."),
-]
-CHAPTERS = ["Population", "Cities", "Power", "Kinshasa"]
-
-
-def scene_at(s):
-    for i, sc in enumerate(SCENES):
-        if s < sc[1]:
-            return i
-    return len(SCENES) - 1
-
-
-def text_alpha(s, i):
-    a, b = SCENES[i][0], SCENES[i][1]
-    fin = 1.0 if i == 0 else min(1.0, (s - a) / FADE)
-    fout = 1.0 if i == len(SCENES) - 1 else min(1.0, (b - s) / FADE)
-    return max(0.0, min(fin, fout))
-
-
-def country_color(shp, s):
-    """Choropleth per scene; colours cross-fade over 0.8 s at scene changes."""
-    def scene_color(i):
-        if not shp["africa"]:
-            return LAND
-        if i == 0:
-            v = interp(shp["pop"], 2025 + 75 * ease((s - 1.0) / 9.0))
-            return lerp_color(RAMP, math.log(v) / math.log(400)) if v else AFRICA
-        if i == 1:
-            return lerp_color(RAMP, (40 - shp["age"]) / 25) if shp["age"] else AFRICA
-        if i == 3:
-            return lerp_color(AMBER, shp["elec"] / 100) if shp["elec"] is not None else AFRICA
-        if i == 5:
-            v = shp["pop"].get(2100)
-            return lerp_color(RAMP, math.log(v) / math.log(400)) if v else AFRICA
-        return AFRICA
-    i = scene_at(s)
-    c = scene_color(i)
-    if i > 0 and s - SCENES[i][0] < 0.8:
-        c = mix(scene_color(i - 1), c, (s - SCENES[i][0]) / 0.8)
-    return c
-
-
-LEGENDS = {0: (RAMP, "1 M people", "400 M"), 1: (RAMP, "older (40)", "younger (15)"),
-           3: (AMBER, "0% with power", "100%"), 5: (RAMP, "1 M people", "400 M")}
-
-
-def legend(d, s, F, a):
-    i = scene_at(s)
-    if i not in LEGENDS:
-        return
-    ramp, lo, hi = LEGENDS[i]
-    x0, y0, w = BOX[0] + 14, BOX[3] - 52, 260
-    for k in range(w):
-        d.line((x0 + k, y0, x0 + k, y0 + 12), fill=mix(WATER, lerp_color(ramp, k / (w - 1)), a))
-    d.text((x0, y0 + 18), lo, font=F["small"], fill=mix(WATER, MUTED, a))
-    d.text((x0 + w - d.textlength(hi, font=F["small"]), y0 + 18), hi, font=F["small"], fill=mix(WATER, MUTED, a))
-
-
-def hud(D, s):
-    """Big counter and the muted line beside it."""
-    i = scene_at(s)
-    a = SCENES[i][0]
-    if i == 0:
-        y = 2025 + 75 * ease((s - 1.0) / 9.0)
-        afr, wld = interp(D["regions"]["Africa"], y), interp(D["regions"]["World"], y)
-        return f"{int(round(y))}", f"{afr / 1000:.2f} B people · {afr / wld:.0%} of humanity"
-    if i == 1:
-        return "15.6", "median age in Niger. Japan: 49.8"
-    if i == 2:
-        y = 1975 + 75 * ease((s - a - 0.8) / 9.5)
-        n = sum(1 for c in D["cities"] if (interp(c["pop"], y) or 0) >= 1)
-        return f"{int(round(y))}", f"{n} cities over 1 million"
-    if i == 3:
-        y = 2000 + 22 * ease((s - a - 0.6) / 4.5)
-        return f"{interp(D['elec'], y):.0f} M", f"Africans without power, {int(round(y))}"
-    if i == 4:
-        y = kin_year(s)
-        return f"{int(round(y))}", f"Kinshasa: {interp(D['kin_pop'], y):.1f} million people"
-    return "84 M", "Kinshasa in 2100. About Germany today."
-
-
-def kin_year(s):
-    return 1975 + 55 * ease((s - 42.5) / 6.5)
+    ring = np.asarray(max(polys, key=lambda p: len(p[0]))[0])
+    return float(ring[:, 0].mean()), float(ring[:, 1].mean())
 
 
 # ---------------------------------------------------------------- drawing
@@ -318,6 +269,19 @@ def wrap(text, fnt, max_w):
         else:
             cur = t
     return out + [cur]
+
+
+def country_fill(shp, s, close):
+    if not shp["africa"]:
+        return LAND
+    if close:
+        return AFRICA
+    col = AFRICA
+    if shp["young"]:
+        col = mix(col, GREEN, show_young(s))
+    if shp["dark"]:
+        col = mix(col, ORANGE, show_power(s))
+    return col
 
 
 def draw_map(D, s, cam):
@@ -338,109 +302,119 @@ def draw_map(D, s, cam):
     for shp in D["shapes"]:
         if not visible(shp["bbox"]):
             continue
-        col = AFRICA if close and shp["africa"] else country_color(shp, s)
+        col = country_fill(shp, s, close)
         for r in shp["rings"]:
             if len(r) > 2:
-                d.polygon(px(r), fill=col, outline=EDGE, width=max(1, SS))
+                d.polygon(px(r), fill=col, outline=WATER, width=SS)
 
-    if close:                                       # Kinshasa layers
+    labels = []                                     # (x, y, text, size) in 1x box pixels
+    if close:                                       # Kinshasa: gray 1975 city, blue growth since
         f = min(1.0, (2000 - wkm) / 1500)
-        year = kin_year(s) if s < 50 else 2030
+        year = keyed(KIN_YEAR, s)
         for epoch, rs in D["built"]:                # newest first: 1975 ends on top
-            k = 1.0 if epoch == 1975 else (year - (epoch - 6)) / 6
-            if k <= 0:
-                continue
-            col = mix(AFRICA, hexrgb(EPOCH_COLORS[epoch]), min(k, 1.0) * f)
+            if epoch == 1975:
+                col = mix(AFRICA, OLD_CITY, f)
+            else:
+                k = (year - (epoch - 10)) / 10
+                if k <= 0:
+                    continue
+                col = mix(AFRICA, BLUE, min(k, 1.0) * f)
             for r in rs:
                 if len(r) > 2:
                     d.polygon(px(r), fill=col)
         for r in D["water"]:
             if len(r) > 2:
                 d.polygon(px(r), fill=WATER)
+        hi = window(s, 64.8, 68.8, 0.4)
         for ln in D["roads"]:
-            d.line(px(ln), fill=mix(AFRICA, ROAD, f), width=2 * SS)
+            d.line(px(ln), fill=mix(mix(AFRICA, ROAD_DIM, f), INK, hi), width=int((2 + 2 * hi) * SS))
+        if wkm < 400:
+            for name, lon, lat in (("Kinshasa", 15.31, -4.36), ("Brazzaville", 15.25, -4.24)):
+                (x, y), = px([laea(lon, lat)])
+                labels.append((x / SS, y / SS, name, 24, f))
 
-    i = scene_at(s)
-    if i == 2 or (i == 3 and s < 31.8):
-        year = 1975 + 75 * ease((s - 19.8) / 9.5)
-        fade = 1.0 if i == 2 else 1 - (s - 31.0) / 0.8
+    def circle(x, y, r, a):
+        d.ellipse((x - r, y - r, x + r, y + r), fill=mix(AFRICA, BLUE, a), outline=WATER, width=2 * SS)
+
+    a = show_pop(s)
+    if a > 0 and not close:                         # countries as circles: bigger = more people
+        year = keyed(POP_YEAR, s)
+        focus = window(s, 9.4, 13.8, 0.4)           # the Nigeria beat dims the rest
+        ranked = sorted((sh for sh in D["shapes"] if sh["africa"] and sh["pop"]),
+                        key=lambda sh: -sh["pop"].get(2025, 0))
+        for rank, sh in enumerate(ranked):
+            grow = ease((s - 0.05 * min(rank, 12)) / 0.5)   # staggered pop-in for the hook
+            p = interp(sh["pop"], year)
+            r = math.sqrt(p) * 3.6 * SS * grow
+            if r < 1:
+                continue
+            (x, y), = px([(sh["x"], sh["y"])])
+            dim = 1 - 0.65 * focus if sh["iso"] != "NGA" else 1
+            circle(x, y, r, a * dim)
+            if sh["iso"] in TOP_COUNTRIES and grow > 0.9:
+                la = a * (dim if sh["iso"] != "NGA" else 1)
+                labels.append((x / SS, y / SS, f"{TOP_COUNTRIES[sh['iso']]}\n{p:.0f} M", 22, la))
+
+    a = show_cities(s)
+    if a > 0 and not close:
+        year = keyed(CITY_YEAR, s)
         for c in sorted(D["cities"], key=lambda c: -(interp(c["pop"], year) or 0)):
             p = interp(c["pop"], year)
-            if not p:
+            if not p or p < 1:
                 continue
             (x, y), = px([(c["x"], c["y"])])
-            r = math.sqrt(p) * 5.2 * SS
-            d.ellipse((x - r, y - r, x + r, y + r), fill=mix(AFRICA, (30, 215, 185), 0.85 * fade),
-                      outline=mix(AFRICA, WATER, fade), width=SS)
-    return img.resize((bw, bh), Image.LANCZOS), px, scale
+            r = math.sqrt(p) * 8.5 * SS
+            circle(x, y, r, a)
+            if c["name"] and p >= 8:
+                labels.append((x / SS + r / SS + 6, y / SS, f"{c['name']} {p:.0f} M", 22, a))
+    a = window(s, 70.8, DURATION + 1, 0.8)           # Kinshasa's 2100 size, on the city scale
+    if a > 0:
+        (x, y), = px([laea(15.3276, -4.3869)])
+        r = math.sqrt(83.5) * 8.5 * SS * ease((s - 70.8) / 1.2)
+        circle(x, y, r, a)
+        labels.append((x / SS + r / SS + 8, y / SS, "Kinshasa 84 M", 22, a))
+    return img.resize((bw, bh), Image.LANCZOS), labels
 
 
 def render(D, s, cam, F):
     canvas = Image.new("RGB", (W, H), WATER)
-    m, px, scale = draw_map(D, s, cam)
+    m, labels = draw_map(D, s, cam)
     canvas.paste(m, BOX[:2])
     d = ImageDraw.Draw(canvas)
-    i = scene_at(s)
-    a = text_alpha(s, i)
-    ink, muted = mix(WATER, INK, a), mix(WATER, MUTED, a)
-    _, title, sub, cap = SCENES[i][2:]
 
-    # Title + subtitle
-    d.text((40, TITLE_Y), title, font=F["title"], fill=ink)
-    for k, line in enumerate(wrap(sub, F["sub"], W - 80)):
-        d.text((42, TITLE_Y + 66 + 36 * k), line, font=F["sub"], fill=muted)
+    for x, y, text, size, a in labels:              # numbers sit on the places they describe
+        if a <= 0:
+            continue
+        fnt = F["label22"] if size == 22 else F["label24"]
+        x, y = x + BOX[0], y + BOX[1]
+        anchor = "lm" if "\n" not in text and text not in ("Kinshasa", "Brazzaville") else "mm"
+        d.multiline_text((x, y), text, font=fnt, fill=mix(WATER, INK, a), anchor=anchor, align="center",
+                         stroke_width=4, stroke_fill=WATER, spacing=2)
 
-    # Map labels (unsupersampled coordinates)
-    def label(x, y, text, left=False, col=INK):
-        x, y = x / SS + BOX[0], y / SS + BOX[1]
-        if not (BOX[0] < x < BOX[2] and BOX[1] < y < BOX[3]):
-            return
-        c = mix(WATER, col, a)
-        d.ellipse((x - 4, y - 4, x + 4, y + 4), fill=c, outline=WATER)
-        tw = d.textlength(text, font=F["label"])
-        tx = x - 12 - tw if left else x + 12
-        d.text((tx, y - 14), text, font=F["label"], fill=c, stroke_width=3, stroke_fill=WATER)
+    year, ya = year_label(s)
+    if year:
+        d.text((44, BOX[3] - 40), str(year), font=F["year"], fill=mix(WATER, INK, ya), anchor="ls",
+               stroke_width=5, stroke_fill=WATER)
 
-    if i == 2:
-        year = 1975 + 75 * ease((s - 19.8) / 9.5)
-        for c in D["cities"]:
-            p = interp(c["pop"], year)
-            if c["name"] and p and p >= 2:
-                (x, y), = px([(c["x"], c["y"])])
-                label(x, y, f"{c['name']} {p:.1f} M", c["name"] in LEFT)
-    if i in (4, 5) and cam.at(s)[2] < 400:
-        for name, lon, lat, left in (("Kinshasa", 15.307, -4.322, False),
-                                     ("Brazzaville", 15.283, -4.266, True)):
-            (x, y), = px([laea(lon, lat)])
-            label(x, y, name, left)
-    if i == 5 and cam.at(s)[2] > 3000:
-        (x, y), = px([laea(15.3276, -4.3869)])
-        label(x, y, "Kinshasa", True)
-
-    legend(d, s, F, a)
-
-    # HUD
-    big, small = hud(D, s)
-    d.text((40, HUD_Y), big, font=F["clock"], fill=ink)
-    d.text((40 + d.textlength(big, font=F["clock"]) + 28, HUD_Y + 42), small, font=F["clock2"], fill=muted)
-
-    # Chapter bar: four segments, marker = progress through the video
-    bar_y, x0, x1 = HUD_Y + 128, 40, W - 40
-    seg = (x1 - x0) / len(CHAPTERS)
-    ch = SCENES[i][2]
-    for k, name in enumerate(CHAPTERS):
-        col = lerp_color(RAMP, k / 3) if k <= ch else (40, 46, 58)
-        d.rectangle((x0 + k * seg + 1, bar_y, x0 + (k + 1) * seg - 1, bar_y + 16), fill=col)
-        d.text((x0 + k * seg + 2, bar_y + 22), name, font=F["small"], fill=INK if k == ch else MUTED)
-    mx = x0 + (x1 - x0) * min(s / DURATION, 1)
-    d.polygon([(mx - 8, bar_y - 12), (mx + 8, bar_y - 12), (mx, bar_y - 2)], fill=INK)
-
-    for k, line in enumerate(wrap(cap, F["small"], W - 80)):
-        d.text((40, bar_y + 56 + 28 * k), line, font=F["small"], fill=muted)
-    d.text((40, bar_y + 122), "Full story: mapzimus.com/lab/african-urbanization",
-           font=F["small"], fill=MUTED)
-    d.text((40, bar_y + 150), "Map data: Natural Earth, © OpenStreetMap contributors.",
-           font=F["small"], fill=MUTED)
+    # The one sentence, cross-fading between beats.
+    for start, end, text in BEATS:
+        if start <= s < end or (end == DURATION and s >= end):
+            a = window(s, start, end, FADE) if start > 0 else min(1.0, (end - s) / FADE)
+            if end == DURATION:
+                a = min(1.0, (s - start) / FADE)
+            if text is None:                        # end card
+                c, cm = mix(WATER, INK, a), mix(WATER, MUTED, a)
+                d.text((44, TEXT_Y), "Full story + sources:", font=F["text"], fill=c)
+                d.text((44, TEXT_Y + 72), "mapzimus.com/lab/african-urbanization", font=F["url"], fill=c)
+                for k, line in enumerate((
+                        "UN World Population Prospects 2024 · UN World Urbanization Prospects 2025",
+                        "World Bank · EU Global Human Settlement Layer · Hoornweg & Pope (2100 cities)",
+                        "Map data: Natural Earth, © OpenStreetMap contributors")):
+                    d.text((44, TEXT_Y + 140 + 30 * k), line, font=F["small"], fill=cm)
+            else:
+                for k, line in enumerate(wrap(text, F["text"], W - 88)):
+                    d.text((44, TEXT_Y + 70 * k), line, font=F["text"], fill=mix(WATER, INK, a))
+            break
     return canvas
 
 
@@ -450,12 +424,11 @@ def main():
     args = ap.parse_args()
     OUT.mkdir(exist_ok=True)
     D = load()
-    F = {"title": font("title", 52), "sub": font("body", 28), "label": font("label", 21),
-         "small": font("body", 19), "clock": font("clock", 92), "clock2": font("clock", 38)}
+    F = {"text": font("bold", 56), "url": font("bold", 40), "small": font("body", 20),
+         "label22": font("label", 24), "label24": font("label", 28), "year": font("clock", 120)}
 
-    # Whole continent fitted to the box; Kinshasa close-up ~90 km wide.
-    bw, bh = BOX[2] - BOX[0], BOX[3] - BOX[1]
     # Mainland + Madagascar only: the far islands (Cabo Verde, Mauritius...) shrank the frame.
+    bw, bh = BOX[2] - BOX[0], BOX[3] - BOX[1]
     pts = np.vstack([np.vstack(s["rings"]) for s in D["shapes"] if s["africa"]])
     lo_x, lo_y = laea(-18.0, -35.0)
     hi_x, hi_y = laea(51.5, 37.5)
@@ -465,7 +438,7 @@ def main():
             max(ax.max() - ax.min(), (ay.max() - ay.min()) * bw / bh) * 1.04)
     kx, ky = laea(15.36, -4.36)
     kin = (float(kx), float(ky), 90.0)
-    cam = Camera([(0, full), (38.6, full), (42.4, kin), (50.2, kin), (52.8, full), (DURATION, full)])
+    cam = Camera([(0, full), (50.2, full), (53.4, kin), (68.8, kin), (71.6, full), (DURATION, full)])
 
     if args.stills:
         for t in (float(v) for v in args.stills.split(",")):
@@ -482,7 +455,7 @@ def main():
     n = int(DURATION * FPS)
     for f in range(n):
         ff.stdin.write(render(D, f / FPS, cam, F).tobytes())
-        if f % 150 == 0:
+        if f % 300 == 0:
             print(f"  frame {f}/{n}", flush=True)
     ff.stdin.close()
     ff.wait()
