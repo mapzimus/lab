@@ -62,6 +62,7 @@ const hostedProjectRoutes = {
   "ground-truth": "/ground-truth/",
   "world-xi": "/lab/world-xi/",
   "national-parks": "/lab/national-parks/",
+  "state-puzzle": "/lab/state-puzzle/",
   "vacation-selector": "/vacation-selector/",
 };
 
