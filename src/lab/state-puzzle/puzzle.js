@@ -16,11 +16,12 @@
 
   const KM = 2.5;        // km per fine pixel
   const COARSE = 4;      // coarse pixels are COARSE fine pixels wide (10 km)
-  const CW = 1400, CH = 1200; // coarse packing grid
+  const CW = 1800, CH = 1500; // coarse packing grid
   const R_EARTH = 6371;
   const D2R = Math.PI / 180;
-  const CLOSE_R = 4;     // final tidy-up closing, fine px (10 km)
-  const FILL_R = 20;     // cracks between pieces up to 2× this wide are filled (100 km)
+  const CLOSE_R = 24;    // final closing of the whole coast, fine px (60 km): inlets under 120 km fill in
+  const FILL_R = 32;     // cracks between pieces up to 2× this wide are filled (160 km)
+  const CANDIDATES = 12; // landing spots tried per piece; the one with the longest contact wins
   const ISLAND_R = 24;   // bridge archipelago states (AK, HI) so they pack as one piece
   const FILL_MAX = 800;  // enclosed gaps under this many px² (5,000 km²) become land
   const LAKE_OPEN = 4;   // smooth lakes with an opening of this radius
@@ -100,21 +101,28 @@
       d[q] = (q - v[k]) * (q - v[k]) + f[v[k]];
     }
   }
+  // Squared Euclidean distance to the nearest pixel whose mask value equals
+  // `target`: a vertical run-length pass, then the 1-D parabola transform along
+  // each row (Felzenszwalb & Huttenlocher). `buf` is a reusable Float32Array.
+  const BIGRUN = 1e6;
   function edt(mask, w, h, target, buf) {
     const g = buf && buf.length >= w * h ? buf : new Float32Array(w * h);
-    for (let i = 0; i < w * h; i++) g[i] = mask[i] === target ? 0 : INF;
-    const n = Math.max(w, h);
-    const f = new Float64Array(n), d = new Float64Array(n), v = new Int32Array(n), z = new Float64Array(n + 1);
+    const run = new Int32Array(w).fill(BIGRUN);
     for (let y = 0; y < h; y++) {
       const o = y * w;
-      for (let x = 0; x < w; x++) f[x] = g[o + x];
+      for (let x = 0; x < w; x++) { run[x] = mask[o + x] === target ? 0 : run[x] + 1; g[o + x] = run[x]; }
+    }
+    run.fill(BIGRUN);
+    for (let y = h - 1; y >= 0; y--) {
+      const o = y * w;
+      for (let x = 0; x < w; x++) { run[x] = mask[o + x] === target ? 0 : run[x] + 1; if (run[x] < g[o + x]) g[o + x] = run[x]; }
+    }
+    const f = new Float64Array(w), d = new Float64Array(w), v = new Int32Array(w), z = new Float64Array(w + 1);
+    for (let y = 0; y < h; y++) {
+      const o = y * w;
+      for (let x = 0; x < w; x++) { const t = g[o + x]; f[x] = t >= BIGRUN ? INF : t * t; }
       dt1d(f, w, d, v, z);
       for (let x = 0; x < w; x++) g[o + x] = d[x];
-    }
-    for (let x = 0; x < w; x++) {
-      for (let y = 0; y < h; y++) f[y] = g[y * w + x];
-      dt1d(f, h, d, v, z);
-      for (let y = 0; y < h; y++) g[y * w + x] = d[y];
     }
     return g;
   }
@@ -189,14 +197,36 @@
         if (yy >= 0 && yy < ch && xx >= 0 && xx < cw) grown[yy * cw + xx] = 1;
       }
     }
-    const cells = [], boundary = [];
+    const cells = [], halo = [];
     for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
       const i = y * cw + x;
       if (grown[i]) cells.push(x, y);
-      if (c0[i] && (x === 0 || y === 0 || x === cw - 1 || y === ch - 1 ||
-          !c0[i - 1] || !c0[i + 1] || !c0[i - cw] || !c0[i + cw])) boundary.push(x, y);
+      if (grown[i] && !c0[i]) halo.push(x, y);   // the one-block skin: where contact is measured
     }
-    return { st, xf, rings, ox, oy, w, h, shape, glue, cw, ch, c0, cells, boundary, area, cx: sx / area, cy: sy / area };
+    // The piece's main body: the largest connected run of blocks. Pieces are
+    // only allowed to count contact with main bodies, so nothing moors itself
+    // to an offshore speck and drifts away from the continent.
+    const comp = new Int32Array(cw * ch).fill(-1), sizes = [];
+    const stack = [];
+    for (let s0 = 0; s0 < cw * ch; s0++) {
+      if (!c0[s0] || comp[s0] >= 0) continue;
+      const id = sizes.length; let size = 0;
+      stack.push(s0); comp[s0] = id;
+      while (stack.length) {
+        const i = stack.pop(); size++;
+        const x = i % cw;
+        const visit = (j) => { if (c0[j] && comp[j] < 0) { comp[j] = id; stack.push(j); } };
+        if (x > 0) visit(i - 1);
+        if (x < cw - 1) visit(i + 1);
+        if (i >= cw) visit(i - cw);
+        if (i + cw < cw * ch) visit(i + cw);
+      }
+      sizes.push(size);
+    }
+    const mainId = sizes.indexOf(Math.max(...sizes));
+    const main = new Uint8Array(cw * ch);
+    for (let i = 0; i < cw * ch; i++) if (comp[i] === mainId) main[i] = 1;
+    return { st, xf, rings, ox, oy, w, h, shape, glue, cw, ch, c0, main, cells, halo, area, cx: sx / area, cy: sy / area };
   }
 
   // ---------------------------------------------------------------- packing
@@ -206,19 +236,36 @@
     for (let i = 0; i < c.length; i += 2) if (L[(oy + c[i + 1]) * CW + ox + c[i]]) return false;
     return true;
   }
-  // Each piece is dropped from a random direction and slid in toward the
-  // heart of the landmass until it touches. A few directions are tried and the
-  // one that lands closest to the centre wins, which keeps the blob compact
-  // without making it round.
+  // How much of the piece's skin touches land already placed. Long contact
+  // means the piece has nestled into the pile instead of kissing it at a point.
+  function contact(Lc, p, ox, oy) {
+    const L = Lc;
+    const hl = p.halo;
+    let n = 0;
+    for (let i = 0; i < hl.length; i += 2) {
+      const x = ox + hl[i], y = oy + hl[i + 1], j = y * CW + x;
+      if (L[j - 1] || L[j + 1] || L[j - CW] || L[j + CW]) n++;
+    }
+    return n;
+  }
+  const NEIGH = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+
+  // Each piece is dropped from a random direction, slid in toward the heart
+  // of the landmass until it touches, then wiggled into the spot nearby with
+  // the longest contact. Several directions are tried and the best contact
+  // wins, which packs tight without making the blob round.
   function pack(pieces, rng) {
-    const L = new Uint8Array(CW * CH);
+    const L = new Uint8Array(CW * CH);   // everything placed: what a piece may not overlap
+    const Lc = new Uint8Array(CW * CH);  // main bodies only: what a piece may count as contact
     let sx = 0, sy = 0, n = 0;
     let bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
     const stamp = (p, ox, oy) => {
       p.px = ox; p.py = oy;
       for (let y = 0; y < p.ch; y++) for (let x = 0; x < p.cw; x++) {
-        if (!p.c0[y * p.cw + x]) continue;
+        const i = y * p.cw + x;
+        if (!p.c0[i]) continue;
         L[(oy + y) * CW + ox + x] = 1;
+        if (p.main[i]) Lc[(oy + y) * CW + ox + x] = 1;
         sx += ox + x; sy += oy + y; n++;
       }
       bx0 = Math.min(bx0, ox); by0 = Math.min(by0, oy);
@@ -233,13 +280,13 @@
       const rb = Math.max(Math.hypot(bx0 - cx, by0 - cy), Math.hypot(bx1 - cx, by0 - cy), Math.hypot(bx0 - cx, by1 - cy), Math.hypot(bx1 - cx, by1 - cy));
       const rp = Math.hypot(p.cw, p.ch) / 2;
       const at = (dx, dy, t) => [Math.round(cx + dx * t - p.cw / 2), Math.round(cy + dy * t - p.ch / 2)];
-      let best = null, bestD = Infinity, found = 0;
-      for (let tries = 0; tries < 60 && found < 6; tries++) {
+      let best = null, bestScore = -Infinity, found = 0;
+      for (let tries = 0; tries < 80 && found < CANDIDATES; tries++) {
         const a = rng() * Math.PI * 2, dx = Math.cos(a), dy = Math.sin(a);
         let t = rb + rp + 2;
         let pos = at(dx, dy, t);
         // Out of the grid? Walk the start point back in along the ray.
-        while (t > 0 && (pos[0] < 0 || pos[1] < 0 || pos[0] + p.cw > CW || pos[1] + p.ch > CH)) { t -= 2; pos = at(dx, dy, t); }
+        while (t > 0 && (pos[0] < 1 || pos[1] < 1 || pos[0] + p.cw > CW - 1 || pos[1] + p.ch > CH - 1)) { t -= 2; pos = at(dx, dy, t); }
         if (!fits(L, p, pos[0], pos[1])) continue;
         // Slide inward: coarse steps, then back off and creep to contact.
         for (let step = 3; step >= 1; step = step === 3 ? 1 : 0) {
@@ -249,9 +296,30 @@
             t -= step; pos = q;
           }
         }
+        // Wiggle: hill-climb on contact over the eight neighbouring offsets.
+        // Contact is cheap (skin only) and the overlap test is not, so rank
+        // the neighbours by contact first and test only the promising ones.
+        let c = contact(Lc, p, pos[0], pos[1]);
+        for (let w = 0; w < 50; w++) {
+          const ranked = [];
+          for (const [ex, ey] of NEIGH) {
+            const qx = pos[0] + ex, qy = pos[1] + ey;
+            if (qx < 1 || qy < 1 || qx + p.cw > CW - 1 || qy + p.ch > CH - 1) continue;
+            const cc = contact(Lc, p, qx, qy);
+            if (cc > c) ranked.push([cc, qx, qy]);
+          }
+          ranked.sort((a, b) => b[0] - a[0]);
+          let moved = false;
+          for (const [cc, qx, qy] of ranked) {
+            if (!fits(L, p, qx, qy)) continue;
+            c = cc; pos = [qx, qy]; moved = true; break;
+          }
+          if (!moved) break;
+        }
+        if (c === 0) continue;   // only touching specks or nothing: not a landing
         found++;
-        const d = Math.hypot(pos[0] + p.cw / 2 - cx, pos[1] + p.ch / 2 - cy);
-        if (d < bestD) { bestD = d; best = pos; }
+        const score = c * 1000 - Math.hypot(pos[0] + p.cw / 2 - cx, pos[1] + p.ch / 2 - cy);
+        if (score > bestScore) { bestScore = score; best = pos; }
       }
       if (!best) throw new Error(`could not place ${p.st.name}`);
       stamp(p, best[0], best[1]);
@@ -260,6 +328,40 @@
   }
 
   // --------------------------------------------------------------- assemble
+  // Flood from the frame edge over `open` pixels; marks them in `out`.
+  function floodEdge(open, W, H, out, queue) {
+    let qh = 0, qt = 0;
+    const push = (i) => { if (open[i] && !out[i]) { out[i] = 1; queue[qt++] = i; } };
+    for (let x = 0; x < W; x++) { push(x); push((H - 1) * W + x); }
+    for (let y = 0; y < H; y++) { push(y * W); push(y * W + W - 1); }
+    while (qh < qt) {
+      const i = queue[qh++], x = i % W;
+      if (x > 0) push(i - 1);
+      if (x < W - 1) push(i + 1);
+      if (i >= W) push(i - W);
+      if (i + W < W * H) push(i + W);
+    }
+  }
+  // Connected components of `open` pixels not already in `skip`; calls
+  // onComponent(queue, size) with the member indices for each one.
+  function components(open, skip, W, H, label, queue, onComponent) {
+    label.fill(0);
+    for (let s = 0; s < W * H; s++) {
+      if (!open[s] || skip[s] || label[s]) continue;
+      let qh = 0, qt = 0;
+      queue[qt++] = s; label[s] = 1;
+      while (qh < qt) {
+        const i = queue[qh++], x = i % W;
+        let j;
+        if (x > 0 && open[j = i - 1] && !skip[j] && !label[j]) { label[j] = 1; queue[qt++] = j; }
+        if (x < W - 1 && open[j = i + 1] && !skip[j] && !label[j]) { label[j] = 1; queue[qt++] = j; }
+        if (i >= W && open[j = i - W] && !skip[j] && !label[j]) { label[j] = 1; queue[qt++] = j; }
+        if (i + W < W * H && open[j = i + W] && !skip[j] && !label[j]) { label[j] = 1; queue[qt++] = j; }
+      }
+      onComponent(queue, qt);
+    }
+  }
+
   function assemble(pieces) {
     const M = 40;
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -268,7 +370,6 @@
       x1 = Math.max(x1, p.px * COARSE + p.w); y1 = Math.max(y1, p.py * COARSE + p.h);
     }
     const W = x1 - x0 + 2 * M, H = y1 - y0 + 2 * M;
-    const buf = new Float32Array(W * H);
     const union = new Uint8Array(W * H);
     const owner = new Int16Array(W * H).fill(-1);
     pieces.forEach((p, idx) => {
@@ -279,83 +380,98 @@
       }
     });
 
-    // Heal the cracks between pieces. A crack is water that lies between two
-    // different pieces: close to the Voronoi seam separating them, and inside
-    // a generous morphological closing of the whole union. Water deep inside
-    // one piece's own bay is near no seam and stays water.
-    const label = new Int16Array(W * H);
-    const queue = new Int32Array(W * H);
-    let qh = 0, qt = 0;
-    for (let i = 0; i < W * H; i++) { label[i] = owner[i]; if (owner[i] >= 0) queue[qt++] = i; }
-    while (qh < qt) {
-      const i = queue[qh++], x = i % W, l = label[i];
-      if (x > 0 && label[i - 1] < 0) { label[i - 1] = l; queue[qt++] = i - 1; }
-      if (x < W - 1 && label[i + 1] < 0) { label[i + 1] = l; queue[qt++] = i + 1; }
-      if (i >= W && label[i - W] < 0) { label[i - W] = l; queue[qt++] = i - W; }
-      if (i + W < W * H && label[i + W] < 0) { label[i + W] = l; queue[qt++] = i + W; }
-    }
-    const seam = new Uint8Array(W * H);
-    for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    // The crack healing runs at half resolution: the radii are tens of
+    // pixels, so nothing is lost, and the distance field is interpolated back
+    // up, so the coast comes out smooth rather than blocky.
+    const w2 = (W + 1) >> 1, h2 = (H + 1) >> 1, N2 = w2 * h2;
+    const union2 = new Uint8Array(N2), owner2 = new Int16Array(N2).fill(-1);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const i = y * W + x;
-      if (union[i]) continue;
-      const l = label[i];
-      if (label[i - 1] !== l || label[i + 1] !== l || label[i - W] !== l || label[i + W] !== l) seam[i] = 1;
+      if (!union[i]) continue;
+      const j = (y >> 1) * w2 + (x >> 1);
+      union2[j] = 1; if (owner2[j] < 0) owner2[j] = owner[i];
     }
-    const nearSeam = dilate(seam, W, H, FILL_R, buf);
-    const closedBig = close(union, W, H, FILL_R, buf);
-    const filled = new Uint8Array(W * H);
-    for (let i = 0; i < W * H; i++) filled[i] = union[i] || (closedBig[i] && nearSeam[i]) ? 1 : 0;
-    const closed = close(filled, W, H, CLOSE_R, buf);
+    const buf2 = new Float32Array(N2);
 
-    // Water that still touches the edge of the world is sea; the rest are gaps.
-    const outside = new Uint8Array(W * H);
-    qh = 0; qt = 0;
-    const push = (i) => { if (!closed[i] && !outside[i]) { outside[i] = 1; queue[qt++] = i; } };
-    for (let x = 0; x < W; x++) { push(x); push((H - 1) * W + x); }
-    for (let y = 0; y < H; y++) { push(y * W); push(y * W + W - 1); }
+    // A crack is water between two different pieces: close to the Voronoi
+    // seam separating them, and inside a generous closing of the whole union.
+    // Water deep inside one piece's own bay is near no seam and stays water.
+    const label2 = owner2;                  // grows outward from the pieces
+    const queue2 = new Int32Array(N2);
+    let qh = 0, qt = 0;
+    for (let i = 0; i < N2; i++) if (label2[i] >= 0) queue2[qt++] = i;
     while (qh < qt) {
-      const i = queue[qh++], x = i % W;
-      if (x > 0) push(i - 1);
-      if (x < W - 1) push(i + 1);
-      if (i >= W) push(i - W);
-      if (i + W < W * H) push(i + W);
+      const i = queue2[qh++], x = i % w2, l = label2[i];
+      if (x > 0 && label2[i - 1] < 0) { label2[i - 1] = l; queue2[qt++] = i - 1; }
+      if (x < w2 - 1 && label2[i + 1] < 0) { label2[i + 1] = l; queue2[qt++] = i + 1; }
+      if (i >= w2 && label2[i - w2] < 0) { label2[i - w2] = l; queue2[qt++] = i - w2; }
+      if (i + w2 < N2 && label2[i + w2] < 0) { label2[i + w2] = l; queue2[qt++] = i + w2; }
     }
-    // Label the gaps: small ones silt up into land, big ones become lakes.
-    label.fill(-1);
+    const seam2 = new Uint8Array(N2);
+    for (let y = 1; y < h2 - 1; y++) for (let x = 1; x < w2 - 1; x++) {
+      const i = y * w2 + x;
+      if (union2[i]) continue;
+      const l = label2[i];
+      if (label2[i - 1] !== l || label2[i + 1] !== l || label2[i - w2] !== l || label2[i + w2] !== l) seam2[i] = 1;
+    }
+    const R2 = FILL_R / 2, C2 = CLOSE_R / 2;
+    const nearSeam2 = dilate(seam2, w2, h2, R2, buf2);
+    const closedBig2 = close(union2, w2, h2, R2, buf2);
+    const filled2 = new Uint8Array(N2);
+    for (let i = 0; i < N2; i++) filled2[i] = union2[i] || (closedBig2[i] && nearSeam2[i]) ? 1 : 0;
+    // Final closing of the whole coast, kept as a distance field so it can be
+    // sampled at full resolution: a pixel is land where it sits deeper than
+    // C2 inside the dilated mask.
+    const dil2 = dilate(filled2, w2, h2, C2, buf2);
+    const deep = edt(dil2, w2, h2, 0, buf2);   // squared distance to the nearest non-dilated pixel
+    const closed = new Uint8Array(W * H);
+    const thr = C2 * C2;
+    for (let y = 0; y < H; y++) {
+      const v = Math.min(h2 - 1, Math.max(0, (y - 0.5) / 2)), vy = Math.floor(v), fy = v - vy, vy1 = Math.min(h2 - 1, vy + 1);
+      for (let x = 0; x < W; x++) {
+        const i = y * W + x;
+        if (union[i]) { closed[i] = 1; continue; }
+        const u = Math.min(w2 - 1, Math.max(0, (x - 0.5) / 2)), ux = Math.floor(u), fx = u - ux, ux1 = Math.min(w2 - 1, ux + 1);
+        const d = (deep[vy * w2 + ux] * (1 - fx) + deep[vy * w2 + ux1] * fx) * (1 - fy)
+                + (deep[vy1 * w2 + ux] * (1 - fx) + deep[vy1 * w2 + ux1] * fx) * fy;
+        if (d > thr) closed[i] = 1;
+      }
+    }
+
+    // Water that still touches the edge of the world is sea; the rest are
+    // gaps. Small gaps silt up into land, big ones become lakes.
+    const water = new Uint8Array(W * H);
+    for (let i = 0; i < W * H; i++) water[i] = closed[i] ? 0 : 1;
+    const outside = new Uint8Array(W * H);
+    const queue = new Int32Array(W * H);
+    floodEdge(water, W, H, outside, queue);
+    const label = new Uint8Array(W * H);
     const lake = new Uint8Array(W * H);
-    let comps = 0;
-    for (let s = 0; s < W * H; s++) {
-      if (closed[s] || outside[s] || label[s] >= 0) continue;
-      qh = 0; qt = 0; queue[qt++] = s; label[s] = comps;
-      while (qh < qt) {
-        const i = queue[qh++], x = i % W;
-        const visit = (j) => { if (!closed[j] && !outside[j] && label[j] < 0) { label[j] = comps; queue[qt++] = j; } };
-        if (x > 0) visit(i - 1);
-        if (x < W - 1) visit(i + 1);
-        if (i >= W) visit(i - W);
-        if (i + W < W * H) visit(i + W);
+    let lx0 = W, ly0 = H, lx1 = -1, ly1 = -1;
+    components(water, outside, W, H, label, queue, (q, n) => {
+      if (n < FILL_MAX) return;
+      for (let k = 0; k < n; k++) {
+        const i = q[k], x = i % W, y = (i / W) | 0;
+        lake[i] = 1;
+        if (x < lx0) lx0 = x; if (x > lx1) lx1 = x; if (y < ly0) ly0 = y; if (y > ly1) ly1 = y;
       }
-      if (qt >= FILL_MAX) for (let k = 0; k < qt; k++) lake[queue[k]] = 1;
-      comps++;
+    });
+    const lakes = new Uint8Array(W * H);
+    if (lx1 >= 0) {
+      // Smooth the lakes with an opening, on just the rectangle that holds them.
+      const pad = LAKE_OPEN + 2;
+      const cx0 = Math.max(0, lx0 - pad), cy0 = Math.max(0, ly0 - pad);
+      const cw = Math.min(W, lx1 + pad + 1) - cx0, ch = Math.min(H, ly1 + pad + 1) - cy0;
+      const sub = new Uint8Array(cw * ch);
+      for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) sub[y * cw + x] = lake[(cy0 + y) * W + cx0 + x];
+      const opened = open(sub, cw, ch, LAKE_OPEN);
+      for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) if (opened[y * cw + x]) lakes[(cy0 + y) * W + cx0 + x] = 1;
     }
-    const lakes = open(lake, W, H, LAKE_OPEN, buf);
     const land = new Uint8Array(W * H);
-    let lakeCount = 0, landArea = 0;
+    let landArea = 0;
     for (let i = 0; i < W * H; i++) { land[i] = !outside[i] && !lakes[i] ? 1 : 0; landArea += land[i]; }
-    // Count lakes as connected components of the final water inside the land.
-    label.fill(-1);
-    for (let s = 0; s < W * H; s++) {
-      if (land[s] || outside[s] || label[s] >= 0) continue;
-      lakeCount++; qh = 0; qt = 0; queue[qt++] = s; label[s] = 1;
-      while (qh < qt) {
-        const i = queue[qh++], x = i % W;
-        const visit = (j) => { if (!land[j] && !outside[j] && label[j] < 0) { label[j] = 1; queue[qt++] = j; } };
-        if (x > 0) visit(i - 1);
-        if (x < W - 1) visit(i + 1);
-        if (i >= W) visit(i - W);
-        if (i + W < W * H) visit(i + W);
-      }
-    }
+    let lakeCount = 0;
+    components(lakes, outside, W, H, label, queue, () => { lakeCount++; });
 
     // Crop to the land with a margin of sea around it.
     const MG = 28;
@@ -367,26 +483,39 @@
     view.w = Math.min(W, bx1 + MG + 1) - view.x0;
     view.h = Math.min(H, by1 + MG + 1) - view.y0;
 
-    // Paint: paper land, shaded water, a dark hairline of coast.
-    const img = new ImageData(view.w, view.h);
-    const px = img.data;
-    const toLand = edt(land, W, H, 1, buf);            // water → distance to land
-    for (let y = 0; y < view.h; y++) for (let x = 0; x < view.w; x++) {
-      const i = (y + view.y0) * W + x + view.x0, o = (y * view.w + x) * 4;
-      if (land[i]) continue;
-      const t = Math.min(1, Math.sqrt(toLand[i]) / 9);
-      px[o] = 178 - 30 * t; px[o + 1] = 207 - 24 * t; px[o + 2] = 224 - 16 * t; px[o + 3] = 255;
+    // The coast band (free in scoring) is land within three steps of water;
+    // the hairline is the outermost step.
+    const vw = view.w, vh = view.h;
+    const lv = new Uint8Array(vw * vh);
+    for (let y = 0; y < vh; y++) for (let x = 0; x < vw; x++) lv[y * vw + x] = land[(y + view.y0) * W + x + view.x0];
+    const edgeOf = (m) => {
+      const e = new Uint8Array(vw * vh);
+      for (let y = 0; y < vh; y++) for (let x = 0; x < vw; x++) {
+        const i = y * vw + x;
+        if (!m[i]) continue;
+        if (x === 0 || y === 0 || x === vw - 1 || y === vh - 1 || !m[i - 1] || !m[i + 1] || !m[i - vw] || !m[i + vw]) e[i] = 1;
+      }
+      return e;
+    };
+    const hairline = edgeOf(lv);
+    const nearWater = new Uint8Array(vw * vh);
+    let shrink = lv;
+    for (let k = 0; k < 3; k++) {
+      const e = edgeOf(shrink);
+      const next = new Uint8Array(vw * vh);
+      for (let i = 0; i < vw * vh; i++) { if (e[i]) nearWater[i] = 1; next[i] = shrink[i] && !e[i] ? 1 : 0; }
+      shrink = next;
     }
-    const toWater = edt(land, W, H, 0, buf);           // land → distance to water
-    const nearWater = new Uint8Array(view.w * view.h); // coast band, free in scoring
-    for (let y = 0; y < view.h; y++) for (let x = 0; x < view.w; x++) {
-      const i = (y + view.y0) * W + x + view.x0, o = (y * view.w + x) * 4;
-      if (!land[i]) continue;
-      const d = Math.sqrt(toWater[i]);
-      if (d <= 3) nearWater[y * view.w + x] = 1;
-      if (d <= 1.2) { px[o] = 122; px[o + 1] = 104; px[o + 2] = 74; px[o + 3] = 255; continue; }
-      const t = Math.min(1, d / 14);
-      px[o] = 214 + 20 * t; px[o + 1] = 200 + 24 * t; px[o + 2] = 168 + 30 * t; px[o + 3] = 255;
+
+    // The land layer: paper with a dark hairline coast, transparent water.
+    const img = new ImageData(vw, vh);
+    const px = img.data;
+    for (let i = 0; i < vw * vh; i++) {
+      if (!lv[i]) continue;
+      const o = i * 4;
+      if (hairline[i]) { px[o] = 122; px[o + 1] = 104; px[o + 2] = 74; }
+      else { px[o] = 232; px[o + 1] = 222; px[o + 2] = 196; }
+      px[o + 3] = 255;
     }
     return { W, H, view, img, land, nearWater, lakeCount, landKm2: landArea * KM * KM };
   }
@@ -409,17 +538,19 @@
     const rng = mulberry32(hashSeed(seed + (rotate ? "|rot" : "")));
     const t0 = performance.now();
     const pieces = STATES.map((st) => buildPiece(st, rotate ? rng() * Math.PI * 2 : 0));
+    const t1 = performance.now();
     let order;
     try { order = pack(pieces, rng); }
     catch (e) { console.error(e); setStatus("That one would not fit. Try another landmass."); $("new").disabled = false; return; }
+    const t2 = performance.now();
     const w = assemble(order);
+    console.debug(`state-puzzle: pieces ${(t1 - t0) | 0} ms, pack ${(t2 - t1) | 0} ms, assemble ${(performance.now() - t2) | 0} ms`);
     world = { ...w, pieces: order };
     strokes = []; lastCheck = null; revealed = false;
     $("reveal").setAttribute("aria-pressed", "false");
     $("numbers").hidden = true;
     frame.style.aspectRatio = `${w.view.w} / ${w.view.h}`;
-    landC.width = w.view.w; landC.height = w.view.h;
-    landC.getContext("2d").putImageData(w.img, 0, 0);
+    paintLand(w);
     resultC.width = w.view.w; resultC.height = w.view.h;
     resultC.getContext("2d").clearRect(0, 0, w.view.w, w.view.h);
     $("seed-label").textContent = seed + (rotate ? " (rotated)" : "");
@@ -431,6 +562,25 @@
   }
 
   // ---------------------------------------------------------------- drawing
+  function paintLand(w) {
+    const { view, img } = w;
+    landC.width = view.w; landC.height = view.h;
+    const ctx = landC.getContext("2d");
+    ctx.fillStyle = "#94b6cc";
+    ctx.fillRect(0, 0, view.w, view.h);
+    const layer = document.createElement("canvas");
+    layer.width = view.w; layer.height = view.h;
+    layer.getContext("2d").putImageData(img, 0, 0);
+    // Shallows: the land, blurred and faded, lightens the water along the coast.
+    if ("filter" in ctx) {
+      ctx.save();
+      ctx.filter = "blur(7px)";
+      ctx.globalAlpha = 0.55;
+      ctx.drawImage(layer, 0, 0);
+      ctx.restore();
+    }
+    ctx.drawImage(layer, 0, 0);
+  }
   function screenScale() {
     const rect = frame.getBoundingClientRect();
     const dpr = Math.min(2, window.devicePixelRatio || 1);
