@@ -1,4 +1,4 @@
-# Mapzimus Geospatial Radar — 2026-10-17
+# Mapzimus Geospatial Radar — 2026-10-18
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
@@ -53,14 +53,14 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Finding the land area east and west of meridian](https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian) (▲ -1 · 0 answers)
+- [Finding the land area east and west of meridian](https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian) (▲ 0 · 0 answers)
 - [Need to find out if my street is public or Private](https://gis.stackexchange.com/questions/501591/need-to-find-out-if-my-street-is-public-or-private) (▲ -2 · 0 answers)
 - [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
 - [Issue with alignment of legend labels in QGIS Print layout](https://gis.stackexchange.com/questions/501570/issue-with-alignment-of-legend-labels-in-qgis-print-layout) (▲ 1 · 1 answers)
 - [Filtering GetCapabilities request using keyword](https://gis.stackexchange.com/questions/501574/filtering-getcapabilities-request-using-keyword) (▲ 1 · 1 answers)
 - [Multi map views is not properly saved in QGIS](https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis) (▲ 1 · 0 answers)
-- [Orfeo fails to map paths in QGIS 3.44.2](https://gis.stackexchange.com/questions/501583/orfeo-fails-to-map-paths-in-qgis-3-44-2) (▲ 1 · 0 answers)
 - [Extracting data (or even converting) from WMS to shapefile in QGIS](https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis) (▲ 3 · 0 answers)
+- [Orfeo fails to map paths in QGIS 3.44.2](https://gis.stackexchange.com/questions/501583/orfeo-fails-to-map-paths-in-qgis-3-44-2) (▲ 1 · 0 answers)
 - [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 3 · 1 answers)
 - [Converting multiple GeoTIFF to MBTiles or PMTiles](https://gis.stackexchange.com/questions/501557/converting-multiple-geotiff-to-mbtiles-or-pmtiles) (▲ 2 · 0 answers)
 
@@ -69,13 +69,13 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
+- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
 - [Mid-Atlantic Lightning Mapping Array (MALMA)](https://search.earthdata.nasa.gov/search?q=malma) — The Mid-Atlantic Lightning Mapping Array (MALMA) dataset collection is used to validate the Lightning Imaging Sensor (LIS) on the International Space Station…
-- [Wallops Flight Facility Lightning Mapping Array (LMA)](https://search.earthdata.nasa.gov/search?q=wfflma) — The Wallops Island Flight Facility Lightning Mapping Array (WFFLMA) dataset collection is used to validate the Lightning Imaging Sensor (LIS) on the Internat…
-- [EMIT L2B Fractional Cover and Uncertainty 60 m V001](https://search.earthdata.nasa.gov/search?q=EMITL2BFRCOV) — The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.
-- [EMIT L2B Estimated Methane Plume Complexes 60 m V002](https://search.earthdata.nasa.gov/search?q=EMITL2BCH4PLM) — The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.
-- [EMIT L2B Estimated Carbon Dioxide Plume Complexes 60 m V002](https://search.earthdata.nasa.gov/search?q=EMITL2BCO2PLM) — The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.
-- [EMIT L2B Methane Enhancement Data 60 m V003](https://search.earthdata.nasa.gov/search?q=EMITL2BCH4ENH) — The Earth Surface Mineral Dust Source Investigation ([EMIT](https://earth.jpl.nasa.gov/emit/)) is an Earth Ventures-Instrument (EVI-4) Mission aboard the Int…
-- [EMIT L2B Carbon Dioxide Enhancement Data 60 m V002](https://search.earthdata.nasa.gov/search?q=EMITL2BCO2ENH) — The Earth Surface Mineral Dust Source Investigation (EMIT) instrument measures surface mineralogy, targeting the Earth’s arid dust source regions.
 
 ## Data.gov — new geodata
 
@@ -89,6 +89,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## OSM pulse
 
+- [weeklyOSM 847](https://weeklyosm.eu/archives/0847/)
 - [weeklyOSM 846](https://weeklyosm.eu/archives/0846/)
 - [weeklyOSM 845](https://weeklyosm.eu/archives/0845/)
-- [weeklyOSM 844](https://weeklyosm.eu/archives/0844/)
