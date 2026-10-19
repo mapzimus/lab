@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>State Puzzle · Mapzimus Lab</title>
+  <meta name="description" content="The 50 states, broken apart and glued back together into one random landmass with the borders erased and the cities left in place. Trace the old state lines back on.">
+  <link rel="canonical" href="https://mapzimus.com/lab/state-puzzle/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="State Puzzle · Mapzimus Lab">
+  <meta property="og:description" content="The 50 states, broken apart and glued back together into one random landmass with the borders erased and the cities left in place. Trace the old state lines back on.">
+  <meta property="og:url" content="https://mapzimus.com/lab/state-puzzle/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#0b1016">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/state-puzzle/puzzle.css">
+  <script src="/lab/state-puzzle/puzzle.js" defer></script>
+</head>
+<body>
+  <header class="chrome">
+    <a class="back" href="/lab/">← Lab</a>
+    <div class="brand-block">
+      <p class="brand">Mapzimus</p>
+      <h1>State Puzzle</h1>
+      <p class="lede">All 50 states, true to shape and size, shuffled into one new continent. The borders are gone; the cities stayed. Draw the old lines back.</p>
+    </div>
+  </header>
+
+  <div class="toolbar" role="toolbar" aria-label="Puzzle controls">
+    <div class="group">
+      <button type="button" id="new" class="btn">New landmass</button>
+      <button type="button" id="rot" class="btn tog" aria-pressed="false" title="Let pieces turn when they are placed">Rotate pieces</button>
+      <button type="button" id="share" class="btn ghost" title="Copy a link to this exact landmass">Copy link</button>
+    </div>
+    <div class="group">
+      <button type="button" id="undo" class="btn">Undo</button>
+      <button type="button" id="clear" class="btn">Clear ink</button>
+      <button type="button" id="check" class="btn primary">Check</button>
+      <button type="button" id="reveal" class="btn tog" aria-pressed="false">Reveal</button>
+    </div>
+  </div>
+
+  <main class="stage" id="stage">
+    <div class="frame" id="frame" style="aspect-ratio: 4 / 3">
+      <canvas id="land" aria-label="Scrambled landmass"></canvas>
+      <canvas id="result" aria-hidden="true"></canvas>
+      <canvas id="marks" aria-hidden="true"></canvas>
+      <canvas id="ink" aria-label="Drawing surface for state borders"></canvas>
+      <p class="status" id="status">Assembling the continent…</p>
+    </div>
+  </main>
+
+  <footer class="score" id="score" aria-live="polite">
+    <p class="hint">Draw with a mouse, pen, or finger. Hit <strong>Check</strong> to see which old borders your ink found. Coastlines and lake shores are free.</p>
+    <dl class="numbers" id="numbers" hidden>
+      <div><dt>Score</dt><dd id="n-score">–</dd></div>
+      <div><dt>Borders found</dt><dd id="n-found">–</dd></div>
+      <div><dt>Stray ink</dt><dd id="n-stray">–</dd></div>
+    </dl>
+    <p class="seed">Landmass <code id="seed-label">…</code> · <span id="meta"></span></p>
+  </footer>
+</body>
+</html>
