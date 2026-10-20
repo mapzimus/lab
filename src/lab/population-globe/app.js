@@ -271,7 +271,7 @@ let playing = false, yearF = 2025;
 function setPlaying(on) {
   if (on && !layer.timeline) return;
   playing = on;
-  if (on) { if (year >= 2030) setYear(1975); yearF = year; }
+  if (on) { if (year >= 2025) setYear(1975); yearF = year; }
   $("play-icon").setAttribute("d", on ? "M5 3h3.5v14H5zM11.5 3H15v14h-3.5z" : "M5 3l12 7-12 7z");
   playBtn.setAttribute("aria-label", on ? "Pause" : "Play the years from 1975");
 }
