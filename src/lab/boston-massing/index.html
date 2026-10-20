@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Boston Massing Model · Mapzimus Lab</title>
+  <meta name="description" content="Downtown Boston in 3D: 9,637 OpenStreetMap buildings and tower parts raised to their recorded heights, with streets, parks and the harbor.">
+  <link rel="canonical" href="https://mapzimus.com/lab/boston-massing/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Boston Massing Model · Mapzimus Lab">
+  <meta property="og:description" content="Downtown Boston in 3D: 9,637 OpenStreetMap buildings and tower parts raised to their recorded heights, with streets, parks and the harbor.">
+  <meta property="og:url" content="https://mapzimus.com/lab/boston-massing/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#dfe6ec">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/boston-massing/styles.css">
+  <script src="/lab/boston-massing/vendor/three.min.js" defer></script>
+  <script src="/lab/boston-massing/vendor/OrbitControls.js" defer></script>
+  <script src="/lab/boston-massing/app.js" defer></script>
+</head>
+<body>
+  <div id="stage"></div>
+
+<aside class="sheet" id="sheet">
+  <a class="back" href="/lab/">← Lab</a>
+  <header>
+    <div>
+      <div class="eyebrow">42.353° N · 71.068° W</div>
+      <h1 class="display-narrow">Downtown Boston, extruded</h1>
+    </div>
+    <button id="toggle" aria-expanded="true">Hide</button>
+  </header>
+  <p class="lede">Every building in OpenStreetMap from Back Bay to the harbor, raised to its recorded height, with towers built from their mapped parts. Drag to orbit, right-drag to pan, scroll to zoom.</p>
+
+  <div class="group">
+    <div class="eyebrow">Colour by</div>
+    <div class="seg" role="group" aria-label="Colour mode">
+      <button id="m-real" aria-pressed="true">Materials</button>
+      <button id="m-height" aria-pressed="false">Height</button>
+      <button id="m-src" aria-pressed="false">Source</button>
+    </div>
+    <p class="foot" id="legend-real">Facade and roof colours come from OpenStreetMap tags where mappers recorded them. Other buildings get a typical Boston material for their type: brick rowhouses, limestone and granite offices, glass towers.</p>
+    <div id="legend-height" hidden>
+      <div class="ramp"></div>
+      <div class="ramp-scale"><span>0 m</span><span>60</span><span>120</span><span>240 m</span></div>
+    </div>
+    <div class="keys" id="legend-src" hidden>
+      <div class="key"><i style="background:var(--src-m)"></i><span>Measured height tag</span><b id="c-m"></b></div>
+      <div class="key"><i style="background:var(--src-f)"></i><span>Floors × 3.3 m</span><b id="c-f"></b></div>
+      <div class="key"><i style="background:var(--src-e)"></i><span>Typical for building type</span><b id="c-e"></b></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <label class="row" for="exag">Vertical scale <output id="exag-out">1.0×</output></label>
+    <input type="range" id="exag" min="0.5" max="3" step="0.1" value="1">
+  </div>
+
+  <div class="group">
+    <div class="eyebrow">Tallest named · click to fly</div>
+    <ul class="tall" id="tall"></ul>
+  </div>
+
+  <p class="foot">Footprints and heights © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, ODbL. <span id="count"></span></p>
+</aside>
+
+<div id="tip" hidden></div>
+</body>
+</html>
