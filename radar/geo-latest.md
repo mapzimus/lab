@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-19
+# Mapzimus Geospatial Radar — 2026-10-20
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [London is Bigger than Colorado](http://googlemapsmania.blogspot.com/2026/10/london-is-bigger-than-colorado.html)
 - [There are 89,603 Dogs in New York City](http://googlemapsmania.blogspot.com/2026/10/there-are-89603-dogs-in-new-york-city.html)
 - [What is Your Walk Score?](http://googlemapsmania.blogspot.com/2026/10/what-is-your-walk-score.html)
 - [What America Looks Like After 700 Meters of Sea Level Rise](http://googlemapsmania.blogspot.com/2026/10/what-america-looks-like-after-700.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [The New Age of Building Age Maps Has Begun](http://googlemapsmania.blogspot.com/2026/10/the-new-age-of-building-age-maps-has.html)
 - [The World is Your War Zone](http://googlemapsmania.blogspot.com/2026/10/the-world-is-your-war-zone.html)
 - [Mapping the Cosmos](http://googlemapsmania.blogspot.com/2026/10/mapping-cosmos.html)
-- [Animated Map Videos](http://googlemapsmania.blogspot.com/2026/10/animated-map-videos.html)
 
 ## Geography Realm
 
@@ -53,7 +53,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Getting Maps to Align using QGIS](https://gis.stackexchange.com/questions/501609/getting-maps-to-align-using-qgis) (▲ -2 · 0 answers)
 - [Finding the land area east and west of meridian](https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian) (▲ 0 · 0 answers)
 - [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
 - [Need to find out if my street is public or Private](https://gis.stackexchange.com/questions/501591/need-to-find-out-if-my-street-is-public-or-private) (▲ -2 · 0 answers)
@@ -63,19 +62,20 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Extracting data (or even converting) from WMS to shapefile in QGIS](https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis) (▲ 3 · 0 answers)
 - [Orfeo fails to map paths in QGIS 3.44.2](https://gis.stackexchange.com/questions/501583/orfeo-fails-to-map-paths-in-qgis-3-44-2) (▲ 1 · 0 answers)
 - [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 3 · 1 answers)
+- [Joining point attributes to line in QGIS](https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis) (▲ 2 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
 
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
-- [Mid-Atlantic Lightning Mapping Array (MALMA)](https://search.earthdata.nasa.gov/search?q=malma) — The Mid-Atlantic Lightning Mapping Array (MALMA) dataset collection is used to validate the Lightning Imaging Sensor (LIS) on the International Space Station…
+- [OMI/Aura NO2 Cloud-Screened Total and Tropospheric Column L3 Global Gridded 0.25 degree x 0.25 degree Ver 5.0, Col 004 (OMNO2d)](https://search.earthdata.nasa.gov/search?q=OMNO2d) — This is Level-3 daily global gridded (0.25x0.25 degree) Nitrogen Dioxide Product (OMNO2d).
+- [OMI/Aura NO2 Total and Tropospheric Column Daily L2 Global Gridded 0.25 degree x 0.25 degree Ver 5.0, Col 004 (OMNO2G)](https://search.earthdata.nasa.gov/search?q=OMNO2G) — This Level-2G daily global gridded product OMNO2G is based on the pixel level OMI Level-2 NO2 product OMNO2.
+- [OMI/Aura Nitrogen Dioxide (NO2) Total and Tropospheric Column 1-orbit L2 Swath 13x24 km Ver 5.0, Col 004 (OMNO2)](https://search.earthdata.nasa.gov/search?q=OMNO2) — The Version 5.0, Collection 004 Aura Ozone Monitoring Instrument (OMI) Nitrogen Dioxide (NO2) Standard Product (OMNO2) is now available from the NASA Goddard…
+- [CLASIC07 Vegetation Water Content Map V001](https://search.earthdata.nasa.gov/search?q=CL07VWC) — The Vegetation Water Content (VWC) map for the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07) was derived by calculating Normalized Difference W…
+- [CLASIC07 In Situ Vegetation Data V001](https://search.earthdata.nasa.gov/search?q=CL07V) — This data set includes in situ vegetation data collected during the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07) campaign.
+- [CLASIC07 In Situ Soil Moisture Data V001](https://search.earthdata.nasa.gov/search?q=CL07SM) — This data set is comprised of several parameters from in situ measurements collected for the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07).
+- [CLASIC07 Land Cover Classification Map V001](https://search.earthdata.nasa.gov/search?q=CL07LC) — This data set consists of land cover classification data derived from satellite imagery as part of the Cloud and Land Surface Interaction Campaign 2007 (CLAS…
 
 ## Data.gov — new geodata
 

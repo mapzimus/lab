@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-19",
+  "generatedAt": "2026-10-20",
   "news": {
     "mapsmania": [
+      {
+        "title": "London is Bigger than Colorado",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/london-is-bigger-than-colorado.html",
+        "desc": ""
+      },
       {
         "title": "There are 89,603 Dogs in New York City",
         "url": "http://googlemapsmania.blogspot.com/2026/10/there-are-89603-dogs-in-new-york-city.html",
@@ -35,11 +40,6 @@
       {
         "title": "Mapping the Cosmos",
         "url": "http://googlemapsmania.blogspot.com/2026/10/mapping-cosmos.html",
-        "desc": ""
-      },
-      {
-        "title": "Animated Map Videos",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/animated-map-videos.html",
         "desc": ""
       }
     ],
@@ -210,12 +210,6 @@
   ],
   "gisse": [
     {
-      "title": "Getting Maps to Align using QGIS",
-      "url": "https://gis.stackexchange.com/questions/501609/getting-maps-to-align-using-qgis",
-      "score": -2,
-      "answers": 0
-    },
-    {
       "title": "Finding the land area east and west of meridian",
       "url": "https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian",
       "score": 0,
@@ -268,6 +262,12 @@
       "url": "https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis",
       "score": 3,
       "answers": 1
+    },
+    {
+      "title": "Joining point attributes to line in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis",
+      "score": 2,
+      "answers": 1
     }
   ],
   "nasa": [
@@ -290,46 +290,46 @@
       "org": "ASF"
     },
     {
-      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
-      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
+      "title": "OMI/Aura NO2 Cloud-Screened Total and Tropospheric Column L3 Global Gridded 0.25 degree x 0.25 degree Ver 5.0, Col 004 (OMNO2d)",
+      "url": "https://search.earthdata.nasa.gov/search?q=OMNO2d",
+      "desc": "This is Level-3 daily global gridded (0.25x0.25 degree) Nitrogen Dioxide Product (OMNO2d).",
+      "org": "GES_DISC"
+    },
+    {
+      "title": "OMI/Aura NO2 Total and Tropospheric Column Daily L2 Global Gridded 0.25 degree x 0.25 degree Ver 5.0, Col 004 (OMNO2G)",
+      "url": "https://search.earthdata.nasa.gov/search?q=OMNO2G",
+      "desc": "This Level-2G daily global gridded product OMNO2G is based on the pixel level OMI Level-2 NO2 product OMNO2.",
+      "org": "GES_DISC"
+    },
+    {
+      "title": "OMI/Aura Nitrogen Dioxide (NO2) Total and Tropospheric Column 1-orbit L2 Swath 13x24 km Ver 5.0, Col 004 (OMNO2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=OMNO2",
+      "desc": "The Version 5.0, Collection 004 Aura Ozone Monitoring Instrument (OMI) Nitrogen Dioxide (NO2) Standard Product (OMNO2) is now available from the NASA Goddard…",
+      "org": "GES_DISC"
+    },
+    {
+      "title": "CLASIC07 Vegetation Water Content Map V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=CL07VWC",
+      "desc": "The Vegetation Water Content (VWC) map for the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07) was derived by calculating Normalized Difference W…",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "title": "CLASIC07 In Situ Vegetation Data V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=CL07V",
+      "desc": "This data set includes in situ vegetation data collected during the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07) campaign.",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
-      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "title": "CLASIC07 In Situ Soil Moisture Data V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=CL07SM",
+      "desc": "This data set is comprised of several parameters from in situ measurements collected for the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07).",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
-      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "title": "CLASIC07 Land Cover Classification Map V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=CL07LC",
+      "desc": "This data set consists of land cover classification data derived from satellite imagery as part of the Cloud and Land Surface Interaction Campaign 2007 (CLAS…",
       "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "Mid-Atlantic Lightning Mapping Array (MALMA)",
-      "url": "https://search.earthdata.nasa.gov/search?q=malma",
-      "desc": "The Mid-Atlantic Lightning Mapping Array (MALMA) dataset collection is used to validate the Lightning Imaging Sensor (LIS) on the International Space Station…",
-      "org": "GHRC_DAAC"
     }
   ],
   "datagov": [
