@@ -1,6 +1,7 @@
 (async () => {
   const POP = await (await fetch("/lab/population-globe/data/density.json")).json();
   const NE = await (await fetch("/lab/population-globe/data/places.json")).json();
+  const COUNTRIES = await (await fetch("/lab/population-globe/data/countries.json")).json();
 (() => {
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -109,26 +110,59 @@ const bars = new THREE.InstancedMesh(box, new THREE.MeshLambertMaterial(), cells
 bars.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 scene.add(bars);
 
+// two metrics: residents per km², and residents in the whole cell (density × cell area)
+const cpop = new Float32Array(dens.length);
+for (let r = 0; r < H; r++) { const a = cellArea(r); for (let c = 0; c < W; c++) cpop[r * W + c] = dens[r * W + c] * a; }
+let pmax = 0;
+for (const g of cells) if (cpop[g] > pmax) pmax = cpop[g];
+let metric = "dens";
+const val = g => metric === "dens" ? dens[g] : cpop[g];
+const vmax = () => metric === "dens" ? dmax : pmax;
+const tOf = v => Math.log10(1 + v) / Math.log10(1 + vmax());
+
+// countries, classed by total population and average density against the median country
+const CT = COUNTRIES.countries.map(([name, a3, pop, area, dens, lat, lon]) => ({ name, a3, pop, area, dens, lat, lon }));
+const median = a => { const s = [...a].sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
+const medPop = median(CT.map(c => c.pop)), medDen = median(CT.map(c => c.dens));
+CT.forEach(c => { c.cls = (c.pop >= medPop ? 2 : 0) + (c.dens >= medDen ? 1 : 0); });
+const CLS_NAME = ["small and sparse", "small and crowded", "big and sparse", "big and crowded"];
+const craw = atob(COUNTRIES.grid), ccode = new Uint8Array(craw.length);
+for (let i = 0; i < craw.length; i++) ccode[i] = craw.charCodeAt(i);
+const BIV = ["--b0", "--b1", "--b2", "--b3"].map(n => new THREE.Color(css(n)));
+const NOCLS = new THREE.Color(0x3a4256);
+let colorMode = "ramp", selected = -1;
+
 const ramp = ["--r0", "--r1", "--r2", "--r3"].map(n => new THREE.Color(css(n)));
 const stops = [0, 0.4, 0.72, 1];
-const lmax = Math.log10(1 + dmax);
-const tOf = d => Math.log10(1 + d) / lmax;
 function rampColor(t, out) {
   let i = 0; while (i < stops.length - 2 && t > stops[i + 1]) i++;
   const k = (t - stops[i]) / (stops[i + 1] - stops[i]);
   return out.copy(ramp[i]).lerp(ramp[i + 1], Math.min(1, Math.max(0, k)));
 }
+function colorFor(i, out) {
+  const g = cells[i], k = ccode[g];
+  if (colorMode === "ramp") rampColor(tOf(val(g)), out);
+  else out.copy(k === 255 ? NOCLS : BIV[CT[k].cls]).multiplyScalar(0.5 + 0.5 * tOf(val(g)));
+  if (selected >= 0 && k !== selected) out.multiplyScalar(0.22);
+  return out;
+}
 const tmpC = new THREE.Color();
-cells.forEach((g, i) => bars.setColorAt(i, rampColor(tOf(dens[g]), tmpC)));
+let hovered = -1;
+function recolorAll() {
+  for (let i = 0; i < cells.length; i++) bars.setColorAt(i, colorFor(i, tmpC));
+  if (hovered >= 0) bars.setColorAt(hovered, tmpC.set(0xffffff));
+  bars.instanceColor.needsUpdate = true;
+}
+recolorAll();
 
 const SCALES = {
-  lin: { f: d => d / dmax, max: 60, note: "True proportions. A handful of megacity cells tower over everything else." },
-  sqrt: { f: d => Math.sqrt(d / dmax), max: 34, note: "Compresses the tallest spikes so dense regions like the Ganges plain and eastern China stand out." },
-  log: { f: d => tOf(d), max: 16, note: "Every tenfold step in density adds the same height, so sparse regions show up too." }
+  lin: { f: v => v / vmax(), max: 60, note: "True proportions. A handful of megacity cells tower over everything else." },
+  sqrt: { f: v => Math.sqrt(v / vmax()), max: 34, note: "Compresses the tallest spikes so dense regions like the Ganges plain and eastern China stand out." },
+  log: { f: v => tOf(v), max: 16, note: "Every tenfold step adds the same height, so sparse regions show up too." }
 };
 let scaleKey = "sqrt";
 const cur = new Float32Array(cells.length), target = new Float32Array(cells.length);
-function setTargets() { const s = SCALES[scaleKey]; cells.forEach((g, i) => target[i] = Math.max(0.15, s.f(dens[g]) * s.max)); document.getElementById("scale-note").textContent = s.note; }
+function setTargets() { const s = SCALES[scaleKey]; cells.forEach((g, i) => target[i] = Math.max(0.15, s.f(val(g)) * s.max)); document.getElementById("scale-note").textContent = s.note; }
 setTargets();
 if (reduceMotion) cur.set(target);
 
@@ -167,15 +201,133 @@ for (const [k, id] of Object.entries(scaleBtns)) document.getElementById(id).add
 });
 
 const ticks = document.getElementById("ticks");
-for (const v of [1, 10, 100, 1000, 10000].filter(v => tOf(v) < 0.86)) {
-  const s = document.createElement("span");
-  s.style.left = (tOf(v) * 100) + "%";
-  s.textContent = v >= 1000 ? v / 1000 + "k" : v;
-  ticks.append(s);
+const fmtShort = v => v >= 1e6 ? (v / 1e6).toFixed(v >= 1e7 ? 0 : 1) + "M" : v >= 1000 ? Math.round(v / 1000) + "k" : String(Math.round(v));
+function buildTicks() {
+  ticks.replaceChildren();
+  const vals = metric === "dens" ? [1, 10, 100, 1000, 10000] : [100, 1000, 1e4, 1e5, 1e6];
+  for (const v of vals.filter(v => tOf(v) > 0.04 && tOf(v) < 0.86)) {
+    const s = document.createElement("span");
+    s.style.left = (tOf(v) * 100) + "%";
+    s.textContent = fmtShort(v);
+    ticks.append(s);
+  }
+  const last = document.createElement("span");
+  last.style.left = "100%";
+  last.textContent = metric === "dens" ? Math.round(vmax()).toLocaleString() : fmtShort(vmax());
+  ticks.append(last);
 }
-const lastTick = document.createElement("span");
-lastTick.style.left = "100%"; lastTick.textContent = Math.round(dmax).toLocaleString();
-ticks.append(lastTick);
+buildTicks();
+
+const METRIC_NOTE = {
+  dens: "Residents per square kilometre: how crowded each place is.",
+  pop: "Total residents in each 28 km cell. Cells narrow toward the poles, so the same crowding holds fewer people in Scandinavia than in Nigeria."
+};
+const metricBtns = { dens: "v-dens", pop: "v-pop" };
+function setMetric(m) {
+  metric = m;
+  for (const [k, id] of Object.entries(metricBtns)) document.getElementById(id).setAttribute("aria-pressed", String(k === m));
+  document.getElementById("metric-note").textContent = METRIC_NOTE[m];
+  document.getElementById("ramp-title").textContent = m === "dens" ? "People per km²" : "People per cell";
+  setTargets(); buildTicks(); recolorAll();
+  if (reduceMotion) { cur.set(target); writeMatrices(); }
+}
+for (const [k, id] of Object.entries(metricBtns)) document.getElementById(id).addEventListener("click", () => setMetric(k));
+document.getElementById("metric-note").textContent = METRIC_NOTE.dens;
+
+// colour mode + country comparison chart
+const colorBtns = { ramp: "c-ramp", cmp: "c-cmp" };
+for (const [k, id] of Object.entries(colorBtns)) document.getElementById(id).addEventListener("click", () => {
+  colorMode = k;
+  for (const [k2, id2] of Object.entries(colorBtns)) document.getElementById(id2).setAttribute("aria-pressed", String(k2 === k));
+  document.getElementById("legend-ramp").hidden = k !== "ramp";
+  document.getElementById("legend-cmp").hidden = k !== "cmp";
+  recolorAll();
+  if (k === "cmp") drawScatter();
+});
+const sc = document.getElementById("scatter"), sctx = sc.getContext("2d");
+const read = document.getElementById("cmp-read"), clearBtn = document.getElementById("cmp-clear");
+const LABELED = new Set(["IND", "CHN", "USA", "RUS", "CAN", "AUS", "BGD", "SGP", "MNG", "NLD", "BRA", "ISL"]);
+const SX = [4, 9.3], SY = [-1, 4.2], PAD = { l: 30, r: 8, t: 10, b: 22 };
+let scHover = -1, scPts = [];
+function drawScatter() {
+  const w = sc.clientWidth, h = sc.clientHeight, dpr = devicePixelRatio || 1;
+  if (!w) return;
+  sc.width = w * dpr; sc.height = h * dpr;
+  sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  sctx.clearRect(0, 0, w, h);
+  const X = v => PAD.l + (Math.log10(v) - SX[0]) / (SX[1] - SX[0]) * (w - PAD.l - PAD.r);
+  const Y = v => PAD.t + (1 - (Math.log10(Math.max(v, 0.1)) - SY[0]) / (SY[1] - SY[0])) * (h - PAD.t - PAD.b);
+  const muted = css("--muted"), rule = css("--rule"), ink = css("--ink");
+  sctx.font = "10px 'IBM Plex Mono', monospace";
+  sctx.lineWidth = 1;
+  for (const [v, l] of [[1e4, "10k"], [1e5, "100k"], [1e6, "1M"], [1e7, "10M"], [1e8, "100M"], [1e9, "1B"]]) {
+    const x = Math.round(X(v)) + 0.5;
+    sctx.strokeStyle = rule; sctx.beginPath(); sctx.moveTo(x, PAD.t); sctx.lineTo(x, h - PAD.b); sctx.stroke();
+    sctx.fillStyle = muted; sctx.textAlign = "center"; sctx.fillText(l, x, h - 8);
+  }
+  for (const [v, l] of [[1, "1"], [10, "10"], [100, "100"], [1000, "1k"], [10000, "10k"]]) {
+    const y = Math.round(Y(v)) + 0.5;
+    sctx.strokeStyle = rule; sctx.beginPath(); sctx.moveTo(PAD.l, y); sctx.lineTo(w - PAD.r, y); sctx.stroke();
+    sctx.fillStyle = muted; sctx.textAlign = "right"; sctx.fillText(l, PAD.l - 4, y + 3);
+  }
+  sctx.setLineDash([3, 3]); sctx.strokeStyle = muted;
+  sctx.beginPath(); sctx.moveTo(X(medPop), PAD.t); sctx.lineTo(X(medPop), h - PAD.b); sctx.stroke();
+  sctx.beginPath(); sctx.moveTo(PAD.l, Y(medDen)); sctx.lineTo(w - PAD.r, Y(medDen)); sctx.stroke();
+  sctx.setLineDash([]);
+  sctx.fillStyle = muted; sctx.textAlign = "left"; sctx.fillText("per km² ↑", PAD.l + 3, PAD.t + 8);
+  sctx.textAlign = "right"; sctx.fillText("people →", w - PAD.r - 2, h - PAD.b - 4);
+  scPts = CT.map((c, i) => ({ i, x: X(c.pop), y: Y(c.dens) }));
+  for (const p of scPts) {
+    const c = CT[p.i], on = p.i === selected || p.i === scHover;
+    sctx.globalAlpha = selected >= 0 && !on ? 0.35 : 0.9;
+    sctx.fillStyle = "#" + BIV[c.cls].getHexString();
+    sctx.beginPath(); sctx.arc(p.x, p.y, on ? 5 : 3, 0, Math.PI * 2); sctx.fill();
+    if (on) { sctx.strokeStyle = ink; sctx.stroke(); }
+  }
+  sctx.globalAlpha = 1;
+  sctx.font = "600 10.5px Archivo, sans-serif"; sctx.fillStyle = ink;
+  const placed = [];
+  const order = [...scPts].sort((a, b) => (b.i === selected || b.i === scHover) - (a.i === selected || a.i === scHover));
+  for (const p of order) {
+    const c = CT[p.i];
+    if (!LABELED.has(c.a3) && p.i !== selected && p.i !== scHover) continue;
+    const name = c.a3 === "USA" ? "USA" : c.name;
+    const tw = sctx.measureText(name).width, right = p.x + tw + 8 > w;
+    const x0 = right ? p.x - 6 - tw : p.x + 6, box = [x0 - 2, p.y - 7, x0 + tw + 2, p.y + 6];
+    if (placed.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) continue;
+    placed.push(box);
+    sctx.textAlign = "left";
+    sctx.fillText(name, x0, p.y + 3);
+  }
+}
+const describe = c => `<b>${c.name.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</b> · ${fmt(c.pop)} people · ${c.dens < 10 ? c.dens.toFixed(1) : Math.round(c.dens).toLocaleString()} per km² · ${CLS_NAME[c.cls]}`;
+function nearest(e) {
+  const r = sc.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  let best = -1, bd = 81;
+  for (const p of scPts) { const d = (p.x - x) ** 2 + (p.y - y) ** 2; if (d < bd) { bd = d; best = p.i; } }
+  return best;
+}
+sc.addEventListener("pointermove", e => {
+  const i = nearest(e);
+  if (i === scHover) return;
+  scHover = i;
+  read.innerHTML = i >= 0 ? describe(CT[i]) : selected >= 0 ? describe(CT[selected]) : "Each dot is a country. Hover to read it, click to fly there and highlight it.";
+  drawScatter();
+});
+sc.addEventListener("pointerleave", () => { scHover = -1; if (selected >= 0) read.innerHTML = describe(CT[selected]); drawScatter(); });
+function selectCountry(i) {
+  selected = i;
+  clearBtn.hidden = i < 0;
+  if (i >= 0) {
+    const c = CT[i];
+    read.innerHTML = describe(c);
+    flyTo(c.lat, c.lon, Math.min(430, 150 + Math.sqrt(c.area) * 0.06));
+  }
+  recolorAll(); drawScatter();
+}
+sc.addEventListener("click", e => { const i = nearest(e); if (i >= 0) selectCountry(i); });
+clearBtn.addEventListener("click", () => { selectCountry(-1); read.textContent = "Each dot is a country. Hover to read it, click to fly there and highlight it."; });
+addEventListener("resize", () => { if (colorMode === "cmp") drawScatter(); });
 
 const cellAt = (lat, lon) => {
   const r = Math.min(H - 1, Math.max(0, Math.floor((90 - lat) / STEP)));
@@ -299,10 +451,9 @@ function placeLabels() {
 // hover: intersect the sphere analytically and look up the grid cell beneath
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), sphere = new THREE.Sphere(new THREE.Vector3(), R), hit = new THREE.Vector3();
 const tip = document.getElementById("tip");
-let hovered = -1;
 function hoverCell(g) {
   const i = g >= 0 ? instOf[g] : -1;
-  if (hovered >= 0) bars.setColorAt(hovered, rampColor(tOf(dens[cells[hovered]]), tmpC));
+  if (hovered >= 0) bars.setColorAt(hovered, colorFor(hovered, tmpC));
   hovered = i;
   if (i >= 0) bars.setColorAt(i, tmpC.set(0xffffff));
   bars.instanceColor.needsUpdate = true;
@@ -322,7 +473,13 @@ function probe(x, y) {
   const m = document.createElement("div"); m.className = "m";
   const cLat = 90 - (r + 0.5) * STEP, cLon = -180 + (g % W + 0.5) * STEP;
   m.textContent = `${Math.abs(cLat).toFixed(2)}°${cLat >= 0 ? "N" : "S"} ${Math.abs(cLon).toFixed(2)}°${cLon >= 0 ? "E" : "W"}`;
-  tip.append(s, p, m);
+  tip.append(s, p);
+  if (ccode[g] !== 255) {
+    const c = CT[ccode[g]], cl = document.createElement("div");
+    cl.textContent = `${c.name}: ${fmt(c.pop)} people, ${c.dens < 10 ? c.dens.toFixed(1) : Math.round(c.dens).toLocaleString()} per km² (${CLS_NAME[c.cls]})`;
+    tip.append(cl);
+  }
+  tip.append(m);
   tip.hidden = false;
   tip.style.left = Math.min(x + 14, innerWidth - tip.offsetWidth - 16) + "px";
   tip.style.top = Math.min(y + 14, innerHeight - tip.offsetHeight - 16) + "px";

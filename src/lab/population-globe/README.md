@@ -12,6 +12,13 @@ bar and are decluttered each frame by metro population, with more appearing as
 you zoom in. Hover picking intersects the sphere analytically and looks up the
 grid cell, so it costs nothing per bar.
 
+Bars can show residents per km² or total residents per cell (density × cell
+area). The **Country type** colour mode splits countries at the median country
+on total population and on average density, so big-but-sparse places (Russia,
+Canada) and small-but-crowded ones (Singapore, Bahrain) separate. A scatter of
+every country (log population against log density) sits in the panel; clicking
+a dot flies there and dims every other country.
+
 ## Data
 
 - `data/density.json` — `pipeline/prep_density.py` sums the GHS-POP R2023A
@@ -22,3 +29,8 @@ grid cell, so it costs nothing per bar.
 - `data/places.json` — `pipeline/prep_places.py` keeps Natural Earth 10m
   populated places over 250,000 (1,721 cities, `pop_max`), and the 50m land
   borders and coastlines with coordinates rounded to 0.01°.
+- `data/countries.json` — `pipeline/prep_countries.py` sums the same GHS-POP
+  grid at 0.05° inside Natural Earth 50m admin-0 polygons (rasterised) for each
+  country's population and area, keeping 215 countries over 300 km². It also
+  stores a 0.25° `uint8` grid of country indexes (255 = none) aligned with the
+  density grid, which colours each bar by its country.

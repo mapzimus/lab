@@ -51,7 +51,16 @@
   </div>
 
   <div class="group">
-    <div class="eyebrow">Bar height</div>
+    <div class="eyebrow">Bars show</div>
+    <div class="seg" role="group" aria-label="Metric">
+      <button id="v-dens" aria-pressed="true">People per km²</button>
+      <button id="v-pop" aria-pressed="false">People per cell</button>
+    </div>
+    <p class="note" id="metric-note"></p>
+  </div>
+
+  <div class="group">
+    <div class="eyebrow">Height scale</div>
     <div class="seg" role="group" aria-label="Height scale">
       <button id="s-lin" aria-pressed="false">Linear</button>
       <button id="s-sqrt" aria-pressed="true">Square root</button>
@@ -61,9 +70,28 @@
   </div>
 
   <div class="group">
-    <div class="eyebrow">Density, people per km²</div>
-    <div class="ramp"></div>
-    <div class="ticks" id="ticks"></div>
+    <div class="eyebrow">Colour</div>
+    <div class="seg" role="group" aria-label="Colour mode">
+      <button id="c-ramp" aria-pressed="true">Same as height</button>
+      <button id="c-cmp" aria-pressed="false">Country type</button>
+    </div>
+    <div id="legend-ramp">
+      <div class="eyebrow" id="ramp-title">People per km²</div>
+      <div class="ramp"></div>
+      <div class="ticks" id="ticks"></div>
+    </div>
+    <div id="legend-cmp" hidden>
+      <p class="note">A big population is not the same as a crowded one. Each country is split at the median country on both counts, so Russia (big, sparse) and Singapore (small, crowded) land in opposite corners.</p>
+      <div class="keys2">
+        <span><i style="background:var(--b2)"></i>Big and sparse</span>
+        <span><i style="background:var(--b3)"></i>Big and crowded</span>
+        <span><i style="background:var(--b0)"></i>Small and sparse</span>
+        <span><i style="background:var(--b1)"></i>Small and crowded</span>
+      </div>
+      <canvas id="scatter" aria-label="Countries plotted by total population and average density"></canvas>
+      <p id="cmp-read">Each dot is a country. Hover to read it, click to fly there and highlight it.</p>
+      <button class="btn" id="cmp-clear" hidden>Clear highlight</button>
+    </div>
   </div>
 
   <div class="group">

@@ -32,6 +32,7 @@ body { margin: 0; }
   --rule: #2a3550;
   --accent: #f6a34a;
   --r0: #3b2a6b; --r1: #b23a6e; --r2: #f08a3e; --r3: #fff1c2;
+  --b0: #6c7896; --b1: #e05fa8; --b2: #46b6e0; --b3: #f6a34a;
   --f-display: "Archivo", "Arial Narrow", sans-serif;
   --f-body: "Archivo", system-ui, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
@@ -85,6 +86,12 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .lbl.big { font-size: 14px; font-family: var(--f-display); }
 .lbl:hover { color: var(--accent); }
 .lbl:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.keys2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 10px; font-size: 12px; }
+.keys2 span { display: flex; gap: 6px; align-items: center; }
+.keys2 i { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+#scatter { width: 100%; height: 230px; display: block; cursor: crosshair; }
+#cmp-read { margin: 0; min-height: 2.8em; font: 400 12px/1.4 var(--f-mono); color: var(--muted); }
+#cmp-read b { color: var(--ink); font-weight: 600; }
 .row2 { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
 .sheet { overflow-x: hidden; }
 .sheet > * { min-width: 0; }
