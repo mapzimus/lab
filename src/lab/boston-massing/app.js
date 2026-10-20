@@ -1,5 +1,5 @@
 (async () => {
-  const DATA = await (await fetch("/lab/boston-massing/data/boston.json")).json();
+  const [DATA] = await Promise.all([fetch("/lab/boston-massing/data/boston.json").then(r => r.json())]);
 (() => {
 const B = DATA.buildings;
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -27,11 +27,11 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 stage.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0xffffff, 2600, 7500);
+scene.fog = new THREE.Fog(0xffffff, 3200, 9000);
 const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 10, 20000);
-camera.position.set(-1700, 1500, 2000);
+camera.position.set(-2300, 2400, 1500);
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.target.set(150, 0, 0);
+controls.target.set(0, 0, -1000);
 controls.enableDamping = true;
 controls.maxPolarAngle = Math.PI * 0.47;
 controls.minDistance = 80;
@@ -93,12 +93,13 @@ function areaLayer(list, mat, y) {
 const parkMat = stdMat({}), waterMat = stdMat({ roughness: 0.25, metalness: 0.1 }), roadMat = stdMat({ roughness: 0.95 }), pathMat = stdMat({});
 areaLayer(DATA.parks, parkMat, 0.15);
 areaLayer(DATA.water, waterMat, 0.25);
-function ribbons(filter, mat, y) {
+// roads: [width, height above ground, x, z, ...]; bridges carry their deck height
+function ribbons(filter, mat, shadow) {
   const p = [];
   for (const r of DATA.roads) {
-    if (!filter(r[0])) continue;
-    const w = r[0] / 2;
-    for (let k = 1; k + 3 < r.length; k += 2) {
+    if (!filter(r[0], r[1])) continue;
+    const w = r[0] / 2, y = r[1];
+    for (let k = 2; k + 3 < r.length; k += 2) {
       const x1 = r[k] / 10, z1 = r[k + 1] / 10, x2 = r[k + 2] / 10, z2 = r[k + 3] / 10;
       const dx = x2 - x1, dz = z2 - z1, L = Math.hypot(dx, dz) || 1;
       const nx = -dz / L * w, nz = dx / L * w, ex = dx / L * w * 0.5, ez = dz / L * w * 0.5;
@@ -112,10 +113,72 @@ function ribbons(filter, mat, y) {
   const m = new THREE.Mesh(g, mat);
   m.material.side = THREE.DoubleSide;
   m.receiveShadow = true;
+  m.castShadow = !!shadow;
   scene.add(m);
 }
-ribbons(w => w > 2, roadMat, 0.4);
-ribbons(w => w <= 2, pathMat, 0.5);
+ribbons((w, y) => w > 2 && y < 2, roadMat);
+ribbons((w, y) => w <= 2 && y < 2, pathMat);
+ribbons((w, y) => y >= 2, roadMat, true);
+
+// bridge decks: slabs 2.2 m thick at their deck height
+const bridgeMat = stdMat({ roughness: 0.85 });
+{
+  const geos = [];
+  for (const b of DATA.bridges) {
+    const sh = new THREE.Shape(ringToVec(b.o));
+    try {
+      const g = new THREE.ExtrudeGeometry(sh, { depth: 2.2, bevelEnabled: false });
+      g.rotateX(-Math.PI / 2); g.translate(0, b.y - 2.2, 0);
+      geos.push(g);
+    } catch (e) {}
+  }
+  const m = new THREE.Mesh(mergeFlat(geos), bridgeMat);
+  m.castShadow = m.receiveShadow = true;
+  scene.add(m);
+}
+
+// Zakim Bridge: the deck is mapped, the towers and cables are not, so they are built here from its published
+// dimensions: two inverted-Y towers (north 90 m, south 82 m) 227 m apart, cables fanned to both deck edges.
+const towerMat = stdMat({ roughness: 0.6 }), cableMat = new THREE.LineBasicMaterial({ transparent: true, opacity: 0.75 });
+const ZK = DATA.zakim;
+if (ZK) {
+  const ax = new THREE.Vector3(ZK.ax, 0, ZK.az).normalize(), px = new THREE.Vector3(-ax.z, 0, ax.x);
+  const c0 = new THREE.Vector3(ZK.cx, 0, ZK.cz);
+  const half = ZK.w / 2, deck = ZK.deck;
+  const geos = [], cab = [];
+  const strut = (a, b, t) => {
+    const d = b.clone().sub(a), g = new THREE.BoxGeometry(t, d.length(), t);
+    g.translate(0, d.length() / 2, 0);
+    const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize());
+    g.applyQuaternion(q); g.translate(a.x, a.y, a.z);
+    geos.push(g);
+  };
+  // the north tower is the one toward Charlestown (more negative z)
+  const ends = [-113.5, 113.5].map(s => c0.clone().addScaledVector(ax, s)).sort((a, b) => a.z - b.z);
+  [[ends[0], 90], [ends[1], 82]].forEach(([base, top]) => {
+    const apex = base.clone().setY(top * 0.68);
+    for (const s of [-1, 1]) strut(base.clone().addScaledVector(px, s * (half + 5)), apex, 4.5);
+    strut(apex, base.clone().setY(top), 4);
+    strut(base.clone().addScaledVector(px, -half).setY(deck - 3), base.clone().addScaledVector(px, half).setY(deck - 3).add(new THREE.Vector3(0, 0.01, 0)), 3);
+    const along = base.clone().sub(c0).dot(ax) > 0 ? 1 : -1;
+    for (let k = 1; k <= 11; k++) {
+      const yTop = top * 0.7 + (top * 0.27) * (k / 11);
+      for (const dir of [-1, 1]) {
+        const reach = dir === -along ? k * 9.5 : k * 7.5;
+        for (const s of [-1, 1]) {
+          const from = base.clone().setY(yTop), to = base.clone().addScaledVector(ax, dir * reach).addScaledVector(px, s * (half - 1)).setY(deck);
+          cab.push(from.x, from.y, from.z, to.x, to.y, to.z);
+        }
+      }
+    }
+  });
+  const tm = new THREE.Mesh(mergeFlat(geos), towerMat);
+  tm.castShadow = tm.receiveShadow = true;
+  scene.add(tm);
+  const cg = new THREE.BufferGeometry();
+  cg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(cab), 3));
+  scene.add(new THREE.LineSegments(cg, cableMat));
+}
 
 // buildings: one merged mesh; each building owns a contiguous vertex range (caps first, then walls)
 const geos = [];
@@ -208,6 +271,7 @@ function applyTheme() {
   roadMat.color.set(css("--road"));
   pathMat.color.set(css("--path"));
   edgeMat.color.set(css("--edge"));
+  bridgeMat.color.set(css("--bridge")); towerMat.color.set(css("--tower")); cableMat.color.set(css("--tower"));
   cLo.set(css("--bld-lo")); cHi.set(css("--bld-hi"));
   for (const k of ["m", "f", "e"]) cSrc[k] = new THREE.Color(css("--src-" + k));
   cHover.set(css("--src-f"));
@@ -250,6 +314,14 @@ for (const b of tallest) {
   const h = document.createElement("span"); h.textContent = Math.round(b.h) + " m";
   btn.append(a, h); li.append(btn); list.append(li);
   btn.addEventListener("click", () => flyTo(b));
+}
+
+if (ZK) {
+  const li = document.createElement("li"), btn = document.createElement("button");
+  const a = document.createElement("span"); a.textContent = "Zakim Bridge towers";
+  const h = document.createElement("span"); h.textContent = "90 m";
+  btn.append(a, h); li.append(btn); list.append(li);
+  btn.addEventListener("click", () => flyTo({ box: [ZK.cx - 1, ZK.cx + 1, ZK.cz - 1, ZK.cz + 1], h: 90 }));
 }
 
 const sheet = document.getElementById("sheet"), toggle = document.getElementById("toggle");

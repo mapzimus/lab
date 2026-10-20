@@ -28,6 +28,8 @@ body { margin: 0; }
   --park: #a9c48f;
   --water: #8fb3cc;
   --edge: #2a2f33;
+  --bridge: #b8b5ad;
+  --tower: #f1f1ec;
   --lit: 1;
   --bld-lo: #f4f5f3;
   --bld-hi: #3f8f7f;
@@ -44,13 +46,13 @@ body { margin: 0; }
   --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --sky: #0f1417; --ground: #1d2226; --road: #2e353a; --path: #262c30; --park: #233325; --water: #132634; --edge: #05080a; --lit: 0.5;
+  --sky: #0f1417; --ground: #1d2226; --road: #2e353a; --path: #262c30; --park: #233325; --water: #132634; --edge: #05080a; --bridge: #4b5155; --tower: #dfe6ea; --lit: 0.5;
   --bld-lo: #39434a; --bld-hi: #6fd1bb;
   --src-m: #6fd1bb; --src-f: #e0b85c; --src-e: #4d5860;
   --sheet: rgba(20, 26, 30, 0.9); --ink: #e6ecef; --muted: #98a6ae; --rule: #33404a; --accent: #6fd1bb; color-scheme: dark;
 } }
 :root[data-theme="dark"] {
-  --sky: #0f1417; --ground: #1d2226; --road: #2e353a; --path: #262c30; --park: #233325; --water: #132634; --edge: #05080a; --lit: 0.5;
+  --sky: #0f1417; --ground: #1d2226; --road: #2e353a; --path: #262c30; --park: #233325; --water: #132634; --edge: #05080a; --bridge: #4b5155; --tower: #dfe6ea; --lit: 0.5;
   --bld-lo: #39434a; --bld-hi: #6fd1bb;
   --src-m: #6fd1bb; --src-f: #e0b85c; --src-e: #4d5860;
   --sheet: rgba(20, 26, 30, 0.9); --ink: #e6ecef; --muted: #98a6ae; --rule: #33404a; --accent: #6fd1bb; color-scheme: dark;

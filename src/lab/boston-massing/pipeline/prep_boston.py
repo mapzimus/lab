@@ -2,17 +2,17 @@ import json, math, re, sys
 
 D = "data/"
 LAT0, LON0 = 42.3530, -71.0680
-S, N, Wl, E = 42.3405, 42.3655, -71.0905, -71.0455
+S, N, Wl, E = 42.3405, 42.3860, -71.0905, -71.0455
 KX = math.cos(math.radians(LAT0)) * 111320
 KY = 110540
 X0, X1 = (Wl - LON0) * KX, (E - LON0) * KX
 Y0, Y1 = (S - LAT0) * KY, (N - LAT0) * KY  # y = north, metres
 
 load = lambda f: json.load(open(D + f, encoding="utf-8"))["elements"]
-bways = [e for e in load("boston2.json") if e["type"] == "way"]
-ctx = load("boston_ctx.json")
-rels = load("rels.json")
-coast = load("coast.json")
+bways = [e for e in load("b2/buildings.json") if e["type"] == "way"]
+ctx = load("b2/ctx.json")
+rels = load("b2/rels.json")
+coast = load("b2/coast.json")
 
 DEFAULT_H = {"house": 9, "detached": 9, "semidetached_house": 10, "terrace": 13, "apartments": 15,
              "residential": 13, "commercial": 15, "office": 22, "retail": 7, "garage": 4, "garages": 4,
@@ -233,9 +233,30 @@ for e in ctx:
     if hw not in RW or e["type"] != "way": continue
     if e["tags"].get("tunnel") in ("yes", "building_passage"): continue
     g = [P(p["lat"], p["lon"]) for p in e.get("geometry", [])]
-    if len(g) > 1: roads.append([RW[hw]] + enc(g))
+    lay = num(e["tags"].get("layer")) or 0
+    deck = round(max(lay, 1) * 7 + 0.8, 1) if e["tags"].get("bridge") not in (None, "no") else (0.4 if hw not in ("footway",) else 0.5)
+    if len(g) > 1: roads.append([RW[hw], deck] + enc(g))
+
+bridges, zakim = [], None
+for e in ctx + [r for r in rels if r.get("tags", {}).get("man_made") == "bridge"]:
+    t = e.get("tags", {})
+    if t.get("man_made") != "bridge":
+        continue
+    lay = num(t.get("layer")) or 1
+    for o, holes in polys(e):
+        rec = {"o": enc(o), "y": round(max(lay, 1) * 7, 1)}
+        if t.get("name"): rec["n"] = t["name"]
+        bridges.append(rec)
+        if "Zakim" in t.get("name", "") and zakim is None:
+            import numpy as np
+            pts = np.array(o); c = pts.mean(axis=0); u, sv, vt = np.linalg.svd(pts - c)
+            ax = vt[0]; proj = (pts - c) @ ax; perp = (pts - c) @ vt[1]
+            if ax[1] < 0: ax = -ax
+            zakim = {"cx": round(c[0], 1), "cz": round(-c[1], 1), "ax": round(float(ax[0]), 4), "az": round(float(-ax[1]), 4),
+                     "len": round(float(proj.max() - proj.min()), 1), "w": round(float(perp.max() - perp.min()), 1), "deck": round(max(lay, 1) * 7, 1)}
+print("bridges", len(bridges), "zakim", zakim)
 
 json.dump({"lat0": LAT0, "lon0": LON0, "box": [round(X0), round(X1), round(-Y1), round(-Y0)], "buildings": out,
-           "water": water, "parks": parks, "roads": roads},
+           "water": water, "parks": parks, "roads": roads, "bridges": bridges, "zakim": zakim},
           open(D + "boston_min.json", "w", encoding="utf-8"), separators=(",", ":"), ensure_ascii=False)
 print(len(out), "solids;", len(part_recs), "parts;", hidden, "outlines replaced by parts;", len(water), "water;", len(parks), "parks;", len(roads), "roads")
