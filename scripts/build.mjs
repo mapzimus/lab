@@ -63,6 +63,8 @@ const hostedProjectRoutes = {
   "world-xi": "/lab/world-xi/",
   "national-parks": "/lab/national-parks/",
   "state-puzzle": "/lab/state-puzzle/",
+  "boston-massing": "/lab/boston-massing/",
+  "population-globe": "/lab/population-globe/",
   "vacation-selector": "/vacation-selector/",
 };
 

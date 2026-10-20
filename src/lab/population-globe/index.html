@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Population Relief Globe · Mapzimus Lab</title>
+  <meta name="description" content="Where the world lives: 2025 population density as 105,700 bars on a globe, with city labels, borders, search and a tilt-to-horizon camera.">
+  <link rel="canonical" href="https://mapzimus.com/lab/population-globe/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Population Relief Globe · Mapzimus Lab">
+  <meta property="og:description" content="Where the world lives: 2025 population density as 105,700 bars on a globe, with city labels, borders, search and a tilt-to-horizon camera.">
+  <meta property="og:url" content="https://mapzimus.com/lab/population-globe/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#070a12">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/population-globe/styles.css">
+  <script src="/lab/population-globe/vendor/three.min.js" defer></script>
+  <script src="/lab/population-globe/vendor/OrbitControls.js" defer></script>
+  <script src="/lab/population-globe/app.js" defer></script>
+</head>
+<body>
+  <div id="stage"></div>
+<div id="labels"></div>
+
+<aside class="sheet" id="sheet">
+  <a class="back" href="/lab/">← Lab</a>
+  <header>
+    <div>
+      <div class="eyebrow">Residents per km² · 2025</div>
+      <h1 class="display-narrow">Where the world lives</h1>
+    </div>
+    <button id="toggle" aria-expanded="true">Hide</button>
+  </header>
+  <p class="lede">Each bar is a quarter-degree cell, about 28 km across at the equator. Bar height and colour show how many people live there per square kilometre. The grid adds up to <strong id="total"></strong> people.</p>
+
+  <div class="group">
+    <label class="eyebrow" for="search">Find a city</label>
+    <input id="search" list="city-list" placeholder="Type a city name, then Enter" autocomplete="off">
+    <datalist id="city-list"></datalist>
+  </div>
+
+  <div class="group">
+    <label class="row" for="tilt">Camera tilt <output id="tilt-out">0°</output></label>
+    <input type="range" id="tilt" min="0" max="72" step="1" value="0">
+    <p class="note">Tilt toward the horizon to see the bars rise like a skyline.</p>
+    <div class="row2">
+      <button class="btn" id="spin">Pause spin</button>
+      <label><input type="checkbox" id="lines" checked> Borders</label>
+      <label><input type="checkbox" id="names" checked> Labels</label>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="eyebrow">Bars show</div>
+    <div class="seg" role="group" aria-label="Metric">
+      <button id="v-dens" aria-pressed="true">People per km²</button>
+      <button id="v-pop" aria-pressed="false">People per cell</button>
+    </div>
+    <p class="note" id="metric-note"></p>
+  </div>
+
+  <div class="group">
+    <div class="eyebrow">Height scale</div>
+    <div class="seg" role="group" aria-label="Height scale">
+      <button id="s-lin" aria-pressed="false">Linear</button>
+      <button id="s-sqrt" aria-pressed="true">Square root</button>
+      <button id="s-log" aria-pressed="false">Log</button>
+    </div>
+    <p class="note" id="scale-note"></p>
+  </div>
+
+  <div class="group">
+    <div class="eyebrow">Colour</div>
+    <div class="seg" role="group" aria-label="Colour mode">
+      <button id="c-ramp" aria-pressed="true">Same as height</button>
+      <button id="c-cmp" aria-pressed="false">Country type</button>
+    </div>
+    <div id="legend-ramp">
+      <div class="eyebrow" id="ramp-title">People per km²</div>
+      <div class="ramp"></div>
+      <div class="ticks" id="ticks"></div>
+    </div>
+    <div id="legend-cmp" hidden>
+      <p class="note">A big population is not the same as a crowded one. Each country is split at the median country on both counts, so Russia (big, sparse) and Singapore (small, crowded) land in opposite corners.</p>
+      <div class="keys2">
+        <span><i style="background:var(--b2)"></i>Big and sparse</span>
+        <span><i style="background:var(--b3)"></i>Big and crowded</span>
+        <span><i style="background:var(--b0)"></i>Small and sparse</span>
+        <span><i style="background:var(--b1)"></i>Small and crowded</span>
+      </div>
+      <canvas id="scatter" aria-label="Countries plotted by total population and average density"></canvas>
+      <p id="cmp-read">Each dot is a country. Hover to read it, click to fly there and highlight it.</p>
+      <button class="btn" id="cmp-clear" hidden>Clear highlight</button>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="eyebrow">Fly to · density of that cell</div>
+    <ul class="cities" id="cities"></ul>
+  </div>
+
+  <p class="foot">Data: <a href="https://human-settlement.emergency.copernicus.eu/ghs_pop2023.php" target="_blank" rel="noopener">GHS-POP R2023A</a>, 2025 estimate, European Commission JRC. 30″ grid summed to 0.25°. Cities, borders and coastlines: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>. <span id="cells"></span></p>
+</aside>
+
+<div id="tip" hidden></div>
+</body>
+</html>
