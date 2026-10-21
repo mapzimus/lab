@@ -57,7 +57,6 @@ const hostedProjectRoutes = {
   "mapzimus-board": "/mapzimus-board/",
   "boston-in-motion": "/boston-in-motion/",
   "where-the-games-go": "/where-the-games-go/",
-  "smartpicker": "/smartpicker/",
   "citynario": "/citynario/",
   "ground-truth": "/ground-truth/",
   "world-xi": "/lab/world-xi/",
@@ -81,7 +80,6 @@ const appRoutes = {
   "mapzimus-board": "mapzimus-board",
   "boston-in-motion": "boston-in-motion",
   "where-the-games-go": "where-the-games-go",
-  smartpicker: "smartpicker",
   citynario: "citynario",
   "ground-truth": "ground-truth",
 };
@@ -365,7 +363,7 @@ const pages = {
     canonical: "https://mapzimus.com/tools/",
     eyebrow: "",
     heading: "Tools",
-    intro: `${utilityCount} tools.`,
+    intro: `${utilityCount} tools. Classroom and teacher tools are on <a href="https://lehsmath.com/">lehsmath.com</a>.`,
     catalogHeading: "",
   },
   maps: {

@@ -16,7 +16,6 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/mapzimus-board/` | `mapzimus/mapzimus-board` | `acdb429` — was `mapzimus.github.io/mapzimus-board/`. Deployable `index.html` + `app.js` + `data.js` only. |
 | `/boston-in-motion/` | `mapzimus/Motion` | `4df1ff7` — was `mapzimus.github.io/Motion/`. Static client only (`css/`, `js/`, `index.html`). |
 | `/where-the-games-go/` | `mapzimus/where-the-games-go` (`public/`) | `2cbec72` — was `mapzimus.github.io/where-the-games-go/`. |
-| `/smartpicker/` | `mapzimus/smartpicker` | `5c6f298` — was `mapzimus.github.io/smartpicker/`. |
 | `/citynario/` | `mapzimus/Citynario` | Static Next export. |
 | `/ground-truth/` | `mapzimus/ground-truth` | Lidar / wooded-land site studies. |
 
