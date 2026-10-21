@@ -285,6 +285,8 @@ section.catalog { border-top: 1px solid var(--line); }
 footer { border-top: 1px solid var(--line); padding-block: 30px 44px; display: flex; justify-content: space-between; align-items: start; gap: 24px; color: var(--muted); font-size: 0.9rem; }
 .footer-main { display: flex; flex-direction: column; gap: 14px; max-width: 52ch; }
 .footer-main p { margin: 0; }
+.footer-sites { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.footer-sites span { font: 600 11px var(--mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink); }
 .footer-nav { display: flex; flex-wrap: wrap; gap: 8px 16px; }
 .footer-nav a {
   font: 600 11px var(--mono); letter-spacing: 0.05em; text-transform: uppercase;
