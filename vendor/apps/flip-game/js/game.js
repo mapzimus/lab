@@ -17,6 +17,12 @@ const GAME_STATES = {
 const SD_THRESHOLD = 70;
 const SD_STEP = 20;   // flips per escalation level (+1 extra life lost each level)
 
+function alignToStartingRoster(turns, playerCount) {
+  const count = Math.max(1, Math.floor(Number(playerCount) || 0));
+  const value = Math.max(0, Math.floor(Number(turns) || 0));
+  return Math.ceil(value / count) * count;
+}
+
 // Additive rewards (ON FIRE and Heart Rush) may raise a player to 150% of
 // the selected starting lives. Odd totals round up because lives are whole.
 // Explicit multiplier prizes (Double Flip / Plinko) can exceed this ceiling,
@@ -59,6 +65,7 @@ const game = {
   startingLives: 10,
   maxLives: 15,
   suddenDeathFlipThreshold: SD_THRESHOLD,
+  suddenDeathStep: SD_STEP,
   perfectLanding: false,
   capLand: false,          // last make was a rare upside-down / on-cap land (worth 2)
   rareLifeGain: 0,         // +3 Heart Rush reward on the last successful rare flip
@@ -76,9 +83,16 @@ const game = {
     this.insanity = !!opts.insanity;
     this.startingLives = STARTING_LIFE_PRESETS.includes(+opts.startingLives) ? +opts.startingLives : 10;
     this.maxLives = Math.ceil(this.startingLives * MAX_LIFE_MULTIPLIER);
+    const rosterSize = Array.isArray(defs) ? defs.length : 0;
     this.suddenDeathFlipThreshold = Number.isInteger(opts.suddenDeathFlipThreshold) &&
-      opts.suddenDeathFlipThreshold >= 0 ? opts.suddenDeathFlipThreshold : SD_THRESHOLD;
+      opts.suddenDeathFlipThreshold >= 0
+        ? opts.suddenDeathFlipThreshold
+        : alignToStartingRoster(SD_THRESHOLD, rosterSize);
+    this.suddenDeathStep = Number.isInteger(opts.suddenDeathStep) && opts.suddenDeathStep >= 1
+      ? opts.suddenDeathStep
+      : alignToStartingRoster(SD_STEP, rosterSize);
     this.players = defs.map(d => ({
+      id: d.id || null,
       name: d.name,
       color: d.color || '#0b86ff',
       isAI: !!d.isAI,
@@ -242,15 +256,17 @@ const game = {
   // predict "this upcoming flip" must use turnCounter+1 to stay in sync.
   inSuddenDeath() { return !this.practice && this.turnCounter > this.suddenDeathFlipThreshold; },
   sdLevel() {
+    const step = Math.max(1, this.suddenDeathStep || SD_STEP);
     return this.inSuddenDeath()
-      ? Math.floor((this.turnCounter - this.suddenDeathFlipThreshold - 1) / SD_STEP) + 1
+      ? Math.floor((this.turnCounter - this.suddenDeathFlipThreshold - 1) / step) + 1
       : 0;
   },
   sdLevelForNextFlip() {
     if (this.practice) return 0;
     const next = this.turnCounter + 1;
+    const step = Math.max(1, this.suddenDeathStep || SD_STEP);
     return next > this.suddenDeathFlipThreshold
-      ? Math.floor((next - this.suddenDeathFlipThreshold - 1) / SD_STEP) + 1
+      ? Math.floor((next - this.suddenDeathFlipThreshold - 1) / step) + 1
       : 0;
   },
 
@@ -489,6 +505,7 @@ if (typeof module === 'object' && module.exports) {
     GAME_STATES,
     SD_THRESHOLD,
     SD_STEP,
+    alignToStartingRoster,
     MAX_LIFE_MULTIPLIER,
     STARTING_LIFE_PRESETS,
     game,

@@ -165,17 +165,8 @@ input[aria-invalid="true"] { border: 3px solid var(--miss); }
 #lab-route-readout { min-block-size: 64px; padding: 12px; border: 1px solid var(--line); border-radius: 9px; background: rgba(0,0,0,.16); }
 .lab-game-readout { align-self: center; margin: 6px auto; max-inline-size: min(92vw,760px); min-block-size: 34px; padding: 6px 12px; border-radius: 8px; background: rgba(7,19,34,.82); color: #d8f7ff; text-align: center; }
 
-/* Online */
-.narrow-main { inline-size: min(100%, 720px); margin-inline: auto; }
-.online-card { display: grid; gap: 12px; }
-.field-stack { display: grid; gap: 4px; }
 .field-error, .inline-error { min-block-size: 1.2em; color: #ffadb2; }
-.code-input { text-transform: uppercase; letter-spacing: .25em; text-align: center; font-size: 1.25rem; font-weight: 900; }
-.room-code { font-size: clamp(2rem, 7vw, 4rem); letter-spacing: .24em; color: var(--accent); font-weight: 900; font-variant-numeric: tabular-nums; text-align: center; }
-.online-roster { display: grid; gap: 8px; max-block-size: 45vh; overflow: auto; border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
-.online-peer { min-block-size: 56px; display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 9px; background: rgba(255,255,255,.045); }
 .dot, .score-dot { inline-size: 16px; block-size: 16px; border-radius: 50%; flex: 0 0 auto; border: 2px solid white; }
-.host-tag { margin-inline-start: auto; color: var(--heat); font-weight: 800; }
 
 /* Game canvas and HUD */
 #game-screen { pointer-events: none; }
@@ -189,16 +180,26 @@ input[aria-invalid="true"] { border: 3px solid var(--miss); }
 #mode-badge, .event-status { color: var(--heat); letter-spacing: .06em; }
 #flip-hint { position: fixed; inset-inline: 0; inset-block-end: calc(142px + env(safe-area-inset-bottom)); text-align: center; color: #d5e2ec; pointer-events: none; }
 #player-list { position: fixed; inset-inline: 0; inset-block-end: 0; display: flex; gap: 8px; padding: 8px max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); overflow-x: auto; pointer-events: auto; }
+#player-list.player-list-focus { justify-content: center; align-items: stretch; overflow-x: hidden; }
+#player-list.roster-open { flex-wrap: wrap; overflow-x: hidden; overflow-y: auto; max-block-size: 42vh; }
 .player-card { flex: 1 0 96px; min-inline-size: 96px; max-inline-size: 180px; padding: 7px; display: grid; place-items: center; border: 2px solid var(--line); border-radius: 10px; background: rgba(11,25,39,.9); }
+.player-card.focus-current { flex: 1.35 0 140px; max-inline-size: 220px; }
+.player-card.focus-next { flex: 1 0 110px; }
+.p-focus-label { color: var(--muted); font-size: .65rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.roster-drawer-btn { flex: 0 0 auto; align-self: center; min-block-size: 48px; padding: 8px 12px; border: 2px solid var(--line); border-radius: 10px; background: rgba(11,25,39,.92); color: inherit; font-weight: 800; }
 .player-card.active { border-color: var(--accent); background: #173e57; }
 .player-card.eliminated { opacity: .5; text-decoration: line-through; }
+.player-card.on-fire { border-color: #ffb300; background: #4a2208; box-shadow: 0 0 18px rgba(255,140,0,.55); }
+.player-card.heating-up { border-color: #ff8a3d; }
+body.on-fire-live { box-shadow: inset 0 0 80px rgba(255,90,0,.28); }
 .p-name { max-inline-size: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; }
 .p-lives-num { font-size: clamp(2rem, 6vh, 4rem); font-weight: 950; line-height: .95; }
 .p-lives-label, .ps-label { color: var(--muted); font-size: .7rem; text-transform: uppercase; }
 .practice-stats { display: flex; margin-inline: auto; gap: 18px; }
 .ps-item { display: grid; place-items: center; }.ps-num { font-size: 1.6rem; font-weight: 900; }
-#practice-meter { position: fixed; inset-inline-start: 50%; inset-block-end: calc(190px + env(safe-area-inset-bottom)); transform: translateX(-50%); inline-size: min(440px, 78vw); pointer-events: none; }
-.pm-row + .pm-row { margin-block-start: 10px; }.pm-track { position: relative; block-size: 12px; border-radius: 8px; background: rgba(255,255,255,.2); }.pm-band { position: absolute; inset-block: 0; background: rgba(121,239,173,.5); }.pm-marker { position: absolute; inset-block-start: -5px; inline-size: 4px; block-size: 22px; background: white; }.pm-pad { position: absolute; inset-block-start: -4px; inline-size: 12px; block-size: 12px; background: var(--make); transform: rotate(45deg); }.pm-label { margin-block-start: 5px; text-align: center; color: var(--muted); font-size: .68rem; }
+#practice-meter { position: fixed; z-index: 6; inset-inline-start: 50%; inset-block-end: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-bottom)); transform: translateX(-50%); inline-size: min(560px, calc(100vw - 24px)); padding: 9px 14px 8px; border: 1px solid rgba(190,225,245,.25); border-radius: 12px; background: rgba(7,19,34,.78); box-shadow: 0 5px 18px rgba(0,0,0,.24); backdrop-filter: blur(5px); pointer-events: none; }
+.practice-active #flip-hint { display: none; }
+.pm-row + .pm-row { margin-block-start: 8px; }.pm-track { position: relative; block-size: 12px; border-radius: 8px; background: rgba(255,255,255,.2); }.pm-band { position: absolute; inset-block: 0; background: rgba(121,239,173,.5); }.pm-marker { position: absolute; inset-block-start: -5px; inline-size: 4px; block-size: 22px; background: white; }.pm-pad { position: absolute; inset-block-start: -4px; inline-size: 12px; block-size: 12px; background: var(--make); transform: rotate(45deg); }.pm-label { margin-block-start: 4px; text-align: center; color: #d5e2ec; font-size: .68rem; line-height: 1.15; }
 .centered-screen { display: grid; place-items: center; z-index: 20; background: rgba(0,0,0,.82); padding: 12px; }
 .pass-card, .mystery-card { inline-size: min(100%, 520px); padding: 28px; display: grid; gap: 14px; place-items: center; border: 2px solid var(--accent); border-radius: 18px; background: var(--surface); }
 #pass-name { max-inline-size: 100%; overflow-wrap: anywhere; font-size: clamp(2.5rem, 10vw, 5rem); font-weight: 950; text-align: center; }
@@ -236,7 +237,7 @@ input[aria-invalid="true"] { border: 3px solid var(--miss); }
   .stats-rail details:not([open]) > label { display: grid; }
   .stats-rail details:not([open]) > label.check-control { display: flex; }
   .picker-grid { grid-template-columns: repeat(4, minmax(0,1fr)); }.metric-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .result-grid, .gs-players, .online-roster { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .result-grid, .gs-players { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .lab-main { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (min-width: 1100px) {

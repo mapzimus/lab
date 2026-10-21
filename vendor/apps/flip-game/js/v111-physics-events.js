@@ -109,7 +109,7 @@
       visual: { theme: 'ice', surface: 'slick' }, reward: {},
     },
     'alien-invasion': {
-      physicsKind: 'alien', gravity: 0.08, settleMs: 4000, bankRequired: true,
+      physicsKind: 'alien', gravity: 0.10, settleMs: 4000, bankRequired: true,
       visual: { theme: 'alien', target: 'tractor-ring' }, reward: {},
     },
     'gravity-slam': {
@@ -240,6 +240,7 @@
       registryOrder: entry.registryOrder,
       physics: {
         kind: config.physicsKind,
+        gravity: config.gravity == null ? null : config.gravity,
         settleLimitMs: config.settleMs,
         requiredRotations: config.requiredRotations || 1,
         bankRequired: !!config.bankRequired,

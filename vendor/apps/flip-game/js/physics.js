@@ -12,6 +12,48 @@ const Physics = (() => {
   let capThrowArmed = false; // seed-rolled over-spin throw aiming for a cap land
   let lastLandingInfo = null;
   let lastFlickInfo = null;
+  // Passive integration observations. These never step the engine, poll a
+  // verdict, choose an event, or alter the existing landing decision.
+  const observationListeners = new Set();
+  let observationRevision = 0;
+  let observedLaunchSequence = 0;
+  let observationAngleTimes = [];
+  let observationDeadlineEvidence = null;
+  let observationAirborneEvidence = null;
+  function getObservation(kind = 'snapshot') {
+    const observedLanding = landingPhase === 'resolved' && lastLandingInfo;
+    const measuredStableMs = angleWin.length && angleWin.length === observationAngleTimes.length
+      ? Math.max(0, simElapsedMs - observationAngleTimes[0]) : 0;
+    return Object.freeze({
+      schema: 'PhysicsObservationV1', revision: observationRevision, kind,
+      launchSequence: observedLaunchSequence, launched,
+      atMs: simElapsedMs, phase: landingPhase,
+      grounded: !!(wasAirborne && bottle && touchingLandingPlane()),
+      wasAirborne, hasFlipped,
+      eventId: activeEventDefinition ? activeEventDefinition.id :
+        (lastFlickInfo && lastFlickInfo.eventId) || null,
+      firstContactMs, contacts: contactCount, bounces: bounceCount,
+      landing: observedLanding ? Object.freeze({
+        result: observedLanding.result,
+        pose: observedLanding.onCap ? 'cap' : observedLanding.result === 'MAKE' ? 'upright' : 'miss',
+        reason: observedLanding.reason,
+        stableForMs: measuredStableMs,
+        deadlineEvidence: observationDeadlineEvidence,
+        airborneTerminalEvidence: observationAirborneEvidence,
+      }) : null,
+    });
+  }
+  function publishObservation(kind) {
+    observationRevision++;
+    if (!observationListeners.size) return;
+    const snapshot = getObservation(kind);
+    observationListeners.forEach((listener) => { try { listener(snapshot); } catch (_) {} });
+  }
+  function subscribeObservations(listener) {
+    if (typeof listener !== 'function') throw new TypeError('Physics observer must be a function');
+    observationListeners.add(listener);
+    return () => observationListeners.delete(listener);
+  }
   let onImpact = null;          // (type, speed, x, y) → wall/ceiling/ground juice
   let groundImpactSent = false; // one thud per flick
   function setImpactCallback(fn) { onImpact = fn; }
@@ -29,26 +71,57 @@ const Physics = (() => {
   // if you give a decent flick; only wild overshoots tip. v78: cut high-end
   // over-rotation (hard flicks were falling ~70% of the time).
   //
-  // "Feel" knob: a flatter spin curve widens the make window (soft/hard flicks
-  // differ less), a steeper one narrows it. The curve PIVOTS around the sweet
-  // spot (~2500 px/s) so every feel makes the same ideal flick — only the
-  // punishment for being off-speed changes. 'standard' == today's default.
-  const SPIN_BASE_DEFAULT  = 0.138;  // soft/medium flicks clear 360°
-  const SPIN_RANGE_DEFAULT = 0.082;  // flat high end — hard flicks tip less
+  // v1.12 deliberately uses one postlaunch physics curve for every Feel. The
+  // old implementation changed angular velocity after launch, which meant the
+  // same physical gesture stopped being the same flip when a menu preference
+  // changed. Feel is now a bounded PRELAUNCH input transfer (below); gravity,
+  // spin, contacts, and landing tolerance are identical after launch.
+  const SPIN_BASE_DEFAULT  = 0.105;
+  const SPIN_RANGE_DEFAULT = 0.110;
   const POWER_SPEED = 4000;   // flick px/s that maps to full power
   const SWEET_POWER = 2500 / POWER_SPEED; // AI / measured sweet-spot power
   const SWEET_SPIN  = SPIN_BASE_DEFAULT + SWEET_POWER * SPIN_RANGE_DEFAULT;
-  // Relative to standard (0.082): forgiving ≈ 0.7×, pro ≈ 1.3× — same ratios
-  // as the v8-era knob, retargeted onto the current spin curve.
-  const FEEL_RANGES = { forgiving: 0.057, standard: 0.082, pro: 0.107 };
-  let spinRange = SPIN_RANGE_DEFAULT;
-  let spinBase  = SPIN_BASE_DEFAULT;
+  // Event profiles were individually calibrated against the v1.11 sweet-spot
+  // angular speed. Preserve those physical contracts while retuning only the
+  // ordinary launch curve requested for v2.
+  const EVENT_SPIN_COMPENSATION = (0.138 + SWEET_POWER * 0.082) / SWEET_SPIN;
+  const FEEL_MODES = new Set(['forgiving', 'standard', 'pro']);
+  const FORGIVING_BAND_MIN = 2300;
+  const FORGIVING_BAND_MAX = 3300;
+  const FORGIVING_NEAR_MIN = 1200;
+  const FORGIVING_NEAR_MAX = 4200;
   let feelMode  = 'standard';
   function setFeel(mode) {
-    const m = FEEL_RANGES[mode] != null ? mode : 'standard';
-    feelMode  = m;
-    spinRange = FEEL_RANGES[m];
-    spinBase  = SWEET_SPIN - SWEET_POWER * spinRange; // standard → exactly 0.138
+    feelMode = FEEL_MODES.has(mode) ? mode : 'standard';
+  }
+
+  function transferInputForFeel(vx, vy, requestedMode = feelMode) {
+    const inputVx = Number.isFinite(Number(vx)) ? Number(vx) : 0;
+    const inputVy = Number.isFinite(Number(vy)) ? Number(vy) : 0;
+    const mode = FEEL_MODES.has(requestedMode) ? requestedMode : 'standard';
+    // Standard and Pro are canonical/raw. Forgiving only nudges a nearby
+    // vertical near-miss toward the controlled band, never by more than 8% of
+    // the player's own signal. Horizontal aim is never corrected.
+    if (mode !== 'forgiving' || inputVy >= 0) return { vx: inputVx, vy: inputVy, mode };
+    const upSpeed = -inputVy;
+    if (upSpeed < FORGIVING_NEAR_MIN || upSpeed > FORGIVING_NEAR_MAX ||
+        (upSpeed >= FORGIVING_BAND_MIN && upSpeed <= FORGIVING_BAND_MAX)) {
+      return { vx: inputVx, vy: inputVy, mode };
+    }
+    const target = upSpeed < FORGIVING_BAND_MIN
+      ? FORGIVING_BAND_MIN : FORGIVING_BAND_MAX;
+    const maxCorrection = upSpeed * 0.08;
+    const corrected = upSpeed + Math.sign(target - upSpeed) *
+      Math.min(Math.abs(target - upSpeed), maxCorrection);
+    return { vx: inputVx, vy: -corrected, mode };
+  }
+
+  function requireUint32Seed(value, owner = 'Physics') {
+    if (typeof value !== 'number' || !Number.isFinite(value) ||
+        !Number.isInteger(value) || value < 0 || value > 0xffffffff) {
+      throw new TypeError(`${owner} requires an unsigned 32-bit seed`);
+    }
+    return value;
   }
   const WALL_INSET  = 14;     // px from each screen edge to the wall's inner face (matches renderer)
   const FIXED_DT    = 1 / 60; // multiplayer-safe fixed physics step
@@ -183,6 +256,7 @@ const Physics = (() => {
     return Math.max(1, Math.floor(odds / boost));
   }
   function rareEventForSeed(seed, plinkoRoll = false, multiplier = 1, excludedEventIds = []) {
+    seed = requireUint32Seed(seed, 'rareEventForSeed');
     if (plinkoRoll) return null;
     const events = eventSystem();
     if (events) {
@@ -211,6 +285,7 @@ const Physics = (() => {
   const INSANITY_EVENT_SALT = 0x6c8e9cf5;
   const INSANITY_PICK_SALT = 0x3d20adea;
   function insanityEventForSeed(seed, excludedEventIds = []) {
+    seed = requireUint32Seed(seed, 'insanityEventForSeed');
     const events = eventSystem();
     if (events) return events.rollId({
       mode: 'insane', oddsProfile: 'normal', seed, excludedEventIds,
@@ -298,13 +373,9 @@ const Physics = (() => {
 
   function currentHitHalfWidth() {
     let configuredScale = profile.hitScale == null ? 1 : profile.hitScale;
-    if (profile.alienPortal) {
+    if (alienShotActive()) {
       const metrics = alienMetricsForViewport(viewW || canvasW, viewH || arenaH);
-      // Keep the effective tractor-ring target proportional to the playable
-      // court. The fixed legacy 0.86 inset made the same ring generous on the
-      // expanded phone court but pixel-tight at tablet/desktop scale.
-      configuredScale *= metrics.scale < 0.85 ? 0.85
-        : (metrics.scale < 1.4 ? 1.15 : 1);
+      configuredScale = metrics.hitRadiusScale;
     }
     const scale = Math.max(0.2, Math.min(1, configuredScale));
     return Math.max(8, targetHW * scale);
@@ -319,12 +390,65 @@ const Physics = (() => {
   let rareEvent = null;     // seeded physics/gameplay/cosmetic event for this flick
   let temporaryAlien = false; // 1/250 Alien Invasion for a non-Alien object
   let bankHits = 0;          // portal only activates after a real carom
+  let alienStepTick = 0;
+  let pendingAlienBanks = [];
+  let alienBankCooldowns = new Map();
+  let alienBankTrace = [];
   let alwaysMagnetActive = false; // permanent Plinko prize owned by this flipper
   let rareImpulseUsed = false; // one-shot event impulse guard
   let rareEffectFrames = 0; // short-lived Ice Slide surface timer
   let rarePhase = 0;        // seeded wind phase; cosmetic randomness never touches physics RNG
 
+  function clearAlienBankState() {
+    bankHits = 0;
+    alienStepTick = 0;
+    pendingAlienBanks = [];
+    alienBankCooldowns = new Map();
+    alienBankTrace = [];
+  }
+
   function screenW() { return viewW || canvasW || 0; }
+
+  // Native Alien and the Alien Invasion event are the same bank-shot game.
+  // Keep every gameplay-affecting value here instead of inheriting half from
+  // the selected object's profile: that split made Invasion easier, removed
+  // its UFOs entirely, and changed results substantially with viewport size.
+  const ALIEN_CONTRACT = Object.freeze({
+    gravity: 0.10,
+    frictionAir: 0.003,
+    friction: 0.02,
+    restitution: 0.90,
+    wallBounce: 0.96,
+    hitRadiusScale: 0.55,
+    attractionPerStep: 0.032,
+    captureRadiusScale: 1.42,
+    captureRadiusGrowth: 0.19,
+    captureRadiusMaximum: 1.75,
+    captureDamping: 0.35,
+    capturePullMultiplier: 40.0,
+    timeoutFrames: 360,
+    deflectorCount: 3,
+    saucerCount: 6,
+    bankMinSpeed: 1.8,
+    bankCooldownTicks: 8,
+    minimumDampedSpeed: 6,
+    bankDamping: Object.freeze([
+      Object.freeze({ linear: 1, angular: 1 }),
+      Object.freeze({ linear: 0.88, angular: 0.72 }),
+      Object.freeze({ linear: 0.80, angular: 0.58 }),
+      Object.freeze({ linear: 0.72, angular: 0.45 }),
+    ]),
+  });
+
+  function coarsePointerActive() {
+    return typeof window !== 'undefined' && window.matchMedia &&
+      window.matchMedia('(pointer: coarse)').matches;
+  }
+
+  function isCompactScreen(width = screenW()) {
+    const w = Math.max(0, Number(width) || 0);
+    return w < 900 || (coarsePointerActive() && w < 1100);
+  }
 
   // One normalized matrix drives Alien geometry and forces on phones,
   // tablets, desktop boards, and ultrawide smartboards. Values are world-space
@@ -334,51 +458,158 @@ const Physics = (() => {
     const h = Math.max(480, Number(height) || 800);
     const shortEdge = Math.min(w, h);
     const scale = Math.max(0.65, Math.min(2.7, shortEdge / 800));
-    const compact = w < 900;
+    const compact = isCompactScreen(w);
+    // Keep the compact bank-shot court's horizontal travel proportional to its
+    // launch scale. Without this, the 360px court was less than half as wide as
+    // the tablet court in normalized units and nearly every carom crossed the
+    // ring. The camera still fits the complete court into the available view.
+    const compactArenaExpandX = Math.max(1.45, (1160 * scale) / w);
+    // The shared object collider intentionally stays the same visible CSS size
+    // from phone to 4K. Slightly scale the inner scoring aperture to offset that
+    // fixed collider without enlarging or shrinking the selected object art.
+    const baseHitRadiusScale = Math.min(0.64,
+      ALIEN_CONTRACT.hitRadiusScale - 0.05 + 0.052 * scale);
+    const phoneBlend = Math.max(0, Math.min(1, (scale - 0.65) / 0.20));
+    const hitRadiusScale = scale < 0.85
+      ? 0.45 + (baseHitRadiusScale - 0.45) * phoneBlend
+      : baseHitRadiusScale;
     return Object.freeze({
       width: w,
       height: h,
       scale,
-      arenaExpandX: compact ? 1.45 : 1,
+      arenaExpandX: compact ? compactArenaExpandX : 1,
       arenaExpandY: compact ? 1.20 : 1,
       ringRadius: Math.round(Math.max(54, Math.min(210, shortEdge * 0.09))),
-      attractionPerStep: 0.10 * scale * scale,
-      timeoutFrames: Math.round(compact ? -130 + 584 * scale : 240 + 70 * scale),
+      hitRadiusScale,
+      attractionPerStep: ALIEN_CONTRACT.attractionPerStep * scale,
+      captureRadiusScale: Math.min(ALIEN_CONTRACT.captureRadiusMaximum,
+        ALIEN_CONTRACT.captureRadiusScale +
+          Math.max(0, scale - 0.90) * ALIEN_CONTRACT.captureRadiusGrowth),
+      captureDamping: ALIEN_CONTRACT.captureDamping,
+      capturePullMultiplier: ALIEN_CONTRACT.capturePullMultiplier,
+      timeoutFrames: ALIEN_CONTRACT.timeoutFrames,
       launchScale: scale,
+      compact,
     });
   }
 
-  function configureTemporaryAlienArena() {
+  // Pure prelaunch geometry query. Alien Invasion is selected before input,
+  // so the renderer and a physical CPU aimer both need the exact ring location
+  // before applyFlick activates the temporary profile. Keeping placement here
+  // also prevents native Alien and Invasion from duplicating target math.
+  function alienTargetForSeed(seed, width = viewW || canvasW, height = viewH || arenaH,
+      bottomInset = viewBottomInset) {
+    seed = requireUint32Seed(seed, 'alienTargetForSeed');
+    const metrics = alienMetricsForViewport(width, height);
+    const worldW = Math.round(metrics.width * metrics.arenaExpandX);
+    const floorY = metrics.height - tableInset(metrics.height) -
+      Math.max(0, Number(bottomInset) || 0);
+    const margin = WALL_INSET + metrics.ringRadius + 32;
+    const xRoll = mixSeed(seed, 0x76a9f4d1) / 4294967296;
+    const yRoll = mixSeed(seed, 0xb5297a4d) / 4294967296;
+    const x = margin + xRoll * Math.max(0, worldW - margin * 2);
+    const y = Math.max(metrics.ringRadius + 60,
+      Math.min(floorY - metrics.ringRadius - 60,
+        floorY * (0.36 + yRoll * 0.24)));
+    return Object.freeze({
+      x,
+      y,
+      halfWidth: metrics.ringRadius,
+      hitHalfWidth: Math.max(8, metrics.ringRadius * metrics.hitRadiusScale),
+      worldW,
+      worldH: floorY + 30,
+      viewW: metrics.width,
+      viewH: metrics.height,
+    });
+  }
+
+  function configureAlienArena() {
     const metrics = alienMetricsForViewport(viewW || canvasW, viewH || arenaH);
-    canvasW = Math.round((viewW || canvasW) * metrics.arenaExpandX);
-    groundY = (viewH || arenaH) - tableInset(viewH || arenaH) - viewBottomInset;
-    ceilingY = -Math.round(Math.max(0, metrics.arenaExpandY - 1) * groundY);
-    const midY = (groundY + ceilingY) / 2;
-    Body.setPosition(ground, { x: canvasW / 2, y: groundY + 25 });
-    Body.setPosition(leftWall, { x: WALL_INSET - 20, y: midY });
-    Body.setPosition(rightWall, { x: canvasW - WALL_INSET + 20, y: midY });
-    Body.setPosition(ceilingBody, { x: canvasW / 2, y: ceilingY - 20 });
+    layoutArena();
     Body.setPosition(bottle, { x: canvasW / 2, y: groundY - 76 });
+    openArena = false;
+    sideWallsEnabled = true;
+    leftWall.collisionFilter.mask = 0xFFFFFFFF;
+    rightWall.collisionFilter.mask = 0xFFFFFFFF;
+    ceilingBody.collisionFilter.mask = 0xFFFFFFFF;
+    leftWall.restitution = rightWall.restitution = ceilingBody.restitution =
+      ALIEN_CONTRACT.wallBounce;
+    for (const part of [bottle, ...bottle.parts]) {
+      part.frictionAir = ALIEN_CONTRACT.frictionAir;
+      part.friction = ALIEN_CONTRACT.friction;
+      part.restitution = ALIEN_CONTRACT.restitution;
+    }
+    buildObstacles(arenaH);
     return metrics;
+  }
+
+  function queueAlienBank(otherBody, fallbackLabel, incomingSpeed) {
+    if (!alienShotActive()) return false;
+    const rootBody = otherBody && otherBody.parent && otherBody.parent !== otherBody
+      ? otherBody.parent : otherBody;
+    const label = String((rootBody && rootBody.label) || fallbackLabel || '');
+    if (!['wall', 'deflector', 'saucer'].includes(label) ||
+        incomingSpeed < ALIEN_CONTRACT.bankMinSpeed) return false;
+    const surfaceId = rootBody && rootBody.id != null ? rootBody.id : label;
+    const lastTick = alienBankCooldowns.get(surfaceId);
+    if (lastTick != null && alienStepTick - lastTick < ALIEN_CONTRACT.bankCooldownTicks) {
+      return false;
+    }
+    alienBankCooldowns.set(surfaceId, alienStepTick);
+    bankHits++;
+    pendingAlienBanks.push({ hit: bankHits, surfaceId, label, incomingSpeed });
+    return true;
+  }
+
+  function applyPendingAlienBankDamping() {
+    if (!bottle || pendingAlienBanks.length === 0) return;
+    for (const bank of pendingAlienBanks.splice(0)) {
+      const schedule = ALIEN_CONTRACT.bankDamping[
+        Math.min(bank.hit - 1, ALIEN_CONTRACT.bankDamping.length - 1)
+      ];
+      const preVx = bottle.velocity.x;
+      const preVy = bottle.velocity.y;
+      const preSpeed = Math.hypot(preVx, preVy);
+      const preAngular = bottle.angularVelocity;
+      if (bank.hit > 1) {
+        const requestedSpeed = preSpeed * schedule.linear;
+        const postSpeed = preSpeed > ALIEN_CONTRACT.minimumDampedSpeed
+          ? Math.max(ALIEN_CONTRACT.minimumDampedSpeed, requestedSpeed)
+          : preSpeed;
+        const scale = preSpeed > 0 ? postSpeed / preSpeed : 1;
+        Body.setVelocity(bottle, { x: preVx * scale, y: preVy * scale });
+        Body.setAngularVelocity(bottle, preAngular * schedule.angular);
+      }
+      alienBankTrace.push({
+        tick: alienStepTick,
+        hit: bank.hit,
+        surfaceId: bank.surfaceId,
+        label: bank.label,
+        incomingSpeed: bank.incomingSpeed,
+        preSpeed,
+        postSpeed: Math.hypot(bottle.velocity.x, bottle.velocity.y),
+        preAngular,
+        postAngular: bottle.angularVelocity,
+        linearRetention: schedule.linear,
+        angularRetention: schedule.angular,
+      });
+      if (alienBankTrace.length > 32) alienBankTrace.shift();
+    }
+  }
+
+  function getAlienBankTelemetry() {
+    return {
+      hits: bankHits,
+      tick: alienStepTick,
+      pending: pendingAlienBanks.length,
+      trace: alienBankTrace.map((entry) => ({ ...entry })),
+    };
   }
 
   function wantsOpenArena() {
     if (profile.keepWalls || profile.wallBounce > 0) return false;
-    if (typeof window === 'undefined') return false;
-    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-    const w = screenW();
     // Phones / small tablets: no side walls so wall-caroms can't make mobile easier.
-    return w < 900 || (coarse && w < 1100);
-  }
-
-  // Compact screens get the lighter bounce-mode furniture (1 wedge). Desktop
-  // keeps the full set. Uses the SCREEN width — never the expanded physics
-  // world width — so alien's bigger court doesn't flip us into "desktop" mode.
-  function isCompactScreen() {
-    const w = screenW();
-    if (typeof window === 'undefined') return w < 900;
-    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-    return w < 900 || (coarse && w < 1100);
+    return typeof window !== 'undefined' && isCompactScreen();
   }
 
   function syncSideWalls() {
@@ -392,6 +623,9 @@ const Physics = (() => {
   // Bank-shot profiles can grow the PHYSICS world past the screen. Camera then
   // fits wall-to-wall so the phone stays full-bleed while caroms have room.
   function arenaExpandX() {
+    if (alienShotActive()) {
+      return alienMetricsForViewport(viewW || canvasW, viewH || arenaH).arenaExpandX;
+    }
     if (!(profile.floorResolve || profile.keepWalls)) return 1;
     const compact = isCompactScreen();
     const x = compact
@@ -400,6 +634,9 @@ const Physics = (() => {
     return Math.max(1, Number(x) || 1);
   }
   function arenaExpandY() {
+    if (alienShotActive()) {
+      return alienMetricsForViewport(viewW || canvasW, viewH || arenaH).arenaExpandY;
+    }
     if (!(profile.floorResolve || profile.keepWalls)) return 1;
     const compact = isCompactScreen();
     const y = compact
@@ -459,24 +696,17 @@ const Physics = (() => {
     }
   }
 
-  // ── PLINKO DROP (1/1000 easter egg) ────────────────────────────────────────
-  // On the roll, the floor vanishes at the flick and the object falls through
-  // into a plinko board below the table. The nine slots are mirrored around
-  // one jackpot: double, halve, magnet, loss, WIN, loss, magnet, halve, double.
-  // Seed-derived
-  // but main.js disables it for online games (it rewrites lives directly).
-  // The board can be WIDER than the screen; the follow camera stays with the
-  // falling object so all nine bins remain large and legible on a phone.
-  const PLINKO_KINDS = [
-    'double', 'halve', 'magnet', 'lose', 'win',
-    'lose', 'magnet', 'halve', 'double',
-  ];
+  // ── PLINKO DROP ────────────────────────────────────────────────────────────
+  // The live bridge owns a canonical 24-row Matter board and a physical
+  // trampoline opening. It never swaps the selected compound Flipper for a
+  // generic puck, never teleports a wedged body, and never derives a prize
+  // from elapsed time or an unverified horizontal coordinate.
   let plinkoEnabled = true;
   let forcedSpecialEvent = null; // secret test trigger — consumed by the next flick
-  let plinko = null;          // { left, right, top, bottom, pegs, dividers, slots }
-  let plinkoBodies = [];
-  let plinkoSettle = 0;
-  let plinkoNudges = 0;       // "machine shakes" applied to a wedged object
+  let plinko = null;          // renderer-compatible projection of authoritative geometry
+  let plinkoLive = null;      // FlipgameV112PlinkoLive lane bridge
+  let plinkoContactCursor = 0;
+  let plinkoAppearance = null;
 
   function setPlinkoEnabled(v) { plinkoEnabled = !!v; }
   function forceSpecialEvent(id) {
@@ -498,114 +728,98 @@ const Physics = (() => {
   }
   function forcePlinko() { return forceSpecialEvent('plinko'); }
 
-  function startPlinko() {
+  function plinkoSystem() {
+    return typeof globalThis !== 'undefined'
+      ? globalThis.FlipgameV112PlinkoLive || null : null;
+  }
+
+  // Optional presentation binding. Physics remains correct without it; the
+  // renderer/main integration may provide the selected art revision so the
+  // authority snapshot can prove exactly which authored Flipper stayed live.
+  function setPlinkoAppearance(value) {
+    if (value == null) { plinkoAppearance = null; return; }
+    if (typeof value !== 'object' || Array.isArray(value)) {
+      throw new TypeError('Plinko appearance binding must be an object');
+    }
+    plinkoAppearance = {
+      flipperId: String(value.flipperId || 'selected-flipper'),
+      variantId: String(value.variantId || 'selected-variant'),
+      appearanceRevision: String(value.appearanceRevision || 'live-selected-v1'),
+      cosmeticId: String(value.cosmeticId || 'none'),
+      physicsProfileId: String(value.physicsProfileId || 'competitive-shared'),
+      authoredParts: Array.isArray(value.authoredParts)
+        ? value.authoredParts.map(String).slice(0, 32) : [],
+      internalDynamics: Array.isArray(value.internalDynamics)
+        ? value.internalDynamics.map(String).slice(0, 32) : [],
+    };
+  }
+
+  function startPlinko(seed, entryVelocityX, angularVelocity) {
     clearPlinko();
-    // Bank-shot furniture (alien wedges/saucers) would steal the drop — clear
-    // them for this throw. Next turn's setProfile/buildObstacles rebuilds.
     clearObstacles();
-    // Board width is independent of the screen — at least 990 so nine slots
-    // stay ball-sized; the camera follows the object through it.
-    const bw = Math.max(990, Math.min(canvasW - 36, 1440));
-    const left = canvasW / 2 - bw / 2;
-    const right = left + bw;
-    const top = groundY + 26;
-    // The flipped object is BIG (~74×140), so peg gaps and slots must be wide
-    // enough for it to tumble through — this is bottle plinko, not puck plinko.
-    // v100: twice the peg field of the original board. Eight staggered rows
-    // create a long, suspenseful fall worthy of a one-in-a-thousand event.
-    const rows = 8, rowGap = 92, slotH = 150;
-    const bottom = top + 42 + rows * rowGap + slotH;
-    const pegs = [];
-    const dividers = [];
-    const opts = { isStatic: true, label: 'plinko', friction: 0.05, restitution: 0.55 };
-
-    // Offset peg grid — the object becomes a ball (r=34) for the drop, so
-    // ~110px gaps give real plinko action without wedging.
-    const cols = Math.max(7, Math.min(13, Math.floor(bw / 100)));
-    for (let r = 0; r < rows; r++) {
-      const y = top + 42 + r * rowGap;
-      const n = cols + (r % 2 ? 0 : 1);
-      for (let i = 0; i < n; i++) {
-        const x = r % 2
-          ? left + (bw / (n + 1)) * (i + 1)
-          : left + (bw / n) * (i + 0.5);
-        if (x < left + 20 || x > right - 20) continue;
-        pegs.push({ x, y, r: 9 });
-        plinkoBodies.push(Bodies.circle(x, y, 9, opts));
+    const live = plinkoSystem();
+    if (!live || live.schema !== 'FlipgameV112PlinkoLiveV1') {
+      throw new Error('Canonical live Plinko bridge is not loaded');
+    }
+    plinkoLive = live.create({ Matter });
+    try {
+      const attached = plinkoLive.attach({
+        engine,
+        world,
+        selectedBody: bottle,
+        width: canvasW,
+        height: viewH || arenaH,
+        groundY,
+        seed,
+        entryVelocityX,
+        angularVelocity,
+        appearance: plinkoAppearance,
+      });
+      if (!attached.selectedBodyPreserved) {
+        throw new Error('Live Plinko detached the selected compound Flipper');
       }
+      plinko = attached.board;
+    } catch (error) {
+      try { plinkoLive.cleanup(); } catch (_) {}
+      plinkoLive = null;
+      plinko = null;
+      buildObstacles(arenaH);
+      throw error;
     }
-    // Dividers get a pointed cap so the object sheds off instead of balancing.
-    const kinds = PLINKO_KINDS;
-    for (let k = 1; k < kinds.length; k++) {
-      const x = left + (bw / kinds.length) * k;
-      dividers.push({ x, y0: bottom - slotH, y1: bottom });
-      plinkoBodies.push(Bodies.rectangle(x, bottom - slotH / 2, 10, slotH, opts));
-      plinkoBodies.push(Bodies.circle(x, bottom - slotH, 9, opts));
-    }
-    plinkoBodies.push(Bodies.rectangle(canvasW / 2, bottom + 22, Math.max(canvasW, bw) * 2, 44, {
-      ...opts, friction: 0.8, restitution: 0.02,
-    }));
-    // The board brings its own side rails (it may be wider than the arena).
-    const railH = bottom + 500;
-    plinkoBodies.push(Bodies.rectangle(left - 24, bottom - railH / 2, 48, railH, opts));
-    plinkoBodies.push(Bodies.rectangle(right + 24, bottom - railH / 2, 48, railH, opts));
-    const slots = kinds.map((kind, i) => ({
-      kind,
-      x0: left + (bw / kinds.length) * i,
-      x1: left + (bw / kinds.length) * (i + 1),
-    }));
-    World.add(world, plinkoBodies);
 
-    // The floor "disappears", and the arena walls/ceiling go dead too — the
-    // board's own rails take over (the board may extend past the screen edges).
-    // Alien mode keeps a live ceiling for bank shots; kill it for the drop so
-    // the ball isn't trapped bouncing under the roof.
+    // The canonical board and trampoline now own every collision. Arena
+    // furniture and landing planes remain disabled until cleanup.
     ground.collisionFilter.mask = 0;
     if (leftWall)  leftWall.collisionFilter.mask = 0;
     if (rightWall) rightWall.collisionFilter.mask = 0;
     if (ceilingBody) ceilingBody.collisionFilter.mask = 0;
-
-    plinko = { left, right, top, bottom, slotH, pegs, dividers, slots,
-               drift: randEvent() < 0.5 ? -1 : 1, rows, antiWedge: true };
-    plinkoSettle = 0;
-    plinkoNudges = 0;
-
-    // The object "curls up" into a ball for the drop — a bottle-shaped body
-    // bridges pegs and wedges, a ball plinkos properly. The renderer draws
-    // the character at ~60% scale so it reads as the same object tumbling.
-    const pos = { x: bottle.position.x, y: bottle.position.y };
-    World.remove(world, bottle);
-    bottle = Bodies.circle(pos.x, pos.y, 34, {
-      label: 'bottle',
-      density: 0.008,
-      friction: 0.15,
-      frictionAir: 0.004,
-      restitution: 0.5,
-    });
-    World.add(world, bottle);
+    plinkoContactCursor = 0;
+    return plinko;
   }
 
   function clearPlinko() {
-    for (const b of plinkoBodies) World.remove(world, b);
-    plinkoBodies = [];
+    if (plinkoLive) {
+      const report = plinkoLive.cleanup();
+      if (!report.clean || !report.selectedBodyPreserved) {
+        throw new Error('Live Plinko cleanup did not preserve the selected Flipper');
+      }
+    }
+    plinkoLive = null;
     plinko = null;
-    plinkoSettle = 0;
+    plinkoContactCursor = 0;
     if (ground) ground.collisionFilter.mask = 0xFFFFFFFF;
     if (ceilingBody) ceilingBody.collisionFilter.mask = profile.ceiling ? 0xFFFFFFFF : 0;
     syncSideWalls();
   }
 
-  function plinkoVerdict() {
-    const bw = plinko.right - plinko.left;
-    const n = plinko.slots.length;
-    const i = Math.max(0, Math.min(n - 1,
-      Math.floor((bottle.position.x - plinko.left) / (bw / n))));
-    const prize = plinko.slots[i].kind;
-    const result = prize === 'lose' ? 'MISS' : 'MAKE';
-    const canonicalPrize = {
-      double: 'lives-doubled', halve: 'everyone-else-halved', magnet: 'always-magnet',
-      lose: 'automatic-loss', win: 'automatic-win',
-    }[prize];
+  function plinkoVerdict(authoritativeSnapshot) {
+    const snapshot = authoritativeSnapshot || (plinkoLive && plinkoLive.snapshot());
+    const outcome = snapshot && snapshot.outcome;
+    if (!outcome || outcome.actualSensorContact !== true) return null;
+    const i = outcome.slotIndex;
+    const prize = outcome.legacyPrize;
+    const result = outcome.result;
+    const canonicalPrize = outcome.canonicalPrize;
     lastLandingInfo = {
       result,
       tilt: null,
@@ -618,17 +832,27 @@ const Physics = (() => {
       maxTilt: 0,
       padOffset: null,
       eventId: 'plinko',
-      contacts: contactCount,
+      contacts: snapshot.contactCount,
       bounces: bounceCount,
       firstContactMs,
-      settleMs: firstContactMs == null ? null : Math.max(0, simElapsedMs - firstContactMs),
+      settleMs: outcome.dropMs,
+      // Standardized collision evidence for observation, statistics, and
+      // independent qualification consumers. Keep the legacy-prefixed fields
+      // during migration, but never require callers to infer a slot from x.
+      sensorRef: outcome.sensorRef,
+      actualSensorContact: true,
+      settled: true,
+      plinkoSensorRef: outcome.sensorRef,
+      plinkoContactDigest: outcome.contactDigest,
     };
     const plinkoSpec = activeEventMetadata && activeEventMetadata.reward;
     const slotEffect = plinkoSpec && plinkoSpec.slotEffects
       ? plinkoSpec.slotEffects[canonicalPrize] : null;
     eventResultMetadata = {
       eventId: 'plinko',
-      meta: { onCap: false, pose: 'other', contacts: contactCount, bounces: bounceCount, banks: 0 },
+      meta: { onCap: false, pose: 'other', contacts: snapshot.contactCount,
+        bounces: bounceCount, banks: 0, physical: true,
+        sensorRef: outcome.sensorRef, contactDigest: outcome.contactDigest },
       eventReward: Object.assign({ plinkoPrize: canonicalPrize, slotIndex: i, legacyPrize: prize },
         slotEffect || {}),
       plinkoPrize: canonicalPrize,
@@ -648,6 +872,7 @@ const Physics = (() => {
   }
 
   function getPlinko() { return plinko; }
+  function getPlinkoSnapshot() { return plinkoLive ? plinkoLive.snapshot() : null; }
 
   // ── Obstacles: deflector wedges + saucers (alien bank shot) ────────────────
   let deflectors = [];
@@ -668,7 +893,12 @@ const Physics = (() => {
       { x: -halfW, y: -height / 2 },
       { x:  halfW, y: -height / 2 },
       { x: 0,      y:  height / 2 },
-    ]], { isStatic: true, label: 'deflector', friction: 0, restitution: profile.wallBounce });
+    ]], {
+      isStatic: true,
+      label: 'deflector',
+      friction: 0,
+      restitution: alienShotActive() ? ALIEN_CONTRACT.wallBounce : profile.wallBounce,
+    });
     if (body) {
       World.add(world, body);
       deflectors.push(body);
@@ -680,11 +910,15 @@ const Physics = (() => {
     clearObstacles();
     const arenaH = h || (groundY + 30);
     const compact = isCompactScreen();
+    const alienActive = alienShotActive();
 
-    if (profile.deflector) {
+    if (profile.deflector || alienActive) {
       // Mobile: a single launch-spot wedge. Desktop: full count, flat-side
       // bolted to the ceiling so they read as roof teeth across a wide arena.
-      const count = compact ? 1 : Math.max(1, profile.deflectorCount || 3);
+      const configuredCount = alienActive
+        ? ALIEN_CONTRACT.deflectorCount
+        : Math.max(1, profile.deflectorCount || 3);
+      const count = compact ? 1 : configuredCount;
       const halfW = compact ? 62 : 70;
       const height = compact ? 78 : 88;
 
@@ -707,9 +941,8 @@ const Physics = (() => {
 
     // Phones: fewer saucers so the court isn't a UFO traffic jam when the
     // camera is pulled back to show the whole bank-shot arena.
-    const saucerN = compact
-      ? Math.min(profile.saucerCount, 3)
-      : profile.saucerCount;
+    const configuredSaucers = alienActive ? ALIEN_CONTRACT.saucerCount : profile.saucerCount;
+    const saucerN = compact ? Math.min(configuredSaucers, 3) : configuredSaucers;
     for (let i = 0; i < saucerN; i++) {
       const lane = (i + 0.5) / Math.max(1, saucerN);
       const x = WALL_INSET + 50 + lane * Math.max(40, canvasW - WALL_INSET * 2 - 100);
@@ -719,7 +952,8 @@ const Physics = (() => {
         label: 'saucer',
         frictionAir: 0.05,
         friction: 0,
-        restitution: Math.max(0.7, profile.wallBounce),
+        restitution: Math.max(0.7,
+          alienActive ? ALIEN_CONTRACT.wallBounce : profile.wallBounce),
         density: 0.0011,
       });
       World.add(world, body);
@@ -753,15 +987,27 @@ const Physics = (() => {
 
   function getObstacles() {
     return {
+      schema: 'AlienObstacleGeometryV1',
+      coordinateSpace: 'physics-world-css-px',
       theme: 'alien',
-      deflectors: deflectors.map((d) => ({ vertices: d.vertices.map((v) => ({ x: v.x, y: v.y })) })),
+      deflectors: deflectors.map((d) => ({
+        surfaceId: d.id,
+        label: 'deflector',
+        collider: 'polygon',
+        vertices: d.vertices.map((v) => ({ x: v.x, y: v.y })),
+      })),
       // Back-compat single deflector for older renderers
       deflector: deflectors[0]
         ? { vertices: deflectors[0].vertices.map((v) => ({ x: v.x, y: v.y })) }
         : null,
       saucers: saucers.map((s) => ({
+        surfaceId: s.body.id,
+        label: 'saucer',
+        collider: 'rectangle',
         x: s.body.position.x, y: s.body.position.y,
         angle: s.body.angle, rx: s.rx, ry: s.ry,
+        vertices: s.body.vertices.map((v) => ({ x: v.x, y: v.y })),
+        velocity: { x: s.body.velocity.x, y: s.body.velocity.y },
       })),
     };
   }
@@ -771,7 +1017,8 @@ const Physics = (() => {
   function placeTarget(explicitX) {
     if (!profile.landOnTarget || !canvasW) { targetX = null; targetY = null; return; }
     targetHW = currentTargetHalfWidth();
-    const margin = (sideWallsEnabled ? WALL_INSET : 8) + targetHW + 16;
+    const margin = (sideWallsEnabled ? WALL_INSET : 8) + targetHW +
+      (profile.alienPortal ? 32 : 16);
     if (explicitX != null && Number.isFinite(explicitX)) {
       targetX = Math.max(margin, Math.min(canvasW - margin, explicitX));
     } else {
@@ -779,17 +1026,16 @@ const Physics = (() => {
       targetX = margin + rand() * span;
     }
     targetY = profile.alienPortal
-      ? Math.max(145, Math.min(groundY - 180, groundY * (0.36 + rand() * 0.24)))
+      ? Math.max(targetHW + 60,
+        Math.min(groundY - targetHW - 60, groundY * (0.36 + rand() * 0.24)))
       : null;
   }
 
-  function placeTemporaryAlienTarget() {
-    const metrics = alienMetricsForViewport(viewW || canvasW, viewH || arenaH);
-    targetHW = metrics.ringRadius;
-    const margin = WALL_INSET + targetHW + 32;
-    targetX = margin + randEvent() * Math.max(0, canvasW - margin * 2);
-    targetY = Math.max(metrics.ringRadius + 60,
-      Math.min(groundY - metrics.ringRadius - 60, groundY * (0.36 + randEvent() * 0.24)));
+  function placeAlienTargetForSeed(seed) {
+    const target = alienTargetForSeed(seed);
+    targetHW = target.halfWidth;
+    targetX = target.x;
+    targetY = target.y;
   }
 
   function getTarget() {
@@ -800,6 +1046,21 @@ const Physics = (() => {
       y: targetY,
       style: alienShotActive() ? 'portal' : 'pad',
       armed: bankHits > 0,
+    };
+  }
+
+  function getAlienArenaState(seed) {
+    const metrics = alienMetricsForViewport(viewW || canvasW, viewH || arenaH);
+    const preview = arguments.length === 0
+      ? null : alienTargetForSeed(requireUint32Seed(seed, 'getAlienArenaState'));
+    return {
+      schema: 'AlienArenaGeometryV1',
+      coordinateSpace: 'physics-world-css-px',
+      active: alienShotActive(),
+      metrics: { ...metrics },
+      target: preview || getTarget(),
+      obstacles: getObstacles(),
+      bank: getAlienBankTelemetry(),
     };
   }
 
@@ -1099,6 +1360,21 @@ const Physics = (() => {
         result, landingInfo: lastLandingInfo,
       }));
     }
+    observationDeadlineEvidence = !activeEventDefinition &&
+      !(lastFlickInfo && lastFlickInfo.eventId) && firstContactMs != null &&
+      simElapsedMs - firstContactMs >= 4000 ? Object.freeze({
+        schema: 'LandingDeadlineEvidenceV1',
+        onLandingPlane: withinLandingPlaneTolerance(),
+        rotationComplete: !profile.requireFlip || hasFlipped,
+      }) : null;
+    observationAirborneEvidence = !activeEventDefinition &&
+      !(lastFlickInfo && lastFlickInfo.eventId) && result === 'MISS' && reason === 'timeout' &&
+      launched && wasAirborne && firstContactMs == null && contactCount === 0 &&
+      flightFrames > ABS_MISS_FRAMES ? Object.freeze({
+        schema: 'LandingAirborneTerminalEvidenceV1', kind: 'absolute-flight-timeout',
+        wasAirborne: true, flightFrames, limitFrames: ABS_MISS_FRAMES,
+      }) : null;
+    publishObservation('landing');
     return result;
   }
 
@@ -1242,57 +1518,17 @@ const Physics = (() => {
       return checkSplitEventLanding();
     }
 
-    // Plinko drop: the only verdict is which slot it settles in.
-    if (plinko && launched) {
-      if (flightFrames > 3000) return plinkoVerdict();   // ~50s failsafe for the long board
-      const speed = Math.hypot(bottle.velocity.x, bottle.velocity.y);
-      const inPegZone = bottle.position.y < plinko.bottom - plinko.slotH - 20;
-      if (inPegZone) {
-        // A bottle-sized puck loves to bridge two pegs and doze off, so the
-        // machine "shakes" while it's slow up here: a continuous seeded drift
-        // push (reversing periodically if it stays stuck) until it drops into
-        // the slot zone. Verdict only happens down in the slots.
-        if (speed < 2.5) {
-          plinkoNudges++;   // shake-frame counter
-          const dir = plinko.drift * (Math.floor(plinkoNudges / 70) % 2 === 0 ? 1 : -1);
-          Body.setVelocity(bottle, {
-            x: bottle.velocity.x + dir * 0.45,
-            y: bottle.velocity.y + 0.35,
-          });
-        }
-        if (plinkoNudges > 700) {
-          Body.setPosition(bottle, {
-            x: Math.max(plinko.left + 36, Math.min(plinko.right - 36, bottle.position.x + plinko.drift * 48)),
-            y: plinko.bottom - plinko.slotH + 34,
-          });
-          Body.setVelocity(bottle, { x: plinko.drift * 2.5, y: 5 });
-          plinkoNudges = 0;
-        }
-        plinkoSettle = 0;
-        return null;
-      }
-      if (firstContactMs == null) {
-        firstContactMs = simElapsedMs;
-        landingPhase = 'contact';
-        contactCount = 1;
-        if (eventController && eventController.active()) {
-          eventController.onContact(Object.assign(eventContext(lastFlickInfo && lastFlickInfo.seed), {
-            contactIndex: 1, elapsedMs: simElapsedMs,
-          }));
-        }
-        return null;
-      }
-      if (landingPhase === 'contact') {
-        landingPhase = 'settling';
-        settlingStartedMs = simElapsedMs;
-        return null;
-      }
-      if (speed < 1.2 && Math.abs(bottle.angularVelocity) < 0.05) plinkoSettle++;
-      else plinkoSettle = 0;
-      if (plinkoSettle > 40) return plinkoVerdict();
-      const plinkoSettleLimit = activeEventMetadata && activeEventMetadata.physics
-        ? activeEventMetadata.physics.settleLimitMs : 4000;
-      if (simElapsedMs - firstContactMs >= plinkoSettleLimit) return plinkoVerdict();
+    // Plinko drop: elapsed time and horizontal position are never verdicts.
+    // The Matter adapter resolves only after the selected body's tethered
+    // contact chassis has physically touched the matching canonical sensor and
+    // slot floor, then remained settled for the required fixed ticks.
+    if (plinkoLive && launched) {
+      const authoritative = plinkoLive.snapshot();
+      plinko = authoritative.board;
+      if (authoritative.outcome) return plinkoVerdict(authoritative);
+      // A timeout is deliberately exposed in getPlinkoSnapshot() as a
+      // no-contest signal for the rules/session owner. It cannot fabricate a
+      // prize or convert elapsed time into MAKE/MISS here.
       return null;
     }
 
@@ -1419,6 +1655,9 @@ const Physics = (() => {
     }
 
     if (angVel < SETTLE_ANG_VEL && linSpeed < SETTLE_LIN_SPD) {
+      if (!angleWin.length) observationAngleTimes = [];
+      observationAngleTimes.push(simElapsedMs);
+      if (observationAngleTimes.length > SETTLE_FRAMES) observationAngleTimes.shift();
       angleWin.push(bottle.angle);
       if (angleWin.length > SETTLE_FRAMES) angleWin.shift();
       let lo = Infinity, hi = -Infinity;
@@ -1518,7 +1757,9 @@ const Physics = (() => {
         const bIsBottle = bodyB === bottle || bodyB.parent === bottle;
         if (aIsBottle === bIsBottle) continue;
         const other = aIsBottle ? bodyB : bodyA;
-        const label = other.label;
+        const rootOther = other && other.parent && other.parent !== other
+          ? other.parent : other;
+        const label = (rootOther && rootOther.label) || other.label;
         if (label === 'meteor' && eventRuntime && eventRuntime.kind === 'meteors') {
           eventRuntime.meteorHits = (eventRuntime.meteorHits || 0) + 1;
           eventRuntime.lastMeteorHit = {
@@ -1532,7 +1773,11 @@ const Physics = (() => {
             label !== 'deflector' && label !== 'saucer') continue;
         const speed = Math.hypot(bottle.velocity.x, bottle.velocity.y);
         if (speed < 1.8) continue;
-        if (alienShotActive()) bankHits++;
+        // Matter reports collisionStart before its solver has produced the
+        // outgoing carom. Queue accepted Alien banks here, then apply any
+        // progressive damping immediately after Engine.update. Canonical root
+        // IDs and an eight-tick cooldown prevent compound-body double counts.
+        queueAlienBank(rootOther, label, speed);
         const type = (label === 'deflector' || label === 'saucer') ? 'wall' : label;
         if (onImpact) onImpact(type, speed, bottle.position.x, bottle.position.y);
       }
@@ -1563,6 +1808,9 @@ const Physics = (() => {
 
   function resetBottle() {
     cleanupActiveEvent('reset');
+    // Plinko cleanup must happen while the selected body still belongs to the
+    // world so the adapter can prove it preserved that exact compound body.
+    if (plinkoLive || plinko) clearPlinko();
     if (pendingReflow && engine) {
       const deferred = pendingReflow;
       pendingReflow = null;
@@ -1574,9 +1822,11 @@ const Physics = (() => {
     }
     if (bottle) World.remove(world, bottle);
     if (engine) engine.gravity.y = profile.gravity;   // clear any moon throw
-    if (plinko) clearPlinko();                        // restore the floor
     groundedFrames = 0;
     angleWin       = [];
+    observationAngleTimes = [];
+    observationDeadlineEvidence = null;
+    observationAirborneEvidence = null;
     totalRotation  = 0;
     hasFlipped     = false;
     requiredRotation = 5.6;
@@ -1595,7 +1845,7 @@ const Physics = (() => {
     flightFrames   = 0;
     rareEvent      = null;
     temporaryAlien = false;
-    bankHits       = 0;
+    clearAlienBankState();
     rareImpulseUsed = false;
     rareEffectFrames = 0;
     alwaysMagnetActive = false;
@@ -1623,15 +1873,18 @@ const Physics = (() => {
     bottle = createBottle();
     World.add(world, bottle);
     applyBodyMaterial();
+    publishObservation('reset');
   }
 
   // Seed arena RNG for this turn (pad placement + future furniture). Must run
   // AFTER setProfile/resetBottle and BEFORE the player aims, so peers that
   // share turnCounter + playerIndex place the same pad without a net message.
   function seedTurn(seed) {
-    seedRng((seed >>> 0) || 1);
+    seed = requireUint32Seed(seed, 'seedTurn');
+    seedRng(seed || 1);
     arenaTime = 0;
-    placeTarget();
+    if (profile.alienPortal) placeAlienTargetForSeed(seed);
+    else placeTarget();
   }
 
   function eventConfig(id) {
@@ -1968,6 +2221,8 @@ const Physics = (() => {
           state.releaseMs = state.elapsedMs;
         }
       } else if (kind === 'mitosis' && airborne && !state.flags.split && state.elapsedMs >= 240) {
+        // Whole selected Flipper, never a cap or blob. The renderer paints this
+        // clone with the same object/variant as the source body.
         const initialVelocity = { ...bottle.velocity };
         const initialAngularVelocity = bottle.angularVelocity;
         const originalMass = bottle.mass;
@@ -2152,11 +2407,19 @@ const Physics = (() => {
   }
 
   function cleanupActiveEvent(reason) {
+    const restoreTemporaryAlien = temporaryAlien;
     if (eventController && eventController.active()) {
       eventController.cleanup(Object.assign(eventContext(lastFlickInfo && lastFlickInfo.seed), { reason }));
     } else {
       removeEventBodies();
     }
+    if (restoreTemporaryAlien && temporaryAlien) {
+      temporaryAlien = false;
+      if (!profile.landOnTarget) { targetX = null; targetY = null; }
+      layoutArena();
+      buildObstacles(arenaH);
+    }
+    clearAlienBankState();
     eventController = null;
     activeEventDefinition = null;
     activeEventMetadata = null;
@@ -2168,9 +2431,16 @@ const Physics = (() => {
   // otherwise a fresh seed is drawn and recorded in lastFlickInfo.
   // Does NOT re-roll the pad — that was seeded in seedTurn().
   function applyFlick(vx, vy, seed, rareMultiplier = 1, eventMode = 'normal', alwaysMagnet = false, eventPolicy = {}) {
-    const s = (seed !== undefined && seed !== null
-      ? seed
-      : Math.floor(Math.random() * 0xffffffff)) >>> 0;
+    const rawVx = Number.isFinite(Number(vx)) ? Number(vx) : 0;
+    const rawVy = Number.isFinite(Number(vy)) ? Number(vy) : 0;
+    const requestedInputFeel = eventPolicy && eventPolicy.inputFeelMode;
+    const transferredInput = transferInputForFeel(rawVx, rawVy,
+      FEEL_MODES.has(requestedInputFeel) ? requestedInputFeel : feelMode);
+    vx = transferredInput.vx;
+    vy = transferredInput.vy;
+    const s = seed === undefined
+      ? Math.floor(Math.random() * 0x100000000)
+      : requireUint32Seed(seed, 'applyFlick');
     seedRng(s);
     seedEventRng(mixSeed(s, 0x51ed270b));
     simElapsedMs = 0;
@@ -2209,35 +2479,33 @@ const Physics = (() => {
     const plinkoRoll = forcedEvent === 'plinko' ||
       (plinkoEnabled && (rolledEvent === 'plinko' || rolledEvent === true));
     const effectiveEvent = rolledEvent === 'plinko' && !plinkoRoll ? null : rolledEvent;
-    if (plinkoRoll) startPlinko();
 
     rareEvent = plinkoRoll ? null : effectiveEvent;
     rareImpulseUsed = false;
     rareEffectFrames = 0;
     alwaysMagnetActive = !!alwaysMagnet;
+    clearAlienBankState();
     temporaryAlien = rareEvent === 'alien-invasion';
-    bankHits = 0;
-    if (temporaryAlien) {
-      configureTemporaryAlienArena();
-      openArena = false;
-      sideWallsEnabled = true;
-      leftWall.collisionFilter.mask = 0xFFFFFFFF;
-      rightWall.collisionFilter.mask = 0xFFFFFFFF;
-      ceilingBody.collisionFilter.mask = 0xFFFFFFFF;
-      leftWall.restitution = rightWall.restitution = ceilingBody.restitution = 0.96;
-      for (const part of [bottle, ...bottle.parts]) {
-        part.frictionAir = 0.003;
-        part.restitution = 0.90;
-      }
-      placeTemporaryAlienTarget();
+    if (alienShotActive() && !plinkoRoll) {
+      configureAlienArena();
+    }
+    if (temporaryAlien && !plinkoRoll) {
+      placeAlienTargetForSeed(s);
     }
     rarePhase = randEvent() * Math.PI * 2;
     requiredRotation = rareEvent === 'double-flip' ? Math.PI * 4 : 5.6;
 
     const moon = rareEvent === 'moon-gravity';
-    const gravityScale = temporaryAlien ? 0.08
-      : (moon ? 0.28 : (rareEvent === 'gravity-slam' ? 2.55 : 1));
-    if (engine) engine.gravity.y = temporaryAlien ? 0.10 : profile.gravity * gravityScale;
+    const requestedGravityScale = moon ? 0.28
+      : (rareEvent === 'gravity-slam' ? 2.55 : 1);
+    const gravityY = alienShotActive() ? ALIEN_CONTRACT.gravity
+      : profile.gravity * requestedGravityScale;
+    // Historically Invasion reported .08 while the engine actually ran .10.
+    // Keep the existing field useful for callers and report the real Alien
+    // value consistently; gravityY is always the exact engine setting.
+    const gravityScale = alienShotActive() ? ALIEN_CONTRACT.gravity
+      : requestedGravityScale;
+    if (engine) engine.gravity.y = gravityY;
     prepareActiveEvent(plinkoRoll ? 'plinko' : effectiveEvent, s);
 
     // CAP THROW (~1/100, seed-rolled): normal spin tuning lands completed
@@ -2275,8 +2543,7 @@ const Physics = (() => {
       // Alien's legacy profile also carries launchScale=1.5; applying both made
       // native shots 50% hotter than the identically scored Alien Invasion and
       // produced strong tablet/desktop outcome drift.
-      const nativeLaunchCalibration = temporaryAlien ? 1 : 1.25;
-      launchY = -Math.max(7, Math.abs(baseLaunchY) * 0.52 * nativeLaunchCalibration) *
+      launchY = -Math.max(7, Math.abs(baseLaunchY) * 0.52) *
         alienMetrics.launchScale;
     }
 
@@ -2288,15 +2555,20 @@ const Physics = (() => {
       launchY = 8 + power * 2;
     }
 
-    if (profile.minHorizRatio > 0) {
+    if (!alienShotActive() && profile.minHorizRatio > 0) {
       const minX = Math.abs(launchY) * profile.minHorizRatio;
       if (Math.abs(launchX) < minX) launchX = (launchX >= 0 ? 1 : -1) * minX;
     }
 
     const dir  = vx >= 0 ? 1 : -1;
-    let spin = dir * (spinBase + power * spinRange) * jSpin * profile.spinScale *
+    let spin = dir * (SPIN_BASE_DEFAULT + power * SPIN_RANGE_DEFAULT) *
+      jSpin * profile.spinScale *
       (capThrowArmed ? 1.52 : 1);
-    if (temporaryAlien) spin *= 0.72;
+    if (alienShotActive()) {
+      spin = dir * (SPIN_BASE_DEFAULT + power * SPIN_RANGE_DEFAULT) * jSpin * 0.70;
+    } else if (rareEvent && rareEvent !== 'mirror-match' && rareEvent !== 'rewind') {
+      spin *= EVENT_SPIN_COMPENSATION;
+    }
 
     // Extreme gravity changes need matching spin timing so the spectacle does
     // not secretly predetermine a miss before the player can see it play out.
@@ -2331,7 +2603,16 @@ const Physics = (() => {
     }
     // Life Drain's hidden magnet needs a completed rotation to catch. A small
     // initial spin assist keeps ordinary classroom flicks inside that catch.
-    if (rareEvent === 'life-drain') spin *= 1.12;
+    if (rareEvent === 'life-drain') {
+      spin *= 1.12;
+    }
+
+    // Plinko consumes the player's horizontal aim and spin, while its physical
+    // trampoline owns the vertical launch. Attach only after those values are
+    // final so ordinary launch code cannot overwrite the spring sequence.
+    if (plinkoRoll) startPlinko(s,
+      Math.max(-12, Math.min(12, launchX)),
+      Math.max(-1.5, Math.min(1.5, spin)));
 
     lastFlickInfo = {
       upSpeed: Math.round(upSpeed),
@@ -2340,6 +2621,7 @@ const Physics = (() => {
       seed: s,
       moon,
       gravityScale,
+      gravityY,
       plinko: plinkoRoll,
       rareEvent,
       eventId: plinkoRoll ? 'plinko' : effectiveEvent,
@@ -2349,6 +2631,9 @@ const Physics = (() => {
       requiredTurns: rareEvent === 'double-flip' ? 2 : 1,
       vx: Math.round(vx),
       vy: Math.round(vy),
+      rawVx: Math.round(rawVx),
+      rawVy: Math.round(rawVy),
+      feel: transferredInput.mode,
       trajectoryJitter: { spin: jSpin, launch: jLaunch, drift: jDrift },
     };
     launchAngle = bottle.angle;
@@ -2358,12 +2643,29 @@ const Physics = (() => {
     groundedFrames = 0;
     angleWin = [];
     lastLandingInfo = null;
-    Body.setVelocity(bottle, { x: launchX, y: launchY });
-    Body.setAngularVelocity(bottle, spin);
+    if (!plinkoRoll) {
+      Body.setVelocity(bottle, { x: launchX, y: launchY });
+      Body.setAngularVelocity(bottle, spin);
+    }
+    observedLaunchSequence++;
+    observationAngleTimes = [];
+    observationDeadlineEvidence = null;
+    observationAirborneEvidence = null;
+    publishObservation('launch');
   }
 
   function stepOnce() {
-    Engine.update(engine, FIXED_DT * 1000);
+    if (alienShotActive() && launched) alienStepTick++;
+    let livePlinkoSnapshot = null;
+    if (plinkoLive) {
+      // The adapter advances this same engine by exactly one fixed tick. Never
+      // also call Engine.update here or Plinko would run at double speed.
+      livePlinkoSnapshot = plinkoLive.step();
+      plinko = livePlinkoSnapshot.board;
+    } else {
+      Engine.update(engine, FIXED_DT * 1000);
+      applyPendingAlienBankDamping();
+    }
     arenaTime += FIXED_DT;
     simElapsedMs += FIXED_DT * 1000;
 
@@ -2373,6 +2675,34 @@ const Physics = (() => {
 
     if (launched && !wasAirborne && bottle.bounds.max.y < groundY - 24) wasAirborne = true;
     if (launched && wasAirborne) flightFrames++;
+
+    if (launched && livePlinkoSnapshot) {
+      const previousContactCount = plinkoContactCursor;
+      plinkoContactCursor = livePlinkoSnapshot.contactCount;
+      contactCount = livePlinkoSnapshot.contactCount;
+      if (livePlinkoSnapshot.boardEnabled &&
+          plinkoContactCursor > previousContactCount) {
+        if (firstContactMs == null) {
+          firstContactMs = simElapsedMs;
+          landingPhase = 'contact';
+        } else {
+          bounceCount += plinkoContactCursor - previousContactCount;
+        }
+        if (eventController && eventController.active()) {
+          for (let index = previousContactCount; index < plinkoContactCursor; index++) {
+            eventController.onContact(Object.assign(
+              eventContext(lastFlickInfo && lastFlickInfo.seed), {
+                contactIndex: index + 1,
+                elapsedMs: simElapsedMs,
+              }));
+          }
+        }
+      } else if (landingPhase === 'contact' && simElapsedMs > firstContactMs) {
+        landingPhase = 'settling';
+        settlingStartedMs = simElapsedMs;
+        if (eventRuntime) eventRuntime.phase = 'settling';
+      }
+    }
 
     if (launched && !plinko &&
         !(eventRuntime && eventRuntime.kind === 'rewind' && eventRuntime.flags.reversing)) {
@@ -2408,15 +2738,16 @@ const Physics = (() => {
       const dy = targetY - bottle.position.y;
       const dist = Math.max(1, Math.hypot(dx, dy));
       const metrics = alienMetricsForViewport(viewW || canvasW, viewH || arenaH);
-      let nativePullCalibration = 1;
-      if (profile.alienPortal && !temporaryAlien) {
-        if (metrics.scale < 0.85) nativePullCalibration = 0.85;
-        else if (metrics.scale >= 2) nativePullCalibration = 1.10;
-      }
-      const pull = metrics.attractionPerStep * nativePullCalibration;
+      const hitRadius = currentHitHalfWidth();
+      const captureEdge = hitRadius * metrics.captureRadiusScale;
+      const capture = Math.max(0, Math.min(1,
+        (captureEdge - dist) / Math.max(1, captureEdge - hitRadius)));
+      const pull = metrics.attractionPerStep *
+        (1 + capture * metrics.capturePullMultiplier);
+      const damping = 1 - capture * (1 - metrics.captureDamping);
       Body.setVelocity(bottle, {
-        x: bottle.velocity.x + dx / dist * pull,
-        y: bottle.velocity.y + dy / dist * pull,
+        x: bottle.velocity.x * damping + dx / dist * pull,
+        y: bottle.velocity.y * damping + dy / dist * pull,
       });
     }
 
@@ -2567,8 +2898,8 @@ const Physics = (() => {
         bottle.bounds.max.y < groundY - GROUND_TOUCH_PX) {
       const wave = Math.sin(arenaTime * 9 + rarePhase);
       const corkscrewForce = {
-        x: wave * bottle.mass * 0.00062,
-        y: -Math.abs(wave) * bottle.mass * 0.00010,
+        x: wave * bottle.mass * 0.00090,
+        y: -Math.abs(wave) * bottle.mass * 0.00016,
       };
       Body.applyForce(bottle, { x: bottle.position.x, y: bottle.position.y - 34 }, corkscrewForce);
       if (eventRuntime) eventRuntime.corkscrewForce = corkscrewForce;
@@ -2636,7 +2967,7 @@ const Physics = (() => {
     // Landing kick is for normal flips (liquid slosh punch). Bank-shot editions
     // accumulate "hasFlipped" from wall caroms and must not get a random shove.
     // v78: softened — the old kick tipped a lot of near-makes into misses.
-    if (!plinko && !profile.floorResolve && hasFlipped && !hasLanded &&
+    if (!plinko && !alienShotActive() && !profile.floorResolve && hasFlipped && !hasLanded &&
         bottle.velocity.y > 0 && bottle.position.y >= groundY - 55) {
       hasLanded = true;
       const a = normalizeSignedAngle(bottle.angle);
@@ -2654,7 +2985,7 @@ const Physics = (() => {
 
     // Cap-sticky assist: pull gently toward fully inverted and kill spin so a
     // rare on-cap balance can actually settle instead of tippling over.
-    if (capSticky && launched && !profile.floorResolve && !plinko) {
+    if (capSticky && launched && !alienShotActive() && !profile.floorResolve && !plinko) {
       const a = normalizeSignedAngle(bottle.angle);
       const target = a >= 0 ? Math.PI : -Math.PI;
       const pull = (target - a) * 0.085;
@@ -2667,6 +2998,7 @@ const Physics = (() => {
     if (rareEvent === 'mirror-match') syncMirrorPresentation();
     liquid.update(bottle.angularVelocity, FIXED_DT, bottle.angle);
     updateSaucers(FIXED_DT);
+    publishObservation('step');
   }
 
   function step(dt) {
@@ -2710,30 +3042,36 @@ const Physics = (() => {
     // long board into one frame. This keeps the character readable and clear
     // of a crowded 8-player HUD; when it reaches the bins, their labels travel
     // into view with it.
-    if (plinko && bottle) {
-      const boardW = plinko.right - plinko.left;
-      // Wide classroom boards stay nearly full-size. Compact screens still
-      // retain enough nearby pegs to make the fall understandable.
-      const contextW = Math.min(1100, Math.max(720, boardW + 120));
-      const zoom = Math.max(0.68, Math.min(0.92, vw / contextW));
+    if (plinkoLive && plinko && bottle) {
+      const liveSnapshot = plinkoLive.snapshot();
+      const camera = liveSnapshot.camera;
       return {
         openArena,
         sideWalls: false,   // arena walls are dead + the board has its own rails
-        zoom,
-        camX: bottle.position.x,
-        camY: bottle.position.y + 20,
+        zoom: camera.zoom,
+        camX: camera.camX,
+        camY: camera.camY,
         worldW: canvasW,
         worldH: plinko.bottom + 90,
         tracking: 'plinko',
         trackingData: {
+          cameraSchema: camera.schema,
+          phase: camera.mode,
+          targetRef: camera.targetRef,
+          allSlotsVisible: camera.allSlotsVisible,
+          fitBounds: camera.fitBounds,
           boardTop: plinko.top,
           boardBottom: plinko.bottom,
           slotBandTop: plinko.bottom - plinko.slotH,
           progress: Math.max(0, Math.min(1,
             (bottle.position.y - plinko.top) / Math.max(1, plinko.bottom - plinko.top))),
-          antiWedgeNudges: plinkoNudges,
+          antiWedgeNudges: liveSnapshot.recovery.antiBalanceApplied,
+          recoveryImpulses: liveSnapshot.recovery.applied,
+          trampoline: liveSnapshot.spring,
+          boardEnabled: liveSnapshot.boardEnabled,
           slots: plinko.slots.map((slot, index) => ({
-            index, kind: slot.kind, x0: slot.x0, x1: slot.x1,
+            index, kind: slot.kind, canonicalKind: slot.canonicalKind,
+            sensorRef: slot.sensorRef, x0: slot.x0, x1: slot.x1,
           })),
         },
       };
@@ -2857,6 +3195,9 @@ const Physics = (() => {
         slideDirection: eventRuntime.slideDirection,
         assistVelocity: eventRuntime.assistVelocity || null,
         tableOffset: eventRuntime.tableOffset || null,
+        bodyScale: eventRuntime.bodyScale,
+        originY: eventRuntime.originY,
+        lastHeartbeatMs: eventRuntime.lastHeartbeatMs,
         iceFriction: eventRuntime.iceFriction,
         frictionReturnProgress: eventRuntime.frictionReturnProgress,
         compression: eventRuntime.compression,
@@ -2919,11 +3260,15 @@ const Physics = (() => {
     getBottle, getLiquid, getGroundY, getLastLandingInfo, getLastFlickInfo,
     setProfile, getTarget, getObstacles, getViewHint, isOpenArena, placeTarget,
     seedTurn, setPlinkoEnabled, forcePlinko, forceSpecialEvent, forceSpecialEventName,
-    getPlinko, setFeel,
+    getPlinko, getPlinkoSnapshot, setPlinkoAppearance,
+    setFeel, previewInput: transferInputForFeel,
     rareEventForSeed, insanityEventForSeed,
     getFeel: () => feelMode, setImpactCallback,
     getLandingLifecycle, getEventMetadata, getEventResultMetadata,
     getEventRenderState, getEventBodies, hasDeferredReflow,
-    cleanupEvent: cleanupActiveEvent, alienMetricsForViewport, getArenaProfiles,
+    cleanupEvent: cleanupActiveEvent, alienMetricsForViewport, alienTargetForSeed,
+    getAlienArenaState, getAlienBankTelemetry,
+    getArenaProfiles,
+    getObservation, subscribeObservations,
   };
 })();

@@ -10,6 +10,8 @@ const METADATA_FILE = "release-provenance.json";
 const ROOT_FILES = ["index.html", "service-worker.js", "manifest.json"];
 const OPTIONAL_ROOT_FILES = [".nojekyll"];
 const RUNTIME_DIRECTORIES = ["css", "js", "icons"];
+// v1.12 added data/ (the bundled globe geometry); older releases have none.
+const OPTIONAL_RUNTIME_DIRECTORIES = ["data"];
 const RELEASE_RE = /^v\d+\.\d+$/;
 const SHA_RE = /^[0-9a-f]{40}$/i;
 
@@ -81,7 +83,7 @@ function isAllowedRuntimePath(relativePath) {
   const clean = toRuntimePath(path.normalize(relativePath)).replace(/^\.\//, "");
   if (!clean || clean === "." || clean.startsWith("../") || path.isAbsolute(clean)) return false;
   if (ROOT_FILES.includes(clean) || OPTIONAL_ROOT_FILES.includes(clean)) return true;
-  return RUNTIME_DIRECTORIES.some((directory) => clean.startsWith(`${directory}/`));
+  return [...RUNTIME_DIRECTORIES, ...OPTIONAL_RUNTIME_DIRECTORIES].some((directory) => clean.startsWith(`${directory}/`));
 }
 
 function walkRuntimeFiles(root, relativeDirectory) {
@@ -191,6 +193,9 @@ function collectRuntimeFiles(upstreamRoot) {
     }
   }
   for (const directory of RUNTIME_DIRECTORIES) files.push(...walkRuntimeFiles(upstreamRoot, directory));
+  for (const directory of OPTIONAL_RUNTIME_DIRECTORIES) {
+    if (fs.existsSync(path.join(upstreamRoot, directory))) files.push(...walkRuntimeFiles(upstreamRoot, directory));
+  }
   const normalized = [...new Set(files.map(toRuntimePath))].sort();
   for (const relative of normalized) {
     if (!isAllowedRuntimePath(relative)) fail(`internal allowlist error for ${relative}`);
@@ -301,7 +306,7 @@ export function syncFlipgame({ upstreamRoot, sourceSha, expectedRelease, labRoot
       releaseVersion: release,
     },
     hostedRoute: "/flipgame/",
-    runtimeAllowlist: ["index.html", "service-worker.js", "manifest.json", "css/**", "js/**", "icons/**", ".nojekyll (optional)"],
+    runtimeAllowlist: ["index.html", "service-worker.js", "manifest.json", "css/**", "js/**", "icons/**", "data/** (optional)", ".nojekyll (optional)"],
     runtimeFiles,
     contentSha256: digestFiles(realUpstreamRoot, runtimeFiles),
   };

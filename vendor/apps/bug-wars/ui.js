@@ -1,10 +1,7 @@
 /* ============================================================================
-   Bug Wars — ui.js   (v3 — faction-aware)
+   Bug Wars — ui.js   (v6: upgrades + doctrines)
    ----------------------------------------------------------------------------
-   The onboarding + HUD-chrome layer: start menu, faction picker, difficulty,
-   the dynamically-built build/train panel for the chosen faction, the attack
-   warning, and a faction-aware tutorial. Only observes state + updates DOM.
-   (Panel buttons are built with safe DOM methods, not innerHTML.)
+   Menu, faction picker, build/train/upgrade panel, turn banner, tutorial.
    ========================================================================== */
 
 window.BW = window.BW || {};
@@ -22,27 +19,28 @@ window.BW = window.BW || {};
     hive: 'Hive', brood: 'Brood', apiary: 'Apiary',
     mound: 'Mound', den: 'Den', burrow: 'Burrow',
     lair: 'Lair', nursery: 'Nursery', spinnery: 'Spinnery',
+    outpost: 'Outpost',
   };
   const DESC = {
-    worker: 'gathers resources', soldier: 'tanky · beats skirmishers', fireant: 'fast · venom · anti-air & siege', leafcutter: 'siege · wrecks buildings & walls',
-    drone: 'gathers resources', guard: 'tanky frontline', striker: 'fast · venom · anti-air & siege', carpenter: 'siege · wrecks buildings & walls', hornet: 'flyer · raids · ignores walls',
-    grub: 'gathers resources', bruiser: 'slow heavy tank', bombardier: 'acid spit · anti-air & siege', ram: 'siege · cracks walls & buildings',
-    spiderling: 'gathers resources', hunter: 'agile frontline', spitter: 'venom · anti-air & siege', weaver: 'siege · wrecks buildings & walls', balloonist: 'flyer · drifts over walls',
-    barracks: 'makes soldiers / fire ants', workshop: 'makes leafcutters', granary: 'closer drop-off', tower: 'shoots attackers (+ flyers)', wall: 'tough barrier · only siege cracks it',
-    brood: 'makes guards / strikers', apiary: 'makes carpenters + hornets',
-    den: 'makes bruisers / bombardiers', burrow: 'makes rams',
-    nursery: 'makes hunters / spitters', spinnery: 'makes weavers + balloonists',
+    worker: 'move 3 · harvests', soldier: 'move 4 · beats skirmishers · digs nests', fireant: 'move 4 · range 2 · venom · AA', leafcutter: 'move 2 · siege buildings',
+    drone: 'move 3 · harvests', guard: 'move 4 · frontline', striker: 'move 4 · range 2 · venom · AA', carpenter: 'move 2 · siege', hornet: 'move 5 · flyer · over walls',
+    grub: 'move 3 · harvests', bruiser: 'move 3 · heavy tank', bombardier: 'move 3 · range 2 · AA', ram: 'move 2 · cracks walls',
+    spiderling: 'move 3 · harvests', hunter: 'move 4 · agile', spitter: 'move 4 · range 2 · venom', weaver: 'move 2 · siege', balloonist: 'move 5 · flyer',
+    barracks: 'soldiers / fire ants', workshop: 'leafcutters', granary: '+40% nearby harvest · +pop', tower: 'fires each turn · prioritizes siege', wall: 'blocks · siege only',
+    brood: 'guards / strikers', apiary: 'carpenters + hornets',
+    den: 'bruisers / bombardiers', burrow: 'rams',
+    nursery: 'hunters / spitters', spinnery: 'weavers + balloonists',
   };
   const ICON = { food: '🍞', mud: '🟫', honeydew: '🍯' };
   const costStr = cost => Object.keys(cost).map(k => ICON[k] + ' ' + cost[k]).join(' ') || '—';
 
   const span = (cls, text) => { const e = document.createElement('span'); e.className = cls; e.textContent = text; return e; };
-  function makeBtn(cls, dataKey, kind, cost, hotkey) {
+  function makeBtn(cls, dataKey, kind, cost, hotkey, desc) {
     const btn = document.createElement('button');
     btn.className = cls; btn.dataset[dataKey] = kind;
     btn.append(span('bk', NAMES[kind] || kind), span('bc', cost));
     if (hotkey != null) btn.append(span('bh', hotkey));
-    btn.append(span('bd', DESC[kind] || ''));
+    btn.append(span('bd', desc || DESC[kind] || ''));
     return btn;
   }
   function rowLabel(text, small) {
@@ -50,27 +48,48 @@ window.BW = window.BW || {};
     if (small) { const sm = document.createElement('small'); sm.textContent = small; e.append(sm); }
     return e;
   }
-  // Rebuild the build/train buttons for the player's faction (safe DOM, no innerHTML).
   function buildPanel(faction) {
     const F = cfg.FACTIONS[faction]; if (!F) return;
-    const br = $('buildRow'), tr = $('trainRow');
+    const br = $('buildRow'), tr = $('trainRow'), ur = $('upgradeRow');
     if (br) { br.replaceChildren(rowLabel('Build', '(Mud)')); F.buildMenu.forEach(k => br.append(makeBtn('buildbtn', 'build', k, costStr(cfg.BUILDING_STATS[k].cost)))); }
     if (tr) { tr.replaceChildren(rowLabel('Train')); F.trainMenu.forEach((k, i) => tr.append(makeBtn('trainbtn', 'train', k, costStr(cfg.UNIT_STATS[k].cost), i + 1))); }
+    if (ur) {
+      ur.replaceChildren(rowLabel('Tech', '(Honeydew)'));
+      (F.upgradeMenu || []).forEach(k => {
+        const up = cfg.UPGRADES[k];
+        if (!up) return;
+        const btn = document.createElement('button');
+        btn.className = 'upgradebtn';
+        btn.dataset.upgrade = k;
+        btn.append(span('bk', up.name), span('bc', costStr(up.cost)), span('bd', up.desc));
+        ur.append(btn);
+      });
+    }
   }
 
-  // Faction-aware tutorial (works for ants or bees).
+  function refreshUpgradeState() {
+    const ur = $('upgradeRow');
+    if (!ur || !BW.state || !BW.state.upgrades) return;
+    const bag = BW.state.upgrades.player || {};
+    ur.querySelectorAll('.upgradebtn').forEach(btn => {
+      const done = !!bag[btn.dataset.upgrade];
+      btn.classList.toggle('done', done);
+      btn.disabled = done;
+    });
+  }
+
   const pf = () => (BW.state && BW.state.faction) ? BW.state.faction.player : 'ants';
   const STEPS = [
-    { text: "Drag a box over your gatherers, then RIGHT-CLICK a Food pile (green) to mine it. Scroll the map with WASD / arrows / screen edges — or click the minimap.",
-      done: s => s.units.some(u => u.team === 'player' && u.kind === cfg.FACTIONS[pf()].gatherer && (u.order.type === 'gather' || u.order.type === 'returning')) },
-    { text: "You need MUD (brown) to build. With ~120 mud, click your production building below and place it near your base.",
+    { text: 'Tap a gatherer. Blue tiles = move range. Tap Food/Mud to harvest — they collect at the start of each turn while adjacent. Build a Granary near piles for +40% yield.',
+      done: s => s.units.some(u => u.team === 'player' && u.kind === cfg.FACTIONS[pf()].gatherer && u.gathering != null) },
+    { text: 'Gather Mud, then place a production building. Capture the green Outposts mid-map (attack until claimed) for income. Contest Honeydew — it does not regen.',
       done: s => s.buildings.some(b => b.team === 'player' && b.kind === cfg.FACTIONS[pf()].producers[0]) },
-    { text: "Train fighters from it (number keys). Counters matter — skirmishers shoot down flyers, siege wrecks buildings.",
+    { text: 'Train fighters. Skirmishers have range 2; siege is slow but wrecks buildings; flyers ignore walls. Multi-select Army then tap a target to move the group. Counters show on hover (×1.6).',
       done: s => s.units.some(u => u.team === 'player' && u.kind !== cfg.FACTIONS[pf()].gatherer) },
-    { text: "Defend with a Tower + Walls, keep your economy running, and RIGHT-CLICK the enemy base to destroy it. A warning shows when they attack!",
+    { text: 'Spend Honeydew on Tech upgrades. Walls + towers defend. End Turn when ready — destroy their nest to win.',
       done: () => false },
   ];
-  let stepIdx = 0, lastPhase = 'menu', selectedFaction = 'ants';
+  let stepIdx = 0, lastPhase = 'menu', selectedFaction = 'ants', selectedMap = 'skirmish';
 
   function tick() {
     const s = BW.state;
@@ -81,6 +100,28 @@ window.BW = window.BW || {};
 
     const sp = $('selPanel');
     if (sp) sp.style.display = (s.phase === 'playing' && !s.watchMode) ? '' : 'none';
+
+    const endBtn = $('endTurnBtn');
+    if (endBtn) {
+      const yours = s.phase === 'playing' && !s.watchMode && s.turn && s.turn.side === 'player' && !s.turn.busy;
+      endBtn.disabled = !yours;
+      endBtn.classList.toggle('ready', yours);
+      endBtn.textContent = !s.turn ? 'End Turn'
+        : s.turn.busy ? '…'
+        : s.turn.side === 'enemy' ? 'Enemy turn'
+        : 'End Turn';
+    }
+
+    const turnEl = $('turnBanner');
+    if (turnEl && s.turn) {
+      if (s.phase !== 'playing') turnEl.classList.remove('show');
+      else {
+        turnEl.classList.add('show');
+        const side = s.turn.side === 'player' ? 'Your turn' : 'Enemy turn';
+        turnEl.textContent = 'Turn ' + s.turn.number + ' · ' + side;
+        turnEl.classList.toggle('enemy', s.turn.side === 'enemy');
+      }
+    }
 
     if (s.phase !== lastPhase) {
       if (BW.sound && s.phase === 'won') BW.sound.play('win');
@@ -100,6 +141,12 @@ window.BW = window.BW || {};
         tc.classList.add('show');
       }
     }
+
+    refreshUpgradeState();
+
+    // Faction blurb under menu buttons
+    const blurb = $('facBlurb');
+    if (blurb && cfg.FACTIONS[selectedFaction]) blurb.textContent = cfg.FACTIONS[selectedFaction].blurb || '';
   }
   function resetTutorial() { stepIdx = 0; }
 
@@ -107,9 +154,15 @@ window.BW = window.BW || {};
     document.querySelectorAll('.facbtn').forEach(b => b.addEventListener('click', () => {
       selectedFaction = b.dataset.faction;
       document.querySelectorAll('.facbtn').forEach(x => x.classList.toggle('selected', x === b));
+      const blurb = $('facBlurb');
+      if (blurb && cfg.FACTIONS[selectedFaction]) blurb.textContent = cfg.FACTIONS[selectedFaction].blurb || '';
     }));
-    document.querySelectorAll('.diffbtn').forEach(b => b.addEventListener('click', () => BW.startGame(b.dataset.diff, { faction: selectedFaction })));
-    document.querySelectorAll('.watchbtn').forEach(b => b.addEventListener('click', () => BW.startGame(b.dataset.diff, { playerAI: true, faction: selectedFaction })));
+    document.querySelectorAll('.mapbtn').forEach(b => b.addEventListener('click', () => {
+      selectedMap = b.dataset.map;
+      document.querySelectorAll('.mapbtn').forEach(x => x.classList.toggle('selected', x === b));
+    }));
+    document.querySelectorAll('.diffbtn').forEach(b => b.addEventListener('click', () => BW.startGame(b.dataset.diff, { faction: selectedFaction, map: selectedMap })));
+    document.querySelectorAll('.watchbtn').forEach(b => b.addEventListener('click', () => BW.startGame(b.dataset.diff, { playerAI: true, faction: selectedFaction, map: selectedMap })));
     document.querySelectorAll('[data-action="menu"]').forEach(b => b.addEventListener('click', () => BW.toMenu()));
     const close = $('tutorialClose'); if (close) close.addEventListener('click', () => { const tc = $('tutorial'); if (tc) tc.style.display = 'none'; });
   }

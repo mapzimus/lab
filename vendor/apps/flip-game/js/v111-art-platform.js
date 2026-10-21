@@ -828,6 +828,11 @@
   function paintReactionFace(ctx, face, input) {
     var state = normalizeRenderState(input);
     var profile = face && face.anchor ? face : null;
+    var objectId = input && input.objectId != null ? String(input.objectId) : '';
+    // Bottle and T-Rex keep their authored face. Calibration variants already
+    // paint one expression; a second overlay doubles the features.
+    if (objectId === 'bottle' || objectId === 'trex') return false;
+    if (profile && profile.source === 'render-variant') return false;
     if (!profile || !profile.supportsEmotion || state.emotion === 'idle') return false;
     var x = profile.anchor.x;
     var y = profile.anchor.y;

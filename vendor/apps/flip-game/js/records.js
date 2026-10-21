@@ -237,7 +237,11 @@
 
   var browserStorage = null;
   try { browserStorage = root && root.localStorage ? root.localStorage : null; } catch (_) {}
-  var defaultStore = createStore({ storage: browserStorage });
+  // The browser UI reads the module-level Progression store directly. Records
+  // must advance that exact same in-memory store; creating a second adapter over
+  // the same localStorage key persists the reward but leaves the picker stale
+  // until a reload.
+  var defaultStore = createStore({ storage: browserStorage, progression: Progression });
   return Object.freeze({
     recordFlip: defaultStore.recordFlip, recordWin: defaultStore.recordWin,
     renderHtml: defaultStore.renderHtml, reset: defaultStore.reset,

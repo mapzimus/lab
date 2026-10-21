@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Bug Wars — Maxwell Howe GIS</title>
-  <meta name="description" content="Bug Wars: a browser real-time strategy game. Command ants, bees, beetles, or spiders — gather three resources, build, defend, and destroy the rival nest.">
+  <meta name="description" content="Bug Wars: a turn-based strategy game for desktop and mobile. Command ants, bees, beetles, or spiders — gather, build, fight, and destroy the rival nest.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%F0%9F%90%9C%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,35 +25,30 @@
       <div class="stat res-mud"><span class="dot"></span><span id="mudCount" class="val">0</span><span class="rlabel">Mud</span></div>
       <div class="stat res-honey"><span class="dot"></span><span id="honeydewCount" class="val">0</span><span class="rlabel">Honeydew</span></div>
       <div class="stat"><span class="label">Pop</span><span id="popCount" class="val">0/0</span></div>
-      <div class="stat"><span class="label">Time</span><span id="clock" class="val">0:00</span></div>
-      <div class="stat"><span class="label">Sel</span><span id="selCount" class="val">0</span></div>
-      <div class="stat spd-ctl">
-        <span class="label">Speed</span>
-        <button id="speedDown" class="ctrl spd" title="Slower ( [ )">−</button>
-        <span id="speedVal" class="val">0.6×</span>
-        <button id="speedUp" class="ctrl spd" title="Faster ( ] )">+</button>
-      </div>
-      <button id="pauseBtn" class="ctrl" title="Pause / resume (P)">⏸ Pause</button>
+      <div class="stat"><span class="label">Turn</span><span id="clock" class="val">1</span></div>
+      <div class="stat"><span class="label">Ready</span><span id="selCount" class="val">0</span></div>
+      <button id="endTurnBtn" class="ctrl end-turn" title="End Turn (Enter)">End Turn</button>
     </div>
   </header>
 
   <!-- ===== Play area ===== -->
   <main class="stage">
     <canvas id="gameCanvas" width="1280" height="720"></canvas>
+    <div id="turnBanner" class="turn-banner">Turn 1 · Your turn</div>
     <div id="warnBanner" class="warn-banner">⚠ The red colony is attacking! (Space jumps there)</div>
     <div id="spectateBadge" class="spectate-badge">👁 SPECTATING · AI vs AI · press R to restart</div>
     <div id="toast" class="toast"></div>
 
-    <!-- Selection bar: select-by-type + live summary -->
+    <!-- Selection bar -->
     <div id="selPanel" class="sel-panel">
       <div class="sel-row">
         <span class="sel-label">Select</span>
-        <button class="selbtn" data-select="all" title="Select all units">All</button>
-        <button class="selbtn" data-select="workers" title="All workers (Q)">Workers</button>
+        <button class="selbtn" data-select="next" title="Next ready unit (F / Tab)">Next</button>
+        <button class="selbtn" data-select="ready" title="Units that still have an action">Ready</button>
+        <button class="selbtn" data-select="workers" title="All gatherers (Q)">Workers</button>
         <button class="selbtn" data-select="army" title="All fighters (E)">Army</button>
-        <button class="selbtn" data-select="idleWorkers" title="Idle workers (.)">Idle</button>
       </div>
-      <div id="selSummary" class="sel-summary">drag a box to select · double-click a unit for all of its type</div>
+      <div id="selSummary" class="sel-summary">tap a unit · Army multi-select moves as a group · End Turn when done</div>
     </div>
 
     <!-- Tutorial coaching card -->
@@ -66,12 +62,18 @@
     <div id="menu" class="overlay menu">
       <div class="overlay-card menu-card">
         <h1 class="menu-title">BUG WARS</h1>
-        <p class="menu-sub">A backyard real-time strategy game. Out-economy, out-build, and out-fight a rival colony.</p>
+        <p class="menu-sub">Out-economy, out-position, and out-fight a rival colony. Gather scarce Honeydew for tech, capture outposts, and juggle attack with defense — one turn at a time.</p>
         <div class="how">
-          <div><b>Gather</b> — drag-select workers, right-click <span class="c-food">Food</span> / <span class="c-mud">Mud</span> / <span class="c-honey">Honeydew</span> to mine. They keep at it until you move them.</div>
-          <div><b>Build &amp; Train</b> — spend Mud on buildings, Food to train units. Counters matter: infantry &gt; skirmisher &gt; siege &gt; buildings, and skirmishers shoot down flyers. Walls only fall to siege.</div>
-          <div><b>Explore</b> — the map is bigger than your screen. Move the camera with <b>WASD</b> / arrow keys, by dragging the <b>minimap</b> (bottom-right), by pushing the screen edges, or by <b>middle-mouse dragging</b> the map. <b>Space</b> jumps to the action.</div>
-          <div><b>Win</b> — destroy the enemy base before they destroy yours. You'll get a warning when they march.</div>
+          <div><b>Your turn</b> — tap a bug (or multi-select Army), then tap a blue tile / red enemy. Skirmishers shoot range 2; siege is slow but wrecks buildings; flyers ignore walls. Counters show on hover.</div>
+          <div><b>Economy</b> — park gatherers on <span class="c-food">Food</span> / <span class="c-mud">Mud</span> / <span class="c-honey">Honeydew</span>. Granaries boost nearby harvest. Honeydew does not regen — contest the mid piles. Capture green Outposts for income.</div>
+          <div><b>Tech &amp; Defense</b> — spend Honeydew on colony upgrades. Walls + towers matter. Infantry &gt; skirmisher &gt; siege &gt; buildings; skirmishers are anti-air.</div>
+          <div><b>End Turn</b> — tap End Turn when done. Destroy their nest to win.</div>
+        </div>
+        <div class="maprow">
+          <span class="fac-label">Map</span>
+          <button class="ctrl mapbtn selected" data-map="skirmish">📱 Skirmish</button>
+          <button class="ctrl mapbtn" data-map="garden">🌿 Garden</button>
+          <span class="fac-vs">— Skirmish is tighter &amp; better on phones</span>
         </div>
         <div class="facrow">
           <span class="fac-label">Play as</span>
@@ -79,8 +81,8 @@
           <button class="ctrl facbtn" data-faction="bees">🐝 Bees</button>
           <button class="ctrl facbtn" data-faction="beetles">🐞 Beetles</button>
           <button class="ctrl facbtn" data-faction="spiders">🕷️ Spiders</button>
-          <span class="fac-vs">— you'll face a random rival</span>
         </div>
+        <p id="facBlurb" class="fac-blurb">Balanced eco. Strong forage &amp; tunnels.</p>
         <div class="diffrow">
           <button class="ctrl big diffbtn" data-diff="easy">Easy</button>
           <button class="ctrl big diffbtn" data-diff="normal">Normal</button>
@@ -110,12 +112,12 @@
   <!-- ===== Build + Train panel ===== -->
   <footer class="panel">
     <div class="rows">
-      <div class="panel-row" id="buildRow"></div>   <!-- built per-faction by ui.js -->
+      <div class="panel-row" id="buildRow"></div>
       <div class="panel-row" id="trainRow"></div>
+      <div class="panel-row" id="upgradeRow"></div>
     </div>
   </footer>
 
-  <!-- ===== Scripts (order matters — config first, main last) ===== -->
   <script src="config.js"></script>
   <script src="world.js"></script>
   <script src="systems.js"></script>

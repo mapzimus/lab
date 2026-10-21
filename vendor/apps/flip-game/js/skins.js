@@ -1903,7 +1903,25 @@ ${crown}
       physics: null,
       v111Art: true,
     })) : [];
-    return legacy.concat(additions);
+    const known = new Set(legacy.concat(additions).map((entry) => entry.id));
+    const v112 = typeof window !== 'undefined' && window.FlipArtV112;
+    const calibrated = v112 && Array.isArray(v112.definitions)
+      ? v112.definitions.filter((entry) => !known.has(entry.objectId)).map((entry) => {
+        const first = entry.variants && entry.variants[0];
+        return {
+          id: entry.objectId,
+          name: entry.displayName,
+          emoji: '◈',
+          drawAs: entry.objectId,
+          unlock: null,
+          tint: (first && first.color) || '#1f9bff',
+          color: (first && first.color) || '#1f9bff',
+          liquid: null,
+          physics: null,
+          v112Art: true,
+        };
+      }) : [];
+    return legacy.concat(additions, calibrated);
   }
 
   const CHARACTERS = buildCharacters();
@@ -1965,6 +1983,9 @@ ${crown}
     // Default player name for a skin family + color (always unique per flavor).
     nameFor: (id, color) => {
       const c = character(id);
+      const authoredNames = typeof window !== 'undefined' && window.FLIP_V112_VARIANT_NAMES;
+      const authoredName = authoredNames && authoredNames.nameFor(id, color || (c && c.tint) || '#1f9bff');
+      if (authoredName) return authoredName;
       const family = (c && c.drawAs) || id;
       const list = FAMILY_COLOR_NAMES[family];
       const hex = colorToHexKey(color || (c && c.tint) || '#1f9bff');
@@ -1986,12 +2007,38 @@ ${crown}
     },
     editionChars: (edition) => (EDITION_TO_CHARS[edition] || []).slice(),
     hasDraw: (id) => {
+      if (typeof window !== 'undefined' && window.FlipArtV112 && FlipArtV112.getDefinition(id)) return true;
       if (typeof window !== 'undefined' && window.FlipArtV111 && FlipArtV111.getObject(id)) return true;
       const drawAs = resolveDraw(id);
       return drawAs !== 'bottle' && !!drawFns[drawAs];
     },
     draw: (ctx, id, opts) => {
       const c = character(id);
+      if (typeof window !== 'undefined' && window.FlipArtV112 && FlipArtV112.getDefinition(id)) {
+        const variantId = (opts && opts.variantId) || 'blue-steel';
+        const variant = FlipArtV112.getRenderVariant(id, variantId);
+        const mapping = variant.metrics.mapping;
+        ctx.save();
+        ctx.scale(mapping.artScale, mapping.artScale);
+        ctx.translate(-mapping.pivot.x, -mapping.pivot.y);
+        variant.renderCanvasLocal(ctx, {
+          mode: 'gameplay',
+          time: (opts && opts.time) || 0,
+          reducedMotion: !!(opts && opts.reducedMotion),
+          angle: opts && opts.angle,
+          slosh: opts && opts.slosh,
+          angularVelocity: opts && opts.angularVelocity,
+          velocity: opts && opts.velocity,
+          airborne: opts && opts.airborne,
+          contact: opts && opts.contact,
+          impact: opts && opts.impact,
+          emotion: opts && opts.emotion,
+          flipSeed: opts && opts.flipSeed,
+          motionSeed: opts && opts.motionSeed,
+        }, opts || {});
+        ctx.restore();
+        return;
+      }
       if (c && c.v111Art && typeof window !== 'undefined' && window.FlipArtV111) {
         const variantId = (opts && opts.variantId) || 'blue-steel';
         const variant = FlipArtV111.getRenderVariant(id, variantId);

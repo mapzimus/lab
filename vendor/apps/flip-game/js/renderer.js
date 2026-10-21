@@ -17,6 +17,7 @@ const Renderer = (() => {
   let fxCosmeticId = null;
   let fxVisualArenaId = null;
   let fxPlinko = null;   // plinko board geometry while a drop is live
+  let plinkoPresentation = null;
   let trailAccumulator = 0;
   const rainbowTrailPoints = [];
   let motionFlipKey = null, motionElapsed = 0;
@@ -55,6 +56,7 @@ const Renderer = (() => {
     W = canvas.width;
     H = canvas.height;
     camZoom = 1; camX = W / 2; camY = H / 2;
+    plinkoPresentation = null; fxPlinko = null;
     motionFlipKey = null; motionElapsed = 0;
     if (reactionFocus) reactionFocus.reset();
   }
@@ -71,6 +73,7 @@ const Renderer = (() => {
 
   function projectBottleCenter(bottle, groundY) {
     const p = projectPoint(bottle.position.x, bottle.position.y, groundY);
+    if (plinkoPresentation) return p;
     return {
       x: p.x,
       y: p.y - (BOTTLE_DRAW_SCALE - 1) * 43,
@@ -78,6 +81,98 @@ const Renderer = (() => {
   }
 
   function bottleDrawScale() { return BOTTLE_DRAW_SCALE; }
+
+  function eventRuntime() {
+    return fxEventState && fxEventState.runtime ? fxEventState.runtime : null;
+  }
+
+  function eventObjectScale() {
+    const runtime = eventRuntime();
+    if (runtime && runtime.flags && runtime.flags.shrunk) {
+      const scale = Number(runtime.bodyScale);
+      if (Number.isFinite(scale) && scale > 0) return scale;
+      const visualScale = Number(fxEventState && fxEventState.visual && fxEventState.visual.objectScale);
+      if (Number.isFinite(visualScale) && visualScale > 0) return visualScale;
+    }
+    return 1;
+  }
+
+  function eventCapDetached() {
+    const id = fxEventState && fxEventState.eventId;
+    const flags = eventRuntime() && eventRuntime().flags;
+    return !!(flags && ((id === 'cap-toss' && flags.split) || (id === 'fizz-jet' && flags.capEjected)));
+  }
+
+  function slamCompression() {
+    if (!fxEventState || fxEventState.eventId !== 'gravity-slam') return 0;
+    const value = Number(eventRuntime() && eventRuntime().compression);
+    return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0;
+  }
+
+  function bodiesWithLabel(bodies, label) {
+    return (bodies || []).filter((body) => body && body.label === label);
+  }
+
+  function drawEventCap(body, color) {
+    if (!body) return;
+    const width = body.bounds ? (body.bounds.max.x - body.bounds.min.x) : 28;
+    const height = body.bounds ? (body.bounds.max.y - body.bounds.min.y) : 10;
+    ctx.save();
+    ctx.translate(body.x, body.y);
+    ctx.rotate(body.angle || 0);
+    ctx.fillStyle = color || '#ff6d00';
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.roundRect(-width / 2, -height / 2, width, height, 4);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.32)';
+    ctx.fillRect(-width * 0.28, -height * 0.28, width * 0.22, height * 0.36);
+    ctx.restore();
+  }
+
+  function drawIceBumper(body) {
+    if (!body || !body.bounds) return;
+    const width = body.bounds.max.x - body.bounds.min.x;
+    const height = body.bounds.max.y - body.bounds.min.y;
+    ctx.save();
+    ctx.translate(body.x, body.y);
+    ctx.rotate(body.angle || 0);
+    const frost = ctx.createLinearGradient(-width / 2, 0, width / 2, 0);
+    frost.addColorStop(0, 'rgba(170,245,255,0.18)');
+    frost.addColorStop(0.5, 'rgba(220,255,255,0.92)');
+    frost.addColorStop(1, 'rgba(170,245,255,0.18)');
+    ctx.fillStyle = frost;
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect(-width / 2, -height / 2, width, height, 10);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawQuakeDebris(body) {
+    if (!body || !body.bounds) return;
+    const width = Math.max(22, body.bounds.max.x - body.bounds.min.x);
+    const height = Math.max(16, body.bounds.max.y - body.bounds.min.y);
+    ctx.save();
+    ctx.translate(body.x, body.y);
+    ctx.rotate(body.angle || 0);
+    ctx.fillStyle = '#ffb074';
+    ctx.strokeStyle = '#5a2410';
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = 'rgba(255,140,60,0.45)';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.roundRect(-width / 2, -height / 2, width, height, 3);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,230,0.45)';
+    ctx.fillRect(-width * 0.28, -height * 0.28, width * 0.35, height * 0.28);
+    ctx.restore();
+  }
 
   // ── Color helpers (per-player liquid flavor) ────────────────────────────────
   function hexToRgba(hex, a) {
@@ -241,37 +336,37 @@ const Renderer = (() => {
   function drawRareEventOverlay(event) {
     if (!event) return;
     const colors = {
-      'rainbow-trail': ['rgba(255,40,120,0.14)', 'rgba(40,210,255,0.13)'],
-      'rainbow-corkscrew': ['rgba(255,40,120,0.14)', 'rgba(40,210,255,0.13)'],
-      'half-full': ['rgba(30,150,255,0.18)', 'rgba(80,220,255,0.04)'],
-      'power-launch': ['rgba(255,70,0,0.22)', 'rgba(255,190,30,0.04)'],
-      'fizz-jet': ['rgba(100,235,255,0.18)', 'rgba(255,255,255,0.04)'],
-      'golden-flip': ['rgba(255,192,25,0.22)', 'rgba(255,245,170,0.04)'],
-      'bouncy-bottle': ['rgba(95,255,120,0.16)', 'rgba(255,225,70,0.04)'],
-      earthquake: ['rgba(255,115,50,0.19)', 'rgba(80,20,10,0.06)'],
-      'moon-gravity': ['rgba(75,70,180,0.24)', 'rgba(120,210,255,0.04)'],
-      'ice-slide': ['rgba(80,225,255,0.23)', 'rgba(180,245,255,0.04)'],
-      'alien-invasion': ['rgba(80,255,125,0.24)', 'rgba(70,40,170,0.06)'],
-      'gravity-slam': ['rgba(230,20,35,0.23)', 'rgba(20,0,0,0.08)'],
-      trampoline: ['rgba(70,255,120,0.18)', 'rgba(255,235,40,0.04)'],
-      'wind-tunnel': ['rgba(80,220,255,0.18)', 'rgba(255,255,255,0.03)'],
-      'double-flip': ['rgba(185,70,255,0.22)', 'rgba(70,30,200,0.04)'],
-      'shrink-ray': ['rgba(65,255,205,0.17)', 'rgba(20,90,80,0.04)'],
-      'portal-pair': ['rgba(135,75,255,0.21)', 'rgba(35,220,255,0.05)'],
-      'tether-swing': ['rgba(255,205,80,0.18)', 'rgba(255,255,255,0.03)'],
-      mitosis: ['rgba(80,255,190,0.18)', 'rgba(150,80,255,0.05)'],
-      'ceiling-flip': ['rgba(255,90,190,0.17)', 'rgba(255,255,255,0.03)'],
-      'meteor-shower': ['rgba(255,85,25,0.23)', 'rgba(40,0,0,0.07)'],
-      magnet: ['rgba(40,210,255,0.21)', 'rgba(255,45,80,0.04)'],
-      'heart-rush': ['rgba(255,40,105,0.22)', 'rgba(255,160,190,0.04)'],
-      'black-hole': ['rgba(95,50,180,0.26)', 'rgba(0,0,0,0.12)'],
-      boomerang: ['rgba(255,165,45,0.17)', 'rgba(255,240,100,0.03)'],
-      'roulette-table': ['rgba(220,30,75,0.19)', 'rgba(20,170,90,0.04)'],
-      rewind: ['rgba(60,160,255,0.19)', 'rgba(150,90,255,0.04)'],
-      plinko: ['rgba(255,195,45,0.17)', 'rgba(50,160,255,0.04)'],
-      'mirror-match': ['rgba(170,225,255,0.18)', 'rgba(255,255,255,0.06)'],
-      'cap-toss': ['rgba(255,125,30,0.18)', 'rgba(255,215,70,0.04)'],
-      'life-drain': ['rgba(60,255,75,0.23)', 'rgba(0,70,15,0.08)'],
+      'rainbow-trail': ['rgba(255,40,120,0.32)', 'rgba(40,210,255,0.22)'],
+      'rainbow-corkscrew': ['rgba(255,40,120,0.32)', 'rgba(40,210,255,0.22)'],
+      'half-full': ['rgba(30,150,255,0.36)', 'rgba(80,220,255,0.10)'],
+      'power-launch': ['rgba(255,70,0,0.40)', 'rgba(255,190,30,0.12)'],
+      'fizz-jet': ['rgba(100,235,255,0.34)', 'rgba(255,255,255,0.10)'],
+      'golden-flip': ['rgba(255,192,25,0.40)', 'rgba(255,245,170,0.12)'],
+      'bouncy-bottle': ['rgba(95,255,120,0.32)', 'rgba(255,225,70,0.10)'],
+      earthquake: ['rgba(255,115,50,0.38)', 'rgba(80,20,10,0.14)'],
+      'moon-gravity': ['rgba(75,70,180,0.42)', 'rgba(120,210,255,0.10)'],
+      'ice-slide': ['rgba(80,225,255,0.40)', 'rgba(180,245,255,0.12)'],
+      'alien-invasion': ['rgba(80,255,125,0.40)', 'rgba(70,40,170,0.14)'],
+      'gravity-slam': ['rgba(230,20,35,0.42)', 'rgba(20,0,0,0.16)'],
+      trampoline: ['rgba(70,255,120,0.36)', 'rgba(255,235,40,0.10)'],
+      'wind-tunnel': ['rgba(80,220,255,0.36)', 'rgba(255,255,255,0.08)'],
+      'double-flip': ['rgba(185,70,255,0.40)', 'rgba(70,30,200,0.12)'],
+      'shrink-ray': ['rgba(65,255,205,0.34)', 'rgba(20,90,80,0.10)'],
+      'portal-pair': ['rgba(135,75,255,0.40)', 'rgba(35,220,255,0.12)'],
+      'tether-swing': ['rgba(255,205,80,0.36)', 'rgba(255,255,255,0.08)'],
+      mitosis: ['rgba(80,255,190,0.36)', 'rgba(150,80,255,0.12)'],
+      'ceiling-flip': ['rgba(255,90,190,0.34)', 'rgba(255,255,255,0.08)'],
+      'meteor-shower': ['rgba(255,85,25,0.42)', 'rgba(40,0,0,0.16)'],
+      magnet: ['rgba(40,210,255,0.40)', 'rgba(255,45,80,0.10)'],
+      'heart-rush': ['rgba(255,40,105,0.42)', 'rgba(255,160,190,0.12)'],
+      'black-hole': ['rgba(95,50,180,0.46)', 'rgba(0,0,0,0.20)'],
+      boomerang: ['rgba(255,165,45,0.34)', 'rgba(255,240,100,0.08)'],
+      'roulette-table': ['rgba(220,30,75,0.38)', 'rgba(20,170,90,0.10)'],
+      rewind: ['rgba(60,160,255,0.38)', 'rgba(150,90,255,0.10)'],
+      plinko: ['rgba(255,195,45,0.34)', 'rgba(50,160,255,0.10)'],
+      'mirror-match': ['rgba(170,225,255,0.36)', 'rgba(255,255,255,0.12)'],
+      'cap-toss': ['rgba(255,125,30,0.36)', 'rgba(255,215,70,0.10)'],
+      'life-drain': ['rgba(60,255,75,0.42)', 'rgba(0,70,15,0.16)'],
     };
     const pair = colors[event] || ['rgba(255,255,255,0.10)', 'rgba(255,255,255,0)'];
     ctx.save();
@@ -282,14 +377,29 @@ const Renderer = (() => {
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
 
+    const title = String(event).replace(/-/g, ' ').toUpperCase();
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.font = `900 ${Math.max(28, Math.min(52, W * 0.045))}px system-ui, sans-serif`;
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(0,0,0,0.72)';
+    ctx.lineWidth = 8;
+    ctx.fillStyle = '#fff8e8';
+    ctx.strokeText(title, W / 2, Math.max(16, H * 0.07));
+    ctx.fillText(title, W / 2, Math.max(16, H * 0.07));
+    ctx.restore();
+
     const phase = reduceMotion ? 0 : clock;
     if (event === 'wind-tunnel') {
+      const gust = fxEventState && fxEventState.runtime && fxEventState.runtime.gustVector;
+      const dir = gust && Number(gust.x) < 0 ? -1 : 1;
       ctx.strokeStyle = 'rgba(190,245,255,0.60)';
       ctx.lineWidth = 4;
       for (let i = 0; i < 13; i++) {
         const y = (i + 0.5) * H / 13;
-        const x = ((phase * 520 + i * 137) % (W + 260)) - 130;
-        ctx.beginPath(); ctx.moveTo(x - 110, y); ctx.lineTo(x + 110, y - 18); ctx.stroke();
+        const x = ((phase * 520 * dir + i * 137) % (W + 260) + (W + 260)) % (W + 260) - 130;
+        ctx.beginPath(); ctx.moveTo(x - 110 * dir, y); ctx.lineTo(x + 110 * dir, y - 18); ctx.stroke();
       }
     } else if (event === 'gravity-slam') {
       ctx.strokeStyle = 'rgba(255,80,65,0.56)';
@@ -345,19 +455,47 @@ const Renderer = (() => {
         if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.stroke();
-    } else if (event === 'magnet' || event === 'life-drain') {
-      const c = event === 'life-drain' ? '#62ff57' : '#4de8ff';
-      ctx.strokeStyle = c; ctx.shadowColor = c; ctx.shadowBlur = 26;
+    } else if (event === 'magnet') {
+      const poleX = (fxEventState && fxEventState.runtime && fxEventState.runtime.magnetVector
+        && Number.isFinite(fxEventState.runtime.magnetVector.targetX))
+        ? fxEventState.runtime.magnetVector.targetX : W / 2;
+      ctx.strokeStyle = '#4de8ff'; ctx.shadowColor = '#4de8ff'; ctx.shadowBlur = 26;
       for (let i = 1; i <= 4; i++) {
         ctx.globalAlpha = 0.82 / i;
         ctx.lineWidth = 6;
         ctx.beginPath(); ctx.ellipse(p.x, p.y, 55 + i * 32 + pulse * 8, 75 + i * 42, 0, 0, Math.PI * 2); ctx.stroke();
       }
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = '#ff3b5c';
+      ctx.beginPath(); ctx.arc(poleX - 22, groundY - 18, 14, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#4de8ff';
+      ctx.beginPath(); ctx.arc(poleX + 22, groundY - 18, 14, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = '900 16px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('N', poleX + 22, groundY - 13);
+      ctx.fillText('S', poleX - 22, groundY - 13);
+    } else if (event === 'life-drain') {
+      const wash = ctx.createRadialGradient(p.x, p.y, 8, p.x, p.y, 210);
+      wash.addColorStop(0, `rgba(40,255,70,${0.22 + pulse * 0.10})`);
+      wash.addColorStop(1, 'rgba(0,40,10,0)');
+      ctx.fillStyle = wash;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 210, 0, Math.PI * 2); ctx.fill();
     } else if (event === 'heart-rush') {
+      const count = Math.max(0, Math.min(3, Number(fxEventState && fxEventState.runtime
+        && fxEventState.runtime.heartbeatCount) || 0));
       ctx.fillStyle = `rgba(255,65,125,${0.55 + pulse * 0.35})`;
       ctx.font = `900 ${54 + pulse * 22}px system-ui, sans-serif`;
       ctx.textAlign = 'center';
-      for (const [dx, dy] of [[-95,-25],[100,-70],[-55,90],[75,70]]) ctx.fillText('♥', p.x + dx, p.y + dy);
+      const slots = [[-95, -25], [100, -70], [-55, 90]];
+      for (let i = 0; i < count; i++) ctx.fillText('♥', p.x + slots[i][0], p.y + slots[i][1]);
+      if (count > 0) {
+        ctx.strokeStyle = `rgba(255,65,125,${0.40 + pulse * 0.35})`;
+        ctx.lineWidth = 7;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 62 + count * 20 + pulse * 10, 0, Math.PI * 2);
+        ctx.stroke();
+      }
     } else if (event === 'power-launch' || event === 'double-flip') {
       const c = event === 'power-launch' ? '#ff8a20' : '#cf67ff';
       ctx.strokeStyle = c; ctx.shadowColor = c; ctx.shadowBlur = 25; ctx.lineWidth = 9;
@@ -438,9 +576,30 @@ const Renderer = (() => {
     ctx.restore();
   }
 
+  const venueBackdropCache = new Map();
   function drawVisualArena(layer, groundY) {
     if (!String(fxVisualArenaId || '').startsWith('arena.')) return;
     const id = String(fxVisualArenaId);
+    // Venue art is screen-space scenery, never a second gameplay table. Cache
+    // only three static scenes and crop above their preview furniture.
+    if (layer === 'sky' && typeof document !== 'undefined' && window.FlipgameV112ArenaPreview) {
+      let backdrop = venueBackdropCache.get(id);
+      if (!backdrop) {
+        backdrop = document.createElement('canvas');
+        backdrop.width = 960; backdrop.height = 540;
+        FlipgameV112ArenaPreview.draw(backdrop.getContext('2d'), {arenaId: id, width: 960, height: 540, timeMs: 0, reducedMotion: true});
+        if (venueBackdropCache.size >= 3) venueBackdropCache.delete(venueBackdropCache.keys().next().value);
+        venueBackdropCache.set(id, backdrop);
+      }
+      const height = Math.max(1, Math.min(H, groundY));
+      const scale = Math.max(W / 960, height / 356);
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, 0, W, height); ctx.clip();
+      ctx.drawImage(backdrop, 0, 0, 960, 356, (W - 960 * scale) / 2, height - 356 * scale, 960 * scale, 356 * scale);
+      ctx.fillStyle = 'rgba(7,14,22,.18)'; ctx.fillRect(0, 0, W, height);
+      ctx.restore();
+      return;
+    }
     const color = cosmeticColor(id, '#58c8ff');
     ctx.save();
     if (layer === 'sky') {
@@ -478,14 +637,55 @@ const Renderer = (() => {
     if (id === 'half-full') {
       ctx.fillStyle = 'rgba(75,195,255,.28)'; ctx.fillRect(0, groundY - 28, W, 28);
     } else if (id === 'fizz-jet') {
+      const thrust = runtime.thrustVector || { x: 0, y: 1 };
+      const mag = Math.max(1e-8, Math.hypot(thrust.x || 0, thrust.y || 0));
+      const sx = -(thrust.x || 0) / mag;
+      const sy = -(thrust.y || 0) / mag;
       ctx.strokeStyle = '#b9f5ff'; ctx.lineWidth = 3;
-      for (let i=0;i<12;i++) { const r=4+(i%4)*2, x=p.x+Math.sin(i*5+phase)*48, y=p.y+65+i*15; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke(); }
+      for (let i = 0; i < 12; i++) {
+        const dist = 22 + i * 14;
+        const wobble = Math.sin(i * 5 + phase) * 16;
+        const x = p.x + sx * dist + (-sy) * wobble;
+        const y = p.y + sy * dist + sx * wobble;
+        ctx.beginPath(); ctx.arc(x, y, 4 + (i % 4) * 2, 0, Math.PI * 2); ctx.stroke();
+      }
+      bodiesWithLabel(bodies, 'fizz-cap').forEach((body) => drawEventCap(body, '#ff8a20'));
     } else if (id === 'bouncy-bottle') {
       ctx.strokeStyle = '#85ff9b'; ctx.lineWidth = 5; for(let i=0;i<4;i++){ctx.globalAlpha=.75-i*.15;ctx.beginPath();ctx.ellipse(p.x,groundY,70+i*35,12+i*7,0,0,Math.PI*2);ctx.stroke();}
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = '#85ff9b';
+      ctx.font = '900 28px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${runtime.bounces || 0}/${runtime.maxBounces || 3}`, p.x, groundY - 36);
     } else if (id === 'earthquake') {
+      const table = runtime.tableOffset || { x: 0, y: 0 };
+      ctx.save();
+      ctx.translate(table.x || 0, table.y || 0);
       ctx.strokeStyle='#ff8b55';ctx.lineWidth=5;ctx.beginPath();for(let x=0;x<=W;x+=40){const y=groundY-8-(x/40%2)*16;if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();
+      ctx.restore();
+      bodiesWithLabel(bodies, 'quake-debris').forEach(drawQuakeDebris);
+    } else if (id === 'ice-slide') {
+      bodiesWithLabel(bodies, 'ice-bumper').forEach(drawIceBumper);
     } else if (id === 'shrink-ray') {
-      ctx.strokeStyle='#6dffd1';ctx.lineWidth=3;for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(p.x,p.y,45+i*22,phase+i,phase+i+1.6);ctx.stroke();}
+      const scale = eventObjectScale();
+      ctx.strokeStyle='#6dffd1';ctx.lineWidth=3;for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(p.x,p.y,(45+i*22)*scale,phase+i,phase+i+1.6);ctx.stroke();}
+    } else if (id === 'rainbow-corkscrew' || id === 'rainbow-trail') {
+      const force = runtime.corkscrewForce || { x: 0, y: 0 };
+      const sway = 26 + Math.min(48, Math.abs(force.x || 0) * 22000);
+      const bands = ['#ff3b6a', '#ff8a1d', '#ffe14a', '#4ae06a', '#3ac6ff', '#b46bff'];
+      for (let i = 0; i < bands.length; i++) {
+        ctx.strokeStyle = bands[i];
+        ctx.lineWidth = 4;
+        ctx.globalAlpha = 0.58;
+        ctx.beginPath();
+        for (let t = 0; t <= 14; t++) {
+          const x = p.x + Math.sin(phase * 6 + t * 0.45 + i) * sway + i * 3 - 8;
+          const y = p.y + 16 + t * 13;
+          if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
     } else if (id === 'portal-pair' && runtime.portals) {
       runtime.portals.forEach((portal,index)=>{ctx.strokeStyle=index?'#4ee8ff':'#b66cff';ctx.shadowColor=ctx.strokeStyle;ctx.shadowBlur=18;ctx.lineWidth=10;ctx.beginPath();ctx.ellipse(portal.x,portal.y,48,76,0,0,Math.PI*2);ctx.stroke();});
     } else if (id === 'tether-swing' && runtime.anchor) {
@@ -495,18 +695,75 @@ const Renderer = (() => {
     } else if (id === 'black-hole' && runtime.singularity) {
       const s=runtime.singularity,g=ctx.createRadialGradient(s.x,s.y,3,s.x,s.y,92);g.addColorStop(0,'#000');g.addColorStop(.45,'#090014');g.addColorStop(.7,'rgba(148,76,255,.82)');g.addColorStop(1,'rgba(70,15,130,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(s.x,s.y,92,0,Math.PI*2);ctx.fill();
     } else if (id === 'boomerang') {
-      ctx.strokeStyle='#ffbf58';ctx.lineWidth=6;ctx.setLineDash([18,10]);ctx.beginPath();ctx.arc(p.x,p.y,150,-2.8,.5);ctx.stroke();ctx.setLineDash([]);
+      const originX = Number.isFinite(runtime.originX) ? runtime.originX : p.x;
+      const originY = Number.isFinite(runtime.originY) ? runtime.originY : groundY - 80;
+      const targetX = Number.isFinite(runtime.targetX) ? runtime.targetX : originX;
+      const midX = (originX + targetX) / 2;
+      const midY = Math.min(originY, groundY - 220) - 90;
+      ctx.strokeStyle='#ffbf58';ctx.lineWidth=6;ctx.setLineDash([18,10]);
+      ctx.beginPath(); ctx.moveTo(originX, originY); ctx.quadraticCurveTo(midX, midY, targetX, groundY - 8); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#ffe27a';
+      ctx.beginPath(); ctx.arc(originX, originY, 10, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ff7a18';
+      ctx.beginPath(); ctx.arc(targetX, groundY - 8, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff8e0';
+      ctx.font = '800 16px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('ORIGIN', originX, originY - 16);
+      ctx.fillText('TARGET', targetX, groundY - 24);
     } else if (id === 'roulette-table') {
       const slot=runtime.rouletteSlot||0;for(let i=0;i<8;i++){ctx.fillStyle=i===slot?'#ffe15a':(i%2?'#178755':'#bc264b');ctx.beginPath();ctx.moveTo(p.x,groundY);ctx.arc(p.x,groundY,115,i*Math.PI/4,(i+1)*Math.PI/4);ctx.fill();}ctx.fillStyle='#fff';ctx.font='900 26px system-ui';ctx.textAlign='center';ctx.fillText(`×${[1,2,3,4,4,3,2,1][slot]}`,p.x,groundY+8);
     } else if (id === 'rewind') {
       ctx.strokeStyle='#75bdff';ctx.lineWidth=7;ctx.beginPath();ctx.arc(p.x,p.y,95,.45,Math.PI*1.8);ctx.stroke();ctx.fillStyle='#75bdff';ctx.beginPath();ctx.moveTo(p.x-96,p.y-10);ctx.lineTo(p.x-70,p.y-34);ctx.lineTo(p.x-63,p.y+2);ctx.fill();
+      if (runtime.flags && runtime.flags.reversing) {
+        ctx.globalAlpha = 0.28;
+        for (let i = 1; i <= 5; i++) {
+          ctx.strokeStyle = '#9ad4ff';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.ellipse(p.x - i * 16, p.y + i * 10, 42, 68, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#fff';
+        ctx.font = '900 22px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('REWIND', p.x, p.y - 130);
+      } else if (runtime.flags && runtime.flags.replayed) {
+        ctx.fillStyle = '#fff';
+        ctx.font = '900 20px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('ONE RETRY', p.x, p.y - 130);
+      }
     } else if (id === 'mirror-match') {
       const x=W/2;ctx.strokeStyle='rgba(210,245,255,.8)';ctx.lineWidth=5;ctx.setLineDash([12,8]);ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,groundY);ctx.stroke();ctx.setLineDash([]);
     } else if (id === 'cap-toss') {
       ctx.strokeStyle='#ff9d42';ctx.lineWidth=8;ctx.beginPath();ctx.arc(p.x,groundY-7,42,0,Math.PI*2);ctx.stroke();
+      const caps = bodiesWithLabel(bodies, 'cap-toss-cap');
+      caps.forEach((body) => {
+        drawEventCap(body, '#ff6d00');
+        ctx.strokeStyle = '#ffd54a';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(body.x, groundY - 7, 28, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+    } else if (id === 'mitosis') {
+      ctx.strokeStyle='rgba(80,255,190,.35)';ctx.lineWidth=3;ctx.setLineDash([8,10]);
+      ctx.beginPath();ctx.moveTo(p.x,Math.max(24,p.y-120));ctx.lineTo(p.x,Math.min(groundY-8,p.y+120));ctx.stroke();
+      ctx.setLineDash([]);
     }
-    if ((id === 'mitosis' || id === 'mirror-match' || id === 'meteor-shower') && Array.isArray(bodies)) {
-      bodies.forEach((body)=>{const r=Math.max(12,Math.min(42,(body.bounds.max.x-body.bounds.min.x)/2));ctx.fillStyle=id==='meteor-shower'?'#ff713b':'rgba(120,240,255,.55)';ctx.beginPath();ctx.arc(body.x,body.y,r,0,Math.PI*2);ctx.fill();});
+    if (id === 'meteor-shower' && Array.isArray(bodies)) {
+      bodies.forEach((body)=>{
+        if (!body || body.label === 'mitosis-bottle' || body.label === 'mirror-bottle') return;
+        const width = body.bounds ? (body.bounds.max.x - body.bounds.min.x) : 24;
+        const r = Math.max(12, Math.min(42, width / 2));
+        ctx.fillStyle = '#ff713b';
+        ctx.beginPath();
+        ctx.arc(body.x, body.y, r, 0, Math.PI * 2);
+        ctx.fill();
+      });
     }
     if (visual.theme === 'gold') { ctx.strokeStyle='#ffe27a';ctx.lineWidth=4;ctx.strokeRect(12,12,W-24,H-24); }
     ctx.restore();
@@ -530,6 +787,11 @@ const Renderer = (() => {
     }
     if (skyOnly) return;
     if (fxPlinko) return;   // plinko drop: the floor has vanished
+
+    const quake = (fxEventState && fxEventState.eventId === 'earthquake' && eventRuntime()
+      && eventRuntime().tableOffset) ? eventRuntime().tableOffset : { x: 0, y: 0 };
+    ctx.save();
+    ctx.translate(quake.x || 0, quake.y || 0);
 
     // Extra-wide table so open-arena zoom-outs still show a floor.
     const x0 = -W * 2, tw = W * 5;
@@ -559,6 +821,7 @@ const Renderer = (() => {
       ctx.fillStyle = g;
       ctx.fillRect(x0, groundY - 5, tw, 6);
     }
+    ctx.restore();
   }
 
   // ── Sky ambience: moon throws + seasonal easter eggs ───────────────────────
@@ -627,16 +890,30 @@ const Renderer = (() => {
     const fillCol = hexToRgba(liquidColor || '#0b86ff', 0.92);
     const meniscusCol = lighten(liquidColor || '#0b86ff', 110, 0.9);
 
-    // ON FIRE glow
+    // ON FIRE glow — a major momentum state, not a faint halo.
     if (isOnFire) {
-      const glow = ctx.createRadialGradient(x, y, 10, x, y, 95 * BOTTLE_DRAW_SCALE);
-      glow.addColorStop(0, 'rgba(255,100,0,0.30)');
-      glow.addColorStop(1, 'rgba(255,60,0,0)');
+      const pulse = reduceMotion ? 1 : 0.82 + 0.18 * Math.sin(clock * 8);
+      const radius = 130 * BOTTLE_DRAW_SCALE * pulse;
+      const glow = ctx.createRadialGradient(x, y, 8, x, y, radius);
+      glow.addColorStop(0, 'rgba(255,210,70,0.55)');
+      glow.addColorStop(0.35, 'rgba(255,110,0,0.38)');
+      glow.addColorStop(1, 'rgba(255,40,0,0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(x, y, 95 * BOTTLE_DRAW_SCALE, 0, Math.PI * 2);
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
-      if (!reduceMotion) spawnFire(x, y - 100 * BOTTLE_DRAW_SCALE);
+      ctx.save();
+      ctx.strokeStyle = `rgba(255,220,80,${0.55 + 0.25 * pulse})`;
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(x, y, 78 * BOTTLE_DRAW_SCALE * pulse, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      if (!reduceMotion) {
+        spawnFire(x, y - 100 * BOTTLE_DRAW_SCALE);
+        spawnFire(x + 18, y - 70 * BOTTLE_DRAW_SCALE);
+        spawnFire(x - 16, y - 80 * BOTTLE_DRAW_SCALE);
+      }
     }
 
     // Golden flip: warm aura + drifting sparkles (art already bakes in gold via
@@ -649,6 +926,10 @@ const Renderer = (() => {
       ctx.beginPath();
       ctx.arc(x, y, 90 * BOTTLE_DRAW_SCALE, 0, Math.PI * 2);
       ctx.fill();
+      ctx.fillStyle = 'rgba(40, 18, 0, 0.42)';
+      ctx.beginPath();
+      ctx.ellipse(x, groundY + 6, 62 * BOTTLE_DRAW_SCALE, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
       if (!reduceMotion && Math.random() < 0.35) {
         spawnSplash(x + (Math.random() - 0.5) * 90, y - Math.random() * 110, 1, 'rgba(255,220,110,0.9)');
       }
@@ -657,10 +938,12 @@ const Renderer = (() => {
     ctx.save();
     // tiny/giant name eggs scale the paint; the extra y shift keeps the drawn
     // base on the table (projectBottleCenter compensates for the stock scale).
-    const drawScale = BOTTLE_DRAW_SCALE * (fxSize || 1);
-    ctx.translate(x, y + (BOTTLE_DRAW_SCALE - drawScale) * 43);
+    const drawScale = BOTTLE_DRAW_SCALE * (fxSize || 1) * eventObjectScale();
+    const squash = slamCompression();
+    ctx.translate(x, y + (plinkoPresentation ? 0 : (BOTTLE_DRAW_SCALE - drawScale) * 43));
     ctx.rotate(angle);
-    ctx.scale(drawScale, drawScale);
+    ctx.scale(drawScale * (1 + squash * 0.18), drawScale * (1 - squash * 0.28));
+    if (plinkoPresentation) ctx.scale(plinkoPresentation.scale.x, plinkoPresentation.scale.y);
     // Ghost name egg: the object flips see-through. Cosmetic only.
     if (fxGhost) ctx.globalAlpha = 0.55;
     // Ninja: darken toward silhouette where ctx.filter is supported (the dark
@@ -786,17 +1069,20 @@ const Renderer = (() => {
     ctx.fillRect(-35, -47, 70, 5);
 
     // ── Wide orange Gatorade cap ───────────────────────────────────────────
-    ctx.fillStyle = '#ff6d00';
-    ctx.beginPath();
-    ctx.roundRect(-24, -146, 48, 26, 6);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.22)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(255,255,255,0.28)';
-    ctx.beginPath();
-    ctx.roundRect(-21, -144, 12, 7, 2);
-    ctx.fill();
+    // Cap Toss / Fizz Jet detach a real cap body; keep the primary uncapped.
+    if (!eventCapDetached()) {
+      ctx.fillStyle = '#ff6d00';
+      ctx.beginPath();
+      ctx.roundRect(-24, -146, 48, 26, 6);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.22)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.28)';
+      ctx.beginPath();
+      ctx.roundRect(-21, -144, 12, 7, 2);
+      ctx.fill();
+    }
 
     if (dynamics && dynamics.paintOverlay) dynamics.paintOverlay(ctx, skin || 'bottle', artState);
 
@@ -805,6 +1091,26 @@ const Renderer = (() => {
     // Blue splash on hard slosh
     if (!reduceMotion && Math.abs(liquid.vel) > 1.6) {
       spawnSplash(x, y - 30 * BOTTLE_DRAW_SCALE, 2, 'rgba(0, 170, 255, 0.85)');
+    }
+  }
+
+  function isSelectedObjectClone(body) {
+    return !!body && (body.label === 'mitosis-bottle' || body.label === 'mirror-bottle');
+  }
+
+  // Mitosis and Mirror copies are whole selected objects, never a cap or blob.
+  function drawSelectedObjectClones(bodies, liquid, liquidColor, groundY, skin, variantId, renderState) {
+    if (!Array.isArray(bodies)) return;
+    const pose = liquid || { slosh: 0, vel: 0 };
+    for (const body of bodies) {
+      if (!isSelectedObjectClone(body)) continue;
+      ctx.save();
+      if (body.label === 'mirror-bottle') ctx.globalAlpha = 0.88;
+      drawBottle({
+        position: { x: body.x, y: body.y },
+        angle: body.angle || 0,
+      }, pose, false, liquidColor, groundY, skin, variantId, renderState);
+      ctx.restore();
     }
   }
 
@@ -1185,7 +1491,9 @@ const Renderer = (() => {
     for (const s of obstacles.saucers || []) {
       ctx.save();
       ctx.translate(s.x, s.y);
-      ctx.rotate(s.angle * 0.35);
+      // Physics owns the saucer transform. Paint at that exact angle so the
+      // visible bank surface and its authoritative collider cannot diverge.
+      ctx.rotate(s.angle);
       ctx.beginPath();
       ctx.ellipse(0, -s.ry * 0.55, s.rx * 0.46, s.ry * 0.85, 0, Math.PI, 0);
       ctx.fillStyle = '#bfe7ff';
@@ -1213,8 +1521,9 @@ const Renderer = (() => {
     }
   }
 
-  // ── Plinko board (1/1000 drop) ──────────────────────────────────────────────
+  // ── Plinko board ───────────────────────────────────────────────────────────
   function drawPlinko(p) {
+    if (!p || !Array.isArray(p.slots) || p.slots.length !== 9) return;
     const bw = p.right - p.left;
     ctx.save();
     // Backboard
@@ -1256,6 +1565,10 @@ const Renderer = (() => {
         ctx.fillStyle = s.kind === 'halve' ? 'rgba(140, 90, 255, 0.18)' : 'rgba(90, 220, 140, 0.15)';
       }
       ctx.fillRect(x + 3, p.bottom - p.slotH, slotW - 6, p.slotH);
+      if (plinkoPresentation && plinkoPresentation.selectedSlot === i) {
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 5;
+        ctx.strokeRect(x + 3, p.bottom - p.slotH, slotW - 6, p.slotH);
+      }
       // Two compact lines remain readable across nine bins.
       const labels = {
         win: ['👑 AUTO', 'WIN'],
@@ -1300,6 +1613,46 @@ const Renderer = (() => {
     ctx.restore();
   }
 
+  function drawPlinkoSpring(p) {
+    if (!p || !p.visible) return;
+    ctx.save();
+    const x0 = p.x - p.width / 2, y0 = p.y - p.height / 2;
+    ctx.strokeStyle = '#92a6b8'; ctx.lineWidth = 5;
+    // Real compression state drives deck and coils; no timed pretend launch.
+    for (const x of [x0 + 20, x0 + p.width - 20]) {
+      ctx.beginPath(); ctx.moveTo(x, y0);
+      for (let i = 1; i <= 6; i++) ctx.lineTo(x + (i % 2 ? -8 : 8), y0 + p.height * i / 6);
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#1a3444'; ctx.beginPath();
+    ctx.roundRect(x0, y0 - 8, p.width, 16, 8); ctx.fill();
+    ctx.strokeStyle = '#69dfc0'; ctx.lineWidth = 4; ctx.stroke();
+    ctx.fillStyle = '#455c6e'; ctx.fillRect(x0 - 10, y0 + p.height, p.width + 20, 10);
+    ctx.restore();
+  }
+
+  function drawPlinkoStatus(p) {
+    if (!p) return;
+    ctx.save();
+    const width = Math.min(W - 24, 680), x = (W - width) / 2;
+    ctx.fillStyle = 'rgba(10,20,32,.93)'; ctx.beginPath();
+    ctx.roundRect(x, H - 96, width, 82, 12); ctx.fill();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '700 16px system-ui, sans-serif'; ctx.fillStyle = '#edf5fb';
+    ctx.fillText('PLINKO · ' + (p.timedOut ? 'Drop ended' : p.status), W / 2, H - 75, width - 20);
+    const symbols = { double: '×2', halve: '½', magnet: 'MAG', lose: 'LOSS', win: 'WIN' };
+    const cell = (width - 16) / 9;
+    for (let i = 0; i < 9; i++) {
+      const slot = p.board.slots[i], left = x + 8 + cell * i;
+      ctx.fillStyle = slot.kind === 'win' ? '#6f5719' : slot.kind === 'lose' ? '#672e38' : '#263f52';
+      ctx.fillRect(left + 1, H - 55, cell - 2, 28);
+      if (p.selectedSlot === i) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.strokeRect(left + 1, H - 55, cell - 2, 28); }
+      ctx.fillStyle = '#ffffff'; ctx.font = '700 11px system-ui, sans-serif';
+      ctx.fillText(symbols[slot.kind], left + cell / 2, H - 41, cell - 4);
+    }
+    ctx.restore();
+  }
+
   function applyCamera(view) {
     const targetZoom = view && view.zoom != null ? view.zoom : 1;
     const tx = view && view.camX != null ? view.camX : W / 2;
@@ -1308,9 +1661,12 @@ const Renderer = (() => {
     // frame. Other arena zooms retain the gentler cinematic ease.
     const k = reduceMotion ? 1 : (view && view.tracking === 'plinko' ? 0.30
       : (view && view.tracking === 'reaction' ? 0.24 : 0.14));
-    camZoom += (targetZoom - camZoom) * k;
-    camX += (tx - camX) * k;
-    camY += (ty - camY) * k;
+    // Qualified Plinko already supplies a centered camera. A second smoothing
+    // layer creates frame-rate-dependent lag and can lose the opening launch.
+    const follow = view && view.directTracking ? 1 : k;
+    camZoom += (targetZoom - camZoom) * follow;
+    camX += (tx - camX) * follow;
+    camY += (ty - camY) * follow;
     ctx.translate(W / 2, H / 2);
     ctx.scale(camZoom, camZoom);
     ctx.translate(-camX, -camY);
@@ -1318,6 +1674,13 @@ const Renderer = (() => {
   }
 
   function frame(dt, state) {
+    const plinkoBridge = typeof FlipgameV112PlinkoPresentation !== 'undefined' ? FlipgameV112PlinkoPresentation : null;
+    plinkoPresentation = state.plinkoSnapshot && plinkoBridge
+      ? plinkoBridge.project(state.plinkoSnapshot, { width: W, height: H }) : null;
+    if (plinkoPresentation) state = Object.assign({}, state, {
+      bottle: plinkoPresentation.bottle, view: plinkoPresentation.view,
+      plinkoBoard: plinkoPresentation.board,
+    });
     const { bottle, liquid, drag, groundY, result, resultAlpha, specialLabel, showGlow, isOnFire,
             liquidColor, intense, suddenDeath, awaitingFlick, stake, skin,
             target, obstacles, view } = state;
@@ -1333,9 +1696,15 @@ const Renderer = (() => {
     fxTrail   = state.rareEvent === 'rainbow-trail' || state.rareEvent === 'rainbow-corkscrew' || fxEventState?.eventId === 'rainbow-corkscrew';
     fxRareEvent = fxEventState?.eventId || state.rareEvent || (state.alwaysMagnet ? 'magnet' : null);
     fxPlinko  = state.plinkoBoard || null;
-    // During a plinko drop the physics body is a ball — draw the character
-    // curled up small so it visually fits the peg gaps it's bouncing through.
-    fxSize    = (state.sizeFx || 1) * (fxPlinko ? 0.6 : 1);
+    // Preserve the selected authored Flipper at its normal competitive scale.
+    // The Plinko camera owns framing; shrinking here made the selected art and
+    // its internal dynamics look like a replacement token.
+    fxSize    = state.sizeFx || 1;
+    if (!reduceMotion && fxEventState && fxEventState.eventId === 'earthquake' && eventRuntime()
+        && eventRuntime().tableOffset) {
+      const mag = Math.hypot(eventRuntime().tableOffset.x || 0, eventRuntime().tableOffset.y || 0);
+      shakeAmp = Math.max(shakeAmp, Math.min(6.5, 2 + mag * 0.28));
+    }
     clock += dt;
     const nextMotionKey = state.flipSeed == null ? 'idle' : `flip:${String(state.flipSeed)}`;
     if (nextMotionKey !== motionFlipKey) {
@@ -1361,9 +1730,11 @@ const Renderer = (() => {
       angularVelocity: bottle && bottle.angularVelocity,
       velocity: velocity,
     }) : null;
-    const face = reactions ? reactions.faceFor(window, skin || 'bottle', state.variantId) : null;
+    const faceSkin = skin || 'bottle';
+    const face = reactions && faceSkin !== 'bottle' && faceSkin !== 'trex'
+      ? reactions.faceFor(window, faceSkin, state.variantId) : null;
     let activeView = view;
-    if (reactionFocus && face && bottle) {
+    if (reactionFocus && face && bottle && !plinkoPresentation) {
       const center = projectBottleCenter(bottle, groundY);
       const drawScale = BOTTLE_DRAW_SCALE * (fxSize || 1);
       const centerY = center.y + (BOTTLE_DRAW_SCALE - drawScale) * 43;
@@ -1422,13 +1793,14 @@ const Renderer = (() => {
     ctx.save();
     applyCamera(activeView);
     drawBackground(groundY, isOnFire, { tableOnly: true });
-    drawVisualArena('table', groundY);
+    if (!plinkoPresentation) drawVisualArena('table', groundY);
     drawWalls(groundY, activeView ? activeView.sideWalls : true, activeView && activeView.worldW);
     if (target) drawCeiling(activeView);
     const aimingPad = !!(target && drag && awaitingFlick);
     drawTargetPad(target, groundY, aimingPad);
     drawObstacles(obstacles);
-    if (fxPlinko) drawPlinko(fxPlinko);
+    if (fxPlinko && (!plinkoPresentation || plinkoPresentation.boardVisible)) drawPlinko(fxPlinko);
+    if (plinkoPresentation) drawPlinkoSpring(plinkoPresentation.spring);
     drawFlickIndicator(drag, bottle, groundY);
     if (showGlow && !fxPlinko) drawLandingGlow(bottle, groundY);
     drawRareEventWorld(fxRareEvent, bottle, groundY);
@@ -1436,6 +1808,7 @@ const Renderer = (() => {
     drawSuccessfulShotGhost(state.successfulShotGhost);
     drawRainbowTail();
     drawBottle(bottle, liquid, isOnFire, liquidColor, groundY, skin, state.variantId, renderState);
+    drawSelectedObjectClones(state.eventBodies, liquid, liquidColor, groundY, skin, state.variantId, renderState);
     drawPersonalFinish(bottle, groundY);
     drawRainbowAura(bottle, groundY);
     drawParticles();
@@ -1449,10 +1822,17 @@ const Renderer = (() => {
     drawStake(stake);
     drawIntense(intense, suddenDeath, awaitingFlick);
     drawCosmeticNameplate(state.playerName);
+    drawPlinkoStatus(plinkoPresentation);
 
     if (result) {
       const color = result === 'MAKE' ? '#69f0ae' : '#ff5252';
       drawResult(result === 'MAKE' ? 'MAKE!' : 'MISS', color, resultAlpha, specialLabel);
+    }
+
+    if (result && state.easterPresentation && window.FlipgameV112EasterPresentation) {
+      FlipgameV112EasterPresentation.draw(ctx, {presentation: state.easterPresentation,
+        width: W, height: H, elapsedMs: state.easterElapsedMs,
+        globeSurface: state.globeSurface, globeRequest: state.globeRequest});
     }
 
     if (shakeAmp > 0.05) ctx.restore();
@@ -1475,8 +1855,11 @@ const Renderer = (() => {
       return;
     }
     const prevCanvas = canvas, prevCtx = ctx, prevW = W, prevH = H;
+    const prevPlinkoPresentation = plinkoPresentation, prevPlinko = fxPlinko;
+    plinkoPresentation = null; fxPlinko = null;
     fxGolden = fxGhost = fxNinja = fxRainbow = fxTrail = false; // never leak cosmetics into previews
     fxRareEvent = null;
+    fxEventState = null;
     fxSize = 1;
     canvas = target;
     ctx = target.getContext('2d');
@@ -1503,6 +1886,7 @@ const Renderer = (() => {
         false, liquidColor, -10000, skin, null);
     } finally {
       canvas = prevCanvas; ctx = prevCtx; W = prevW; H = prevH;
+      plinkoPresentation = prevPlinkoPresentation; fxPlinko = prevPlinko;
     }
   }
 

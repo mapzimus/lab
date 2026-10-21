@@ -34,13 +34,16 @@
   var UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   var SCOPE_VALUES = new Set(['all', 'device', 'session', 'import']);
   var ROLLUP_UNKNOWN = '__unknown__';
-  var ROLLUP_MODES = new Set(['classic','cup','team-clash','team','practice','physics-lab','lab','alien','insane']);
+  var ROLLUP_MODES = new Set(['classic','cup','team-clash','team','battle','practice','physics-lab','lab','alien','insane']);
+  var ACTIVITY_IDS = ['free-play','story','rival-board','practice','physics-lab','tutorial'];
+  var FORMAT_IDS = ['classic','cup','team-clash','battle'];
+  var PHYSICS_IDS = ['normal','insane','alien'];
   var ROLLUP_ID_RE = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/;
   var MAX_ROLLUP_CELLS_PER_DAY_LINEAGE = 64;
   var DETAILED_ROLLUP_CELLS_PER_DAY_LINEAGE = 60;
   var MAX_AGGREGATE_INDEX_ENTRIES = 100000;
   var MAX_AGGREGATE_COUNT = 1000000000;
-  var OPEN_ID_LIMITS = Object.freeze({ sessionId: 32, deviceId: 4, playerId: 8, teamId: 8 });
+  var OPEN_ID_LIMITS = Object.freeze({ sessionId: 32, deviceId: 4, playerId: 16, teamId: 8 });
   var OBJECT_IDS = [
     'bottle','coffee-mug','ketchup','milk-carton','maple','teapot','honeybear','salt-pepper-shaker',
     'babybottle','soup-can','extinguisher','smoothie','soap','gumball-machine','hourglass','microscope',
@@ -48,7 +51,7 @@
     'owl','buoy','giraffe','wineglass','red-panda','toucan','trophy-cup','trex','snow-globe',
     'whippedcream','eyeball-monster','potion','soda-can','tabasco','watering-can','coke','pinata',
     'stanley','huge-rubber-duck','lavalamp','action-figures','lawnchair','tall-buildings','octopus',
-    'box-of-snacks','alien',
+    'box-of-snacks','alien','mechanical-metronome','desk-gyroscope',
   ];
   var FLAVOR_IDS = ['blue-steel','sucker-punch','lime-light','orange-crush','grape-expectations',
     'ice-ice-baby','apple-solutely','berry-nice','making-waves','lemon-aid','very-cherry','pink-fluff'];
@@ -70,11 +73,19 @@
   ];
   var ARENA_IDS = ['classic-table','moon-table','slick-table','crosswind','moon-gravity','gravity-slam',
     'spring-table','rooftop','arcade','moon-deck','ice-cave','neon-grid','garden','space-station','volcano',
-    'storm-table','aurora-stage'];
+    'storm-table','aurora-stage','baseline-table','school-cafeteria','sports-locker-room','grand-library',
+    'island-beach','skate-park-sunset','pirate-ship-deck','aquarium-tunnel','rainforest-treehouse',
+    'movie-soundstage','haunted-hall','mars-outpost','stadium-night'];
   var VIEWPORT_BUCKETS = ['360x740','768x1024','1280x720','1280x800','1366x768','1920x1080',
     '3840x2160','tablet-portrait','phone-portrait','desktop','smartboard'];
   function catalogSet(values) { return new Set(values); }
   var STATIC_ROLLUP_IDS = Object.freeze({
+    activityId: catalogSet(ACTIVITY_IDS), formatId: catalogSet(FORMAT_IDS), physicsModeId: catalogSet(PHYSICS_IDS),
+    storyChapterId: catalogSet(['first-broadcast','scatterline','lane-09','under-lights','true-axis','standard-bearer',
+      'case-50a','white-noise','high-water','nine-tracks','deep-time','visitor-zero']),
+    rivalId: catalogSet(['first-light','scatterline','meridian','cold-read','true-axis','standard-bearer',
+      'fine-point','white-noise','high-water','ensemble','deep-time','visitor-zero']),
+    battleFormatId: catalogSet(['equal-volley','timed-rush']),
     eventId: catalogSet(EVENT_IDS), objectId: catalogSet(OBJECT_IDS), cosmeticId: catalogSet(COSMETIC_IDS),
     arenaId: catalogSet(ARENA_IDS), viewportBucket: catalogSet(VIEWPORT_BUCKETS), variantId: catalogSet(FLAVOR_IDS),
   });
@@ -86,6 +97,7 @@
   COSMETIC_IDS.slice(0, 50).forEach(function (id, index) {
     STATIC_ROLLUP_IDS.cosmeticId.add(['finish','trail','burst','nameplate','arena'][index % 5] + '.' + id);
   });
+  STATIC_ROLLUP_IDS.cosmeticId.add('trail.sparks');
   var FLIP_RECORD_FIELDS = Object.freeze([
     'schema','version','releaseVersion','uuid','timestamp','sessionId','deviceId','matchId','sequence','scope',
     'mode','heat','round','turn','playerCount','online','practice','forced','testData','playerId','displayName',
@@ -104,8 +116,12 @@
   var FILTER_FIELDS = Object.freeze([
     'from','to','dateFrom','dateTo','modes','seats','playerIds','playerType','isAI','objectIds','variantIds',
     'cosmeticIds','arenaIds','eventIds','playerCounts','viewportBuckets','scope','scopes','sessionIds','deviceIds',
-    'teamIds','results','online','includeTestData','includeTestEventNames',
+    'teamIds','results','online','includeTestData','includeTestEventNames','activityIds','formatIds','physicsModeIds',
+    'storyChapterIds','rivalIds','battleFormatIds',
   ]);
+  var ACTIVITY_RECORD_FIELDS = ['activityId','formatId','physicsModeId','storyChapterId','rivalId','battleFormatId','laneId','launchLeaseId','story','battle'];
+  var FLIP_RECORD_V2_FIELDS = Object.freeze(FLIP_RECORD_FIELDS.concat(ACTIVITY_RECORD_FIELDS));
+  var MATCH_RECORD_V2_FIELDS = Object.freeze(MATCH_RECORD_FIELDS.concat(ACTIVITY_RECORD_FIELDS));
   var instanceSequence = 0;
 
   function clone(value) {
@@ -256,13 +272,39 @@
     var players = Array.isArray(game.players) ? game.players : (Array.isArray(payload.players) ? payload.players : []);
     return { source: source, payload: payload, game: game, players: players };
   }
+  function recordVersion(payload, kind) {
+    if (payload.schema == null) return 1;
+    var match = new RegExp('^' + kind + 'RecordV([0-9]+)$').exec(payload.schema);
+    if (!match) return 1; // Legacy outcome envelopes are not raw records.
+    var version = Number(match[1]);
+    if ((version !== 1 && version !== 2) || (payload.version != null && payload.version !== version)) {
+      throw new TypeError('Unsupported ' + kind + ' record version');
+    }
+    return version;
+  }
+  function activityFields(payload, base, version) {
+    if (version !== 2) return {};
+    return {
+      activityId: oneOf(firstValue(payload.activityId, base.activityId), ACTIVITY_IDS, 'free-play'),
+      formatId: oneOf(firstValue(payload.formatId, base.formatId, payload.mode), FORMAT_IDS, 'classic'),
+      physicsModeId: oneOf(firstValue(payload.physicsModeId, base.physicsModeId), PHYSICS_IDS, 'normal'),
+      storyChapterId: text(firstValue(payload.storyChapterId, base.storyChapterId), null),
+      rivalId: text(firstValue(payload.rivalId, base.rivalId), null),
+      battleFormatId: oneOf(firstValue(payload.battleFormatId, base.battleFormatId), ['equal-volley','timed-rush'], null),
+      laneId: text(firstValue(payload.laneId, base.laneId), null),
+      launchLeaseId: text(firstValue(payload.launchLeaseId, base.launchLeaseId), null),
+      story: sanitizeNamesDeep(clone(firstValue(payload.story, base.story))),
+      battle: sanitizeNamesDeep(clone(firstValue(payload.battle, base.battle))),
+    };
+  }
   function normalizeFlipRecord(input, options) {
     var opts = options || {};
     var parts = sourceParts(input);
     var source = parts.source;
     var payload = parts.payload;
     var game = parts.game;
-    var recordBase = payload.schema === 'FlipRecordV1' ? clone(payload) : clone(payload.record || {});
+    var version = recordVersion(payload.record || payload, 'Flip');
+    var recordBase = /^FlipRecordV[12]$/.test(payload.schema) ? clone(payload) : clone(payload.record || {});
     var landing = Object.assign({}, object(recordBase.landing), object(payload.landing));
     var flick = Object.assign({}, object(recordBase.flick), object(payload.flick));
     var before = Object.assign({}, object(recordBase.before), object(payload.before));
@@ -271,7 +313,7 @@
     var playerIndex = integer(firstValue(payload.playerIndex, payload.seat, recordBase.playerIndex,
       recordBase.seat), integer(game.currentPlayerIndex, 0));
     var player = safePlayer(payload.player || parts.players[playerIndex] ||
-      (payload.schema === 'FlipRecordV1' ? payload : null), playerIndex);
+      (/^FlipRecordV[12]$/.test(payload.schema) ? payload : null), playerIndex);
     var result = text(firstValue(payload.result, recordBase.result, landing.result),
       text(game.lastResult, 'MISS')).toUpperCase() === 'MAKE' ? 'MAKE' : 'MISS';
     var direction = finite(firstValue(payload.direction, recordBase.direction, flick.direction, game.direction), null);
@@ -308,9 +350,9 @@
       uuid: firstValue(source.uuid, payload.uuid, recordBase.uuid), id: firstValue(source.id, payload.id, recordBase.id),
     });
     var record = Object.assign({}, recordBase, {
-      schema: 'FlipRecordV1', version: 1,
+      schema: 'FlipRecordV' + version, version: version,
       releaseVersion: text(firstValue(payload.releaseVersion, recordBase.releaseVersion),
-        Interfaces && Interfaces.RELEASE_VERSION || 'v1.11'),
+        Interfaces && Interfaces.RELEASE_VERSION || 'v1.15'),
       uuid: recordUuid('flip', recordIdentity, opts),
       timestamp: timestamp(firstValue(source.timestamp, payload.timestamp, recordBase.timestamp), opts.now ? opts.now() : Date.now()),
       sessionId: text(firstValue(payload.sessionId, recordBase.sessionId), opts.sessionId),
@@ -385,6 +427,8 @@
         recordBase.heat, modeState.heatIndex), null),
       teamScore: finite(firstValue(payload.teamScore, recordBase.teamScore), null),
     });
+    Object.assign(record, activityFields(payload, recordBase, version));
+    if (version === 2) { record.mode = record.formatId; record.online = false; }
     record = sanitizeNamesDeep(record);
     if (input && input._importId) record._importId = String(input._importId);
     return freeze(record);
@@ -396,7 +440,8 @@
     var payload = parts.payload;
     var game = parts.game;
     var nestedMatch = object(payload.match);
-    var recordBase = payload.schema === 'MatchRecordV1' ? clone(payload)
+    var version = recordVersion(payload.record || payload, 'Match');
+    var recordBase = /^MatchRecordV[12]$/.test(payload.schema) ? clone(payload)
       : clone(payload.record || nestedMatch.record || {});
     var modeState = Object.assign({}, object(recordBase.modeState), object(payload.modeState));
     var stats = firstValue(payload.stats, recordBase.stats, nestedMatch.stats);
@@ -404,6 +449,7 @@
     var playerInput = Array.isArray(payload.participants) ? payload.participants
       : (Array.isArray(recordBase.participants) ? recordBase.participants
       : (Array.isArray(payload.players) ? payload.players : parts.players));
+    if (version === 2 && playerInput.length > 16) throw new RangeError('V2 match records support at most 16 players');
     var winnerIndex = integer(firstValue(payload.winnerIndex, recordBase.winnerIndex,
       game.winnerIndex), null);
     var players = playerInput.map(function (player, index) {
@@ -447,9 +493,9 @@
         insanity: game.insanity, arenaId: firstValue(payload.arenaId, recordBase.arenaId, modeState.arenaId),
       })));
     var record = Object.assign({}, recordBase, {
-      schema: 'MatchRecordV1', version: 1,
+      schema: 'MatchRecordV' + version, version: version,
       releaseVersion: text(firstValue(payload.releaseVersion, recordBase.releaseVersion),
-        Interfaces && Interfaces.RELEASE_VERSION || 'v1.11'),
+        Interfaces && Interfaces.RELEASE_VERSION || 'v1.15'),
       uuid: recordUuid('match', recordIdentity, opts), timestamp: endedAt, startedAt: startedAt,
       durationMs: durationMs,
       sessionId: text(firstValue(payload.sessionId, recordBase.sessionId), opts.sessionId),
@@ -488,6 +534,8 @@
         String(firstValue(game.format, recordBase.mode)) === 'team-clash' ? modeState : null))),
       stats: sanitizeNamesDeep(clone(stats)), completed: completed,
     });
+    Object.assign(record, activityFields(payload, recordBase, version));
+    if (version === 2) { record.mode = record.formatId; record.online = false; }
     record = sanitizeNamesDeep(record);
     if (input && input._importId) record._importId = String(input._importId);
     return freeze(record);
@@ -513,6 +561,8 @@
       day: dayBucket(record.timestamp), releaseVersion: record.releaseVersion,
       sessionId: record.sessionId, deviceId: record.deviceId,
       scope: record.scope, mode: record.mode, heat: record.heat, round: record.round, turn: record.turn,
+      activityId: record.activityId, formatId: record.formatId, physicsModeId: record.physicsModeId,
+      storyChapterId: record.storyChapterId, rivalId: record.rivalId, battleFormatId: record.battleFormatId,
       playerCount: record.playerCount, online: !!record.online, practice: !!record.practice,
       testData: !!record.testData, playerId: record.playerId, displayName: record.displayName,
       playerIndex: record.playerIndex, seat: record.seat, isAI: !!record.isAI,
@@ -611,21 +661,25 @@
     var viewportBucket = has('viewportBucket') ? source.viewportBucket
       : (has('viewport') && source.viewport && Object.prototype.hasOwnProperty.call(source.viewport, 'bucket')
         ? source.viewport.bucket : ROLLUP_UNKNOWN);
-    return {
+    var output = {
       day: day,
       scope: stringValue('scope'), sessionId: stringValue('sessionId'), deviceId: stringValue('deviceId'),
       mode: stringValue('mode'), playerId: stringValue('playerId'),
-      seat: boundedInteger('seat', 0, 7),
+      seat: boundedInteger('seat', 0, 15),
       isAI: booleanValue('isAI'), teamId: stringValue('teamId'),
       objectId: stringValue('objectId'), variantId: stringValue('variantId'),
       cosmeticId: stringValue('cosmeticId'), arenaId: stringValue('arenaId'),
       eventId: stringValue('eventId'),
-      playerCount: boundedInteger('playerCount', 1, 8),
+      playerCount: boundedInteger('playerCount', 1, 16),
       viewportBucket: viewportBucket == null || viewportBucket === ROLLUP_UNKNOWN
         ? viewportBucket : (STATIC_ROLLUP_IDS.viewportBucket.has(String(viewportBucket)) ? String(viewportBucket) : 'other'),
       result: stringValue('result'), online: booleanValue('online'),
       testData: booleanValue('testData'),
     };
+    ['activityId','formatId','physicsModeId','storyChapterId','rivalId','battleFormatId'].forEach(function (key) {
+      if (source[key] !== undefined) output[key] = stringValue(key);
+    });
+    return output;
   }
 
   function rollupDayRange(day) {
@@ -652,7 +706,7 @@
       var rotations = Math.max(0, integer(value, 0)); return rotations >= 6 ? '6+' : String(rotations);
     }
     if (group === 'seats') {
-      var seat = integer(value, -1); return seat >= 0 && seat <= 7 ? String(seat) : 'other';
+      var seat = integer(value, -1); return seat >= 0 && seat <= 15 ? String(seat) : 'other';
     }
     if (group === 'playerTypes') return key === 'cpu' ? 'cpu' : 'human';
     if (group === 'powerDirection') {
@@ -663,7 +717,7 @@
       return power + '|' + direction;
     }
     if (group === 'playerCounts') {
-      var players = integer(value, 0); return players >= 2 && players <= 8 ? String(players) : 'other';
+      var players = integer(value, 0); return players >= 1 && players <= 16 ? String(players) : 'other';
     }
     if (group === 'lives') return rangedBucket(value, [0,1,2,3,5,10,25,50,100]);
     if (group === 'stakes') return rangedBucket(value, [0,1,2,3,5,10,20,50,100]);
@@ -1035,10 +1089,12 @@
       var dictionary = record._rollupDictionaries
         ? cloneOpenDictionaries(record._rollupDictionaries) : dictionaryFor(partition);
       var top = boundedRollupDimensions(record, dictionary, !record._importId);
-      var players = Array.isArray(record.players) ? record.players.slice(0, 8) : [];
+      var players = Array.isArray(record.players) ? record.players.slice(0, 16) : [];
       var dimensions = {
         day: top.day, scope: top.scope, sessionId: top.sessionId, deviceId: top.deviceId,
         mode: top.mode, online: top.online, testData: top.testData,
+        activityId: top.activityId, formatId: top.formatId, physicsModeId: top.physicsModeId,
+        storyChapterId: top.storyChapterId, rivalId: top.rivalId, battleFormatId: top.battleFormatId,
         arenaId: top.arenaId, playerCount: top.playerCount, viewportBucket: top.viewportBucket,
         eventIds: boundedMatchEventIds(record),
         participants: players.map(function (player) {
@@ -1144,6 +1200,12 @@
       playerIds: listFilter(source.playerIds != null ? source.playerIds : source.playerId),
       seats: listFilter(firstValue(source.seats, source.seat, source.playerIndexes, source.playerIndex)),
       modes: listFilter(source.modes != null ? source.modes : source.mode),
+      activityIds: listFilter(firstValue(source.activityIds, source.activityId)),
+      formatIds: listFilter(firstValue(source.formatIds, source.formatId)),
+      physicsModeIds: listFilter(firstValue(source.physicsModeIds, source.physicsModeId)),
+      storyChapterIds: listFilter(firstValue(source.storyChapterIds, source.storyChapterId)),
+      rivalIds: listFilter(firstValue(source.rivalIds, source.rivalId)),
+      battleFormatIds: listFilter(firstValue(source.battleFormatIds, source.battleFormatId)),
       eventIds: listFilter(source.eventIds != null ? source.eventIds : source.eventId),
       objectIds: listFilter(source.objectIds != null ? source.objectIds : source.objectId),
       variantIds: listFilter(firstValue(source.variantIds, source.variantId)),
@@ -1174,7 +1236,10 @@
     if (!inScope(Object.assign({}, dim, { _importId: cell ? cell._importId : dim._importId }), filter)) return false;
     if (!contains(filter.sessionIds, dim.sessionId) || !contains(filter.deviceIds, dim.deviceId) ||
         !contains(filter.playerIds, dim.playerId) || !contains(filter.seats, firstValue(dim.seat, dim.playerIndex)) ||
-        !contains(filter.modes, dim.mode) ||
+        !contains(filter.modes, dim.mode) || !contains(filter.activityIds, dim.activityId) ||
+        !contains(filter.formatIds, dim.formatId) || !contains(filter.physicsModeIds, dim.physicsModeId) ||
+        !contains(filter.storyChapterIds, dim.storyChapterId) || !contains(filter.rivalIds, dim.rivalId) ||
+        !contains(filter.battleFormatIds, dim.battleFormatId) ||
         !contains(filter.eventIds, dim.eventId) || !contains(filter.objectIds, dim.objectId) ||
         !contains(filter.variantIds, dim.variantId) || !contains(filter.cosmeticIds, dim.cosmeticId) ||
         !contains(filter.arenaIds, dim.arenaId) || !contains(filter.playerCounts, dim.playerCount) ||
@@ -1190,7 +1255,7 @@
   }
   function matchesRecord(record, filter) {
     var effective = filter;
-    if (record && record.schema === 'MatchRecordV1') {
+    if (record && /^MatchRecordV[12]$/.test(record.schema)) {
       var players = Array.isArray(record.players) ? record.players : [];
       if (filter.playerIds) {
         if (!players.some(function (player) { return contains(filter.playerIds, player.playerId); })) return false;
@@ -1940,17 +2005,21 @@
         'flightMs','firstContactMs','settleMs','stakeBefore','stakeAfter','livesBefore','livesAfter','streakBefore',
         'streakAfter','onFireBefore','onFireAfter','suddenDeathBefore','suddenDeathAfter','eventId','eventSuccess',
         'oddsProfile','eventSeed','trajectorySeed','appliedReward','appliedEffect','objectId','variantId','cosmeticId',
-        'arenaId','viewport','performance','online','practice','forced','testData'];
+        'arenaId','viewport','performance','online','practice','forced','testData',
+        'activityId','formatId','physicsModeId','storyChapterId','rivalId','battleFormatId','laneId','launchLeaseId'];
       return csv(source.flips.map(function (row) { return Object.assign({},
         opts.includeNames === true ? row : pseudonymizePlayers(row, aliases),
         { playerId: opts.includeNames === true ? row.playerId : (aliases.get(String(row.playerId)) || 'Player'),
           player: showName(row.playerId, row.displayName) }); }), flipColumns);
     }
-    if (type === 'match') {
+    if (type === 'match' || type === 'story' || type === 'battle') {
+      if (type === 'story') source.matches = source.matches.filter(function (row) { return row.activityId === 'story' || row.activityId === 'rival-board'; });
+      if (type === 'battle') source.matches = source.matches.filter(function (row) { return row.formatId === 'battle'; });
       var matchColumns = ['schema','version','releaseVersion','uuid','startedAt','timestamp','durationMs','sessionId','deviceId',
         'matchId','scope','mode','arenaId','viewport','online','practice','playerCount','completed','completionReason',
         'winnerId','winnerIds','winnerTeamId','participants','teams','heatSummaries','roundSummaries','totalFlips',
-        'eventCounts','startingSettings','cup','team','stats','testData'];
+        'eventCounts','startingSettings','cup','team','stats','testData',
+        'activityId','formatId','physicsModeId','storyChapterId','rivalId','battleFormatId','story','battle'];
       return csv(source.matches.map(function (row) { return Object.assign({},
         opts.includeNames === true ? row : pseudonymizePlayers(row, aliases), {
         participants: (row.participants || row.players || []).map(function (player) {
@@ -1981,7 +2050,7 @@
       return csv(buildDatasets(source, { includeTestData: true }).events,
         ['eventId','observed','successes','fraction','observedFraction','frequency','frequencyPercent','successRate','successPercent']);
     }
-    throw new RangeError('CSV type must be flip, match, player, or event');
+    throw new RangeError('CSV type must be flip, match, player, event, story, or battle');
   }
 
   function createStore(options) {
@@ -2280,12 +2349,14 @@
               return {
                 day: matchBounded.day, scope: matchBounded.scope, sessionId: matchBounded.sessionId,
                 deviceId: matchBounded.deviceId, mode: matchBounded.mode, online: matchBounded.online,
+                activityId: matchBounded.activityId, formatId: matchBounded.formatId, physicsModeId: matchBounded.physicsModeId,
+                storyChapterId: matchBounded.storyChapterId, rivalId: matchBounded.rivalId, battleFormatId: matchBounded.battleFormatId,
                 testData: matchBounded.testData, arenaId: matchBounded.arenaId,
                 playerCount: matchBounded.playerCount, viewportBucket: matchBounded.viewportBucket,
                 eventIds: (Array.isArray(dimensions.eventIds) ? dimensions.eventIds : []).map(function (id) {
                   return STATIC_ROLLUP_IDS.eventId.has(String(id)) ? String(id) : 'other';
                 }).filter(function (id, index, values) { return values.indexOf(id) === index; }).sort(),
-                participants: (Array.isArray(dimensions.participants) ? dimensions.participants : []).slice(0, 8).map(function (player) {
+                participants: (Array.isArray(dimensions.participants) ? dimensions.participants : []).slice(0, 16).map(function (player) {
                   var participant = boundedRollupDimensions(player, dictionaries, false);
                   return { playerId: participant.playerId, seat: participant.seat, isAI: participant.isAI,
                     teamId: participant.teamId, objectId: participant.objectId, variantId: participant.variantId,
@@ -2397,6 +2468,7 @@
     EXPORT_SCHEMA: EXPORT_SCHEMA, FALLBACK_KEY: FALLBACK_KEY, DEVICE_KEY: DEVICE_KEY,
     FALLBACK_WARNING: FALLBACK_WARNING, AGGREGATE_CAPACITY_WARNING: AGGREGATE_CAPACITY_WARNING,
     FLIP_RECORD_FIELDS: FLIP_RECORD_FIELDS, MATCH_RECORD_FIELDS: MATCH_RECORD_FIELDS,
+    FLIP_RECORD_V2_FIELDS: FLIP_RECORD_V2_FIELDS, MATCH_RECORD_V2_FIELDS: MATCH_RECORD_V2_FIELDS,
     FILTER_FIELDS: FILTER_FIELDS,
     MAX_RAW_FLIPS: MAX_RAW_FLIPS, MAX_AGGREGATE_INDEX_ENTRIES: MAX_AGGREGATE_INDEX_ENTRIES,
     stableUuid: stableUuid, normalizeFlipRecord: normalizeFlipRecord, normalizeMatchRecord: normalizeMatchRecord,

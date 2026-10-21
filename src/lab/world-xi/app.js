@@ -104,7 +104,6 @@ const byCoord = new Map();
 const featuresByLeague = new Map();
 let searchIndex = [];
 let ranks = new Map();
-let nearest = null;
 let stats = null;
 let popup = null;
 let popupIds = [];
@@ -358,19 +357,32 @@ function fitCrest(source) {
   return deboxCrest(g.getImageData(0, 0, cw, ch));
 }
 
-// Symbol tiles cache resolved icons; re-setting the (identical) layout
-// expression makes freshly added crest images take effect. Each call re-lays
-// out every symbol, so this is throttled on a trailing timer rather than fired
-// per image — a bulk league toggle would otherwise re-layout every frame.
+// Symbol tiles resolve their icons when they are laid out, and MapLibre only
+// reloads a tile for an image it recorded as a dependency — and an image that
+// was missing at layout time never becomes one. Every crest is missing at
+// layout time, because they stream in after the tile, so a crest arriving
+// changes nothing on screen by itself. Re-setting the icon-image expression to
+// itself was meant to force the re-layout, and never did: setLayoutProperty
+// deep-compares old and new and returns early when they match. Not one crest
+// ever painted that way; they showed only when a filter change or a zoom past
+// a tile boundary happened to reload the tile, which is why the map looked
+// fine on a stroll and broken under load.
+//
+// Nudging a layout property that has no visible effect is a real change.
+// icon-padding feeds collision detection only, and both collision switches
+// are off for this layer. Trailing-throttled, because each reload re-lays out
+// every tile of the source: a burst of arriving crests costs one reload.
+const ICON_REFRESH_MS = 400;
 let refreshTimer = null;
+let paddingFlip = false;
 function refreshIcons() {
   if (refreshTimer || !map?.getLayer("clubs")) return;
   refreshTimer = setTimeout(() => {
     refreshTimer = null;
-    if (map?.getLayer("clubs")) {
-      map.setLayoutProperty("clubs", "icon-image", map.getLayoutProperty("clubs", "icon-image"));
-    }
-  }, 200);
+    if (!map?.getLayer("clubs")) return;
+    paddingFlip = !paddingFlip;
+    map.setLayoutProperty("clubs", "icon-padding", paddingFlip ? 2.001 : 2);
+  }, ICON_REFRESH_MS);
 }
 
 // Crests are the expensive thing on this map: each is a 128px RGBA texture, so
@@ -382,10 +394,20 @@ function refreshIcons() {
 // the opening view all of that was loaded to draw nothing at all.
 //
 // So residency follows the *viewport* instead: only clubs on screen, only at a
-// zoom where crests are actually drawn, and never more than CREST_BUDGET at
+// zoom where crests are actually drawn, and never more than the budget at
 // once. That bounds texture memory by screen area rather than by how much data
 // the map carries, which is what makes "switch everything on" survivable.
-const CREST_BUDGET = 900;          // ≈59 MB of texture, well clear of any limit
+//
+// The budget is not one number. Every tile packs the crests it draws into an
+// atlas of its own — one texture, which has to fit the GPU's maximum texture
+// size. That is 4096px on most phones and plenty of laptops: room for about
+// 960 padded 128px crests and not one more, and past it the upload fails and
+// the tile draws no icons at all. And below zoom 5 a crest is drawn at 43px or
+// less, so a dense view there is a soup whichever crests are in it; a smaller
+// budget costs nothing visible and keeps the atlases small exactly where the
+// tiles are largest.
+const CREST_BUDGET = 900;          // ≈59 MB of texture, well clear of any desktop limit
+const CREST_BUDGET_PHONE = 300;    // a third of that where memory is the constraint
 const CREST_MIN_ZOOM = 3;          // matches where icon-opacity starts fading in
 const CREST_MARGIN = 0.25;         // load a little beyond the edge so panning is smooth
 
@@ -394,16 +416,46 @@ const inFlight = new Set();
 const crestFailures = [];
 let crestTick = 0;
 let syncTimer = null;
+let budgetCeiling = CREST_BUDGET;  // settled once the map exists; halved on context loss
+let budgetOverride = null;         // the browser check sets this to force eviction
 
-function crestsWanted() {
+// Decided once the map exists, from the device rather than from a constant.
+function settleBudget() {
+  let cap = CREST_BUDGET;
+  const phone = (window.matchMedia?.("(hover: none)").matches ?? false)
+    || Math.min(window.innerWidth, window.innerHeight) < 600;
+  const mem = navigator.deviceMemory;   // Chromium only; undefined elsewhere
+  if (phone || (mem && mem <= 4)) cap = CREST_BUDGET_PHONE;
+  try {
+    // Asking the canvas for the context MapLibre already made hands back that
+    // same context; the wrong kind returns null and disturbs nothing.
+    const canvas = map.getCanvas();
+    const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+    const maxTex = gl?.getParameter(gl.MAX_TEXTURE_SIZE);
+    // each icon is padded by a pixel on every side in the atlas; keep a fifth
+    // in hand for the packer's slack and the league dots that share it
+    if (maxTex) cap = Math.min(cap, Math.floor(((maxTex / (CREST_SIZE + 2)) ** 2) * 0.8));
+  } catch { /* keep the default */ }
+  budgetCeiling = Math.max(50, cap);
+}
+
+function crestBudget() {
+  if (budgetOverride != null) return budgetOverride;
+  const z = map?.getZoom() ?? 0;
+  const share = z < 5 ? 1 / 3 : z < 6.5 ? 2 / 3 : 1;
+  return Math.max(50, Math.round(budgetCeiling * share));
+}
+
+function crestsWanted(budget) {
   if (!map || map.getZoom() < CREST_MIN_ZOOM) return [];
-  let b;
-  try { b = map.getBounds(); } catch { return []; }
+  let b, c;
+  try { b = map.getBounds(); c = map.getCenter().wrap(); } catch { return []; }
   const padLng = (b.getEast() - b.getWest()) * CREST_MARGIN;
   const padLat = (b.getNorth() - b.getSouth()) * CREST_MARGIN;
   const w = b.getWest() - padLng, e = b.getEast() + padLng;
   const so = b.getSouth() - padLat, n = b.getNorth() + padLat;
   const on = new Set(visibleLeagues().map((l) => l.key));
+  const cosLat = Math.cos(rad(c.lat));
   const out = [];
   for (const f of allFeatures) {
     const p = f.properties;
@@ -413,16 +465,25 @@ function crestsWanted() {
     // A globe can show more than 360° of longitude at low zoom; when the bounds
     // wrap, longitude cannot exclude anything.
     if (e - w < 360 && (lng < w || lng > e)) continue;
-    out.push(f);
-    if (out.length > CREST_BUDGET * 3) break;   // dense view: the budget decides
+    let dx = lng - c.lng;
+    if (dx > 180) dx -= 360; else if (dx < -180) dx += 360;
+    dx *= cosLat;
+    const dy = lat - c.lat;
+    out.push({ f, d: dx * dx + dy * dy });
   }
-  return out;
+  // Nearest the centre first. When the view holds more crests than the budget,
+  // the ones that get it are the ones under the user's eye — not whichever
+  // leagues happen to come first in the file, which is what "the first N
+  // features" amounted to.
+  out.sort((a, b) => a.d - b.d);
+  return out.slice(0, budget).map((o) => o.f);
 }
 
 function dropCrest(id) {
-  resident.delete(id);
   const key = `club-${id}`;
+  const had = resident.delete(id);
   if (map?.hasImage(key)) { try { map.removeImage(key); } catch { /* already gone */ } }
+  return had;
 }
 
 // Called on every camera move and whenever the filters change. Debounced: a
@@ -432,64 +493,81 @@ function syncCrests() {
   syncTimer = setTimeout(runCrestSync, 120);
 }
 
+let syncing = false;
+let syncAgain = false;
 async function runCrestSync() {
   if (!map) return;
-  const want = crestsWanted();
-  const keep = new Set();
-  crestTick += 1;
-  for (const f of want) {
-    const { id } = f.properties;
-    keep.add(id);
-    if (resident.has(id)) resident.set(id, crestTick);
-  }
-  // Evict what is off screen, oldest first, once over budget. Anything on
-  // screen is never evicted — that would flicker the crest the user is looking
-  // at straight back off the map.
-  if (resident.size > CREST_BUDGET) {
-    const cold = [...resident.entries()].filter(([id]) => !keep.has(id))
-      .sort((a, b) => a[1] - b[1]);
-    for (const [id] of cold.slice(0, resident.size - CREST_BUDGET)) dropCrest(id);
-  }
-  const room = CREST_BUDGET - resident.size;
-  if (room <= 0) return;
-  const missing = want.filter((f) => !resident.has(f.properties.id) && !inFlight.has(f.properties.id))
-    .slice(0, room);
-  if (!missing.length) return;
-  const queue = [...missing];
-  const worker = async () => {
-    for (;;) {
-      const f = queue.shift();
-      if (!f) return;
+  // One run at a time. Two of these interleaving would each measure the same
+  // room and, between them, load twice the budget.
+  if (syncing) { syncAgain = true; return; }
+  syncing = true;
+  try {
+    const budget = crestBudget();
+    const want = crestsWanted(budget);
+    crestTick += 1;
+    const keep = new Set();
+    for (const f of want) {
       const { id } = f.properties;
-      const url = crestUrl(f.properties.crest);
-      if (!url || resident.has(id)) continue;
-      inFlight.add(id);
-      try {
-        const img = await map.loadImage(url);
-        // the league may have been switched off, or the camera moved away,
-        // while this was in flight
-        if (visibleLeagues().some((l) => l.key === f.properties.leagueKey)) {
-          if (!map.hasImage(`club-${id}`)) map.addImage(`club-${id}`, fitCrest(img.data));
-          resident.set(id, crestTick);
-        }
-      } catch (err) {
-        // The colored dot is a fine fallback for a crest that will not load,
-        // but swallowing the reason is how a decode bug hid 448 crests. Count
-        // them so the browser check can insist the number stays zero.
-        crestFailures.push(`${id}: ${String(err).slice(0, 120)}`);
-      } finally { inFlight.delete(id); }
+      keep.add(id);
+      if (resident.has(id)) resident.set(id, crestTick);
     }
-  };
-  await Promise.allSettled(Array.from({ length: 6 }, worker));
-  refreshIcons();
+    const missing = want.filter((f) => !resident.has(f.properties.id) && !inFlight.has(f.properties.id));
+
+    // Make room *before* loading. Eviction used to run only once the budget
+    // was exceeded — which a loader that never exceeds it never triggered. So
+    // the first dense view filled the budget, and every view after it got
+    // plain dots for as long as the tab lived. Cold means off screen, oldest
+    // first: the crest under the cursor is never the one that flickers away.
+    const over = resident.size + inFlight.size + missing.length - budget;
+    if (over > 0) {
+      const cold = [...resident.entries()].filter(([id]) => !keep.has(id)).sort((a, b) => a[1] - b[1]);
+      let dropped = 0;
+      for (const [id] of cold.slice(0, over)) if (dropCrest(id)) dropped++;
+      if (dropped) refreshIcons();
+    }
+    const room = budget - resident.size - inFlight.size;
+    const queue = missing.slice(0, Math.max(0, room));
+    if (!queue.length) return;
+
+    const worker = async () => {
+      for (;;) {
+        const f = queue.shift();
+        if (!f) return;
+        const { id } = f.properties;
+        const url = crestUrl(f.properties.crest);
+        if (!url || resident.has(id)) continue;
+        inFlight.add(id);
+        try {
+          const img = await map.loadImage(url);
+          // the league may have been switched off, or the camera moved away,
+          // while this was in flight
+          if (visibleLeagues().some((l) => l.key === f.properties.leagueKey)) {
+            if (!map.hasImage(`club-${id}`)) map.addImage(`club-${id}`, fitCrest(img.data));
+            resident.set(id, crestTick);
+            refreshIcons();   // throttled: paints what has arrived so far, not the batch at its end
+          }
+        } catch (err) {
+          // The colored dot is a fine fallback for a crest that will not load,
+          // but swallowing the reason is how a decode bug hid 448 crests. Count
+          // them so the browser check can insist the number stays zero.
+          crestFailures.push(`${id}: ${String(err).slice(0, 120)}`);
+        } finally { inFlight.delete(id); }
+      }
+    };
+    await Promise.allSettled(Array.from({ length: 6 }, worker));
+  } finally {
+    syncing = false;
+    if (syncAgain) { syncAgain = false; syncCrests(); }
+  }
 }
 
 // Switching a league off hands its textures back at once rather than waiting
 // for the budget to notice.
 function releaseCrests(leagueKey) {
   if (!map) return;
-  for (const f of featuresByLeague.get(leagueKey) ?? []) dropCrest(f.properties.id);
-  refreshIcons();
+  let dropped = 0;
+  for (const f of featuresByLeague.get(leagueKey) ?? []) if (dropCrest(f.properties.id)) dropped++;
+  if (dropped) refreshIcons();
 }
 
 /* ----------------------------------------------------------------- filter */
@@ -900,25 +978,33 @@ function buildIndexes(features) {
   }
 }
 
-// ~650 points => ~210k haversine pairs, tens of milliseconds. A spatial grid
-// would save little and introduce antimeridian/pole bucketing bugs on a
-// dataset that spans both.
-function buildNearest() {
-  if (nearest) return nearest;
-  const pts = allFeatures.map((f) => ({ id: f.properties.id, name: f.properties.name, c: f.geometry.coordinates, ck: coordKey(f.geometry.coordinates) }));
-  const best = new Map();
-  for (let i = 0; i < pts.length; i++) {
-    for (let j = i + 1; j < pts.length; j++) {
-      if (pts[i].ck === pts[j].ck) continue; // ground-sharers: covered by the shared note
-      const km = haversineKm(pts[i].c, pts[j].c);
-      const bi = best.get(pts[i].id);
-      if (!bi || km < bi.km) best.set(pts[i].id, { id: pts[j].id, name: pts[j].name, km });
-      const bj = best.get(pts[j].id);
-      if (!bj || km < bj.km) best.set(pts[j].id, { id: pts[i].id, name: pts[i].name, km });
-    }
+// The nearest other club, found when a card asks for it. This used to be a
+// table of every club's nearest, built once at idle — ~210k haversine pairs
+// for the 650 clubs the map opened with, "tens of milliseconds". At 5,522
+// clubs it is 15 million pairs and a second and a half of blocked main thread
+// on a desktop, several on a phone, a few seconds after every load, and it
+// doubles with every 40% the dataset grows. One club's nearest is a single
+// pass over the rest, under half a millisecond; nobody opens 5,000 cards.
+const nearestCache = new Map();
+function nearestTo(id) {
+  if (nearestCache.has(id)) return nearestCache.get(id);
+  const f = byId.get(id);
+  if (!f) return null;
+  const c = f.geometry.coordinates;
+  const ck = coordKey(c);
+  let best = null;
+  for (const g of allFeatures) {
+    if (g === f) continue;
+    const gc = g.geometry.coordinates;
+    if (coordKey(gc) === ck) continue; // ground-sharers: covered by the shared note
+    // a degree of latitude is 111 km anywhere, so a club further than the
+    // current best in latitude alone cannot beat it — no trigonometry needed
+    if (best && Math.abs(gc[1] - c[1]) * 111.2 > best.km) continue;
+    const km = haversineKm(c, gc);
+    if (!best || km < best.km) best = { id: g.properties.id, name: g.properties.name, km };
   }
-  nearest = best;
-  return nearest;
+  nearestCache.set(id, best);
+  return best;
 }
 
 /* ------------------------------------------------------------------ stats */
@@ -994,7 +1080,6 @@ function renderStats() {
 const leagueColor = (key) => leagues.find((l) => l.key === key)?.color ?? "#ffffff";
 
 function popupHtml(feats) {
-  const near = buildNearest();
   // Only venue-precision clubs actually share a stadium. Clubs placed on a town
   // can land on one point too, and calling that a shared ground would invent a
   // fact — so decide here rather than trusting whoever assembled the group.
@@ -1024,7 +1109,7 @@ function popupHtml(feats) {
     const rankLine = r
       ? `<p class="rank">${ordinal(r.rank)} largest ${r.of < r.total ? `of ${r.of} ranked ` : ""}in ${esc(r.league)}</p>`
       : "";
-    const n = feats.length === 1 ? near.get(p.id) : null;
+    const n = feats.length === 1 ? nearestTo(p.id) : null;
     const nearLine = n ? `<p class="near">Nearest: ${esc(n.name)}, ${fmtKm(n.km)}</p>` : "";
     return `<article class="club-card">
       ${crest ? `<img class="club-crest" src="${esc(crest)}" alt="" width="56">` : ""}
@@ -1193,12 +1278,15 @@ function searchClubs(query, limit = 8) {
   const q = fold(query).trim();
   if (!q) return [];
   const tokens = q.split(/\s+/);
+  // built once per keystroke, not once per club: this sat inside the loop and
+  // compiled 5,522 regular expressions for every character typed
+  const atWordStart = new RegExp(`(^|[\\s.\\-])${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
   const hits = [];
   for (const e of searchIndex) {
     if (!tokens.every((t) => e.haystack.includes(t))) continue;
     let score = 4;
     if (e.nameFold.startsWith(q)) score = 0;
-    else if (new RegExp(`(^|[\\s.\\-])${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`).test(e.nameFold)) score = 1;
+    else if (atWordStart.test(e.nameFold)) score = 1;
     else if (e.nameFold.includes(q)) score = 2;
     else if (fold(e.venue ?? "").includes(q)) score = 3;
     hits.push({ e, score });
@@ -1457,6 +1545,7 @@ async function loadData() {
 }
 
 function addMapLayers(data) {
+  settleBudget();
   if (typeof map.setProjection === "function") map.setProjection({ type: "globe" });
   map.setSky({ "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.85, 5, 0.85, 7, 0] });
   map.setLight({ anchor: "viewport", color: "#ffffff", intensity: 0.55, position: [1.15, 210, 30] });
@@ -1519,6 +1608,7 @@ function addMapLayers(data) {
         3, 16 / CREST_SIZE, 5, 43 / CREST_SIZE, 7, 59 / CREST_SIZE, 11, 90 / CREST_SIZE],
       "icon-allow-overlap": true,
       "icon-ignore-placement": true,
+      "icon-padding": 2, // the value refreshIcons() nudges; see there
     },
     paint: { "icon-opacity": ["interpolate", ["linear"], ["zoom"], 3, 0, 4, 1] },
   });
@@ -1550,15 +1640,21 @@ function addMapLayers(data) {
   map.on("moveend", syncCrests);
   map.on("zoomend", syncCrests);
 
+  // A lost WebGL context takes every texture with it. MapLibre brings the
+  // context back and rebuilds its tiles, but the crests it held are gone, and
+  // whatever budget lost it was evidently too much for this device.
+  map.on("webglcontextlost", () => {
+    for (const id of [...resident.keys()]) dropCrest(id);
+    inFlight.clear();
+    budgetCeiling = Math.max(50, Math.floor(budgetCeiling / 2));
+  });
+  map.on("webglcontextrestored", syncCrests);
+
   applyFilter();
   syncCrests();
 
   if (!REDUCED_MOTION) map.easeTo({ center: [0, 40], zoom: 2.6, duration: 2500 });
   else map.jumpTo({ center: [0, 40], zoom: 2.6 });
-
-  // the nearest-club table is only needed when a card opens
-  const idle = window.requestIdleCallback ?? ((fn) => setTimeout(fn, 0));
-  idle(() => buildNearest());
 }
 
 wireSearch();
@@ -1635,7 +1731,7 @@ window.__worldxi = {
   get stats() { return stats; },
   searchClubs,
   selectClub,
-  nearestOf: (id) => buildNearest().get(id),
+  nearestOf: nearestTo,
   imageOf: (id) => { const i = map?.getImage(`club-${id}`); return i ? { width: i.data.width, height: i.data.height } : null; },
   capacityRankOf: (id) => ranks.get(id),
   features: () => allFeatures,
@@ -1650,7 +1746,11 @@ window.__worldxi = {
   // images live GPU-side, so the JS heap stayed flat at 29 MB while 305 MB of
   // crests piled up behind it.
   crestsResident: () => resident.size,
-  crestBudget: () => CREST_BUDGET,
+  crestResidentIds: () => [...resident.keys()],
+  crestBudget,
+  // Forces a tiny budget so the check can prove eviction hands textures back
+  // when the camera moves on, without needing a thousand stubbed crests.
+  setCrestBudget: (n) => { budgetOverride = n == null ? null : Math.max(1, n | 0); syncCrests(); },
   crestFailures: () => crestFailures.slice(0, 10),
   zoom: () => map?.getZoom?.() ?? 0,
   project: (lngLat) => { const p = map?.project?.(lngLat); return p ? { x: p.x, y: p.y } : null; },

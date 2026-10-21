@@ -15,7 +15,7 @@
   var SCHEMA = 'FlipgameModeStateV1';
   var VERSION = 1;
   var CONTRACT_REVISION = 4;
-  var TEAM_COUNTS = Object.freeze([2, 4, 6, 8]);
+  var TEAM_COUNTS = Object.freeze([2, 4, 6, 8, 10, 12, 14, 16]);
   var ROULETTE_MULTIPLIERS = Object.freeze([1, 2, 3, 4, 4, 3, 2, 1]);
   var PLINKO_SLOTS = Object.freeze([
     Object.freeze({ label: 'Lives Doubled', prize: 'double' }),
@@ -62,14 +62,20 @@
   function snapshot(value) { return deepFreeze(clone(value)); }
   function modulo(value, length) { return ((value % length) + length) % length; }
   function otherTeam(teamIndex) { return teamIndex === 0 ? 1 : 0; }
-  function assertPlayerCount(count) {
-    if (!Number.isInteger(count) || count < 2 || count > 8) {
-      throw new RangeError('Player count must be between 2 and 8');
+  function cupPlayerMaximum(cupFormat) {
+    return cupFormat && cupFormat.id === 'full' ? 8 : 12;
+  }
+  function assertPlayerCount(count, cupFormat) {
+    var maximum = cupPlayerMaximum(cupFormat);
+    if (!Number.isInteger(count) || count < 2 || count > maximum) {
+      throw new RangeError(cupFormat && cupFormat.id === 'full'
+        ? 'Full Cup supports 2 through 8 players'
+        : 'Short Cup supports 2 through 12 players');
     }
   }
   function assertTeamPlayerCount(count) {
     if (TEAM_COUNTS.indexOf(count) < 0) {
-      throw new RangeError('Team Clash needs 2, 4, 6, or 8 players');
+      throw new RangeError('Team Clash needs an even 2–16 players');
     }
   }
   function normalizeDirection(value) { return value === -1 ? -1 : 1; }
@@ -220,9 +226,9 @@
     if (!(this instanceof CupSeries)) return new CupSeries(options);
     var config = options || {};
     var count = Number(config.playerCount || (config.playerIds && config.playerIds.length));
-    assertPlayerCount(count);
     var cupFormat = CUP_FORMATS[config.cupLength || config.length || 'short'];
     if (!cupFormat) throw new RangeError('Cup length must be short or full');
+    assertPlayerCount(count, cupFormat);
     var direction = normalizeDirection(config.direction);
     var openingIndex = Number.isInteger(config.openingIndex) ? modulo(config.openingIndex, count) : 0;
     var source = config.state && typeof config.state === 'object' ? config.state : null;

@@ -212,7 +212,7 @@
   }
 
   // Natural Earth 1:110m land, simplified to half-degree coordinates for this
-  // 76px-radius globe. The source is public domain; see docs/v111-art-pack-b.md.
+  // 76px-radius globe. The source is public domain; see docs/archive/v111-art-pack-b.md.
   // Each ring is pipe-separated, points are comma-separated, and lon/lat are
   // stored as signed base-36 integers at two units per degree. Keeping the
   // geographic data packed makes the offline/APK payload smaller than GeoJSON.
@@ -358,6 +358,17 @@
       : time * DESK_GLOBE_ROTATION_RADIANS_PER_SECOND;
     var centerLongitude = (-25 + index * 29) * DESK_GLOBE_DEGREES
       + spin - objectAngle * 0.32 - accessoryLag * 0.16;
+    // The live service composites only the sphere. Rear stand, front rings,
+    // base, variant accents and all competitive geometry stay authored here.
+    var live = typeof globalThis !== 'undefined' && globalThis.FlipgameV112GlobeLive;
+    if (live && typeof live.drawSphere === 'function') {
+      try {
+        var sphere = live.drawSphere(ctx, { state: renderState, dynamics: dynamics,
+          variantIndex: index, centerX: centerX, centerY: centerY, radius: radius });
+        if (sphere && sphere.orientation) centerLongitude = sphere.orientation.centerLon;
+        if (sphere && sphere.handled) return centerLongitude;
+      } catch (_) { /* The bundled vector globe remains available if GPU paint fails. */ }
+    }
     var project = deskGlobeProjection(centerLongitude, centerX, centerY, radius);
 
     ellipsePath(ctx, centerX, centerY, radius, radius);
