@@ -137,17 +137,11 @@
   const hm  = min => { const h = Math.floor(min / 60), m = Math.round(min % 60); return h ? `${h}h ${m}m` : `${m}m`; };
   const days = min => (min / 60 / 8).toFixed(1);                    // driving-days @ 8 h/day
 
-  // ---- basemap: keyless CARTO dark raster ----
-  const style = {
-    version: 8,
-    sources: { dark: { type:"raster", tileSize:256,
-      tiles:["https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png","https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"],
-      attribution:"© OpenStreetMap contributors © CARTO · routing © OSRM" } },
-    layers: [{ id:"bg", type:"background", paint:{"background-color":"#0a0e17"} },
-             { id:"dark", type:"raster", source:"dark", paint:{"raster-opacity":0.55, "raster-brightness-max":0.85} }]
-  };
+  // ---- basemap: keyless OpenFreeMap dark vector style ----
+  const style = "https://tiles.openfreemap.org/styles/dark";
   const map = new maplibregl.Map({ container:"map", style,
-    bounds:[[-125,24.5],[-66.5,49.5]], fitBoundsOptions:{padding:48}, attributionControl:true });
+    bounds:[[-125,24.5],[-66.5,49.5]], fitBoundsOptions:{padding:48},
+    attributionControl:{ customAttribution:"routing © OSRM" } });
   map.addControl(new maplibregl.NavigationControl({showCompass:false}), "bottom-right");
 
   // termini point GeoJSON

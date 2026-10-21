@@ -1777,7 +1777,7 @@
   </div>
 </div>
 <div class="attribution-strip">
-  Tiles &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> &middot;
+  Tiles &copy; <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &middot; <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> &middot;
   Data &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors
 </div>
 
@@ -1831,10 +1831,14 @@
 </main>
 
 <footer>
-  Geopuesto · Open data: OSM · Nominatim · Wikipedia · Wikimedia Commons · Open-Meteo · REST Countries · sunrise-sunset · wheretheiss.at · USGS · NOAA · radio-browser · Overpass · CARTO · Esri · OpenSky · AISStream · Mapillary · Google Maps · <a href="https://www.geonames.org/" target="_blank" rel="noopener">GeoNames</a> (CC BY 4.0) · <a href="./playground/">Spherical-geometry playground →</a>
+  Geopuesto · Open data: OSM · Nominatim · Wikipedia · Wikimedia Commons · Open-Meteo · REST Countries · sunrise-sunset · wheretheiss.at · USGS · NOAA · radio-browser · Overpass · OpenFreeMap · Esri · OpenSky · AISStream · Mapillary · Google Maps · <a href="https://www.geonames.org/" target="_blank" rel="noopener">GeoNames</a> (CC BY 4.0) · <a href="./playground/">Spherical-geometry playground →</a>
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="/lib/maplibre/maplibre-gl.css" />
+<script src="/lib/maplibre/maplibre-gl.js"></script>
+<script src="/lib/maplibre/leaflet-maplibre-gl.js"></script>
+<script src="/lib/maplibre/basemap.js"></script>
 <script src="geometry.js"></script>
 <script src="cities.js"></script>
 <script>
@@ -2020,18 +2024,14 @@ const PRESETS = [
   { name: "Salar de Uyuni — train cemetery", dest: "South China Sea", lat: -20.4783, lng: -66.8253 },
 ];
 
-// CARTO Dark Matter — denser labels (small cities/towns), keeps Mission Control aesthetic
-const BASE_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
-const BASE_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
-const TILE_OPTS = { attribution: BASE_ATTR, maxZoom: 20, subdomains: "abcd" };
-
+// OpenFreeMap dark vector basemap (keyless), keeps the Mission Control aesthetic.
 // Attribution rendered separately in the .attribution-strip below the viewports
-const MAP_OPTS = { worldCopyJump: true, attributionControl: false };
-const TILE_OPTS_NOATTR = { maxZoom: TILE_OPTS.maxZoom, subdomains: TILE_OPTS.subdomains };
+const MAP_OPTS = { worldCopyJump: true, attributionControl: false, maxZoom: 20 };
+const darkBasemap = () => MapzimusBasemap.leaflet({ style: "dark", attribution: false });
 const mapOrigin = L.map("mapOrigin", MAP_OPTS).setView([20, 0], 2);
 const mapAntipode = L.map("mapAntipode", MAP_OPTS).setView([-20, 180], 2);
-L.tileLayer(BASE_URL, TILE_OPTS_NOATTR).addTo(mapOrigin);
-L.tileLayer(BASE_URL, TILE_OPTS_NOATTR).addTo(mapAntipode);
+darkBasemap().addTo(mapOrigin);
+darkBasemap().addTo(mapAntipode);
 
 let originMarker = null, antipodeMarker = null;
 let activePresetName = null;
@@ -2309,10 +2309,11 @@ function initEquatorOverviewMap() {
   equatorOverviewMap = L.map(div, {
     worldCopyJump: true,
     attributionControl: false,
+    maxZoom: 20,
     zoomControl: true,
     scrollWheelZoom: false,  // avoid hijacking page scroll
   }).setView([0, 0], 2);
-  L.tileLayer(BASE_URL, TILE_OPTS_NOATTR).addTo(equatorOverviewMap);
+  darkBasemap().addTo(equatorOverviewMap);
   if (currentOriginForEquator) {
     drawEquatorOverviewContents(currentOriginForEquator.lat, currentOriginForEquator.lng);
   }

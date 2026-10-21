@@ -11,24 +11,13 @@ const map = new maplibregl.Map({
   container: "map",
   center: [30, 25],
   zoom: 1.4,
-  style: {
-    version: 8,
-    projection: { type: "globe" },
-    sky: {
-      "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0],
-    },
-    light: { anchor: "map", intensity: 0.4 },
-    sources: {
-      osm: {
-        type: "raster",
-        tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-        tileSize: 256,
-        maxzoom: 19,
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      },
-    },
-    layers: [{ id: "osm", type: "raster", source: "osm" }],
-  },
+  // OpenFreeMap's Liberty vector style: keyless, and crisper on the globe than raster tiles.
+  style: "https://tiles.openfreemap.org/styles/liberty",
+});
+map.on("style.load", () => {
+  map.setProjection({ type: "globe" });
+  map.setSky({ "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 1, 5, 1, 7, 0] });
+  map.setLight({ anchor: "map", intensity: 0.4 });
 });
 map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }));
 

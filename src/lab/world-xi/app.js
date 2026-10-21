@@ -112,6 +112,7 @@ let popupIds = [];
 /* -------------------------------------------------------------------- map */
 
 let map;
+let styleArrived = false;
 try {
   map = new maplibregl.Map({
     container: "map",
@@ -124,6 +125,12 @@ try {
   });
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-right");
   map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+  // The style usually lands while the club data is still downloading, before
+  // the loader below registers its own style.load handler. isStyleLoaded()
+  // cannot stand in for that missed event: it also waits on basemap tiles, so
+  // it reads false right after the style arrives and the clubs never drew.
+  // Remember the event here instead.
+  map.once("style.load", () => { styleArrived = true; });
 } catch (err) {
   console.error(err);
   document.body.classList.add("map-failed");
@@ -1582,7 +1589,7 @@ wirePanels();
   // `on`, not `once`: the fallback below replaces the style, and that second
   // style.load is the one that has to draw the clubs.
   map.on("style.load", startLayers);
-  if (map.isStyleLoaded()) startLayers();
+  if (styleArrived || map.isStyleLoaded()) startLayers();
 
   // Every club layer lives inside the map's style, so until a style loads there
   // is nothing on the globe at all. That made the whole map a hostage of one
@@ -1600,7 +1607,7 @@ wirePanels();
         version: 8,
         sources: {},
         layers: [{ id: "backdrop", type: "background", paint: { "background-color": "#0d1424" } }],
-      });
+      }, { diff: false }); // a diffed swap never fires style.load, so the clubs would not draw
     } catch (err) {
       console.error(err);
       setReadout("The map layers failed to initialise.");
