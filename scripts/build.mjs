@@ -63,6 +63,7 @@ const hostedProjectRoutes = {
   "national-parks": "/lab/national-parks/",
   "state-puzzle": "/lab/state-puzzle/",
   "boston-massing": "/lab/boston-massing/",
+  "orbit-to-street": "/lab/orbit-to-street/",
   "population-globe": "/lab/population-globe/",
   "category-five": "/c5/",
   "vacation-selector": "/vacation-selector/",

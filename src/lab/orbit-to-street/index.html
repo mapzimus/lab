@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Orbit to Street · Mapzimus Lab</title>
+  <meta name="description" content="One to-scale 3D scene from 40,000 km out to Boston and Lynn rooftops: population bars, real sunlight and night, and buildings that cast shadows for any date and time.">
+  <link rel="canonical" href="https://mapzimus.com/lab/orbit-to-street/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Orbit to Street · Mapzimus Lab">
+  <meta property="og:description" content="One to-scale 3D scene from 40,000 km out to Boston and Lynn rooftops: population bars, real sunlight and night, and buildings that cast shadows for any date and time.">
+  <meta property="og:url" content="https://mapzimus.com/lab/orbit-to-street/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#05070d">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/orbit-to-street/styles.css">
+  <script src="/lab/orbit-to-street/vendor/three.min.js" defer></script>
+  <script src="/lab/orbit-to-street/app.js" defer></script>
+</head>
+<body>
+<div id="stage"></div>
+<div id="labels"></div>
+
+<div id="loader" role="status" aria-live="polite">
+  <div class="ld">
+    <h1>Orbit to Street</h1>
+    <p id="ld-msg">Loading the population grid and 29,000 buildings…</p>
+    <div class="bar"><i id="ld-bar"></i></div>
+  </div>
+</div>
+
+<aside class="sheet" id="sheet" aria-label="Controls">
+  <div class="sheet-head">
+    <div>
+      <a class="back" href="/lab/">← Lab</a>
+      <div class="eyebrow" style="margin-top:8px">Population · buildings · real sunlight</div>
+      <h1>From orbit to the street</h1>
+    </div>
+    <button class="icon-btn" id="toggle" aria-expanded="true" aria-controls="sheet-body">Hide</button>
+  </div>
+  <div class="sheet-body" id="sheet-body">
+    <p class="lede">Everything here is drawn to scale, from 40,000 km out down to Boston rooftops. Scroll or pinch to descend. Below a few thousand km the population bars flatten into the land, and below 50 km Boston's buildings rise in their place.</p>
+
+    <div class="actions">
+      <button class="btn primary" id="dive">Dive into Boston</button>
+      <button class="btn" id="tour-btn">Take the tour</button>
+    </div>
+
+    <section class="scale">
+      <div class="eyebrow">Altitude</div>
+      <div class="alt" id="alt-big">–</div>
+      <div aria-live="polite" aria-atomic="true">
+        <h2 id="stage-name">–</h2>
+        <p class="note" id="stage-note"></p>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2 class="eyebrow" id="layers-h">Population bars</h2>
+      <div class="layers" id="layers" role="radiogroup" aria-labelledby="layers-h"></div>
+      <div id="legend"></div>
+      <div class="yr-row">
+        <button class="mini-play" id="yr-play" aria-label="Play the years from 1975"><svg viewBox="0 0 20 20" aria-hidden="true"><path id="yr-icon" d="M5 3l12 7-12 7z" fill="currentColor"/></svg></button>
+        <input type="range" id="yr" min="1975" max="2030" step="1" value="2025" aria-label="Population year">
+        <output class="yr-val" id="yr-out" for="yr">2025</output>
+      </div>
+      <p class="note" id="yr-note"></p>
+      <div class="row" id="hs-label">Bar height</div>
+      <div class="seg" id="scales" role="radiogroup" aria-labelledby="hs-label"></div>
+    </section>
+
+    <section class="group">
+      <h2 class="eyebrow">Display</h2>
+      <div class="switches">
+        <label class="switch"><input type="checkbox" id="realsun" role="switch" checked><i aria-hidden="true"></i>Real sunlight</label>
+        <label class="switch"><input type="checkbox" id="names" role="switch" checked><i aria-hidden="true"></i>Labels</label>
+        <label class="switch"><input type="checkbox" id="lines" role="switch" checked><i aria-hidden="true"></i>Borders</label>
+      </div>
+      <p class="note">Turn off real sunlight to light the whole globe evenly, so the night side's bars are easy to read.</p>
+    </section>
+
+    <details class="group">
+      <summary class="eyebrow">Most crowded cells, <span id="top-year">2025</span></summary>
+      <table class="top">
+        <thead><tr><th scope="col">Nearest city</th><th scope="col">Per km²</th><th scope="col">People</th></tr></thead>
+        <tbody id="top-body"></tbody>
+      </table>
+      <p class="note">Each row is one 28 km cell. Click a name to fly there.</p>
+    </details>
+
+    <details class="group" open>
+      <summary class="eyebrow">Fly to</summary>
+      <ul class="places" id="places"></ul>
+    </details>
+
+    <details class="group">
+      <summary class="eyebrow">Mouse, keyboard and touch</summary>
+      <dl class="keys">
+        <dt>Drag · one finger</dt><dd>Move across the ground</dd>
+        <dt>Right-drag · two fingers</dt><dd>Turn and tilt the view</dd>
+        <dt>Scroll · pinch</dt><dd>Climb or descend, toward the pointer</dd>
+        <dt>Click · tap</dt><dd>Read a place or a building</dd>
+        <dt><kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd></dt><dd>Move (click the scene first)</dd>
+        <dt><kbd>+</kbd> <kbd>−</kbd></dt><dd>Descend or climb</dd>
+        <dt><kbd>Q</kbd> <kbd>E</kbd></dt><dd>Turn left or right</dd>
+        <dt><kbd>PgUp</kbd> <kbd>PgDn</kbd></dt><dd>Tilt toward or away from the horizon</dd>
+        <dt><kbd>Space</kbd></dt><dd>Play or pause the sun clock</dd>
+        <dt><kbd>Home</kbd></dt><dd>Back to the whole Earth</dd>
+      </dl>
+    </details>
+
+    <p class="foot">Population: <a href="https://human-settlement.emergency.copernicus.eu/ghs_pop2023.php" target="_blank" rel="noopener">GHS-POP R2023A</a>, European Commission JRC, 1975–2030 (2030 is a projection), summed to 0.25° cells. Night lights: <a href="https://science.nasa.gov/earth/earth-observatory/earth-at-night/maps/" target="_blank" rel="noopener">NASA Black Marble 2016</a>. Coastlines, borders, cities: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>. Buildings, roads, parks and water © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, ODbL. Sun position from the standard low-precision solar formulas (good to about a tenth of a degree). Stars are decorative, not a catalogue.</p>
+  </div>
+</aside>
+
+<div class="dock" id="dock" role="group" aria-label="Sun clock for Boston">
+  <button class="play" id="clock-play" aria-label="Play the day">
+    <svg viewBox="0 0 20 20" aria-hidden="true"><path id="clock-icon" d="M5 3l12 7-12 7z" fill="currentColor"/></svg>
+  </button>
+  <div class="dk-main">
+    <div class="dk-top">
+      <span class="clock" id="clock">–</span>
+      <span class="dk-date" id="date-out"></span>
+      <span class="dk-sun" id="sun-out"></span>
+      <button class="chip" id="now" aria-pressed="true">Now</button>
+    </div>
+    <div class="dk-sliders">
+      <label>Time in Boston<input type="range" id="tod" min="0" max="1439" step="1"></label>
+      <label>Date<input type="range" id="doy" min="0" max="364" step="1"></label>
+    </div>
+    <div class="dk-foot">
+      <span id="sun-extra"></span>
+      <button class="chip" data-md="3-20">Mar 20</button>
+      <button class="chip" data-md="6-21">Jun 21</button>
+      <button class="chip" data-md="9-22">Sep 22</button>
+      <button class="chip" data-md="12-21">Dec 21</button>
+    </div>
+  </div>
+</div>
+
+<div class="rail">
+  <div class="ladder" id="ladder" aria-label="Altitude ladder, logarithmic"></div>
+  <div class="mapctl" role="toolbar" aria-label="View" aria-orientation="vertical">
+    <button id="zin" aria-label="Descend" title="Descend (+)">+</button>
+    <button id="zout" aria-label="Climb" title="Climb (−)">−</button>
+    <button id="tiltbtn" aria-pressed="false" aria-label="Tilt toward the horizon" title="Tilt (PgUp / PgDn)">
+      <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 16h14M5 16l3-10M10 16V5M15 16l-3-10"/></svg>
+    </button>
+    <button id="compass" aria-label="Face north" title="Face north (N)">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><g id="needle"><path d="M10 2.5l3 7.5h-6z" fill="var(--accent)"/><path d="M10 17.5l3-7.5h-6z" fill="currentColor" opacity=".55"/></g></svg>
+    </button>
+    <button id="home" aria-label="Whole Earth" title="Whole Earth (Home)">
+      <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5v3M10 13.5v3M3.5 10h3M13.5 10h3"/></svg>
+    </button>
+  </div>
+</div>
+
+<section id="caption" hidden aria-live="polite">
+  <div class="eyebrow" id="cap-step"></div>
+  <h2 id="cap-title"></h2>
+  <p id="cap-text"></p>
+  <div class="cap-foot">
+    <div class="cap-dots" id="cap-dots" aria-hidden="true"></div>
+    <button class="chip" id="cap-stop">End tour</button>
+    <button class="chip" id="cap-next">Next</button>
+  </div>
+</section>
+
+<div id="tip" role="status" hidden></div>
+</body>
+</html>
