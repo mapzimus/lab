@@ -18,7 +18,7 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/where-the-games-go/` | `mapzimus/where-the-games-go` (`public/`) | `2cbec72` — was `mapzimus.github.io/where-the-games-go/`. |
 | `/citynario/` | `mapzimus/Citynario` | Static Next export. |
 | `/ground-truth/` | `mapzimus/ground-truth` | Lidar / wooded-land site studies. |
-| `/c5/` | `mapzimus/c5` | `f86958c` — Category Five, 32 party games. Built with `npm run build` (Vite `base` is already `/c5/`) and the whole `dist/` copied here. Was `mapzimus.github.io/c5/`. |
+| `/c5/` | `mapzimus/c5` | `7251bb2` (the `deep-links` branch, mapzimus/c5#47) — Category Five, 32 party games; each catalog card opens `/c5/?game=<id>`. Built with `npm run build` (Vite `base` is already `/c5/`) and the whole `dist/` copied here. Was `mapzimus.github.io/c5/`. |
 
 Documentation, source-only scripts, Android wrappers, and other non-deployable files are omitted from the snapshots.
 
