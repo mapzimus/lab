@@ -21,6 +21,12 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /whydah/navigator/* /whydah-voyage/:splat 301
 /navigator /whydah-voyage/ 301
 /navigator/ /whydah-voyage/ 301
+# The WhydahStory curriculum and its class photo unit live only on whydahstory.com.
+# The curriculum pages keep the same paths there; the photo unit has no public page.
+/whydah/photo https://www.whydahstory.com/ 301
+/whydah/photo/* https://www.whydahstory.com/ 301
+/whydah https://www.whydahstory.com/ 301
+/whydah/* https://www.whydahstory.com/:splat 301
 # Parrots are now an unlockable skin inside the Bottle Game (full parrot port
 # lives only on whydahstory.com), so every legacy alias points at /flipgame/.
 /parrot-flip /flipgame/ 301
@@ -32,12 +38,14 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /bottle-game /flipgame/ 301
 /bottle-game/ /flipgame/ 301
 
-# Black Sam removed from Games; curriculum copy (if any) stays under /whydah/
+# Black Sam removed from Games; the curriculum lives on whydahstory.com
 /black-sam /games/ 301
 /black-sam/ /games/ 301
 /black-sam/* /games/ 301
 
 # Retired /games/<slug> snapshots → canonical first-party route
+/games/bugwars /bug-wars/ 301
+/games/bugwars/* /bug-wars/ 301
 /games/flip /flipgame/ 301
 /games/flip/* /flipgame/:splat 301
 /games/grog-flip /flipgame/ 301
