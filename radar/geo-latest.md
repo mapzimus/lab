@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-20
+# Mapzimus Geospatial Radar — 2026-10-21
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Pixelate the World](http://googlemapsmania.blogspot.com/2026/10/pixelate-world.html)
 - [London is Bigger than Colorado](http://googlemapsmania.blogspot.com/2026/10/london-is-bigger-than-colorado.html)
 - [There are 89,603 Dogs in New York City](http://googlemapsmania.blogspot.com/2026/10/there-are-89603-dogs-in-new-york-city.html)
 - [What is Your Walk Score?](http://googlemapsmania.blogspot.com/2026/10/what-is-your-walk-score.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Travel Blogging & Mapping](http://googlemapsmania.blogspot.com/2026/10/travel-blogging-mapping.html)
 - [The New Age of Building Age Maps Has Begun](http://googlemapsmania.blogspot.com/2026/10/the-new-age-of-building-age-maps-has.html)
 - [The World is Your War Zone](http://googlemapsmania.blogspot.com/2026/10/the-world-is-your-war-zone.html)
-- [Mapping the Cosmos](http://googlemapsmania.blogspot.com/2026/10/mapping-cosmos.html)
 
 ## Geography Realm
 
@@ -53,6 +53,9 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
+- [QgsTaskManager active vs queued vs running task](https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task) (▲ 1 · 1 answers)
+- [QGIS: Raster to Vector conversion crashing my computer](https://gis.stackexchange.com/questions/501619/qgis-raster-to-vector-conversion-crashing-my-computer) (▲ 0 · 2 answers)
+- [How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?](https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal) (▲ 0 · 1 answers)
 - [Finding the land area east and west of meridian](https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian) (▲ 0 · 0 answers)
 - [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
 - [Need to find out if my street is public or Private](https://gis.stackexchange.com/questions/501591/need-to-find-out-if-my-street-is-public-or-private) (▲ -2 · 0 answers)
@@ -60,22 +63,19 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Filtering GetCapabilities request using keyword](https://gis.stackexchange.com/questions/501574/filtering-getcapabilities-request-using-keyword) (▲ 1 · 1 answers)
 - [Multi map views is not properly saved in QGIS](https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis) (▲ 1 · 0 answers)
 - [Extracting data (or even converting) from WMS to shapefile in QGIS](https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis) (▲ 3 · 0 answers)
-- [Orfeo fails to map paths in QGIS 3.44.2](https://gis.stackexchange.com/questions/501583/orfeo-fails-to-map-paths-in-qgis-3-44-2) (▲ 1 · 0 answers)
-- [Grib flow mesh is stretched larger than the input DEM in QGIS](https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis) (▲ 3 · 1 answers)
-- [Joining point attributes to line in QGIS](https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis) (▲ 2 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
 
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [OMI/Aura NO2 Cloud-Screened Total and Tropospheric Column L3 Global Gridded 0.25 degree x 0.25 degree Ver 5.0, Col 004 (OMNO2d)](https://search.earthdata.nasa.gov/search?q=OMNO2d) — This is Level-3 daily global gridded (0.25x0.25 degree) Nitrogen Dioxide Product (OMNO2d).
-- [OMI/Aura NO2 Total and Tropospheric Column Daily L2 Global Gridded 0.25 degree x 0.25 degree Ver 5.0, Col 004 (OMNO2G)](https://search.earthdata.nasa.gov/search?q=OMNO2G) — This Level-2G daily global gridded product OMNO2G is based on the pixel level OMI Level-2 NO2 product OMNO2.
-- [OMI/Aura Nitrogen Dioxide (NO2) Total and Tropospheric Column 1-orbit L2 Swath 13x24 km Ver 5.0, Col 004 (OMNO2)](https://search.earthdata.nasa.gov/search?q=OMNO2) — The Version 5.0, Collection 004 Aura Ozone Monitoring Instrument (OMI) Nitrogen Dioxide (NO2) Standard Product (OMNO2) is now available from the NASA Goddard…
-- [CLASIC07 Vegetation Water Content Map V001](https://search.earthdata.nasa.gov/search?q=CL07VWC) — The Vegetation Water Content (VWC) map for the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07) was derived by calculating Normalized Difference W…
-- [CLASIC07 In Situ Vegetation Data V001](https://search.earthdata.nasa.gov/search?q=CL07V) — This data set includes in situ vegetation data collected during the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07) campaign.
-- [CLASIC07 In Situ Soil Moisture Data V001](https://search.earthdata.nasa.gov/search?q=CL07SM) — This data set is comprised of several parameters from in situ measurements collected for the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07).
-- [CLASIC07 Land Cover Classification Map V001](https://search.earthdata.nasa.gov/search?q=CL07LC) — This data set consists of land cover classification data derived from satellite imagery as part of the Cloud and Land Surface Interaction Campaign 2007 (CLAS…
+- [Near Real-Time VIIRS/JPSS-1 L3 Global Daily 500m SIN Grid Snow Cover, Grain Size, and Dust Radiative Forcing V001](https://search.earthdata.nasa.gov/search?q=VJ1SCGDRF_NRT) — The VIIRS Snow Covered Area and Grain-size (VIIRS SCAG) and VIIRS Dust Radiative Forcing in Snow (VIIRS DRFS) algorithms are applied to near real-time VIIRS…
+- [SMAP L4 Global 9 km EASE-Grid Surface and Root Zone Soil Moisture Land Model Constants V008](https://search.earthdata.nasa.gov/search?q=SPL4SMLM) — SMAP Level-4 (L4) surface and root zone soil moisture (L4_SM) data are provided in three products.
+- [SMAP L4 Global 3-hourly 9 km EASE-Grid Surface and Root Zone Soil Moisture Geophysical Data V008](https://search.earthdata.nasa.gov/search?q=SPL4SMGP) — SMAP Level-4 (L4) surface and root zone soil moisture (L4_SM) data are provided in three products.
+- [SMAP L4 Global 3-hourly 9 km EASE-Grid Surface and Root Zone Soil Moisture Analysis Update V008](https://search.earthdata.nasa.gov/search?q=SPL4SMAU) — SMAP Level-4 (L4) surface and root zone soil moisture (L4_SM) data are provided in three products.
+- [SMAP L4 Global Daily 9 km EASE-Grid Carbon Net Ecosystem Exchange V008](https://search.earthdata.nasa.gov/search?q=SPL4CMDL) — The Level-4 (L4) carbon product (SPL4CMDL) provides global gridded daily estimates of net ecosystem carbon (CO2) exchange derived using a satellite data base…
+- [Soil Moisture Active Passive (SMAP) L4 Carbon Ancillary Meteorology Preprocessor Output Log Files V001](https://search.earthdata.nasa.gov/search?q=SMAP_L4_C_ANC_MET_LOG) — This ancillary SMAP product contains daily meteorological model log files, including model outputs.
+- [Soil Moisture Active Passive (SMAP) L4 Carbon Ancillary Model Run Time Input Parameters V001](https://search.earthdata.nasa.gov/search?q=SMAP_L4_C_ANC_MDL_RIP) — This ancillary SMAP product contains SMAP L4 Carbon model configurations, including model inputs.
 
 ## Data.gov — new geodata
 

@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-20",
+  "generatedAt": "2026-10-21",
   "news": {
     "mapsmania": [
+      {
+        "title": "Pixelate the World",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/pixelate-world.html",
+        "desc": ""
+      },
       {
         "title": "London is Bigger than Colorado",
         "url": "http://googlemapsmania.blogspot.com/2026/10/london-is-bigger-than-colorado.html",
@@ -35,11 +40,6 @@
       {
         "title": "The World is Your War Zone",
         "url": "http://googlemapsmania.blogspot.com/2026/10/the-world-is-your-war-zone.html",
-        "desc": ""
-      },
-      {
-        "title": "Mapping the Cosmos",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/mapping-cosmos.html",
         "desc": ""
       }
     ],
@@ -210,6 +210,24 @@
   ],
   "gisse": [
     {
+      "title": "QgsTaskManager active vs queued vs running task",
+      "url": "https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task",
+      "score": 1,
+      "answers": 1
+    },
+    {
+      "title": "QGIS: Raster to Vector conversion crashing my computer",
+      "url": "https://gis.stackexchange.com/questions/501619/qgis-raster-to-vector-conversion-crashing-my-computer",
+      "score": 0,
+      "answers": 2
+    },
+    {
+      "title": "How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?",
+      "url": "https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal",
+      "score": 0,
+      "answers": 1
+    },
+    {
       "title": "Finding the land area east and west of meridian",
       "url": "https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian",
       "score": 0,
@@ -250,24 +268,6 @@
       "url": "https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis",
       "score": 3,
       "answers": 0
-    },
-    {
-      "title": "Orfeo fails to map paths in QGIS 3.44.2",
-      "url": "https://gis.stackexchange.com/questions/501583/orfeo-fails-to-map-paths-in-qgis-3-44-2",
-      "score": 1,
-      "answers": 0
-    },
-    {
-      "title": "Grib flow mesh is stretched larger than the input DEM in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501554/grib-flow-mesh-is-stretched-larger-than-the-input-dem-in-qgis",
-      "score": 3,
-      "answers": 1
-    },
-    {
-      "title": "Joining point attributes to line in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501544/joining-point-attributes-to-line-in-qgis",
-      "score": 2,
-      "answers": 1
     }
   ],
   "nasa": [
@@ -290,45 +290,45 @@
       "org": "ASF"
     },
     {
-      "title": "OMI/Aura NO2 Cloud-Screened Total and Tropospheric Column L3 Global Gridded 0.25 degree x 0.25 degree Ver 5.0, Col 004 (OMNO2d)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMNO2d",
-      "desc": "This is Level-3 daily global gridded (0.25x0.25 degree) Nitrogen Dioxide Product (OMNO2d).",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "OMI/Aura NO2 Total and Tropospheric Column Daily L2 Global Gridded 0.25 degree x 0.25 degree Ver 5.0, Col 004 (OMNO2G)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMNO2G",
-      "desc": "This Level-2G daily global gridded product OMNO2G is based on the pixel level OMI Level-2 NO2 product OMNO2.",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "OMI/Aura Nitrogen Dioxide (NO2) Total and Tropospheric Column 1-orbit L2 Swath 13x24 km Ver 5.0, Col 004 (OMNO2)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OMNO2",
-      "desc": "The Version 5.0, Collection 004 Aura Ozone Monitoring Instrument (OMI) Nitrogen Dioxide (NO2) Standard Product (OMNO2) is now available from the NASA Goddard…",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "CLASIC07 Vegetation Water Content Map V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=CL07VWC",
-      "desc": "The Vegetation Water Content (VWC) map for the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07) was derived by calculating Normalized Difference W…",
+      "title": "Near Real-Time VIIRS/JPSS-1 L3 Global Daily 500m SIN Grid Snow Cover, Grain Size, and Dust Radiative Forcing V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=VJ1SCGDRF_NRT",
+      "desc": "The VIIRS Snow Covered Area and Grain-size (VIIRS SCAG) and VIIRS Dust Radiative Forcing in Snow (VIIRS DRFS) algorithms are applied to near real-time VIIRS…",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "CLASIC07 In Situ Vegetation Data V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=CL07V",
-      "desc": "This data set includes in situ vegetation data collected during the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07) campaign.",
+      "title": "SMAP L4 Global 9 km EASE-Grid Surface and Root Zone Soil Moisture Land Model Constants V008",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL4SMLM",
+      "desc": "SMAP Level-4 (L4) surface and root zone soil moisture (L4_SM) data are provided in three products.",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "CLASIC07 In Situ Soil Moisture Data V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=CL07SM",
-      "desc": "This data set is comprised of several parameters from in situ measurements collected for the Cloud and Land Surface Interaction Campaign 2007 (CLASIC07).",
+      "title": "SMAP L4 Global 3-hourly 9 km EASE-Grid Surface and Root Zone Soil Moisture Geophysical Data V008",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL4SMGP",
+      "desc": "SMAP Level-4 (L4) surface and root zone soil moisture (L4_SM) data are provided in three products.",
       "org": "NSIDC_CPRD"
     },
     {
-      "title": "CLASIC07 Land Cover Classification Map V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=CL07LC",
-      "desc": "This data set consists of land cover classification data derived from satellite imagery as part of the Cloud and Land Surface Interaction Campaign 2007 (CLAS…",
+      "title": "SMAP L4 Global 3-hourly 9 km EASE-Grid Surface and Root Zone Soil Moisture Analysis Update V008",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL4SMAU",
+      "desc": "SMAP Level-4 (L4) surface and root zone soil moisture (L4_SM) data are provided in three products.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "SMAP L4 Global Daily 9 km EASE-Grid Carbon Net Ecosystem Exchange V008",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL4CMDL",
+      "desc": "The Level-4 (L4) carbon product (SPL4CMDL) provides global gridded daily estimates of net ecosystem carbon (CO2) exchange derived using a satellite data base…",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "Soil Moisture Active Passive (SMAP) L4 Carbon Ancillary Meteorology Preprocessor Output Log Files V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=SMAP_L4_C_ANC_MET_LOG",
+      "desc": "This ancillary SMAP product contains daily meteorological model log files, including model outputs.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "Soil Moisture Active Passive (SMAP) L4 Carbon Ancillary Model Run Time Input Parameters V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=SMAP_L4_C_ANC_MDL_RIP",
+      "desc": "This ancillary SMAP product contains SMAP L4 Carbon model configurations, including model inputs.",
       "org": "NSIDC_CPRD"
     }
   ],
