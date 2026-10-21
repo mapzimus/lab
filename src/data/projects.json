@@ -1,5 +1,35 @@
 [
  {
+  "slug": "appalachians",
+  "title": "The Appalachians",
+  "description": "The whole Appalachian range, Georgia to Newfoundland: its regions, named ranges, high peaks, and both Appalachian Trails, with 3D terrain.",
+  "icon": "⛰️",
+  "category": "maps",
+  "tags": [
+   "MapLibre",
+   "3D terrain",
+   "geology"
+  ],
+  "url": "https://maxwellhowegis.com/appalachians/",
+  "status": "live",
+  "updated": "2026-10"
+ },
+ {
+  "slug": "pockettiles",
+  "title": "PocketTiles Studio",
+  "description": "Draw on a map or drop in a GeoJSON file, then bake it into a PMTiles map archive right in the browser. No tile server needed.",
+  "icon": "🧳",
+  "category": "experiments",
+  "tags": [
+   "PMTiles",
+   "vector tiles",
+   "MapLibre"
+  ],
+  "url": "https://maxwellhowegis.com/pockettiles/",
+  "status": "live",
+  "updated": "2026-10"
+ },
+ {
   "slug": "orbit-to-street",
   "title": "Orbit to Street",
   "description": "One to-scale 3D scene from 40,000 km out to Boston and Lynn rooftops. Population bars flatten into the land as you descend, buildings rise, and the real sun sets the day, night and shadows for any date and time.",
@@ -1025,7 +1055,7 @@
  {
   "slug": "optitrek",
   "title": "Optitrek",
-  "description": "A US road-trip planner that picks a route through hundreds of national parks. Still being built.",
+  "description": "Twelve road-trip maps from a route optimizer: the fastest drives through America's national parks, including a loop that beats Randal Olson's famous 2015 trip by 14% in driving time.",
   "icon": "🚗",
   "category": "maps",
   "tags": [
@@ -1034,9 +1064,8 @@
    "route optimization"
   ],
   "url": "https://github.com/mapzimus/optitrek",
-  "status": "in-progress",
-  "updated": "2026-08",
-  "external": true
+  "status": "live",
+  "updated": "2026-09"
  },
  {
   "slug": "hurricane-impact-lab",
