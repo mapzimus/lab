@@ -203,6 +203,7 @@
 
   function paintFace(ctx, metadata, emotion) {
     if (!metadata || !metadata.supportsEmotion || emotion === 'idle') return false;
+    if (metadata.protected === true) return false;
     const x = metadata.anchor.x;
     const y = metadata.anchor.y;
     const scale = metadata.scale;

@@ -97,8 +97,8 @@
 
   function normalizePlayerIndex(value, path) {
     var index = Number(value);
-    if (!Number.isInteger(index) || index < 0 || index > 7) {
-      throw new RangeError(path + '.playerIndex must be an integer from 0 through 7');
+    if (!Number.isInteger(index) || index < 0 || index > 15) {
+      throw new RangeError(path + '.playerIndex must be an integer from 0 through 15');
     }
     return index;
   }
@@ -115,8 +115,8 @@
   function normalizeRoster(value, path, allowEmpty) {
     var here = path || 'activeRoster';
     if (!Array.isArray(value)) throw new TypeError(here + ' must be an array');
-    if ((!allowEmpty && value.length < 2) || value.length > 8) {
-      throw new RangeError(here + ' must describe ' + (allowEmpty ? '0' : '2') + ' through 8 players');
+    if ((!allowEmpty && value.length < 2) || value.length > 16) {
+      throw new RangeError(here + ' must describe ' + (allowEmpty ? '0' : '2') + ' through 16 players');
     }
     var ids = Object.create(null);
     var indexes = Object.create(null);
@@ -217,7 +217,7 @@
     }
     if (STATUSES.indexOf(state.status) < 0) throw new RangeError('Mirror Match snapshot status is invalid');
     if (!policyIsExact(state.policy)) throw new RangeError('Mirror Match snapshot replay policy was modified');
-    if (!Array.isArray(state.targets) || state.targets.length > 7) {
+    if (!Array.isArray(state.targets) || state.targets.length > 15) {
       throw new RangeError('Mirror Match snapshot targets are invalid');
     }
 

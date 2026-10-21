@@ -13,7 +13,7 @@
   'use strict';
 
   var CONTRACT_REVISION = 3;
-  var RELEASE_VERSION = 'v1.11';
+  var RELEASE_VERSION = 'v1.15';
   var ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
   var EVENT_CATALOG_SOURCE = [
@@ -71,6 +71,17 @@
   }
 
   function immutableCopy(value) { return deepFreeze(clone(value)); }
+
+  var PLAYER_LIMITS = deepFreeze({
+    classic: { min: 2, max: 16, step: 1 },
+    cupShort: { min: 2, max: 12, step: 1 },
+    cupFull: { min: 2, max: 8, step: 1 },
+    teamClash: { min: 2, max: 16, step: 2 },
+    practice: { min: 1, max: 1, step: 1 },
+    physicsLab: { min: 1, max: 1, step: 1 },
+    rosterMax: 16,
+    seatIndexMax: 15,
+  });
 
   function assertObject(value, label) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -323,6 +334,26 @@
     return candidate;
   }
 
+  function playerLimit(formatId) {
+    if (formatId === 'cup-full' || formatId === 'full') return PLAYER_LIMITS.cupFull;
+    if (formatId === 'cup-short' || formatId === 'short' || formatId === 'cup') return PLAYER_LIMITS.cupShort;
+    if (formatId === 'team-clash' || formatId === 'team') return PLAYER_LIMITS.teamClash;
+    if (formatId === 'practice') return PLAYER_LIMITS.practice;
+    if (formatId === 'physics-lab' || formatId === 'lab') return PLAYER_LIMITS.physicsLab;
+    return PLAYER_LIMITS.classic;
+  }
+
+  function supportedPlayerCounts(formatId) {
+    var limit = playerLimit(formatId);
+    var counts = [];
+    for (var n = limit.min; n <= limit.max; n += limit.step) counts.push(n);
+    return counts;
+  }
+
+  function isSupportedPlayerCount(formatId, count) {
+    return supportedPlayerCounts(formatId).indexOf(count) >= 0;
+  }
+
   function assertRenderVariant(candidate) {
     assertObject(candidate, 'RenderVariant');
     assertId(candidate.objectId, 'RenderVariant.objectId');
@@ -342,6 +373,10 @@
   return deepFreeze({
     CONTRACT_REVISION: CONTRACT_REVISION,
     RELEASE_VERSION: RELEASE_VERSION,
+    PLAYER_LIMITS: PLAYER_LIMITS,
+    playerLimit: playerLimit,
+    supportedPlayerCounts: supportedPlayerCounts,
+    isSupportedPlayerCount: isSupportedPlayerCount,
     EVENT_CATALOG: EVENT_CATALOG,
     EVENT_IDS: EVENT_IDS,
     EVENT_HOOKS: EVENT_HOOKS,
