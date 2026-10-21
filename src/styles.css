@@ -104,7 +104,10 @@ main, footer, .site-header { padding-inline: clamp(20px, 4vw, 44px); }
 
 .site-header { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-block: 18px; border-bottom: 1px solid var(--line); position: relative; }
 .brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; }
-.brand-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--heritage); color: #fff; font: 600 12.5px var(--sans); letter-spacing: 0.02em; }
+.brand-mark { display: block; width: 36px; height: 36px; border-radius: 8px; overflow: hidden; background: #141618; }
+.brand-mark img { display: block; width: 100%; height: 100%; }
+/* The logo's own background matches the night theme, so give it an edge there. */
+html[data-theme="dark"] .brand-mark { box-shadow: 0 0 0 1px var(--line); }
 .brand-name { font-weight: 680; font-stretch: 100%; font-size: 1.08rem; letter-spacing: -0.01em; }
 
 .site-nav { display: flex; align-items: center; gap: 4px 18px; flex-wrap: wrap; justify-content: flex-end; }
@@ -139,6 +142,13 @@ main, footer, .site-header { padding-inline: clamp(20px, 4vw, 44px); }
 .nav-more-panel a:hover { color: var(--ink); background: var(--well); }
 .nav-more-panel a[aria-current="page"] { color: var(--accent); }
 
+/* Social links sit with the theme toggle at the right end of the header. */
+.header-end { display: flex; align-items: center; gap: 10px; }
+.social { display: flex; align-items: center; gap: 2px; }
+.social a { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: var(--muted); }
+.social a:hover { color: var(--ink); background: var(--card); }
+.social svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+.social svg .fill { fill: currentColor; stroke: none; }
 .theme-toggle { width: 34px; height: 34px; border: 1px solid var(--line); background: var(--card); border-radius: 10px; cursor: pointer; display: grid; place-items: center; padding: 0; }
 .theme-toggle:hover { border-color: var(--ink); }
 .theme-toggle svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; }
@@ -312,6 +322,7 @@ footer a:hover { color: var(--ink); }
   .catalog-controls { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
+  .social { display: none; }
   .site-nav { display: none; }
   .menu { display: block; }
   .featured-grid { grid-template-columns: 1fr; }
