@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <title>Whydah’s Voyage</title>
-    <meta name="description" content="Whydah’s Voyage — live the true 1717 voyage of the Whydah Gally: dive the wrecks, take the ship, fight your way north, and survive the storm." />
+    <meta name="description" content="Whydah’s Voyage — live the 1717 voyage of the Whydah Gally: take the ship, fight your way north, and survive the storm." />
     <meta name="theme-color" content="#0b1620" />
     <link rel="icon" type="image/png" sizes="32x32" href="pics/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="pics/favicon-16.png" />
@@ -24,9 +24,13 @@
     </div>
 
     <div id="controls" aria-hidden="true">
-      <div class="ctl-cluster">
-        <button id="btn-left" class="btn" type="button" aria-label="Steer left">◀</button>
-        <button id="btn-right" class="btn" type="button" aria-label="Steer right">▶</button>
+      <div class="ctl-cluster helm">
+        <button id="btn-up" class="btn helm-up" type="button" aria-label="Sail forward">▲</button>
+        <div class="helm-row">
+          <button id="btn-left" class="btn" type="button" aria-label="Steer left">◀</button>
+          <button id="btn-down" class="btn" type="button" aria-label="Fall back">▼</button>
+          <button id="btn-right" class="btn" type="button" aria-label="Steer right">▶</button>
+        </div>
       </div>
       <div class="ctl-cluster">
         <button id="btn-blast" class="btn blast" type="button" aria-label="Powder blast">⚡</button>

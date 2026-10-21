@@ -34,21 +34,29 @@ html, body {
   pointer-events: none;             /* only buttons catch input */
   z-index: 5;
 }
-.ctl-cluster { display: flex; gap: 12px; pointer-events: none; }
+.ctl-cluster { display: flex; gap: 12px; pointer-events: none; align-items: flex-end; }
+.ctl-cluster.helm {
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.helm-row { display: flex; gap: 8px; pointer-events: none; }
+.helm-row .btn, .ctl-cluster.helm > .btn { pointer-events: auto; }
 .btn {
   pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
-  width: clamp(58px, 15vw, 84px); height: clamp(58px, 15vw, 84px);
+  width: clamp(52px, 13vw, 76px); height: clamp(52px, 13vw, 76px);
   border-radius: 50%;
   border: 2px solid rgba(244,231,201,.55);
   background: rgba(20,40,55,.42);
   color: #f4e7c9;
-  font-size: clamp(22px, 6vw, 32px);
+  font-size: clamp(20px, 5.5vw, 28px);
   line-height: 1;
   display: flex; align-items: center; justify-content: center;
   backdrop-filter: blur(3px);
   transition: transform .06s ease, background .12s ease;
 }
+.btn.helm-up { width: clamp(48px, 12vw, 68px); height: clamp(48px, 12vw, 68px); }
 .btn:active, .btn.held { transform: scale(.92); background: rgba(210,170,90,.5); }
 .btn.fire {
   width: clamp(66px, 17vw, 96px); height: clamp(66px, 17vw, 96px);
@@ -95,8 +103,11 @@ body.hide-touch .ctl-cluster { display: none; }   /* keyboard players: hide stee
 }
 /* Short landscape phones: shrink the pads so they don't cover the sea */
 @media (max-height: 480px) {
-  .btn { width: 52px; height: 52px; font-size: 20px; }
-  .btn.fire { width: 60px; height: 60px; }
+  .btn { width: 48px; height: 48px; font-size: 18px; }
+  .btn.helm-up { width: 44px; height: 44px; }
+  .btn.fire { width: 56px; height: 56px; }
+  .ctl-cluster.helm { gap: 6px; }
+  .helm-row { gap: 6px; }
   #controls { padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
   .mini-btn { height: 34px; min-width: 34px; font-size: 15px; }
 }

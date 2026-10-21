@@ -8,7 +8,7 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/geopuesto/` and `/geopuesto/playground/` | `mapzimus/geopuesto` | |
 | `/bug-wars/` | `mapzimus/bug-wars` | `799f4f8` (v6, turn-based mobile strategy). Runtime files only; `CLAUDE.md` and `tools/` are left out. |
 | `/flipgame/` | `mapzimus/flipgame` | Approved releases are copied by `scripts/sync-flipgame.mjs`; exact deterministic provenance is published at `vendor/apps/flip-game/release-provenance.json`. Legacy `/flip-game/`, `/bottle-game/`, `/parrot-flip/`, and `/grog-flip/` paths redirect here. |
-| `/whydah-voyage/` | `mapzimus/Whydah-Unit` (`navigator/`) | Whydah's Voyage / First Sail. |
+| `/whydah-voyage/` | `mapzimus/Whydah-Unit` (`navigator/`) | `dd4d52e`, Whydah's Voyage / First Sail. On copy: the canonical-host redirect and the classroom gate (`/games-gate.js`) are removed, and the icon links point at the copies kept beside the game (`pics/`, `favicon.ico`, `apple-touch-icon.png`, `site.webmanifest`). |
 | `/true-scale/` | `mapzimus/true-scale` | |
 | `/concord-war/` | built from `mapzimus/concord-war` | |
 | `/transit/` | `transit/` in `mapzimus/maxwellhowegis` | |
