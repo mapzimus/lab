@@ -47,6 +47,16 @@ The build fails if the catalog data is invalid: missing required fields, duplica
 
 The committed `wrangler.jsonc` matches those settings. Preview branches use normal Pages preview deployments.
 
+**Production deploys come from GitHub Actions**, not from Cloudflare's Git builds. `.github/workflows/deploy.yml` runs `npm run check` and then `wrangler pages deploy dist` on every push to `main`, and again after each Daily radar run. That takes about a minute. Cloudflare's own Git builds queue one at a time and clone the whole repo, which took 2–20 minutes. Setup:
+
+- Repository secrets:
+  - `CLOUDFLARE_API_TOKEN`: a custom token with Account › Cloudflare Pages › Edit.
+  - `CLOUDFLARE_ACCOUNT_ID`.
+  - `GOOGLE_MAPS_EMBED_KEY`: Geopuesto's Street View key. The build reads it in Actions, so it belongs here rather than in Cloudflare's build variables.
+- In the Pages project (Settings › Build › Branch control), turn off automatic production branch deployments. Preview deployments for other branches can stay on.
+
+Without `CLOUDFLARE_API_TOKEN`, the workflow builds and checks but skips the deploy.
+
 ## Updating the catalog
 
 `src/data/tools.json` and `src/data/projects.json` hold the shelf metadata. Source `url` fields are provenance (where the item originally lived); the build rewrites public URLs to first-party paths and writes them into `dist/data/`. Drop a tool HTML file into `vendor/tools/{slug}.html` (or an app tree into `vendor/apps/{name}/`) and update `vendor/SOURCES.md` when mirroring something new.
