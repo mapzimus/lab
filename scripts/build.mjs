@@ -513,6 +513,16 @@ for (const [sourceName, route] of Object.entries(appRoutes)) {
   fs.cpSync(appSource, path.join(output, route), { recursive: true });
 }
 
+// Geopuesto's Street View embed has to carry a Google key in the page, but the key
+// stays out of git: it comes from GOOGLE_MAPS_EMBED_KEY, set in Cloudflare Pages.
+// Without it the placeholder becomes "" and Geopuesto hides the Street View module.
+const geopuestoPage = path.join(output, "geopuesto", "index.html");
+fs.writeFileSync(
+  geopuestoPage,
+  fs.readFileSync(geopuestoPage, "utf8").replaceAll("__GOOGLE_MAPS_EMBED_KEY__", process.env.GOOGLE_MAPS_EMBED_KEY || ""),
+  "utf8",
+);
+
 // ---- Static pages that carry pre-rendered blocks ----
 
 function fillStatic(relPath, replacements) {
