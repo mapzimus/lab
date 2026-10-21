@@ -50,3 +50,7 @@
 
 /lab/:project/vendor/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Category Five: Vite fingerprints every asset filename, so they never change in place.
+/c5/assets/*
+  Cache-Control: public, max-age=31536000, immutable

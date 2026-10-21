@@ -19,6 +19,7 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/smartpicker/` | `mapzimus/smartpicker` | `5c6f298` — was `mapzimus.github.io/smartpicker/`. |
 | `/citynario/` | `mapzimus/Citynario` | Static Next export. |
 | `/ground-truth/` | `mapzimus/ground-truth` | Lidar / wooded-land site studies. |
+| `/c5/` | `mapzimus/c5` | `f86958c` — Category Five, 32 party games. Built with `npm run build` (Vite `base` is already `/c5/`) and the whole `dist/` copied here. Was `mapzimus.github.io/c5/`. |
 
 Documentation, source-only scripts, Android wrappers, and other non-deployable files are omitted from the snapshots.
 
