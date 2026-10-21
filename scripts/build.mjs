@@ -66,6 +66,9 @@ const hostedProjectRoutes = {
   "orbit-to-street": "/lab/orbit-to-street/",
   "population-globe": "/lab/population-globe/",
   "category-five": "/c5/",
+  optitrek: "/optitrek/",
+  appalachians: "/appalachians/",
+  pockettiles: "/pockettiles/",
   "vacation-selector": "/vacation-selector/",
 };
 
@@ -85,6 +88,9 @@ const appRoutes = {
   citynario: "citynario",
   "ground-truth": "ground-truth",
   c5: "c5",
+  optitrek: "optitrek",
+  appalachians: "appalachians",
+  pockettiles: "pockettiles",
 };
 
 const tools = loadCatalog("tools.json");

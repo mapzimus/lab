@@ -19,6 +19,9 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/citynario/` | `mapzimus/Citynario` | Static Next export. |
 | `/ground-truth/` | `mapzimus/ground-truth` | Lidar / wooded-land site studies. |
 | `/c5/` | `mapzimus/c5` | `7251bb2` (the `deep-links` branch, mapzimus/c5#47) — Category Five, 32 party games; each catalog card opens `/c5/?game=<id>`. Built with `npm run build` (Vite `base` is already `/c5/`) and the whole `dist/` copied here. Was `mapzimus.github.io/c5/`. |
+| `/optitrek/` | `mapzimus/optitrek` (`gallery/`) | `1af171f`: the 12 Folium route maps and two PNGs. On copy, the Carto Positron tiles are swapped for Esri's keyless Light Gray Canvas (`maxNativeZoom` 16). The gallery page itself is `src/optitrek/index.html`. |
+| `/appalachians/` | `appalachians/` in `mapzimus/maxwellhowegis` | `84634e5`: `index.html` and `data/`. The credit link points to maxwellhowegis.com instead of `../portfolio.html`. Was `maxwellhowegis.com/appalachians/`. |
+| `/pockettiles/` | `pockettiles/` in `mapzimus/maxwellhowegis` | `84634e5`: runtime files (`index.html`, `viewer.html`, `config.js`, `css/`, `js/`). Supabase cloud publishing stays off, because `config.js` ships empty. The "← Portfolio" link becomes "← Lab" (`/lab/`). Was `maxwellhowegis.com/pockettiles/`. |
 
 Documentation, source-only scripts, Android wrappers, and other non-deployable files are omitted from the snapshots.
 
