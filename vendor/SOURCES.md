@@ -22,4 +22,6 @@ The files in this directory are deployable snapshots of projects maintained in s
 
 Documentation, source-only scripts, Android wrappers, and other non-deployable files are omitted from the snapshots.
 
+**Basemaps (October 2026):** Carto's raster and GL basemaps began serving "API KEY REQUIRED" watermarks to unregistered sites, so these snapshots were patched here to use keyless [OpenFreeMap](https://openfreemap.org) vector styles: `/transit/`, `/true-scale/`, `/geopuesto/` (and its playground), `/interstate-challenge/`, and `/boston-in-motion/`. Leaflet pages draw them through the shared `/lib/maplibre/` bundle (`src/lib/maplibre/basemap.js`). The tools in `vendor/tools/` keep OpenStreetMap raster tiles but use the single `tile.openstreetmap.org` host. The upstream repositories still point at Carto, so re-apply these changes (or fix them upstream) before refreshing any of those snapshots.
+
 **Still external by design:** [tappymaps.com](https://tappymaps.com) (own product domain) and the MCAS item bank at [lehsmath.com](https://lehsmath.com/tools/mcas/). The classroom curriculum site remains at [whydahstory.com](https://whydahstory.com); the games listed above are mirrored here.

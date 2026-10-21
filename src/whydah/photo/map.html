@@ -102,6 +102,10 @@
 <div id="map" role="application" aria-label="Interactive map of Salem photography walk locations"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="/lib/maplibre/maplibre-gl.css" />
+<script src="/lib/maplibre/maplibre-gl.js"></script>
+<script src="/lib/maplibre/leaflet-maplibre-gl.js"></script>
+<script src="/lib/maplibre/basemap.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
 <script>
 /* ============================================================
@@ -146,17 +150,18 @@ const ISO = {"features":[{"properties":{"contour":15.0},"geometry":{"coordinates
 const RAIL = {"type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8959264,42.5176866],[-70.8959598,42.5174420],[-70.8959715,42.5173474],[-70.8960095,42.5170495],[-70.8960703,42.5166886]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8959859,42.5239637],[-70.8959991,42.5238385],[-70.8959973,42.5237056],[-70.8959844,42.5235472],[-70.8959621,42.5233048],[-70.8958254,42.5224207],[-70.8956743,42.5214439],[-70.8955043,42.5203449],[-70.8954941,42.5202398],[-70.8955001,42.5201376],[-70.8958675,42.5180313]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8968225,42.5116516],[-70.8968465,42.5114949],[-70.8968721,42.5113009],[-70.8968913,42.5111541],[-70.8969553,42.5106933],[-70.8969799,42.5105034],[-70.8970046,42.5103370],[-70.8970340,42.5101126]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8934246,42.5283814],[-70.8929727,42.5290784],[-70.8928497,42.5292718],[-70.8921935,42.5301919],[-70.8918599,42.5306611],[-70.8914439,42.5312470],[-70.8910396,42.5318316],[-70.8907323,42.5323106],[-70.8906443,42.5324608],[-70.8904537,42.5327969],[-70.8904151,42.5328714],[-70.8903403,42.5330033],[-70.8902785,42.5331239],[-70.8902278,42.5332315],[-70.8901473,42.5333879],[-70.8900660,42.5335612],[-70.8899840,42.5337431],[-70.8898791,42.5339875],[-70.8897642,42.5342719],[-70.8897332,42.5343543],[-70.8896768,42.5345071],[-70.8896099,42.5346923],[-70.8895740,42.5347958],[-70.8894116,42.5352546],[-70.8893194,42.5355319],[-70.8891382,42.5360617],[-70.8889490,42.5366275]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8889038,42.5366209],[-70.8891859,42.5357872],[-70.8892741,42.5355256],[-70.8895577,42.5346967],[-70.8896568,42.5344164],[-70.8898161,42.5340162],[-70.8899833,42.5336249],[-70.8901740,42.5332270],[-70.8903872,42.5328117],[-70.8908479,42.5320426],[-70.8909884,42.5318273],[-70.8913173,42.5313461],[-70.8934246,42.5283814]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8961191,42.5166925],[-70.8962527,42.5159080],[-70.8964241,42.5146879],[-70.8967433,42.5122466],[-70.8967798,42.5119691],[-70.8968225,42.5116516]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8959264,42.5176866],[-70.8959724,42.5174457],[-70.8959994,42.5173204],[-70.8960591,42.5170382],[-70.8961191,42.5166925]]}},{"type":"Feature","properties":{"name":"Eastern Route","usage":"main","active":true},"geometry":{"type":"LineString","coordinates":[[-70.8960703,42.5166886],[-70.8962114,42.5158593],[-70.8962485,42.5156153],[-70.8963223,42.5151005],[-70.8965091,42.5136470],[-70.8967727,42.5116505]]}},{"type":"Feature","properties":{"name":"Danvers Industrial Track","usage":"industrial","active":false},"geometry":{"type":"LineString","coordinates":[[-70.9120608,42.5224573],[-70.9119357,42.5224101]]}},{"type":"Feature","properties":{"name":"Danvers Industrial Track","usage":"industrial","active":false},"geometry":{"type":"LineString","coordinates":[[-70.9119357,42.5224101],[-70.9104340,42.5218129],[-70.9103625,42.5217856],[-70.9102632,42.5217477],[-70.9093521,42.5213886],[-70.9090690,42.5212782],[-70.9088920,42.5212222],[-70.9086606,42.5211594],[-70.9084507,42.5211176],[-70.9082575,42.5210944],[-70.9080670,42.5210845],[-70.9077923,42.5210751],[-70.9076828,42.5210749],[-70.9075801,42.5210776],[-70.9074347,42.5210861],[-70.9072693,42.5211050],[-70.9070598,42.5211377],[-70.9069678,42.5211545],[-70.9068784,42.5211762],[-70.9067722,42.5212027],[-70.9066689,42.5212326],[-70.9064701,42.5212965],[-70.9062502,42.5213755],[-70.9060909,42.5214346],[-70.9056222,42.5216133]]}},{"type":"Feature","properties":{"name":"Danvers Industrial Track","usage":"industrial","active":false},"geometry":{"type":"LineString","coordinates":[[-70.9056222,42.5216133],[-70.9054652,42.5216708]]}},{"type":"Feature","properties":{"name":"Danvers Industrial Track","usage":"industrial","active":false},"geometry":{"type":"LineString","coordinates":[[-70.9054652,42.5216708],[-70.9049304,42.5218797],[-70.9046683,42.5219970],[-70.9045598,42.5220507],[-70.9043983,42.5221172],[-70.9036726,42.5223914]]}},{"type":"Feature","properties":{"name":"Danvers Industrial Track","usage":"industrial","active":false},"geometry":{"type":"LineString","coordinates":[[-70.9036726,42.5223914],[-70.9034454,42.5225000],[-70.9033112,42.5225639],[-70.9030945,42.5226493],[-70.9024485,42.5228974],[-70.9020043,42.5230651],[-70.9015317,42.5232476],[-70.9010575,42.5234263],[-70.9006174,42.5235971],[-70.9000804,42.5238015],[-70.8999134,42.5238611]]}}]};
 
 /* ---------- map + basemaps ---------- */
-const map = L.map("map", { zoomControl: true, attributionControl: true });
+const map = L.map("map", { zoomControl: true, attributionControl: true, maxZoom: 20 });
 L.control.zoom({ position: "topright" }).remove();
 map.zoomControl.setPosition("topright");
 
 const baseAtt = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
-const positron = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { attribution: baseAtt + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains:"abcd", maxZoom: 20 });
-const voyager  = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { attribution: baseAtt + ' &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains:"abcd", maxZoom: 20 });
+// OpenFreeMap vector styles (keyless); Carto's raster tiles now want an API key.
+const positron = MapzimusBasemap.leaflet({ style: "positron" });
+const voyager  = MapzimusBasemap.leaflet({ style: "liberty" });
 const esriImg  = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { attribution: "Imagery &copy; Esri, Maxar, Earthstar Geographics", maxZoom: 20 });
 const esriLab  = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", { maxZoom: 20, pane: "overlayPane" });
 const satellite = L.layerGroup([esriImg, esriLab]);
-const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: baseAtt, maxZoom: 19 });
+const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: baseAtt, maxZoom: 19 });
 
 positron.addTo(map);
 
@@ -264,7 +269,7 @@ const anchorMarker = L.marker([COLLINS.lat, COLLINS.lon], { icon: pinIcon({cat:"
   .addTo(anchorLayer);
 
 /* ---------- layer control ---------- */
-const baseLayers = { "Carto Light": positron, "Carto Voyager": voyager, "Satellite (scouting)": satellite, "OpenStreetMap": osm };
+const baseLayers = { "Light": positron, "Streets": voyager, "Satellite (scouting)": satellite, "OpenStreetMap": osm };
 const overlays = {
   "<b>15-min walk-shed</b>": walkShed,
   "Commuter rail (active)": railLayer,

@@ -8,6 +8,10 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="/lib/maplibre/maplibre-gl.css" />
+<script src="/lib/maplibre/maplibre-gl.js"></script>
+<script src="/lib/maplibre/leaflet-maplibre-gl.js"></script>
+<script src="/lib/maplibre/basemap.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -212,12 +216,10 @@ let state = { name:'US Fantasy Transit Network', nodes:[], edges:[] };
 const tierVisible = { 1:true, 2:true, 3:true, 4:true };   // legend toggles
 
 /* ---- map ---- */
-const map = L.map('map', { zoomControl:true, attributionControl:true, worldCopyJump:true, preferCanvas:true })
+const map = L.map('map', { zoomControl:true, attributionControl:true, worldCopyJump:true, preferCanvas:true, maxZoom:19 })
   .setView([39.5, -98.35], 4);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  subdomains:'abcd', maxZoom:19,
-  attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a> &middot; towns: US Census'
-}).addTo(map);
+MapzimusBasemap.leaflet({ style:'dark' }).addTo(map);
+map.attributionControl.addAttribution('towns: US Census');
 
 /* dedicated panes: tier-4 renders under the tier 1-3 network — the commuter
    web lines sit below the town dots */

@@ -434,6 +434,10 @@
   <script src="https://unpkg.com/globe.gl@2.30.0/dist/globe.gl.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <link rel="stylesheet" href="/lib/maplibre/maplibre-gl.css" />
+  <script src="/lib/maplibre/maplibre-gl.js"></script>
+  <script src="/lib/maplibre/leaflet-maplibre-gl.js"></script>
+  <script src="/lib/maplibre/basemap.js"></script>
   <script>
     // Tell cities.js where to find the dataset. The default fetch path is
     // relative to the page URL; from playground/ we need to go up one level
@@ -601,10 +605,8 @@
 
       function ensureTpMap() {
         if (tpMap) return tpMap;
-        tpMap = L.map('tp-map', { worldCopyJump: true }).setView([20, 0], 1);
-        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-          attribution: 'Esri Dark Gray Canvas', maxZoom: 16, subdomains: ['', ''],
-        }).addTo(tpMap);
+        tpMap = L.map('tp-map', { worldCopyJump: true, maxZoom: 16 }).setView([20, 0], 1);
+        MapzimusBasemap.leaflet({ style: "dark" }).addTo(tpMap);
         tpLayers.lines = L.layerGroup().addTo(tpMap);
         tpLayers.pins = L.layerGroup().addTo(tpMap);
         return tpMap;
@@ -695,10 +697,8 @@
 
       function ensurePolyMap() {
         if (polyMap) return polyMap;
-        polyMap = L.map('salem-map', { worldCopyJump: true }).setView([20, -30], 1);
-        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-          attribution: 'Esri Dark Gray Canvas', maxZoom: 16, subdomains: ['', ''],
-        }).addTo(polyMap);
+        polyMap = L.map('salem-map', { worldCopyJump: true, maxZoom: 16 }).setView([20, -30], 1);
+        MapzimusBasemap.leaflet({ style: "dark" }).addTo(polyMap);
         polyLayers.edges = L.layerGroup().addTo(polyMap);
         polyLayers.pins = L.layerGroup().addTo(polyMap);
         return polyMap;
@@ -1109,10 +1109,8 @@
 
       function ensureCurvesMap() {
         if (curvesMap) return curvesMap;
-        curvesMap = L.map('curves-map', { worldCopyJump: true }).setView([20, -30], 1);
-        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-          attribution: 'Esri Dark Gray Canvas', maxZoom: 16, subdomains: ['', ''],
-        }).addTo(curvesMap);
+        curvesMap = L.map('curves-map', { worldCopyJump: true, maxZoom: 16 }).setView([20, -30], 1);
+        MapzimusBasemap.leaflet({ style: "dark" }).addTo(curvesMap);
         curvesLayer.polyline = L.layerGroup().addTo(curvesMap);
         curvesLayer.pin = L.layerGroup().addTo(curvesMap);
         return curvesMap;
@@ -1283,10 +1281,8 @@
 
       function ensureAnalysisMap() {
         if (analysisMap) return analysisMap;
-        analysisMap = L.map('analysis-map', { worldCopyJump: true }).setView([20, 0], 1);
-        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-          attribution: 'Esri Dark Gray Canvas', maxZoom: 16, subdomains: ['', ''],
-        }).addTo(analysisMap);
+        analysisMap = L.map('analysis-map', { worldCopyJump: true, maxZoom: 16 }).setView([20, 0], 1);
+        MapzimusBasemap.leaflet({ style: "dark" }).addTo(analysisMap);
         analysisLayer.addTo(analysisMap);
         return analysisMap;
       }

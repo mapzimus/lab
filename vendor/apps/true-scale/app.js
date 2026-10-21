@@ -34,12 +34,9 @@
 
   // ---- map setup -----------------------------------------------------------
   function initMap() {
-    map = L.map("map", { worldCopyJump: true, minZoom: 1, zoomControl: true, maxBoundsViscosity: 0.6 })
+    map = L.map("map", { worldCopyJump: true, minZoom: 1, maxZoom: 12, zoomControl: true, maxBoundsViscosity: 0.6 })
             .setView([25, 0], 2);
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      subdomains: "abcd", maxZoom: 12, attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-    }).addTo(map);
+    MapzimusBasemap.leaflet({ style: "dark" }).addTo(map);
   }
 
   // ---- data load -----------------------------------------------------------

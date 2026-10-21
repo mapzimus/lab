@@ -88,7 +88,8 @@ export const CONFIG = {
   // on: ~400 buses, ~600 bike stations, wall-to-wall traffic color).
   DEFAULT_OFF_GROUPS: ['bus', 'bike', 'traffic'],
 
-  BASEMAP_STYLE: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+  // OpenFreeMap's dark vector style: keyless. (Carto's GL style needs an API key now.)
+  BASEMAP_STYLE: 'https://tiles.openfreemap.org/styles/dark',
 };
 
 // Persist keys passed via URL so they survive future visits.

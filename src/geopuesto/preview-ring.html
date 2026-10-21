@@ -63,19 +63,21 @@
   <div class="stats" id="stats"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="/lib/maplibre/maplibre-gl.css" />
+  <script src="/lib/maplibre/maplibre-gl.js"></script>
+  <script src="/lib/maplibre/leaflet-maplibre-gl.js"></script>
+  <script src="/lib/maplibre/basemap.js"></script>
   <script src="geometry.js"></script>
   <script src="cities.js"></script>
   <script>
     'use strict';
 
     // ---- Map setup (mirrors production index.html line 1395-1398) ----
-    const TILE_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
-    const TILE_OPTS = { maxZoom: 20, subdomains: "abcd" };
-    const MAP_OPTS = { worldCopyJump: true, attributionControl: false };
+    const MAP_OPTS = { worldCopyJump: true, attributionControl: false, maxZoom: 20 };
     const mapOrigin = L.map("mapOrigin", MAP_OPTS).setView([20, 0], 2);
     const mapAntipode = L.map("mapAntipode", MAP_OPTS).setView([-20, 180], 2);
-    L.tileLayer(TILE_URL, TILE_OPTS).addTo(mapOrigin);
-    L.tileLayer(TILE_URL, TILE_OPTS).addTo(mapAntipode);
+    MapzimusBasemap.leaflet({ style: "dark", attribution: false }).addTo(mapOrigin);
+    MapzimusBasemap.leaflet({ style: "dark", attribution: false }).addTo(mapAntipode);
 
     // ---- Ring renderer (verbatim from production renderPersonalEquator) ----
     const originEquatorLayer = L.layerGroup().addTo(mapOrigin);

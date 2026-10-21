@@ -256,21 +256,9 @@ function wireOverlay(checkboxId) {
 function init() {
   map = new maplibregl.Map({
     container: "map",
-    style: {
-      version: 8,
-      sources: {
-        osm: {
-          type: "raster",
-          tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-          tileSize: 256,
-          attribution: "© OpenStreetMap contributors",
-        },
-      },
-      layers: [{
-        id: "osm", type: "raster", source: "osm",
-        paint: { "raster-saturation": -0.9, "raster-opacity": 0.85, "raster-brightness-max": 0.4 },
-      }],
-    },
+    // OpenFreeMap's dark vector style: keyless, and already as muted as the old
+    // desaturated OSM raster was made to look.
+    style: "https://tiles.openfreemap.org/styles/dark",
     bounds: [[-73.60, 41.15], [-69.85, 42.95]],
     fitBoundsOptions: { padding: 24 },
     attributionControl: { compact: false },

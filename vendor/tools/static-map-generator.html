@@ -724,7 +724,7 @@ document.addEventListener('click', (e) => {
 function initMap() {
   if (window.__leafletCssFailed) { mapFail(); return; }
   map = L.map('map', { worldCopyJump: true }).setView([view.lat, view.lng], view.zoom);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
