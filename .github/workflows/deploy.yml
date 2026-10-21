@@ -1,0 +1,56 @@
+name: Deploy
+
+# Production deploys straight from Actions: the build takes seconds here, while
+# Cloudflare's Git builds queue one at a time and clone the whole repo first
+# (2–20 minutes per push). PR previews still come from Cloudflare's Git builds.
+#
+# Needs repository secrets CLOUDFLARE_API_TOKEN (Account › Cloudflare Pages › Edit)
+# and CLOUDFLARE_ACCOUNT_ID, plus GOOGLE_MAPS_EMBED_KEY for Geopuesto's Street
+# View. Without the Cloudflare secrets the deploy step is skipped, not failed.
+
+on:
+  push:
+    branches: [main]
+  # The radar job commits with GITHUB_TOKEN, and those pushes don't trigger
+  # workflows, so deploy when it finishes instead.
+  workflow_run:
+    workflows: ["Daily radar"]
+    types: [completed]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      HAS_CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build, validate catalog, and check first-party links
+        run: npm run check
+        env:
+          GOOGLE_MAPS_EMBED_KEY: ${{ secrets.GOOGLE_MAPS_EMBED_KEY }}
+      - name: Deploy to Cloudflare Pages
+        if: env.HAS_CLOUDFLARE_TOKEN == 'true'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=mapzimus-lab --branch=main
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Note the skipped deploy
+        if: env.HAS_CLOUDFLARE_TOKEN != 'true'
+        run: echo "::warning::CLOUDFLARE_API_TOKEN is not set, so nothing was deployed. Cloudflare's Git builds still deploy production until they are paused."
