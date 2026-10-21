@@ -1862,9 +1862,10 @@ const CONFIG = {
   // set it to your deployed Worker URL (no trailing slash) to light them up.
   proxyBase: "https://geopuesto-live-feeds.mapzimus.workers.dev",
 
-  // Google Maps Embed API key (for reliable Street View).
+  // Google Maps Embed API key (for reliable Street View). Kept out of git: the
+  // mapzimus.com build fills it from the GOOGLE_MAPS_EMBED_KEY variable.
   // https://console.cloud.google.com/apis/credentials  · enable "Maps Embed API"
-  googleMapsApiKey: "AIzaSyBjC4lYi3UHjoeYr2dSQhtvCP_-65NElcM",
+  googleMapsApiKey: "__GOOGLE_MAPS_EMBED_KEY__",
 
   // Mapillary client token (free, community photos).
   // https://www.mapillary.com/dashboard/developers
