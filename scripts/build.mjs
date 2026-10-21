@@ -64,6 +64,7 @@ const hostedProjectRoutes = {
   "state-puzzle": "/lab/state-puzzle/",
   "boston-massing": "/lab/boston-massing/",
   "population-globe": "/lab/population-globe/",
+  "category-five": "/c5/",
   "vacation-selector": "/vacation-selector/",
 };
 
@@ -82,6 +83,7 @@ const appRoutes = {
   "where-the-games-go": "where-the-games-go",
   citynario: "citynario",
   "ground-truth": "ground-truth",
+  c5: "c5",
 };
 
 const tools = loadCatalog("tools.json");
