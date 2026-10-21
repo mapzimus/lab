@@ -33,7 +33,7 @@ function decodeText(value) {
     .replaceAll("&gt;", ">");
 }
 
-const knownCategories = new Set(["maps", "data", "design", "classroom", "math", "soccer", "utilities", "everyday", "play", "experiments"]);
+const knownCategories = new Set(["maps", "data", "design", "classroom", "math", "soccer", "utilities", "everyday", "play", "party", "experiments"]);
 const requiredFields = ["slug", "title", "description", "category", "url"];
 
 /** First-party routes for projects hosted on-site (snapshotted under vendor/
@@ -89,6 +89,13 @@ const appRoutes = {
 
 const tools = loadCatalog("tools.json");
 const projects = loadCatalog("projects.json");
+// Each Category Five game (slug "c5-<game id>") opens its own pregame screen
+// through c5's ?game= deep link.
+for (const project of projects) {
+  if (project.category === "party" && project.slug.startsWith("c5-")) {
+    hostedProjectRoutes[project.slug] = `/c5/?game=${project.slug.slice(3)}`;
+  }
+}
 const featuredSlugs = loadCatalog("featured.json");
 const sourceCatalog = [...tools, ...projects];
 // Field Notes dormant — page redirects home until posts return.
@@ -178,6 +185,7 @@ const categoryLabels = {
   classroom: "Classroom",
   soccer: "Soccer",
   play: "Games",
+  party: "Category Five",
   experiments: "Experiments",
   // Legacy aliases kept for any lingering project tags
   design: "Everyday",
@@ -193,7 +201,7 @@ const viewCategories = {
   home: null,
   tools: ["maps", "data", "everyday", "soccer"],
   maps: ["maps"],
-  games: ["play"],
+  games: ["play", "party"],
 };
 
 function escapeHtml(value) {
@@ -237,8 +245,9 @@ function card(item, { featured = false, star = true } = {}) {
 function itemsForView(view, category) {
   return catalog.filter((item) => {
     if (view === "lab") {
-      // Lab = every project (maps included). No tools, no skills.
-      if (item.source !== "projects") return false;
+      // Lab = every project (maps included). No tools, no skills. Category Five's
+      // games stay on the Games page; Lab lists the collection as one card.
+      if (item.source !== "projects" || item.category === "party") return false;
     } else if (view === "maps") {
       // First-party map projects that live on this site (embeddable destinations).
       // GIS utilities stay under Tools → Maps & GIS.
@@ -262,7 +271,7 @@ function filtersHtml(view, activeCategory) {
 }
 
 // Canonical order for grouped subsections.
-const catOrder = ["maps", "data", "everyday", "soccer", "classroom", "play", "experiments"];
+const catOrder = ["maps", "data", "everyday", "soccer", "classroom", "play", "party", "experiments"];
 
 /** Split a view's items into labelled groups so a long list reads as a few
     scannable shelves instead of one wall. */

@@ -9,6 +9,7 @@
     classroom: "Classroom",
     soccer: "Soccer",
     play: "Games",
+    party: "Category Five",
     experiments: "Experiments",
     design: "Everyday",
     utilities: "Everyday",
@@ -22,7 +23,7 @@
     home: null,
     tools: ["maps", "data", "everyday", "soccer"],
     maps: ["maps"],
-    games: ["play"],
+    games: ["play", "party"],
   };
 
   function readFavorites() {
@@ -107,7 +108,7 @@
 
   function allowedByView(item) {
     // Keep in sync with itemsForView() in scripts/build.mjs.
-    if (view === "lab") return item.source === "projects";
+    if (view === "lab") return item.source === "projects" && item.category !== "party";
     if (view === "maps") {
       return item.source === "projects" && item.category === "maps" && !item.external;
     }

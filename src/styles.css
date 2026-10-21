@@ -243,6 +243,7 @@ section.catalog { border-top: 1px solid var(--line); }
 .card[data-category="teaching"] { --cat: var(--c-classroom); }
 .card[data-category="fun"] { --cat: var(--c-utilities); }
 .card[data-category="play"] { --cat: var(--c-play); }
+.card[data-category="party"] { --cat: var(--c-play); }
 .card[data-category="experiments"] { --cat: var(--c-experiments); }
 
 .card-link { display: flex; flex-direction: column; flex: 1; padding: 18px; text-decoration: none; }
