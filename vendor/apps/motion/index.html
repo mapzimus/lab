@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    // Startup watchdog. A plain script, so it runs even when the app bundle
+    // fails to download, parse, or evaluate (a stale cached page, a browser
+    // too old for the bundle, a blocked request). Without it any of those
+    // leaves "Loading New England…" on screen forever with no clue why. It
+    // sits first in <head>, above the bundle tag the build injects there, so
+    // it is listening before that script can fail.
+    //
+    // When the app script itself fails to load, the usual cause is a deploy
+    // in progress: right after back-to-back merges GitHub briefly publishes
+    // the raw repo, whose src/main.tsx no browser can run, and browsers cache
+    // that page for 10 minutes. So reload a cache-busted copy (up to 3 times,
+    // counted in the URL) before showing the error.
+    (function () {
+      var MAX_RETRIES = 3;
+      var params = new URLSearchParams(location.search);
+      var tries = parseInt(params.get('try') || '0', 10) || 0;
+      var firstError = null;
+      var shown = false;
+      function remember(message) { if (!firstError && message) firstError = String(message); }
+      function freshUrl(nextTry) {
+        var next = new URLSearchParams(location.search);
+        next.set('fresh', String(Date.now()));
+        if (nextTry) next.set('try', String(nextTry)); else next.delete('try');
+        return location.pathname + '?' + next.toString() + location.hash;
+      }
+      function show(message, withLink) {
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', function () { show(message, withLink); });
+          return;
+        }
+        if (shown || window.__motionStarted) return;
+        shown = true;
+        var overlay = document.getElementById('overlay');
+        var text = document.getElementById('overlay-text');
+        if (!overlay || !text) return;
+        overlay.classList.remove('hidden');
+        if (withLink) overlay.classList.add('fatal');
+        text.textContent = message;
+        if (!withLink) return;
+        var reload = document.createElement('a');
+        reload.href = freshUrl(0);
+        reload.textContent = 'Reload a fresh copy';
+        text.appendChild(reload);
+      }
+      function giveUp() {
+        show('Motion didn’t start' + (firstError ? ': ' + firstError : '') + '. ', true);
+      }
+      window.addEventListener('error', function (event) {
+        var el = event.target;
+        if (el && el.tagName === 'SCRIPT' && el.type === 'module') {
+          remember('Could not load ' + el.src);
+          if (tries < MAX_RETRIES) {
+            show('Motion is updating… loading a fresh copy.', false);
+            setTimeout(function () { location.replace(freshUrl(tries + 1)); }, 4000);
+          } else {
+            giveUp();
+          }
+          return;
+        }
+        remember(event.message || (el && el.src && 'Could not load ' + el.src));
+      }, true);
+      window.addEventListener('unhandledrejection', function (event) {
+        remember(event.reason && (event.reason.message || event.reason));
+      });
+      setTimeout(giveUp, 30000);
+    })();
+  </script>
+  <title>Motion — transportation moving live</title>
+  <meta name="description" content="One live map for transportation across New England, New York, and New Jersey — transit, ferries, aircraft, harbor vessels, bikes, and road traffic, filterable by city or state.">
+  <meta property="og:title" content="Motion">
+  <meta property="og:description" content="Transportation moving across New England, New York, and New Jersey, tracked live.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23f4f6f8'/%3E%3Ctext x='16' y='23' font-family='Arial,sans-serif' font-size='20' font-weight='bold' text-anchor='middle' fill='%23111'%3ET%3C/text%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script type="module" crossorigin src="/motion/assets/index-CXiLkeqG.js"></script>
+  <link rel="stylesheet" crossorigin href="/motion/assets/index-cmEsR2UO.css">
+</head>
+<body>
+
+  <a href="#map" class="skip-link">Skip to map</a>
+  <div id="map"></div>
+
+  <aside id="panel" aria-label="Motion controls">
+    <button type="button" id="sheet-grip" class="sheet-grip" aria-label="Resize the control sheet" aria-expanded="false"><span></span></button>
+    <header class="panel-head">
+      <div class="title-row">
+        <h1>Motion <span class="title-sep" aria-hidden="true">·</span> <span id="region-title" class="title-region">New England</span></h1>
+        <button type="button" id="about-toggle" class="about-toggle" aria-label="About this map" aria-expanded="false" aria-controls="panel-about">i</button>
+      </div>
+      <div id="panel-about" class="panel-about" hidden>
+        <p>Transit, ferries, aircraft and road conditions across New England, live. Choose a metro area, region or state.</p>
+        <p id="region-about"></p>
+        <p>Stop names appear as you zoom in: rail first, then ferry landings, then bus stops.</p>
+      </div>
+      <div class="search-wrap">
+        <input
+          id="search-input"
+          class="search-input"
+          type="search"
+          role="combobox"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="Train number, route, stop, or town…"
+          aria-label="Search live vehicles, stops, stations, routes, towns, and geographies"
+          aria-autocomplete="list"
+          aria-controls="search-results"
+          aria-expanded="false"
+          aria-haspopup="listbox">
+        <ul id="search-results" class="search-results" role="listbox" aria-label="Search results" hidden></ul>
+      </div>
+      <div id="search-status" class="search-status" aria-live="polite"></div>
+      <div id="vehicle-presets" class="preset-chips mode-chips" role="group" aria-label="Show one kind of movement"></div>
+    </header>
+
+    <div class="panel-scroll">
+      <section class="panel-section region-section">
+        <div class="section-title-row">
+          <label for="region-select"><h2>Geography</h2></label>
+          <label class="switch-inline" for="live-only">
+            <span>Live only</span>
+            <span class="switch"><input type="checkbox" id="live-only" aria-label="Show only live positions"><span class="knob"></span></span>
+          </label>
+        </div>
+        <select id="region-select" class="region-select" aria-label="Choose map geography or a scene"></select>
+        <div class="basemap-row">
+          <span class="filter-caption">Basemap</span>
+          <div id="basemap-options" class="preset-chips" role="group" aria-label="Basemap"></div>
+        </div>
+      </section>
+
+      <section class="panel-section layers-section">
+        <h2>Layers</h2>
+        <div id="layers-root"></div>
+      </section>
+
+      <section class="panel-section">
+        <h2>Service alerts <span class="count-chip" id="alerts-count">0</span></h2>
+        <ul id="alerts-list" class="alerts-list"></ul>
+      </section>
+    </div>
+
+    <footer class="panel-foot">
+      <div class="status-line">
+        <span class="live-dot" id="status-dot"></span>
+        <span id="status-text">Connecting…</span>
+      </div>
+      <div class="credits">
+        Data MBTA · agency GTFS · 511 · WZDx · NWS · FAA · ADS-B · AIS · GBFS<br>
+        Roads Census · rail FRA · trails OSM · basemap CARTO · USGS<br>
+        Built by Max Howe · <a href="https://github.com/mapzimus" target="_blank" rel="noopener">github.com/mapzimus</a>
+      </div>
+    </footer>
+  </aside>
+
+  <section id="trip-card" class="trip-card" hidden aria-label="Followed vehicle">
+    <div class="trip-grip" aria-hidden="true"></div>
+    <header class="trip-head">
+      <span class="trip-swatch" aria-hidden="true"></span>
+      <div class="trip-titles">
+        <div class="trip-title"></div>
+        <div class="trip-headsign"></div>
+      </div>
+      <button type="button" class="trip-close" aria-label="Stop following and close">×</button>
+    </header>
+    <div class="trip-badges"></div>
+    <div class="trip-alert" role="status" hidden></div>
+    <div class="trip-status" aria-live="polite"></div>
+    <div class="trip-actions">
+      <button type="button" class="trip-follow" aria-pressed="false">Follow</button>
+      <button type="button" class="trip-share">Copy link</button>
+    </div>
+    <ol class="trip-stops" aria-label="Next stops"></ol>
+    <p class="trip-note"></p>
+    <div class="trip-meta"></div>
+    <footer class="trip-foot"></footer>
+  </section>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+
+  <div id="overlay">
+    <div class="loader-bar" aria-hidden="true"></div>
+    <div id="overlay-text">Loading New England…</div>
+  </div>
+
+</body>
+</html>
