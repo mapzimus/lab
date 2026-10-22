@@ -1,0 +1,51 @@
+diff --git a/src/app/shapes.ts b/src/app/shapes.ts
+index 6ccec34..c7b0cae 100644
+--- a/src/app/shapes.ts
++++ b/src/app/shapes.ts
+@@ -29,7 +29,21 @@ export function annotateLegendKeys(features: GeoJSON.Feature[]): GeoJSON.Feature
+ }
+ 
+ /**
+- * Fetch regional-routes.geojson with retries.
++ * Parse a JSON response whose bytes may be gzip. The route file is served as a
++ * plain .gz (no Content-Encoding), so inflate it here; if a CDN already decoded
++ * it, the gzip magic bytes are gone and the text parses directly.
++ */
++async function readJsonMaybeGzip(response: Response): Promise<any> {
++  const bytes = new Uint8Array(await response.arrayBuffer());
++  if (bytes[0] === 0x1f && bytes[1] === 0x8b) {
++    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
++    return JSON.parse(await new Response(stream).text());
++  }
++  return JSON.parse(new TextDecoder().decode(bytes));
++}
++
++/**
++ * Fetch regional-routes.geojson(.gz) with retries.
+  */
+ export async function loadRegionalRouteFeatures(): Promise<GeoJSON.Feature[]> {
+   const attempts = 3;
+@@ -40,7 +54,7 @@ export async function loadRegionalRouteFeatures(): Promise<GeoJSON.Feature[]> {
+         signal: AbortSignal.timeout(20_000),
+       });
+       if (!response.ok) throw new Error(`regional routes ${response.status}`);
+-      const collection = await response.json();
++      const collection = await readJsonMaybeGzip(response);
+       if (!Array.isArray(collection.features) || !collection.features.length) {
+         throw new Error('regional routes contained no features');
+       }
+diff --git a/src/feeds/config.js b/src/feeds/config.js
+index 587e532..9dffec9 100644
+--- a/src/feeds/config.js
++++ b/src/feeds/config.js
+@@ -85,7 +85,9 @@ export const CONFIG = {
+   // so it's cached as encoded polylines (compact enough for localStorage).
+   SHAPE_CACHE_KEY: 'bim-shapes-v4',
+   SHAPE_CACHE_TTL_MS: 24 * 3600 * 1000,
+-  REGIONAL_ROUTE_URL: `${dataBase}regional-routes.geojson`,
++  // mapzimus.com (Cloudflare Pages) caps files at 25 MiB, so the 74 MB route file
++  // ships gzipped and loadRegionalRouteFeatures() inflates it.
++  REGIONAL_ROUTE_URL: `${dataBase}regional-routes.geojson.gz`,
+   INFRASTRUCTURE_URL: `${dataBase}infrastructure.geojson`,
+   LOCAL_SERVICES_URL: `${dataBase}local-services.geojson`,
+   // Bike-share systems without a usable public GBFS feed, one reference

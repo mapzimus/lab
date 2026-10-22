@@ -51,11 +51,12 @@ https://www.mapzimus.com/* https://mapzimus.com/:splat 301
 /games/grog-flip /flipgame/ 301
 /games/grog-flip/* /flipgame/:splat 301
 
-# Motion / atlas aliases from GitHub Pages repo names
-/Motion /boston-in-motion/ 301
-/Motion/* /boston-in-motion/:splat 301
-/motion /boston-in-motion/ 301
-/motion/* /boston-in-motion/:splat 301
+# Boston in Motion is now Motion, at /motion/. Old links and the GitHub Pages
+# repo-name path (/Motion/) land there.
+/boston-in-motion /motion/ 301
+/boston-in-motion/* /motion/:splat 301
+/Motion /motion/ 301
+/Motion/* /motion/:splat 301
 
 # Still external by design (own product / classroom domains)
 /mcas https://lehsmath.com/tools/mcas/ 301

@@ -5,7 +5,7 @@ Source for [mapzimus.com](https://mapzimus.com), the creative lab for Maxwell Ho
 Every catalog item that can run as static files is **hosted in this repo** and served as a first-party path on mapzimus.com. Snapshots live under `vendor/` (see `vendor/SOURCES.md`). The build copies them into `dist/` beside the front-door catalog.
 
 - Tools: `mapzimus.com/{slug}/` (e.g. `/coordinate-converter/`)
-- Games & maps: `/flipgame/`, `/boston-in-motion/`, `/where-the-games-go/`, `/whydah-voyage/`, `/bug-wars/`, `/transit/`, …
+- Games & maps: `/flipgame/`, `/motion/`, `/where-the-games-go/`, `/whydah-voyage/`, `/bug-wars/`, `/transit/`, …
 - Lab experiments already in `src/lab/` stay at `/lab/…`
 
 Legacy `/max/*.html` URLs and older GitHub Pages paths redirect here. TappyMaps keeps its own domain (`tappymaps.com`); the MCAS item bank stays on `lehsmath.com`.
