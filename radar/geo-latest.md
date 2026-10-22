@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-21
+# Mapzimus Geospatial Radar — 2026-10-22
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [The World's Most Notable Places.](http://googlemapsmania.blogspot.com/2026/10/the-worlds-most-notable-places.html)
 - [Pixelate the World](http://googlemapsmania.blogspot.com/2026/10/pixelate-world.html)
 - [London is Bigger than Colorado](http://googlemapsmania.blogspot.com/2026/10/london-is-bigger-than-colorado.html)
 - [There are 89,603 Dogs in New York City](http://googlemapsmania.blogspot.com/2026/10/there-are-89603-dogs-in-new-york-city.html)
@@ -9,11 +10,10 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [What America Looks Like After 700 Meters of Sea Level Rise](http://googlemapsmania.blogspot.com/2026/10/what-america-looks-like-after-700.html)
 - [Travel Blogging & Mapping](http://googlemapsmania.blogspot.com/2026/10/travel-blogging-mapping.html)
 - [The New Age of Building Age Maps Has Begun](http://googlemapsmania.blogspot.com/2026/10/the-new-age-of-building-age-maps-has.html)
-- [The World is Your War Zone](http://googlemapsmania.blogspot.com/2026/10/the-world-is-your-war-zone.html)
 
 ## Geography Realm
 
-- [Good Governance Needs a Strong Code of Conduct](https://www.geographyrealm.com/good-governance-code-of-conduct/) — Editorial: Most geographers work for government agencies or do substantial business with them, so how those agencies are governed is our business too.
+- [Good Governance Needs a Strong Code of Conduct](https://www.geographyrealm.com/good-governance-code-of-conduct/) — UPDATE, October 21, 2026: Read my op-ed in San José Spotlight: “Midpen board votes to free directors from being required to respect the public.” Editorial: M…
 - [Alaska’s Coastline is Longer Than All the Other 49 States Combined](https://www.geographyrealm.com/alaskas-coastline-is-longer-than-all-the-other-49-states-combined/) — Alaska has the longest U.S.
 - [Geography Facts about the World’s Continents](https://www.geographyrealm.com/continents/) — How many continents are there?
 - [X is Longitude, Y is Latitude](https://www.geographyrealm.com/x-longitude-y-latitude/) — Why is X longitude and Y latitude in GIS?
@@ -31,19 +31,19 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
-- [Photo viewpoint](https://plugins.qgis.org/plugins/prese_fotografiche/)
-- [Profile Chainage Marker](https://plugins.qgis.org/plugins/profile_chainage_marker/)
-- [AeroCustodia](https://plugins.qgis.org/plugins/AeroCustodia/)
-- [Topology Rules](https://plugins.qgis.org/plugins/topology_rules/)
-- [WebSDB](https://plugins.qgis.org/plugins/websdb/)
-- [géoduc dt](https://plugins.qgis.org/plugins/geoduc_dt/)
-- [World Administrative Boundaries](https://plugins.qgis.org/plugins/world_admin_boundaries/)
-- [PlantaSync-MIG](https://plugins.qgis.org/plugins/PlantaSync_MIG/)
+- [Drone AI Georef](https://plugins.qgis.org/plugins/drone_ai_georef/)
+- [GSI2Campus3D](https://plugins.qgis.org/plugins/gsi2campus3d/)
+- [Pinned Layers](https://plugins.qgis.org/plugins/pinned_layers/)
+- [Strip Map Maker](https://plugins.qgis.org/plugins/strip_map_maker/)
+- [Contours2Mesh](https://plugins.qgis.org/plugins/contours2mesh/)
+- [TELEMAC Toolkit](https://plugins.qgis.org/plugins/telemac_toolkit/)
+- [Road Network Integration Toolkit](https://plugins.qgis.org/plugins/road_network_integration_toolkit/)
+- [Geo Emprises](https://plugins.qgis.org/plugins/Geo_Emprises_QGIS_Plugin/)
 
 ## Library releases
 
+- [duckdb v2.0.0](https://github.com/duckdb/duckdb/releases/tag/v2.0.0) (2026-10-21) — This release of DuckDB is named "Cyanoptera" after Spatula Cyanoptera, a species of duck found in western North and South America.
 - [maplibre-gl-js v6.15.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.15.0) (2026-10-18) — ### ✨ Features and improvements - Add `dragRotate: {around: 'pointer'}` to turn and tilt the map around the point under the pointer, and `{around: 'center',…
-- [duckdb v1.5.6](https://github.com/duckdb/duckdb/releases/tag/v1.5.6) (2026-09-28) — This is a bug fix release for various issues discovered after we released v1.5.5 ## What's Changed * Use relative includes in unity build sources for cache r…
 - [QGIS final-3_44_15](https://github.com/qgis/QGIS/releases/tag/final-3_44_15) (2026-09-25) — https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15
 - [deck.gl v9.4.0](https://github.com/visgl/deck.gl/releases/tag/v9.4.0) (2026-09-05) — deck.gl v9.4 brings together a collection of completed improvements focused on performance, stability, and usability.
 - [gdal v3.13.3](https://github.com/OSGeo/gdal/releases/tag/v3.13.3) (2026-08-18) — Bug fix release. See release notes: https://github.com/OSGeo/gdal/blob/v3.13.3/NEWS.md
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [QgsTaskManager active vs queued vs running task](https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task) (▲ 1 · 1 answers)
+- [Increasing the size of the selected line symbol within layer in ArcGIS Pro](https://gis.stackexchange.com/questions/501625/increasing-the-size-of-the-selected-line-symbol-within-layer-in-arcgis-pro) (▲ 2 · 2 answers)
+- [How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?](https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal) (▲ 0 · 2 answers)
+- [QgsTaskManager active vs queued vs running task](https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task) (▲ 2 · 1 answers)
 - [QGIS: Raster to Vector conversion crashing my computer](https://gis.stackexchange.com/questions/501619/qgis-raster-to-vector-conversion-crashing-my-computer) (▲ 0 · 2 answers)
-- [How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?](https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal) (▲ 0 · 1 answers)
-- [Finding the land area east and west of meridian](https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian) (▲ 0 · 0 answers)
 - [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
+- [Finding the land area east and west of meridian](https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian) (▲ 0 · 0 answers)
 - [Need to find out if my street is public or Private](https://gis.stackexchange.com/questions/501591/need-to-find-out-if-my-street-is-public-or-private) (▲ -2 · 0 answers)
 - [Issue with alignment of legend labels in QGIS Print layout](https://gis.stackexchange.com/questions/501570/issue-with-alignment-of-legend-labels-in-qgis-print-layout) (▲ 1 · 1 answers)
 - [Filtering GetCapabilities request using keyword](https://gis.stackexchange.com/questions/501574/filtering-getcapabilities-request-using-keyword) (▲ 1 · 1 answers)
 - [Multi map views is not properly saved in QGIS](https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis) (▲ 1 · 0 answers)
-- [Extracting data (or even converting) from WMS to shapefile in QGIS](https://gis.stackexchange.com/questions/501569/extracting-data-or-even-converting-from-wms-to-shapefile-in-qgis) (▲ 3 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [Near Real-Time VIIRS/JPSS-1 L3 Global Daily 500m SIN Grid Snow Cover, Grain Size, and Dust Radiative Forcing V001](https://search.earthdata.nasa.gov/search?q=VJ1SCGDRF_NRT) — The VIIRS Snow Covered Area and Grain-size (VIIRS SCAG) and VIIRS Dust Radiative Forcing in Snow (VIIRS DRFS) algorithms are applied to near real-time VIIRS…
-- [SMAP L4 Global 9 km EASE-Grid Surface and Root Zone Soil Moisture Land Model Constants V008](https://search.earthdata.nasa.gov/search?q=SPL4SMLM) — SMAP Level-4 (L4) surface and root zone soil moisture (L4_SM) data are provided in three products.
-- [SMAP L4 Global 3-hourly 9 km EASE-Grid Surface and Root Zone Soil Moisture Geophysical Data V008](https://search.earthdata.nasa.gov/search?q=SPL4SMGP) — SMAP Level-4 (L4) surface and root zone soil moisture (L4_SM) data are provided in three products.
-- [SMAP L4 Global 3-hourly 9 km EASE-Grid Surface and Root Zone Soil Moisture Analysis Update V008](https://search.earthdata.nasa.gov/search?q=SPL4SMAU) — SMAP Level-4 (L4) surface and root zone soil moisture (L4_SM) data are provided in three products.
-- [SMAP L4 Global Daily 9 km EASE-Grid Carbon Net Ecosystem Exchange V008](https://search.earthdata.nasa.gov/search?q=SPL4CMDL) — The Level-4 (L4) carbon product (SPL4CMDL) provides global gridded daily estimates of net ecosystem carbon (CO2) exchange derived using a satellite data base…
-- [Soil Moisture Active Passive (SMAP) L4 Carbon Ancillary Meteorology Preprocessor Output Log Files V001](https://search.earthdata.nasa.gov/search?q=SMAP_L4_C_ANC_MET_LOG) — This ancillary SMAP product contains daily meteorological model log files, including model outputs.
-- [Soil Moisture Active Passive (SMAP) L4 Carbon Ancillary Model Run Time Input Parameters V001](https://search.earthdata.nasa.gov/search?q=SMAP_L4_C_ANC_MDL_RIP) — This ancillary SMAP product contains SMAP L4 Carbon model configurations, including model inputs.
+- [SWOT Level 2 Nadir Altimeter Operational Geophysical Data Record with Waveforms, GPS, NRT, Version D](https://search.earthdata.nasa.gov/search?q=SWOT_L2_NALT_OGDR_NRTGPS_D) — The value-added SWOT Level 2 Near Real Time GPS Nadir Altimeter Operational Geophysical Data Record (NRT GPS OGDR) Version D dataset produced by the Surface…
+- [STAQS Ground Data](https://search.earthdata.nasa.gov/search?q=STAQS_Ground_Data) — STAQS_Ground_Data is the ground site data collected during the Synergistic TEMPO Air Quality Science (STAQS) mission.
+- [EMIT L1B At-Sensor Calibrated Radiance and Geolocation Data 60 m V002](https://search.earthdata.nasa.gov/search?q=EMITL1BRAD) — The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).
+- [EMIT L2A Surface Reflectance and Uncertainty 60 m V002](https://search.earthdata.nasa.gov/search?q=EMITL2ARFL) — The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).
+- [EMIT L1B Corrected Spacecraft Attitude and Ephemeris V002](https://search.earthdata.nasa.gov/search?q=EMITL1BATT) — The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).
+- [EMIT L2A Masks 60 m V003](https://search.earthdata.nasa.gov/search?q=EMITL2AMASK) — The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).
+- [EMIT L2B Methane Enhancement Data 60 m V003](https://search.earthdata.nasa.gov/search?q=EMITL2BCH4ENH) — The Earth Surface Mineral Dust Source Investigation ([EMIT](https://earth.jpl.nasa.gov/emit/)) is an Earth Ventures-Instrument (EVI-4) Mission aboard the Int…
 
 ## Data.gov — new geodata
 
