@@ -103,7 +103,8 @@ await page.evaluate(() => { window.__drive = true; __tick(16); });
 
 // ---------- camera ----------
 const D2R = Math.PI / 180;
-const toVec = (lat, lon, r) => { const a = lat * D2R, b = lon * D2R; return [r * Math.cos(a) * Math.sin(b), r * Math.sin(a), r * Math.cos(a) * Math.cos(b)]; };
+// same convention as the page's toVec: x = cos·cos λ, y = sin φ, z = −cos·sin λ
+const toVec = (lat, lon, r) => { const a = lat * D2R, b = lon * D2R; return [r * Math.cos(a) * Math.cos(b), r * Math.sin(a), -r * Math.cos(a) * Math.sin(b)]; };
 const cr = (p0, p1, p2, p3, u) => 0.5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u);
 function camAt(t) {
   let i = 0;
@@ -113,7 +114,7 @@ function camAt(t) {
   const f = k => cr(a[k], b[k], c[k], d[k], u);
   const lat = f("lat"), lon = f("lon"), dist = Math.exp(cr(...[a, b, c, d].map(k => Math.log(k.dist)), u)), tilt = Math.max(0, f("tilt")) * D2R;
   // target on the surface, camera pulled back along the normal and tipped south so it looks north over it
-  const n = toVec(lat, lon, 1), north = [-Math.sin(lat * D2R) * Math.sin(lon * D2R), Math.cos(lat * D2R), -Math.sin(lat * D2R) * Math.cos(lon * D2R)];
+  const n = toVec(lat, lon, 1), north = [-Math.sin(lat * D2R) * Math.cos(lon * D2R), Math.cos(lat * D2R), Math.sin(lat * D2R) * Math.sin(lon * D2R)];
   const h = dist - 1;
   const pos = n.map((v, k) => v + n[k] * h * Math.cos(tilt) - north[k] * h * Math.sin(tilt));
   const up = n.map((v, k) => north[k] * Math.cos(tilt) + n[k] * Math.sin(tilt));
