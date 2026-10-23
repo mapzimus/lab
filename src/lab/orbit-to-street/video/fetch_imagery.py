@@ -2,9 +2,9 @@
 
     globe8k.jpg    EOX Sentinel-2 cloudless 2020, z5, reprojected to equirectangular 8192 x 4096
     northeast.jpg  same source, z9, over NE_BOX (the northeastern US), equirectangular 8192 x 6144
-    state.jpg      Esri World Imagery, z12, 160 km around Boston, in Boston's local metre frame
+    state.jpg      EOX Sentinel-2 cloudless, z12, 160 km around Boston, in Boston's local metre frame
     metro.jpg      same, z13, 60 km around Boston
-    boston.jpg     same, z16, the Boston model's box plus 2.5 km
+    boston.jpg     Esri World Imagery, z16, the Boston model's box plus 2.5 km
     lynn.jpg       same for Lynn
 
 The layers overlap and cross-fade by altitude, so there is never a stretch where the
@@ -91,7 +91,7 @@ def equirect(src, z, lonA, lonB, latA, latB, w, h, name):
     Image.fromarray(sample(src, z, LAT, LON)).save(CACHE / name, quality=90)
 
 
-def city(json_name, kx, ky, margin, z, px_max, name):
+def city(json_name, kx, ky, margin, z, px_max, name, src=ESRI):
     D = json.loads((DATA / json_name).read_text())
     lat0, lon0 = D["lat0"], D["lon0"]
     x0, x1, z0, z1 = D["box"]
@@ -104,7 +104,7 @@ def city(json_name, kx, ky, margin, z, px_max, name):
     lon = lon0 + XX / kx(lat0)
     lat = lat0 - ZZ / ky
     print(name, w, "x", h, f"{mpp:.2f} m/px")
-    Image.fromarray(sample(ESRI, z, lat, lon)).save(CACHE / name, quality=90)
+    Image.fromarray(sample(src, z, lat, lon)).save(CACHE / name, quality=90)
     return {"rect": [x0, x1, z0, z1]}
 
 
@@ -118,8 +118,8 @@ if __name__ == "__main__":
     meta = {
         # Boston's pipeline uses flat 111,320 / 110,540 m per degree; Lynn's uses the sphere
         "boston": city("boston.json", lambda la: math.cos(math.radians(la)) * 111320, 110540, 2500, 16, 4096, "boston.jpg"),
-        "state": city("boston.json", lambda la: math.cos(math.radians(la)) * 111320, 110540, 78000, 12, 4096, "state.jpg"),
-        "metro": city("boston.json", lambda la: math.cos(math.radians(la)) * 111320, 110540, 28000, 13, 4096, "metro.jpg"),
+        "state": city("boston.json", lambda la: math.cos(math.radians(la)) * 111320, 110540, 78000, 12, 4096, "state.jpg", EOX),
+        "metro": city("boston.json", lambda la: math.cos(math.radians(la)) * 111320, 110540, 28000, 13, 4096, "metro.jpg", EOX),
         "lynn": city("lynn.json", lambda la: math.cos(math.radians(la)) * R * math.pi / 180, R * math.pi / 180, 2500, 16, 4096, "lynn.jpg"),
     }
     (CACHE / "meta.json").write_text(json.dumps(meta))
