@@ -44,11 +44,17 @@ const META = JSON.parse(readFileSync(CACHE + "meta.json", "utf8"));
 // [find, replace] pairs applied to app.js; each find must occur exactly once
 const PATCHES = [
   // imagery textures, loaded alongside the generated masks
-  ["const REG = { lonA:",
-   `const IMG_G = new THREE.TextureLoader().load("/__img/globe.jpg"), IMG_R = new THREE.TextureLoader().load("/__img/region.jpg");
+  // the regional patch grows from southern New England to the whole Northeast (fetch_imagery.NE_BOX)
+  ["const REG = { lonA: -73.6, lonB: -68.6, latA: 40.4, latB: 44.2 };",
+   `const IMG_G = new THREE.TextureLoader().load("/__img/globe8k.jpg"), IMG_R = new THREE.TextureLoader().load("/__img/northeast.jpg");
 for (const t of [IMG_G, IMG_R]) { t.anisotropy = 8; }
 IMG_R.wrapS = IMG_R.wrapT = THREE.ClampToEdgeWrapping;
-const REG = { lonA:`],
+const REG = { lonA: -80, lonB: -62, latA: 36, latB: 48 };`],
+  // ...and takes over from the globe texture much higher up, so the globe's 5 km pixels are never magnified
+  ["patch.visible = alt < 1.1e6;", "patch.visible = alt < 8e6;"],
+  ["1 - smooth(6e5, 1.05e6, alt)", "1 - smooth(4.5e6, 7.5e6, alt)"],
+  // cities (and their imagery planes) switch on from 1,500 km so the 160 km layer can fade in early
+  ["C.on = alt < 1.8e5 && camera.position.distanceTo(C.origin) < 7e5;", "C.on = alt < 1.5e6 && camera.position.distanceTo(C.origin) < 3e6;"],
   ["uRegionOn: { value: region ? 1 : 0 }, uAlpha: { value: 1 },",
    "uRegionOn: { value: region ? 1 : 0 }, uAlpha: { value: 1 }, uImg: { value: region ? IMG_R : IMG_G },"],
   ["uniform sampler2D uMask, uLights, uPop;", "uniform sampler2D uMask, uLights, uPop, uImg;"],
@@ -79,6 +85,7 @@ for (const C of CITIES) {
   IMG[C.name.toLowerCase()] = addImagery(C, C.name.toLowerCase(), -0.2, 3, 40);
 }
 IMG.metro = addImagery(BOSTON, "metro", -0.6, 2, 70);
+IMG.state = addImagery(BOSTON, "state", -1.0, 1, 60);
 window.__rig = { view, goal, flyTo, setRange, backBay, airliner, HOME, D2R, RE, rangeFor, toGeoXZ, cityGeo, BOSTON, LYNN,
   PLACES, setSim, IMG, get alt() { return alt; }, get flying() { return !!flight; }, stop() { flight = null; } };
 function worldTarget(out)`],
