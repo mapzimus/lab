@@ -23,17 +23,17 @@ const stills = args.includes("--stills") ? args[args.indexOf("--stills") + 1].sp
 
 // t (s), point under the camera, distance from the globe centre (globe radius 100), tilt toward the horizon (deg)
 const KEYS = [
-  { t: 0, lat: 22, lon: 70, dist: 470, tilt: 0 },
-  { t: 7, lat: 24, lon: 60, dist: 430, tilt: 0 },
-  { t: 14, lat: 24, lon: 72, dist: 300, tilt: 10 },
-  { t: 21, lat: 23, lon: 69, dist: 165, tilt: 45 },
-  { t: 27, lat: 23.6, lon: 67.6, dist: 128, tilt: 62 },
-  { t: 33, lat: 26, lon: 45, dist: 210, tilt: 35 },
-  { t: 39, lat: 27.5, lon: 31.5, dist: 150, tilt: 55 },
-  { t: 45, lat: 5, lon: 75, dist: 330, tilt: 15 },
-  { t: 51, lat: -28, lon: 133, dist: 250, tilt: 30 },
-  { t: 58, lat: 15, lon: 150, dist: 470, tilt: 0 },
-  { t: 65, lat: 18, lon: 170, dist: 480, tilt: 0 },
+  { t: 0, lat: 22, lon: 70, dist: 720, tilt: 0 },
+  { t: 7, lat: 24, lon: 62, dist: 700, tilt: 0 },
+  { t: 14, lat: 24, lon: 74, dist: 420, tilt: 8 },
+  { t: 21, lat: 25, lon: 70, dist: 260, tilt: 30 },
+  { t: 27, lat: 24.2, lon: 67.6, dist: 190, tilt: 42 },
+  { t: 33, lat: 27, lon: 46, dist: 330, tilt: 25 },
+  { t: 39, lat: 27.5, lon: 31.5, dist: 210, tilt: 40 },
+  { t: 45, lat: 0, lon: 80, dist: 480, tilt: 10 },
+  { t: 51, lat: -27, lon: 134, dist: 330, tilt: 25 },
+  { t: 58, lat: 12, lon: 150, dist: 720, tilt: 0 },
+  { t: 65, lat: 15, lon: 168, dist: 740, tilt: 0 },
 ];
 
 // [start, end, line, small line]
