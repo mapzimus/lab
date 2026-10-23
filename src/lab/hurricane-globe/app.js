@@ -37,6 +37,26 @@ const WIND_LEVELS = [
 
 const DENSITY_RAMP = ['#2a0b4a', '#6a1b6e', '#b8336a', '#f0605d', '#fca65f', '#fcfdbf'].map((h) => new THREE.Color(h));
 
+// HURDAT2 for the two NHC basins, IBTrACS for the rest; one file per basin
+const BASINS = [
+  { key: 'AL', name: 'North Atlantic', short: 'N. Atlantic', file: '/lab/hurricane-globe/data/storms-AL.json' },
+  { key: 'EP', name: 'Eastern & Central Pacific', short: 'E. Pacific', file: '/lab/hurricane-globe/data/storms-EP.json' },
+  { key: 'WP', name: 'Western Pacific', short: 'W. Pacific', file: '/lab/hurricane-globe/data/storms-WP.json' },
+  { key: 'NI', name: 'North Indian Ocean', short: 'N. Indian', file: '/lab/hurricane-globe/data/storms-NI.json' },
+  { key: 'SI', name: 'South Indian Ocean', short: 'S. Indian', file: '/lab/hurricane-globe/data/storms-SI.json' },
+  { key: 'SP', name: 'South Pacific', short: 'S. Pacific', file: '/lab/hurricane-globe/data/storms-SP.json' },
+  { key: 'SA', name: 'South Atlantic', short: 'S. Atlantic', file: '/lab/hurricane-globe/data/storms-SA.json' },
+];
+const BASIN = Object.fromEntries(BASINS.map((b) => [b.key, b]));
+
+// what forecasters in each basin call a storm of this (1-minute) peak wind
+function regionalName(basin, w) {
+  if (basin === 'AL' || basin === 'EP') return w >= 64 ? 'Hurricane' : w >= 34 ? 'Tropical storm' : 'Tropical depression';
+  if (basin === 'WP') return w >= 130 ? 'Super typhoon' : w >= 64 ? 'Typhoon' : w >= 34 ? 'Tropical storm' : 'Tropical depression';
+  if (basin === 'NI') return w >= 64 ? 'Very severe cyclonic storm' : w >= 48 ? 'Severe cyclonic storm' : w >= 34 ? 'Cyclonic storm' : 'Depression';
+  return w >= 64 ? 'Severe tropical cyclone' : w >= 34 ? 'Tropical cyclone' : 'Tropical low';
+}
+
 const PLACES = [
   ['Lynn, MA', 42.4668, -70.9495],
   ['New York, NY', 40.7128, -74.006],
@@ -53,6 +73,29 @@ const PLACES = [
   ['Acapulco, Mexico', 16.8531, -99.8237],
   ['Cabo San Lucas, Mexico', 22.8905, -109.9167],
   ['Honolulu, HI', 21.3069, -157.8583],
+  ['Guam', 13.4443, 144.7937],
+  ['Tokyo, Japan', 35.6762, 139.6503],
+  ['Okinawa, Japan', 26.2124, 127.6809],
+  ['Shanghai, China', 31.2304, 121.4737],
+  ['Taipei, Taiwan', 25.033, 121.5654],
+  ['Hong Kong', 22.3193, 114.1694],
+  ['Manila, Philippines', 14.5995, 120.9842],
+  ['Tacloban, Philippines', 11.2433, 125.0045],
+  ['Busan, South Korea', 35.1796, 129.0756],
+  ['Da Nang, Vietnam', 16.0544, 108.2022],
+  ['Kolkata, India', 22.5726, 88.3639],
+  ['Mumbai, India', 19.076, 72.8777],
+  ['Chittagong, Bangladesh', 22.3569, 91.7832],
+  ['Yangon, Myanmar', 16.8409, 96.1735],
+  ['Muscat, Oman', 23.588, 58.3829],
+  ['Darwin, Australia', -12.4634, 130.8456],
+  ['Cairns, Australia', -16.9186, 145.7781],
+  ['Port Hedland, Australia', -20.3106, 118.6011],
+  ['Suva, Fiji', -18.1248, 178.4501],
+  ['Port Vila, Vanuatu', -17.7333, 168.3273],
+  ['Réunion', -20.8823, 55.4504],
+  ['Toamasina, Madagascar', -18.1492, 49.4023],
+  ['Beira, Mozambique', -19.8436, 34.8389],
 ];
 
 const catIndex = (w) => {
@@ -64,9 +107,9 @@ const fixColor = (status, w) => (NONTROP_STATUS.has(status) ? NONTROP.color : CA
 const wrapLon = (d) => (d > 180 ? d - 360 : d < -180 ? d + 360 : d);
 
 const state = {
-  basins: new Set(['AL', 'EP']),
-  y0: 1851,
-  y1: 2025,
+  basins: new Set(BASINS.map((b) => b.key)),
+  y0: 1842,
+  y1: 2026,
   minW: 34,
   name: '',
   extrude: true,
@@ -133,11 +176,16 @@ function nearPoint(list, lat0, lon0, km) {
   const kx = 111.32 * Math.cos(lat0 * DEG), ky = 110.57;
   const out = [];
   for (const s of list) {
-    let best = Infinity, bw = 0, px = 0, py = 0, pw = 0;
+    let best = Infinity, bw = 0, px = 0, py = 0, pw = 0, pdl = 0;
     s.pts.forEach((p, i) => {
-      const x = wrapLon(p[1] - lon0) * kx, y = (p[0] - lat0) * ky;
+      const dl = wrapLon(p[1] - lon0);
+      const x = dl * kx, y = (p[0] - lat0) * ky;
       let d = Math.hypot(x, y), w = p[2];
-      if (i > 0) {
+      // a step across the query point's antimeridian wraps from +180° to -180° in
+      // local x, and its straight segment would falsely sweep past the query point
+      const wrapped = Math.abs(dl - pdl) > 180;
+      pdl = dl;
+      if (i > 0 && !wrapped) {
         const dx = x - px, dy = y - py, len2 = dx * dx + dy * dy || 1;
         const t = Math.min(1, Math.max(0, -(px * dx + py * dy) / len2));
         d = Math.hypot(px + t * dx, py + t * dy);
@@ -328,18 +376,24 @@ function trackArrays(list, tCut = Infinity) {
   return [pos, col];
 }
 
-// flat arrays of every fix for screen-space hover picking
-let pick = { xyz: new Float32Array(0), ref: [] };
+// every fix for screen-space hover picking, binned by 5° of ground position so a
+// hover only projects the fixes near the point under the cursor
+const PICK_BIN = 5;
+const pickBin = (lat, lon) => Math.floor((lat + 90) / PICK_BIN) * 1000 + Math.floor((wrapLon(lon) + 180) / PICK_BIN);
+let pick = { xyz: new Float32Array(0), ref: [], bins: new Map() };
 function buildPick(list) {
   const n = list.reduce((k, s) => k + s.pts.length, 0);
-  const xyz = new Float32Array(n * 3), ref = new Array(n), v = new THREE.Vector3();
+  const xyz = new Float32Array(n * 3), ref = new Array(n), bins = new Map(), v = new THREE.Vector3();
   let k = 0;
   for (const s of list)
     for (const p of s.pts) {
       toVec(p[0], p[1], alt(p[2]), v).toArray(xyz, k * 3);
-      ref[k++] = s;
+      ref[k] = s;
+      const key = pickBin(p[0], p[1]);
+      if (!bins.has(key)) bins.set(key, []);
+      bins.get(key).push(k++);
     }
-  pick = { xyz, ref };
+  pick = { xyz, ref, bins };
 }
 
 // ---------- landfall layer ----------
@@ -756,6 +810,14 @@ function refresh() {
   if (state.query && !state.selected) showInfo();
 }
 
+// sliders and typing fire faster than a global rebuild, so coalesce to one per frame
+let refreshQueued = false;
+function scheduleRefresh() {
+  if (refreshQueued) return;
+  refreshQueued = true;
+  requestAnimationFrame(() => { refreshQueued = false; refresh(); });
+}
+
 // ---------- annual chart ----------
 
 let chartYears = [];
@@ -787,18 +849,23 @@ function chartYearAt(e) {
 // ---------- UI wiring ----------
 
 function initUI() {
+  $('basins').innerHTML = BASINS.map((b) =>
+    `<label title="${b.name}"><input type="checkbox" name="basin" value="${b.key}" checked> ${b.short}</label>`).join('');
   document.querySelectorAll('input[name=basin]').forEach((el) =>
     el.addEventListener('change', () => {
       el.checked ? state.basins.add(el.value) : state.basins.delete(el.value);
-      refresh();
+      scheduleRefresh();
     }));
 
   const y0 = $('y0'), y1 = $('y1');
+  for (const el of [y0, y1]) { el.min = yearMin; el.max = yearMax; }
+  y0.value = state.y0 = yearMin;
+  y1.value = state.y1 = yearMax;
   const onYears = (e) => {
     let a = +y0.value, b = +y1.value;
     if (a > b) e.target === y0 ? (b = a, y1.value = b) : (a = b, y0.value = a);
     state.y0 = a; state.y1 = b;
-    refresh();
+    scheduleRefresh();
   };
   y0.addEventListener('input', onYears);
   y1.addEventListener('input', onYears);
@@ -808,10 +875,13 @@ function initUI() {
     refresh();
   };
   document.querySelectorAll('[data-years]').forEach((b) =>
-    b.addEventListener('click', () => setYears(...b.dataset.years.split('-').map(Number))));
+    b.addEventListener('click', () => {
+      const [a, z] = b.dataset.years.split('-').map(Number);
+      setYears(a || yearMin, z || yearMax);
+    }));
 
   $('minW').addEventListener('change', (e) => { state.minW = +e.target.value; refresh(); });
-  $('q').addEventListener('input', (e) => { state.name = e.target.value; refresh(); });
+  $('q').addEventListener('input', (e) => { state.name = e.target.value; scheduleRefresh(); });
   $('q').addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && current.length) select(current.at(-1), true);
   });
@@ -848,7 +918,15 @@ function initUI() {
 
   // point query
   const place = $('place');
-  PLACES.forEach(([name], i) => place.add(new Option(name, i)));
+  const regionOf = ([, lat, lon]) =>
+    lat < 0 ? 'Australia, South Pacific & South Indian' : lon < -30 ? 'Americas, Caribbean & Hawaii' : lon >= 100 ? 'East Asia & West Pacific' : 'North Indian Ocean';
+  const groups = new Map();
+  PLACES.forEach((pl, i) => {
+    const g = regionOf(pl);
+    if (!groups.has(g)) groups.set(g, Object.assign(document.createElement('optgroup'), { label: g }));
+    groups.get(g).append(new Option(pl[0], i));
+  });
+  place.append(...groups.values());
   place.addEventListener('change', () => {
     if (place.value === '') return;
     const [name, lat, lon] = PLACES[+place.value];
@@ -868,7 +946,7 @@ function initUI() {
   $('clearQuery').addEventListener('click', clearQuery);
 
   const ys = $('seasonYear');
-  for (let y = 2025; y >= 1851; y--) ys.add(new Option(y, y));
+  for (let y = yearMax; y >= yearMin; y--) ys.add(new Option(y, y));
   ys.value = 2005;
   $('playSeason').addEventListener('click', () => {
     const y = +ys.value;
@@ -930,11 +1008,11 @@ function stormHTML(s) {
   const swath = s.r
     ? `<label class="toggle swath"><input type="checkbox" id="swathToggle" ${state.swath ? 'checked' : ''}> Wind-field swath
          <span class="sw" style="--c:${WIND_LEVELS[2].hex}"></span>34 <span class="sw" style="--c:${WIND_LEVELS[1].hex}"></span>50 <span class="sw" style="--c:${WIND_LEVELS[0].hex}"></span>64 kt</label>`
-    : '<p class="hint">Wind-radii swaths are available for storms from 2004 on.</p>';
+    : '<p class="hint">No wind-radii record for this storm. They start in 2001–04, depending on the basin.</p>';
   return `
     ${back}
     <h2>${s.name} <span>${s.year}</span></h2>
-    <div class="meta">${s.basin === 'AL' ? 'Atlantic' : 'Eastern Pacific'} · ${s.id}</div>
+    <div class="meta">${BASIN[s.basin].name} · ${regionalName(s.basin, s.w)} · ${s.id}</div>
     <span class="chip" style="--c:${cat.hex}">Peak: ${cat.name}</span>
     <dl>
       <dt>Peak wind</dt><dd>${s.w} kt (${Math.round(s.w * 1.15078)} mph)</dd>
@@ -959,7 +1037,7 @@ function queryHTML() {
   return `
     <div class="eyebrow">Within ${q.km} km of</div>
     <h2>${q.label}</h2>
-    <p class="meta">${q.results.length} storms under current filters · ${hu} at hurricane strength inside the circle · ${maj} major${last ? ` · last hurricane: ${last.s.name} ${last.s.year}` : ''}</p>
+    <p class="meta">${q.results.length} storms under current filters · ${hu} at 64 kt+ (hurricane or typhoon strength) inside the circle · ${maj} at 96 kt+${last ? ` · most recent 64 kt+: ${last.s.name} ${last.s.year}` : ''}</p>
     <div class="sort">Sort:
       <button data-sort="w" aria-pressed="${sort === 'w'}">Strongest</button>
       <button data-sort="year" aria-pressed="${sort === 'year'}">Recent</button>
@@ -1125,8 +1203,11 @@ function stepPlayback(dt, time) {
     }
     e.mesh.position.copy(v);
     e.mesh.lookAt(out.copy(v).multiplyScalar(2));
-    e.mesh.rotateZ(time * (1 + q[2] / 40));
-    e.mesh.scale.setScalar(0.025 + (q[2] / 160) * 0.06);
+    // cyclones turn clockwise south of the equator: mirror the spiral and reverse the spin
+    const south = q[0] < 0 ? -1 : 1;
+    const size = 0.025 + (q[2] / 160) * 0.06;
+    e.mesh.rotateZ(south * time * (1 + q[2] / 40));
+    e.mesh.scale.set(south * size, size, size);
     e.mesh.material.color.copy(fixColor(q[5], q[2]));
     e.label.position.copy(v);
     e.div.textContent = s.name === 'Unnamed' ? '' : s.name;
@@ -1199,8 +1280,21 @@ function doPick() {
   const v = new THREE.Vector3(), cam = camera.position, r2 = R * R;
   const W = innerWidth, H = innerHeight;
   let best = null, bd = 10 * 10;
-  const { xyz, ref } = pick;
-  for (let k = 0; k < ref.length; k++) {
+  const { xyz, ref, bins } = pick;
+  // raised tracks drift off their ground point on screen, so search a 10° margin around it
+  const ll = globePoint(mouse.x, mouse.y);
+  const near = [];
+  if (ll) {
+    const dLat = 10, dLon = Math.min(180, 10 / Math.max(0.15, Math.cos(ll[0] * DEG)));
+    for (let la = ll[0] - dLat; la <= ll[0] + dLat + PICK_BIN; la += PICK_BIN) {
+      if (la < -90 || la > 90) continue;
+      for (let lo = ll[1] - dLon; lo <= ll[1] + dLon + PICK_BIN; lo += PICK_BIN) {
+        const b = bins.get(pickBin(Math.min(la, 89.9), lo));
+        if (b) near.push(b);
+      }
+    }
+  }
+  for (const list of near) for (const k of list) {
     v.fromArray(xyz, k * 3);
     if (v.dot(cam) < r2) continue;
     v.project(camera);
@@ -1209,7 +1303,7 @@ function doPick() {
     if (d < bd) { bd = d; best = ref[k]; }
   }
   hovered = best;
-  showTip(best && `<b>${best.name}</b> ${best.year} · ${CATS[catIndex(best.w)].name}`);
+  showTip(best && `<b>${best.name}</b> ${best.year} · ${regionalName(best.basin, best.w)}${best.w >= 64 ? `, ${CATS[catIndex(best.w)].name}` : ''}`);
   renderer.domElement.style.cursor = best ? 'pointer' : '';
 }
 
@@ -1239,9 +1333,9 @@ function animate() {
 
 // ---------- boot ----------
 
-const [data, world] = await Promise.all([
-  fetch('/lab/hurricane-globe/data/storms.json').then((r) => r.json()),
+const [world, ...basinData] = await Promise.all([
   fetch('/lab/hurricane-globe/data/countries-50m.json').then((r) => r.json()),
+  ...BASINS.map((b) => fetch(b.file).then((r) => r.json())),
 ]);
 
 globe.material.map = landTexture(world);
@@ -1251,7 +1345,9 @@ scene.add(graticule());
 scene.add(meshLines(mesh(world, world.objects.land), 0x4f6d88, 0.9));
 scene.add(meshLines(mesh(world, world.objects.countries, (a, b) => a !== b), 0x2c4258, 0.8));
 
-storms = data.storms;
+storms = basinData.flatMap((d) => d.storms).sort((a, b) => a.t0 - b.t0);
+const yearMin = Math.min(...storms.map((s) => s.year));
+const yearMax = Math.max(...storms.map((s) => s.year));
 for (const s of storms) {
   s.end = s.t0 + s.pts.at(-1)[4] * HOUR;
   s.ace = aceOf(s);

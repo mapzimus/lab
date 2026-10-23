@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Hurricane Globe · Mapzimus Lab</title>
-  <meta name="description" content="Every Atlantic and Eastern Pacific hurricane since 1851 on a three.js globe: tracks that rise with wind speed, wind-field swaths, storm density, season replays and a storms-near-you search.">
+  <meta name="description" content="Every hurricane, typhoon and cyclone on record, in every ocean, on a three.js globe: tracks that rise with wind speed, wind-field swaths, storm density, season replays and a storms-near-you search.">
   <link rel="canonical" href="https://mapzimus.com/lab/hurricane-globe/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Hurricane Globe · Mapzimus Lab">
-  <meta property="og:description" content="Every Atlantic and Eastern Pacific hurricane since 1851 on a three.js globe: tracks that rise with wind speed, wind-field swaths, storm density, season replays and a storms-near-you search.">
+  <meta property="og:description" content="Every hurricane, typhoon and cyclone on record, in every ocean, on a three.js globe: tracks that rise with wind speed, wind-field swaths, storm density, season replays and a storms-near-you search.">
   <meta property="og:url" content="https://mapzimus.com/lab/hurricane-globe/">
   <meta name="twitter:card" content="summary">
   <meta name="theme-color" content="#03070d">
@@ -23,7 +23,7 @@
   <summary>
     <a class="back" href="/lab/">← Lab</a>
     <h1>Hurricane Globe</h1>
-    <p class="sub">NOAA HURDAT2 best tracks · Atlantic &amp; NE Pacific</p>
+    <p class="sub">Every tropical cyclone on record · NOAA HURDAT2 + IBTrACS</p>
   </summary>
 
   <section>
@@ -42,22 +42,20 @@
   </section>
 
   <section>
-    <div class="row basins">
-      <label><input type="checkbox" name="basin" value="AL" checked> Atlantic</label>
-      <label><input type="checkbox" name="basin" value="EP" checked> E. Pacific</label>
-    </div>
+    <div class="label">Ocean basins</div>
+    <div class="basins" id="basins"></div>
 
     <div class="field">
       <div class="label">Years <span id="yearsOut"></span></div>
       <div class="dual">
-        <input type="range" id="y0" min="1851" max="2025" value="1851" aria-label="First year">
-        <input type="range" id="y1" min="1851" max="2025" value="2025" aria-label="Last year">
+        <input type="range" id="y0" aria-label="First year">
+        <input type="range" id="y1" aria-label="Last year">
       </div>
       <div class="chips">
-        <button data-years="1851-2025">All</button>
-        <button data-years="1966-2025">Satellite era</button>
-        <button data-years="1996-2025">Since 1996</button>
-        <button data-years="2016-2025">Last 10 yrs</button>
+        <button data-years="0-0">All</button>
+        <button data-years="1966-0">Satellite era</button>
+        <button data-years="1996-0">Since 1996</button>
+        <button data-years="2016-0">Last 10 yrs</button>
       </div>
     </div>
 
@@ -114,7 +112,7 @@
       </select>
       <button id="playSeason">Play</button>
     </div>
-    <p class="hint">Since 2004 each storm carries its live 34/50/64 kt wind field.</p>
+    <p class="hint">Storms carry their live 34/50/64 kt wind field once wind radii exist (2001–04 on, by basin). South of the equator they spin clockwise.</p>
   </section>
 
   <section class="legend">
@@ -122,7 +120,7 @@
     <p class="hint">Hover a track for its name, click to inspect. Drag to orbit, scroll to zoom. Esc clears.</p>
   </section>
 
-  <p class="foot">Data: <a href="https://www.nhc.noaa.gov/data/#hurdat" target="_blank" rel="noopener">NOAA NHC HURDAT2</a> best tracks, Atlantic 1851–2025 and NE Pacific 1949–2025, with wind radii from 2004. Coastlines and borders: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> via world-atlas.</p>
+  <p class="foot">Data: <a href="https://www.nhc.noaa.gov/data/#hurdat" target="_blank" rel="noopener">NOAA NHC HURDAT2</a> for the North Atlantic (1851–) and Eastern &amp; Central Pacific (1949–). <a href="https://www.ncei.noaa.gov/products/international-best-track-archive" target="_blank" rel="noopener">NOAA NCEI IBTrACS v04r01</a> (Knapp et al. 2010) for every other basin, using JTWC 1-minute winds where they exist. Winds from 10-minute agencies are converted with a 0.88 factor. Coastlines and borders: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> via world-atlas.</p>
 </details>
 
 <aside id="info" hidden></aside>
@@ -138,7 +136,7 @@
 </div>
 
 <div id="tip" hidden></div>
-<div id="loading">Loading 175 years of storms…</div>
+<div id="loading">Loading every tropical cyclone on record…</div>
 
 </body>
 </html>
