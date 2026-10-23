@@ -27,8 +27,10 @@ const KEYS = [
   { t: 12, lat: 20, lon: -70, dist: 2.3, tilt: 32 },
   { t: 20, lat: 22, lon: -66, dist: 2.3, tilt: 28 },
   { t: 28, lat: 23, lon: -66, dist: 2.2, tilt: 22 },
-  { t: 33, lat: 20, lon: -72, dist: 1.75, tilt: 35 },
-  { t: 43, lat: 27, lon: -66, dist: 1.85, tilt: 32 },
+  // Melissa: across the Caribbean to Jamaica, then north-east past the Bahamas
+  { t: 33, lat: 15, lon: -73, dist: 1.7, tilt: 35 },
+  { t: 39, lat: 17, lon: -76.5, dist: 1.6, tilt: 36 },
+  { t: 43.5, lat: 24, lon: -72, dist: 1.8, tilt: 30 },
   { t: 47, lat: 13, lon: -101, dist: 1.55, tilt: 38 },
   { t: 56, lat: 15, lon: -101, dist: 1.5, tilt: 40 },
   { t: 65, lat: 22, lon: -84, dist: 3.2, tilt: 0 },
