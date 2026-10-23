@@ -1,7 +1,7 @@
 # Hurricane Globe
 
 Every tropical cyclone on record, in every ocean basin, drawn on a three.js
-globe: about 10,300 storms and 232,000 fixes. The North Atlantic (1851–) and
+globe: about 12,700 storms and 386,000 fixes. The North Atlantic (1851–) and
 Eastern & Central Pacific (1949–) come from NOAA's HURDAT2. The West Pacific,
 North Indian, South Indian, South Pacific and South Atlantic come from NOAA
 NCEI's IBTrACS v04r01.
@@ -11,6 +11,10 @@ on, each track rises off the surface in proportion to its wind, and a selected
 storm gets a translucent curtain down to the ground so you can read its
 intensity along the path. Hover picks the nearest fix on screen within 10 px.
 
+- **South Atlantic.** IBTrACS holds only Catarina (2004), Anita (2010) and
+  Arani (2011). Later storms named by the Brazilian Navy, such as Iba (2019)
+  and Akará (2024), are not in any international best-track archive, so they
+  are not drawn.
 - **Wind fields (2001–04 on, by basin).** A selected storm shows its lifetime 34/50/64 kt
   swath, built from NHC quadrant radii: each fix becomes four quarter circles,
   consecutive fixes are joined by their convex hull, and the hulls are drawn
@@ -33,9 +37,11 @@ intensity along the path. Hover picks the nearest fix on screen within 10 px.
 - The info panel names each storm the way its own basin does (super typhoon,
   very severe cyclonic storm, severe tropical cyclone). South of the equator,
   playback eyes are mirrored and spin clockwise.
-- Hover picking bins fixes by 5° of ground position and only projects the bins
-  within 10° of the point under the cursor. Filter changes are coalesced to one
-  rebuild per frame.
+- Each storm caches its vertex positions (per height setting) and colours, so a
+  filter change only copies typed arrays. Hover picking counting-sorts fixes
+  into 5° bins of ground position and only projects the bins within 10° of the
+  point under the cursor. Filter changes are coalesced to one rebuild per frame
+  (about 150–200 ms for the whole world).
 
 ## Data
 
@@ -48,15 +54,24 @@ intensity along the path. Hover picks the nearest fix on screen within 10 px.
   - IBTrACS v04r01 per-basin CSVs (`ibtracs.{WP,NI,SI,SP,SA}.list.v04r01.csv`)
     for the rest. Storms are deduplicated across the basin files and filed
     under the basin they formed in. Storms that formed in the Atlantic or East
-    Pacific are left to HURDAT2. Only main-track, non-interpolated fixes are
-    kept, plus the moment a storm first comes ashore (`DIST2LAND` reaching 0),
-    which becomes a landfall.
+    Pacific are left to HURDAT2. Main-track fixes are kept at the 6-hourly
+    synoptic times, plus any off-hour fix an agency reported (an `O` anywhere in
+    `IFLAG`, which has one flag per agency) and the moment a storm first comes
+    ashore (`DIST2LAND` reaching 0), which becomes a landfall. IBTrACS's own
+    3-hourly interpolations are dropped.
 - Winds are 1-minute sustained everywhere so the Saffir-Simpson colours compare
-  across basins. IBTrACS fixes use the US agency wind (JTWC outside the
-  Americas) when present. Otherwise they use the WMO agency's wind divided by
-  0.88 (10-minute: Tokyo, Réunion, BoM, Nadi, Wellington) or 0.93 (3-minute:
-  New Delhi). Wind radii come from the US agency columns and start in
+  across basins. Each IBTrACS fix takes the first wind it has: the US agency
+  (JTWC outside the Americas), then the WMO agency, then any other regional
+  agency (Tokyo, CMA, HKO, KMA, New Delhi, Réunion, BoM, Nadi, Wellington), then
+  the historical compilations (Neumann, DS824, TD9636, TD9635, MLC). 10-minute
+  agencies are divided by 0.88 and 2- or 3-minute ones (CMA, New Delhi) by 0.93.
+  The historical sets are used as reported and are often coarse class values
+  (25/30/45/64 kt). Wind radii come from the US agency columns and start in
   2001–2004, depending on the basin.
+- A fix with no wind from any source is stored as `-1`. About 2,700 storms,
+  mostly West Pacific before 1940 and South Indian before 1950, have a track
+  but no wind at all. The page draws them in their own colour, and a checkbox
+  shows or hides them independently of the intensity filter.
 - Each fix is `[lat, lon, wind_kt, pressure_mb, hours_since_first_fix, status, landfall]`.
   Storms with wind radii carry a parallel `r` array of the 12 radii (nm).
   `year` is the season, so a Southern Hemisphere storm in January 2019 belongs

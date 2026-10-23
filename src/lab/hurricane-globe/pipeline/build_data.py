@@ -18,10 +18,17 @@ Writes data/storms-<BASIN>.json for AL, EP, WP, NI, SI, SP and SA:
   ]}
 
 Winds are 1-minute sustained so the Saffir-Simpson colours mean the same thing
-everywhere. IBTrACS fixes use the US agency wind (JTWC outside the Americas)
-when there is one. Otherwise they use the WMO agency's wind, converted from
-10-minute (Tokyo, Réunion, BoM, Nadi, Wellington) or 3-minute (New Delhi)
-averaging with the usual 0.88 and 0.93 factors.
+everywhere. Each IBTrACS fix takes the first wind it has, in this order:
+  1. the US agency (JTWC outside the Americas)
+  2. the WMO agency
+  3. any other regional agency (Tokyo, CMA, HKO, KMA, New Delhi, Réunion, BoM,
+     Nadi, Wellington)
+  4. the historical compilations (Neumann, DS824, TD9636, TD9635, MLC)
+10-minute agencies are divided by 0.88 and 2- or 3-minute ones (CMA, New
+Delhi) by 0.93. The historical sets are used as reported, and many of them are
+coarse class values (25/30/45/64 kt). A fix with no wind anywhere is stored as
+-1, "not recorded", rather than 0, so the page can show those storms without
+calling them depressions.
 """
 import csv
 import json
@@ -38,7 +45,15 @@ PACIFIC = "hurdat2-nepac-1949-2025-092926.txt"
 IBTRACS = "https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/"
 IBTRACS_BASINS = ["WP", "NI", "SI", "SP", "SA"]
 STATUS = ["TD", "TS", "HU", "EX", "SD", "SS", "LO", "WV", "DB"]
-TO_ONE_MINUTE = {"tokyo": 1 / 0.88, "reunion": 1 / 0.88, "bom": 1 / 0.88, "nadi": 1 / 0.88, "wellington": 1 / 0.88, "newdelhi": 1 / 0.93}
+TEN_MIN, TWO_THREE_MIN = 1 / 0.88, 1 / 0.93
+TO_ONE_MINUTE = {"tokyo": TEN_MIN, "reunion": TEN_MIN, "bom": TEN_MIN, "nadi": TEN_MIN, "wellington": TEN_MIN, "newdelhi": TWO_THREE_MIN}
+# fallbacks after USA_WIND and WMO_WIND, with the factor that makes each 1-minute
+OTHER_WINDS = [
+    ("TOKYO_WIND", TEN_MIN), ("CMA_WIND", TWO_THREE_MIN), ("HKO_WIND", TEN_MIN), ("KMA_WIND", TEN_MIN),
+    ("NEWDELHI_WIND", TWO_THREE_MIN), ("REUNION_WIND", TEN_MIN), ("BOM_WIND", TEN_MIN), ("NADI_WIND", TEN_MIN),
+    ("WELLINGTON_WIND", TEN_MIN), ("NEUMANN_WIND", 1), ("DS824_WIND", 1), ("TD9636_WIND", 1),
+    ("TD9635_WIND", 1), ("MLC_WIND", 1),
+]
 RADII = [f"USA_R{kt}_{q}" for kt in (34, 50, 64) for q in ("NE", "SE", "SW", "NW")]
 
 
@@ -89,7 +104,7 @@ def parse_hurdat(path, basin):
             pts.append([
                 round(coord(c[4]), 1),
                 round(coord(c[5]), 1),
-                max(wind, 0),
+                wind if wind >= 0 else -1,
                 pres if pres > 0 else 0,
                 round((t - t0).total_seconds() / 3600, 2),
                 STATUS.index(c[3]) if c[3] in STATUS else 8,
@@ -107,6 +122,20 @@ def num(s):
     return float(s) if s else None
 
 
+def ib_wind(r):
+    wind = num(r["USA_WIND"])
+    if wind is not None:
+        return wind
+    wmo = num(r["WMO_WIND"])
+    if wmo is not None:
+        return wmo * TO_ONE_MINUTE.get(r["WMO_AGENCY"], 1)
+    for col, factor in OTHER_WINDS:
+        v = num(r[col])
+        if v is not None:
+            return v * factor
+    return -1
+
+
 def ib_status(nature, wind):
     if nature == "ET":
         return 3
@@ -118,7 +147,7 @@ def ib_status(nature, wind):
 
 
 def parse_ibtracs(paths):
-    """Group main-track rows by storm, keep original (non-interpolated) fixes plus
+    """Group main-track rows by storm, keep 6-hourly and originally reported fixes plus
     landfall moments, and assign each storm to the basin it formed in."""
     rows_by_sid, order = {}, []
     for path in paths:
@@ -149,14 +178,15 @@ def parse_ibtracs(paths):
             dist = num(r["DIST2LAND"])
             landfall = prev_land is not None and prev_land > 0 and dist == 0
             prev_land = dist
-            if not r["IFLAG"].startswith("O") and not landfall:
-                continue
             t = datetime.strptime(r["ISO_TIME"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+            # IFLAG has one character per source agency ("O" = original report). Keep the
+            # 6-hourly synoptic fixes, any off-hour fix that some agency actually reported,
+            # and landfall moments; drop IBTrACS's own 3-hourly interpolations.
+            synoptic = t.minute == 0 and t.hour % 6 == 0
+            if not (synoptic or "O" in r["IFLAG"] or landfall):
+                continue
             t0 = t0 or t
-            wind = num(r["USA_WIND"])
-            if wind is None:
-                wmo = num(r["WMO_WIND"])
-                wind = wmo * TO_ONE_MINUTE.get(r["WMO_AGENCY"], 1) if wmo is not None else 0
+            wind = ib_wind(r)
             pres = num(r["USA_PRES"]) or num(r["WMO_PRES"]) or 0
             lon = float(r["LON"])
             lon = lon - 360 if lon > 180 else lon

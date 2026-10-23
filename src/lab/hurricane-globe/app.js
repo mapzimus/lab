@@ -24,6 +24,8 @@ const CATS = [
 ];
 CATS.forEach((c) => (c.color = new THREE.Color(c.hex)));
 const NONTROP = { hex: '#7d8794', color: new THREE.Color('#7d8794') };
+// fixes whose wind was never recorded by any agency come through as -1
+const UNKNOWN = { name: 'Wind not recorded', hex: '#a08fd8', color: new THREE.Color('#a08fd8') };
 // HURDAT2 status codes (index into data.status): EX, LO, WV, DB are not tropical
 const NONTROP_STATUS = new Set([3, 6, 7, 8]);
 const TROPICAL_FOR_ACE = new Set([1, 2, 5]); // TS, HU, SS
@@ -51,6 +53,7 @@ const BASIN = Object.fromEntries(BASINS.map((b) => [b.key, b]));
 
 // what forecasters in each basin call a storm of this (1-minute) peak wind
 function regionalName(basin, w) {
+  if (w < 0) return 'Intensity not recorded';
   if (basin === 'AL' || basin === 'EP') return w >= 64 ? 'Hurricane' : w >= 34 ? 'Tropical storm' : 'Tropical depression';
   if (basin === 'WP') return w >= 130 ? 'Super typhoon' : w >= 64 ? 'Typhoon' : w >= 34 ? 'Tropical storm' : 'Tropical depression';
   if (basin === 'NI') return w >= 64 ? 'Very severe cyclonic storm' : w >= 48 ? 'Severe cyclonic storm' : w >= 34 ? 'Cyclonic storm' : 'Depression';
@@ -103,7 +106,8 @@ const catIndex = (w) => {
   for (let k = 0; k < CATS.length; k++) if (w >= CATS[k].min) i = k;
   return i;
 };
-const fixColor = (status, w) => (NONTROP_STATUS.has(status) ? NONTROP.color : CATS[catIndex(w)].color);
+const fixColor = (status, w) => (w < 0 ? UNKNOWN.color : NONTROP_STATUS.has(status) ? NONTROP.color : CATS[catIndex(w)].color);
+const peakStyle = (w) => (w < 0 ? UNKNOWN : CATS[catIndex(w)]);
 const wrapLon = (d) => (d > 180 ? d - 360 : d < -180 ? d + 360 : d);
 
 const state = {
@@ -111,6 +115,7 @@ const state = {
   y0: 1842,
   y1: 2026,
   minW: 34,
+  unknown: true,
   name: '',
   extrude: true,
   mode: 'tracks', // or 'density'
@@ -142,7 +147,7 @@ function dest(lat, lon, brg, km) {
   return [p2 / DEG, wrapLon(l2 / DEG)];
 }
 
-const alt = (w) => R + 0.003 + (state.extrude ? (w / 170) * 0.16 : 0);
+const alt = (w) => R + 0.003 + (state.extrude ? (Math.max(0, w) / 170) * 0.16 : 0);
 
 // fix interpolated at time t (ms), handling the antimeridian; radii come back as the 8th element
 function interp(s, t) {
@@ -157,7 +162,8 @@ function interp(s, t) {
   const ra = s.r?.[i - 1], rb = s.r?.[i];
   if (ra && rb) r = ra.map((v, k) => v + (rb[k] - v) * f);
   else if (ra || rb) r = ra || rb;
-  return [a[0] + (b[0] - a[0]) * f, a[1] + wrapLon(b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f, 0, h, a[5], 0, r];
+  const w = a[2] < 0 || b[2] < 0 ? Math.max(a[2], b[2]) : a[2] + (b[2] - a[2]) * f;
+  return [a[0] + (b[0] - a[0]) * f, a[1] + wrapLon(b[1] - a[1]) * f, w, 0, h, a[5], 0, r];
 }
 
 function aceOf(s, tMax = Infinity) {
@@ -176,7 +182,7 @@ function nearPoint(list, lat0, lon0, km) {
   const kx = 111.32 * Math.cos(lat0 * DEG), ky = 110.57;
   const out = [];
   for (const s of list) {
-    let best = Infinity, bw = 0, px = 0, py = 0, pw = 0, pdl = 0;
+    let best = Infinity, bw = -1, px = 0, py = 0, pw = 0, pdl = 0;
     s.pts.forEach((p, i) => {
       const dl = wrapLon(p[1] - lon0);
       const x = dl * kx, y = (p[0] - lat0) * ky;
@@ -189,7 +195,7 @@ function nearPoint(list, lat0, lon0, km) {
         const dx = x - px, dy = y - py, len2 = dx * dx + dy * dy || 1;
         const t = Math.min(1, Math.max(0, -(px * dx + py * dy) / len2));
         d = Math.hypot(px + t * dx, py + t * dy);
-        w = pw + t * (p[2] - pw);
+        w = p[2] < 0 || pw < 0 ? Math.max(p[2], pw) : pw + t * (p[2] - pw);
       }
       if (d < best) best = d;
       if (d <= km) bw = Math.max(bw, w);
@@ -352,7 +358,39 @@ function setTrackGeometry(pos, col) {
   tracks.userData.empty = pos.length === 0;
 }
 
-// segments for every storm in list, optionally cut off at time tCut
+// per-storm vertex cache: positions depend on the height toggle, colours never change
+function stormGeom(s) {
+  if (s.geomExtrude !== state.extrude) {
+    const xyz = new Float32Array(s.pts.length * 3), v = new THREE.Vector3();
+    s.pts.forEach((p, i) => toVec(p[0], p[1], alt(p[2]), v).toArray(xyz, i * 3));
+    s.xyz = xyz;
+    s.geomExtrude = state.extrude;
+  }
+  if (!s.rgb) {
+    s.rgb = new Float32Array(s.pts.length * 3);
+    s.pts.forEach((p, i) => fixColor(p[5], p[2]).toArray(s.rgb, i * 3));
+  }
+  return s;
+}
+
+// whole tracks for every storm in list, copied out of the per-storm caches
+function fullTrackArrays(list) {
+  let segs = 0;
+  for (const s of list) segs += s.pts.length - 1;
+  const pos = new Float32Array(segs * 6), col = new Float32Array(segs * 6);
+  let o = 0;
+  for (const s of list) {
+    const { xyz, rgb } = stormGeom(s);
+    for (let i = 3; i < xyz.length; i += 3, o += 6)
+      for (let k = 0; k < 6; k++) {
+        pos[o + k] = xyz[i - 3 + k];
+        col[o + k] = rgb[i - 3 + k];
+      }
+  }
+  return [pos, col];
+}
+
+// segments for every storm in list, cut off at time tCut (playback)
 function trackArrays(list, tCut = Infinity) {
   const pos = [], col = [];
   const a = new THREE.Vector3(), b = new THREE.Vector3();
@@ -376,24 +414,32 @@ function trackArrays(list, tCut = Infinity) {
   return [pos, col];
 }
 
-// every fix for screen-space hover picking, binned by 5° of ground position so a
-// hover only projects the fixes near the point under the cursor
-const PICK_BIN = 5;
-const pickBin = (lat, lon) => Math.floor((lat + 90) / PICK_BIN) * 1000 + Math.floor((wrapLon(lon) + 180) / PICK_BIN);
-let pick = { xyz: new Float32Array(0), ref: [], bins: new Map() };
+// every fix for screen-space hover picking, counting-sorted into 5° bins of ground
+// position so a hover only projects the fixes near the point under the cursor
+const PICK_BIN = 5, LAT_BINS = 180 / PICK_BIN, LON_BINS = 360 / PICK_BIN;
+const pickBin = (lat, lon) =>
+  Math.min(LAT_BINS - 1, Math.max(0, Math.floor((lat + 90) / PICK_BIN))) * LON_BINS +
+  Math.min(LON_BINS - 1, Math.floor((wrapLon(lon) + 180) / PICK_BIN));
+let pick = { xyz: new Float32Array(0), ref: [], start: new Int32Array(LAT_BINS * LON_BINS + 1), order: new Int32Array(0) };
 function buildPick(list) {
-  const n = list.reduce((k, s) => k + s.pts.length, 0);
-  const xyz = new Float32Array(n * 3), ref = new Array(n), bins = new Map(), v = new THREE.Vector3();
+  let n = 0;
+  for (const s of list) n += s.pts.length;
+  const xyz = new Float32Array(n * 3), ref = new Array(n), bin = new Int32Array(n);
+  const start = new Int32Array(LAT_BINS * LON_BINS + 1);
   let k = 0;
-  for (const s of list)
-    for (const p of s.pts) {
-      toVec(p[0], p[1], alt(p[2]), v).toArray(xyz, k * 3);
+  for (const s of list) {
+    xyz.set(stormGeom(s).xyz, k * 3);
+    s.bins ||= Int32Array.from(s.pts, (p) => pickBin(p[0], p[1]));
+    for (const b of s.bins) {
       ref[k] = s;
-      const key = pickBin(p[0], p[1]);
-      if (!bins.has(key)) bins.set(key, []);
-      bins.get(key).push(k++);
+      bin[k++] = b;
+      start[b + 1]++;
     }
-  pick = { xyz, ref, bins };
+  }
+  for (let b = 1; b < start.length; b++) start[b] += start[b - 1];
+  const fill = start.slice(0, -1), order = new Int32Array(n);
+  for (let j = 0; j < n; j++) order[fill[bin[j]]++] = j;
+  pick = { xyz, ref, start, order };
 }
 
 // ---------- landfall layer ----------
@@ -768,7 +814,8 @@ let current = [];
 function filtered() {
   const q = state.name.trim().toLowerCase();
   return storms.filter((s) =>
-    state.basins.has(s.basin) && s.year >= state.y0 && s.year <= state.y1 && s.w >= state.minW &&
+    state.basins.has(s.basin) && s.year >= state.y0 && s.year <= state.y1 &&
+    (s.w >= state.minW || (s.w < 0 && state.unknown)) &&
     (!q || s.name.toLowerCase().includes(q)));
 }
 
@@ -791,7 +838,7 @@ function refresh() {
     current = q.results.map((r) => r.s);
   }
   if (!state.play) {
-    const [pos, col] = trackArrays(current);
+    const [pos, col] = fullTrackArrays(current);
     setTrackGeometry(pos, col);
     tracks.material.opacity = THREE.MathUtils.clamp(1.05 - Math.log10(current.length + 1) * 0.3, 0.12, 0.95);
     if (state.selected) tracks.material.opacity *= 0.3;
@@ -802,9 +849,11 @@ function refresh() {
   syncLayerVisibility();
 
   const hu = current.filter((s) => s.w >= 64).length;
+  const unknownCount = current.filter((s) => s.w < 0).length;
   const maj = current.filter((s) => s.w >= 96).length;
   $('stats').innerHTML = `<b>${current.length.toLocaleString()}</b> storms · <b>${hu.toLocaleString()}</b> hurricanes · <b>${maj.toLocaleString()}</b> major` +
-    (nLand != null ? ` · <b>${nLand.toLocaleString()}</b> landfalls` : '');
+    (nLand != null ? ` · <b>${nLand.toLocaleString()}</b> landfalls` : '') +
+    (unknownCount ? ` · <b>${unknownCount.toLocaleString()}</b> with no wind record` : '');
   $('yearsOut').textContent = state.y0 === state.y1 ? state.y0 : `${state.y0}–${state.y1}`;
   drawChart();
   if (state.query && !state.selected) showInfo();
@@ -899,6 +948,7 @@ function initUI() {
     if (state.play) state.play.dirty = true;
   });
   $('landfalls').addEventListener('change', (e) => { state.landfalls = e.target.checked; refresh(); });
+  $('unknown').addEventListener('change', (e) => { state.unknown = e.target.checked; refresh(); });
 
   // chart: hover reads out a year, click narrows to it
   const chart = $('chart');
@@ -955,6 +1005,7 @@ function initUI() {
   });
 
   $('legend').innerHTML = [...CATS, { name: 'Post-tropical / low', hex: NONTROP.hex }]
+    .concat(UNKNOWN)
     .map((c) => `<div><i style="--c:${c.hex}"></i>${c.name}</div>`).join('');
   $('densityRamp').style.background = `linear-gradient(90deg, ${DENSITY_RAMP.map((c) => '#' + c.getHexString()).join(',')})`;
 
@@ -996,13 +1047,14 @@ function sparkline(s) {
   s.pts.forEach((p) => { if (p[6]) out += `<line x1="${x(p[4])}" x2="${x(p[4])}" y1="0" y2="${H}" stroke="#fff" stroke-opacity="0.35"/>`; });
   for (let i = 1; i < s.pts.length; i++) {
     const a = s.pts[i - 1], b = s.pts[i];
+    if (a[2] < 0 || b[2] < 0) continue;
     out += `<line x1="${x(a[4])}" y1="${y(a[2])}" x2="${x(b[4])}" y2="${y(b[2])}" stroke="${hexOf(fixColor(b[5], b[2]))}" stroke-width="2" stroke-linecap="round"/>`;
   }
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="Wind speed over time; white lines mark landfalls">${out}</svg>`;
 }
 
 function stormHTML(s) {
-  const cat = CATS[catIndex(s.w)];
+  const cat = peakStyle(s.w);
   const days = (s.end - s.t0) / (24 * HOUR);
   const back = state.query ? `<button class="back" id="backToQuery">← ${state.query.results.length} storms near ${state.query.label}</button>` : '';
   const swath = s.r
@@ -1013,9 +1065,9 @@ function stormHTML(s) {
     ${back}
     <h2>${s.name} <span>${s.year}</span></h2>
     <div class="meta">${BASIN[s.basin].name} · ${regionalName(s.basin, s.w)} · ${s.id}</div>
-    <span class="chip" style="--c:${cat.hex}">Peak: ${cat.name}</span>
+    <span class="chip" style="--c:${cat.hex}">${s.w < 0 ? cat.name : `Peak: ${cat.name}`}</span>
     <dl>
-      <dt>Peak wind</dt><dd>${s.w} kt (${Math.round(s.w * 1.15078)} mph)</dd>
+      <dt>Peak wind</dt><dd>${s.w < 0 ? 'not recorded' : `${s.w} kt (${Math.round(s.w * 1.15078)} mph)`}</dd>
       <dt>Min pressure</dt><dd>${s.p ? s.p + ' mb' : 'not recorded'}</dd>
       <dt>Active</dt><dd>${fmtDate(s.t0)} – ${fmtDate(s.end)} (${days.toFixed(1)} days)</dd>
       <dt>Landfalls</dt><dd>${s.landfalls || 'none recorded'}</dd>
@@ -1045,9 +1097,9 @@ function queryHTML() {
     </div>
     <ol class="results">${rows.map((r, i) => `
       <li><button data-i="${q.results.indexOf(r)}">
-        <i style="--c:${CATS[catIndex(r.w)].hex}"></i>
+        <i style="--c:${peakStyle(r.w).hex}"></i>
         <span class="n">${r.s.name} ${r.s.year}</span>
-        <span class="w">${r.w} kt</span>
+        <span class="w">${r.w < 0 ? '—' : `${r.w} kt`}</span>
         <span class="d">${Math.round(r.dist)} km</span>
       </button></li>`).join('')}</ol>
     <p class="hint">Wind is the strongest the storm had inside the circle; distance is its closest approach.</p>`;
@@ -1184,7 +1236,7 @@ function stepPlayback(dt, time) {
     clearGroup(liveWind);
     liveWind.add(windMeshes(buffers));
     $('pstats').textContent = p.list.length === 1
-      ? `${Math.round(interp(p.list[0], p.t)[2])} kt · ACE ${ace.toFixed(1)}`
+      ? `${interp(p.list[0], p.t)[2] < 0 ? 'wind not recorded' : Math.round(interp(p.list[0], p.t)[2]) + ' kt'} · ACE ${ace.toFixed(1)}`
       : `${named} named · ${hu} hurricanes · ${maj} major · ACE ${ace.toFixed(1)}`;
   }
 
@@ -1205,8 +1257,9 @@ function stepPlayback(dt, time) {
     e.mesh.lookAt(out.copy(v).multiplyScalar(2));
     // cyclones turn clockwise south of the equator: mirror the spiral and reverse the spin
     const south = q[0] < 0 ? -1 : 1;
-    const size = 0.025 + (q[2] / 160) * 0.06;
-    e.mesh.rotateZ(south * time * (1 + q[2] / 40));
+    const kt = Math.max(0, q[2]);
+    const size = 0.025 + (kt / 160) * 0.06;
+    e.mesh.rotateZ(south * time * (1 + kt / 40));
     e.mesh.scale.set(south * size, size, size);
     e.mesh.material.color.copy(fixColor(q[5], q[2]));
     e.label.position.copy(v);
@@ -1280,21 +1333,17 @@ function doPick() {
   const v = new THREE.Vector3(), cam = camera.position, r2 = R * R;
   const W = innerWidth, H = innerHeight;
   let best = null, bd = 10 * 10;
-  const { xyz, ref, bins } = pick;
+  const { xyz, ref, start, order } = pick;
   // raised tracks drift off their ground point on screen, so search a 10° margin around it
   const ll = globePoint(mouse.x, mouse.y);
-  const near = [];
+  const near = new Set();
   if (ll) {
     const dLat = 10, dLon = Math.min(180, 10 / Math.max(0.15, Math.cos(ll[0] * DEG)));
-    for (let la = ll[0] - dLat; la <= ll[0] + dLat + PICK_BIN; la += PICK_BIN) {
-      if (la < -90 || la > 90) continue;
-      for (let lo = ll[1] - dLon; lo <= ll[1] + dLon + PICK_BIN; lo += PICK_BIN) {
-        const b = bins.get(pickBin(Math.min(la, 89.9), lo));
-        if (b) near.push(b);
-      }
-    }
+    for (let la = ll[0] - dLat; la <= ll[0] + dLat + PICK_BIN; la += PICK_BIN)
+      for (let lo = ll[1] - dLon; lo <= ll[1] + dLon + PICK_BIN; lo += PICK_BIN) near.add(pickBin(la, lo));
   }
-  for (const list of near) for (const k of list) {
+  for (const b of near) for (let j = start[b]; j < start[b + 1]; j++) {
+    const k = order[j];
     v.fromArray(xyz, k * 3);
     if (v.dot(cam) < r2) continue;
     v.project(camera);
