@@ -1,10 +1,14 @@
 """Satellite imagery for the video's realistic Earth. Writes video/cache/*.jpg (not committed).
 
-    globe.jpg   EOX Sentinel-2 cloudless 2020, z4, reprojected to equirectangular 4096 x 2048
-    region.jpg  same source, z10, over the app's REG box (-73.6..-68.6, 40.4..44.2), equirectangular
-    boston.jpg  Esri World Imagery, z16, in Boston's local metre frame (x east, z south)
-    metro.jpg   same, z13, 60 km around Boston, bridging the region and the city
-    lynn.jpg    same for Lynn
+    globe8k.jpg    EOX Sentinel-2 cloudless 2020, z5, reprojected to equirectangular 8192 x 4096
+    northeast.jpg  same source, z9, over NE_BOX (the northeastern US), equirectangular 8192 x 6144
+    state.jpg      EOX Sentinel-2 cloudless, z12, 160 km around Boston, in Boston's local metre frame
+    metro.jpg      same, z13, 60 km around Boston
+    boston.jpg     Esri World Imagery, z16, the Boston model's box plus 2.5 km
+    lynn.jpg       same for Lynn
+
+The layers overlap and cross-fade by altitude, so there is never a stretch where the
+nearest layer is magnified far past its resolution.
 
 Imagery: Sentinel-2 cloudless by EOX IT Services GmbH (contains modified Copernicus Sentinel data 2020);
 Esri, Maxar, Earthstar Geographics.
@@ -33,6 +37,7 @@ DATA = HERE.parent / "data"
 os.environ.setdefault("SSL_CERT_FILE", "/root/.ccr/ca-bundle.crt")
 
 EOX = "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2020_3857/default/g/{z}/{y}/{x}.jpg"
+NE_BOX = (-80.0, -62.0, 36.0, 48.0)  # lonA, lonB, latA, latB: replaces the app's REG patch box in the video
 ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
 
 
@@ -86,7 +91,7 @@ def equirect(src, z, lonA, lonB, latA, latB, w, h, name):
     Image.fromarray(sample(src, z, LAT, LON)).save(CACHE / name, quality=90)
 
 
-def city(json_name, kx, ky, margin, z, px_max, name):
+def city(json_name, kx, ky, margin, z, px_max, name, src=ESRI):
     D = json.loads((DATA / json_name).read_text())
     lat0, lon0 = D["lat0"], D["lon0"]
     x0, x1, z0, z1 = D["box"]
@@ -99,20 +104,22 @@ def city(json_name, kx, ky, margin, z, px_max, name):
     lon = lon0 + XX / kx(lat0)
     lat = lat0 - ZZ / ky
     print(name, w, "x", h, f"{mpp:.2f} m/px")
-    Image.fromarray(sample(ESRI, z, lat, lon)).save(CACHE / name, quality=90)
+    Image.fromarray(sample(src, z, lat, lon)).save(CACHE / name, quality=90)
     return {"rect": [x0, x1, z0, z1]}
 
 
 if __name__ == "__main__":
     CACHE.mkdir(exist_ok=True)
-    if not (CACHE / "globe.jpg").exists():
-        equirect(EOX, 4, -180, 180, -90, 90, 4096, 2048, "globe.jpg")
-        equirect(EOX, 10, -73.6, -68.6, 40.4, 44.2, 4096, 4096, "region.jpg")
+    if not (CACHE / "globe8k.jpg").exists():
+        equirect(EOX, 5, -180, 180, -90, 90, 8192, 4096, "globe8k.jpg")
+    if not (CACHE / "northeast.jpg").exists():
+        equirect(EOX, 9, NE_BOX[0], NE_BOX[1], NE_BOX[2], NE_BOX[3], 8192, 6144, "northeast.jpg")
     R = 6371008.8
     meta = {
         # Boston's pipeline uses flat 111,320 / 110,540 m per degree; Lynn's uses the sphere
         "boston": city("boston.json", lambda la: math.cos(math.radians(la)) * 111320, 110540, 2500, 16, 4096, "boston.jpg"),
-        "metro": city("boston.json", lambda la: math.cos(math.radians(la)) * 111320, 110540, 28000, 13, 4096, "metro.jpg"),
+        "state": city("boston.json", lambda la: math.cos(math.radians(la)) * 111320, 110540, 78000, 12, 4096, "state.jpg", EOX),
+        "metro": city("boston.json", lambda la: math.cos(math.radians(la)) * 111320, 110540, 28000, 13, 4096, "metro.jpg", EOX),
         "lynn": city("lynn.json", lambda la: math.cos(math.radians(la)) * R * math.pi / 180, R * math.pi / 180, 2500, 16, 4096, "lynn.jpg"),
     }
     (CACHE / "meta.json").write_text(json.dumps(meta))

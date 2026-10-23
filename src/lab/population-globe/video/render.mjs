@@ -9,7 +9,8 @@
 // Caption facts, from data/density.json and data/countries.json at 0.25°:
 //   total 8,191,988,517; half of it lives in the densest cells covering 2.1% of land (140.6 M km²);
 //   52% of land is under 1 person/km²; densest cell 24.88N 67.12E (Karachi), 23,545/km²;
-//   Egypt: 95% of 115.3 M on 5.6% of its area; Australia: 95% of 26.6 M on 3.3%.
+//   China: half of 1,412 M in its densest cells covering 5.3% of its area;
+//   USA: half of 341.2 M on 2.0% of its area.
 import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -28,12 +29,13 @@ const KEYS = [
   { t: 14, lat: 24, lon: 74, dist: 420, tilt: 8 },
   { t: 21, lat: 25, lon: 70, dist: 260, tilt: 30 },
   { t: 27, lat: 24.2, lon: 67.6, dist: 190, tilt: 42 },
-  { t: 33, lat: 27, lon: 46, dist: 330, tilt: 25 },
-  { t: 39, lat: 27.5, lon: 31.5, dist: 210, tilt: 40 },
-  { t: 45, lat: 0, lon: 80, dist: 480, tilt: 10 },
-  { t: 51, lat: -27, lon: 134, dist: 330, tilt: 25 },
-  { t: 58, lat: 12, lon: 150, dist: 720, tilt: 0 },
-  { t: 65, lat: 15, lon: 168, dist: 740, tilt: 0 },
+  { t: 33, lat: 33, lon: 98, dist: 420, tilt: 15 },
+  { t: 39, lat: 31, lon: 111, dist: 330, tilt: 30 },
+  // east across the Pacific (longitude kept continuous past 180 so the path doesn't swing back over Asia)
+  { t: 45, lat: 38, lon: 200, dist: 620, tilt: 10 },
+  { t: 51, lat: 37, lon: 263, dist: 340, tilt: 25 },
+  { t: 58, lat: 28, lon: 278, dist: 720, tilt: 0 },
+  { t: 65, lat: 25, lon: 290, dist: 740, tilt: 0 },
 ];
 
 // [start, end, line, small line]
@@ -42,10 +44,10 @@ const CAPS = [
   [7.0, 14.0, "Half of them live on 2% of the land"],
   [14.0, 21.0, "South Asia"],
   [21.0, 29.5, "Karachi", "23,500 people per km², the densest square on Earth"],
-  [29.5, 36.0, "Egypt"],
-  [36.0, 43.0, "95% of Egyptians live on 6% of the land", "Along the Nile"],
-  [43.0, 49.0, "Australia"],
-  [49.0, 56.0, "95% of Australians live on 3% of the land"],
+  [29.5, 36.0, "China", "1.4 billion people"],
+  [36.0, 43.0, "Half of them live on 5% of China's land"],
+  [43.0, 49.0, "United States"],
+  [49.0, 56.0, "Half of Americans live on 2% of the land"],
   [56.0, 65.0, "Population Relief Globe", "mapzimus.com/lab/population-globe"],
 ];
 const CREDIT = "Data: GHS-POP 2025, European Commission JRC · Borders: Natural Earth";
