@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-22
+# Mapzimus Geospatial Radar — 2026-10-23
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Have You Had Your Five a Day?](http://googlemapsmania.blogspot.com/2026/10/have-you-had-your-five-day.html)
 - [The World's Most Notable Places.](http://googlemapsmania.blogspot.com/2026/10/the-worlds-most-notable-places.html)
 - [Pixelate the World](http://googlemapsmania.blogspot.com/2026/10/pixelate-world.html)
 - [London is Bigger than Colorado](http://googlemapsmania.blogspot.com/2026/10/london-is-bigger-than-colorado.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [What is Your Walk Score?](http://googlemapsmania.blogspot.com/2026/10/what-is-your-walk-score.html)
 - [What America Looks Like After 700 Meters of Sea Level Rise](http://googlemapsmania.blogspot.com/2026/10/what-america-looks-like-after-700.html)
 - [Travel Blogging & Mapping](http://googlemapsmania.blogspot.com/2026/10/travel-blogging-mapping.html)
-- [The New Age of Building Age Maps Has Begun](http://googlemapsmania.blogspot.com/2026/10/the-new-age-of-building-age-maps-has.html)
 
 ## Geography Realm
 
@@ -31,14 +31,14 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
+- [QGIS Live Driver](https://plugins.qgis.org/plugins/qgis_live_driver/)
+- [BasinWorks GIS](https://plugins.qgis.org/plugins/hydrology/)
 - [Drone AI Georef](https://plugins.qgis.org/plugins/drone_ai_georef/)
 - [GSI2Campus3D](https://plugins.qgis.org/plugins/gsi2campus3d/)
 - [Pinned Layers](https://plugins.qgis.org/plugins/pinned_layers/)
 - [Strip Map Maker](https://plugins.qgis.org/plugins/strip_map_maker/)
 - [Contours2Mesh](https://plugins.qgis.org/plugins/contours2mesh/)
 - [TELEMAC Toolkit](https://plugins.qgis.org/plugins/telemac_toolkit/)
-- [Road Network Integration Toolkit](https://plugins.qgis.org/plugins/road_network_integration_toolkit/)
-- [Geo Emprises](https://plugins.qgis.org/plugins/Geo_Emprises_QGIS_Plugin/)
 
 ## Library releases
 
@@ -53,16 +53,16 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
+- [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 3 · 0 answers)
+- [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 1 answers)
+- [Download postgis-bundle-pg18x64-setup-3.6.2-1.exe](https://gis.stackexchange.com/questions/501628/download-postgis-bundle-pg18x64-setup-3-6-2-1-exe) (▲ -1 · 1 answers)
 - [Increasing the size of the selected line symbol within layer in ArcGIS Pro](https://gis.stackexchange.com/questions/501625/increasing-the-size-of-the-selected-line-symbol-within-layer-in-arcgis-pro) (▲ 2 · 2 answers)
 - [How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?](https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal) (▲ 0 · 2 answers)
 - [QgsTaskManager active vs queued vs running task](https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task) (▲ 2 · 1 answers)
 - [QGIS: Raster to Vector conversion crashing my computer](https://gis.stackexchange.com/questions/501619/qgis-raster-to-vector-conversion-crashing-my-computer) (▲ 0 · 2 answers)
+- [GEE - Inspector and rendered classification disagree at max zoom — OBIA pipeline](https://gis.stackexchange.com/questions/501616/gee-inspector-and-rendered-classification-disagree-at-max-zoom-obia-pipeline) (▲ 0 · 0 answers)
 - [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
 - [Finding the land area east and west of meridian](https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian) (▲ 0 · 0 answers)
-- [Need to find out if my street is public or Private](https://gis.stackexchange.com/questions/501591/need-to-find-out-if-my-street-is-public-or-private) (▲ -2 · 0 answers)
-- [Issue with alignment of legend labels in QGIS Print layout](https://gis.stackexchange.com/questions/501570/issue-with-alignment-of-legend-labels-in-qgis-print-layout) (▲ 1 · 1 answers)
-- [Filtering GetCapabilities request using keyword](https://gis.stackexchange.com/questions/501574/filtering-getcapabilities-request-using-keyword) (▲ 1 · 1 answers)
-- [Multi map views is not properly saved in QGIS](https://gis.stackexchange.com/questions/501582/multi-map-views-is-not-properly-saved-in-qgis) (▲ 1 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
@@ -70,12 +70,12 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
 - [SWOT Level 2 Nadir Altimeter Operational Geophysical Data Record with Waveforms, GPS, NRT, Version D](https://search.earthdata.nasa.gov/search?q=SWOT_L2_NALT_OGDR_NRTGPS_D) — The value-added SWOT Level 2 Near Real Time GPS Nadir Altimeter Operational Geophysical Data Record (NRT GPS OGDR) Version D dataset produced by the Surface…
-- [STAQS Ground Data](https://search.earthdata.nasa.gov/search?q=STAQS_Ground_Data) — STAQS_Ground_Data is the ground site data collected during the Synergistic TEMPO Air Quality Science (STAQS) mission.
-- [EMIT L1B At-Sensor Calibrated Radiance and Geolocation Data 60 m V002](https://search.earthdata.nasa.gov/search?q=EMITL1BRAD) — The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).
-- [EMIT L2A Surface Reflectance and Uncertainty 60 m V002](https://search.earthdata.nasa.gov/search?q=EMITL2ARFL) — The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).
-- [EMIT L1B Corrected Spacecraft Attitude and Ephemeris V002](https://search.earthdata.nasa.gov/search?q=EMITL1BATT) — The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).
-- [EMIT L2A Masks 60 m V003](https://search.earthdata.nasa.gov/search?q=EMITL2AMASK) — The Earth Surface Mineral Dust Source Investigation (EMIT) is an Earth Ventures-Instrument (EVI-4) Mission aboard the International Space Station (ISS).
-- [EMIT L2B Methane Enhancement Data 60 m V003](https://search.earthdata.nasa.gov/search?q=EMITL2BCH4ENH) — The Earth Surface Mineral Dust Source Investigation ([EMIT](https://earth.jpl.nasa.gov/emit/)) is an Earth Ventures-Instrument (EVI-4) Mission aboard the Int…
+- [Ground-Based GNSS-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN) GPS daily accumulated real-time Prec…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_POD_60sec_clk_corr) — This product contains a time series of clock biases for healthy satellites in the GPS constellation that are accumulated every minute throughout the day.
+- [Ground-Based GNSS-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN) GPS daily accumulated real-time Prec…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_POD_30sec_att_quat) — This product contains a time series of attitude quaternion components for healthy satellites in the GPS constellation that are accumulated every minute throu…
+- [Ground-Based GNSS-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN) GPS daily accumulated real-time Prec…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_POD_1sec_clk_corr) — This product contains a high-rate time series of clock biases for healthy satellites in the GPS constellation that are accumulated every minute throughout th…
+- [Ground-Based Global Navigation Satellite System (GNSS)-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN)…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_EOP) — This product contains a time series of Earth orientation parameters from the IERS Bulletin A for the GPS constellation of satellites.
+- [Ground-Based Global Navigation Satellite System (GNSS)-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN)…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_ant_phse_map_meta) — This product contains file names and URLs to files containing antenna phase map data used in the real-time GPS POD processing.
+- [Ground-Based Global Navigation Satellite System (GNSS)-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN)…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_ant_phse_ctrs) — This product ontains antenna phase center locations relative to the GPS satellite's center of mass.
 
 ## Data.gov — new geodata
 
