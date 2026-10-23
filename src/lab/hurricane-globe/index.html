@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Hurricane Globe · Mapzimus Lab</title>
+  <meta name="description" content="Every Atlantic and Eastern Pacific hurricane since 1851 on a three.js globe: tracks that rise with wind speed, wind-field swaths, storm density, season replays and a storms-near-you search.">
+  <link rel="canonical" href="https://mapzimus.com/lab/hurricane-globe/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Hurricane Globe · Mapzimus Lab">
+  <meta property="og:description" content="Every Atlantic and Eastern Pacific hurricane since 1851 on a three.js globe: tracks that rise with wind speed, wind-field swaths, storm density, season replays and a storms-near-you search.">
+  <meta property="og:url" content="https://mapzimus.com/lab/hurricane-globe/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#03070d">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/hurricane-globe/styles.css">
+  <script type="module" src="/lab/hurricane-globe/app.js"></script>
+</head>
+<body>
+<div id="globe"></div>
+
+<details id="panel" open>
+  <summary>
+    <a class="back" href="/lab/">← Lab</a>
+    <h1>Hurricane Globe</h1>
+    <p class="sub">NOAA HURDAT2 best tracks · Atlantic &amp; NE Pacific</p>
+  </summary>
+
+  <section>
+    <div class="seg" role="group" aria-label="Map layer">
+      <button data-mode="tracks" aria-pressed="true">Tracks</button>
+      <button data-mode="density" aria-pressed="false">Density</button>
+    </div>
+    <label class="toggle"><input type="checkbox" id="extrude" checked> Track height = wind speed</label>
+    <label class="toggle"><input type="checkbox" id="landfalls"> Landfall points</label>
+    <div id="densityLegend" class="ramp" hidden>
+      <div class="label">Storms crossing each 2° cell</div>
+      <div id="densityRamp" class="bar"></div>
+      <div class="ends"><span>1</span><span id="densityMax"></span></div>
+      <p class="hint">Click a column to list the storms that passed near it.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="row basins">
+      <label><input type="checkbox" name="basin" value="AL" checked> Atlantic</label>
+      <label><input type="checkbox" name="basin" value="EP" checked> E. Pacific</label>
+    </div>
+
+    <div class="field">
+      <div class="label">Years <span id="yearsOut"></span></div>
+      <div class="dual">
+        <input type="range" id="y0" min="1851" max="2025" value="1851" aria-label="First year">
+        <input type="range" id="y1" min="1851" max="2025" value="2025" aria-label="Last year">
+      </div>
+      <div class="chips">
+        <button data-years="1851-2025">All</button>
+        <button data-years="1966-2025">Satellite era</button>
+        <button data-years="1996-2025">Since 1996</button>
+        <button data-years="2016-2025">Last 10 yrs</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <svg id="chart" preserveAspectRatio="none" aria-label="Storms per year"></svg>
+      <div class="chartaxis"><span id="chartA"></span><span id="chartRead"></span><span id="chartB"></span></div>
+    </div>
+
+    <div class="field">
+      <label class="label" for="minW">Peak intensity</label>
+      <select id="minW">
+        <option value="0">All systems</option>
+        <option value="34" selected>Tropical storm or stronger</option>
+        <option value="64">Hurricanes</option>
+        <option value="96">Major hurricanes (Cat 3+)</option>
+        <option value="137">Category 5 only</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="label" for="q">Storm name</label>
+      <input type="search" id="q" placeholder="e.g. Katrina, Sandy, Patricia" autocomplete="off">
+    </div>
+
+    <p id="stats" class="stats"></p>
+  </section>
+
+  <section>
+    <div class="label">Storms near a place</div>
+    <div class="row">
+      <select id="place" aria-label="Place"><option value="">Choose a place…</option></select>
+      <select id="radius" aria-label="Radius" class="narrow">
+        <option value="50">50 km</option>
+        <option value="100" selected>100 km</option>
+        <option value="200">200 km</option>
+        <option value="400">400 km</option>
+      </select>
+    </div>
+    <div class="row gap">
+      <button id="pickPoint" aria-pressed="false">Pick a point on the globe</button>
+      <button id="clearQuery" hidden>Clear</button>
+    </div>
+  </section>
+
+  <section class="season">
+    <div class="label">Season playback</div>
+    <div class="row">
+      <select id="seasonYear" aria-label="Season"></select>
+      <select id="speed" aria-label="Playback speed">
+        <option value="6">6 h/s</option>
+        <option value="12" selected>12 h/s</option>
+        <option value="24">1 day/s</option>
+        <option value="48">2 days/s</option>
+      </select>
+      <button id="playSeason">Play</button>
+    </div>
+    <p class="hint">Since 2004 each storm carries its live 34/50/64 kt wind field.</p>
+  </section>
+
+  <section class="legend">
+    <div id="legend" class="cats"></div>
+    <p class="hint">Hover a track for its name, click to inspect. Drag to orbit, scroll to zoom. Esc clears.</p>
+  </section>
+
+  <p class="foot">Data: <a href="https://www.nhc.noaa.gov/data/#hurdat" target="_blank" rel="noopener">NOAA NHC HURDAT2</a> best tracks, Atlantic 1851–2025 and NE Pacific 1949–2025, with wind radii from 2004. Coastlines and borders: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> via world-atlas.</p>
+</details>
+
+<aside id="info" hidden></aside>
+
+<div id="player" hidden>
+  <button id="pp" aria-label="Pause">❚❚</button>
+  <div class="ptext">
+    <div id="pdate"></div>
+    <div id="pstats"></div>
+  </div>
+  <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Playback position">
+  <button id="pstop" aria-label="Close playback">✕</button>
+</div>
+
+<div id="tip" hidden></div>
+<div id="loading">Loading 175 years of storms…</div>
+
+</body>
+</html>

@@ -65,6 +65,7 @@ const hostedProjectRoutes = {
   "boston-massing": "/lab/boston-massing/",
   "orbit-to-street": "/lab/orbit-to-street/",
   "population-globe": "/lab/population-globe/",
+  "hurricane-globe": "/lab/hurricane-globe/",
   "category-five": "/c5/",
   optitrek: "/optitrek/",
   appalachians: "/appalachians/",
