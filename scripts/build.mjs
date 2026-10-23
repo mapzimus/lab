@@ -389,7 +389,7 @@ const pages = {
     canonical: "https://mapzimus.com/tools/",
     eyebrow: "",
     heading: "Tools",
-    intro: `${utilityCount} tools. Classroom and teacher tools are on <a href="https://lehsmath.com/">lehsmath.com</a>.`,
+    intro: `${utilityCount} single-page tools. Open one and use it; there's nothing to sign up for. Classroom and teacher tools are on <a href="https://lehsmath.com/">lehsmath.com</a>.`,
     catalogHeading: "",
   },
   maps: {
@@ -399,7 +399,7 @@ const pages = {
     canonical: "https://mapzimus.com/maps/",
     eyebrow: "",
     heading: "Maps",
-    intro: `${mapCount} maps.`,
+    intro: `${mapCount} interactive maps, from live transit to 3D cities. Open any card to start.`,
     catalogHeading: "",
   },
   games: {
@@ -409,7 +409,7 @@ const pages = {
     canonical: "https://mapzimus.com/games/",
     eyebrow: "",
     heading: "Games",
-    intro: `${gamesCount} games.`,
+    intro: `${gamesCount} games that run in your browser. The Category Five shelf holds party games for one screen.`,
     catalogHeading: "",
   },
 };
@@ -446,13 +446,9 @@ for (const [key, page] of Object.entries(pages)) {
       ? `<div class="catalog-grid">${itemsForView(view, page.category).map((item) => card(item)).join("\n")}</div>`
       : groupedBrowseHtml(view);
   const browseClass = isHome ? "browse browse-home" : "browse";
-  const heroActions = isHome
-    ? `<div class="hero-actions" aria-label="Primary actions">
-        <a class="hero-cta" href="/maps/">Maps</a>
-        <a class="hero-cta quiet" href="/games/">Games</a>
-        <a class="hero-cta quiet" href="/tools/">Tools</a>
-      </div>`
-    : "";
+  // The stat tiles under the intro link to Maps, Games, and Tools, so the hero
+  // needs no second set of buttons for the same three tabs.
+  const heroActions = "";
   let html = template
     .replaceAll("{{VIEW}}", view)
     .replaceAll("{{CATEGORY}}", page.category || "")

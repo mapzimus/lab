@@ -1,0 +1,44 @@
+/* Optitrek drive-time chart. One series in one hue, validated with the dataviz
+   palette checks (lightness band, chroma floor, contrast) on each theme's card:
+   #1c7aa9 on #ffffff, #4995c1 on #1c1f21. The gray reference bar is de-emphasis
+   and always carries a direct label. */
+:root { --chart-1: #1c7aa9; --chart-ref: #9ba09e; --chart-grid: #e6e7e6; }
+html[data-theme="dark"] { --chart-1: #4995c1; --chart-ref: #5f6462; --chart-grid: #2c3032; }
+
+.chart-block { padding: 8px 0 clamp(24px, 4vw, 40px); }
+.chart { position: relative; margin: 0; padding: 20px 22px 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
+.chart figcaption h2 { font-size: 1.1rem; }
+.chart figcaption p { margin: 6px 0 14px; color: var(--muted); font-size: 0.92rem; max-width: 62ch; }
+.chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.chart-svg .grid { stroke: var(--chart-grid); stroke-width: 1; shape-rendering: crispEdges; }
+.chart-svg .tick { fill: var(--muted); font: 400 11px var(--mono); font-variant-numeric: tabular-nums; }
+.chart-svg .cat { fill: var(--ink); font: 500 13px var(--sans); }
+.chart-svg .val { fill: var(--ink); font: 600 12px var(--sans); }
+.chart-svg .mark { fill: var(--chart-1); }
+.chart-svg .ref .mark { fill: var(--chart-ref); }
+.chart-svg .ref .cat { fill: var(--muted); }
+.chart-svg .hit { fill: transparent; }
+.chart-svg .bar { cursor: default; outline: none; }
+.chart-svg .bar:hover .hit, .chart-svg .bar:focus-visible .hit { fill: var(--well); }
+.chart-svg .bar:focus-visible .cat { text-decoration: underline; }
+
+.chart-tip { position: absolute; z-index: 3; pointer-events: none; padding: 8px 10px; background: var(--card); border: 1px solid var(--ink); border-radius: 8px; box-shadow: var(--shadow); font-size: 0.85rem; line-height: 1.35; white-space: nowrap; }
+.chart-tip strong { display: block; font-size: 0.95rem; }
+.chart-tip span { color: var(--muted); }
+
+.chart-table { margin-top: 10px; font-size: 0.88rem; }
+.chart-table summary { cursor: pointer; color: var(--muted); font: 600 12px var(--mono); text-transform: uppercase; letter-spacing: 0.04em; }
+.chart-table table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+.chart-table th, .chart-table td { padding: 6px 8px; border-bottom: 1px solid var(--line-soft); text-align: left; }
+.chart-table td { font-variant-numeric: tabular-nums; }
+.chart-table td:nth-child(3), .chart-table td:nth-child(4) { text-align: right; }
+
+/* Phones get the stacked layout (label above bar); display:none also drops the
+   other copy from the accessibility tree, so screen readers hear one chart. */
+.chart-narrow { display: none; }
+@media (max-width: 560px) {
+  .chart { padding: 16px 12px 12px; }
+  .chart-wide { display: none; }
+  .chart-narrow { display: block; }
+}
