@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Glacier Express · video scene</title>
+<!-- Video-only scene for render.mjs: real terrain, Sentinel-2 imagery and the OSM track, driven frame by frame
+     through window.__scene.frame(t). Not linked from the site; render.mjs serves it and its data itself. -->
+<style>
+  html, body { margin: 0; height: 100%; background: #9fb7cf; overflow: hidden; }
+  canvas { display: block; }
+  #cap { position: fixed; left: 0; right: 0; top: 200px; text-align: center; color: #fff;
+    font: 800 56px/1.12 system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 50px; letter-spacing: -0.01em;
+    text-shadow: 0 2px 4px #000, 0 0 22px rgba(0,0,0,.9); }
+  #cap small { display: block; margin-top: 16px; font-weight: 600; font-size: 27px; color: #e4e8ee; }
+  #hud { position: fixed; left: 0; right: 0; bottom: 260px; text-align: center; color: #f2f5f9;
+    font: 700 27px/1.5 ui-monospace, Menlo, monospace; text-shadow: 0 1px 3px #000, 0 0 12px #000; }
+  #credit { position: fixed; left: 0; right: 0; bottom: 200px; text-align: center; padding: 0 40px;
+    font: 500 13px/1.3 system-ui, sans-serif; color: rgba(255,255,255,.7); text-shadow: 0 1px 2px #000; }
+</style>
+</head>
+<body>
+<div id="cap"></div><div id="hud"></div><div id="credit"></div>
+<script src="three.min.js"></script>
+<script>
+(async () => {
+const get = async (u, t) => { const r = await fetch(u); if (!r.ok) throw new Error(u); return t === "bin" ? r.arrayBuffer() : r.json(); };
+const [ROUTE, META, HBUF] = await Promise.all([get("route.json"), get("meta.json"), get("terrain.bin", "bin")]);
+const EXAG = 1.0;
+const W = innerWidth, H = innerHeight;
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+// ---------- frame: x east, z south, metres from the box centre ----------
+const { lon0, lat0, kx, ky, nx, nz, grid } = META;
+const [bx0, bx1, bz0, bz1] = META.box;
+const toXZ = (lon, lat) => [(lon - lon0) * kx, -(lat - lat0) * ky];
+const HT = new Int16Array(HBUF);
+function ground(x, z) {
+  const gx = clamp((x - bx0) / grid, 0, nx - 1.001), gz = clamp((z - bz0) / grid, 0, nz - 1.001);
+  const i = Math.floor(gx), j = Math.floor(gz), fx = gx - i, fz = gz - j;
+  const a = HT[j * nx + i], b = HT[j * nx + i + 1], c = HT[(j + 1) * nx + i], d = HT[(j + 1) * nx + i + 1];
+  return ((a * (1 - fx) + b * fx) * (1 - fz) + (c * (1 - fx) + d * fx) * fz) * EXAG;
+}
+
+// ---------- renderer ----------
+THREE.ColorManagement.legacyMode = false;
+const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+renderer.setSize(W, H);
+document.body.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const SKY = new THREE.Color("#a9c3dc");
+scene.background = SKY;
+scene.fog = new THREE.Fog(SKY, 40000, 160000);
+const camera = new THREE.PerspectiveCamera(50, W / H, 20, 2e6);
+const sun = new THREE.DirectionalLight(0xfff3e2, 2.6);
+sun.position.set(-0.55, 0.62, 0.55).multiplyScalar(1e5);   // afternoon sun from the south-west
+scene.add(sun, new THREE.HemisphereLight(0xcfe0f5, 0x4a4136, 0.75));
+
+// ---------- terrain: one mesh per imagery tile ----------
+THREE.DefaultLoadingManager.onLoad = () => { window.__loaded = true; };
+const loader = new THREE.TextureLoader();
+const { mpp, w: IW, h: IH } = META.img;
+const STEP = 1;   // grid cells per vertex
+for (let r = 0; r < 2; r++) for (let c = 0; c < 2; c++) {
+  const ix0 = c * IW / 2 * mpp, ix1 = (c + 1) * IW / 2 * mpp, iz0 = r * IH / 2 * mpp, iz1 = (r + 1) * IH / 2 * mpp;
+  const gi0 = Math.floor(ix0 / grid), gi1 = Math.min(nx - 1, Math.ceil(ix1 / grid));
+  const gj0 = Math.floor(iz0 / grid), gj1 = Math.min(nz - 1, Math.ceil(iz1 / grid));
+  const cw = Math.floor((gi1 - gi0) / STEP) + 1, ch = Math.floor((gj1 - gj0) / STEP) + 1;
+  const pos = new Float32Array(cw * ch * 3), uv = new Float32Array(cw * ch * 2);
+  for (let j = 0; j < ch; j++) for (let i = 0; i < cw; i++) {
+    const gi = gi0 + i * STEP, gj = gj0 + j * STEP, k = j * cw + i;
+    const x = bx0 + gi * grid, z = bz0 + gj * grid;
+    pos[k * 3] = x; pos[k * 3 + 1] = HT[gj * nx + gi] * EXAG; pos[k * 3 + 2] = z;
+    uv[k * 2] = (gi * grid - ix0) / (ix1 - ix0); uv[k * 2 + 1] = 1 - (gj * grid - iz0) / (iz1 - iz0);
+  }
+  const idx = new Uint32Array((cw - 1) * (ch - 1) * 6);
+  let n = 0;
+  for (let j = 0; j < ch - 1; j++) for (let i = 0; i < cw - 1; i++) {
+    const a = j * cw + i, b = a + 1, d = a + cw, e = d + 1;
+    idx[n++] = a; idx[n++] = d; idx[n++] = b; idx[n++] = b; idx[n++] = d; idx[n++] = e;
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+  g.setIndex(new THREE.BufferAttribute(idx, 1));
+  g.computeVertexNormals();
+  const tex = loader.load(`img_${r}${c}.jpg`);
+  tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 8;
+  tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+  scene.add(new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: tex, roughness: 1, metalness: 0 })));
+}
+
+// ---------- the track ----------
+const N = ROUTE.coords.length, KM = ROUTE.km, TOTAL = KM[N - 1];
+const P = ROUTE.coords.map(([lon, lat], i) => { const [x, z] = toXZ(lon, lat); return new THREE.Vector3(x, META.elev[i] * EXAG, z); });
+// ribbon: each point gets a left/right pair; the vertex shader pushes them apart by a screen-friendly width
+{
+  const pos = new Float32Array(N * 2 * 3), side = new Float32Array(N * 2 * 3), km = new Float32Array(N * 2);
+  for (let i = 0; i < N; i++) {
+    const a = P[Math.max(0, i - 1)], b = P[Math.min(N - 1, i + 1)];
+    let dx = b.x - a.x, dz = b.z - a.z; const L = Math.hypot(dx, dz) || 1; dx /= L; dz /= L;
+    for (let s = 0; s < 2; s++) {
+      const k = i * 2 + s, sg = s ? 1 : -1;
+      pos[k * 3] = P[i].x; pos[k * 3 + 1] = P[i].y + 8; pos[k * 3 + 2] = P[i].z;
+      side[k * 3] = -dz * sg; side[k * 3 + 2] = dx * sg; km[k] = KM[i];
+    }
+  }
+  const idx = [];
+  for (let i = 0; i < N - 1; i++) { const a = i * 2; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  g.setAttribute("side", new THREE.BufferAttribute(side, 3));
+  g.setAttribute("km", new THREE.BufferAttribute(km, 1));
+  g.setIndex(idx);
+  var trackU = { uWidth: { value: 40 }, uProg: { value: 0 } };
+  const m = new THREE.ShaderMaterial({
+    uniforms: trackU, side: THREE.DoubleSide, transparent: true,
+    vertexShader: `#include <common>
+      #include <logdepthbuf_pars_vertex>
+      attribute vec3 side; attribute float km; uniform float uWidth; varying float vKm;
+      void main() { vKm = km; vec3 p = position + side * uWidth * 0.5;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+        #include <logdepthbuf_vertex>
+      }`,
+    fragmentShader: `#include <common>
+      #include <logdepthbuf_pars_fragment>
+      uniform float uProg; varying float vKm;
+      void main() {
+        #include <logdepthbuf_fragment>
+        float done = step(vKm, uProg);
+        gl_FragColor = vec4(mix(vec3(1.0, 0.97, 0.9), vec3(0.55, 0.07, 0.09), done), mix(0.75, 0.9, done));
+        #include <tonemapping_fragment>
+        #include <encodings_fragment>
+      }`,
+  });
+  const mesh = new THREE.Mesh(g, m); mesh.renderOrder = 5; mesh.frustumCulled = false;
+  scene.add(mesh);
+}
+// the train: six red cars that each sit on the track at their own km, so the train bends through curves
+const CARS = 6, CAR_GAP = 0.12;   // gap as a fraction of a car length
+const carGeo = new THREE.BoxGeometry(1, 0.28, 0.2);   // length along x, scaled per frame
+const roofGeo = new THREE.BoxGeometry(0.98, 0.06, 0.16);
+const glassGeo = new THREE.BoxGeometry(0.9, 0.08, 0.205);
+const red = new THREE.MeshStandardMaterial({ color: 0xc8102e, roughness: 0.5, emissive: 0x3a0306 });
+const roof = new THREE.MeshStandardMaterial({ color: 0xf2f2ee, roughness: 0.6 });
+const glass = new THREE.MeshStandardMaterial({ color: 0x1b2430, roughness: 0.2, metalness: 0.3 });
+const cars = [];
+for (let i = 0; i < CARS; i++) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(carGeo, red); body.position.y = 0.14;
+  const top = new THREE.Mesh(roofGeo, roof); top.position.y = 0.31;
+  const win = new THREE.Mesh(glassGeo, glass); win.position.y = 0.2;
+  g.add(body, top, win);
+  g.renderOrder = 6;
+  scene.add(g); cars.push(g);
+}
+
+// position and heading along the line at a given km
+function at(km) {
+  km = clamp(km, 0, TOTAL);
+  let lo = 0, hi = N - 1;
+  while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (KM[mid] <= km) lo = mid; else hi = mid; }
+  const f = (km - KM[lo]) / ((KM[hi] - KM[lo]) || 1);
+  return { p: P[lo].clone().lerp(P[hi], f), i: lo, elev: META.elev[lo] + (META.elev[hi] - META.elev[lo]) * f };
+}
+
+// ---------- timeline ----------
+const T_IN = 5, T_OUT = 59, DUR = 65;
+// the train slows where there is something to see: weights per km, integrated and inverted for km(t)
+const SLOW = [[0, 4, 0.5], [META.top.km - 4, META.top.km + 4, 0.45], [243, 251, 0.3], [262, 268, 0.45], [283, TOTAL, 0.5]];
+const wAt = k => { let w = 1; for (const [a, b, s] of SLOW) if (k >= a && k <= b) w = Math.min(w, s); return w; };
+const CUM = [0];
+for (let k = 0; k < TOTAL; k += 0.1) CUM.push(CUM[CUM.length - 1] + 0.1 / wAt(k));
+const kmAtT = t => {
+  const u = clamp((t - T_IN) / (T_OUT - T_IN), 0, 1) * CUM[CUM.length - 1];
+  let lo = 0, hi = CUM.length - 1;
+  while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (CUM[mid] <= u) lo = mid; else hi = mid; }
+  return clamp((lo + (u - CUM[lo]) / ((CUM[hi] - CUM[lo]) || 1)) * 0.1, 0, TOTAL);
+};
+const tAtKm = km => { for (let t = T_IN; t <= T_OUT; t += 0.02) if (kmAtT(t) >= km) return t; return T_OUT; };
+
+// overview: high above the middle of the line, turned so east (the direction of travel) is up the tall frame
+const mid = new THREE.Vector3((bx0 + bx1) / 2, 0, (bz0 + bz1) / 2);
+const OVER = { pos: mid.clone().add(new THREE.Vector3(-55000, 185000, 0)), look: mid.clone().add(new THREE.Vector3(3000, 0, 0)), up: new THREE.Vector3(1, 0, 0) };
+const UP = new THREE.Vector3(0, 1, 0);
+
+// chase camera, precomputed on a 50 m grid of km so it can be smoothed hard: position over a few km,
+// heading over ~8 km (it glides through curves and loops instead of whipping round them), height over ~6 km
+// with a terrain clearance that is itself smoothed, so the camera never bobs over ridges
+const CS = 0.05, CN = Math.ceil(TOTAL / CS) + 1;
+function gauss(arr, sigmaKm) {
+  const r = Math.ceil(3 * sigmaKm / CS), w = [];
+  for (let k = -r; k <= r; k++) w.push(Math.exp(-0.5 * (k * CS / sigmaKm) ** 2));
+  return arr.map((_, i) => { let s = 0, n = 0; for (let k = -r; k <= r; k++) { const j = clamp(i + k, 0, arr.length - 1); s += arr[j] * w[k + r]; n += w[k + r]; } return s / n; });
+}
+const rawX = [], rawZ = [], rawY = [], rawDX = [], rawDZ = [];
+for (let i = 0; i < CN; i++) {
+  const a = at(i * CS), b = at(i * CS + 0.3), c = at(i * CS - 0.3);
+  rawX.push(a.p.x); rawZ.push(a.p.z); rawY.push(a.p.y);
+  const dx = b.p.x - c.p.x, dz = b.p.z - c.p.z, L = Math.hypot(dx, dz) || 1;
+  rawDX.push(dx / L); rawDZ.push(dz / L);
+}
+const SX = gauss(rawX, 1.2), SZ = gauss(rawZ, 1.2), SY = gauss(rawY, 3);
+const SDX = gauss(rawDX, 4), SDZ = gauss(rawDZ, 4);
+const BACK = 3000, LIFT = 1500, AHEAD = 350;
+const camY = [];
+for (let i = 0; i < CN; i++) {
+  const L = Math.hypot(SDX[i], SDZ[i]) || 1, dx = SDX[i] / L, dz = SDZ[i] / L;
+  let need = SY[i] + LIFT;
+  // clear the terrain under the camera and along the sight line to the train
+  for (let f = 0; f <= 1; f += 0.25) {
+    const x = SX[i] - dx * BACK * (1 - f), z = SZ[i] - dz * BACK * (1 - f);
+    need = Math.max(need, ground(x, z) + 450 + (1 - f) * 250);
+  }
+  camY.push(need);
+}
+// running max over ±2 km, then smoothed: the camera rises early for a ridge and stays up until past it
+const R2 = Math.round(2 / CS);
+const camYmax = camY.map((_, i) => { let m = -1e9; for (let k = -R2; k <= R2; k++) m = Math.max(m, camY[clamp(i + k, 0, CN - 1)]); return m; });
+const SCY = gauss(camYmax, 1.5);
+const sample = (arr, km) => { const f = clamp(km / CS, 0, CN - 1), i = Math.min(CN - 2, Math.floor(f)); return arr[i] + (arr[i + 1] - arr[i]) * (f - i); };
+function chase(km) {
+  const dx0 = sample(SDX, km), dz0 = sample(SDZ, km), L = Math.hypot(dx0, dz0) || 1, dx = dx0 / L, dz = dz0 / L;
+  const bx = sample(SX, km), bz = sample(SZ, km), by = sample(SY, km);
+  const pos = new THREE.Vector3(bx - dx * BACK, sample(SCY, km), bz - dz * BACK);
+  // aim just past the train, so it sits a little below the middle of the frame with the line ahead of it
+  const look = new THREE.Vector3(bx + dx * AHEAD, by + 250, bz + dz * AHEAD);
+  return { pos, look };
+}
+function pose(t) {
+  const km = kmAtT(t);
+  const c = chase(km);
+  if (t < T_IN) {
+    const e = ease(clamp(t / T_IN, 0, 1));
+    return { pos: OVER.pos.clone().lerp(c.pos, e), look: OVER.look.clone().lerp(c.look, e), up: OVER.up.clone().lerp(UP, e).normalize(), km };
+  }
+  if (t > T_OUT) {
+    const e = ease(clamp((t - T_OUT) / (DUR - T_OUT), 0, 1));
+    return { pos: c.pos.clone().lerp(OVER.pos, e), look: c.look.clone().lerp(OVER.look, e), up: UP.clone().lerp(OVER.up, e).normalize(), km };
+  }
+  return { ...c, km };
+}
+
+// ---------- captions (km windows become time windows) ----------
+const top = META.top;
+const AT_KM = [
+  [0, 7, "Zermatt"],
+  [32, 38, "Visp"],
+  [41.5, 47, "Brig"],
+  [85.7, 101.1, "Furka Base Tunnel", "15.4 km under the mountain"],
+  [107, 112, "Andermatt"],
+  [top.km - 4, top.km + 4, "Oberalp Pass", "The highest point on the line"],
+  [137, 142, "Disentis"],
+  [195, 201, "Chur"],
+  [243.5, 248.5, "Landwasser Viaduct"],
+  [262.5, 267.5, "Albula viaducts"],
+  [269.8, 275.6, "Albula Tunnel", "5.8 km"],
+  [283, 287, "St. Moritz"],
+];
+const CAPS = [[0.4, T_IN - 0.4, "Glacier Express", "Zermatt → St. Moritz"]]
+  .concat(AT_KM.map(([a, b, l, s]) => [tAtKm(a), tAtKm(b), l, s]))
+  .concat([[T_OUT + 0.6, DUR, "Glacier Express", `${Math.round(TOTAL)} km · ${ROUTE.bridges.length} bridges · ${ROUTE.tunnels.length} tunnels<br>mapzimus.com/lab/train-routes`]]);
+// drop a caption that would start before the previous one has had 2 s on screen
+for (let i = 1; i < CAPS.length; i++) CAPS[i][0] = Math.max(CAPS[i][0], CAPS[i - 1][1] + 0.3);
+
+const capEl = document.getElementById("cap"), hudEl = document.getElementById("hud");
+document.getElementById("credit").textContent = "Track © OpenStreetMap contributors · Terrain: AWS Terrain Tiles · Imagery: Sentinel-2 cloudless by EOX (Copernicus Sentinel data 2020)";
+const passed = (runs, km) => runs.filter(r => r[0] < km).length;
+
+window.__scene = {
+  frame(t) {
+    const p = pose(t);
+    camera.position.copy(p.pos); camera.up.copy(p.up || UP); camera.lookAt(p.look);
+    // haze scales with height, so the overview shots see the whole Alps and the chase keeps its depth
+    const hgt = Math.max(0, p.pos.y - ground(p.pos.x, p.pos.z));
+    scene.fog.near = 40000 + hgt * 1.5; scene.fog.far = 160000 + hgt * 4;
+    const k = p.km, a = at(k);
+    const dist = camera.position.distanceTo(a.p);
+    trackU.uProg.value = t < T_IN ? 0 : k;
+    trackU.uWidth.value = clamp(dist * 0.0045, 25, 1400);
+    // car length grows with distance so the train stays legible (about a fifth of the frame width in the chase)
+    const carLen = clamp(dist * 0.03, 20, 2500);
+    const showTrain = t >= T_IN - 1.5;
+    for (let i = 0; i < CARS; i++) {
+      const front = k - i * carLen * (1 + CAR_GAP) / 1000, back = front - carLen / 1000;
+      const f = at(front), b = at(back), mid = at((front + back) / 2);
+      const g = cars[i];
+      g.visible = showTrain && front > 0 && ROUTE.kind[mid.i] !== "tunnel";
+      if (!g.visible) continue;
+      g.position.copy(f.p).add(b.p).multiplyScalar(0.5);
+      g.position.y += carLen * 0.02;
+      g.scale.setScalar(carLen);
+      g.lookAt(f.p.x, g.position.y + (f.p.y - b.p.y) * 0.5, f.p.z);
+      g.rotateY(-Math.PI / 2);   // the box's length runs along x; lookAt aims z
+    }
+    renderer.render(scene, camera);
+
+    const cap = CAPS.find(c => t >= c[0] && t < c[1]);
+    const html = cap ? cap[2] + (cap[3] ? `<small>${cap[3]}</small>` : "") : "";
+    if (capEl.innerHTML !== html) capEl.innerHTML = html;
+    capEl.style.opacity = cap ? Math.min(1, (t - cap[0]) / 0.25, (cap[1] - t) / 0.25) : 0;
+    const showHud = t >= T_IN - 0.5 && t <= T_OUT + 0.5;
+    hudEl.style.opacity = showHud ? 1 : 0;
+    hudEl.innerHTML = `km ${Math.round(k)} of ${Math.round(TOTAL)} · ${Math.round(a.elev).toLocaleString("en-US")} m<br>` +
+      `bridges ${passed(ROUTE.bridges, k)} · tunnels ${passed(ROUTE.tunnels, k)}`;
+  },
+};
+window.__ready = true;
+})().catch(e => { document.body.textContent = "scene error: " + e.message; window.__error = e.message; });
+</script>
+</body>
+</html>
