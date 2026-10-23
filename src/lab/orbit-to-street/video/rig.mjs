@@ -27,7 +27,7 @@ const HIDE = `
 #sheet, #dock, .ladder, nav, #caption, #tip, #labels, .zoom, .ctrl, .rail, header, footer { display: none !important; }
 #cap {
   position: fixed; left: 0; right: 0; top: 200px; z-index: 50; text-align: center;
-  font: 800 44px/1.15 system-ui, -apple-system, "Segoe UI", sans-serif; color: #fff;
+  font: 800 56px/1.15 system-ui, -apple-system, "Segoe UI", sans-serif; color: #fff;
   padding: 0 50px; text-shadow: 0 2px 4px #000, 0 0 22px rgba(0,0,0,.9); letter-spacing: -0.01em;
 }
 #cap small { display: block; margin-top: 16px; font-weight: 600; font-size: 27px; color: #d6dce6; }

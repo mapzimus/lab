@@ -34,15 +34,15 @@ const KEYS = [
 
 // [start, end, sentence, small line]
 const CAPS = [
-  [0.4, 4.6, "Let's fall from space to one street in Boston."],
-  [4.6, 10.4, "No cartoon map. Every pixel is a real satellite photo."],
-  [10.4, 16.6, "The sun is already setting on Europe and Africa."],
-  [16.6, 23.4, "That hook is Cape Cod. Boston is just above it."],
-  [23.4, 30.4, "Below the Space Station, below the clouds…"],
-  [30.4, 37.4, "Now the buildings rise, each one at its real height.", "15,116 of them, from OpenStreetMap"],
-  [37.4, 45.0, "This is Back Bay."],
-  [45.0, 53.0, "The shadows are from the real sun: 1:30 pm, late October."],
-  [53.0, 65.0, "From space to the rooftops.<br>One scene. No cuts.", "mapzimus.com/lab/orbit-to-street"],
+  [0.4, 6.0, "Real satellite imagery", "One shot, no cuts"],
+  [6.0, 12.0, "North America"],
+  [12.0, 18.5, "New England"],
+  [18.5, 24.0, "Cape Cod"],
+  [24.0, 30.4, "Boston"],
+  [30.4, 37.4, "15,116 buildings", "Real heights, from OpenStreetMap"],
+  [37.4, 45.0, "Back Bay"],
+  [45.0, 53.0, "Real sun position", "1:30 pm, late October"],
+  [53.0, 65.0, "Orbit to Street", "mapzimus.com/lab/orbit-to-street"],
 ];
 const CREDIT = "Imagery: Sentinel-2 cloudless by EOX (Copernicus Sentinel data 2020) · Esri, Maxar, Earthstar Geographics · Buildings © OpenStreetMap contributors";
 
