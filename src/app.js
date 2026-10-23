@@ -97,7 +97,7 @@
     return `<article class="card${featured ? " featured" : ""}" data-slug="${escapeHtml(item.slug)}" data-category="${escapeHtml(item.category)}">
       <button class="star" type="button" aria-label="${favorite ? "Remove from" : "Add to"} favorites" aria-pressed="${favorite}">${favorite ? "★" : "☆"}</button>
       <a class="card-link" href="${escapeHtml(item.url)}"${targetAttrs}>
-        <div class="card-meta"><span class="cat-tick" aria-hidden="true"></span><span class="card-type">${escapeHtml(categoryLabels[item.category] || item.category)}</span><span class="card-icon" aria-hidden="true">${escapeHtml(item.icon || "")}</span></div>
+        <div class="card-meta"><span class="cat-tick" aria-hidden="true"></span><span class="card-type">${escapeHtml(item.source === "tools" && item.category === "maps" ? "GIS" : categoryLabels[item.category] || item.category)}</span><span class="card-icon" aria-hidden="true">${escapeHtml(item.icon || "")}</span></div>
         <h3>${escapeHtml(item.title)}</h3>
         <p class="card-copy">${escapeHtml(item.description)}</p>
         ${featured ? "" : `<div class="card-tags">${tags}</div>`}
@@ -108,9 +108,11 @@
 
   function allowedByView(item) {
     // Keep in sync with itemsForView() in scripts/build.mjs.
-    if (view === "lab") return item.source === "projects" && item.category !== "party";
+    if (view === "lab") {
+      return item.source === "projects" && (item.category === "experiments" || item.status === "in-progress");
+    }
     if (view === "maps") {
-      return item.source === "projects" && item.category === "maps" && !item.external;
+      return item.source === "projects" && item.category === "maps" && item.status !== "in-progress";
     }
     if (view === "tools" && item.source !== "tools") return false;
     const allowed = viewCategories[view];
