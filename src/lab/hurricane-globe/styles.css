@@ -78,7 +78,8 @@ section {
 }
 
 .row { display: flex; gap: 8px; align-items: center; }
-.basins label { flex: 1; }
+.basins { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+.basins label { white-space: nowrap; }
 
 .field { margin-top: 10px; }
 .label {
