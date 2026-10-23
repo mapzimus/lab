@@ -107,7 +107,7 @@ if (dry) {
 } else {
   const ff = spawn("ffmpeg", ["-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", String(FPS), "-c:v", "mjpeg", "-i", "-",
     "-vf", "scale=1080:1920:flags=lanczos", "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
-    OUT + "orbit_to_street.mp4"], { stdio: ["pipe", "inherit", "inherit"] });
+    OUT + "orbit_to_street_master.mp4"], { stdio: ["pipe", "inherit", "inherit"] });
   const t0 = Date.now();
   for (let f = 0; f < DUR * FPS; f++) {
     const t = f / FPS, a = await frame(t);
@@ -118,6 +118,6 @@ if (dry) {
   }
   ff.stdin.end();
   await new Promise(r => ff.on("close", r));
-  console.log("wrote", OUT + "orbit_to_street.mp4");
+  console.log("wrote", OUT + "orbit_to_street_master.mp4");
 }
 await browser.close();
