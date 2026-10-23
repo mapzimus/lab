@@ -6,6 +6,7 @@
 //   python3 src/lab/train-routes/video/fetch_terrain.py
 //   node src/lab/train-routes/video/render.mjs                    # -> video/out/glacier_express_master.mp4
 //   node src/lab/train-routes/video/render.mjs --peek 3,20,45     # single frames
+//   node src/lab/train-routes/video/render.mjs --range 40,50      # a short clip -> video/out/preview.mp4
 import { spawn } from "node:child_process";
 import { mkdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -16,6 +17,8 @@ const FPS = 30, DUR = 65, VW = 720, VH = 1280;
 const HERE = fileURLToPath(new URL("./", import.meta.url));
 const OUT = HERE + "out/";
 const args = process.argv.slice(2);
+const range = args.includes("--range") ? args[args.indexOf("--range") + 1].split(",").map(Number) : [0, DUR];
+const outName = args.includes("--range") ? "preview.mp4" : "glacier_express_master.mp4";
 const peek = args.includes("--peek") ? args[args.indexOf("--peek") + 1].split(",").map(Number) : null;
 
 const FILES = {
@@ -53,9 +56,9 @@ if (peek) {
 } else {
   const ff = spawn("ffmpeg", ["-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", String(FPS), "-c:v", "mjpeg", "-i", "-",
     "-vf", "scale=1080:1920:flags=lanczos", "-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
-    OUT + "glacier_express_master.mp4"], { stdio: ["pipe", "inherit", "inherit"] });
+    OUT + outName], { stdio: ["pipe", "inherit", "inherit"] });
   const t0 = Date.now();
-  for (let f = 0; f < DUR * FPS; f++) {
+  for (let f = Math.round(range[0] * FPS); f < range[1] * FPS; f++) {
     await frame(f / FPS);
     const buf = await page.screenshot({ type: "jpeg", quality: 94, timeout: 180000 });
     if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once("drain", r));
@@ -63,6 +66,6 @@ if (peek) {
   }
   ff.stdin.end();
   await new Promise(r => ff.on("close", r));
-  console.log("wrote", OUT + "glacier_express_master.mp4");
+  console.log("wrote", OUT + outName);
 }
 await browser.close();

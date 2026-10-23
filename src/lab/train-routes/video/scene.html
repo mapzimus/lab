@@ -132,7 +132,7 @@ const P = ROUTE.coords.map(([lon, lat], i) => { const [x, z] = toXZ(lon, lat); r
       void main() {
         #include <logdepthbuf_fragment>
         float done = step(vKm, uProg);
-        gl_FragColor = vec4(mix(vec3(1.0, 0.97, 0.9), vec3(0.86, 0.1, 0.12), done), mix(0.75, 1.0, done));
+        gl_FragColor = vec4(mix(vec3(1.0, 0.97, 0.9), vec3(0.55, 0.07, 0.09), done), mix(0.75, 0.9, done));
         #include <tonemapping_fragment>
         #include <encodings_fragment>
       }`,
@@ -140,10 +140,24 @@ const P = ROUTE.coords.map(([lon, lat], i) => { const [x, z] = toXZ(lon, lat); r
   const mesh = new THREE.Mesh(g, m); mesh.renderOrder = 5; mesh.frustumCulled = false;
   scene.add(mesh);
 }
-// the train itself: a red marker that stays readable at any distance
-const train = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 16), new THREE.MeshBasicMaterial({ color: 0xff2a1f }));
-train.renderOrder = 6;
-scene.add(train);
+// the train: six red cars that each sit on the track at their own km, so the train bends through curves
+const CARS = 6, CAR_GAP = 0.12;   // gap as a fraction of a car length
+const carGeo = new THREE.BoxGeometry(1, 0.28, 0.2);   // length along x, scaled per frame
+const roofGeo = new THREE.BoxGeometry(0.98, 0.06, 0.16);
+const glassGeo = new THREE.BoxGeometry(0.9, 0.08, 0.205);
+const red = new THREE.MeshStandardMaterial({ color: 0xc8102e, roughness: 0.5, emissive: 0x3a0306 });
+const roof = new THREE.MeshStandardMaterial({ color: 0xf2f2ee, roughness: 0.6 });
+const glass = new THREE.MeshStandardMaterial({ color: 0x1b2430, roughness: 0.2, metalness: 0.3 });
+const cars = [];
+for (let i = 0; i < CARS; i++) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(carGeo, red); body.position.y = 0.14;
+  const top = new THREE.Mesh(roofGeo, roof); top.position.y = 0.31;
+  const win = new THREE.Mesh(glassGeo, glass); win.position.y = 0.2;
+  g.add(body, top, win);
+  g.renderOrder = 6;
+  scene.add(g); cars.push(g);
+}
 
 // position and heading along the line at a given km
 function at(km) {
@@ -174,17 +188,49 @@ const mid = new THREE.Vector3((bx0 + bx1) / 2, 0, (bz0 + bz1) / 2);
 const OVER = { pos: mid.clone().add(new THREE.Vector3(-55000, 185000, 0)), look: mid.clone().add(new THREE.Vector3(3000, 0, 0)), up: new THREE.Vector3(1, 0, 0) };
 const UP = new THREE.Vector3(0, 1, 0);
 
-// chase camera: behind and above the train, heading smoothed over the track ahead and behind
+// chase camera, precomputed on a 50 m grid of km so it can be smoothed hard: position over a few km,
+// heading over ~8 km (it glides through curves and loops instead of whipping round them), height over ~6 km
+// with a terrain clearance that is itself smoothed, so the camera never bobs over ridges
+const CS = 0.05, CN = Math.ceil(TOTAL / CS) + 1;
+function gauss(arr, sigmaKm) {
+  const r = Math.ceil(3 * sigmaKm / CS), w = [];
+  for (let k = -r; k <= r; k++) w.push(Math.exp(-0.5 * (k * CS / sigmaKm) ** 2));
+  return arr.map((_, i) => { let s = 0, n = 0; for (let k = -r; k <= r; k++) { const j = clamp(i + k, 0, arr.length - 1); s += arr[j] * w[k + r]; n += w[k + r]; } return s / n; });
+}
+const rawX = [], rawZ = [], rawY = [], rawDX = [], rawDZ = [];
+for (let i = 0; i < CN; i++) {
+  const a = at(i * CS), b = at(i * CS + 0.3), c = at(i * CS - 0.3);
+  rawX.push(a.p.x); rawZ.push(a.p.z); rawY.push(a.p.y);
+  const dx = b.p.x - c.p.x, dz = b.p.z - c.p.z, L = Math.hypot(dx, dz) || 1;
+  rawDX.push(dx / L); rawDZ.push(dz / L);
+}
+const SX = gauss(rawX, 1.2), SZ = gauss(rawZ, 1.2), SY = gauss(rawY, 3);
+const SDX = gauss(rawDX, 4), SDZ = gauss(rawDZ, 4);
+const BACK = 3000, LIFT = 1500, AHEAD = 350;
+const camY = [];
+for (let i = 0; i < CN; i++) {
+  const L = Math.hypot(SDX[i], SDZ[i]) || 1, dx = SDX[i] / L, dz = SDZ[i] / L;
+  let need = SY[i] + LIFT;
+  // clear the terrain under the camera and along the sight line to the train
+  for (let f = 0; f <= 1; f += 0.25) {
+    const x = SX[i] - dx * BACK * (1 - f), z = SZ[i] - dz * BACK * (1 - f);
+    need = Math.max(need, ground(x, z) + 450 + (1 - f) * 250);
+  }
+  camY.push(need);
+}
+// running max over ±2 km, then smoothed: the camera rises early for a ridge and stays up until past it
+const R2 = Math.round(2 / CS);
+const camYmax = camY.map((_, i) => { let m = -1e9; for (let k = -R2; k <= R2; k++) m = Math.max(m, camY[clamp(i + k, 0, CN - 1)]); return m; });
+const SCY = gauss(camYmax, 1.5);
+const sample = (arr, km) => { const f = clamp(km / CS, 0, CN - 1), i = Math.min(CN - 2, Math.floor(f)); return arr[i] + (arr[i + 1] - arr[i]) * (f - i); };
 function chase(km) {
-  const here = at(km).p, ahead = at(km + 2.2).p, behind = at(km - 2.2).p;
-  const dir = ahead.clone().sub(behind); dir.y = 0; dir.normalize();
-  const pos = here.clone().addScaledVector(dir, -3200); pos.y = here.y + 1700;
-  pos.y = Math.max(pos.y, ground(pos.x, pos.z) + 600);
-  const look = here.clone().addScaledVector(dir, 1800); look.y = here.y - 150;
+  const dx0 = sample(SDX, km), dz0 = sample(SDZ, km), L = Math.hypot(dx0, dz0) || 1, dx = dx0 / L, dz = dz0 / L;
+  const bx = sample(SX, km), bz = sample(SZ, km), by = sample(SY, km);
+  const pos = new THREE.Vector3(bx - dx * BACK, sample(SCY, km), bz - dz * BACK);
+  // aim just past the train, so it sits a little below the middle of the frame with the line ahead of it
+  const look = new THREE.Vector3(bx + dx * AHEAD, by + 250, bz + dz * AHEAD);
   return { pos, look };
 }
-// direction smoothing between frames
-let sPos = null, sLook = null;
 function pose(t) {
   const km = kmAtT(t);
   const c = chase(km);
@@ -236,9 +282,21 @@ window.__scene = {
     const dist = camera.position.distanceTo(a.p);
     trackU.uProg.value = t < T_IN ? 0 : k;
     trackU.uWidth.value = clamp(dist * 0.0045, 25, 1400);
-    train.position.copy(a.p).add(new THREE.Vector3(0, 12, 0));
-    train.scale.setScalar(clamp(dist * 0.006, 25, 2000));
-    train.visible = t >= T_IN - 1.5 && !(ROUTE.kind[a.i] === "tunnel" && t > T_IN && t < T_OUT);
+    // car length grows with distance so the train stays legible (about a fifth of the frame width in the chase)
+    const carLen = clamp(dist * 0.03, 20, 2500);
+    const showTrain = t >= T_IN - 1.5;
+    for (let i = 0; i < CARS; i++) {
+      const front = k - i * carLen * (1 + CAR_GAP) / 1000, back = front - carLen / 1000;
+      const f = at(front), b = at(back), mid = at((front + back) / 2);
+      const g = cars[i];
+      g.visible = showTrain && front > 0 && ROUTE.kind[mid.i] !== "tunnel";
+      if (!g.visible) continue;
+      g.position.copy(f.p).add(b.p).multiplyScalar(0.5);
+      g.position.y += carLen * 0.02;
+      g.scale.setScalar(carLen);
+      g.lookAt(f.p.x, g.position.y + (f.p.y - b.p.y) * 0.5, f.p.z);
+      g.rotateY(-Math.PI / 2);   // the box's length runs along x; lookAt aims z
+    }
     renderer.render(scene, camera);
 
     const cap = CAPS.find(c => t >= c[0] && t < c[1]);
