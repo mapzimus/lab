@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-23",
+  "generatedAt": "2026-10-24",
   "news": {
     "mapsmania": [
+      {
+        "title": "A Fair Election Map for the Midterms",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/a-fair-election-map-for-midterms.html",
+        "desc": ""
+      },
       {
         "title": "Have You Had Your Five a Day?",
         "url": "http://googlemapsmania.blogspot.com/2026/10/have-you-had-your-five-day.html",
@@ -35,11 +40,6 @@
       {
         "title": "What America Looks Like After 700 Meters of Sea Level Rise",
         "url": "http://googlemapsmania.blogspot.com/2026/10/what-america-looks-like-after-700.html",
-        "desc": ""
-      },
-      {
-        "title": "Travel Blogging & Mapping",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/travel-blogging-mapping.html",
         "desc": ""
       }
     ],
@@ -210,9 +210,21 @@
   ],
   "gisse": [
     {
+      "title": "Converting a DEM from grid to TIFF changes range of elevation values",
+      "url": "https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Layout size and PDF size don't match in QGIS",
       "url": "https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis",
-      "score": 3,
+      "score": 4,
+      "answers": 0
+    },
+    {
+      "title": "Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API",
+      "url": "https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api",
+      "score": 0,
       "answers": 0
     },
     {
@@ -220,6 +232,12 @@
       "url": "https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis",
       "score": 2,
       "answers": 1
+    },
+    {
+      "title": "Convert Discrete Voxel Layer to same-value-merged 3D objects in ArcGIS?",
+      "url": "https://gis.stackexchange.com/questions/501634/convert-discrete-voxel-layer-to-same-value-merged-3d-objects-in-arcgis",
+      "score": 1,
+      "answers": 0
     },
     {
       "title": "Download postgis-bundle-pg18x64-setup-3.6.2-1.exe",
@@ -250,24 +268,6 @@
       "url": "https://gis.stackexchange.com/questions/501619/qgis-raster-to-vector-conversion-crashing-my-computer",
       "score": 0,
       "answers": 2
-    },
-    {
-      "title": "GEE - Inspector and rendered classification disagree at max zoom — OBIA pipeline",
-      "url": "https://gis.stackexchange.com/questions/501616/gee-inspector-and-rendered-classification-disagree-at-max-zoom-obia-pipeline",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Creating this dark green (\"V\") line symbology in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis",
-      "score": 4,
-      "answers": 1
-    },
-    {
-      "title": "Finding the land area east and west of meridian",
-      "url": "https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian",
-      "score": 0,
-      "answers": 0
     }
   ],
   "nasa": [
@@ -290,46 +290,46 @@
       "org": "ASF"
     },
     {
-      "title": "SWOT Level 2 Nadir Altimeter Operational Geophysical Data Record with Waveforms, GPS, NRT, Version D",
-      "url": "https://search.earthdata.nasa.gov/search?q=SWOT_L2_NALT_OGDR_NRTGPS_D",
-      "desc": "The value-added SWOT Level 2 Near Real Time GPS Nadir Altimeter Operational Geophysical Data Record (NRT GPS OGDR) Version D dataset produced by the Surface…",
-      "org": "POCLOUD"
+      "title": "ACTIVATE Falcon In-Situ Meteorological and Navigational Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=ACTIVATE_MetNav_AircraftInSitu_Falcon_Data",
+      "desc": "ACTIVATE_MetNav_AircraftInSitu_Falcon_Data is the meteorological and navigational data collected onboard the HU-25 Falcon aircraft via in-situ instrumentatio…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based GNSS-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN) GPS daily accumulated real-time Prec…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_POD_60sec_clk_corr",
-      "desc": "This product contains a time series of clock biases for healthy satellites in the GPS constellation that are accumulated every minute throughout the day.",
-      "org": "CDDIS"
+      "title": "ACTIVATE Falcon In Situ Trace Gas Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=ACTIVATE_TraceGas_AircraftInSitu_Falcon_Data",
+      "desc": "ACTIVATE_TraceGas_AircraftInSitu_Falcon_Data is the trace gas data collected onboard the HU-25 Falcon aircraft via in-situ instrumentation during the ACTIVAT…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based GNSS-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN) GPS daily accumulated real-time Prec…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_POD_30sec_att_quat",
-      "desc": "This product contains a time series of attitude quaternion components for healthy satellites in the GPS constellation that are accumulated every minute throu…",
-      "org": "CDDIS"
+      "title": "ACTIVATE Miscellaneous and Ancillary Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=ACTIVATE_Miscellaneous_Data",
+      "desc": "ACTIVATE_Miscellaneous_Data is the supplementary miscellaneous data collected and utilized during the ACTIVATE project.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based GNSS-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN) GPS daily accumulated real-time Prec…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_POD_1sec_clk_corr",
-      "desc": "This product contains a high-rate time series of clock biases for healthy satellites in the GPS constellation that are accumulated every minute throughout th…",
-      "org": "CDDIS"
+      "title": "ACTIVATE King Air Meteorological and Navigational Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=ACTIVATE_MetNav_AircraftInSitu_KingAir_Data",
+      "desc": "ACTIVATE_MetNav_AircraftInSitu_KingAir_Data is the meteorological and navigational data collected onboard the B-200 King Air aircraft via in-situ instrumenta…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS)-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN)…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_EOP",
-      "desc": "This product contains a time series of Earth orientation parameters from the IERS Bulletin A for the GPS constellation of satellites.",
-      "org": "CDDIS"
+      "title": "ACTIVATE Falcon In Situ Cloud Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=ACTIVATE_Cloud_AircraftInSitu_Falcon_Data",
+      "desc": "ACTIVATE_Cloud_AircraftInSitu_Falcon_Data is the cloud data collected onboard the HU-25 Falcon aircraft via in-situ instrumentation during the ACTIVATE project.",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS)-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN)…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_ant_phse_map_meta",
-      "desc": "This product contains file names and URLs to files containing antenna phase map data used in the real-time GPS POD processing.",
-      "org": "CDDIS"
+      "title": "ACTIVATE Falcon In Situ Aerosol Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=ACTIVATE_Aerosol_AircraftInSitu_Falcon_Data",
+      "desc": "ACTIVATE_Aerosol_AircraftInSitu_Falcon_Data is the aerosol data collected onboard the HU-25 Falcon aircraft via in-situ instrumentation during the ACTIVATE p…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS)-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN)…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_ant_phse_ctrs",
-      "desc": "This product ontains antenna phase center locations relative to the GPS satellite's center of mass.",
-      "org": "CDDIS"
+      "title": "ACTIVATE King Air Aerosol and Cloud Remotely Sensed Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=ACTIVATE_AerosolCloud_AircraftRemoteSensing_KingAir_Data",
+      "desc": "ACTIVATE_AerosolCloud_AircraftRemoteSensing_KingAir_Data is the aerosol and cloud data collected onboard the B-200 King Air aircraft via remote sensing instr…",
+      "org": "LARC_CLOUD"
     }
   ],
   "datagov": [

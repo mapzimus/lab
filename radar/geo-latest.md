@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-23
+# Mapzimus Geospatial Radar — 2026-10-24
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [A Fair Election Map for the Midterms](http://googlemapsmania.blogspot.com/2026/10/a-fair-election-map-for-midterms.html)
 - [Have You Had Your Five a Day?](http://googlemapsmania.blogspot.com/2026/10/have-you-had-your-five-day.html)
 - [The World's Most Notable Places.](http://googlemapsmania.blogspot.com/2026/10/the-worlds-most-notable-places.html)
 - [Pixelate the World](http://googlemapsmania.blogspot.com/2026/10/pixelate-world.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [There are 89,603 Dogs in New York City](http://googlemapsmania.blogspot.com/2026/10/there-are-89603-dogs-in-new-york-city.html)
 - [What is Your Walk Score?](http://googlemapsmania.blogspot.com/2026/10/what-is-your-walk-score.html)
 - [What America Looks Like After 700 Meters of Sea Level Rise](http://googlemapsmania.blogspot.com/2026/10/what-america-looks-like-after-700.html)
-- [Travel Blogging & Mapping](http://googlemapsmania.blogspot.com/2026/10/travel-blogging-mapping.html)
 
 ## Geography Realm
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 3 · 0 answers)
+- [Converting a DEM from grid to TIFF changes range of elevation values](https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values) (▲ 0 · 0 answers)
+- [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 4 · 0 answers)
+- [Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API](https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api) (▲ 0 · 0 answers)
 - [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 1 answers)
+- [Convert Discrete Voxel Layer to same-value-merged 3D objects in ArcGIS?](https://gis.stackexchange.com/questions/501634/convert-discrete-voxel-layer-to-same-value-merged-3d-objects-in-arcgis) (▲ 1 · 0 answers)
 - [Download postgis-bundle-pg18x64-setup-3.6.2-1.exe](https://gis.stackexchange.com/questions/501628/download-postgis-bundle-pg18x64-setup-3-6-2-1-exe) (▲ -1 · 1 answers)
 - [Increasing the size of the selected line symbol within layer in ArcGIS Pro](https://gis.stackexchange.com/questions/501625/increasing-the-size-of-the-selected-line-symbol-within-layer-in-arcgis-pro) (▲ 2 · 2 answers)
 - [How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?](https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal) (▲ 0 · 2 answers)
 - [QgsTaskManager active vs queued vs running task](https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task) (▲ 2 · 1 answers)
 - [QGIS: Raster to Vector conversion crashing my computer](https://gis.stackexchange.com/questions/501619/qgis-raster-to-vector-conversion-crashing-my-computer) (▲ 0 · 2 answers)
-- [GEE - Inspector and rendered classification disagree at max zoom — OBIA pipeline](https://gis.stackexchange.com/questions/501616/gee-inspector-and-rendered-classification-disagree-at-max-zoom-obia-pipeline) (▲ 0 · 0 answers)
-- [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 1 answers)
-- [Finding the land area east and west of meridian](https://gis.stackexchange.com/questions/501596/finding-the-land-area-east-and-west-of-meridian) (▲ 0 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [SWOT Level 2 Nadir Altimeter Operational Geophysical Data Record with Waveforms, GPS, NRT, Version D](https://search.earthdata.nasa.gov/search?q=SWOT_L2_NALT_OGDR_NRTGPS_D) — The value-added SWOT Level 2 Near Real Time GPS Nadir Altimeter Operational Geophysical Data Record (NRT GPS OGDR) Version D dataset produced by the Surface…
-- [Ground-Based GNSS-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN) GPS daily accumulated real-time Prec…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_POD_60sec_clk_corr) — This product contains a time series of clock biases for healthy satellites in the GPS constellation that are accumulated every minute throughout the day.
-- [Ground-Based GNSS-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN) GPS daily accumulated real-time Prec…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_POD_30sec_att_quat) — This product contains a time series of attitude quaternion components for healthy satellites in the GPS constellation that are accumulated every minute throu…
-- [Ground-Based GNSS-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN) GPS daily accumulated real-time Prec…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_POD_1sec_clk_corr) — This product contains a high-rate time series of clock biases for healthy satellites in the GPS constellation that are accumulated every minute throughout th…
-- [Ground-Based Global Navigation Satellite System (GNSS)-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN)…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_EOP) — This product contains a time series of Earth orientation parameters from the IERS Bulletin A for the GPS constellation of satellites.
-- [Ground-Based Global Navigation Satellite System (GNSS)-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN)…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_ant_phse_map_meta) — This product contains file names and URLs to files containing antenna phase map data used in the real-time GPS POD processing.
-- [Ground-Based Global Navigation Satellite System (GNSS)-based Upper Atmospheric Realtime Disaster Information and Alert Network (GUARDIAN)…](https://search.earthdata.nasa.gov/search?q=GNSS_GD_GPS_dly_ant_phse_ctrs) — This product ontains antenna phase center locations relative to the GPS satellite's center of mass.
+- [ACTIVATE Falcon In-Situ Meteorological and Navigational Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_MetNav_AircraftInSitu_Falcon_Data) — ACTIVATE_MetNav_AircraftInSitu_Falcon_Data is the meteorological and navigational data collected onboard the HU-25 Falcon aircraft via in-situ instrumentatio…
+- [ACTIVATE Falcon In Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_TraceGas_AircraftInSitu_Falcon_Data) — ACTIVATE_TraceGas_AircraftInSitu_Falcon_Data is the trace gas data collected onboard the HU-25 Falcon aircraft via in-situ instrumentation during the ACTIVAT…
+- [ACTIVATE Miscellaneous and Ancillary Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_Miscellaneous_Data) — ACTIVATE_Miscellaneous_Data is the supplementary miscellaneous data collected and utilized during the ACTIVATE project.
+- [ACTIVATE King Air Meteorological and Navigational Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_MetNav_AircraftInSitu_KingAir_Data) — ACTIVATE_MetNav_AircraftInSitu_KingAir_Data is the meteorological and navigational data collected onboard the B-200 King Air aircraft via in-situ instrumenta…
+- [ACTIVATE Falcon In Situ Cloud Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_Cloud_AircraftInSitu_Falcon_Data) — ACTIVATE_Cloud_AircraftInSitu_Falcon_Data is the cloud data collected onboard the HU-25 Falcon aircraft via in-situ instrumentation during the ACTIVATE project.
+- [ACTIVATE Falcon In Situ Aerosol Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_Aerosol_AircraftInSitu_Falcon_Data) — ACTIVATE_Aerosol_AircraftInSitu_Falcon_Data is the aerosol data collected onboard the HU-25 Falcon aircraft via in-situ instrumentation during the ACTIVATE p…
+- [ACTIVATE King Air Aerosol and Cloud Remotely Sensed Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_AerosolCloud_AircraftRemoteSensing_KingAir_Data) — ACTIVATE_AerosolCloud_AircraftRemoteSensing_KingAir_Data is the aerosol and cloud data collected onboard the B-200 King Air aircraft via remote sensing instr…
 
 ## Data.gov — new geodata
 
