@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Detroit · video scene</title>
+<!-- Video-only scene for render.mjs: the page's hex grid as 3D columns over OpenFreeMap's dark basemap,
+     driven frame by frame through window.__scene.frame(t). Not linked from the site. -->
+<link rel="stylesheet" href="maplibre-gl.css">
+<style>
+  html, body, #map { margin: 0; height: 100%; background: #0b0d10; }
+  .maplibregl-ctrl-attrib, .maplibregl-ctrl-logo { display: none !important; }
+  #cap { position: fixed; left: 0; right: 0; top: 200px; z-index: 5; text-align: center; color: #fff;
+    font: 800 56px/1.12 system-ui, -apple-system, "Segoe UI", sans-serif; padding: 0 50px; letter-spacing: -0.01em;
+    text-shadow: 0 2px 4px #000, 0 0 22px rgba(0,0,0,.9); }
+  #cap small { display: block; margin-top: 16px; font-weight: 600; font-size: 27px; color: #e4e8ee; }
+  #hud { position: fixed; left: 0; right: 0; bottom: 260px; z-index: 5; text-align: center; color: #f2f5f9;
+    font: 700 27px/1.5 ui-monospace, Menlo, monospace; text-shadow: 0 1px 3px #000, 0 0 12px #000; }
+  #credit { position: fixed; left: 0; right: 0; bottom: 200px; z-index: 5; text-align: center; padding: 0 40px;
+    font: 500 13px/1.3 system-ui, sans-serif; color: rgba(255,255,255,.6); }
+</style>
+</head>
+<body>
+<div id="map"></div><div id="cap"></div><div id="hud"></div><div id="credit"></div>
+<script src="maplibre-gl.js"></script>
+<script>
+(async () => {
+const grid = await (await fetch("detroit-grid.geojson")).json();
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const lerp = (a, b, f) => a + (b - a) * f;
+
+// ---------- per-cell series ----------
+const Y0 = 1900, YB = 2013, YD0 = 2014, YD1 = 2026;
+const cells = grid.features.map((f, id) => {
+  f.id = id;
+  const p = f.properties;
+  let dated = 0; for (const k in p) if (k.startsWith("built_") && +k.slice(6) <= YB) dated += p[k];
+  let dem = 0, nb = 0; for (let y = YD0; y <= YD1; y++) { dem += p["demolitions_" + y] || 0; nb += p["newbuilds_" + y] || 0; }
+  const s14 = p.stock_now + dem - nb;
+  // built-by-year, cumulative (surviving buildings only), scaled so 2013 lands on the 2014 stock
+  const scale = dated ? s14 / dated : 0;
+  const builtBy = {}; let run = 0;
+  for (const k in p) if (k.startsWith("built_") && +k.slice(6) < Y0) run += p[k];
+  for (let y = Y0; y <= YB; y++) { run += p["built_" + y] || 0; builtBy[y] = run * scale; }
+  const stockAt = {}, demBy = {}, nbBy = {}; let d = 0, n = 0;
+  for (let y = YD0; y <= YD1; y++) { d += p["demolitions_" + y] || 0; n += p["newbuilds_" + y] || 0; demBy[y] = d; nbBy[y] = n; stockAt[y] = s14 - d + n; }
+  return { id, p, s14, dem, nb, builtBy, stockAt, demBy, nbBy };
+});
+// citywide counters, raw (not scaled)
+const META = grid.metadata.citywide_totals;
+const cityBuiltBy = {}; { let r = 0; for (const y in META) { r += META[y].built; cityBuiltBy[y] = r; } }
+const cityDemBy = {}, cityNbBy = {}; { let d = 0, n = 0; for (let y = YD0; y <= YD1; y++) { d += META[y].demolitions; n += META[y].newbuilds; cityDemBy[y] = d; cityNbBy[y] = n; } }
+const at = (obj, yf, lo, hi) => { const y = clamp(yf, lo, hi), a = Math.floor(y), b = Math.min(hi, a + 1); return lerp(obj[a] ?? 0, obj[b] ?? 0, y - a); };
+
+// ---------- map ----------
+const map = new maplibregl.Map({
+  container: "map", style: "https://tiles.openfreemap.org/styles/dark",
+  center: [-83.08, 42.37], zoom: 10.3, pitch: 0, bearing: 0, interactive: false,
+  fadeDuration: 0, preserveDrawingBuffer: true, maxPitch: 75,
+});
+await new Promise(r => map.once("load", r));
+map.addSource("hex", { type: "geojson", data: grid });
+map.addSource("city", { type: "geojson", data: await (await fetch("detroit-boundary.geojson")).json() });
+map.addLayer({ id: "city", type: "line", source: "city", paint: { "line-color": "#8892a0", "line-width": 1.2, "line-opacity": 0.7 } });
+map.addLayer({
+  id: "hex3d", type: "fill-extrusion", source: "hex",
+  paint: {
+    "fill-extrusion-height": ["coalesce", ["feature-state", "h"], 0],
+    "fill-extrusion-color": ["coalesce", ["feature-state", "c"], "#d8cdb8"],
+    "fill-extrusion-opacity": 0.92,
+    "fill-extrusion-vertical-gradient": true,
+  },
+});
+const M_PER_BUILDING = 5;
+
+// ---------- timeline ----------
+// 0-3 flat intro; 3-16 built 1900->2013; 16-38 torn down 2014->2026; 38-46 Mapleridge; 46-56 new builds downtown; 56-65 end
+const yearAt = t => t < 3 ? Y0 : t < 16 ? lerp(Y0, YB, ease((t - 3) / 13)) : t < 38 ? lerp(YD0 - 1, YD1, ease(clamp((t - 16) / 21, 0, 1))) : YD1;
+const MAPLE = [-82.9722, 42.4253], DOWNTOWN = [-83.06, 42.338];
+const KEYS = [   // t, lon, lat, zoom, pitch, bearing
+  [0, -83.08, 42.37, 10.3, 0, 0],
+  [3, -83.08, 42.37, 10.3, 0, 0],
+  [10, -83.07, 42.36, 10.5, 55, -15],
+  [16, -83.07, 42.37, 10.5, 58, -25],
+  [30, -83.03, 42.38, 10.6, 60, -40],
+  [38, -82.985, 42.405, 11.4, 58, -35],
+  [44, MAPLE[0] + 0.004, MAPLE[1] - 0.01, 12.1, 55, -20],
+  [50, -83.04, 42.36, 11.6, 60, -80],
+  [56, DOWNTOWN[0], DOWNTOWN[1] - 0.004, 12.6, 64, -95],
+  [65, -83.08, 42.37, 10.4, 50, -120],
+];
+const cr = (p0, p1, p2, p3, u) => 0.5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u);
+function cam(t) {
+  let i = 0; while (i < KEYS.length - 2 && t > KEYS[i + 1][0]) i++;
+  const a = KEYS[Math.max(0, i - 1)], b = KEYS[i], c = KEYS[i + 1], d = KEYS[Math.min(KEYS.length - 1, i + 2)];
+  const u = clamp((t - b[0]) / (c[0] - b[0]), 0, 1), f = k => cr(a[k], b[k], c[k], d[k], u);
+  return { center: [f(1), f(2)], zoom: f(3), pitch: clamp(f(4), 0, 70), bearing: f(5) };
+}
+
+const CAPS = [
+  [0.3, 3.0, "Detroit"],
+  [3.0, 16.0, "Every building still standing", "Raised by the year it was built"],
+  [16.0, 38.0, "Then, from 2014: demolitions", "31,580 buildings torn down"],
+  [38.0, 46.0, "Mapleridge", "236 of 503 buildings gone, 47%"],
+  [46.0, 56.0, "Built back: 942", "New buildings since 2019. Green: 5 or more"],
+  [56.0, 65.0, "Torn Down / Built Back", "mapzimus.com/lab/detroit-rebuild"],
+];
+const capEl = document.getElementById("cap"), hudEl = document.getElementById("hud");
+document.getElementById("credit").textContent = "Data: City of Detroit demolitions and BSEED permits, Detroit parcels · Basemap © OpenMapTiles © OpenStreetMap contributors";
+const fmt = n => Math.round(n).toLocaleString("en-US");
+const STONE = [216, 205, 184], RED = [214, 56, 48], GREEN = [76, 201, 120], DIM = [58, 62, 70];
+const mix = (a, b, f) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * f)).join(",")})`;
+
+window.__scene = {
+  frame(t) {
+    const y = yearAt(t);
+    const c = cam(t);
+    map.jumpTo(c);
+    const green = smooth(46, 48.5, t) * (1 - smooth(56, 58, t));
+    for (const cell of cells) {
+      let n, col;
+      if (t < 16) {
+        n = at(cell.builtBy, y, Y0, YB) * smooth(2.6, 4.5, t + 0.0001) + 0;
+        if (t < 3) n = 0;
+        col = mix(STONE, STONE, 0);
+      } else {
+        n = at(cell.stockAt, y, YD0 - 1, YD1);
+        if (y < YD0) n = cell.s14;
+        const lost = at(cell.demBy, y, YD0, YD1) / Math.max(cell.s14, 25);
+        const f = clamp(lost / 0.35, 0, 1), base = STONE.map((v, i) => v + (RED[i] - v) * f);
+        col = mix(base, base, 0);
+        // Mapleridge: everything else dims while its cells stay lit
+        const maple = smooth(38, 39.5, t) * (1 - smooth(45, 46.5, t));
+        if (maple > 0 && cell.p.neighborhood !== "Mapleridge") { col = mix(base, DIM, maple * 0.85); n *= 1 - maple * 0.75; }
+        // built back: cells with new buildings turn green, the rest dim
+        // (5+ new buildings: where the building back is concentrated)
+        if (green > 0) {
+          if (cell.nb >= 5) col = mix(base, GREEN, green);
+          else { col = mix(base, DIM, green * 0.85); n *= 1 - green * 0.75; }
+        }
+      }
+      map.setFeatureState({ source: "hex", id: cell.id }, { h: n * M_PER_BUILDING, c: col });
+    }
+    const cap = CAPS.find(k => t >= k[0] && t < k[1]);
+    const html = cap ? cap[2] + (cap[3] ? `<small>${cap[3]}</small>` : "") : "";
+    if (capEl.innerHTML !== html) capEl.innerHTML = html;
+    capEl.style.opacity = cap ? Math.min(1, (t - cap[0]) / 0.25, (cap[1] - t) / 0.25) : 0;
+    if (t >= 3 && t < 16) hudEl.innerHTML = `${Math.round(y)}<br>${fmt(at(cityBuiltBy, y, 1870, YB))} buildings`;
+    else if (t >= 16 && t < 56) hudEl.innerHTML = `${Math.min(YD1, Math.max(YD0, Math.round(y)))}<br>${fmt(at(cityDemBy, y, YD0, YD1))} torn down · ${fmt(at(cityNbBy, y, YD0, YD1))} new`;
+    else hudEl.innerHTML = "";
+    return new Promise(r => { map.once("idle", r); map.triggerRepaint(); setTimeout(r, 4000); });
+  },
+};
+window.__ready = true;
+})().catch(e => { window.__error = e.message; document.body.append("scene error: " + e.message); });
+</script>
+</body>
+</html>
