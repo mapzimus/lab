@@ -116,6 +116,9 @@ const state = {
   y1: 2026,
   minW: 34,
   unknown: true,
+  rain: true,
+  radar: true,
+  ovT: 0, // overlay time for the selected storm
   name: '',
   extrude: true,
   mode: 'tracks', // or 'density'
@@ -743,6 +746,292 @@ function clearQuery() {
   showInfo(state.selected);
 }
 
+// ---------- rain + radar overlays ----------
+//
+// Satellite rain is NASA GPM IMERG half-hourly precipitation from GIBS. At zoom 2
+// its EPSG:4326 WMTS is 5×3 tiles of 72°, about IMERG's native 0.1°. The tiles are
+// painted into an equirectangular canvas draped just above the globe and masked to
+// a soft disc around each storm. US radar is the NEXRAD N0R base-reflectivity
+// composite from the Iowa Environmental Mesonet. Those Web Mercator tiles go on a
+// patch of the sphere whose vertices are spaced evenly in Mercator y, so the texture
+// maps without a reprojection shader.
+
+const RAIN_URL = 'https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/IMERG_Precipitation_Rate_30min/default';
+const RADAR_URL = 'https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/ridge::USCOMP-N0R-';
+const RAIN_FIRST = Date.UTC(1998, 0, 1), RADAR_FIRST = Date.UTC(1995, 0, 1);
+const OVERLAY_LAG = 12 * HOUR; // the newest frames take a few hours to post
+const RAIN_DEG = 72, RAIN_TILE = 512, RAIN_PX = RAIN_TILE / RAIN_DEG;
+const RAIN_RADIUS = 12; // degrees of rain kept around each storm
+const RADAR_Z = 6, RADAR_SPAN = 4; // 4×4 tiles at zoom 6, about 22° square
+const RADAR_BOX = { lat0: 17, lat1: 52, lon0: -128, lon1: -62 }; // storm centres the US mosaic can reach
+
+const imageCache = new Map();
+function loadImage(url) {
+  if (!imageCache.has(url)) {
+    if (imageCache.size > 600) imageCache.delete(imageCache.keys().next().value);
+    imageCache.set(url, new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = url;
+    }));
+  }
+  return imageCache.get(url);
+}
+
+const overlayStatus = { rain: '', radar: '', loading: 0 };
+function renderOverlayStatus() {
+  const text = [overlayStatus.rain, overlayStatus.radar].filter(Boolean).join(' · ') + (overlayStatus.loading ? ' · loading…' : '');
+  const el = $(state.play ? 'povl' : 'ovStatus');
+  if (el) el.textContent = text;
+}
+function trackLoad(promise) {
+  overlayStatus.loading++;
+  renderOverlayStatus();
+  return promise.finally(() => { overlayStatus.loading--; renderOverlayStatus(); });
+}
+
+const rainCanvas = Object.assign(document.createElement('canvas'), { width: 360 * RAIN_PX, height: 180 * RAIN_PX });
+const rainCtx = rainCanvas.getContext('2d');
+const maskCanvas = Object.assign(document.createElement('canvas'), { width: rainCanvas.width, height: rainCanvas.height });
+const maskCtx = maskCanvas.getContext('2d');
+const rainTex = new THREE.CanvasTexture(rainCanvas);
+rainTex.colorSpace = THREE.SRGBColorSpace;
+const rainMesh = new THREE.Mesh(
+  new THREE.SphereGeometry(R + 0.0013, 160, 80),
+  new THREE.MeshBasicMaterial({ map: rainTex, transparent: true, opacity: 0.9, depthWrite: false }),
+);
+rainMesh.renderOrder = 4;
+rainMesh.visible = false;
+scene.add(rainMesh);
+
+const halfHourIso = (t) => new Date(Math.floor(t / 18e5) * 18e5).toISOString().slice(0, 19) + 'Z';
+const overlayAvailable = (t, first) => t >= first && t <= Date.now() - OVERLAY_LAG;
+
+function rainUrls(t, centers) {
+  const when = halfHourIso(t), tiles = new Set();
+  for (const [lat, lon] of centers) {
+    const row0 = Math.max(0, Math.floor((90 - lat - RAIN_RADIUS) / RAIN_DEG));
+    const row1 = Math.min(2, Math.floor((90 - lat + RAIN_RADIUS) / RAIN_DEG));
+    const dLon = Math.min(180, RAIN_RADIUS / Math.max(0.2, Math.cos(lat * DEG)));
+    for (let row = row0; row <= row1; row++)
+      for (let lo = lon - dLon; ; lo += RAIN_DEG) {
+        const col = Math.min(4, Math.floor((wrapLon(Math.min(lo, lon + dLon)) + 180) / RAIN_DEG));
+        tiles.add(`${row}/${col}`);
+        if (lo >= lon + dLon) break;
+      }
+  }
+  return [...tiles].map((k) => ({ k, url: `${RAIN_URL}/${when}/2km/2/${k}.png` }));
+}
+
+let rainKey = '', rainSeq = 0;
+function showRain(t, centers) {
+  if (!state.rain || !centers.length || !overlayAvailable(t, RAIN_FIRST)) {
+    rainMesh.visible = false;
+    rainKey = '';
+    overlayStatus.rain = state.rain && centers.length && t < RAIN_FIRST ? 'Satellite rain starts in 1998' : '';
+    return;
+  }
+  const tiles = rainUrls(t, centers);
+  const key = tiles.map((x) => x.url).join() + centers.map((c) => c.map((v) => v.toFixed(1))).join(';');
+  overlayStatus.rain = `Satellite rain ${halfHourIso(t).slice(11, 16)} UTC`;
+  if (key === rainKey) return;
+  rainKey = key;
+  const seq = ++rainSeq;
+  trackLoad(Promise.all(tiles.map(({ k, url }) => loadImage(url).then((img) => [k, img])))).then((imgs) => {
+    if (seq !== rainSeq) return;
+    const W = rainCanvas.width, H = rainCanvas.height;
+    rainCtx.globalCompositeOperation = 'source-over';
+    rainCtx.clearRect(0, 0, W, H);
+    for (const [k, img] of imgs) {
+      if (!img) continue;
+      const [row, col] = k.split('/').map(Number);
+      rainCtx.drawImage(img, col * RAIN_TILE, row * RAIN_TILE);
+    }
+    // soft disc around each storm, stretched by 1/cos(lat) because the canvas is equirectangular
+    maskCtx.setTransform(1, 0, 0, 1, 0, 0);
+    maskCtx.clearRect(0, 0, W, H);
+    for (const [lat, lon] of centers) {
+      const k = 1 / Math.max(0.2, Math.cos(lat * DEG)), r = RAIN_RADIUS * RAIN_PX;
+      const x = (lon + 180) * RAIN_PX, y = (90 - lat) * RAIN_PX;
+      for (const wrap of [-W, 0, W]) {
+        maskCtx.setTransform(k, 0, 0, 1, x + wrap, y);
+        const g = maskCtx.createRadialGradient(0, 0, 0, 0, 0, r);
+        g.addColorStop(0, '#000');
+        g.addColorStop(0.7, '#000');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        maskCtx.fillStyle = g;
+        maskCtx.fillRect(-r, -r, 2 * r, 2 * r);
+      }
+    }
+    maskCtx.setTransform(1, 0, 0, 1, 0, 0);
+    rainCtx.globalCompositeOperation = 'destination-in';
+    rainCtx.drawImage(maskCanvas, 0, 0);
+    rainCtx.globalCompositeOperation = 'source-over';
+    rainTex.needsUpdate = true;
+    rainMesh.visible = imgs.some(([, img]) => img);
+    if (!rainMesh.visible) { overlayStatus.rain = 'No satellite rain for this time'; renderOverlayStatus(); }
+  });
+}
+
+const tileLon = (x, z) => (x / 2 ** z) * 360 - 180;
+const tileLat = (y, z) => Math.atan(Math.sinh(Math.PI * (1 - (2 * y) / 2 ** z))) / DEG;
+
+// a grid on the sphere spaced evenly in Mercator y, so uv is linear in tile pixels
+function mercatorPatch(x0, y0, span, z) {
+  const N = 32, pos = [], uv = [], idx = [], v = new THREE.Vector3();
+  for (let j = 0; j <= N; j++) {
+    const lat = tileLat(y0 + (span * j) / N, z);
+    for (let i = 0; i <= N; i++) {
+      toVec(lat, tileLon(x0 + (span * i) / N, z), R + 0.0018, v);
+      pos.push(v.x, v.y, v.z);
+      uv.push(i / N, 1 - j / N);
+    }
+  }
+  for (let j = 0; j < N; j++)
+    for (let i = 0; i < N; i++) {
+      const a = j * (N + 1) + i;
+      idx.push(a, a + N + 1, a + 1, a + 1, a + N + 1, a + N + 2);
+    }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  return g;
+}
+
+const radarPatches = [];
+function radarPatch(i) {
+  if (!radarPatches[i]) {
+    const canvas = Object.assign(document.createElement('canvas'), { width: 256 * RADAR_SPAN, height: 256 * RADAR_SPAN });
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const mesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({
+      map: tex, transparent: true, opacity: 0.95, depthWrite: false, side: THREE.DoubleSide,
+    }));
+    mesh.renderOrder = 5;
+    mesh.visible = false;
+    scene.add(mesh);
+    radarPatches[i] = { canvas, ctx: canvas.getContext('2d'), tex, mesh, key: '', grid: '', seq: 0 };
+  }
+  return radarPatches[i];
+}
+
+const inRadarBox = ([lat, lon]) => lat >= RADAR_BOX.lat0 && lat <= RADAR_BOX.lat1 && lon >= RADAR_BOX.lon0 && lon <= RADAR_BOX.lon1;
+
+function radarJob(t, [lat, lon]) {
+  const scale = 2 ** RADAR_Z;
+  const cx = ((lon + 180) / 360) * scale;
+  const cy = ((1 - Math.log(Math.tan(Math.PI / 4 + (lat * DEG) / 2)) / Math.PI) / 2) * scale;
+  const x0 = Math.round(cx - RADAR_SPAN / 2), y0 = Math.round(cy - RADAR_SPAN / 2);
+  const stamp = new Date(Math.floor(t / 3e5) * 3e5).toISOString().replace(/[-:T]/g, '').slice(0, 12);
+  const tiles = [];
+  for (let dy = 0; dy < RADAR_SPAN; dy++)
+    for (let dx = 0; dx < RADAR_SPAN; dx++) tiles.push({ dx, dy, url: `${RADAR_URL}${stamp}/${RADAR_Z}/${x0 + dx}/${y0 + dy}.png` });
+  return { x0, y0, stamp, tiles };
+}
+
+function showRadar(t, centers) {
+  const near = state.radar && overlayAvailable(t, RADAR_FIRST) ? centers.filter(inRadarBox).slice(0, 3) : [];
+  near.forEach((c, i) => {
+    const job = radarJob(t, c), p = radarPatch(i);
+    const grid = `${job.x0}/${job.y0}`;
+    if (p.grid !== grid) {
+      p.mesh.geometry.dispose();
+      p.mesh.geometry = mercatorPatch(job.x0, job.y0, RADAR_SPAN, RADAR_Z);
+      p.mesh.visible = false;
+      p.grid = grid;
+    }
+    const key = job.stamp + grid;
+    if (p.key === key) return;
+    p.key = key;
+    const seq = ++p.seq;
+    trackLoad(Promise.all(job.tiles.map((tile) => loadImage(tile.url).then((img) => ({ ...tile, img }))))).then((imgs) => {
+      if (seq !== p.seq) return;
+      p.ctx.clearRect(0, 0, p.canvas.width, p.canvas.height);
+      for (const { dx, dy, img } of imgs) if (img) p.ctx.drawImage(img, dx * 256, dy * 256);
+      p.tex.needsUpdate = true;
+      p.mesh.visible = imgs.some((x) => x.img);
+    });
+  });
+  for (let i = near.length; i < radarPatches.length; i++) {
+    radarPatches[i].mesh.visible = false;
+    radarPatches[i].key = '';
+  }
+  overlayStatus.radar = !state.radar ? ''
+    : near.length ? `US radar ${new Date(Math.floor(t / 3e5) * 3e5).toISOString().slice(11, 16)} UTC`
+    : !state.play && centers.length === 1 && overlayAvailable(t, RADAR_FIRST) ? 'Outside US radar range' : '';
+}
+
+function updateOverlays(t, centers) {
+  showRain(t, centers);
+  showRadar(t, centers);
+  renderOverlayStatus();
+}
+
+function prefetchOverlays(t, centers) {
+  if (state.rain && overlayAvailable(t, RAIN_FIRST)) for (const { url } of rainUrls(t, centers)) loadImage(url);
+  if (state.radar && overlayAvailable(t, RADAR_FIRST))
+    for (const c of centers.filter(inRadarBox).slice(0, 3)) for (const { url } of radarJob(t, c).tiles) loadImage(url);
+}
+
+function hideOverlays() {
+  rainMesh.visible = false;
+  rainKey = '';
+  for (const p of radarPatches) { p.mesh.visible = false; p.key = ''; }
+  ovMarker.visible = false;
+  overlayStatus.rain = overlayStatus.radar = '';
+  renderOverlayStatus();
+}
+
+const activeCenters = (list, t) =>
+  list.filter((s) => s.t0 <= t && t <= s.end).map((s) => { const q = interp(s, t); return [q[0], q[1]]; });
+
+// ring marking where the selected storm was at the overlay time
+const ovMarker = new THREE.Mesh(
+  new THREE.RingGeometry(0.9, 1, 64),
+  new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9, depthWrite: false, side: THREE.DoubleSide }),
+);
+ovMarker.renderOrder = 6;
+ovMarker.visible = false;
+scene.add(ovMarker);
+
+function peakTime(s) {
+  if (s.w < 0) return (s.t0 + s.end) / 2;
+  const p = s.pts.reduce((a, b) => (b[2] > a[2] ? b : a));
+  return s.t0 + p[4] * HOUR;
+}
+
+function refreshSelectionOverlay() {
+  const s = state.selected;
+  if (state.play) return;
+  if (!s) { hideOverlays(); return; }
+  const q = interp(s, state.ovT);
+  const v = toVec(q[0], q[1], R + 0.005);
+  ovMarker.position.copy(v);
+  ovMarker.lookAt(v.clone().multiplyScalar(2));
+  ovMarker.scale.setScalar(0.012);
+  ovMarker.visible = true;
+  updateOverlays(state.ovT, [[q[0], q[1]]]);
+  if ($('ovTime')) $('ovTime').textContent = new Date(state.ovT).toLocaleString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC',
+  }) + ' UTC';
+  if ($('ovScrub')) $('ovScrub').value = ((state.ovT - s.t0) / (s.end - s.t0 || 1)) * 1000;
+}
+
+function overlayHTML(s) {
+  if (s.end < RADAR_FIRST) return '<p class="hint">Satellite rain starts in 1998 and US radar in 1995, after this storm.</p>';
+  const chips = [['Peak', peakTime(s)], ...s.pts.filter((p) => p[6]).map((p, i) => [`Landfall ${i + 1}`, s.t0 + p[4] * HOUR])];
+  return `
+    <div class="ov">
+      <div class="ovhead"><span class="eyebrow">Rain &amp; radar</span><span id="ovTime"></span></div>
+      <input type="range" id="ovScrub" min="0" max="1000" aria-label="Rain and radar time">
+      <div class="chips">${chips.map(([label, t]) => `<button data-ovt="${t}">${label}</button>`).join('')}</div>
+      <p class="hint" id="ovStatus"></p>
+    </div>`;
+}
+
 // ---------- playback eyes ----------
 
 function eyeTexture() {
@@ -949,6 +1238,14 @@ function initUI() {
   });
   $('landfalls').addEventListener('change', (e) => { state.landfalls = e.target.checked; refresh(); });
   $('unknown').addEventListener('change', (e) => { state.unknown = e.target.checked; refresh(); });
+  const onOverlayToggle = () => {
+    state.rain = $('rainToggle').checked;
+    state.radar = $('radarToggle').checked;
+    if (state.play) state.play.overlayT = null;
+    else refreshSelectionOverlay();
+  };
+  $('rainToggle').addEventListener('change', onOverlayToggle);
+  $('radarToggle').addEventListener('change', onOverlayToggle);
 
   // chart: hover reads out a year, click narrows to it
   const chart = $('chart');
@@ -1075,6 +1372,7 @@ function stormHTML(s) {
     </dl>
     ${sparkline(s)}
     ${swath}
+    ${overlayHTML(s)}
     <div class="actions"><button id="playStorm">Play track</button><button id="flyStorm">Fly to</button></div>`;
 }
 
@@ -1116,6 +1414,14 @@ function showInfo(s = state.selected) {
     $('flyStorm').onclick = () => flyToStorm(s);
     $('backToQuery')?.addEventListener('click', () => select(null));
     $('swathToggle')?.addEventListener('change', (e) => { state.swath = e.target.checked; drawSelection(s); });
+    $('ovScrub')?.addEventListener('input', (e) => {
+      state.ovT = Math.round((s.t0 + (s.end - s.t0) * (e.target.value / 1000)) / 18e5) * 18e5;
+      refreshSelectionOverlay();
+    });
+    el.querySelectorAll('[data-ovt]').forEach((b) => b.addEventListener('click', () => {
+      state.ovT = +b.dataset.ovt;
+      refreshSelectionOverlay();
+    }));
   } else {
     el.querySelectorAll('[data-sort]').forEach((b) => b.addEventListener('click', () => { el.dataset.sort = b.dataset.sort; showInfo(); }));
     el.querySelectorAll('.results button').forEach((b) =>
@@ -1125,9 +1431,11 @@ function showInfo(s = state.selected) {
 
 function select(s, fly = false) {
   state.selected = s;
+  if (s) state.ovT = peakTime(s);
   drawSelection(s);
   refresh();
   showInfo(s);
+  refreshSelectionOverlay();
   history.replaceState(null, '', s ? '#' + s.id : location.pathname);
   if (s && fly) flyToStorm(s);
 }
@@ -1149,6 +1457,13 @@ function flyToStorms(list) {
   vs.forEach((v) => c.add(v));
   c.normalize();
   const spread = Math.max(...vs.map((v) => v.angleTo(c)));
+  // storms on opposite sides of the planet average out near a pole, so for a
+  // multi-basin season keep the current heading and just pull back
+  if (spread > 1.4) {
+    const [lat, lon] = toLatLon(camera.position);
+    flyTo(THREE.MathUtils.clamp(lat, -30, 30), lon, 2.9);
+    return;
+  }
   const [lat, lon] = toLatLon(c);
   flyTo(lat, lon, 1 + THREE.MathUtils.clamp(spread * 2.6, 0.6, 3));
 }
@@ -1167,7 +1482,8 @@ function stepFly(dt) {
 function startPlayback(list, label) {
   const t0 = Math.min(...list.map((s) => s.t0));
   const t1 = Math.max(...list.map((s) => s.end));
-  state.play = { list, label, t0, t1, t: t0, playing: true, dirty: true };
+  state.play = { list, label, t0, t1, t: t0, playing: true, dirty: true, overlayT: null };
+  hideOverlays();
   $('player').hidden = false;
   $('tip').hidden = true;
   syncLayerVisibility();
@@ -1180,7 +1496,9 @@ function stopPlayback() {
   $('player').hidden = true;
   hideEyes();
   clearGroup(liveWind);
+  hideOverlays();
   refresh();
+  refreshSelectionOverlay();
 }
 
 function togglePlay() {
@@ -1238,6 +1556,16 @@ function stepPlayback(dt, time) {
     $('pstats').textContent = p.list.length === 1
       ? `${interp(p.list[0], p.t)[2] < 0 ? 'wind not recorded' : Math.round(interp(p.list[0], p.t)[2]) + ' kt'} · ACE ${ace.toFixed(1)}`
       : `${named} named · ${hu} hurricanes · ${maj} major · ACE ${ace.toFixed(1)}`;
+  }
+
+  // rain and radar step in coarse jumps while playing (a frame load per step) and
+  // at the half hour when paused or scrubbing; the next step is fetched ahead
+  const step = p.playing ? Math.max(1, +$('speed').value / 4) * HOUR : 18e5;
+  const ot = Math.floor(p.t / step) * step;
+  if (ot !== p.overlayT) {
+    p.overlayT = ot;
+    updateOverlays(ot, activeCenters(p.list, ot));
+    prefetchOverlays(ot + step, activeCenters(p.list, ot + step));
   }
 
   // eyes for storms active right now

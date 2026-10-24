@@ -117,12 +117,20 @@
     <p class="hint">Storms carry their live 34/50/64 kt wind field once wind radii exist (2001–04 on, by basin). South of the equator they spin clockwise.</p>
   </section>
 
+  <section>
+    <div class="label">Rain &amp; radar</div>
+    <label class="toggle"><input type="checkbox" id="rainToggle" checked> Satellite rain (NASA IMERG, 1998–)</label>
+    <label class="toggle"><input type="checkbox" id="radarToggle" checked> US radar near landfalls (NEXRAD, 1995–)</label>
+    <div class="ramp"><div class="bar rainbar"></div><div class="ends"><span>light</span><span>heavy rain</span></div></div>
+    <p class="hint">Shown during playback, and for a selected storm at its peak or any landfall. The imagery streams from NASA and Iowa State as you go. Satellite rain covers every ocean; radar only reaches about 250 km from the US coast.</p>
+  </section>
+
   <section class="legend">
     <div id="legend" class="cats"></div>
     <p class="hint">Hover a track for its name, click to inspect. Drag to orbit, scroll to zoom. Esc clears.</p>
   </section>
 
-  <p class="foot">Data: <a href="https://www.nhc.noaa.gov/data/#hurdat" target="_blank" rel="noopener">NOAA NHC HURDAT2</a> for the North Atlantic (1851–) and Eastern &amp; Central Pacific (1949–). <a href="https://www.ncei.noaa.gov/products/international-best-track-archive" target="_blank" rel="noopener">NOAA NCEI IBTrACS v04r01</a> (Knapp et al. 2010) for every other basin, using JTWC 1-minute winds where they exist. Winds from 10-minute agencies are converted with a 0.88 factor. Coastlines and borders: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> via world-atlas.</p>
+  <p class="foot">Data: <a href="https://www.nhc.noaa.gov/data/#hurdat" target="_blank" rel="noopener">NOAA NHC HURDAT2</a> for the North Atlantic (1851–) and Eastern &amp; Central Pacific (1949–). <a href="https://www.ncei.noaa.gov/products/international-best-track-archive" target="_blank" rel="noopener">NOAA NCEI IBTrACS v04r01</a> (Knapp et al. 2010) for every other basin, using JTWC 1-minute winds where they exist. Winds from 10-minute agencies are converted with a 0.88 factor. Rain: <a href="https://gpm.nasa.gov/data/imerg" target="_blank" rel="noopener">NASA GPM IMERG</a> via <a href="https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api" target="_blank" rel="noopener">GIBS</a>. Radar: NOAA NEXRAD composites from the <a href="https://mesonet.agron.iastate.edu/" target="_blank" rel="noopener">Iowa Environmental Mesonet</a>. Coastlines and borders: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> via world-atlas.</p>
 </details>
 
 <aside id="info" hidden></aside>
@@ -132,6 +140,7 @@
   <div class="ptext">
     <div id="pdate"></div>
     <div id="pstats"></div>
+    <div id="povl"></div>
   </div>
   <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Playback position">
   <button id="pstop" aria-label="Close playback">✕</button>

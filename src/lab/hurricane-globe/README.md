@@ -28,6 +28,24 @@ intensity along the path. Hover picks the nearest fix on screen within 10 px.
   get every storm that passed within it, with its strongest wind inside the
   circle and its closest approach. The tracks and the annual chart narrow to
   those storms too.
+- **Rain and radar.** Season and single-storm playback, and any selected storm,
+  can show the storm's rain:
+  - **Satellite rain** is NASA GPM IMERG half-hourly precipitation (1998–) from
+    GIBS. Its EPSG:4326 WMTS tiles at zoom 2 (5×3 tiles of 72°, about IMERG's
+    native 0.1°) are painted into an equirectangular canvas on a sphere just
+    above the globe. The canvas is masked to a soft 12° disc around each active
+    storm.
+  - **US radar** is the NEXRAD N0R base-reflectivity composite (1995–) from the
+    Iowa Environmental Mesonet. When a storm centre is within reach of the US
+    network, a 4×4 block of zoom-6 Web Mercator tiles is drawn on a patch of the
+    sphere whose grid is spaced evenly in Mercator y. That makes the texture
+    coordinates linear, so no reprojection shader is needed.
+  - Playback steps the imagery every speed/4 hours of storm time (3 h at
+    12 h/s), and every half hour when paused or scrubbing, fetching the next
+    step ahead. A selected storm gets a time slider plus Peak and Landfall
+    buttons, with a ring marking where the storm was at that moment.
+  - Both services allow cross-origin image loads. They are the page's only
+    run-time dependencies, and if either is down, its layer simply stays empty.
 - **Annual chart.** Storms per year with hurricanes and majors overlaid. Hover
   for counts and ACE, click to narrow the filters to that year.
 - **Season playback.** Replays a year with running named, hurricane, major and

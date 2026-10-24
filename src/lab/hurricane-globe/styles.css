@@ -238,7 +238,13 @@ button[aria-pressed="true"] { background: rgba(94, 186, 255, 0.22); border-color
 #pp { grid-area: pp; width: 38px; }
 .ptext { grid-area: text; }
 #pdate { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
-#pstats { color: var(--muted); font-size: 12px; }
+#pstats, #povl { color: var(--muted); font-size: 12px; }
+.rainbar { background: linear-gradient(90deg, #2c9b3a, #8fd14f, #f7e64a, #f5a623, #e3342f, #a50026); }
+#info .ov { margin: 0 0 10px; }
+#info .ovhead { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12px; }
+#info .ovhead #ovTime { font-variant-numeric: tabular-nums; }
+#info .ov input[type="range"] { width: 100%; accent-color: var(--accent); margin: 4px 0 2px; }
+#info .ov .hint { margin-top: 4px; }
 #scrub { grid-area: scrub; width: 100%; accent-color: var(--accent); }
 #pstop { grid-area: stop; }
 
