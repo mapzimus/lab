@@ -19,12 +19,13 @@ const range = args.includes("--range") ? args[args.indexOf("--range") + 1].split
 const outName = args.includes("--range") ? "preview.mp4" : "detroit_master.mp4";
 const peek = args.includes("--peek") ? args[args.indexOf("--peek") + 1].split(",").map(Number) : null;
 
+// served under http://scene.local/ with the same layout as the repo, so scene.html's relative paths are real ones
 const FILES = {
-  "scene.html": [HERE + "scene.html", "text/html"],
-  "maplibre-gl.js": [HERE + "../vendor/maplibre-gl.js", "text/javascript"],
-  "maplibre-gl.css": [HERE + "../vendor/maplibre-gl.css", "text/css"],
-  "detroit-grid.geojson": [HERE + "../data/detroit-grid.geojson", "application/json"],
-  "detroit-boundary.geojson": [HERE + "../data/detroit-boundary.geojson", "application/json"],
+  "video/scene.html": [HERE + "scene.html", "text/html"],
+  "vendor/maplibre-gl.js": [HERE + "../vendor/maplibre-gl.js", "text/javascript"],
+  "vendor/maplibre-gl.css": [HERE + "../vendor/maplibre-gl.css", "text/css"],
+  "data/detroit-grid.geojson": [HERE + "../data/detroit-grid.geojson", "application/json"],
+  "data/detroit-boundary.geojson": [HERE + "../data/detroit-boundary.geojson", "application/json"],
 };
 
 const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium",
@@ -37,7 +38,7 @@ await page.route("http://scene.local/**", route => {
   if (!f) return route.fulfill({ status: 404, body: "" });
   route.fulfill({ body: readFileSync(f[0]), contentType: f[1] });
 });
-await page.goto("http://scene.local/scene.html");
+await page.goto("http://scene.local/video/scene.html");
 await page.waitForFunction(() => window.__ready || window.__error, null, { timeout: 300000 });
 const err = await page.evaluate(() => window.__error);
 if (err) throw new Error(err);

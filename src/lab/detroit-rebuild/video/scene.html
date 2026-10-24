@@ -5,7 +5,7 @@
 <title>Detroit · video scene</title>
 <!-- Video-only scene for render.mjs: the page's hex grid as 3D columns over OpenFreeMap's dark basemap,
      driven frame by frame through window.__scene.frame(t). Not linked from the site. -->
-<link rel="stylesheet" href="maplibre-gl.css">
+<link rel="stylesheet" href="../vendor/maplibre-gl.css">
 <style>
   html, body, #map { margin: 0; height: 100%; background: #0b0d10; }
   .maplibregl-ctrl-attrib, .maplibregl-ctrl-logo { display: none !important; }
@@ -21,10 +21,10 @@
 </head>
 <body>
 <div id="map"></div><div id="cap"></div><div id="hud"></div><div id="credit"></div>
-<script src="maplibre-gl.js"></script>
+<script src="../vendor/maplibre-gl.js"></script>
 <script>
 (async () => {
-const grid = await (await fetch("detroit-grid.geojson")).json();
+const grid = await (await fetch("../data/detroit-grid.geojson")).json();
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const smooth = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -61,7 +61,7 @@ const map = new maplibregl.Map({
 });
 await new Promise(r => map.once("load", r));
 map.addSource("hex", { type: "geojson", data: grid });
-map.addSource("city", { type: "geojson", data: await (await fetch("detroit-boundary.geojson")).json() });
+map.addSource("city", { type: "geojson", data: await (await fetch("../data/detroit-boundary.geojson")).json() });
 map.addLayer({ id: "city", type: "line", source: "city", paint: { "line-color": "#8892a0", "line-width": 1.2, "line-opacity": 0.7 } });
 map.addLayer({
   id: "hex3d", type: "fill-extrusion", source: "hex",
