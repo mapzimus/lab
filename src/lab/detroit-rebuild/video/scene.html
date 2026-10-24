@@ -149,7 +149,7 @@ window.__scene = {
     if (t >= 3 && t < 16) hudEl.innerHTML = `${Math.round(y)}<br>${fmt(at(cityBuiltBy, y, 1870, YB))} buildings`;
     else if (t >= 16 && t < 56) hudEl.innerHTML = `${Math.min(YD1, Math.max(YD0, Math.round(y)))}<br>${fmt(at(cityDemBy, y, YD0, YD1))} torn down · ${fmt(at(cityNbBy, y, YD0, YD1))} new`;
     else hudEl.innerHTML = "";
-    return new Promise(r => { map.once("idle", r); map.triggerRepaint(); setTimeout(r, 4000); });
+    return new Promise(r => { map.once("idle", r); map.triggerRepaint(); setTimeout(r, 1500); });
   },
 };
 window.__ready = true;
