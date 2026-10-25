@@ -1,4 +1,4 @@
-# Mapzimus Geospatial Radar — 2026-10-24
+# Mapzimus Geospatial Radar — 2026-10-25
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
+- [Pointing QGIS to use DEM layer as hight source](https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-hight-source) (▲ 0 · 0 answers)
+- [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 4 · 1 answers)
 - [Converting a DEM from grid to TIFF changes range of elevation values](https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values) (▲ 0 · 0 answers)
-- [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 4 · 0 answers)
 - [Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API](https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api) (▲ 0 · 0 answers)
 - [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 1 answers)
-- [Convert Discrete Voxel Layer to same-value-merged 3D objects in ArcGIS?](https://gis.stackexchange.com/questions/501634/convert-discrete-voxel-layer-to-same-value-merged-3d-objects-in-arcgis) (▲ 1 · 0 answers)
 - [Download postgis-bundle-pg18x64-setup-3.6.2-1.exe](https://gis.stackexchange.com/questions/501628/download-postgis-bundle-pg18x64-setup-3-6-2-1-exe) (▲ -1 · 1 answers)
 - [Increasing the size of the selected line symbol within layer in ArcGIS Pro](https://gis.stackexchange.com/questions/501625/increasing-the-size-of-the-selected-line-symbol-within-layer-in-arcgis-pro) (▲ 2 · 2 answers)
+- [Convert Discrete Voxel Layer to same-value-merged 3D objects in ArcGIS?](https://gis.stackexchange.com/questions/501634/convert-discrete-voxel-layer-to-same-value-merged-3d-objects-in-arcgis) (▲ 1 · 0 answers)
 - [How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?](https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal) (▲ 0 · 2 answers)
 - [QgsTaskManager active vs queued vs running task](https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task) (▲ 2 · 1 answers)
-- [QGIS: Raster to Vector conversion crashing my computer](https://gis.stackexchange.com/questions/501619/qgis-raster-to-vector-conversion-crashing-my-computer) (▲ 0 · 2 answers)
 
 ## NASA Earthdata — recently updated collections
 
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
+- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
 - [ACTIVATE Falcon In-Situ Meteorological and Navigational Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_MetNav_AircraftInSitu_Falcon_Data) — ACTIVATE_MetNav_AircraftInSitu_Falcon_Data is the meteorological and navigational data collected onboard the HU-25 Falcon aircraft via in-situ instrumentatio…
-- [ACTIVATE Falcon In Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_TraceGas_AircraftInSitu_Falcon_Data) — ACTIVATE_TraceGas_AircraftInSitu_Falcon_Data is the trace gas data collected onboard the HU-25 Falcon aircraft via in-situ instrumentation during the ACTIVAT…
-- [ACTIVATE Miscellaneous and Ancillary Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_Miscellaneous_Data) — ACTIVATE_Miscellaneous_Data is the supplementary miscellaneous data collected and utilized during the ACTIVATE project.
-- [ACTIVATE King Air Meteorological and Navigational Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_MetNav_AircraftInSitu_KingAir_Data) — ACTIVATE_MetNav_AircraftInSitu_KingAir_Data is the meteorological and navigational data collected onboard the B-200 King Air aircraft via in-situ instrumenta…
-- [ACTIVATE Falcon In Situ Cloud Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_Cloud_AircraftInSitu_Falcon_Data) — ACTIVATE_Cloud_AircraftInSitu_Falcon_Data is the cloud data collected onboard the HU-25 Falcon aircraft via in-situ instrumentation during the ACTIVATE project.
-- [ACTIVATE Falcon In Situ Aerosol Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_Aerosol_AircraftInSitu_Falcon_Data) — ACTIVATE_Aerosol_AircraftInSitu_Falcon_Data is the aerosol data collected onboard the HU-25 Falcon aircraft via in-situ instrumentation during the ACTIVATE p…
-- [ACTIVATE King Air Aerosol and Cloud Remotely Sensed Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_AerosolCloud_AircraftRemoteSensing_KingAir_Data) — ACTIVATE_AerosolCloud_AircraftRemoteSensing_KingAir_Data is the aerosol and cloud data collected onboard the B-200 King Air aircraft via remote sensing instr…
 
 ## Data.gov — new geodata
 
@@ -89,6 +89,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## OSM pulse
 
+- [weeklyOSM 848](https://weeklyosm.eu/archives/0848/)
 - [weeklyOSM 847](https://weeklyosm.eu/archives/0847/)
 - [weeklyOSM 846](https://weeklyosm.eu/archives/0846/)
-- [weeklyOSM 845](https://weeklyosm.eu/archives/0845/)
