@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-25",
+  "generatedAt": "2026-10-26",
   "news": {
     "mapsmania": [
+      {
+        "title": "North Ain't Up!",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/north-aint-up.html",
+        "desc": ""
+      },
       {
         "title": "A Fair Election Map for the Midterms",
         "url": "http://googlemapsmania.blogspot.com/2026/10/a-fair-election-map-for-midterms.html",
@@ -35,11 +40,6 @@
       {
         "title": "What is Your Walk Score?",
         "url": "http://googlemapsmania.blogspot.com/2026/10/what-is-your-walk-score.html",
-        "desc": ""
-      },
-      {
-        "title": "What America Looks Like After 700 Meters of Sea Level Rise",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/what-america-looks-like-after-700.html",
         "desc": ""
       }
     ],
@@ -144,6 +144,14 @@
   ],
   "releases": [
     {
+      "repo": "maplibre/maplibre-gl-js",
+      "title": "maplibre-gl-js v6.16.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.16.0",
+      "desc": "### ✨ Features and improvements - Allow `Map#setMaxBounds` to constrain one geographic axis without constraining the other ([#6148](https://github.com/maplib…",
+      "publishedAt": "2026-10-25",
+      "isFresh": true
+    },
+    {
       "repo": "duckdb/duckdb",
       "title": "duckdb v2.0.0",
       "url": "https://github.com/duckdb/duckdb/releases/tag/v2.0.0",
@@ -152,20 +160,12 @@
       "isFresh": true
     },
     {
-      "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.15.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.15.0",
-      "desc": "### ✨ Features and improvements - Add `dragRotate: {around: 'pointer'}` to turn and tilt the map around the point under the pointer, and `{around: 'center',…",
-      "publishedAt": "2026-10-18",
-      "isFresh": true
-    },
-    {
       "repo": "qgis/QGIS",
       "title": "QGIS final-3_44_15",
       "url": "https://github.com/qgis/QGIS/releases/tag/final-3_44_15",
       "desc": "https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15",
       "publishedAt": "2026-09-25",
-      "isFresh": true
+      "isFresh": false
     },
     {
       "repo": "visgl/deck.gl",
@@ -210,8 +210,8 @@
   ],
   "gisse": [
     {
-      "title": "Pointing QGIS to use DEM layer as hight source",
-      "url": "https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-hight-source",
+      "title": "Pointing QGIS to use DEM layer as height source",
+      "url": "https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source",
       "score": 0,
       "answers": 0
     },
@@ -240,16 +240,16 @@
       "answers": 1
     },
     {
-      "title": "Download postgis-bundle-pg18x64-setup-3.6.2-1.exe",
-      "url": "https://gis.stackexchange.com/questions/501628/download-postgis-bundle-pg18x64-setup-3-6-2-1-exe",
-      "score": -1,
-      "answers": 1
-    },
-    {
       "title": "Increasing the size of the selected line symbol within layer in ArcGIS Pro",
       "url": "https://gis.stackexchange.com/questions/501625/increasing-the-size-of-the-selected-line-symbol-within-layer-in-arcgis-pro",
       "score": 2,
       "answers": 2
+    },
+    {
+      "title": "Download postgis-bundle-pg18x64-setup-3.6.2-1.exe",
+      "url": "https://gis.stackexchange.com/questions/501628/download-postgis-bundle-pg18x64-setup-3-6-2-1-exe",
+      "score": -1,
+      "answers": 1
     },
     {
       "title": "Convert Discrete Voxel Layer to same-value-merged 3D objects in ArcGIS?",
