@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-26",
+  "generatedAt": "2026-10-27",
   "news": {
     "mapsmania": [
+      {
+        "title": "Turn Your Neighborhood Into a Manga Universe",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/turn-your-neighborhood-into-manga.html",
+        "desc": ""
+      },
       {
         "title": "North Ain't Up!",
         "url": "http://googlemapsmania.blogspot.com/2026/10/north-aint-up.html",
@@ -35,11 +40,6 @@
       {
         "title": "There are 89,603 Dogs in New York City",
         "url": "http://googlemapsmania.blogspot.com/2026/10/there-are-89603-dogs-in-new-york-city.html",
-        "desc": ""
-      },
-      {
-        "title": "What is Your Walk Score?",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/what-is-your-walk-score.html",
         "desc": ""
       }
     ],
@@ -210,9 +210,15 @@
   ],
   "gisse": [
     {
+      "title": "Google Map Credits in ArcGIS Pro",
+      "url": "https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Pointing QGIS to use DEM layer as height source",
       "url": "https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source",
-      "score": 0,
+      "score": -2,
       "answers": 0
     },
     {
@@ -224,7 +230,7 @@
     {
       "title": "Converting a DEM from grid to TIFF changes range of elevation values",
       "url": "https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values",
-      "score": 0,
+      "score": 1,
       "answers": 0
     },
     {
@@ -258,12 +264,6 @@
       "answers": 0
     },
     {
-      "title": "How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?",
-      "url": "https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal",
-      "score": 0,
-      "answers": 2
-    },
-    {
       "title": "QgsTaskManager active vs queued vs running task",
       "url": "https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task",
       "score": 2,
@@ -290,46 +290,46 @@
       "org": "ASF"
     },
     {
+      "title": "OPERA Dynamic Surface Water Extent from Harmonized Landsat Sentinel-2 product (Version 1)",
+      "url": "https://search.earthdata.nasa.gov/search?q=OPERA_L3_DSWX-HLS_V1",
+      "desc": "This dataset contains Level-3 Dynamic OPERA surface water extent product version 1.",
+      "org": "POCLOUD"
+    },
+    {
+      "title": "Very Long Baseline Interferometry (VLBI) Level 2 VLBI Global Observing System (VGOS) DB format data from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=VLBI_L2_vgosDB_data",
+      "desc": "This CDDIS collection is composed of geodetic, Very Long Baseline Array (VLBI) level 2 observational and supporting data (including observations, standard de…",
+      "org": "CDDIS"
+    },
+    {
+      "title": "Very Long Baseline Interferometry (VLBI) Positions Products from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=VLBI_pos_prod",
+      "desc": "Station positions and velocity solutions in Software INdependent EXchange (SINEX) format derived from analysis of Very Long Baseline Interferometry (VLBI) data.",
+      "org": "CDDIS"
+    },
+    {
+      "title": "Very Long Baseline Interferometry (VLBI) Tropospheric Parameters (TROP) products from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=VLBI_trop_param",
+      "desc": "Troposphere Zenith Path Delay (ZPD) values derived from analysis of Very Long Baseline Interferometry (VLBI) data.",
+      "org": "CDDIS"
+    },
+    {
+      "title": "COWVR STP-H8 Antenna and Microwave Brightness Temperatures During Multi-Angle Configuration Version 11",
+      "url": "https://search.earthdata.nasa.gov/search?q=COWVR_STPH8_L1_TSDR_MA_V11",
+      "desc": "This product is best suited for a cal/val user or sensor expert.",
+      "org": "POCLOUD"
+    },
+    {
+      "title": "AAOE ER-2 Aircraft In-Situ Trace Gas Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=AAOE_TraceGas_AircraftInSitu_ER2_Data",
+      "desc": "AAOE_TraceGas_AircraftInSitu_ER2_Data is the in-situ trace gas data collected onboard the ER-2 aircraft during the Airborne Antarctic Ozone Experiment (AAOE)…",
+      "org": "LARC_CLOUD"
+    },
+    {
       "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
       "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
       "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
       "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
-      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
-      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
-      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
-    {
-      "title": "ACTIVATE Falcon In-Situ Meteorological and Navigational Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=ACTIVATE_MetNav_AircraftInSitu_Falcon_Data",
-      "desc": "ACTIVATE_MetNav_AircraftInSitu_Falcon_Data is the meteorological and navigational data collected onboard the HU-25 Falcon aircraft via in-situ instrumentatio…",
-      "org": "LARC_CLOUD"
     }
   ],
   "datagov": [

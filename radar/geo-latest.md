@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-26
+# Mapzimus Geospatial Radar — 2026-10-27
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Turn Your Neighborhood Into a Manga Universe](http://googlemapsmania.blogspot.com/2026/10/turn-your-neighborhood-into-manga.html)
 - [North Ain't Up!](http://googlemapsmania.blogspot.com/2026/10/north-aint-up.html)
 - [A Fair Election Map for the Midterms](http://googlemapsmania.blogspot.com/2026/10/a-fair-election-map-for-midterms.html)
 - [Have You Had Your Five a Day?](http://googlemapsmania.blogspot.com/2026/10/have-you-had-your-five-day.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Pixelate the World](http://googlemapsmania.blogspot.com/2026/10/pixelate-world.html)
 - [London is Bigger than Colorado](http://googlemapsmania.blogspot.com/2026/10/london-is-bigger-than-colorado.html)
 - [There are 89,603 Dogs in New York City](http://googlemapsmania.blogspot.com/2026/10/there-are-89603-dogs-in-new-york-city.html)
-- [What is Your Walk Score?](http://googlemapsmania.blogspot.com/2026/10/what-is-your-walk-score.html)
 
 ## Geography Realm
 
@@ -53,15 +53,15 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Pointing QGIS to use DEM layer as height source](https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source) (▲ 0 · 0 answers)
+- [Google Map Credits in ArcGIS Pro](https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro) (▲ 0 · 0 answers)
+- [Pointing QGIS to use DEM layer as height source](https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source) (▲ -2 · 0 answers)
 - [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 4 · 1 answers)
-- [Converting a DEM from grid to TIFF changes range of elevation values](https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values) (▲ 0 · 0 answers)
+- [Converting a DEM from grid to TIFF changes range of elevation values](https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values) (▲ 1 · 0 answers)
 - [Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API](https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api) (▲ 0 · 0 answers)
 - [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 1 answers)
 - [Increasing the size of the selected line symbol within layer in ArcGIS Pro](https://gis.stackexchange.com/questions/501625/increasing-the-size-of-the-selected-line-symbol-within-layer-in-arcgis-pro) (▲ 2 · 2 answers)
 - [Download postgis-bundle-pg18x64-setup-3.6.2-1.exe](https://gis.stackexchange.com/questions/501628/download-postgis-bundle-pg18x64-setup-3-6-2-1-exe) (▲ -1 · 1 answers)
 - [Convert Discrete Voxel Layer to same-value-merged 3D objects in ArcGIS?](https://gis.stackexchange.com/questions/501634/convert-discrete-voxel-layer-to-same-value-merged-3d-objects-in-arcgis) (▲ 1 · 0 answers)
-- [How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?](https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal) (▲ 0 · 2 answers)
 - [QgsTaskManager active vs queued vs running task](https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task) (▲ 2 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
@@ -69,13 +69,13 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
+- [OPERA Dynamic Surface Water Extent from Harmonized Landsat Sentinel-2 product (Version 1)](https://search.earthdata.nasa.gov/search?q=OPERA_L3_DSWX-HLS_V1) — This dataset contains Level-3 Dynamic OPERA surface water extent product version 1.
+- [Very Long Baseline Interferometry (VLBI) Level 2 VLBI Global Observing System (VGOS) DB format data from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=VLBI_L2_vgosDB_data) — This CDDIS collection is composed of geodetic, Very Long Baseline Array (VLBI) level 2 observational and supporting data (including observations, standard de…
+- [Very Long Baseline Interferometry (VLBI) Positions Products from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=VLBI_pos_prod) — Station positions and velocity solutions in Software INdependent EXchange (SINEX) format derived from analysis of Very Long Baseline Interferometry (VLBI) data.
+- [Very Long Baseline Interferometry (VLBI) Tropospheric Parameters (TROP) products from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=VLBI_trop_param) — Troposphere Zenith Path Delay (ZPD) values derived from analysis of Very Long Baseline Interferometry (VLBI) data.
+- [COWVR STP-H8 Antenna and Microwave Brightness Temperatures During Multi-Angle Configuration Version 11](https://search.earthdata.nasa.gov/search?q=COWVR_STPH8_L1_TSDR_MA_V11) — This product is best suited for a cal/val user or sensor expert.
+- [AAOE ER-2 Aircraft In-Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=AAOE_TraceGas_AircraftInSitu_ER2_Data) — AAOE_TraceGas_AircraftInSitu_ER2_Data is the in-situ trace gas data collected onboard the ER-2 aircraft during the Airborne Antarctic Ozone Experiment (AAOE)…
 - [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
-- [ACTIVATE Falcon In-Situ Meteorological and Navigational Data](https://search.earthdata.nasa.gov/search?q=ACTIVATE_MetNav_AircraftInSitu_Falcon_Data) — ACTIVATE_MetNav_AircraftInSitu_Falcon_Data is the meteorological and navigational data collected onboard the HU-25 Falcon aircraft via in-situ instrumentatio…
 
 ## Data.gov — new geodata
 
