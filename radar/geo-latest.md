@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-27
+# Mapzimus Geospatial Radar — 2026-10-28
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [How the World Draws the World](http://googlemapsmania.blogspot.com/2026/10/how-world-draws-world.html)
 - [Turn Your Neighborhood Into a Manga Universe](http://googlemapsmania.blogspot.com/2026/10/turn-your-neighborhood-into-manga.html)
 - [North Ain't Up!](http://googlemapsmania.blogspot.com/2026/10/north-aint-up.html)
 - [A Fair Election Map for the Midterms](http://googlemapsmania.blogspot.com/2026/10/a-fair-election-map-for-midterms.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [The World's Most Notable Places.](http://googlemapsmania.blogspot.com/2026/10/the-worlds-most-notable-places.html)
 - [Pixelate the World](http://googlemapsmania.blogspot.com/2026/10/pixelate-world.html)
 - [London is Bigger than Colorado](http://googlemapsmania.blogspot.com/2026/10/london-is-bigger-than-colorado.html)
-- [There are 89,603 Dogs in New York City](http://googlemapsmania.blogspot.com/2026/10/there-are-89603-dogs-in-new-york-city.html)
 
 ## Geography Realm
 
@@ -31,14 +31,14 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
-- [QGIS Live Driver](https://plugins.qgis.org/plugins/qgis_live_driver/)
-- [BasinWorks GIS](https://plugins.qgis.org/plugins/hydrology/)
-- [Drone AI Georef](https://plugins.qgis.org/plugins/drone_ai_georef/)
-- [GSI2Campus3D](https://plugins.qgis.org/plugins/gsi2campus3d/)
-- [Pinned Layers](https://plugins.qgis.org/plugins/pinned_layers/)
-- [Strip Map Maker](https://plugins.qgis.org/plugins/strip_map_maker/)
-- [Contours2Mesh](https://plugins.qgis.org/plugins/contours2mesh/)
-- [TELEMAC Toolkit](https://plugins.qgis.org/plugins/telemac_toolkit/)
+- [DeltaSol](https://plugins.qgis.org/plugins/deltasol/)
+- [Coordinate System Tool](https://plugins.qgis.org/plugins/CoordinateSystemTool/)
+- [LTE PCI and RSI Planning](https://plugins.qgis.org/plugins/lte_pci_rsi_planning/)
+- [Stacked Terrain Builder](https://plugins.qgis.org/plugins/stacked_terrain_builder/)
+- [EpidBot](https://plugins.qgis.org/plugins/epidbot/)
+- [Spectral Harbor](https://plugins.qgis.org/plugins/spectral_harbor/)
+- [GeoTSE - Espacializador Eleitoral](https://plugins.qgis.org/plugins/tse_to_qgis/)
+- [Polygon QC](https://plugins.qgis.org/plugins/polygon_QC/)
 
 ## Library releases
 
@@ -55,27 +55,27 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 - [Google Map Credits in ArcGIS Pro](https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro) (▲ 0 · 0 answers)
 - [Pointing QGIS to use DEM layer as height source](https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source) (▲ -2 · 0 answers)
+- [Converting a DEM from grid to TIFF changes range of elevation values](https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values) (▲ 1 · 1 answers)
 - [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 4 · 1 answers)
-- [Converting a DEM from grid to TIFF changes range of elevation values](https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values) (▲ 1 · 0 answers)
-- [Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API](https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api) (▲ 0 · 0 answers)
 - [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 1 answers)
+- [Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API](https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api) (▲ 0 · 0 answers)
 - [Increasing the size of the selected line symbol within layer in ArcGIS Pro](https://gis.stackexchange.com/questions/501625/increasing-the-size-of-the-selected-line-symbol-within-layer-in-arcgis-pro) (▲ 2 · 2 answers)
 - [Download postgis-bundle-pg18x64-setup-3.6.2-1.exe](https://gis.stackexchange.com/questions/501628/download-postgis-bundle-pg18x64-setup-3-6-2-1-exe) (▲ -1 · 1 answers)
-- [Convert Discrete Voxel Layer to same-value-merged 3D objects in ArcGIS?](https://gis.stackexchange.com/questions/501634/convert-discrete-voxel-layer-to-same-value-merged-3d-objects-in-arcgis) (▲ 1 · 0 answers)
 - [QgsTaskManager active vs queued vs running task](https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task) (▲ 2 · 1 answers)
+- [How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?](https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal) (▲ 0 · 2 answers)
 
 ## NASA Earthdata — recently updated collections
 
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [OPERA Dynamic Surface Water Extent from Harmonized Landsat Sentinel-2 product (Version 1)](https://search.earthdata.nasa.gov/search?q=OPERA_L3_DSWX-HLS_V1) — This dataset contains Level-3 Dynamic OPERA surface water extent product version 1.
-- [Very Long Baseline Interferometry (VLBI) Level 2 VLBI Global Observing System (VGOS) DB format data from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=VLBI_L2_vgosDB_data) — This CDDIS collection is composed of geodetic, Very Long Baseline Array (VLBI) level 2 observational and supporting data (including observations, standard de…
-- [Very Long Baseline Interferometry (VLBI) Positions Products from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=VLBI_pos_prod) — Station positions and velocity solutions in Software INdependent EXchange (SINEX) format derived from analysis of Very Long Baseline Interferometry (VLBI) data.
-- [Very Long Baseline Interferometry (VLBI) Tropospheric Parameters (TROP) products from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=VLBI_trop_param) — Troposphere Zenith Path Delay (ZPD) values derived from analysis of Very Long Baseline Interferometry (VLBI) data.
-- [COWVR STP-H8 Antenna and Microwave Brightness Temperatures During Multi-Angle Configuration Version 11](https://search.earthdata.nasa.gov/search?q=COWVR_STPH8_L1_TSDR_MA_V11) — This product is best suited for a cal/val user or sensor expert.
-- [AAOE ER-2 Aircraft In-Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=AAOE_TraceGas_AircraftInSitu_ER2_Data) — AAOE_TraceGas_AircraftInSitu_ER2_Data is the in-situ trace gas data collected onboard the ER-2 aircraft during the Airborne Antarctic Ozone Experiment (AAOE)…
-- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
+- [Satellite Laser Ranging (SLR) Predictions from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=SLR_predictions) — Predicted satellite orbits for Satellite Laser Ranging (SLR) tracking of satellites equipped with corner cube retroreflectors.
+- [Cloud Radar System (CRS) IMPACTS](https://search.earthdata.nasa.gov/search?q=crsimpacts) — The Cloud Radar System (CRS) IMPACTS dataset consists of calibrated radar reflectivity, Doppler velocity, linear depolarization ratio, and normalized radar c…
+- [SBUV/Nimbus-7 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUVN07L2)](https://search.earthdata.nasa.gov/search?q=SBUVN07L2) — The Solar Backscattered Ultraviolet (SBUV) from Nimbus-7 Level-2 daily product (SBUVN07L2) contains ozone nadir profile and total column data from retrievals…
+- [SBUV2/NOAA-19 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N19L2)](https://search.earthdata.nasa.gov/search?q=SBUV2N19L2) — The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-19 Level-2 daily product (SBUV2N19L2) contains ozone nadir profile and total column data from retrie…
+- [SBUV2/NOAA-18 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N18L2)](https://search.earthdata.nasa.gov/search?q=SBUV2N18L2) — The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-18 Level-2 daily product (SBUV2N18L2) contains ozone nadir profile and total column data from retrie…
+- [DSCOVR EPIC Level 1A Version 4](https://search.earthdata.nasa.gov/search?q=DSCOVR_EPIC_L1A) — Deep Space Climate Observatory (DSCOVR) Earth Polychromatic Imaging Camera (EPIC) is a 10-channel spectro-radiometer (317 – 780 nm) onboard National Oceanic…
+- [SBUV2/NOAA-17 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N17L2)](https://search.earthdata.nasa.gov/search?q=SBUV2N17L2) — The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-17 Level-2 daily product (SBUV2N17L2) contains ozone nadir profile and total column data from retrie…
 
 ## Data.gov — new geodata
 

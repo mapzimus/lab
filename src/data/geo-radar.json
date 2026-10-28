@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-27",
+  "generatedAt": "2026-10-28",
   "news": {
     "mapsmania": [
+      {
+        "title": "How the World Draws the World",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/how-world-draws-world.html",
+        "desc": ""
+      },
       {
         "title": "Turn Your Neighborhood Into a Manga Universe",
         "url": "http://googlemapsmania.blogspot.com/2026/10/turn-your-neighborhood-into-manga.html",
@@ -35,11 +40,6 @@
       {
         "title": "London is Bigger than Colorado",
         "url": "http://googlemapsmania.blogspot.com/2026/10/london-is-bigger-than-colorado.html",
-        "desc": ""
-      },
-      {
-        "title": "There are 89,603 Dogs in New York City",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/there-are-89603-dogs-in-new-york-city.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "QGIS Live Driver",
-      "url": "https://plugins.qgis.org/plugins/qgis_live_driver/"
+      "title": "DeltaSol",
+      "url": "https://plugins.qgis.org/plugins/deltasol/"
     },
     {
-      "title": "BasinWorks GIS",
-      "url": "https://plugins.qgis.org/plugins/hydrology/"
+      "title": "Coordinate System Tool",
+      "url": "https://plugins.qgis.org/plugins/CoordinateSystemTool/"
     },
     {
-      "title": "Drone AI Georef",
-      "url": "https://plugins.qgis.org/plugins/drone_ai_georef/"
+      "title": "LTE PCI and RSI Planning",
+      "url": "https://plugins.qgis.org/plugins/lte_pci_rsi_planning/"
     },
     {
-      "title": "GSI2Campus3D",
-      "url": "https://plugins.qgis.org/plugins/gsi2campus3d/"
+      "title": "Stacked Terrain Builder",
+      "url": "https://plugins.qgis.org/plugins/stacked_terrain_builder/"
     },
     {
-      "title": "Pinned Layers",
-      "url": "https://plugins.qgis.org/plugins/pinned_layers/"
+      "title": "EpidBot",
+      "url": "https://plugins.qgis.org/plugins/epidbot/"
     },
     {
-      "title": "Strip Map Maker",
-      "url": "https://plugins.qgis.org/plugins/strip_map_maker/"
+      "title": "Spectral Harbor",
+      "url": "https://plugins.qgis.org/plugins/spectral_harbor/"
     },
     {
-      "title": "Contours2Mesh",
-      "url": "https://plugins.qgis.org/plugins/contours2mesh/"
+      "title": "GeoTSE - Espacializador Eleitoral",
+      "url": "https://plugins.qgis.org/plugins/tse_to_qgis/"
     },
     {
-      "title": "TELEMAC Toolkit",
-      "url": "https://plugins.qgis.org/plugins/telemac_toolkit/"
+      "title": "Polygon QC",
+      "url": "https://plugins.qgis.org/plugins/polygon_QC/"
     }
   ],
   "releases": [
@@ -222,28 +222,28 @@
       "answers": 0
     },
     {
+      "title": "Converting a DEM from grid to TIFF changes range of elevation values",
+      "url": "https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values",
+      "score": 1,
+      "answers": 1
+    },
+    {
       "title": "Layout size and PDF size don't match in QGIS",
       "url": "https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis",
       "score": 4,
       "answers": 1
     },
     {
-      "title": "Converting a DEM from grid to TIFF changes range of elevation values",
-      "url": "https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values",
-      "score": 1,
-      "answers": 0
+      "title": "Getting before-state of attribute using PyQGIS",
+      "url": "https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis",
+      "score": 2,
+      "answers": 1
     },
     {
       "title": "Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API",
       "url": "https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api",
       "score": 0,
       "answers": 0
-    },
-    {
-      "title": "Getting before-state of attribute using PyQGIS",
-      "url": "https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis",
-      "score": 2,
-      "answers": 1
     },
     {
       "title": "Increasing the size of the selected line symbol within layer in ArcGIS Pro",
@@ -258,16 +258,16 @@
       "answers": 1
     },
     {
-      "title": "Convert Discrete Voxel Layer to same-value-merged 3D objects in ArcGIS?",
-      "url": "https://gis.stackexchange.com/questions/501634/convert-discrete-voxel-layer-to-same-value-merged-3d-objects-in-arcgis",
-      "score": 1,
-      "answers": 0
-    },
-    {
       "title": "QgsTaskManager active vs queued vs running task",
       "url": "https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task",
       "score": 2,
       "answers": 1
+    },
+    {
+      "title": "How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?",
+      "url": "https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal",
+      "score": 0,
+      "answers": 2
     }
   ],
   "nasa": [
@@ -290,46 +290,46 @@
       "org": "ASF"
     },
     {
-      "title": "OPERA Dynamic Surface Water Extent from Harmonized Landsat Sentinel-2 product (Version 1)",
-      "url": "https://search.earthdata.nasa.gov/search?q=OPERA_L3_DSWX-HLS_V1",
-      "desc": "This dataset contains Level-3 Dynamic OPERA surface water extent product version 1.",
-      "org": "POCLOUD"
-    },
-    {
-      "title": "Very Long Baseline Interferometry (VLBI) Level 2 VLBI Global Observing System (VGOS) DB format data from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=VLBI_L2_vgosDB_data",
-      "desc": "This CDDIS collection is composed of geodetic, Very Long Baseline Array (VLBI) level 2 observational and supporting data (including observations, standard de…",
+      "title": "Satellite Laser Ranging (SLR) Predictions from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=SLR_predictions",
+      "desc": "Predicted satellite orbits for Satellite Laser Ranging (SLR) tracking of satellites equipped with corner cube retroreflectors.",
       "org": "CDDIS"
     },
     {
-      "title": "Very Long Baseline Interferometry (VLBI) Positions Products from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=VLBI_pos_prod",
-      "desc": "Station positions and velocity solutions in Software INdependent EXchange (SINEX) format derived from analysis of Very Long Baseline Interferometry (VLBI) data.",
-      "org": "CDDIS"
+      "title": "Cloud Radar System (CRS) IMPACTS",
+      "url": "https://search.earthdata.nasa.gov/search?q=crsimpacts",
+      "desc": "The Cloud Radar System (CRS) IMPACTS dataset consists of calibrated radar reflectivity, Doppler velocity, linear depolarization ratio, and normalized radar c…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "Very Long Baseline Interferometry (VLBI) Tropospheric Parameters (TROP) products from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=VLBI_trop_param",
-      "desc": "Troposphere Zenith Path Delay (ZPD) values derived from analysis of Very Long Baseline Interferometry (VLBI) data.",
-      "org": "CDDIS"
+      "title": "SBUV/Nimbus-7 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUVN07L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SBUVN07L2",
+      "desc": "The Solar Backscattered Ultraviolet (SBUV) from Nimbus-7 Level-2 daily product (SBUVN07L2) contains ozone nadir profile and total column data from retrievals…",
+      "org": "GES_DISC"
     },
     {
-      "title": "COWVR STP-H8 Antenna and Microwave Brightness Temperatures During Multi-Angle Configuration Version 11",
-      "url": "https://search.earthdata.nasa.gov/search?q=COWVR_STPH8_L1_TSDR_MA_V11",
-      "desc": "This product is best suited for a cal/val user or sensor expert.",
-      "org": "POCLOUD"
+      "title": "SBUV2/NOAA-19 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N19L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N19L2",
+      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-19 Level-2 daily product (SBUV2N19L2) contains ozone nadir profile and total column data from retrie…",
+      "org": "GES_DISC"
     },
     {
-      "title": "AAOE ER-2 Aircraft In-Situ Trace Gas Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=AAOE_TraceGas_AircraftInSitu_ER2_Data",
-      "desc": "AAOE_TraceGas_AircraftInSitu_ER2_Data is the in-situ trace gas data collected onboard the ER-2 aircraft during the Airborne Antarctic Ozone Experiment (AAOE)…",
+      "title": "SBUV2/NOAA-18 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N18L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N18L2",
+      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-18 Level-2 daily product (SBUV2N18L2) contains ozone nadir profile and total column data from retrie…",
+      "org": "GES_DISC"
+    },
+    {
+      "title": "DSCOVR EPIC Level 1A Version 4",
+      "url": "https://search.earthdata.nasa.gov/search?q=DSCOVR_EPIC_L1A",
+      "desc": "Deep Space Climate Observatory (DSCOVR) Earth Polychromatic Imaging Camera (EPIC) is a 10-channel spectro-radiometer (317 – 780 nm) onboard National Oceanic…",
       "org": "LARC_CLOUD"
     },
     {
-      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
-      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "SBUV2/NOAA-17 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N17L2)",
+      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N17L2",
+      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-17 Level-2 daily product (SBUV2N17L2) contains ozone nadir profile and total column data from retrie…",
+      "org": "GES_DISC"
     }
   ],
   "datagov": [
