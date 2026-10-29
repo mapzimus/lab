@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-28
+# Mapzimus Geospatial Radar — 2026-10-29
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [To Infinity & Beyond](http://googlemapsmania.blogspot.com/2026/10/to-infinity-beyond.html)
 - [How the World Draws the World](http://googlemapsmania.blogspot.com/2026/10/how-world-draws-world.html)
 - [Turn Your Neighborhood Into a Manga Universe](http://googlemapsmania.blogspot.com/2026/10/turn-your-neighborhood-into-manga.html)
 - [North Ain't Up!](http://googlemapsmania.blogspot.com/2026/10/north-aint-up.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Have You Had Your Five a Day?](http://googlemapsmania.blogspot.com/2026/10/have-you-had-your-five-day.html)
 - [The World's Most Notable Places.](http://googlemapsmania.blogspot.com/2026/10/the-worlds-most-notable-places.html)
 - [Pixelate the World](http://googlemapsmania.blogspot.com/2026/10/pixelate-world.html)
-- [London is Bigger than Colorado](http://googlemapsmania.blogspot.com/2026/10/london-is-bigger-than-colorado.html)
 
 ## Geography Realm
 
@@ -31,21 +31,21 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
+- [Kent Öngörü - Population Projection and Urban Vulnerability](https://plugins.qgis.org/plugins/kent_ongoru/)
+- [Epigrass](https://plugins.qgis.org/plugins/epigrass/)
+- [RMA GeoHydro](https://plugins.qgis.org/plugins/rma_geohydro/)
+- [Media Hub](https://plugins.qgis.org/plugins/media_hub/)
+- [Datagrundlag Browser](https://plugins.qgis.org/plugins/datagrundlag_browser/)
+- [OnGeo US Parcel Explorer](https://plugins.qgis.org/plugins/ongeo_us_parcel_search/)
 - [DeltaSol](https://plugins.qgis.org/plugins/deltasol/)
 - [Coordinate System Tool](https://plugins.qgis.org/plugins/CoordinateSystemTool/)
-- [LTE PCI and RSI Planning](https://plugins.qgis.org/plugins/lte_pci_rsi_planning/)
-- [Stacked Terrain Builder](https://plugins.qgis.org/plugins/stacked_terrain_builder/)
-- [EpidBot](https://plugins.qgis.org/plugins/epidbot/)
-- [Spectral Harbor](https://plugins.qgis.org/plugins/spectral_harbor/)
-- [GeoTSE - Espacializador Eleitoral](https://plugins.qgis.org/plugins/tse_to_qgis/)
-- [Polygon QC](https://plugins.qgis.org/plugins/polygon_QC/)
 
 ## Library releases
 
+- [deck.gl v9.4.1](https://github.com/visgl/deck.gl/releases/tag/v9.4.1) (2026-10-28) — - fix(core): honor Deck GPU debug option during device initialization (#10782) - fix(core): fit the shadow map to the visible frustum at high pitch (#10893)…
 - [maplibre-gl-js v6.16.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.16.0) (2026-10-25) — ### ✨ Features and improvements - Allow `Map#setMaxBounds` to constrain one geographic axis without constraining the other ([#6148](https://github.com/maplib…
 - [duckdb v2.0.0](https://github.com/duckdb/duckdb/releases/tag/v2.0.0) (2026-10-21) — This release of DuckDB is named "Cyanoptera" after Spatula Cyanoptera, a species of duck found in western North and South America.
 - [QGIS final-3_44_15](https://github.com/qgis/QGIS/releases/tag/final-3_44_15) (2026-09-25) — https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15
-- [deck.gl v9.4.0](https://github.com/visgl/deck.gl/releases/tag/v9.4.0) (2026-09-05) — deck.gl v9.4 brings together a collection of completed improvements focused on performance, stability, and usability.
 - [gdal v3.13.3](https://github.com/OSGeo/gdal/releases/tag/v3.13.3) (2026-08-18) — Bug fix release. See release notes: https://github.com/OSGeo/gdal/blob/v3.13.3/NEWS.md
 - [turf v7.4.0](https://github.com/Turfjs/turf/releases/tag/v7.4.0) (2026-08-03) — ## What's Changed ⚠️ Due to correctness fixes, behavior across the boolean-* methods has changed.
 - [tippecanoe 2.79.0](https://github.com/felt/tippecanoe/releases/tag/2.79.0) (2025-07-24) — # 2.79.0 * When deduplicating features by ID in tippecanoe-overzoom, be careful to track even features that have been clipped away.
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Google Map Credits in ArcGIS Pro](https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro) (▲ 0 · 0 answers)
-- [Pointing QGIS to use DEM layer as height source](https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source) (▲ -2 · 0 answers)
+- [Does a single acquisition date of HLSS30 cover a polygon?](https://gis.stackexchange.com/questions/501652/does-a-single-acquisition-date-of-hlss30-cover-a-polygon) (▲ 0 · 1 answers)
+- [Google Map Credits in ArcGIS Pro](https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro) (▲ 1 · 0 answers)
+- [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 2 answers)
+- [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 5 · 1 answers)
+- [Pointing QGIS to use DEM layer as height source](https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source) (▲ -4 · 0 answers)
 - [Converting a DEM from grid to TIFF changes range of elevation values](https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values) (▲ 1 · 1 answers)
-- [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 4 · 1 answers)
-- [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 1 answers)
-- [Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API](https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api) (▲ 0 · 0 answers)
+- [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 2 answers)
 - [Increasing the size of the selected line symbol within layer in ArcGIS Pro](https://gis.stackexchange.com/questions/501625/increasing-the-size-of-the-selected-line-symbol-within-layer-in-arcgis-pro) (▲ 2 · 2 answers)
+- [Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API](https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api) (▲ 0 · 0 answers)
 - [Download postgis-bundle-pg18x64-setup-3.6.2-1.exe](https://gis.stackexchange.com/questions/501628/download-postgis-bundle-pg18x64-setup-3-6-2-1-exe) (▲ -1 · 1 answers)
-- [QgsTaskManager active vs queued vs running task](https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task) (▲ 2 · 1 answers)
-- [How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?](https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal) (▲ 0 · 2 answers)
 
 ## NASA Earthdata — recently updated collections
 
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [Satellite Laser Ranging (SLR) Predictions from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=SLR_predictions) — Predicted satellite orbits for Satellite Laser Ranging (SLR) tracking of satellites equipped with corner cube retroreflectors.
-- [Cloud Radar System (CRS) IMPACTS](https://search.earthdata.nasa.gov/search?q=crsimpacts) — The Cloud Radar System (CRS) IMPACTS dataset consists of calibrated radar reflectivity, Doppler velocity, linear depolarization ratio, and normalized radar c…
-- [SBUV/Nimbus-7 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUVN07L2)](https://search.earthdata.nasa.gov/search?q=SBUVN07L2) — The Solar Backscattered Ultraviolet (SBUV) from Nimbus-7 Level-2 daily product (SBUVN07L2) contains ozone nadir profile and total column data from retrievals…
-- [SBUV2/NOAA-19 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N19L2)](https://search.earthdata.nasa.gov/search?q=SBUV2N19L2) — The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-19 Level-2 daily product (SBUV2N19L2) contains ozone nadir profile and total column data from retrie…
-- [SBUV2/NOAA-18 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N18L2)](https://search.earthdata.nasa.gov/search?q=SBUV2N18L2) — The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-18 Level-2 daily product (SBUV2N18L2) contains ozone nadir profile and total column data from retrie…
-- [DSCOVR EPIC Level 1A Version 4](https://search.earthdata.nasa.gov/search?q=DSCOVR_EPIC_L1A) — Deep Space Climate Observatory (DSCOVR) Earth Polychromatic Imaging Camera (EPIC) is a 10-channel spectro-radiometer (317 – 780 nm) onboard National Oceanic…
-- [SBUV2/NOAA-17 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N17L2)](https://search.earthdata.nasa.gov/search?q=SBUV2N17L2) — The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-17 Level-2 daily product (SBUV2N17L2) contains ozone nadir profile and total column data from retrie…
+- [PACE OCI Level-2 Regional Apparent Optical Properties - Near Real-time (NRT) Data, version 3.2](https://search.earthdata.nasa.gov/search?q=PACE_OCI_L2_AOP_NRT) — The Ocean Biology DAAC produces near real-time (NRT) products using the best-available combination of ancillary data from meteorological and ozone data.
+- [PACE OCI Level-2 Regional Apparent Optical Properties Data, version 3.2](https://search.earthdata.nasa.gov/search?q=PACE_OCI_L2_AOP) — The Apparent Optical Properties (OC_AOP) data suite provides satellite-derived measures of the interaction between solar radiation and the upper ocean.
+- [Global Navigation Satellite System (GNSS) Rapid Clocks Products from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_rpd_clk_prod) — Satellite and receiver clock products derived from analysis of Global Navigation Satellite System (GNSS) data.
+- [Global Navigation Satellite Systems (GNSS) Positions Products from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_pos_prod) — Weekly station positions and velocity solutions in Software INdependent EXchange (SINEX) format derived from analysis of Global Navigation Satellite System (…
+- [Global Navigation Satellite System (GNSS) Data and Products Support Information from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_info) — This dataset consists of supporting information for use of ground-based Global Navigation Satellite System (GNSS) data and products from the NASA Crustal Dyn…
+- [Global Navigation Satellite System (GNSS) IGS Ultra-Rapid Combined Orbit Solution Product (sub-daily files, generated 4 times/day) from N…](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_ult_rpd_comb_orbit_soln) — This derived product set consists of Global Navigation Satellite System Ultra-Rapid Orbit Product (daily files, generated daily) from the NASA Crustal Dynami…
+- [Global Navigation Satellite System (GNSS) IGS Final Troposphere Zenith Path Delay (ZPD) Combination Product (version 1) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_trop_ZPD_prod) — This derived product set consists of version 1 of the Global Navigation Satellite System Final Troposphere Zenith Path Delay (ZPD) Product (daily files by st…
 
 ## Data.gov — new geodata
 

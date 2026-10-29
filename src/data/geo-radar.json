@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-10-28",
+  "generatedAt": "2026-10-29",
   "news": {
     "mapsmania": [
+      {
+        "title": "To Infinity & Beyond",
+        "url": "http://googlemapsmania.blogspot.com/2026/10/to-infinity-beyond.html",
+        "desc": ""
+      },
       {
         "title": "How the World Draws the World",
         "url": "http://googlemapsmania.blogspot.com/2026/10/how-world-draws-world.html",
@@ -35,11 +40,6 @@
       {
         "title": "Pixelate the World",
         "url": "http://googlemapsmania.blogspot.com/2026/10/pixelate-world.html",
-        "desc": ""
-      },
-      {
-        "title": "London is Bigger than Colorado",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/london-is-bigger-than-colorado.html",
         "desc": ""
       }
     ],
@@ -110,39 +110,47 @@
   },
   "qgis": [
     {
+      "title": "Kent Öngörü - Population Projection and Urban Vulnerability",
+      "url": "https://plugins.qgis.org/plugins/kent_ongoru/"
+    },
+    {
+      "title": "Epigrass",
+      "url": "https://plugins.qgis.org/plugins/epigrass/"
+    },
+    {
+      "title": "RMA GeoHydro",
+      "url": "https://plugins.qgis.org/plugins/rma_geohydro/"
+    },
+    {
+      "title": "Media Hub",
+      "url": "https://plugins.qgis.org/plugins/media_hub/"
+    },
+    {
+      "title": "Datagrundlag Browser",
+      "url": "https://plugins.qgis.org/plugins/datagrundlag_browser/"
+    },
+    {
+      "title": "OnGeo US Parcel Explorer",
+      "url": "https://plugins.qgis.org/plugins/ongeo_us_parcel_search/"
+    },
+    {
       "title": "DeltaSol",
       "url": "https://plugins.qgis.org/plugins/deltasol/"
     },
     {
       "title": "Coordinate System Tool",
       "url": "https://plugins.qgis.org/plugins/CoordinateSystemTool/"
-    },
-    {
-      "title": "LTE PCI and RSI Planning",
-      "url": "https://plugins.qgis.org/plugins/lte_pci_rsi_planning/"
-    },
-    {
-      "title": "Stacked Terrain Builder",
-      "url": "https://plugins.qgis.org/plugins/stacked_terrain_builder/"
-    },
-    {
-      "title": "EpidBot",
-      "url": "https://plugins.qgis.org/plugins/epidbot/"
-    },
-    {
-      "title": "Spectral Harbor",
-      "url": "https://plugins.qgis.org/plugins/spectral_harbor/"
-    },
-    {
-      "title": "GeoTSE - Espacializador Eleitoral",
-      "url": "https://plugins.qgis.org/plugins/tse_to_qgis/"
-    },
-    {
-      "title": "Polygon QC",
-      "url": "https://plugins.qgis.org/plugins/polygon_QC/"
     }
   ],
   "releases": [
+    {
+      "repo": "visgl/deck.gl",
+      "title": "deck.gl v9.4.1",
+      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.4.1",
+      "desc": "- fix(core): honor Deck GPU debug option during device initialization (#10782) - fix(core): fit the shadow map to the visible frustum at high pitch (#10893)…",
+      "publishedAt": "2026-10-28",
+      "isFresh": true
+    },
     {
       "repo": "maplibre/maplibre-gl-js",
       "title": "maplibre-gl-js v6.16.0",
@@ -165,14 +173,6 @@
       "url": "https://github.com/qgis/QGIS/releases/tag/final-3_44_15",
       "desc": "https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15",
       "publishedAt": "2026-09-25",
-      "isFresh": false
-    },
-    {
-      "repo": "visgl/deck.gl",
-      "title": "deck.gl v9.4.0",
-      "url": "https://github.com/visgl/deck.gl/releases/tag/v9.4.0",
-      "desc": "deck.gl v9.4 brings together a collection of completed improvements focused on performance, stability, and usability.",
-      "publishedAt": "2026-09-05",
       "isFresh": false
     },
     {
@@ -210,15 +210,33 @@
   ],
   "gisse": [
     {
+      "title": "Does a single acquisition date of HLSS30 cover a polygon?",
+      "url": "https://gis.stackexchange.com/questions/501652/does-a-single-acquisition-date-of-hlss30-cover-a-polygon",
+      "score": 0,
+      "answers": 1
+    },
+    {
       "title": "Google Map Credits in ArcGIS Pro",
       "url": "https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro",
-      "score": 0,
+      "score": 1,
       "answers": 0
+    },
+    {
+      "title": "Getting before-state of attribute using PyQGIS",
+      "url": "https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis",
+      "score": 2,
+      "answers": 2
+    },
+    {
+      "title": "Layout size and PDF size don't match in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis",
+      "score": 5,
+      "answers": 1
     },
     {
       "title": "Pointing QGIS to use DEM layer as height source",
       "url": "https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source",
-      "score": -2,
+      "score": -4,
       "answers": 0
     },
     {
@@ -228,22 +246,10 @@
       "answers": 1
     },
     {
-      "title": "Layout size and PDF size don't match in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis",
+      "title": "Creating this dark green (\"V\") line symbology in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis",
       "score": 4,
-      "answers": 1
-    },
-    {
-      "title": "Getting before-state of attribute using PyQGIS",
-      "url": "https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis",
-      "score": 2,
-      "answers": 1
-    },
-    {
-      "title": "Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API",
-      "url": "https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api",
-      "score": 0,
-      "answers": 0
+      "answers": 2
     },
     {
       "title": "Increasing the size of the selected line symbol within layer in ArcGIS Pro",
@@ -252,22 +258,16 @@
       "answers": 2
     },
     {
+      "title": "Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API",
+      "url": "https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Download postgis-bundle-pg18x64-setup-3.6.2-1.exe",
       "url": "https://gis.stackexchange.com/questions/501628/download-postgis-bundle-pg18x64-setup-3-6-2-1-exe",
       "score": -1,
       "answers": 1
-    },
-    {
-      "title": "QgsTaskManager active vs queued vs running task",
-      "url": "https://gis.stackexchange.com/questions/501620/qgstaskmanager-active-vs-queued-vs-running-task",
-      "score": 2,
-      "answers": 1
-    },
-    {
-      "title": "How to get the biggest POLYGON out of each MULTIPOLYGON, with OGR/GDAL?",
-      "url": "https://gis.stackexchange.com/questions/501617/how-to-get-the-biggest-polygon-out-of-each-multipolygon-with-ogr-gdal",
-      "score": 0,
-      "answers": 2
     }
   ],
   "nasa": [
@@ -290,46 +290,46 @@
       "org": "ASF"
     },
     {
-      "title": "Satellite Laser Ranging (SLR) Predictions from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=SLR_predictions",
-      "desc": "Predicted satellite orbits for Satellite Laser Ranging (SLR) tracking of satellites equipped with corner cube retroreflectors.",
+      "title": "PACE OCI Level-2 Regional Apparent Optical Properties - Near Real-time (NRT) Data, version 3.2",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE_OCI_L2_AOP_NRT",
+      "desc": "The Ocean Biology DAAC produces near real-time (NRT) products using the best-available combination of ancillary data from meteorological and ozone data.",
+      "org": "OB_CLOUD"
+    },
+    {
+      "title": "PACE OCI Level-2 Regional Apparent Optical Properties Data, version 3.2",
+      "url": "https://search.earthdata.nasa.gov/search?q=PACE_OCI_L2_AOP",
+      "desc": "The Apparent Optical Properties (OC_AOP) data suite provides satellite-derived measures of the interaction between solar radiation and the upper ocean.",
+      "org": "OB_CLOUD"
+    },
+    {
+      "title": "Global Navigation Satellite System (GNSS) Rapid Clocks Products from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_rpd_clk_prod",
+      "desc": "Satellite and receiver clock products derived from analysis of Global Navigation Satellite System (GNSS) data.",
       "org": "CDDIS"
     },
     {
-      "title": "Cloud Radar System (CRS) IMPACTS",
-      "url": "https://search.earthdata.nasa.gov/search?q=crsimpacts",
-      "desc": "The Cloud Radar System (CRS) IMPACTS dataset consists of calibrated radar reflectivity, Doppler velocity, linear depolarization ratio, and normalized radar c…",
-      "org": "GHRC_DAAC"
+      "title": "Global Navigation Satellite Systems (GNSS) Positions Products from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_pos_prod",
+      "desc": "Weekly station positions and velocity solutions in Software INdependent EXchange (SINEX) format derived from analysis of Global Navigation Satellite System (…",
+      "org": "CDDIS"
     },
     {
-      "title": "SBUV/Nimbus-7 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUVN07L2)",
-      "url": "https://search.earthdata.nasa.gov/search?q=SBUVN07L2",
-      "desc": "The Solar Backscattered Ultraviolet (SBUV) from Nimbus-7 Level-2 daily product (SBUVN07L2) contains ozone nadir profile and total column data from retrievals…",
-      "org": "GES_DISC"
+      "title": "Global Navigation Satellite System (GNSS) Data and Products Support Information from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_info",
+      "desc": "This dataset consists of supporting information for use of ground-based Global Navigation Satellite System (GNSS) data and products from the NASA Crustal Dyn…",
+      "org": "CDDIS"
     },
     {
-      "title": "SBUV2/NOAA-19 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N19L2)",
-      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N19L2",
-      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-19 Level-2 daily product (SBUV2N19L2) contains ozone nadir profile and total column data from retrie…",
-      "org": "GES_DISC"
+      "title": "Global Navigation Satellite System (GNSS) IGS Ultra-Rapid Combined Orbit Solution Product (sub-daily files, generated 4 times/day) from N…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_ult_rpd_comb_orbit_soln",
+      "desc": "This derived product set consists of Global Navigation Satellite System Ultra-Rapid Orbit Product (daily files, generated daily) from the NASA Crustal Dynami…",
+      "org": "CDDIS"
     },
     {
-      "title": "SBUV2/NOAA-18 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N18L2)",
-      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N18L2",
-      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-18 Level-2 daily product (SBUV2N18L2) contains ozone nadir profile and total column data from retrie…",
-      "org": "GES_DISC"
-    },
-    {
-      "title": "DSCOVR EPIC Level 1A Version 4",
-      "url": "https://search.earthdata.nasa.gov/search?q=DSCOVR_EPIC_L1A",
-      "desc": "Deep Space Climate Observatory (DSCOVR) Earth Polychromatic Imaging Camera (EPIC) is a 10-channel spectro-radiometer (317 – 780 nm) onboard National Oceanic…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "SBUV2/NOAA-17 Ozone (O3) Nadir Profile and Total Column 1 Day L2 V8.7 (SBUV2N17L2)",
-      "url": "https://search.earthdata.nasa.gov/search?q=SBUV2N17L2",
-      "desc": "The Solar Backscattered Ultraviolet/2 (SBUV/2) from NOAA-17 Level-2 daily product (SBUV2N17L2) contains ozone nadir profile and total column data from retrie…",
-      "org": "GES_DISC"
+      "title": "Global Navigation Satellite System (GNSS) IGS Final Troposphere Zenith Path Delay (ZPD) Combination Product (version 1) from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_trop_ZPD_prod",
+      "desc": "This derived product set consists of version 1 of the Global Navigation Satellite System Final Troposphere Zenith Path Delay (ZPD) Product (daily files by st…",
+      "org": "CDDIS"
     }
   ],
   "datagov": [
