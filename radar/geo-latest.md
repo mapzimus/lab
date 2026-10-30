@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-29
+# Mapzimus Geospatial Radar — 2026-10-30
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Famous Place Pictures in Japanese Art](http://googlemapsmania.blogspot.com/2026/10/famous-place-pictures-in-japanese-art.html)
 - [To Infinity & Beyond](http://googlemapsmania.blogspot.com/2026/10/to-infinity-beyond.html)
 - [How the World Draws the World](http://googlemapsmania.blogspot.com/2026/10/how-world-draws-world.html)
 - [Turn Your Neighborhood Into a Manga Universe](http://googlemapsmania.blogspot.com/2026/10/turn-your-neighborhood-into-manga.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [A Fair Election Map for the Midterms](http://googlemapsmania.blogspot.com/2026/10/a-fair-election-map-for-midterms.html)
 - [Have You Had Your Five a Day?](http://googlemapsmania.blogspot.com/2026/10/have-you-had-your-five-day.html)
 - [The World's Most Notable Places.](http://googlemapsmania.blogspot.com/2026/10/the-worlds-most-notable-places.html)
-- [Pixelate the World](http://googlemapsmania.blogspot.com/2026/10/pixelate-world.html)
 
 ## Geography Realm
 
@@ -22,23 +22,23 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## Geospatial World
 
+- [Understanding the Subsurface in India’s Infrastructure Planning](https://geospatialworld.net/video-interviews/understanding-the-subsurface-in-indias-infrastructure-planning/) — Dr. Sanjay Rana, Managing Director, PARSAN Overseas Pvt.
 - [First Principles First: Need to Calibrate Data Access for Disaster Resilience](https://geospatialworld.net/prime/business-and-industry-trends/first-principles-first-need-to-calibrate-data-access-for-disaster-resilience/) — Every year on October 13, the United Nations marks the International Day for Disaster Risk Reduction, a date the General Assembly fixed in 2009 after first s…
 - [Geospatial World Becomes EuroGeographics’ First Observer Member](https://geospatialworld.net/news/geospatial-world-becomes-eurogeographics-first-observer-member/) — New Delhi, 28th September 2026 — Geospatial World has become the first Observer Member of EuroGeographics, marking an important step in strengthening interna…
 - [From Data Deluge to Decision: Dr Abhay Swarup Mittal on Building Sovereign Intelligence at Aetosky](https://geospatialworld.net/videos/exclusive-videos-interviews/from-data-deluge-to-decision-dr-abhay-swarup-mittal-on-building-sovereign-intelligence-at-aetosky/) — In conversation with Dr Abhay Swarup Mittal, Founder and CEO of Aetosky group of companies on the founding story of Aetosky, building sovereign intelligence…
 - [Infrastructure Isn’t Just Built Anymore.](https://geospatialworld.net/videos/intelligent-infrastructure-aec-summit-gwf-2026/) — Infrastructure was once defined by scale.
 - [Strengthening Sovereignty, Economy, and Society](https://geospatialworld.net/prime/interviews/strengthening-sovereignty-economy-and-society/) — How should nations redefine geospatial and space sovereignty in an era of increasing dependence on global platforms, foreign satellite constellations, and in…
-- [Mapping Urban Heat Islands in Ahemedabad](https://geospatialworld.net/videos/mapping-urban-heat-islands-ahmedabad/) — Even though the conversations on climate change have muted due to the geopolitical situation, trade disruptions, greater defence and intelligence spending, a…
 
 ## QGIS — new & updated plugins
 
-- [Kent Öngörü - Population Projection and Urban Vulnerability](https://plugins.qgis.org/plugins/kent_ongoru/)
-- [Epigrass](https://plugins.qgis.org/plugins/epigrass/)
-- [RMA GeoHydro](https://plugins.qgis.org/plugins/rma_geohydro/)
-- [Media Hub](https://plugins.qgis.org/plugins/media_hub/)
-- [Datagrundlag Browser](https://plugins.qgis.org/plugins/datagrundlag_browser/)
-- [OnGeo US Parcel Explorer](https://plugins.qgis.org/plugins/ongeo_us_parcel_search/)
-- [DeltaSol](https://plugins.qgis.org/plugins/deltasol/)
-- [Coordinate System Tool](https://plugins.qgis.org/plugins/CoordinateSystemTool/)
+- [FeatureClass Compare](https://plugins.qgis.org/plugins/FeatureClassCompare/)
+- [Restaure](https://plugins.qgis.org/plugins/restaure/)
+- [GS Mapa](https://plugins.qgis.org/plugins/gs_mapa/)
+- [MapStyle AI](https://plugins.qgis.org/plugins/mapstyle_ai/)
+- [arcskin](https://plugins.qgis.org/plugins/arcskin/)
+- [Spatial Data Import](https://plugins.qgis.org/plugins/KYB_import_coords/)
+- [QFieldDrop](https://plugins.qgis.org/plugins/QFieldDrop/)
+- [BathyTrace](https://plugins.qgis.org/plugins/bathytrace/)
 
 ## Library releases
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
+- [Reuse last entered value takes precedence over duplicate feature value.](https://gis.stackexchange.com/questions/501657/reuse-last-entered-value-takes-precedence-over-duplicate-feature-value-is-there) (▲ 3 · 1 answers)
 - [Does a single acquisition date of HLSS30 cover a polygon?](https://gis.stackexchange.com/questions/501652/does-a-single-acquisition-date-of-hlss30-cover-a-polygon) (▲ 0 · 1 answers)
 - [Google Map Credits in ArcGIS Pro](https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro) (▲ 1 · 0 answers)
 - [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 2 answers)
 - [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 5 · 1 answers)
-- [Pointing QGIS to use DEM layer as height source](https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source) (▲ -4 · 0 answers)
 - [Converting a DEM from grid to TIFF changes range of elevation values](https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values) (▲ 1 · 1 answers)
+- [Pointing QGIS to use DEM layer as height source](https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source) (▲ -4 · 0 answers)
 - [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 2 answers)
 - [Increasing the size of the selected line symbol within layer in ArcGIS Pro](https://gis.stackexchange.com/questions/501625/increasing-the-size-of-the-selected-line-symbol-within-layer-in-arcgis-pro) (▲ 2 · 2 answers)
 - [Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API](https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api) (▲ 0 · 0 answers)
-- [Download postgis-bundle-pg18x64-setup-3.6.2-1.exe](https://gis.stackexchange.com/questions/501628/download-postgis-bundle-pg18x64-setup-3-6-2-1-exe) (▲ -1 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
 
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [PACE OCI Level-2 Regional Apparent Optical Properties - Near Real-time (NRT) Data, version 3.2](https://search.earthdata.nasa.gov/search?q=PACE_OCI_L2_AOP_NRT) — The Ocean Biology DAAC produces near real-time (NRT) products using the best-available combination of ancillary data from meteorological and ozone data.
-- [PACE OCI Level-2 Regional Apparent Optical Properties Data, version 3.2](https://search.earthdata.nasa.gov/search?q=PACE_OCI_L2_AOP) — The Apparent Optical Properties (OC_AOP) data suite provides satellite-derived measures of the interaction between solar radiation and the upper ocean.
-- [Global Navigation Satellite System (GNSS) Rapid Clocks Products from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_rpd_clk_prod) — Satellite and receiver clock products derived from analysis of Global Navigation Satellite System (GNSS) data.
-- [Global Navigation Satellite Systems (GNSS) Positions Products from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_pos_prod) — Weekly station positions and velocity solutions in Software INdependent EXchange (SINEX) format derived from analysis of Global Navigation Satellite System (…
-- [Global Navigation Satellite System (GNSS) Data and Products Support Information from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_info) — This dataset consists of supporting information for use of ground-based Global Navigation Satellite System (GNSS) data and products from the NASA Crustal Dyn…
-- [Global Navigation Satellite System (GNSS) IGS Ultra-Rapid Combined Orbit Solution Product (sub-daily files, generated 4 times/day) from N…](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_ult_rpd_comb_orbit_soln) — This derived product set consists of Global Navigation Satellite System Ultra-Rapid Orbit Product (daily files, generated daily) from the NASA Crustal Dynami…
-- [Global Navigation Satellite System (GNSS) IGS Final Troposphere Zenith Path Delay (ZPD) Combination Product (version 1) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_trop_ZPD_prod) — This derived product set consists of version 1 of the Global Navigation Satellite System Final Troposphere Zenith Path Delay (ZPD) Product (daily files by st…
+- [SWOT Level 2 Nadir Altimeter Operational Geophysical Data Record with Waveforms, GPS, NRT, Version D](https://search.earthdata.nasa.gov/search?q=SWOT_L2_NALT_OGDR_NRTGPS_D) — The value-added SWOT Level 2 Near Real Time GPS Nadir Altimeter Operational Geophysical Data Record (NRT GPS OGDR) Version D dataset produced by the Surface…
+- [SWOT Prior Lake Database, Nominal Orbit, Version 2.02](https://search.earthdata.nasa.gov/search?q=SWOT_LAKEDATABASE_NOM_2.02) — The SWOT Prior Lake Database, Nominal Orbit, Version 2.02 collection is one out of three parts of the SWOT Prior Lake Database.
+- [SWOT Prior Lake Database, Calibration Orbit, Version 2.02](https://search.earthdata.nasa.gov/search?q=SWOT_LAKEDATABASE_CAL_2.02) — The SWOT Prior Lake Database, Calibration Orbit, Version 2.02 collection is one out of three parts of the SWOT Prior Lake Database.
+- [SWOT Prior Lake Database, Basin Files, Version 2.02](https://search.earthdata.nasa.gov/search?q=SWOT_LAKEDATABASE_BASIN_2.02) — The SWOT Prior Lake Database, Basin Files, Version 2.02 collection is one out of three parts of the SWOT Prior Lake Database.
+- [MWOW 6-Hourly Global Ocean Wind Level 3 Version 0.2](https://search.earthdata.nasa.gov/search?q=MWOW_L3_V0.2) — This data set contains 6-hourly, global gridded wind speed and direction at 0.125 degree horizontal resolution from the MWOW (Multi-sensor Worldwide Ocean Wi…
+- [MWOW 6-Hourly High Resolution Global Ocean Wind Level 3 Version 0.2](https://search.earthdata.nasa.gov/search?q=MWOW_L3_HIGHRES_V0.2) — This data set contains 6-hourly, global gridded wind speed and direction at 1/64th degree horizontal resolution from the MWOW (Multi-sensor Worldwide Ocean W…
+- [MWOW 6-Hourly High Resolution Global Ocean Wind with Expanded Platform Inputs Level 3 Version 0.2](https://search.earthdata.nasa.gov/search?q=MWOW_L3_HIGHRES_EPI_V0.2) — This data set contains 6-hourly, global gridded wind speed and direction at 1/64th degree horizontal resolution from the MWOW (Multi-sensor Worldwide Ocean W…
 
 ## Data.gov — new geodata
 
