@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-30
+# Mapzimus Geospatial Radar — 2026-10-31
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [How to Navigate the Roman Empire](http://googlemapsmania.blogspot.com/2026/10/how-to-navigate-roman-empire.html)
 - [Famous Place Pictures in Japanese Art](http://googlemapsmania.blogspot.com/2026/10/famous-place-pictures-in-japanese-art.html)
 - [To Infinity & Beyond](http://googlemapsmania.blogspot.com/2026/10/to-infinity-beyond.html)
 - [How the World Draws the World](http://googlemapsmania.blogspot.com/2026/10/how-world-draws-world.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [North Ain't Up!](http://googlemapsmania.blogspot.com/2026/10/north-aint-up.html)
 - [A Fair Election Map for the Midterms](http://googlemapsmania.blogspot.com/2026/10/a-fair-election-map-for-midterms.html)
 - [Have You Had Your Five a Day?](http://googlemapsmania.blogspot.com/2026/10/have-you-had-your-five-day.html)
-- [The World's Most Notable Places.](http://googlemapsmania.blogspot.com/2026/10/the-worlds-most-notable-places.html)
 
 ## Geography Realm
 
@@ -42,7 +42,7 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## Library releases
 
-- [deck.gl v9.4.1](https://github.com/visgl/deck.gl/releases/tag/v9.4.1) (2026-10-28) — - fix(core): honor Deck GPU debug option during device initialization (#10782) - fix(core): fit the shadow map to the visible frustum at high pitch (#10893)…
+- [deck.gl v9.3.12](https://github.com/visgl/deck.gl/releases/tag/v9.3.12) (2026-10-30) — - fix(core): eliminate 300ms click delay and fix runtime controller prop changes (#10422) - fix(heatmap): compilation failure on Qualcomm Adreno 660 (#10301)…
 - [maplibre-gl-js v6.16.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.16.0) (2026-10-25) — ### ✨ Features and improvements - Allow `Map#setMaxBounds` to constrain one geographic axis without constraining the other ([#6148](https://github.com/maplib…
 - [duckdb v2.0.0](https://github.com/duckdb/duckdb/releases/tag/v2.0.0) (2026-10-21) — This release of DuckDB is named "Cyanoptera" after Spatula Cyanoptera, a species of duck found in western North and South America.
 - [QGIS final-3_44_15](https://github.com/qgis/QGIS/releases/tag/final-3_44_15) (2026-09-25) — https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15
@@ -53,7 +53,7 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Reuse last entered value takes precedence over duplicate feature value.](https://gis.stackexchange.com/questions/501657/reuse-last-entered-value-takes-precedence-over-duplicate-feature-value-is-there) (▲ 3 · 1 answers)
+- [Reuse last entered value takes precedence over duplicate feature value.](https://gis.stackexchange.com/questions/501657/reuse-last-entered-value-takes-precedence-over-duplicate-feature-value-is-there) (▲ 4 · 1 answers)
 - [Does a single acquisition date of HLSS30 cover a polygon?](https://gis.stackexchange.com/questions/501652/does-a-single-acquisition-date-of-hlss30-cover-a-polygon) (▲ 0 · 1 answers)
 - [Google Map Credits in ArcGIS Pro](https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro) (▲ 1 · 0 answers)
 - [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 2 answers)
@@ -69,13 +69,13 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [SWOT Level 2 Nadir Altimeter Operational Geophysical Data Record with Waveforms, GPS, NRT, Version D](https://search.earthdata.nasa.gov/search?q=SWOT_L2_NALT_OGDR_NRTGPS_D) — The value-added SWOT Level 2 Near Real Time GPS Nadir Altimeter Operational Geophysical Data Record (NRT GPS OGDR) Version D dataset produced by the Surface…
-- [SWOT Prior Lake Database, Nominal Orbit, Version 2.02](https://search.earthdata.nasa.gov/search?q=SWOT_LAKEDATABASE_NOM_2.02) — The SWOT Prior Lake Database, Nominal Orbit, Version 2.02 collection is one out of three parts of the SWOT Prior Lake Database.
-- [SWOT Prior Lake Database, Calibration Orbit, Version 2.02](https://search.earthdata.nasa.gov/search?q=SWOT_LAKEDATABASE_CAL_2.02) — The SWOT Prior Lake Database, Calibration Orbit, Version 2.02 collection is one out of three parts of the SWOT Prior Lake Database.
-- [SWOT Prior Lake Database, Basin Files, Version 2.02](https://search.earthdata.nasa.gov/search?q=SWOT_LAKEDATABASE_BASIN_2.02) — The SWOT Prior Lake Database, Basin Files, Version 2.02 collection is one out of three parts of the SWOT Prior Lake Database.
-- [MWOW 6-Hourly Global Ocean Wind Level 3 Version 0.2](https://search.earthdata.nasa.gov/search?q=MWOW_L3_V0.2) — This data set contains 6-hourly, global gridded wind speed and direction at 0.125 degree horizontal resolution from the MWOW (Multi-sensor Worldwide Ocean Wi…
-- [MWOW 6-Hourly High Resolution Global Ocean Wind Level 3 Version 0.2](https://search.earthdata.nasa.gov/search?q=MWOW_L3_HIGHRES_V0.2) — This data set contains 6-hourly, global gridded wind speed and direction at 1/64th degree horizontal resolution from the MWOW (Multi-sensor Worldwide Ocean W…
-- [MWOW 6-Hourly High Resolution Global Ocean Wind with Expanded Platform Inputs Level 3 Version 0.2](https://search.earthdata.nasa.gov/search?q=MWOW_L3_HIGHRES_EPI_V0.2) — This data set contains 6-hourly, global gridded wind speed and direction at 1/64th degree horizontal resolution from the MWOW (Multi-sensor Worldwide Ocean W…
+- [MERRA-2 tavgU_2d_slv_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Single-Level Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TUNXSLV)](https://search.earthdata.nasa.gov/search?q=M2TUNXSLV) — M2TUNXSLV (or tavgU_2d_slv_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
+- [MERRA-2 tavgU_2d_rad_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Radiation Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TUNXRAD)](https://search.earthdata.nasa.gov/search?q=M2TUNXRAD) — M2TUNXRAD (or tavgU_2d_rad_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
+- [MERRA-2 tavgU_2d_ocn_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Ocean Surface Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TUNXOCN)](https://search.earthdata.nasa.gov/search?q=M2TUNXOCN) — M2TUNXOCN (or tavgU_2d_ocn_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
+- [MERRA-2 tavgU_2d_lnd_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Land Surface Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TUNXLND)](https://search.earthdata.nasa.gov/search?q=M2TUNXLND) — M2TUNXLND (or tavgU_2d_lnd_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
+- [MERRA-2 tavgU_2d_lfo_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Land Surface Forcings 0.625 x 0.5 degree V5.12.4 (M2TUNXLFO)](https://search.earthdata.nasa.gov/search?q=M2TUNXLFO) — M2TUNXLFO (or tavgU_2d_lfo_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
+- [MERRA-2 tavgU_2d_int_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Vertically Integrated Diagnostics 0.625 x 0.5 degree V5.12.4…](https://search.earthdata.nasa.gov/search?q=M2TUNXINT) — M2TUNXINT (or tavgU_2d_int_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
+- [MERRA-2 tavgU_2d_glc_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Land Ice Surface Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TU…](https://search.earthdata.nasa.gov/search?q=M2TUNXGLC) — M2TUNXGLC (or tavgU_2d_glc_Nx) is a 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and Applications ve…
 
 ## Data.gov — new geodata
 
