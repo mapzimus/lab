@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-10-31
+# Mapzimus Geospatial Radar — 2026-11-01
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [The #30DayMapChallenge Begins](http://googlemapsmania.blogspot.com/2026/11/the-30daymapchallenge-begins.html)
 - [How to Navigate the Roman Empire](http://googlemapsmania.blogspot.com/2026/10/how-to-navigate-roman-empire.html)
 - [Famous Place Pictures in Japanese Art](http://googlemapsmania.blogspot.com/2026/10/famous-place-pictures-in-japanese-art.html)
 - [To Infinity & Beyond](http://googlemapsmania.blogspot.com/2026/10/to-infinity-beyond.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Turn Your Neighborhood Into a Manga Universe](http://googlemapsmania.blogspot.com/2026/10/turn-your-neighborhood-into-manga.html)
 - [North Ain't Up!](http://googlemapsmania.blogspot.com/2026/10/north-aint-up.html)
 - [A Fair Election Map for the Midterms](http://googlemapsmania.blogspot.com/2026/10/a-fair-election-map-for-midterms.html)
-- [Have You Had Your Five a Day?](http://googlemapsmania.blogspot.com/2026/10/have-you-had-your-five-day.html)
 
 ## Geography Realm
 
@@ -56,8 +56,8 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Reuse last entered value takes precedence over duplicate feature value.](https://gis.stackexchange.com/questions/501657/reuse-last-entered-value-takes-precedence-over-duplicate-feature-value-is-there) (▲ 4 · 1 answers)
 - [Does a single acquisition date of HLSS30 cover a polygon?](https://gis.stackexchange.com/questions/501652/does-a-single-acquisition-date-of-hlss30-cover-a-polygon) (▲ 0 · 1 answers)
 - [Google Map Credits in ArcGIS Pro](https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro) (▲ 1 · 0 answers)
-- [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 2 answers)
 - [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 5 · 1 answers)
+- [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 2 answers)
 - [Converting a DEM from grid to TIFF changes range of elevation values](https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values) (▲ 1 · 1 answers)
 - [Pointing QGIS to use DEM layer as height source](https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source) (▲ -4 · 0 answers)
 - [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 2 answers)
@@ -69,13 +69,13 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [MERRA-2 tavgU_2d_slv_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Single-Level Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TUNXSLV)](https://search.earthdata.nasa.gov/search?q=M2TUNXSLV) — M2TUNXSLV (or tavgU_2d_slv_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
-- [MERRA-2 tavgU_2d_rad_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Radiation Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TUNXRAD)](https://search.earthdata.nasa.gov/search?q=M2TUNXRAD) — M2TUNXRAD (or tavgU_2d_rad_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
-- [MERRA-2 tavgU_2d_ocn_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Ocean Surface Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TUNXOCN)](https://search.earthdata.nasa.gov/search?q=M2TUNXOCN) — M2TUNXOCN (or tavgU_2d_ocn_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
-- [MERRA-2 tavgU_2d_lnd_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Land Surface Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TUNXLND)](https://search.earthdata.nasa.gov/search?q=M2TUNXLND) — M2TUNXLND (or tavgU_2d_lnd_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
-- [MERRA-2 tavgU_2d_lfo_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Land Surface Forcings 0.625 x 0.5 degree V5.12.4 (M2TUNXLFO)](https://search.earthdata.nasa.gov/search?q=M2TUNXLFO) — M2TUNXLFO (or tavgU_2d_lfo_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
-- [MERRA-2 tavgU_2d_int_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Vertically Integrated Diagnostics 0.625 x 0.5 degree V5.12.4…](https://search.earthdata.nasa.gov/search?q=M2TUNXINT) — M2TUNXINT (or tavgU_2d_int_Nx) is a time-averaged 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and A…
-- [MERRA-2 tavgU_2d_glc_Nx: 2d,diurnal,Time-Averaged,Single-Level,Assimilation,Land Ice Surface Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TU…](https://search.earthdata.nasa.gov/search?q=M2TUNXGLC) — M2TUNXGLC (or tavgU_2d_glc_Nx) is a 2-dimensional monthly diurnal means data collection in Modern-Era Retrospective analysis for Research and Applications ve…
+- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
 
 ## Data.gov — new geodata
 
@@ -89,6 +89,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## OSM pulse
 
+- [weeklyOSM 849](https://weeklyosm.eu/archives/0849/)
 - [weeklyOSM 848](https://weeklyosm.eu/archives/0848/)
 - [weeklyOSM 847](https://weeklyosm.eu/archives/0847/)
-- [weeklyOSM 846](https://weeklyosm.eu/archives/0846/)
