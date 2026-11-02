@@ -1,15 +1,15 @@
-# Mapzimus Geospatial Radar — 2026-11-01
+# Mapzimus Geospatial Radar — 2026-11-02
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [A Neon Matterhorn](http://googlemapsmania.blogspot.com/2026/11/a-neon-matterhorn.html)
+- [Europe Divided by Driving Time](http://googlemapsmania.blogspot.com/2026/11/europe-divided-by-driving-time.html)
 - [The #30DayMapChallenge Begins](http://googlemapsmania.blogspot.com/2026/11/the-30daymapchallenge-begins.html)
 - [How to Navigate the Roman Empire](http://googlemapsmania.blogspot.com/2026/10/how-to-navigate-roman-empire.html)
 - [Famous Place Pictures in Japanese Art](http://googlemapsmania.blogspot.com/2026/10/famous-place-pictures-in-japanese-art.html)
 - [To Infinity & Beyond](http://googlemapsmania.blogspot.com/2026/10/to-infinity-beyond.html)
 - [How the World Draws the World](http://googlemapsmania.blogspot.com/2026/10/how-world-draws-world.html)
 - [Turn Your Neighborhood Into a Manga Universe](http://googlemapsmania.blogspot.com/2026/10/turn-your-neighborhood-into-manga.html)
-- [North Ain't Up!](http://googlemapsmania.blogspot.com/2026/10/north-aint-up.html)
-- [A Fair Election Map for the Midterms](http://googlemapsmania.blogspot.com/2026/10/a-fair-election-map-for-midterms.html)
 
 ## Geography Realm
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Reuse last entered value takes precedence over duplicate feature value.](https://gis.stackexchange.com/questions/501657/reuse-last-entered-value-takes-precedence-over-duplicate-feature-value-is-there) (▲ 4 · 1 answers)
+- [What are common data formats used in GIS?](https://gis.stackexchange.com/questions/501669/what-are-common-data-formats-used-in-gis) (▲ 0 · 0 answers)
+- [lidR rasterize_terrain warning about points that are too far from ground points - ?meaning](https://gis.stackexchange.com/questions/501667/lidr-rasterize-terrain-warning-about-points-that-are-too-far-from-ground-points) (▲ 1 · 0 answers)
+- [QGIS useability question: GeoPackage Overwrite or Add New Layer](https://gis.stackexchange.com/questions/501666/qgis-useability-question-geopackage-overwrite-or-add-new-layer) (▲ 1 · 0 answers)
+- [Reuse last entered value takes precedence over duplicate feature value.](https://gis.stackexchange.com/questions/501657/reuse-last-entered-value-takes-precedence-over-duplicate-feature-value-is-there) (▲ 5 · 1 answers)
 - [Does a single acquisition date of HLSS30 cover a polygon?](https://gis.stackexchange.com/questions/501652/does-a-single-acquisition-date-of-hlss30-cover-a-polygon) (▲ 0 · 1 answers)
 - [Google Map Credits in ArcGIS Pro](https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro) (▲ 1 · 0 answers)
 - [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 5 · 1 answers)
 - [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 2 answers)
 - [Converting a DEM from grid to TIFF changes range of elevation values](https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values) (▲ 1 · 1 answers)
 - [Pointing QGIS to use DEM layer as height source](https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source) (▲ -4 · 0 answers)
-- [Creating this dark green ("V") line symbology in QGIS](https://gis.stackexchange.com/questions/501567/creating-this-dark-green-v-line-symbology-in-qgis) (▲ 4 · 2 answers)
-- [Increasing the size of the selected line symbol within layer in ArcGIS Pro](https://gis.stackexchange.com/questions/501625/increasing-the-size-of-the-selected-line-symbol-within-layer-in-arcgis-pro) (▲ 2 · 2 answers)
-- [Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API](https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api) (▲ 0 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
+- [Ground-Based Global Navigation Satellite System (GNSS) GPS real-time POD Attitude Quaternions (30-second sampling, 60-second files) from…](https://search.earthdata.nasa.gov/search?q=GNSS_GPS_POD_30sec_att_quat) — This product contains a time series of attitude quaternion components for healthy satellites in the GPS constellation that are accumulated every minute throu…
+- [MISR Level 3 Component Global Aerosol product in netCDF format covering a day V004](https://search.earthdata.nasa.gov/search?q=MIL3DAEN) — This file contains the MISR Level 3 Component Global Aerosol product in netCDF format covering a day.
+- [MISR Level 3 Component Global Cloud Product covering a year V002](https://search.earthdata.nasa.gov/search?q=MIL3YCLD) — This file contains the public MISR Level 3 Component Global Cloud Product covering a year.
+- [Ground-Based Global Navigation Satellite System (GNSS) GLONASS real-time POD Orbits (60-second sampling, 60-second files) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_GLONASS_POD_60sec_orbits) — This product contains a time series of position and velocity components for healthy satellites in the GLONASS constellation that are accumulated every minute…
+- [MISR Level 3 Component Global Land seasonal product in netCDF format V004](https://search.earthdata.nasa.gov/search?q=MIL3QLSN) — MIL3QLSN_004 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 3 Component Global Land seasonal product in netCDF format version 4 data product.
+- [MISR Level 3 Component Global Land Product covering a quarter (seasonal) V004](https://search.earthdata.nasa.gov/search?q=MIL3QLS) — MIL3QLS_004 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 3 Component Global Land Product covering a quarter (seasonal) version 4 data product.
+- [Ground-Based Global Navigation Satellite System (GNSS) GLONASS real-time POD Clock Corrections (60-second sampling, 60-second files) from…](https://search.earthdata.nasa.gov/search?q=GNSS_GLONASS_POD_60sec_clk_corr) — This product contains a time series of clock biases for healthy satellites in the GLONASS constellation that are accumulated every minute throughout the day.
+- [MISR Level 3 Component Global Radiance Product covering a month V005](https://search.earthdata.nasa.gov/search?q=MIL3MRD) — This file contains the MISR Level 3 Component Global Radiance Product covering a month.
+- [MISR Level 3 Component Global Land product in netCDF format covering a month V004](https://search.earthdata.nasa.gov/search?q=MIL3MLSN) — This file contains the MISR Level 3 Component Global Land product in netCDF format covering a month.
+- [MISR Level 3 Component Global Cloud Product covering a month V002](https://search.earthdata.nasa.gov/search?q=MIL3MCLD) — This file contains the public MISR Level 3 Component Global Cloud Product covering a month.
 
 ## Data.gov — new geodata
 
