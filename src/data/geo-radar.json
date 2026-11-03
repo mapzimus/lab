@@ -1,7 +1,17 @@
 {
-  "generatedAt": "2026-11-02",
+  "generatedAt": "2026-11-03",
   "news": {
     "mapsmania": [
+      {
+        "title": "How Poland Drifted to the West",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/how-poland-drifted-to-west.html",
+        "desc": ""
+      },
+      {
+        "title": "The Era of the Voxel Map Has Arrived",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/the-era-of-voxel-map-has-arrived.html",
+        "desc": ""
+      },
       {
         "title": "A Neon Matterhorn",
         "url": "http://googlemapsmania.blogspot.com/2026/11/a-neon-matterhorn.html",
@@ -30,16 +40,6 @@
       {
         "title": "To Infinity & Beyond",
         "url": "http://googlemapsmania.blogspot.com/2026/10/to-infinity-beyond.html",
-        "desc": ""
-      },
-      {
-        "title": "How the World Draws the World",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/how-world-draws-world.html",
-        "desc": ""
-      },
-      {
-        "title": "Turn Your Neighborhood Into a Manga Universe",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/turn-your-neighborhood-into-manga.html",
         "desc": ""
       }
     ],
@@ -110,36 +110,36 @@
   },
   "qgis": [
     {
-      "title": "FeatureClass Compare",
-      "url": "https://plugins.qgis.org/plugins/FeatureClassCompare/"
+      "title": "CSV to CSR converter",
+      "url": "https://plugins.qgis.org/plugins/CSVtoCSR/"
     },
     {
-      "title": "Restaure",
-      "url": "https://plugins.qgis.org/plugins/restaure/"
+      "title": "Layout Planner",
+      "url": "https://plugins.qgis.org/plugins/layout_planner/"
     },
     {
-      "title": "GS Mapa",
-      "url": "https://plugins.qgis.org/plugins/gs_mapa/"
+      "title": "BHUMI Persil",
+      "url": "https://plugins.qgis.org/plugins/bhumi_persil/"
     },
     {
-      "title": "MapStyle AI",
-      "url": "https://plugins.qgis.org/plugins/mapstyle_ai/"
+      "title": "Fazenda Classifier",
+      "url": "https://plugins.qgis.org/plugins/fazenda_classifier/"
     },
     {
-      "title": "arcskin",
-      "url": "https://plugins.qgis.org/plugins/arcskin/"
+      "title": "TopoLab",
+      "url": "https://plugins.qgis.org/plugins/TOPOLab/"
     },
     {
-      "title": "Spatial Data Import",
-      "url": "https://plugins.qgis.org/plugins/KYB_import_coords/"
+      "title": "Checkpoint",
+      "url": "https://plugins.qgis.org/plugins/checkpoint/"
     },
     {
-      "title": "QFieldDrop",
-      "url": "https://plugins.qgis.org/plugins/QFieldDrop/"
+      "title": "TEM-Viewer",
+      "url": "https://plugins.qgis.org/plugins/tem_viewer/"
     },
     {
-      "title": "BathyTrace",
-      "url": "https://plugins.qgis.org/plugins/bathytrace/"
+      "title": "Contour Label",
+      "url": "https://plugins.qgis.org/plugins/contour_label/"
     }
   ],
   "releases": [
@@ -212,6 +212,12 @@
     {
       "title": "What are common data formats used in GIS?",
       "url": "https://gis.stackexchange.com/questions/501669/what-are-common-data-formats-used-in-gis",
+      "score": -1,
+      "answers": 0
+    },
+    {
+      "title": "How should a resumable geospatial downloader handle an ignored Range request?",
+      "url": "https://gis.stackexchange.com/questions/501670/how-should-a-resumable-geospatial-downloader-handle-an-ignored-range-request",
       "score": 0,
       "answers": 0
     },
@@ -240,16 +246,16 @@
       "answers": 1
     },
     {
-      "title": "Google Map Credits in ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro",
-      "score": 1,
-      "answers": 0
-    },
-    {
       "title": "Layout size and PDF size don't match in QGIS",
       "url": "https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis",
       "score": 5,
       "answers": 1
+    },
+    {
+      "title": "Google Map Credits in ArcGIS Pro",
+      "url": "https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro",
+      "score": 1,
+      "answers": 0
     },
     {
       "title": "Getting before-state of attribute using PyQGIS",
@@ -262,74 +268,68 @@
       "url": "https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values",
       "score": 1,
       "answers": 1
-    },
-    {
-      "title": "Pointing QGIS to use DEM layer as height source",
-      "url": "https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source",
-      "score": -4,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS) GPS real-time POD Attitude Quaternions (30-second sampling, 60-second files) from…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GPS_POD_30sec_att_quat",
-      "desc": "This product contains a time series of attitude quaternion components for healthy satellites in the GPS constellation that are accumulated every minute throu…",
-      "org": "CDDIS"
+      "title": "Australian Lightning Mapping Array Raw Data (AUSLMARAW)",
+      "url": "https://search.earthdata.nasa.gov/search?q=auslmaraw",
+      "desc": "The Australia Lightning Mapping Array (AUSLMA) dataset collection includes two different AUSLMA datasets: Australia Lightning Mapping Array (AUSLMA) and Aust…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "MISR Level 3 Component Global Aerosol product in netCDF format covering a day V004",
-      "url": "https://search.earthdata.nasa.gov/search?q=MIL3DAEN",
-      "desc": "This file contains the MISR Level 3 Component Global Aerosol product in netCDF format covering a day.",
-      "org": "LARC_CLOUD"
+      "title": "Australia Lightning Mapping Array (AUSLMA)",
+      "url": "https://search.earthdata.nasa.gov/search?q=auslma",
+      "desc": "The Australia Lightning Mapping Array (AUSLMA) dataset collection includes two different AUSLMA datasets: Australia Lightning Mapping Array (AUSLMA) and Aust…",
+      "org": "GHRC_DAAC"
     },
     {
-      "title": "MISR Level 3 Component Global Cloud Product covering a year V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=MIL3YCLD",
-      "desc": "This file contains the public MISR Level 3 Component Global Cloud Product covering a year.",
-      "org": "LARC_CLOUD"
+      "title": "Climatological Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Aqua Deep Blue Level 2 Aerosol Products…",
+      "url": "https://search.earthdata.nasa.gov/search?q=MYDFDS_CLM_GLB_L3",
+      "desc": "Version 1 is the current version of the dataset.",
+      "org": "GES_DISC"
     },
     {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS) GLONASS real-time POD Orbits (60-second sampling, 60-second files) from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GLONASS_POD_60sec_orbits",
-      "desc": "This product contains a time series of position and velocity components for healthy satellites in the GLONASS constellation that are accumulated every minute…",
-      "org": "CDDIS"
+      "title": "Standard Deviation of Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Aqua Deep Blue Level 2 Aerosol Pr…",
+      "url": "https://search.earthdata.nasa.gov/search?q=MYDFDS_SDV_GLB_L3",
+      "desc": "Version 1 is the current version of the dataset.",
+      "org": "GES_DISC"
     },
     {
-      "title": "MISR Level 3 Component Global Land seasonal product in netCDF format V004",
-      "url": "https://search.earthdata.nasa.gov/search?q=MIL3QLSN",
-      "desc": "MIL3QLSN_004 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 3 Component Global Land seasonal product in netCDF format version 4 data product.",
-      "org": "LARC_CLOUD"
+      "title": "Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Aqua Deep Blue Level 2 Aerosol Products MYD04_L2 Collec…",
+      "url": "https://search.earthdata.nasa.gov/search?q=MYDFDS_MON_GLB_L3",
+      "desc": "Version 1 is the current version of the dataset.",
+      "org": "GES_DISC"
     },
     {
-      "title": "MISR Level 3 Component Global Land Product covering a quarter (seasonal) V004",
-      "url": "https://search.earthdata.nasa.gov/search?q=MIL3QLS",
-      "desc": "MIL3QLS_004 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 3 Component Global Land Product covering a quarter (seasonal) version 4 data product.",
-      "org": "LARC_CLOUD"
+      "title": "Climatological Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Terra Deep Blue Level 2 Aerosol Products…",
+      "url": "https://search.earthdata.nasa.gov/search?q=MODFDS_CLM_GLB_L3",
+      "desc": "Version 1 is the current version of the dataset.",
+      "org": "GES_DISC"
     },
     {
-      "title": "Ground-Based Global Navigation Satellite System (GNSS) GLONASS real-time POD Clock Corrections (60-second sampling, 60-second files) from…",
-      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_GLONASS_POD_60sec_clk_corr",
-      "desc": "This product contains a time series of clock biases for healthy satellites in the GLONASS constellation that are accumulated every minute throughout the day.",
-      "org": "CDDIS"
+      "title": "Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Terra Deep Blue Level 2 Aerosol Products MOD04_L2 Colle…",
+      "url": "https://search.earthdata.nasa.gov/search?q=MODFDS_MON_GLB_L3",
+      "desc": "Version 1 is the current version of the dataset.",
+      "org": "GES_DISC"
     },
     {
-      "title": "MISR Level 3 Component Global Radiance Product covering a month V005",
-      "url": "https://search.earthdata.nasa.gov/search?q=MIL3MRD",
-      "desc": "This file contains the MISR Level 3 Component Global Radiance Product covering a month.",
-      "org": "LARC_CLOUD"
+      "title": "Standard Deviation of Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Terra Deep Blue Level 2 Aerosol P…",
+      "url": "https://search.earthdata.nasa.gov/search?q=MODFDS_SDV_GLB_L3",
+      "desc": "Version 1 is the current version of the dataset.",
+      "org": "GES_DISC"
     },
     {
-      "title": "MISR Level 3 Component Global Land product in netCDF format covering a month V004",
-      "url": "https://search.earthdata.nasa.gov/search?q=MIL3MLSN",
-      "desc": "This file contains the MISR Level 3 Component Global Land product in netCDF format covering a month.",
-      "org": "LARC_CLOUD"
+      "title": "ICESat-2 Calibration/Validation LVIS L3A Sea Ice Freeboard V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=IS2LVIS3ACV",
+      "desc": "This data set provides high-resolution sea ice freeboard estimates derived from airborne measurements collected over the Arctic Ocean.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "MISR Level 3 Component Global Cloud Product covering a month V002",
-      "url": "https://search.earthdata.nasa.gov/search?q=MIL3MCLD",
-      "desc": "This file contains the public MISR Level 3 Component Global Cloud Product covering a month.",
-      "org": "LARC_CLOUD"
+      "title": "Kwajalein Polarimetric S-band Weather Radar (KPOL) Precipitation Observations for GPM Ground Validation",
+      "url": "https://search.earthdata.nasa.gov/search?q=kpol",
+      "desc": "The Kwajalein Polarimetric S-Band Weather Radar (KPOL) is a dual-polarized Doppler radar system that has been operating continuously since March 2014 in supp…",
+      "org": "GHRC_DAAC"
     }
   ],
   "datagov": [

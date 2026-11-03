@@ -1,15 +1,15 @@
-# Mapzimus Geospatial Radar — 2026-11-02
+# Mapzimus Geospatial Radar — 2026-11-03
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [How Poland Drifted to the West](http://googlemapsmania.blogspot.com/2026/11/how-poland-drifted-to-west.html)
+- [The Era of the Voxel Map Has Arrived](http://googlemapsmania.blogspot.com/2026/11/the-era-of-voxel-map-has-arrived.html)
 - [A Neon Matterhorn](http://googlemapsmania.blogspot.com/2026/11/a-neon-matterhorn.html)
 - [Europe Divided by Driving Time](http://googlemapsmania.blogspot.com/2026/11/europe-divided-by-driving-time.html)
 - [The #30DayMapChallenge Begins](http://googlemapsmania.blogspot.com/2026/11/the-30daymapchallenge-begins.html)
 - [How to Navigate the Roman Empire](http://googlemapsmania.blogspot.com/2026/10/how-to-navigate-roman-empire.html)
 - [Famous Place Pictures in Japanese Art](http://googlemapsmania.blogspot.com/2026/10/famous-place-pictures-in-japanese-art.html)
 - [To Infinity & Beyond](http://googlemapsmania.blogspot.com/2026/10/to-infinity-beyond.html)
-- [How the World Draws the World](http://googlemapsmania.blogspot.com/2026/10/how-world-draws-world.html)
-- [Turn Your Neighborhood Into a Manga Universe](http://googlemapsmania.blogspot.com/2026/10/turn-your-neighborhood-into-manga.html)
 
 ## Geography Realm
 
@@ -31,14 +31,14 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
-- [FeatureClass Compare](https://plugins.qgis.org/plugins/FeatureClassCompare/)
-- [Restaure](https://plugins.qgis.org/plugins/restaure/)
-- [GS Mapa](https://plugins.qgis.org/plugins/gs_mapa/)
-- [MapStyle AI](https://plugins.qgis.org/plugins/mapstyle_ai/)
-- [arcskin](https://plugins.qgis.org/plugins/arcskin/)
-- [Spatial Data Import](https://plugins.qgis.org/plugins/KYB_import_coords/)
-- [QFieldDrop](https://plugins.qgis.org/plugins/QFieldDrop/)
-- [BathyTrace](https://plugins.qgis.org/plugins/bathytrace/)
+- [CSV to CSR converter](https://plugins.qgis.org/plugins/CSVtoCSR/)
+- [Layout Planner](https://plugins.qgis.org/plugins/layout_planner/)
+- [BHUMI Persil](https://plugins.qgis.org/plugins/bhumi_persil/)
+- [Fazenda Classifier](https://plugins.qgis.org/plugins/fazenda_classifier/)
+- [TopoLab](https://plugins.qgis.org/plugins/TOPOLab/)
+- [Checkpoint](https://plugins.qgis.org/plugins/checkpoint/)
+- [TEM-Viewer](https://plugins.qgis.org/plugins/tem_viewer/)
+- [Contour Label](https://plugins.qgis.org/plugins/contour_label/)
 
 ## Library releases
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [What are common data formats used in GIS?](https://gis.stackexchange.com/questions/501669/what-are-common-data-formats-used-in-gis) (▲ 0 · 0 answers)
+- [What are common data formats used in GIS?](https://gis.stackexchange.com/questions/501669/what-are-common-data-formats-used-in-gis) (▲ -1 · 0 answers)
+- [How should a resumable geospatial downloader handle an ignored Range request?](https://gis.stackexchange.com/questions/501670/how-should-a-resumable-geospatial-downloader-handle-an-ignored-range-request) (▲ 0 · 0 answers)
 - [lidR rasterize_terrain warning about points that are too far from ground points - ?meaning](https://gis.stackexchange.com/questions/501667/lidr-rasterize-terrain-warning-about-points-that-are-too-far-from-ground-points) (▲ 1 · 0 answers)
 - [QGIS useability question: GeoPackage Overwrite or Add New Layer](https://gis.stackexchange.com/questions/501666/qgis-useability-question-geopackage-overwrite-or-add-new-layer) (▲ 1 · 0 answers)
 - [Reuse last entered value takes precedence over duplicate feature value.](https://gis.stackexchange.com/questions/501657/reuse-last-entered-value-takes-precedence-over-duplicate-feature-value-is-there) (▲ 5 · 1 answers)
 - [Does a single acquisition date of HLSS30 cover a polygon?](https://gis.stackexchange.com/questions/501652/does-a-single-acquisition-date-of-hlss30-cover-a-polygon) (▲ 0 · 1 answers)
-- [Google Map Credits in ArcGIS Pro](https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro) (▲ 1 · 0 answers)
 - [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 5 · 1 answers)
+- [Google Map Credits in ArcGIS Pro](https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro) (▲ 1 · 0 answers)
 - [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 2 answers)
 - [Converting a DEM from grid to TIFF changes range of elevation values](https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values) (▲ 1 · 1 answers)
-- [Pointing QGIS to use DEM layer as height source](https://gis.stackexchange.com/questions/501639/pointing-qgis-to-use-dem-layer-as-height-source) (▲ -4 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [Ground-Based Global Navigation Satellite System (GNSS) GPS real-time POD Attitude Quaternions (30-second sampling, 60-second files) from…](https://search.earthdata.nasa.gov/search?q=GNSS_GPS_POD_30sec_att_quat) — This product contains a time series of attitude quaternion components for healthy satellites in the GPS constellation that are accumulated every minute throu…
-- [MISR Level 3 Component Global Aerosol product in netCDF format covering a day V004](https://search.earthdata.nasa.gov/search?q=MIL3DAEN) — This file contains the MISR Level 3 Component Global Aerosol product in netCDF format covering a day.
-- [MISR Level 3 Component Global Cloud Product covering a year V002](https://search.earthdata.nasa.gov/search?q=MIL3YCLD) — This file contains the public MISR Level 3 Component Global Cloud Product covering a year.
-- [Ground-Based Global Navigation Satellite System (GNSS) GLONASS real-time POD Orbits (60-second sampling, 60-second files) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_GLONASS_POD_60sec_orbits) — This product contains a time series of position and velocity components for healthy satellites in the GLONASS constellation that are accumulated every minute…
-- [MISR Level 3 Component Global Land seasonal product in netCDF format V004](https://search.earthdata.nasa.gov/search?q=MIL3QLSN) — MIL3QLSN_004 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 3 Component Global Land seasonal product in netCDF format version 4 data product.
-- [MISR Level 3 Component Global Land Product covering a quarter (seasonal) V004](https://search.earthdata.nasa.gov/search?q=MIL3QLS) — MIL3QLS_004 is the Multi-angle Imaging SpectroRadiometer (MISR) Level 3 Component Global Land Product covering a quarter (seasonal) version 4 data product.
-- [Ground-Based Global Navigation Satellite System (GNSS) GLONASS real-time POD Clock Corrections (60-second sampling, 60-second files) from…](https://search.earthdata.nasa.gov/search?q=GNSS_GLONASS_POD_60sec_clk_corr) — This product contains a time series of clock biases for healthy satellites in the GLONASS constellation that are accumulated every minute throughout the day.
-- [MISR Level 3 Component Global Radiance Product covering a month V005](https://search.earthdata.nasa.gov/search?q=MIL3MRD) — This file contains the MISR Level 3 Component Global Radiance Product covering a month.
-- [MISR Level 3 Component Global Land product in netCDF format covering a month V004](https://search.earthdata.nasa.gov/search?q=MIL3MLSN) — This file contains the MISR Level 3 Component Global Land product in netCDF format covering a month.
-- [MISR Level 3 Component Global Cloud Product covering a month V002](https://search.earthdata.nasa.gov/search?q=MIL3MCLD) — This file contains the public MISR Level 3 Component Global Cloud Product covering a month.
+- [Australian Lightning Mapping Array Raw Data (AUSLMARAW)](https://search.earthdata.nasa.gov/search?q=auslmaraw) — The Australia Lightning Mapping Array (AUSLMA) dataset collection includes two different AUSLMA datasets: Australia Lightning Mapping Array (AUSLMA) and Aust…
+- [Australia Lightning Mapping Array (AUSLMA)](https://search.earthdata.nasa.gov/search?q=auslma) — The Australia Lightning Mapping Array (AUSLMA) dataset collection includes two different AUSLMA datasets: Australia Lightning Mapping Array (AUSLMA) and Aust…
+- [Climatological Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Aqua Deep Blue Level 2 Aerosol Products…](https://search.earthdata.nasa.gov/search?q=MYDFDS_CLM_GLB_L3) — Version 1 is the current version of the dataset.
+- [Standard Deviation of Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Aqua Deep Blue Level 2 Aerosol Pr…](https://search.earthdata.nasa.gov/search?q=MYDFDS_SDV_GLB_L3) — Version 1 is the current version of the dataset.
+- [Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Aqua Deep Blue Level 2 Aerosol Products MYD04_L2 Collec…](https://search.earthdata.nasa.gov/search?q=MYDFDS_MON_GLB_L3) — Version 1 is the current version of the dataset.
+- [Climatological Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Terra Deep Blue Level 2 Aerosol Products…](https://search.earthdata.nasa.gov/search?q=MODFDS_CLM_GLB_L3) — Version 1 is the current version of the dataset.
+- [Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Terra Deep Blue Level 2 Aerosol Products MOD04_L2 Colle…](https://search.earthdata.nasa.gov/search?q=MODFDS_MON_GLB_L3) — Version 1 is the current version of the dataset.
+- [Standard Deviation of Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Terra Deep Blue Level 2 Aerosol P…](https://search.earthdata.nasa.gov/search?q=MODFDS_SDV_GLB_L3) — Version 1 is the current version of the dataset.
+- [ICESat-2 Calibration/Validation LVIS L3A Sea Ice Freeboard V001](https://search.earthdata.nasa.gov/search?q=IS2LVIS3ACV) — This data set provides high-resolution sea ice freeboard estimates derived from airborne measurements collected over the Arctic Ocean.
+- [Kwajalein Polarimetric S-band Weather Radar (KPOL) Precipitation Observations for GPM Ground Validation](https://search.earthdata.nasa.gov/search?q=kpol) — The Kwajalein Polarimetric S-Band Weather Radar (KPOL) is a dual-polarized Doppler radar system that has been operating continuously since March 2014 in supp…
 
 ## Data.gov — new geodata
 
