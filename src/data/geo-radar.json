@@ -1,7 +1,17 @@
 {
-  "generatedAt": "2026-11-03",
+  "generatedAt": "2026-11-04",
   "news": {
     "mapsmania": [
+      {
+        "title": "The Alleyways of Britain",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/the-alleyways-of-britain.html",
+        "desc": ""
+      },
+      {
+        "title": "U.S. Midterm Election Maps",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/us-midterm-election-maps.html",
+        "desc": ""
+      },
       {
         "title": "How Poland Drifted to the West",
         "url": "http://googlemapsmania.blogspot.com/2026/11/how-poland-drifted-to-west.html",
@@ -30,16 +40,6 @@
       {
         "title": "How to Navigate the Roman Empire",
         "url": "http://googlemapsmania.blogspot.com/2026/10/how-to-navigate-roman-empire.html",
-        "desc": ""
-      },
-      {
-        "title": "Famous Place Pictures in Japanese Art",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/famous-place-pictures-in-japanese-art.html",
-        "desc": ""
-      },
-      {
-        "title": "To Infinity & Beyond",
-        "url": "http://googlemapsmania.blogspot.com/2026/10/to-infinity-beyond.html",
         "desc": ""
       }
     ],
@@ -110,6 +110,18 @@
   },
   "qgis": [
     {
+      "title": "ScreenShotMap",
+      "url": "https://plugins.qgis.org/plugins/Screenshotmap/"
+    },
+    {
+      "title": "MapBiomas Alerta Oficial",
+      "url": "https://plugins.qgis.org/plugins/mapbiomas_alerta_oficial/"
+    },
+    {
+      "title": "PCP-EIA Pollution Modeling",
+      "url": "https://plugins.qgis.org/plugins/pcp_eia_pollution_modeling/"
+    },
+    {
       "title": "CSV to CSR converter",
       "url": "https://plugins.qgis.org/plugins/CSVtoCSR/"
     },
@@ -128,18 +140,6 @@
     {
       "title": "TopoLab",
       "url": "https://plugins.qgis.org/plugins/TOPOLab/"
-    },
-    {
-      "title": "Checkpoint",
-      "url": "https://plugins.qgis.org/plugins/checkpoint/"
-    },
-    {
-      "title": "TEM-Viewer",
-      "url": "https://plugins.qgis.org/plugins/tem_viewer/"
-    },
-    {
-      "title": "Contour Label",
-      "url": "https://plugins.qgis.org/plugins/contour_label/"
     }
   ],
   "releases": [
@@ -210,9 +210,15 @@
   ],
   "gisse": [
     {
+      "title": "Seeking WMS/WMTS basemap alternative to Carto Positron",
+      "url": "https://gis.stackexchange.com/questions/501675/seeking-wms-wmts-basemap-alternative-to-carto-positron",
+      "score": 1,
+      "answers": 0
+    },
+    {
       "title": "What are common data formats used in GIS?",
       "url": "https://gis.stackexchange.com/questions/501669/what-are-common-data-formats-used-in-gis",
-      "score": -1,
+      "score": -2,
       "answers": 0
     },
     {
@@ -240,8 +246,8 @@
       "answers": 1
     },
     {
-      "title": "Does a single acquisition date of HLSS30 cover a polygon?",
-      "url": "https://gis.stackexchange.com/questions/501652/does-a-single-acquisition-date-of-hlss30-cover-a-polygon",
+      "title": "Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API",
+      "url": "https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api",
       "score": 0,
       "answers": 1
     },
@@ -252,84 +258,78 @@
       "answers": 1
     },
     {
-      "title": "Google Map Credits in ArcGIS Pro",
-      "url": "https://gis.stackexchange.com/questions/501641/google-map-credits-in-arcgis-pro",
-      "score": 1,
-      "answers": 0
+      "title": "Does a single acquisition date of HLSS30 cover a polygon?",
+      "url": "https://gis.stackexchange.com/questions/501652/does-a-single-acquisition-date-of-hlss30-cover-a-polygon",
+      "score": 0,
+      "answers": 1
     },
     {
       "title": "Getting before-state of attribute using PyQGIS",
       "url": "https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis",
       "score": 2,
       "answers": 2
-    },
-    {
-      "title": "Converting a DEM from grid to TIFF changes range of elevation values",
-      "url": "https://gis.stackexchange.com/questions/501635/converting-a-dem-from-grid-to-tiff-changes-range-of-elevation-values",
-      "score": 1,
-      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "Australian Lightning Mapping Array Raw Data (AUSLMARAW)",
-      "url": "https://search.earthdata.nasa.gov/search?q=auslmaraw",
-      "desc": "The Australia Lightning Mapping Array (AUSLMA) dataset collection includes two different AUSLMA datasets: Australia Lightning Mapping Array (AUSLMA) and Aust…",
-      "org": "GHRC_DAAC"
+      "title": "Global Navigation Satellite System (GNSS) IGS Rapid Daily Ionosphere Vertical Total Electron Content (VTEC) Grid Product from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=GNSS_IGS_rpd_dly_ion_VTEC_grd",
+      "desc": "This derived product set consists of Global Navigation Satellite System Rapid Ionosphere Vertical Total Electron Content (VTEC) product (daily files) from th…",
+      "org": "CDDIS"
     },
     {
-      "title": "Australia Lightning Mapping Array (AUSLMA)",
-      "url": "https://search.earthdata.nasa.gov/search?q=auslma",
-      "desc": "The Australia Lightning Mapping Array (AUSLMA) dataset collection includes two different AUSLMA datasets: Australia Lightning Mapping Array (AUSLMA) and Aust…",
-      "org": "GHRC_DAAC"
+      "title": "SARP 2025 Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=SARP_2025_Data",
+      "desc": "SARP_2025_Data is the data collected onboard the P-3B and B-200 aircrafts and from the Charles City, VA Pandora spectrometer during the 2025 deployment of th…",
+      "org": "LARC_CLOUD"
     },
     {
-      "title": "Climatological Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Aqua Deep Blue Level 2 Aerosol Products…",
-      "url": "https://search.earthdata.nasa.gov/search?q=MYDFDS_CLM_GLB_L3",
-      "desc": "Version 1 is the current version of the dataset.",
+      "title": "HAQES 3-Hourly Ensemble mean surface total PM2.5 concentration at census level, North America V1 (HAQES_NA_PM25_TOT_CENSUS)",
+      "url": "https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_TOT_CENSUS",
+      "desc": "This product provides HAQES 3-hourly ensemble mean surface total PM2.5 concentration at the census level over the continental United States (CONUS).",
       "org": "GES_DISC"
     },
     {
-      "title": "Standard Deviation of Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Aqua Deep Blue Level 2 Aerosol Pr…",
-      "url": "https://search.earthdata.nasa.gov/search?q=MYDFDS_SDV_GLB_L3",
-      "desc": "Version 1 is the current version of the dataset.",
+      "title": "HAQES 3-Hourly Ensemble mean surface total PM2.5 concentration at county level, North America V1 (HAQES_NA_PM25_TOT_COUNTY)",
+      "url": "https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_TOT_COUNTY",
+      "desc": "This product provides HAQES 3-hourly ensemble mean surface total PM2.5 concentration at the county level over the continental United States (CONUS).",
       "org": "GES_DISC"
     },
     {
-      "title": "Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Aqua Deep Blue Level 2 Aerosol Products MYD04_L2 Collec…",
-      "url": "https://search.earthdata.nasa.gov/search?q=MYDFDS_MON_GLB_L3",
-      "desc": "Version 1 is the current version of the dataset.",
+      "title": "HAQES 3-Hourly Ensemble mean surface total PM2.5 concentration, North America V1 (HAQES_NA_PM25_TOT)",
+      "url": "https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_TOT",
+      "desc": "This product provides HAQES 3-hourly ensemble mean surface total PM2.5 concentration over the continental United States (CONUS) and surrounding regions.",
       "org": "GES_DISC"
     },
     {
-      "title": "Climatological Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Terra Deep Blue Level 2 Aerosol Products…",
-      "url": "https://search.earthdata.nasa.gov/search?q=MODFDS_CLM_GLB_L3",
-      "desc": "Version 1 is the current version of the dataset.",
+      "title": "HAQES 3-Hourly Ensemble mean surface PM2.5 Organic Carbon concentration at county level, North America V1 (HAQES_NA_PM25_OC_COUNTY)",
+      "url": "https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_OC_COUNTY",
+      "desc": "This product provides HAQES 3-hourly ensemble mean surface PM2.5 Organic Carbon concentration at the county level over the continental United States (CONUS).",
       "org": "GES_DISC"
     },
     {
-      "title": "Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Terra Deep Blue Level 2 Aerosol Products MOD04_L2 Colle…",
-      "url": "https://search.earthdata.nasa.gov/search?q=MODFDS_MON_GLB_L3",
-      "desc": "Version 1 is the current version of the dataset.",
+      "title": "HAQES 3-Hourly Ensemble mean surface PM2.5 Organic Carbon concentration at census level, North America V1 (HAQES_NA_PM25_OC_CENSUS)",
+      "url": "https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_OC_CENSUS",
+      "desc": "This product provides HAQES 3-hourly ensemble mean surface PM2.5 Organic Carbon concentration at the census level over the continental United States (CONUS).",
       "org": "GES_DISC"
     },
     {
-      "title": "Standard Deviation of Monthly Frequency of Dust Storm over Land for Varying Intensities, Based on MODIS Terra Deep Blue Level 2 Aerosol P…",
-      "url": "https://search.earthdata.nasa.gov/search?q=MODFDS_SDV_GLB_L3",
-      "desc": "Version 1 is the current version of the dataset.",
+      "title": "HAQES 3-Hourly Ensemble mean surface PM2.5 Organic Carbon concentration, North America V1 (HAQES_NA_PM25_OC)",
+      "url": "https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_OC",
+      "desc": "This product provides HAQES 3-hourly ensemble mean surface PM2.5 Organic Carbon concentration over the continental United States (CONUS) and surrounding regi…",
       "org": "GES_DISC"
     },
     {
-      "title": "ICESat-2 Calibration/Validation LVIS L3A Sea Ice Freeboard V001",
-      "url": "https://search.earthdata.nasa.gov/search?q=IS2LVIS3ACV",
-      "desc": "This data set provides high-resolution sea ice freeboard estimates derived from airborne measurements collected over the Arctic Ocean.",
-      "org": "NSIDC_CPRD"
+      "title": "HAQES 3-Hourly Ensemble mean surface PM2.5 Black Carbon concentration at county level, North America V1 (HAQES_NA_PM25_BC_COUNTY)",
+      "url": "https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_BC_COUNTY",
+      "desc": "This product provides HAQES 3-hourly ensemble mean surface PM2.5 Black Carbon concentration at the county level over the continental United States (CONUS).",
+      "org": "GES_DISC"
     },
     {
-      "title": "Kwajalein Polarimetric S-band Weather Radar (KPOL) Precipitation Observations for GPM Ground Validation",
-      "url": "https://search.earthdata.nasa.gov/search?q=kpol",
-      "desc": "The Kwajalein Polarimetric S-Band Weather Radar (KPOL) is a dual-polarized Doppler radar system that has been operating continuously since March 2014 in supp…",
-      "org": "GHRC_DAAC"
+      "title": "HAQES 3-Hourly Ensemble mean surface PM2.5 Black Carbon concentration at census level, North America V1 (HAQES_NA_PM25_BC_CENSUS)",
+      "url": "https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_BC_CENSUS",
+      "desc": "This product provides HAQES 3-hourly ensemble mean surface PM2.5 Black Carbon concentration at the census level over the continental United States (CONUS).",
+      "org": "GES_DISC"
     }
   ],
   "datagov": [
@@ -339,6 +339,13 @@
       "desc": "The Inventory of Owned and Leased Properties (IOLP) allows users to search properties owned and leased by the General Services Administration (GSA) across the U",
       "org": "General Services Administration",
       "rank": 13
+    },
+    {
+      "title": "Crimes - 2001 to Present",
+      "url": "https://catalog.data.gov/dataset/crimes-2001-to-present",
+      "desc": "This dataset reflects reported incidents of crime (with the exception of murders where data exists for each victim) that occurred in the City of Chicago from 20",
+      "org": "City of Chicago",
+      "rank": 3
     },
     {
       "title": "2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection",
@@ -355,13 +362,6 @@
       "rank": 2
     },
     {
-      "title": "NPS Visitor Use Statistics Data Package, 2024",
-      "url": "https://catalog.data.gov/dataset/nps-visitor-use-statistics-data-package-2024",
-      "desc": "The NPS Social Science Program is responsible for coordinating visitor use statistics reporting for units administered by the NPS.",
-      "org": "Department of the Interior",
-      "rank": 2
-    },
-    {
       "title": "Harmonized Tariff Schedule of the United States (2026)",
       "url": "https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2025",
       "desc": "This dataset is the current 2026 Harmonized Tariff Schedule plus all revisions for the current year.",
@@ -369,16 +369,16 @@
       "rank": 2
     },
     {
-      "title": "2017-18 Arrests Civil Rights Data Collection",
-      "url": "https://catalog.data.gov/dataset/2017-18-arrests-civil-rights-data-collection",
-      "desc": "This set of Excel file contains data on student referrals to law enforcement by disability and student-related arrests by disability for all states.",
-      "org": "Department of Education",
+      "title": "NPS Visitor Use Statistics Data Package, 2024",
+      "url": "https://catalog.data.gov/dataset/nps-visitor-use-statistics-data-package-2024",
+      "desc": "The NPS Social Science Program is responsible for coordinating visitor use statistics reporting for units administered by the NPS.",
+      "org": "Department of the Interior",
       "rank": 2
     },
     {
-      "title": "College Scorecard",
-      "url": "https://catalog.data.gov/dataset/college-scorecard",
-      "desc": "Download the data that appears on the College Scorecard, as well as supporting data on student completion, debt and repayment, earnings, and more.",
+      "title": "2017-18 Arrests Civil Rights Data Collection",
+      "url": "https://catalog.data.gov/dataset/2017-18-arrests-civil-rights-data-collection",
+      "desc": "This set of Excel file contains data on student referrals to law enforcement by disability and student-related arrests by disability for all states.",
       "org": "Department of Education",
       "rank": 2
     }
