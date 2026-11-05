@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-04
+# Mapzimus Geospatial Radar — 2026-11-05
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Can You See the Fire Beacon?](http://googlemapsmania.blogspot.com/2026/11/can-you-see-fire-beacon.html)
 - [The Alleyways of Britain](http://googlemapsmania.blogspot.com/2026/11/the-alleyways-of-britain.html)
 - [U.S. Midterm Election Maps](http://googlemapsmania.blogspot.com/2026/11/us-midterm-election-maps.html)
 - [How Poland Drifted to the West](http://googlemapsmania.blogspot.com/2026/11/how-poland-drifted-to-west.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [A Neon Matterhorn](http://googlemapsmania.blogspot.com/2026/11/a-neon-matterhorn.html)
 - [Europe Divided by Driving Time](http://googlemapsmania.blogspot.com/2026/11/europe-divided-by-driving-time.html)
 - [The #30DayMapChallenge Begins](http://googlemapsmania.blogspot.com/2026/11/the-30daymapchallenge-begins.html)
-- [How to Navigate the Roman Empire](http://googlemapsmania.blogspot.com/2026/10/how-to-navigate-roman-empire.html)
 
 ## Geography Realm
 
@@ -53,6 +53,9 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
+- [Saving geographical map as HTML with R](https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r) (▲ 3 · 1 answers)
+- [QGIS layout export returns Could not transform bounding box for geocentric CRS EPSG:7658](https://gis.stackexchange.com/questions/501681/qgis-layout-export-returns-could-not-transform-bounding-box-for-geocentric-crs-e) (▲ 1 · 0 answers)
+- [Layer not showing/invisible after 'Rasterize (vector to raster)' in QGIS](https://gis.stackexchange.com/questions/501678/layer-not-showing-invisible-after-rasterize-vector-to-raster-in-qgis) (▲ 1 · 0 answers)
 - [Seeking WMS/WMTS basemap alternative to Carto Positron](https://gis.stackexchange.com/questions/501675/seeking-wms-wmts-basemap-alternative-to-carto-positron) (▲ 1 · 0 answers)
 - [What are common data formats used in GIS?](https://gis.stackexchange.com/questions/501669/what-are-common-data-formats-used-in-gis) (▲ -2 · 0 answers)
 - [How should a resumable geospatial downloader handle an ignored Range request?](https://gis.stackexchange.com/questions/501670/how-should-a-resumable-geospatial-downloader-handle-an-ignored-range-request) (▲ 0 · 0 answers)
@@ -60,22 +63,19 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [QGIS useability question: GeoPackage Overwrite or Add New Layer](https://gis.stackexchange.com/questions/501666/qgis-useability-question-geopackage-overwrite-or-add-new-layer) (▲ 1 · 0 answers)
 - [Reuse last entered value takes precedence over duplicate feature value.](https://gis.stackexchange.com/questions/501657/reuse-last-entered-value-takes-precedence-over-duplicate-feature-value-is-there) (▲ 5 · 1 answers)
 - [Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API](https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api) (▲ 0 · 1 answers)
-- [Layout size and PDF size don't match in QGIS](https://gis.stackexchange.com/questions/501633/layout-size-and-pdf-size-dont-match-in-qgis) (▲ 5 · 1 answers)
-- [Does a single acquisition date of HLSS30 cover a polygon?](https://gis.stackexchange.com/questions/501652/does-a-single-acquisition-date-of-hlss30-cover-a-polygon) (▲ 0 · 1 answers)
-- [Getting before-state of attribute using PyQGIS](https://gis.stackexchange.com/questions/501630/getting-before-state-of-attribute-using-pyqgis) (▲ 2 · 2 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [Global Navigation Satellite System (GNSS) IGS Rapid Daily Ionosphere Vertical Total Electron Content (VTEC) Grid Product from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=GNSS_IGS_rpd_dly_ion_VTEC_grd) — This derived product set consists of Global Navigation Satellite System Rapid Ionosphere Vertical Total Electron Content (VTEC) product (daily files) from th…
-- [SARP 2025 Data](https://search.earthdata.nasa.gov/search?q=SARP_2025_Data) — SARP_2025_Data is the data collected onboard the P-3B and B-200 aircrafts and from the Charles City, VA Pandora spectrometer during the 2025 deployment of th…
-- [HAQES 3-Hourly Ensemble mean surface total PM2.5 concentration at census level, North America V1 (HAQES_NA_PM25_TOT_CENSUS)](https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_TOT_CENSUS) — This product provides HAQES 3-hourly ensemble mean surface total PM2.5 concentration at the census level over the continental United States (CONUS).
-- [HAQES 3-Hourly Ensemble mean surface total PM2.5 concentration at county level, North America V1 (HAQES_NA_PM25_TOT_COUNTY)](https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_TOT_COUNTY) — This product provides HAQES 3-hourly ensemble mean surface total PM2.5 concentration at the county level over the continental United States (CONUS).
-- [HAQES 3-Hourly Ensemble mean surface total PM2.5 concentration, North America V1 (HAQES_NA_PM25_TOT)](https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_TOT) — This product provides HAQES 3-hourly ensemble mean surface total PM2.5 concentration over the continental United States (CONUS) and surrounding regions.
-- [HAQES 3-Hourly Ensemble mean surface PM2.5 Organic Carbon concentration at county level, North America V1 (HAQES_NA_PM25_OC_COUNTY)](https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_OC_COUNTY) — This product provides HAQES 3-hourly ensemble mean surface PM2.5 Organic Carbon concentration at the county level over the continental United States (CONUS).
-- [HAQES 3-Hourly Ensemble mean surface PM2.5 Organic Carbon concentration at census level, North America V1 (HAQES_NA_PM25_OC_CENSUS)](https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_OC_CENSUS) — This product provides HAQES 3-hourly ensemble mean surface PM2.5 Organic Carbon concentration at the census level over the continental United States (CONUS).
-- [HAQES 3-Hourly Ensemble mean surface PM2.5 Organic Carbon concentration, North America V1 (HAQES_NA_PM25_OC)](https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_OC) — This product provides HAQES 3-hourly ensemble mean surface PM2.5 Organic Carbon concentration over the continental United States (CONUS) and surrounding regi…
-- [HAQES 3-Hourly Ensemble mean surface PM2.5 Black Carbon concentration at county level, North America V1 (HAQES_NA_PM25_BC_COUNTY)](https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_BC_COUNTY) — This product provides HAQES 3-hourly ensemble mean surface PM2.5 Black Carbon concentration at the county level over the continental United States (CONUS).
-- [HAQES 3-Hourly Ensemble mean surface PM2.5 Black Carbon concentration at census level, North America V1 (HAQES_NA_PM25_BC_CENSUS)](https://search.earthdata.nasa.gov/search?q=HAQES_NA_PM25_BC_CENSUS) — This product provides HAQES 3-hourly ensemble mean surface PM2.5 Black Carbon concentration at the census level over the continental United States (CONUS).
+- [Very Long Baseline Interferometry (VLBI) Tropospheric Parameters (TROP) products from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=VLBI_trop_param) — Troposphere Zenith Path Delay (ZPD) values derived from analysis of Very Long Baseline Interferometry (VLBI) data.
+- [DISCOVER-AQ California Deployment P-3B Aircraft In Situ Aerosol Data](https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_California_Aerosol_AircraftInSitu_P3B_Data) — DISCOVERAQ_California_Aerosol_AircraftInSitu_P3B_Data contains in situ aerosol data collected onboard NASA's P-3B aircraft during the California (San Joaquin…
+- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
+- [PACE-PAX Ivanpah Playa Data](https://search.earthdata.nasa.gov/search?q=PACE-PAX_Ivanpah-Playa_Data) — PACE-PAX_Ivanpah-Playa_Data is the Ivanpah Playa ground site data collected during the Plankton, Aerosol, Cloud, ocean Ecosystem Postlaunch Airborne eXperime…
 
 ## Data.gov — new geodata
 
