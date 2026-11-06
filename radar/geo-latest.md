@@ -1,15 +1,15 @@
-# Mapzimus Geospatial Radar — 2026-11-05
+# Mapzimus Geospatial Radar — 2026-11-06
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Noah's Ark found on Vintage Maps](http://googlemapsmania.blogspot.com/2026/11/noahs-ark-found-on-vintage-maps.html)
+- [Collect Birds, Not Beers](http://googlemapsmania.blogspot.com/2026/11/collect-birds-not-beers.html)
 - [Can You See the Fire Beacon?](http://googlemapsmania.blogspot.com/2026/11/can-you-see-fire-beacon.html)
 - [The Alleyways of Britain](http://googlemapsmania.blogspot.com/2026/11/the-alleyways-of-britain.html)
 - [U.S. Midterm Election Maps](http://googlemapsmania.blogspot.com/2026/11/us-midterm-election-maps.html)
 - [How Poland Drifted to the West](http://googlemapsmania.blogspot.com/2026/11/how-poland-drifted-to-west.html)
 - [The Era of the Voxel Map Has Arrived](http://googlemapsmania.blogspot.com/2026/11/the-era-of-voxel-map-has-arrived.html)
 - [A Neon Matterhorn](http://googlemapsmania.blogspot.com/2026/11/a-neon-matterhorn.html)
-- [Europe Divided by Driving Time](http://googlemapsmania.blogspot.com/2026/11/europe-divided-by-driving-time.html)
-- [The #30DayMapChallenge Begins](http://googlemapsmania.blogspot.com/2026/11/the-30daymapchallenge-begins.html)
 
 ## Geography Realm
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Saving geographical map as HTML with R](https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r) (▲ 3 · 1 answers)
+- [ArcGIS Pro failing to listFields() of layers within Group Layer](https://gis.stackexchange.com/questions/501687/arcgis-pro-failing-to-listfields-of-layers-within-group-layer) (▲ 2 · 1 answers)
+- [QGIS 4.2.3 in r.stream.extract there is no longer the option of creating the stream in vector polylines, only option is the points](https://gis.stackexchange.com/questions/501686/qgis-4-2-3-in-r-stream-extract-there-is-no-longer-the-option-of-creating-the-str) (▲ 0 · 0 answers)
 - [QGIS layout export returns Could not transform bounding box for geocentric CRS EPSG:7658](https://gis.stackexchange.com/questions/501681/qgis-layout-export-returns-could-not-transform-bounding-box-for-geocentric-crs-e) (▲ 1 · 0 answers)
+- [Saving geographical map as HTML with R](https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r) (▲ 3 · 1 answers)
+- [OSRM for two far-apart cities: one merged graph + one speed file, or two instances?](https://gis.stackexchange.com/questions/501685/osrm-for-two-far-apart-cities-one-merged-graph-one-speed-file-or-two-instanc) (▲ 0 · 0 answers)
+- [Seeking WMS/WMTS basemap alternative to Carto Positron](https://gis.stackexchange.com/questions/501675/seeking-wms-wmts-basemap-alternative-to-carto-positron) (▲ 0 · 0 answers)
 - [Layer not showing/invisible after 'Rasterize (vector to raster)' in QGIS](https://gis.stackexchange.com/questions/501678/layer-not-showing-invisible-after-rasterize-vector-to-raster-in-qgis) (▲ 1 · 0 answers)
-- [Seeking WMS/WMTS basemap alternative to Carto Positron](https://gis.stackexchange.com/questions/501675/seeking-wms-wmts-basemap-alternative-to-carto-positron) (▲ 1 · 0 answers)
 - [What are common data formats used in GIS?](https://gis.stackexchange.com/questions/501669/what-are-common-data-formats-used-in-gis) (▲ -2 · 0 answers)
 - [How should a resumable geospatial downloader handle an ignored Range request?](https://gis.stackexchange.com/questions/501670/how-should-a-resumable-geospatial-downloader-handle-an-ignored-range-request) (▲ 0 · 0 answers)
 - [lidR rasterize_terrain warning about points that are too far from ground points - ?meaning](https://gis.stackexchange.com/questions/501667/lidr-rasterize-terrain-warning-about-points-that-are-too-far-from-ground-points) (▲ 1 · 0 answers)
-- [QGIS useability question: GeoPackage Overwrite or Add New Layer](https://gis.stackexchange.com/questions/501666/qgis-useability-question-geopackage-overwrite-or-add-new-layer) (▲ 1 · 0 answers)
-- [Reuse last entered value takes precedence over duplicate feature value.](https://gis.stackexchange.com/questions/501657/reuse-last-entered-value-takes-precedence-over-duplicate-feature-value-is-there) (▲ 5 · 1 answers)
-- [Calculating MSAVI from NASA HLSS30 with the Google Earth Engine API](https://gis.stackexchange.com/questions/501636/calculating-msavi-from-nasa-hlss30-with-the-google-earth-engine-api) (▲ 0 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [Very Long Baseline Interferometry (VLBI) Tropospheric Parameters (TROP) products from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=VLBI_trop_param) — Troposphere Zenith Path Delay (ZPD) values derived from analysis of Very Long Baseline Interferometry (VLBI) data.
-- [DISCOVER-AQ California Deployment P-3B Aircraft In Situ Aerosol Data](https://search.earthdata.nasa.gov/search?q=DISCOVERAQ_California_Aerosol_AircraftInSitu_P3B_Data) — DISCOVERAQ_California_Aerosol_AircraftInSitu_P3B_Data contains in situ aerosol data collected onboard NASA's P-3B aircraft during the California (San Joaquin…
-- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
-- [PACE-PAX Ivanpah Playa Data](https://search.earthdata.nasa.gov/search?q=PACE-PAX_Ivanpah-Playa_Data) — PACE-PAX_Ivanpah-Playa_Data is the Ivanpah Playa ground site data collected during the Plankton, Aerosol, Cloud, ocean Ecosystem Postlaunch Airborne eXperime…
+- [PISTON 2018 Research Vessel (RV) Thompson ship datasets of ocean, atmosphere, and air-sea interaction](https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA_RVThompson_2018) — PISTON-ONR-NOAA_RVThompson_2018 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2018 Research Vessel (RV) Thompson data product.
+- [PISTON 2019 Research Vessel (RV) Sally Ride Data](https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA_RVSallyRide_2019) — PISTON-ONR-NOAA_RVSallyRide_2019 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2019 Research Vessel (RV) Sally Ride data product.
+- [PISTON 2018 Research Vessel (RV) Mirai Ship Data](https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA_RVMirai_2018) — PISTON-ONR-NOAA_RVMirai_2018 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2018 Research Vessel (RV) Mirai data product.
+- [PISTON 2018-2019 Island Rawinsonde Data](https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA_Islands_2018-2019) — PISTON-ONR-NOAA_Islands_2018-2019 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2018-2019 island rawinsonde data product.
+- [PISTON 2018-2019 Autonomous Platform Ocean Datasets](https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA-Autonomous-Uncrewed_2018-2019) — PISTON-ONR-NOAA-Autonomous-Uncrewed_2018-2019 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2018-2019 autonomous platform ocean data pr…
+- [CAMP2Ex P-3 In-Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=CAMP2Ex_TraceGas_AircraftInSitu_P3_Data) — CAMP2Ex_TraceGas_AircraftInSitu_P3_Data are in-situ trace gas measurements conducted onboard the P-3 aircraft during the Clouds, Aerosol and Monsoon Processe…
+- [CAMP2Ex In-Situ Radiation Data](https://search.earthdata.nasa.gov/search?q=CAMP2Ex_Radiation_AircraftInSitu_P3_Data) — CAMP2Ex_Radiation_AircraftInSitu_P3_Data are in-situ radiation measurements conducted onboard the P-3 aircraft during the Clouds, Aerosol and Monsoon Process…
+- [CAMP2Ex Miscellaneous Data](https://search.earthdata.nasa.gov/search?q=CAMP2Ex_Miscellaneous_Data) — CAMP2Ex_Miscellaneous_Data are miscellaneous data (satellite, model, analysis, merge data, etc.) collected during the Clouds, Aerosol and Monsoon Processes-P…
+- [CAMP2Ex P-3 In-Situ Meteorological and Navigational Data](https://search.earthdata.nasa.gov/search?q=CAMP2Ex_MetNav_AircraftInSitu_P3_Data) — CAMP2Ex_MetNav_AircraftInSitu_P3_Data are in-situ meteorological and navigational measurements conducted onboard the P-3 aircraft during the Clouds, Aerosol…
+- [CAMP2Ex Learjet In-Situ Meteorological and Navigational Data](https://search.earthdata.nasa.gov/search?q=CAMP2Ex_MetNav_AircraftInSitu_Learjet_Data) — CAMP2Ex_MetNav_AircraftInSitu_Learjet_Data are in-situ meteorological and navigational measurements conducted onboard the Learjet aircraft during the Clouds,…
 
 ## Data.gov — new geodata
 
