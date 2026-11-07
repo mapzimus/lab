@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-11-06",
+  "generatedAt": "2026-11-07",
   "news": {
     "mapsmania": [
+      {
+        "title": "Axis Maps Contours",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/axis-maps-contours.html",
+        "desc": ""
+      },
       {
         "title": "Noah's Ark found on Vintage Maps",
         "url": "http://googlemapsmania.blogspot.com/2026/11/noahs-ark-found-on-vintage-maps.html",
@@ -35,11 +40,6 @@
       {
         "title": "The Era of the Voxel Map Has Arrived",
         "url": "http://googlemapsmania.blogspot.com/2026/11/the-era-of-voxel-map-has-arrived.html",
-        "desc": ""
-      },
-      {
-        "title": "A Neon Matterhorn",
-        "url": "http://googlemapsmania.blogspot.com/2026/11/a-neon-matterhorn.html",
         "desc": ""
       }
     ],
@@ -210,16 +210,22 @@
   ],
   "gisse": [
     {
+      "title": "Share board QGIS",
+      "url": "https://gis.stackexchange.com/questions/501691/share-board-qgis",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "ArcGIS Pro failing to listFields() of layers within Group Layer",
       "url": "https://gis.stackexchange.com/questions/501687/arcgis-pro-failing-to-listfields-of-layers-within-group-layer",
-      "score": 2,
+      "score": 3,
       "answers": 1
     },
     {
-      "title": "QGIS 4.2.3 in r.stream.extract there is no longer the option of creating the stream in vector polylines, only option is the points",
-      "url": "https://gis.stackexchange.com/questions/501686/qgis-4-2-3-in-r-stream-extract-there-is-no-longer-the-option-of-creating-the-str",
-      "score": 0,
-      "answers": 0
+      "title": "Saving geographical map as HTML with R",
+      "url": "https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r",
+      "score": 4,
+      "answers": 1
     },
     {
       "title": "QGIS layout export returns Could not transform bounding box for geocentric CRS EPSG:7658",
@@ -228,20 +234,20 @@
       "answers": 0
     },
     {
-      "title": "Saving geographical map as HTML with R",
-      "url": "https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r",
-      "score": 3,
-      "answers": 1
-    },
-    {
-      "title": "OSRM for two far-apart cities: one merged graph + one speed file, or two instances?",
-      "url": "https://gis.stackexchange.com/questions/501685/osrm-for-two-far-apart-cities-one-merged-graph-one-speed-file-or-two-instanc",
+      "title": "QGIS 4.2.3 in r.stream.extract there is no longer the option of creating the stream in vector polylines, only option is the points",
+      "url": "https://gis.stackexchange.com/questions/501686/qgis-4-2-3-in-r-stream-extract-there-is-no-longer-the-option-of-creating-the-str",
       "score": 0,
       "answers": 0
     },
     {
       "title": "Seeking WMS/WMTS basemap alternative to Carto Positron",
       "url": "https://gis.stackexchange.com/questions/501675/seeking-wms-wmts-basemap-alternative-to-carto-positron",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "OSRM for two far-apart cities: one merged graph + one speed file, or two instances?",
+      "url": "https://gis.stackexchange.com/questions/501685/osrm-for-two-far-apart-cities-one-merged-graph-one-speed-file-or-two-instanc",
       "score": 0,
       "answers": 0
     },
@@ -262,73 +268,67 @@
       "url": "https://gis.stackexchange.com/questions/501670/how-should-a-resumable-geospatial-downloader-handle-an-ignored-range-request",
       "score": 0,
       "answers": 0
-    },
-    {
-      "title": "lidR rasterize_terrain warning about points that are too far from ground points - ?meaning",
-      "url": "https://gis.stackexchange.com/questions/501667/lidr-rasterize-terrain-warning-about-points-that-are-too-far-from-ground-points",
-      "score": 1,
-      "answers": 0
     }
   ],
   "nasa": [
     {
+      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
+      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
+      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Version 3",
+      "org": "ASF"
+    },
+    {
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Data Quality Information Version 3",
+      "org": "ASF"
+    },
+    {
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Metadata Version 3",
+      "org": "ASF"
+    },
+    {
+      "title": "Very Long Baseline Interferometry (VLBI) Tropospheric Parameters (TROP) products from NASA CDDIS",
+      "url": "https://search.earthdata.nasa.gov/search?q=VLBI_trop_param",
+      "desc": "Troposphere Zenith Path Delay (ZPD) values derived from analysis of Very Long Baseline Interferometry (VLBI) data.",
+      "org": "CDDIS"
+    },
+    {
+      "title": "CERES/Aqua FM4 BiDirectional Scans (BDS) broadband filtered radiances, L1B, Swath 20 km, Global, Daily",
+      "url": "https://search.earthdata.nasa.gov/search?q=CER_BDS_Aqua-FM4",
+      "desc": "CERES/Aqua FM4 BiDirectional Scans (BDS) broadband filtered radiances, L1B, Swath 20 km, Global, Daily Edition5, CER_BDS_Aqua-FM4_Edition5, is the Clouds and…",
+      "org": "LARC_CLOUD"
+    },
+    {
+      "title": "BioSCape: L3 Elevation and Canopy Height derived from LVIS Standard Products, NNG, V1",
+      "url": "https://search.earthdata.nasa.gov/search?q=BioSCape_LVIS_L3_elev_canopyht_2526",
+      "desc": "This dataset provides gridded Level 3 (L3) surface elevation and canopy height products derived from the Land, Vegetation, and Ice Sensor (LVIS) Facility Ins…",
+      "org": "ORNL_CLOUD"
+    },
+    {
+      "title": "BioSCape: L3 Fractional Cover and Uncertainty from AVIRIS-NG imagery, V1",
+      "url": "https://search.earthdata.nasa.gov/search?q=BioSCape_AVNG_L3_frcov_2538",
+      "desc": "This dataset holds fractional cover estimates and uncertainties for the Biodiversity Survey of the Cape (BioSCape) project.",
+      "org": "ORNL_CLOUD"
+    },
+    {
       "title": "PISTON 2018 Research Vessel (RV) Thompson ship datasets of ocean, atmosphere, and air-sea interaction",
       "url": "https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA_RVThompson_2018",
       "desc": "PISTON-ONR-NOAA_RVThompson_2018 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2018 Research Vessel (RV) Thompson data product.",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "PISTON 2019 Research Vessel (RV) Sally Ride Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA_RVSallyRide_2019",
-      "desc": "PISTON-ONR-NOAA_RVSallyRide_2019 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2019 Research Vessel (RV) Sally Ride data product.",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "PISTON 2018 Research Vessel (RV) Mirai Ship Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA_RVMirai_2018",
-      "desc": "PISTON-ONR-NOAA_RVMirai_2018 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2018 Research Vessel (RV) Mirai data product.",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "PISTON 2018-2019 Island Rawinsonde Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA_Islands_2018-2019",
-      "desc": "PISTON-ONR-NOAA_Islands_2018-2019 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2018-2019 island rawinsonde data product.",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "PISTON 2018-2019 Autonomous Platform Ocean Datasets",
-      "url": "https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA-Autonomous-Uncrewed_2018-2019",
-      "desc": "PISTON-ONR-NOAA-Autonomous-Uncrewed_2018-2019 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2018-2019 autonomous platform ocean data pr…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "CAMP2Ex P-3 In-Situ Trace Gas Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=CAMP2Ex_TraceGas_AircraftInSitu_P3_Data",
-      "desc": "CAMP2Ex_TraceGas_AircraftInSitu_P3_Data are in-situ trace gas measurements conducted onboard the P-3 aircraft during the Clouds, Aerosol and Monsoon Processe…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "CAMP2Ex In-Situ Radiation Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=CAMP2Ex_Radiation_AircraftInSitu_P3_Data",
-      "desc": "CAMP2Ex_Radiation_AircraftInSitu_P3_Data are in-situ radiation measurements conducted onboard the P-3 aircraft during the Clouds, Aerosol and Monsoon Process…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "CAMP2Ex Miscellaneous Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=CAMP2Ex_Miscellaneous_Data",
-      "desc": "CAMP2Ex_Miscellaneous_Data are miscellaneous data (satellite, model, analysis, merge data, etc.) collected during the Clouds, Aerosol and Monsoon Processes-P…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "CAMP2Ex P-3 In-Situ Meteorological and Navigational Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=CAMP2Ex_MetNav_AircraftInSitu_P3_Data",
-      "desc": "CAMP2Ex_MetNav_AircraftInSitu_P3_Data are in-situ meteorological and navigational measurements conducted onboard the P-3 aircraft during the Clouds, Aerosol…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "CAMP2Ex Learjet In-Situ Meteorological and Navigational Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=CAMP2Ex_MetNav_AircraftInSitu_Learjet_Data",
-      "desc": "CAMP2Ex_MetNav_AircraftInSitu_Learjet_Data are in-situ meteorological and navigational measurements conducted onboard the Learjet aircraft during the Clouds,…",
       "org": "LARC_CLOUD"
     }
   ],
