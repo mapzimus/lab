@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-07
+# Mapzimus Geospatial Radar — 2026-11-08
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Utopian London](http://googlemapsmania.blogspot.com/2026/11/utopian-london.html)
 - [Axis Maps Contours](http://googlemapsmania.blogspot.com/2026/11/axis-maps-contours.html)
 - [Noah's Ark found on Vintage Maps](http://googlemapsmania.blogspot.com/2026/11/noahs-ark-found-on-vintage-maps.html)
 - [Collect Birds, Not Beers](http://googlemapsmania.blogspot.com/2026/11/collect-birds-not-beers.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [The Alleyways of Britain](http://googlemapsmania.blogspot.com/2026/11/the-alleyways-of-britain.html)
 - [U.S. Midterm Election Maps](http://googlemapsmania.blogspot.com/2026/11/us-midterm-election-maps.html)
 - [How Poland Drifted to the West](http://googlemapsmania.blogspot.com/2026/11/how-poland-drifted-to-west.html)
-- [The Era of the Voxel Map Has Arrived](http://googlemapsmania.blogspot.com/2026/11/the-era-of-voxel-map-has-arrived.html)
 
 ## Geography Realm
 
@@ -31,19 +31,19 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
-- [ScreenShotMap](https://plugins.qgis.org/plugins/Screenshotmap/)
-- [MapBiomas Alerta Oficial](https://plugins.qgis.org/plugins/mapbiomas_alerta_oficial/)
-- [PCP-EIA Pollution Modeling](https://plugins.qgis.org/plugins/pcp_eia_pollution_modeling/)
-- [CSV to CSR converter](https://plugins.qgis.org/plugins/CSVtoCSR/)
-- [Layout Planner](https://plugins.qgis.org/plugins/layout_planner/)
-- [BHUMI Persil](https://plugins.qgis.org/plugins/bhumi_persil/)
-- [Fazenda Classifier](https://plugins.qgis.org/plugins/fazenda_classifier/)
-- [TopoLab](https://plugins.qgis.org/plugins/TOPOLab/)
+- [KK_sokuPri](https://plugins.qgis.org/plugins/KK_sokuPri/)
+- [Drop Pin](https://plugins.qgis.org/plugins/drop_pin/)
+- [森林資源量メッシュ（20m）生成プラグイン](https://plugins.qgis.org/plugins/forest_mesh20m/)
+- [QuickTable](https://plugins.qgis.org/plugins/quicktable_latest/)
+- [Proyecto portátil (Portable Project)](https://plugins.qgis.org/plugins/proyecto_portatil/)
+- [Assistente IA para QGIS](https://plugins.qgis.org/plugins/qgis_assistente_ia/)
+- [Layers Panel Tools](https://plugins.qgis.org/plugins/layers_panel_tools/)
+- [kk_txt2dem](https://plugins.qgis.org/plugins/KK_txt2dem/)
 
 ## Library releases
 
+- [maplibre-gl-js v6.17.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.17.0) (2026-11-07) — ### ✨ Features and improvements - feat: Add experimental `sparse` vector source option so a missing tile is sliced from an ancestor ([#8335](https://github.c…
 - [deck.gl v9.3.12](https://github.com/visgl/deck.gl/releases/tag/v9.3.12) (2026-10-30) — - fix(core): eliminate 300ms click delay and fix runtime controller prop changes (#10422) - fix(heatmap): compilation failure on Qualcomm Adreno 660 (#10301)…
-- [maplibre-gl-js v6.16.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.16.0) (2026-10-25) — ### ✨ Features and improvements - Allow `Map#setMaxBounds` to constrain one geographic axis without constraining the other ([#6148](https://github.com/maplib…
 - [duckdb v2.0.0](https://github.com/duckdb/duckdb/releases/tag/v2.0.0) (2026-10-21) — This release of DuckDB is named "Cyanoptera" after Spatula Cyanoptera, a species of duck found in western North and South America.
 - [QGIS final-3_44_15](https://github.com/qgis/QGIS/releases/tag/final-3_44_15) (2026-09-25) — https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15
 - [gdal v3.13.3](https://github.com/OSGeo/gdal/releases/tag/v3.13.3) (2026-08-18) — Bug fix release. See release notes: https://github.com/OSGeo/gdal/blob/v3.13.3/NEWS.md
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
+- [I use Google Maps images](https://gis.stackexchange.com/questions/501692/i-use-google-maps-images) (▲ -4 · 0 answers)
+- [Saving geographical map as HTML with R](https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r) (▲ 4 · 1 answers)
+- [OSRM for two far-apart cities: one merged graph + one speed file, or two instances?](https://gis.stackexchange.com/questions/501685/osrm-for-two-far-apart-cities-one-merged-graph-one-speed-file-or-two-instanc) (▲ 0 · 1 answers)
 - [Share board QGIS](https://gis.stackexchange.com/questions/501691/share-board-qgis) (▲ 0 · 0 answers)
 - [ArcGIS Pro failing to listFields() of layers within Group Layer](https://gis.stackexchange.com/questions/501687/arcgis-pro-failing-to-listfields-of-layers-within-group-layer) (▲ 3 · 1 answers)
-- [Saving geographical map as HTML with R](https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r) (▲ 4 · 1 answers)
 - [QGIS layout export returns Could not transform bounding box for geocentric CRS EPSG:7658](https://gis.stackexchange.com/questions/501681/qgis-layout-export-returns-could-not-transform-bounding-box-for-geocentric-crs-e) (▲ 1 · 0 answers)
 - [QGIS 4.2.3 in r.stream.extract there is no longer the option of creating the stream in vector polylines, only option is the points](https://gis.stackexchange.com/questions/501686/qgis-4-2-3-in-r-stream-extract-there-is-no-longer-the-option-of-creating-the-str) (▲ 0 · 0 answers)
 - [Seeking WMS/WMTS basemap alternative to Carto Positron](https://gis.stackexchange.com/questions/501675/seeking-wms-wmts-basemap-alternative-to-carto-positron) (▲ 0 · 0 answers)
-- [OSRM for two far-apart cities: one merged graph + one speed file, or two instances?](https://gis.stackexchange.com/questions/501685/osrm-for-two-far-apart-cities-one-merged-graph-one-speed-file-or-two-instanc) (▲ 0 · 0 answers)
 - [Layer not showing/invisible after 'Rasterize (vector to raster)' in QGIS](https://gis.stackexchange.com/questions/501678/layer-not-showing-invisible-after-rasterize-vector-to-raster-in-qgis) (▲ 1 · 0 answers)
 - [What are common data formats used in GIS?](https://gis.stackexchange.com/questions/501669/what-are-common-data-formats-used-in-gis) (▲ -2 · 0 answers)
-- [How should a resumable geospatial downloader handle an ignored Range request?](https://gis.stackexchange.com/questions/501670/how-should-a-resumable-geospatial-downloader-handle-an-ignored-range-request) (▲ 0 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
 - [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
 - [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [Very Long Baseline Interferometry (VLBI) Tropospheric Parameters (TROP) products from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=VLBI_trop_param) — Troposphere Zenith Path Delay (ZPD) values derived from analysis of Very Long Baseline Interferometry (VLBI) data.
-- [CERES/Aqua FM4 BiDirectional Scans (BDS) broadband filtered radiances, L1B, Swath 20 km, Global, Daily](https://search.earthdata.nasa.gov/search?q=CER_BDS_Aqua-FM4) — CERES/Aqua FM4 BiDirectional Scans (BDS) broadband filtered radiances, L1B, Swath 20 km, Global, Daily Edition5, CER_BDS_Aqua-FM4_Edition5, is the Clouds and…
-- [BioSCape: L3 Elevation and Canopy Height derived from LVIS Standard Products, NNG, V1](https://search.earthdata.nasa.gov/search?q=BioSCape_LVIS_L3_elev_canopyht_2526) — This dataset provides gridded Level 3 (L3) surface elevation and canopy height products derived from the Land, Vegetation, and Ice Sensor (LVIS) Facility Ins…
-- [BioSCape: L3 Fractional Cover and Uncertainty from AVIRIS-NG imagery, V1](https://search.earthdata.nasa.gov/search?q=BioSCape_AVNG_L3_frcov_2538) — This dataset holds fractional cover estimates and uncertainties for the Biodiversity Survey of the Cape (BioSCape) project.
-- [PISTON 2018 Research Vessel (RV) Thompson ship datasets of ocean, atmosphere, and air-sea interaction](https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA_RVThompson_2018) — PISTON-ONR-NOAA_RVThompson_2018 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2018 Research Vessel (RV) Thompson data product.
+- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
+- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
 
 ## Data.gov — new geodata
 
@@ -89,6 +89,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## OSM pulse
 
+- [weeklyOSM 850](https://weeklyosm.eu/archives/0850/)
 - [weeklyOSM 849](https://weeklyosm.eu/archives/0849/)
 - [weeklyOSM 848](https://weeklyosm.eu/archives/0848/)
-- [weeklyOSM 847](https://weeklyosm.eu/archives/0847/)

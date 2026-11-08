@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-11-07",
+  "generatedAt": "2026-11-08",
   "news": {
     "mapsmania": [
+      {
+        "title": "Utopian London",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/utopian-london.html",
+        "desc": ""
+      },
       {
         "title": "Axis Maps Contours",
         "url": "http://googlemapsmania.blogspot.com/2026/11/axis-maps-contours.html",
@@ -35,11 +40,6 @@
       {
         "title": "How Poland Drifted to the West",
         "url": "http://googlemapsmania.blogspot.com/2026/11/how-poland-drifted-to-west.html",
-        "desc": ""
-      },
-      {
-        "title": "The Era of the Voxel Map Has Arrived",
-        "url": "http://googlemapsmania.blogspot.com/2026/11/the-era-of-voxel-map-has-arrived.html",
         "desc": ""
       }
     ],
@@ -110,53 +110,53 @@
   },
   "qgis": [
     {
-      "title": "ScreenShotMap",
-      "url": "https://plugins.qgis.org/plugins/Screenshotmap/"
+      "title": "KK_sokuPri",
+      "url": "https://plugins.qgis.org/plugins/KK_sokuPri/"
     },
     {
-      "title": "MapBiomas Alerta Oficial",
-      "url": "https://plugins.qgis.org/plugins/mapbiomas_alerta_oficial/"
+      "title": "Drop Pin",
+      "url": "https://plugins.qgis.org/plugins/drop_pin/"
     },
     {
-      "title": "PCP-EIA Pollution Modeling",
-      "url": "https://plugins.qgis.org/plugins/pcp_eia_pollution_modeling/"
+      "title": "森林資源量メッシュ（20m）生成プラグイン",
+      "url": "https://plugins.qgis.org/plugins/forest_mesh20m/"
     },
     {
-      "title": "CSV to CSR converter",
-      "url": "https://plugins.qgis.org/plugins/CSVtoCSR/"
+      "title": "QuickTable",
+      "url": "https://plugins.qgis.org/plugins/quicktable_latest/"
     },
     {
-      "title": "Layout Planner",
-      "url": "https://plugins.qgis.org/plugins/layout_planner/"
+      "title": "Proyecto portátil (Portable Project)",
+      "url": "https://plugins.qgis.org/plugins/proyecto_portatil/"
     },
     {
-      "title": "BHUMI Persil",
-      "url": "https://plugins.qgis.org/plugins/bhumi_persil/"
+      "title": "Assistente IA para QGIS",
+      "url": "https://plugins.qgis.org/plugins/qgis_assistente_ia/"
     },
     {
-      "title": "Fazenda Classifier",
-      "url": "https://plugins.qgis.org/plugins/fazenda_classifier/"
+      "title": "Layers Panel Tools",
+      "url": "https://plugins.qgis.org/plugins/layers_panel_tools/"
     },
     {
-      "title": "TopoLab",
-      "url": "https://plugins.qgis.org/plugins/TOPOLab/"
+      "title": "kk_txt2dem",
+      "url": "https://plugins.qgis.org/plugins/KK_txt2dem/"
     }
   ],
   "releases": [
+    {
+      "repo": "maplibre/maplibre-gl-js",
+      "title": "maplibre-gl-js v6.17.0",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.17.0",
+      "desc": "### ✨ Features and improvements - feat: Add experimental `sparse` vector source option so a missing tile is sliced from an ancestor ([#8335](https://github.c…",
+      "publishedAt": "2026-11-07",
+      "isFresh": true
+    },
     {
       "repo": "visgl/deck.gl",
       "title": "deck.gl v9.3.12",
       "url": "https://github.com/visgl/deck.gl/releases/tag/v9.3.12",
       "desc": "- fix(core): eliminate 300ms click delay and fix runtime controller prop changes (#10422) - fix(heatmap): compilation failure on Qualcomm Adreno 660 (#10301)…",
       "publishedAt": "2026-10-30",
-      "isFresh": true
-    },
-    {
-      "repo": "maplibre/maplibre-gl-js",
-      "title": "maplibre-gl-js v6.16.0",
-      "url": "https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.16.0",
-      "desc": "### ✨ Features and improvements - Allow `Map#setMaxBounds` to constrain one geographic axis without constraining the other ([#6148](https://github.com/maplib…",
-      "publishedAt": "2026-10-25",
       "isFresh": true
     },
     {
@@ -210,6 +210,24 @@
   ],
   "gisse": [
     {
+      "title": "I use Google Maps images",
+      "url": "https://gis.stackexchange.com/questions/501692/i-use-google-maps-images",
+      "score": -4,
+      "answers": 0
+    },
+    {
+      "title": "Saving geographical map as HTML with R",
+      "url": "https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r",
+      "score": 4,
+      "answers": 1
+    },
+    {
+      "title": "OSRM for two far-apart cities: one merged graph + one speed file, or two instances?",
+      "url": "https://gis.stackexchange.com/questions/501685/osrm-for-two-far-apart-cities-one-merged-graph-one-speed-file-or-two-instanc",
+      "score": 0,
+      "answers": 1
+    },
+    {
       "title": "Share board QGIS",
       "url": "https://gis.stackexchange.com/questions/501691/share-board-qgis",
       "score": 0,
@@ -219,12 +237,6 @@
       "title": "ArcGIS Pro failing to listFields() of layers within Group Layer",
       "url": "https://gis.stackexchange.com/questions/501687/arcgis-pro-failing-to-listfields-of-layers-within-group-layer",
       "score": 3,
-      "answers": 1
-    },
-    {
-      "title": "Saving geographical map as HTML with R",
-      "url": "https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r",
-      "score": 4,
       "answers": 1
     },
     {
@@ -246,12 +258,6 @@
       "answers": 0
     },
     {
-      "title": "OSRM for two far-apart cities: one merged graph + one speed file, or two instances?",
-      "url": "https://gis.stackexchange.com/questions/501685/osrm-for-two-far-apart-cities-one-merged-graph-one-speed-file-or-two-instanc",
-      "score": 0,
-      "answers": 0
-    },
-    {
       "title": "Layer not showing/invisible after 'Rasterize (vector to raster)' in QGIS",
       "url": "https://gis.stackexchange.com/questions/501678/layer-not-showing-invisible-after-rasterize-vector-to-raster-in-qgis",
       "score": 1,
@@ -262,21 +268,9 @@
       "url": "https://gis.stackexchange.com/questions/501669/what-are-common-data-formats-used-in-gis",
       "score": -2,
       "answers": 0
-    },
-    {
-      "title": "How should a resumable geospatial downloader handle an ignored Range request?",
-      "url": "https://gis.stackexchange.com/questions/501670/how-should-a-resumable-geospatial-downloader-handle-an-ignored-range-request",
-      "score": 0,
-      "answers": 0
     }
   ],
   "nasa": [
-    {
-      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
-      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
-    },
     {
       "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
       "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
@@ -302,34 +296,40 @@
       "org": "ASF"
     },
     {
-      "title": "Very Long Baseline Interferometry (VLBI) Tropospheric Parameters (TROP) products from NASA CDDIS",
-      "url": "https://search.earthdata.nasa.gov/search?q=VLBI_trop_param",
-      "desc": "Troposphere Zenith Path Delay (ZPD) values derived from analysis of Very Long Baseline Interferometry (VLBI) data.",
-      "org": "CDDIS"
+      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
+      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "CERES/Aqua FM4 BiDirectional Scans (BDS) broadband filtered radiances, L1B, Swath 20 km, Global, Daily",
-      "url": "https://search.earthdata.nasa.gov/search?q=CER_BDS_Aqua-FM4",
-      "desc": "CERES/Aqua FM4 BiDirectional Scans (BDS) broadband filtered radiances, L1B, Swath 20 km, Global, Daily Edition5, CER_BDS_Aqua-FM4_Edition5, is the Clouds and…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
+      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "BioSCape: L3 Elevation and Canopy Height derived from LVIS Standard Products, NNG, V1",
-      "url": "https://search.earthdata.nasa.gov/search?q=BioSCape_LVIS_L3_elev_canopyht_2526",
-      "desc": "This dataset provides gridded Level 3 (L3) surface elevation and canopy height products derived from the Land, Vegetation, and Ice Sensor (LVIS) Facility Ins…",
-      "org": "ORNL_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
+      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "BioSCape: L3 Fractional Cover and Uncertainty from AVIRIS-NG imagery, V1",
-      "url": "https://search.earthdata.nasa.gov/search?q=BioSCape_AVNG_L3_frcov_2538",
-      "desc": "This dataset holds fractional cover estimates and uncertainties for the Biodiversity Survey of the Cape (BioSCape) project.",
-      "org": "ORNL_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
+      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "PISTON 2018 Research Vessel (RV) Thompson ship datasets of ocean, atmosphere, and air-sea interaction",
-      "url": "https://search.earthdata.nasa.gov/search?q=PISTON-ONR-NOAA_RVThompson_2018",
-      "desc": "PISTON-ONR-NOAA_RVThompson_2018 is the Propagation of Intra-Seasonal Tropical Oscillations (PISTON) 2018 Research Vessel (RV) Thompson data product.",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL03LL",
+      "desc": "ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
+      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     }
   ],
   "datagov": [
@@ -385,16 +385,16 @@
   ],
   "osm": [
     {
+      "title": "weeklyOSM 850",
+      "url": "https://weeklyosm.eu/archives/0850/"
+    },
+    {
       "title": "weeklyOSM 849",
       "url": "https://weeklyosm.eu/archives/0849/"
     },
     {
       "title": "weeklyOSM 848",
       "url": "https://weeklyosm.eu/archives/0848/"
-    },
-    {
-      "title": "weeklyOSM 847",
-      "url": "https://weeklyosm.eu/archives/0847/"
     }
   ]
 }
