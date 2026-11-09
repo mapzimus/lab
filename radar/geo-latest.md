@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-08
+# Mapzimus Geospatial Radar — 2026-11-09
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Blowing in the Wind](http://googlemapsmania.blogspot.com/2026/11/blowing-in-wind.html)
 - [Utopian London](http://googlemapsmania.blogspot.com/2026/11/utopian-london.html)
 - [Axis Maps Contours](http://googlemapsmania.blogspot.com/2026/11/axis-maps-contours.html)
 - [Noah's Ark found on Vintage Maps](http://googlemapsmania.blogspot.com/2026/11/noahs-ark-found-on-vintage-maps.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Can You See the Fire Beacon?](http://googlemapsmania.blogspot.com/2026/11/can-you-see-fire-beacon.html)
 - [The Alleyways of Britain](http://googlemapsmania.blogspot.com/2026/11/the-alleyways-of-britain.html)
 - [U.S. Midterm Election Maps](http://googlemapsmania.blogspot.com/2026/11/us-midterm-election-maps.html)
-- [How Poland Drifted to the West](http://googlemapsmania.blogspot.com/2026/11/how-poland-drifted-to-west.html)
 
 ## Geography Realm
 
@@ -31,14 +31,14 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
-- [KK_sokuPri](https://plugins.qgis.org/plugins/KK_sokuPri/)
-- [Drop Pin](https://plugins.qgis.org/plugins/drop_pin/)
-- [森林資源量メッシュ（20m）生成プラグイン](https://plugins.qgis.org/plugins/forest_mesh20m/)
-- [QuickTable](https://plugins.qgis.org/plugins/quicktable_latest/)
-- [Proyecto portátil (Portable Project)](https://plugins.qgis.org/plugins/proyecto_portatil/)
-- [Assistente IA para QGIS](https://plugins.qgis.org/plugins/qgis_assistente_ia/)
-- [Layers Panel Tools](https://plugins.qgis.org/plugins/layers_panel_tools/)
-- [kk_txt2dem](https://plugins.qgis.org/plugins/KK_txt2dem/)
+- [USGS DEM Tile Finder](https://plugins.qgis.org/plugins/usgs_dem_tile_finder/)
+- [US Parcel / APN Data Manager](https://plugins.qgis.org/plugins/parcel_apn_manager/)
+- [Waveshed](https://plugins.qgis.org/plugins/waveshed/)
+- [Adjacent Polygon Attribute Checker](https://plugins.qgis.org/plugins/AdjacentPolygonAttributeChecker/)
+- [KMZ to SHP Converter](https://plugins.qgis.org/plugins/kmz_to_shp_converter/)
+- [ESDL QGIS Plugin](https://plugins.qgis.org/plugins/esdl_qgis_plugin/)
+- [Geodetic-Geocentric Converter](https://plugins.qgis.org/plugins/GeodeticGeocentricConverter/)
+- [NetAnal](https://plugins.qgis.org/plugins/net_anal/)
 
 ## Library releases
 
@@ -53,11 +53,11 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
+- [ArcGIS Pro failing to listFields() of layers within Group Layer](https://gis.stackexchange.com/questions/501687/arcgis-pro-failing-to-listfields-of-layers-within-group-layer) (▲ 4 · 1 answers)
 - [I use Google Maps images](https://gis.stackexchange.com/questions/501692/i-use-google-maps-images) (▲ -4 · 0 answers)
 - [Saving geographical map as HTML with R](https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r) (▲ 4 · 1 answers)
+- [Share board QGIS](https://gis.stackexchange.com/questions/501691/share-board-qgis) (▲ 1 · 0 answers)
 - [OSRM for two far-apart cities: one merged graph + one speed file, or two instances?](https://gis.stackexchange.com/questions/501685/osrm-for-two-far-apart-cities-one-merged-graph-one-speed-file-or-two-instanc) (▲ 0 · 1 answers)
-- [Share board QGIS](https://gis.stackexchange.com/questions/501691/share-board-qgis) (▲ 0 · 0 answers)
-- [ArcGIS Pro failing to listFields() of layers within Group Layer](https://gis.stackexchange.com/questions/501687/arcgis-pro-failing-to-listfields-of-layers-within-group-layer) (▲ 3 · 1 answers)
 - [QGIS layout export returns Could not transform bounding box for geocentric CRS EPSG:7658](https://gis.stackexchange.com/questions/501681/qgis-layout-export-returns-could-not-transform-bounding-box-for-geocentric-crs-e) (▲ 1 · 0 answers)
 - [QGIS 4.2.3 in r.stream.extract there is no longer the option of creating the stream in vector polylines, only option is the points](https://gis.stackexchange.com/questions/501686/qgis-4-2-3-in-r-stream-extract-there-is-no-longer-the-option-of-creating-the-str) (▲ 0 · 0 answers)
 - [Seeking WMS/WMTS basemap alternative to Carto Positron](https://gis.stackexchange.com/questions/501675/seeking-wms-wmts-basemap-alternative-to-carto-positron) (▲ 0 · 0 answers)
@@ -66,16 +66,16 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## NASA Earthdata — recently updated collections
 
-- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
-- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
-- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
+- [PACE-PAX R/V Shearwater Pandora Data](https://search.earthdata.nasa.gov/search?q=PACE-PAX_RV-Shearwater_Pandora_Data) — PACE-PAX_RV-Shearwater_Pandora_Data is the Pandora spectrometer data collected onboard the Research Vessel (R/V) Shearwater during the Plankton, Aerosol, Clo…
+- [Ground-Based Satellite Laser Ranging (SLR) Observation Data (full-rate, daily, 24 hour files) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=SLR_dly_frd_data) — This dataset consists of ground-based Satellite Laser Ranging observation data (full-rate, daily 24 hour files) from the NASA Crustal Dynamics Data Informati…
+- [Satellite Laser Ranging (SLR) data from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=SLR_data) — In Satellite Laser Ranging (SLR), a short pulse of coherent light generated by a laser (Light Amplification by Stimulated Emission of Radiation) is transmitt…
+- [ASIA-AQ DC-8 In-Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=ASIA-AQ_TraceGas_AircraftInSitu_DC8_Data) — ASIA-AQ_TraceGas_AircraftInSitu_DC8_Data is the in-situ trace gas data collected onboard the DC-8 aircraft during the Airborne and Satellite Investigation of…
+- [CDDIS MEaSUREs SESES products Change in Water Storage Time Series](https://search.earthdata.nasa.gov/search?q=MEaSUREs_SESES_wtr_strge_time_series_chg) — Making Earth System Data Records for Use in Research Environments (MEaSUREs) empowers the research community to participate in developing and generating data…
+- [ASIA-AQ DC-8 In-Situ Meteorology and Navigation Data](https://search.earthdata.nasa.gov/search?q=ASIA-AQ_MetNav_AircraftInSitu_DC8_Data) — ASIA-AQ_MetNav_AircraftInSitu_DC8_Data is the in-situ meteorology and navigation data collected onboard the DC-8 aircraft during the Airborne and Satellite I…
+- [ASIA-AQ DC-8 In-Situ Aerosol Data](https://search.earthdata.nasa.gov/search?q=ASIA-AQ_Aerosol_AircraftInSitu_DC8_Data) — ASIA-AQ_Aerosol_AircraftInSitu_DC8_Data is the in-situ aerosol data collected onboard the DC-8 aircraft during the Airborne and Satellite Investigation of As…
+- [ASIA-AQ DC-8 In-Situ Cloud Data](https://search.earthdata.nasa.gov/search?q=ASIA-AQ_Cloud_AircraftInSitu_DC8_Data) — ASIA-AQ_Cloud_AircraftInSitu_DC8_Data is the in-situ cloud data collected onboard the DC-8 aircraft during the Airborne and Satellite Investigation of Asian…
+- [ASIA-AQ Analysis Data](https://search.earthdata.nasa.gov/search?q=ASIA-AQ_Analysis_DC8_Data) — ASIA-AQ_Analysis_DC8_Data are analysis flag files derived from data products onboard the DC-8 aircraft during the Airborne and Satellite Investigation of Asi…
+- [PACE-PAX Ivanpah Playa Data](https://search.earthdata.nasa.gov/search?q=PACE-PAX_Ivanpah-Playa_Data) — PACE-PAX_Ivanpah-Playa_Data is the Ivanpah Playa ground site data collected during the Plankton, Aerosol, Cloud, ocean Ecosystem Postlaunch Airborne eXperime…
 
 ## Data.gov — new geodata
 

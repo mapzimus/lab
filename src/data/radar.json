@@ -1,7 +1,17 @@
 {
-  "generatedAt": "2026-11-08",
+  "generatedAt": "2026-11-09",
   "github": {
     "relevant": [
+      {
+        "name": "developmentseed/lonboard",
+        "url": "https://github.com/developmentseed/lonboard",
+        "desc": "Fast, interactive geospatial data visualization in Jupyter.",
+        "stars": 975,
+        "lang": "Python",
+        "isNew": false,
+        "rank": 145.9788996353334,
+        "relevant": true
+      },
       {
         "name": "eurostat/gridviz",
         "url": "https://github.com/eurostat/gridviz",
@@ -13,33 +23,53 @@
         "relevant": true
       },
       {
+        "name": "muimsd/map-gl-offline",
+        "url": "https://github.com/muimsd/map-gl-offline",
+        "desc": "A TypeScript npm package for MapLibre GL JS and Mapbox GL JS to enable offline tiles.",
+        "stars": 31,
+        "lang": "TypeScript",
+        "isNew": false,
+        "rank": 133.0102999566398,
+        "relevant": true
+      },
+      {
         "name": "bilawalsidhu/gods-eye-view",
         "url": "https://github.com/bilawalsidhu/gods-eye-view",
         "desc": "A spy satellite simulator in your browser, except the data is real. Live open source spatial intelligence on a photorealistic 3D globe.",
-        "stars": 63531,
+        "stars": 63921,
         "lang": "JavaScript",
         "isNew": false,
-        "rank": 119.60598505445431,
+        "rank": 119.61130070956354,
         "relevant": true
       },
       {
         "name": "CesiumGS/cesium",
         "url": "https://github.com/CesiumGS/cesium",
         "desc": "An open-source JavaScript library for world-class 3D globes and maps :earth_americas:",
-        "stars": 15928,
+        "stars": 15933,
         "lang": "JavaScript",
         "isNew": false,
-        "rank": 118.40437702453211,
+        "rank": 118.40464962565909,
         "relevant": true
       },
       {
         "name": "visgl/deck.gl",
         "url": "https://github.com/visgl/deck.gl",
         "desc": "WebGL2 powered visualization framework",
-        "stars": 14742,
+        "stars": 14743,
         "lang": "TypeScript",
         "isNew": false,
-        "rank": 118.33717173107283,
+        "rank": 118.33723064442204,
+        "relevant": true
+      },
+      {
+        "name": "mapbox/mapbox-gl-js",
+        "url": "https://github.com/mapbox/mapbox-gl-js",
+        "desc": "Interactive, thoroughly customizable maps in the browser, powered by vector tiles and WebGL",
+        "stars": 12472,
+        "lang": "TypeScript",
+        "isNew": false,
+        "rank": 118.19194184468743,
         "relevant": true
       },
       {
@@ -63,23 +93,33 @@
         "relevant": true
       },
       {
-        "name": "timschmidt/csgrs",
-        "url": "https://github.com/timschmidt/csgrs",
-        "desc": "Multi-modal exact geometric computation CAD/CAM kernel in Rust",
-        "stars": 265,
-        "lang": "Rust",
+        "name": "dekart-xyz/dekart",
+        "url": "https://github.com/dekart-xyz/dekart",
+        "desc": "Open-source backend for Kepler.gl. Self-hosted alternative to CARTO and Foursquare Studio.",
+        "stars": 438,
+        "lang": "JavaScript",
         "isNew": false,
-        "rank": 114.84976327326214,
+        "rank": 115.28492904048424,
         "relevant": true
       },
       {
-        "name": "GIShub4/solid-map-gl",
-        "url": "https://github.com/GIShub4/solid-map-gl",
-        "desc": "SolidJS Component Library for Mapbox GL JS & MapLibre GL JS 🌏",
-        "stars": 137,
-        "lang": "TypeScript",
+        "name": "timschmidt/csgrs",
+        "url": "https://github.com/timschmidt/csgrs",
+        "desc": "Multi-modal exact geometric computation CAD/CAM kernel in Rust",
+        "stars": 264,
+        "lang": "Rust",
         "isNew": false,
-        "rank": 114.27975817280247,
+        "rank": 114.84649174787361,
+        "relevant": true
+      },
+      {
+        "name": "ingelibre/ingecad",
+        "url": "https://github.com/ingelibre/ingecad",
+        "desc": "Free 2D DWG/DXF CAD for Linux in the spirit of classic AutoCAD — keyboard drafting with acad.pgp aliases, faithful DWG round-trip, paper space and dimensions, plus surveying and terrain plugins (points, construction chart, contours, profiles, earthworks, UTM georeferencing, global DEM, satellite imagery, Google Earth KML)",
+        "stars": 149,
+        "lang": "Python",
+        "isNew": false,
+        "rank": 114.35218251811136,
         "relevant": true
       },
       {
@@ -93,26 +133,6 @@
         "relevant": true
       },
       {
-        "name": "vasturiano/three-geojson-geometry",
-        "url": "https://github.com/vasturiano/three-geojson-geometry",
-        "desc": "ThreeJS geometry to stroke GeoJSON objects on a sphere",
-        "stars": 86,
-        "lang": "JavaScript",
-        "isNew": false,
-        "rank": 113.87903850523723,
-        "relevant": true
-      },
-      {
-        "name": "EarthyScience/Browzarr",
-        "url": "https://github.com/EarthyScience/Browzarr",
-        "desc": "A browser-based visualization framework for exploring and analyzing Zarr and NetCDF datasets.",
-        "stars": 79,
-        "lang": "TypeScript",
-        "isNew": false,
-        "rank": 113.80617997398389,
-        "relevant": true
-      },
-      {
         "name": "Aurtechmx/openlidarviewer",
         "url": "https://github.com/Aurtechmx/openlidarviewer",
         "desc": "LiDAR and point-cloud viewer that runs in the browser. Open LAS, LAZ, E57, PLY, OBJ, glTF and PCD files, or stream COPC, EPT and 3D Tiles. Measure, classify, cut profiles, build terrain models and contours, compare epochs and export reports. Renders on WebGPU with a WebGL 2 fallback. Local files stay on your device.",
@@ -123,13 +143,13 @@
         "relevant": true
       },
       {
-        "name": "FelisPimeja/osm-simple3d-editor",
-        "url": "https://github.com/FelisPimeja/osm-simple3d-editor",
-        "desc": "Browser-based 3D building editor for OpenStreetMap (Simple 3D Buildings): MapLibre + three.js, no backend",
-        "stars": 23,
-        "lang": "TypeScript",
+        "name": "DougLau/earthwyrm",
+        "url": "https://github.com/DougLau/earthwyrm",
+        "desc": "Vector tile maps in Rust",
+        "stars": 28,
+        "lang": "Rust",
         "isNew": false,
-        "rank": 112.76042248342321,
+        "rank": 112.92479599579791,
         "relevant": true
       },
       {
@@ -166,40 +186,20 @@
         "name": "Leaflet/Leaflet",
         "url": "https://github.com/Leaflet/Leaflet",
         "desc": "🍃 number one JavaScript library for interactive maps 🇺🇦",
-        "stars": 45889,
+        "stars": 45900,
         "lang": "JavaScript",
         "isNew": false,
-        "rank": 89.32343611538931,
+        "rank": 89.32364429437523,
         "relevant": true
       },
       {
         "name": "organicmaps/organicmaps",
         "url": "https://github.com/organicmaps/organicmaps",
         "desc": "🍃 Organic Maps is a free Android & iOS offline maps app for more than 12M travelers, tourists, hikers, and cyclists. It uses crowd-sourced OpenStreetMap data and is developed with love by the community. No ads, no tracking, no data collection, no crapware. Please donate to support the development!",
-        "stars": 15907,
+        "stars": 15919,
         "lang": "C++",
         "isNew": false,
-        "rank": 88.40323116462788,
-        "relevant": true
-      },
-      {
-        "name": "opengeos/GeoLibre",
-        "url": "https://github.com/opengeos/GeoLibre",
-        "desc": "A lightweight, cloud-native GIS platform for visualizing, exploring, and analyzing geospatial data. It runs in the web browser, on the desktop, on mobile, and inside Jupyter notebooks.",
-        "stars": 8455,
-        "lang": "TypeScript",
-        "isNew": false,
-        "rank": 87.85432994859875,
-        "relevant": true
-      },
-      {
-        "name": "graphhopper/graphhopper",
-        "url": "https://github.com/graphhopper/graphhopper",
-        "desc": "Open source routing engine for OpenStreetMap. Use it as Java library or standalone web server.",
-        "stars": 6768,
-        "lang": "Java",
-        "isNew": false,
-        "rank": 87.66104902819451,
+        "rank": 88.4038861268033,
         "relevant": true
       }
     ],
@@ -208,100 +208,100 @@
         "name": "storytold/craft-anything",
         "url": "https://github.com/storytold/craft-anything",
         "desc": "Craft Anything: understand how any software works, and craft your own.",
-        "stars": 22293,
+        "stars": 24348,
         "lang": "Rust",
         "isNew": true,
-        "rank": 11.69637599358458,
+        "rank": 11.772962259364148,
         "relevant": false
       },
       {
         "name": "deepseek-ai/dsh-superagent-prototype",
         "url": "https://github.com/deepseek-ai/dsh-superagent-prototype",
         "desc": "Towards a More Autonomous Agent System",
-        "stars": 21146,
+        "stars": 21730,
         "lang": "TypeScript",
         "isNew": true,
-        "rank": 11.650497530575075,
+        "rank": 11.674159423601862,
         "relevant": false
       },
       {
         "name": "heydamir/unslop",
         "url": "https://github.com/heydamir/unslop",
         "desc": "A Claude skill that turns vibecoded, AI-looking UI into a designed interface",
-        "stars": 11810,
+        "stars": 12715,
         "lang": "JavaScript",
         "isNew": true,
-        "rank": 11.144573339019784,
+        "rank": 11.20870103848547,
         "relevant": false
       },
       {
         "name": "zortos293/Lichii",
         "url": "https://github.com/zortos293/Lichii",
         "desc": "VERY experimental Nintendo Switch 2 emulator",
-        "stars": 6576,
+        "stars": 7558,
         "lang": "C++",
         "isNew": true,
-        "rank": 10.636055683718514,
+        "rank": 10.756928690682937,
         "relevant": false
       },
       {
         "name": "valentderah/totk-pc-recomp",
         "url": "https://github.com/valentderah/totk-pc-recomp",
         "desc": "Static recompilation of The Legend of Zelda: Tears of the Kingdom to native Windows and Linux x86-64, with a Vulkan renderer. Game files not included.",
-        "stars": 5859,
+        "stars": 6173,
         "lang": "C",
         "isNew": true,
-        "rank": 10.535795232036183,
+        "rank": 10.581133250292153,
+        "relevant": false
+      },
+      {
+        "name": "Minireel/HGhub",
+        "url": "https://github.com/Minireel/HGhub",
+        "desc": "YellowFruit third-party client",
+        "stars": 5743,
+        "lang": "TypeScript",
+        "isNew": true,
+        "rank": 10.518428862468488,
         "relevant": false
       },
       {
         "name": "Eglantine-Community/Eglantine",
         "url": "https://github.com/Eglantine-Community/Eglantine",
         "desc": "VERY experimental Nintendo Switch 2 emulator",
-        "stars": 5381,
+        "stars": 5631,
         "lang": "C++",
         "isNew": true,
-        "rank": 10.461887386855471,
-        "relevant": false
-      },
-      {
-        "name": "BryceYuuu/RUN",
-        "url": "https://github.com/BryceYuuu/RUN",
-        "desc": "RUN · 润：中国护照持有人的海外移居手册。欧洲 36 国 110 条移民路线 + 13 个主要移民地区：数字游民签证、欧盟蓝卡、技术移民、留学转工作、创业自雇、投资居留，每条附官方来源，持续更新。",
-        "stars": 4243,
-        "lang": "Python",
-        "isNew": true,
-        "rank": 10.255550750458607,
+        "rank": 10.501325292268112,
         "relevant": false
       },
       {
         "name": "JuneYaooo/rea-video",
         "url": "https://github.com/JuneYaooo/rea-video",
         "desc": "Reverse-engineer any video, shot by shot: filmed, AI-generated or coded, and how to remake it. 逆向一切视频，逐个镜头看是拍的、AI 生成的还是代码做的，再告诉你怎么复刻。",
-        "stars": 4242,
+        "stars": 5441,
         "lang": "Python",
         "isNew": true,
-        "rank": 10.255346063533231,
+        "rank": 10.471517074887478,
         "relevant": false
       },
       {
-        "name": "KKKKhazix/agent-autoloop",
-        "url": "https://github.com/KKKKhazix/agent-autoloop",
-        "desc": "让你的命令行 Agent 在后台自己接活、自己跟进到底；平时不烦你，遇到拿不准的事才发卡片找你拍板。",
-        "stars": 4085,
-        "lang": "TypeScript",
+        "name": "NotRexed/Hookshot",
+        "url": "https://github.com/NotRexed/Hookshot",
+        "desc": "A Native Recompilation Of The Legend Of Zelda: Ocarina Of Time Nintendo Switch 2 Remake",
+        "stars": 4838,
+        "lang": "C++",
         "isNew": true,
-        "rank": 10.222596724592858,
+        "rank": 10.369511244217248,
         "relevant": false
       },
       {
-        "name": "worldonlyu/Google_AI_Pro_2Year_ZeroCost_Auto",
-        "url": "https://github.com/worldonlyu/Google_AI_Pro_2Year_ZeroCost_Auto",
-        "desc": "Google_AI_Pro_2Year_ZeroCost_Auto",
-        "stars": 3217,
+        "name": "BryceYuuu/RUN",
+        "url": "https://github.com/BryceYuuu/RUN",
+        "desc": "RUN · 润：中国护照持有人的海外移居手册。欧洲 36 国 110 条移民路线 + 13 个主要移民地区：数字游民签证、欧盟蓝卡、技术移民、留学转工作、创业自雇、投资居留，每条附官方来源，持续更新。",
+        "stars": 4355,
         "lang": "Python",
         "isNew": true,
-        "rank": 10.015172079526021,
+        "rank": 10.278175742167475,
         "relevant": false
       }
     ]
@@ -312,52 +312,21 @@
         "kind": "models",
         "id": "PrunaAI/P-H3-Image-Comfy",
         "url": "https://huggingface.co/PrunaAI/P-H3-Image-Comfy",
-        "likes": 241,
-        "downloads": 625136,
+        "likes": 264,
+        "downloads": 704467,
         "pipeline": "text-to-image",
-        "rank": 95.86763073196087,
+        "rank": 97.74649174787362,
         "relevant": true,
         "desc": "ComfyUI files for P-H3-Image, based on MiniMax-H3"
       },
       {
         "kind": "models",
-        "id": "FusionCow/Sulphur-3",
-        "url": "https://huggingface.co/FusionCow/Sulphur-3",
-        "likes": 414,
-        "downloads": 1003,
-        "rank": 87.3360961934242,
-        "relevant": true,
-        "desc": ""
-      },
-      {
-        "kind": "models",
-        "id": "ccore/Qwen3.5-4B-3D-Coder",
-        "url": "https://huggingface.co/ccore/Qwen3.5-4B-3D-Coder",
-        "likes": 911,
-        "downloads": 254053,
-        "rank": 76.01998967665683,
-        "relevant": true,
-        "desc": "Early preview · General coding with a focus on 3D"
-      },
-      {
-        "kind": "models",
-        "id": "Pika-Labs/Pika-H3-Flex",
-        "url": "https://huggingface.co/Pika-Labs/Pika-H3-Flex",
-        "likes": 516,
-        "downloads": 1083,
-        "pipeline": "image-to-video",
-        "rank": 74.42698108618788,
-        "relevant": true,
-        "desc": "Built for professional iteration."
-      },
-      {
-        "kind": "models",
         "id": "Viggle/Viggle-Remake",
         "url": "https://huggingface.co/Viggle/Viggle-Remake",
-        "likes": 191,
-        "downloads": 76308,
+        "likes": 232,
+        "downloads": 97356,
         "pipeline": "video-to-video",
-        "rank": 73.1666024574071,
+        "rank": 77.33471184205203,
         "relevant": true,
         "desc": "Remake any video. Just ask."
       },
@@ -365,64 +334,95 @@
         "kind": "models",
         "id": "PrunaAI/P-H3-Image",
         "url": "https://huggingface.co/PrunaAI/P-H3-Image",
-        "likes": 169,
-        "downloads": 893,
+        "likes": 183,
+        "downloads": 1016,
         "pipeline": "text-to-image",
-        "rank": 70.86089784275654,
+        "rank": 72.22963564601908,
         "relevant": true,
         "desc": "Image generation and editing based on MiniMax-H3"
       },
       {
         "kind": "models",
-        "id": "Lightricks/LTX-2.5",
-        "url": "https://huggingface.co/Lightricks/LTX-2.5",
-        "likes": 11102,
-        "downloads": 2661026,
+        "id": "ccore/Qwen3.5-4B-3D-Coder",
+        "url": "https://huggingface.co/ccore/Qwen3.5-4B-3D-Coder",
+        "likes": 948,
+        "downloads": 289466,
+        "rank": 71.05453242485459,
+        "relevant": true,
+        "desc": "Early preview · General coding with a focus on 3D"
+      },
+      {
+        "kind": "models",
+        "id": "Pika-Labs/Pika-H3-Flex",
+        "url": "https://huggingface.co/Pika-Labs/Pika-H3-Flex",
+        "likes": 528,
+        "downloads": 1083,
         "pipeline": "image-to-video",
-        "rank": 68.29088067962955,
+        "rank": 70.94691134407037,
+        "relevant": true,
+        "desc": "Built for professional iteration."
+      },
+      {
+        "kind": "models",
+        "id": "FusionCow/Sulphur-3",
+        "url": "https://huggingface.co/FusionCow/Sulphur-3",
+        "likes": 426,
+        "downloads": 1022,
+        "rank": 70.76085575005004,
         "relevant": true,
         "desc": ""
       },
       {
         "kind": "models",
-        "id": "ccore/Qwen3.5-4B-GLB-3D-Coder",
-        "url": "https://huggingface.co/ccore/Qwen3.5-4B-GLB-3D-Coder",
-        "likes": 268,
-        "downloads": 33641,
-        "pipeline": "text-generation",
-        "rank": 59.15950456000482,
+        "id": "VideoRebirthAI/hyperflow-h3-flash",
+        "url": "https://huggingface.co/VideoRebirthAI/hyperflow-h3-flash",
+        "likes": 131,
+        "downloads": 64221,
+        "pipeline": "image-text-to-video",
+        "rank": 66.8411478624117,
         "relevant": true,
-        "desc": "Turn a text prompt into an editable 3D asset."
+        "desc": "By downloading or using these weights, you accept the MiniMax H3 Community License Agreement."
+      },
+      {
+        "kind": "models",
+        "id": "Lightricks/LTX-2.5",
+        "url": "https://huggingface.co/Lightricks/LTX-2.5",
+        "likes": 11254,
+        "downloads": 2720096,
+        "pipeline": "image-to-video",
+        "rank": 66.40269099867308,
+        "relevant": true,
+        "desc": ""
       }
     ],
     "datasets": [
       {
         "kind": "datasets",
-        "id": "ccore/ThreeJS-3D-Scenes",
-        "url": "https://huggingface.co/datasets/ccore/ThreeJS-3D-Scenes",
-        "likes": 90,
-        "downloads": 7351,
-        "rank": 69.4180827846422,
-        "relevant": true,
-        "desc": "4,146 high-quality 3D scene examples with prompts, full thinking traces, and complete HTML/JavaScript responses."
-      },
-      {
-        "kind": "datasets",
         "id": "Angais/pixel-art-atlas-1.4m",
         "url": "https://huggingface.co/datasets/Angais/pixel-art-atlas-1.4m",
-        "likes": 22,
-        "downloads": 1771,
-        "rank": 64.82345567203518,
+        "likes": 211,
+        "downloads": 9427,
+        "rank": 84.1526717218575,
         "relevant": true,
         "desc": "Pixel Art Atlas · 1.4M Synthetic Sprites"
       },
       {
         "kind": "datasets",
+        "id": "ccore/ThreeJS-3D-Scenes",
+        "url": "https://huggingface.co/datasets/ccore/ThreeJS-3D-Scenes",
+        "likes": 100,
+        "downloads": 8172,
+        "rank": 68.80864274756529,
+        "relevant": true,
+        "desc": "4,146 high-quality 3D scene examples with prompts, full thinking traces, and complete HTML/JavaScript responses."
+      },
+      {
+        "kind": "datasets",
         "id": "ccore/ThreeJS-3D-GLB-Assets",
         "url": "https://huggingface.co/datasets/ccore/ThreeJS-3D-GLB-Assets",
-        "likes": 19,
-        "downloads": 1688,
-        "rank": 64.50205999132797,
+        "likes": 24,
+        "downloads": 2046,
+        "rank": 65.09588001734407,
         "relevant": true,
         "desc": "CCORE Three.js 3D GLB Assets"
       },
@@ -430,9 +430,9 @@
         "kind": "datasets",
         "id": "open-index/hacker-news",
         "url": "https://huggingface.co/datasets/open-index/hacker-news",
-        "likes": 550,
-        "downloads": 480388,
-        "rank": 52.682303197703575,
+        "likes": 562,
+        "downloads": 481430,
+        "rank": 48.90101678970269,
         "relevant": true,
         "desc": "Hacker News - Complete Archive"
       },
@@ -440,41 +440,41 @@
         "kind": "datasets",
         "id": "codepawl/abo-glb",
         "url": "https://huggingface.co/datasets/codepawl/abo-glb",
-        "likes": 97,
-        "downloads": 23857,
-        "rank": 43.38245215138499,
+        "likes": 103,
+        "downloads": 27676,
+        "rank": 43.93406667859756,
         "relevant": true,
         "desc": "prettyname: Amazon Berkeley Objects GLB"
       },
       {
         "kind": "datasets",
+        "id": "codepawl/scanned-objects-glb",
+        "url": "https://huggingface.co/datasets/codepawl/scanned-objects-glb",
+        "likes": 54,
+        "downloads": 12689,
+        "rank": 38.38072537898849,
+        "relevant": true,
+        "desc": "prettyname: Scanned Objects GLB"
+      },
+      {
+        "kind": "datasets",
         "id": "scenario-labs/3d-collection",
         "url": "https://huggingface.co/datasets/scenario-labs/3d-collection",
-        "likes": 389,
-        "downloads": 44991,
-        "rank": 38.482129214052996,
+        "likes": 394,
+        "downloads": 45687,
+        "rank": 37.79319419125292,
         "relevant": true,
         "desc": "1,342 selected AI-generated 3D examples, with all 1,500 output files downloaded."
       },
       {
         "kind": "datasets",
-        "id": "HuggingFaceBio/FineDNA",
-        "url": "https://huggingface.co/datasets/HuggingFaceBio/FineDNA",
-        "likes": 62,
-        "downloads": 10729,
-        "rank": 37.89868109890716,
+        "id": "codepawl/plateau-city-glb",
+        "url": "https://huggingface.co/datasets/codepawl/plateau-city-glb",
+        "likes": 38,
+        "downloads": 5638,
+        "rank": 36.682129214053,
         "relevant": true,
-        "desc": "FineDNA is the training data of Carbon-X, the model that taught"
-      },
-      {
-        "kind": "datasets",
-        "id": "codepawl/scanned-objects-glb",
-        "url": "https://huggingface.co/datasets/codepawl/scanned-objects-glb",
-        "likes": 47,
-        "downloads": 11450,
-        "rank": 37.862482474751175,
-        "relevant": true,
-        "desc": "prettyname: Scanned Objects GLB"
+        "desc": "licenselink: https://www.mlit.go.jp/plateau/site-policy/"
       }
     ],
     "spaces": [
@@ -482,8 +482,8 @@
         "kind": "spaces",
         "id": "wank3r/minimax-h3",
         "url": "https://huggingface.co/spaces/wank3r/minimax-h3",
-        "likes": 320,
-        "rank": 60.51301006480974,
+        "likes": 336,
+        "rank": 60.855259801742676,
         "relevant": true,
         "desc": "MiniMax-H3 — unquantized, split across two Spaces"
       },
@@ -491,59 +491,59 @@
         "kind": "spaces",
         "id": "PrunaAI/P-H3-Image",
         "url": "https://huggingface.co/spaces/PrunaAI/P-H3-Image",
-        "likes": 67,
-        "rank": 59.76501782541247,
+        "likes": 73,
+        "rank": 60.338463439461954,
         "relevant": true,
         "desc": "and Edit modes with prompt upsampling, aspect-ratio and resolution controls (4 / 8 / 16 MP"
       },
       {
         "kind": "spaces",
-        "id": "Pika-Labs/pika-h3-flex",
-        "url": "https://huggingface.co/spaces/Pika-Labs/pika-h3-flex",
-        "likes": 92,
-        "rank": 59.13696589710787,
-        "relevant": true,
-        "desc": "Pika H3 Flex — Pika's six-evaluation post-training of MiniMax-H3 (two rank-128 LoRA adapters,"
-      },
-      {
-        "kind": "spaces",
         "id": "umaircxnd/MiniMax-H3-Turbo-Lora-UNCENSORED-Workflow",
         "url": "https://huggingface.co/spaces/umaircxnd/MiniMax-H3-Turbo-Lora-UNCENSORED-Workflow",
-        "likes": 70,
-        "rank": 57.90251669743815,
+        "likes": 90,
+        "rank": 59.318082784642186,
         "relevant": true,
         "desc": "MiniMax-H3 — unquantized, split across two Spaces"
       },
       {
         "kind": "spaces",
+        "id": "Pika-Labs/pika-h3-flex",
+        "url": "https://huggingface.co/spaces/Pika-Labs/pika-h3-flex",
+        "likes": 96,
+        "rank": 58.27354346853249,
+        "relevant": true,
+        "desc": "Pika H3 Flex — Pika's six-evaluation post-training of MiniMax-H3 (two rank-128 LoRA adapters,"
+      },
+      {
+        "kind": "spaces",
         "id": "baka999/MiniMax-H3-Turbo-Lora-UNCENSORED",
         "url": "https://huggingface.co/spaces/baka999/MiniMax-H3-Turbo-Lora-UNCENSORED",
-        "likes": 121,
-        "rank": 57.072719661349495,
+        "likes": 127,
+        "rank": 56.91441993929574,
         "relevant": true
       },
       {
         "kind": "spaces",
-        "id": "ppxxyy/H3-Turbo-Lora",
-        "url": "https://huggingface.co/spaces/ppxxyy/H3-Turbo-Lora",
-        "likes": 56,
-        "rank": 55.611749711344984,
+        "id": "observantdistressed/minimax-h3-turbo",
+        "url": "https://huggingface.co/spaces/observantdistressed/minimax-h3-turbo",
+        "likes": 76,
+        "rank": 55.872981450344966,
         "relevant": true
       },
       {
         "kind": "spaces",
         "id": "LiquidAI/LFM3-Omni-2B-WebGPU",
         "url": "https://huggingface.co/spaces/LiquidAI/LFM3-Omni-2B-WebGPU",
-        "likes": 139,
-        "rank": 42.09225607135647,
+        "likes": 143,
+        "rank": 40.1167249841905,
         "relevant": true
       },
       {
         "kind": "spaces",
         "id": "townbox/motionbricks-playground",
         "url": "https://huggingface.co/spaces/townbox/motionbricks-playground",
-        "likes": 42,
-        "rank": 35.46693691115917,
+        "likes": 44,
+        "rank": 35.50642502755069,
         "relevant": true
       }
     ],
@@ -552,77 +552,77 @@
         "kind": "models",
         "id": "speridlabs/idol",
         "url": "https://huggingface.co/speridlabs/idol",
-        "likes": 1328,
-        "downloads": 22854,
+        "likes": 1607,
+        "downloads": 24747,
         "pipeline": "image-to-3d",
-        "rank": 84.44704996188547,
+        "rank": 90.61257208882486,
         "relevant": false
       },
       {
         "kind": "models",
         "id": "xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic",
         "url": "https://huggingface.co/xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic",
-        "likes": 782,
-        "downloads": 7088,
+        "likes": 1030,
+        "downloads": 11755,
         "pipeline": "text-generation",
-        "rank": 69.18752352411589,
+        "rank": 87.72651733056703,
         "relevant": false
       },
       {
         "kind": "models",
         "id": "moonshotai/Kimi-K3.1-Pro",
         "url": "https://huggingface.co/moonshotai/Kimi-K3.1-Pro",
-        "likes": 1709,
-        "downloads": 25569,
+        "likes": 1792,
+        "downloads": 27926,
         "pipeline": "image-text-to-text",
-        "rank": 61.81599222078431,
-        "relevant": false
-      },
-      {
-        "kind": "models",
-        "id": "ricursiveAI/Ripple-65B-Preview",
-        "url": "https://huggingface.co/ricursiveAI/Ripple-65B-Preview",
-        "likes": 390,
-        "downloads": 5087,
-        "rank": 43.18435351479173,
+        "rank": 65.10716057912437,
         "relevant": false
       },
       {
         "kind": "spaces",
         "id": "huggingface/moe-blogpost",
         "url": "https://huggingface.co/spaces/huggingface/moe-blogpost",
-        "likes": 389,
-        "rank": 43.082129214053,
+        "likes": 462,
+        "rank": 50.53116198203591,
         "relevant": false
       },
       {
         "kind": "models",
-        "id": "Qwen/Qwen3.8-27B",
-        "url": "https://huggingface.co/Qwen/Qwen3.8-27B",
-        "likes": 19390,
-        "downloads": 7668187,
-        "pipeline": "image-text-to-text",
-        "rank": 41.1752004127199,
+        "id": "ricursiveAI/Ripple-65B-Preview",
+        "url": "https://huggingface.co/ricursiveAI/Ripple-65B-Preview",
+        "likes": 448,
+        "downloads": 5835,
+        "rank": 48.40449268200665,
         "relevant": false
       },
       {
         "kind": "models",
         "id": "DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NEO-CODER-MAX-MTP-GGUF",
         "url": "https://huggingface.co/DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NEO-CODER-MAX-MTP-GGUF",
-        "likes": 2694,
-        "downloads": 1553252,
+        "likes": 2771,
+        "downloads": 1530688,
         "pipeline": "image-text-to-text",
-        "rank": 37.861117539045516,
+        "rank": 40.68558645187954,
         "relevant": false
       },
       {
         "kind": "models",
-        "id": "nvidia/NVIDIA-Nemotron-3.5-Transcribe-30B-A4B",
-        "url": "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Transcribe-30B-A4B",
-        "likes": 3106,
-        "downloads": 67230,
-        "pipeline": "automatic-speech-recognition",
-        "rank": 35.08468250650995,
+        "id": "Qwen/Qwen3.8-27B",
+        "url": "https://huggingface.co/Qwen/Qwen3.8-27B",
+        "likes": 19484,
+        "downloads": 7508158,
+        "pipeline": "image-text-to-text",
+        "rank": 40.379400820257416,
+        "relevant": false
+      },
+      {
+        "kind": "models",
+        "id": "NousResearch/Arete-27B",
+        "url": "https://huggingface.co/NousResearch/Arete-27B",
+        "likes": 358,
+        "downloads": 2407,
+        "pipeline": "text-generation",
+        "rank": 39.41018889715664,
         "relevant": false
       }
     ]
@@ -633,30 +633,20 @@
         "title": "We compressed a 31B video+audio diffusion model to 14B, 6 steps, INT8",
         "url": "https://github.com/Video-Rebirth/hyperflow-h3-flash",
         "hnUrl": "https://news.ycombinator.com/item?id=50405263",
-        "points": 74,
+        "points": 82,
         "comments": 14,
         "isShow": true,
-        "rank": 55.7501225267834,
+        "rank": 55.83815618475215,
         "relevant": true
       },
       {
-        "title": "Tasfer: a text editor drawn on a 2D canvas",
-        "url": "https://www.hamza.se/blog/tasfer",
-        "hnUrl": "https://news.ycombinator.com/item?id=50358094",
-        "points": 65,
-        "comments": 46,
-        "isShow": false,
-        "rank": 33.63908787108374,
-        "relevant": true
-      },
-      {
-        "title": "New typeface using intricate designs from Shakespeare's First Folio (2023)",
-        "url": "https://www.itsnicethat.com/news/typeland-shakespeares-globe-amifer-folio-graphic-design-090323",
-        "hnUrl": "https://news.ycombinator.com/item?id=50371360",
-        "points": 39,
-        "comments": 11,
-        "isShow": false,
-        "rank": 33.204119982655925,
+        "title": "JavaScript web apps with WASM layout and GPU rendering in 280 KB",
+        "url": "https://github.com/rkaehn/uniform",
+        "hnUrl": "https://news.ycombinator.com/item?id=50401844",
+        "points": 45,
+        "comments": 21,
+        "isShow": true,
+        "rank": 25.32551566336315,
         "relevant": true
       }
     ],
@@ -665,281 +655,281 @@
         "title": "Coldframe, a honeypot that poses as a supermarket fridge controller",
         "url": "https://github.com/hedgerow-dev/coldframe",
         "hnUrl": "https://news.ycombinator.com/item?id=50406292",
-        "points": 268,
-        "comments": 62,
+        "points": 285,
+        "comments": 68,
         "isShow": true,
-        "rank": 6.859504560004816,
+        "rank": 6.912732066258086,
         "relevant": false
       },
       {
-        "title": "Firenook – Firebase emulators in Rust: 40× faster writes, 10× less RAM",
-        "url": "https://firenook.dev/",
-        "hnUrl": "https://news.ycombinator.com/item?id=50378643",
-        "points": 171,
+        "title": "Every satellite that passed over any place this week, and its photos",
+        "url": "https://www.watched.earth",
+        "hnUrl": "https://news.ycombinator.com/item?id=50428907",
+        "points": 161,
+        "comments": 33,
+        "isShow": true,
+        "rank": 6.4190300290852615,
+        "relevant": false
+      },
+      {
+        "title": "Flide: Make Jev-like decision models up to 9.5x faster",
+        "url": "https://github.com/OmniJev/Flide",
+        "hnUrl": "https://news.ycombinator.com/item?id=50421155",
+        "points": 116,
+        "comments": 27,
+        "isShow": true,
+        "rank": 6.136371723492323,
+        "relevant": false
+      },
+      {
+        "title": "DBDelve – Open-Source DB Client Made with Rust and GPUI",
+        "url": "https://news.ycombinator.com/item?id=50427934",
+        "hnUrl": "https://news.ycombinator.com/item?id=50427934",
+        "points": 81,
         "comments": 30,
         "isShow": true,
-        "rank": 6.471056893815097,
+        "rank": 5.827627704767433,
         "relevant": false
       },
       {
-        "title": "Stroq – a local audit of what your coding agent did and why",
-        "url": "https://github.com/AGGIB/Stroq",
-        "hnUrl": "https://news.ycombinator.com/item?id=50380704",
-        "points": 93,
-        "comments": 34,
-        "isShow": true,
-        "rank": 5.946255707199397,
-        "relevant": false
-      },
-      {
-        "title": "Waymark – A workflow engine that compiles jobs instead of replaying",
-        "url": "https://github.com/piercefreeman/waymark",
-        "hnUrl": "https://news.ycombinator.com/item?id=50379221",
-        "points": 83,
-        "comments": 46,
-        "isShow": true,
-        "rank": 5.848558572123763,
-        "relevant": false
-      },
-      {
-        "title": "Every Mac comes with an (undocumented) family member classifier",
-        "url": "https://8rank.ai/game/apple-intelligence-personal-knowledge-graph",
-        "hnUrl": "https://news.ycombinator.com/item?id=50403097",
-        "points": 811,
-        "comments": 430,
+        "title": "Claude Fable 5.2 and Mythos 5.2",
+        "url": "https://www.anthropic.com/claude-fable-and-mythos-5-2",
+        "hnUrl": "https://news.ycombinator.com/item?id=50429906",
+        "points": 776,
+        "comments": 453,
         "isShow": false,
-        "rank": 5.81911205848235,
+        "rank": 5.780842037601828,
         "relevant": false
       },
       {
-        "title": "What I run on my $10 USD OpenStick homelab",
-        "url": "https://blog.bosscher.ch/posts/openstick/",
-        "hnUrl": "https://news.ycombinator.com/item?id=50406670",
-        "points": 705,
-        "comments": 126,
+        "title": "Fold Epic Paper Airplanes",
+        "url": "https://www.foldableflight.com",
+        "hnUrl": "https://news.ycombinator.com/item?id=50424581",
+        "points": 763,
+        "comments": 129,
         "isShow": false,
-        "rank": 5.697609402103607,
+        "rank": 5.766186717151379,
         "relevant": false
       },
       {
-        "title": "Spindle – a full-featured, type-safe web framework for OCaml 5",
-        "url": "https://github.com/hyphatech/spindle",
-        "hnUrl": "https://news.ycombinator.com/item?id=50377613",
-        "points": 61,
-        "comments": 8,
+        "title": "Is Opus 5.5 nerfed? Thinking patterns changed on November 3",
+        "url": "https://twitter.com/shanemelaugh/status/2119192075505893695",
+        "hnUrl": "https://news.ycombinator.com/item?id=50422069",
+        "points": 668,
+        "comments": 438,
+        "isShow": false,
+        "rank": 5.6508522355356465,
+        "relevant": false
+      },
+      {
+        "title": "MeowDisplay Is iPhone Mirroring, but in Reverse",
+        "url": "https://meowdisplay.app/",
+        "hnUrl": "https://news.ycombinator.com/item?id=50429636",
+        "points": 56,
+        "comments": 22,
         "isShow": true,
-        "rank": 5.584783378996508,
-        "relevant": false
-      },
-      {
-        "title": "Goodbye Claude, hello Pi",
-        "url": "https://caleb.software/posts/claude-to-pi.html",
-        "hnUrl": "https://news.ycombinator.com/item?id=50410107",
-        "points": 568,
-        "comments": 354,
-        "isShow": false,
-        "rank": 5.510224532790143,
+        "rank": 5.511749711344983,
         "relevant": false
       },
       {
         "title": "Where Were We",
         "url": "https://wherewerewe.app/",
         "hnUrl": "https://news.ycombinator.com/item?id=50408082",
-        "points": 51,
-        "comments": 17,
+        "points": 56,
+        "comments": 19,
         "isShow": true,
-        "rank": 5.432006687269598,
+        "rank": 5.511749711344983,
         "relevant": false
       },
       {
-        "title": "Claude Code's \"Don't Ask Again\" exposes passwords in 1,122 public GitHub files",
-        "url": "https://apiiro.com/blog/coding-agents-leaking-secrets-github-dont-ask-again",
-        "hnUrl": "https://news.ycombinator.com/item?id=50407882",
-        "points": 507,
-        "comments": 369,
+        "title": "Payments Canada announces launch of Canada's Real-Time Rail (RTR) payment system",
+        "url": "https://www.payments.ca/canada-launches-real-time-rail-bringing-247-payment-infrastructure-national-economy",
+        "hnUrl": "https://news.ycombinator.com/item?id=50427362",
+        "points": 425,
+        "comments": 231,
         "isShow": false,
-        "rank": 5.411727424567839,
+        "rank": 5.258819198205438,
         "relevant": false
       }
     ]
   },
   "papers": [
     {
+      "title": "PREEN: Exemplar-Based Color Style Transfer with Smartphone Editor Presets",
+      "url": "https://huggingface.co/papers/2610.36896",
+      "desc": "We present PREEN (Preset Regression via an Exemplar-based Editor Network), which casts color style transfer as regression onto the 29 parameters of a deterministic image editor.",
+      "upvotes": 4,
+      "rank": 71.39794000867204,
+      "relevant": true
+    },
+    {
+      "title": "PCBRouteAgent: How Close Are LLM Agents to Becoming PCB Routing Engineers?",
+      "url": "https://huggingface.co/papers/2611.08175",
+      "desc": "Automating printed circuit board (PCB) routing requires coordinating board-level connectivity decisions with geometric execution under strict design rules.",
+      "upvotes": 23,
+      "rank": 62.76042248342321,
+      "relevant": true
+    },
+    {
+      "title": "OmniLatent: Unified Latent for 3D Part Modeling",
+      "url": "https://huggingface.co/papers/2611.09055",
+      "desc": "3D part decomposition is a central capability for editable asset creation, yet existing workflows typically segment a completed mesh as a post-processing step, making the result sensitive to geometric",
+      "upvotes": 3,
+      "rank": 61.204119982655925,
+      "relevant": true
+    },
+    {
+      "title": "Video-Coder: Reinforcing Agentic Coding for Video Generation",
+      "url": "https://huggingface.co/papers/2611.09894",
+      "desc": "Recent years have witnessed remarkable progress in video generation in terms of visual quality and temporal consistency.",
+      "upvotes": 16,
+      "rank": 52.460897842756545,
+      "relevant": true
+    },
+    {
       "title": "Muir: Linear Attention with Sensitivity-Allocated Gating and Matched-Filter Readout",
       "url": "https://huggingface.co/papers/2611.08376",
       "desc": "Linear attention compresses context into a fixed-size key-value state for linear-time training and constant-memory inference.",
-      "upvotes": 12,
-      "rank": 52.227886704613674,
+      "upvotes": 13,
+      "rank": 52.292256071356476,
       "relevant": true
     },
     {
       "title": "Signed but Steerable: Measuring and Closing the Text-Vector Integrity Gap in Offline Retrieval-Augmented Generation",
       "url": "https://huggingface.co/papers/2611.06498",
       "desc": "Offline retrieval-augmented generation (RAG) on edge devices is updated through signed knowledge packs that carry text and precomputed embedding vectors.",
-      "upvotes": 4,
-      "rank": 51.39794000867204,
+      "upvotes": 5,
+      "rank": 51.55630250076729,
       "relevant": true
     },
     {
-      "title": "Koopman Generative Operators for Efficient Probabilistic Time-Series Forecasting",
-      "url": "https://huggingface.co/papers/2611.04760",
-      "desc": "Probabilistic time-series forecasting requires models that simultaneously capture structured temporal dynamics, expressive uncertainty, and efficient inference, yet existing approaches fall short of t",
-      "upvotes": 3,
-      "rank": 51.204119982655925,
-      "relevant": true
-    },
-    {
-      "title": "VFlash: Fast, Accurate Visual Planning via Flash Primitive Decoding",
-      "url": "https://huggingface.co/papers/2611.08449",
-      "desc": "Models for physical AI tasks, such as robotics and autonomous driving, need not reason solely in language.",
-      "upvotes": 104,
-      "rank": 34.04237859813988,
-      "relevant": true
-    },
-    {
-      "title": "WeLM-Image: A Unified Image Generation Model towards Visual Intelligence",
-      "url": "https://huggingface.co/papers/2611.07392",
-      "desc": "We present WeLM-Image, a unified image foundation model that integrates multimodal understanding into text-to-image generation, instruction-guided editing, and multi-reference synthesis.",
-      "upvotes": 44,
-      "rank": 33.30642502755069,
+      "title": "SplatAnything: Gaussian Spacing Normalization for Feed-forward 3DGS across Arbitrary Scenes",
+      "url": "https://huggingface.co/papers/2611.08264",
+      "desc": "We identify a key limitation of existing feed-forward 3DGS methods: Gaussian attributes are typically predicted in a radial-distance-normalized space that canonicalizes a global radial statistic of th",
+      "upvotes": 60,
+      "rank": 33.570659670021534,
       "relevant": true
     },
     {
       "title": "TailSteer: Trajectory-Tail Steering for Drift-Resistant Multi-turn Image Editing",
       "url": "https://huggingface.co/papers/2611.06741",
       "desc": "Strong single-turn editing performance does not guarantee reliable multi-turn interaction: as edited outputs are repeatedly reused, small unintended changes can accumulate into severe visual drift.",
-      "upvotes": 40,
-      "rank": 33.225567713439474,
+      "upvotes": 41,
+      "rank": 33.2464985807958,
       "relevant": true
     },
     {
-      "title": "Open-HumanScale: An Open Recipe for Scaling Human and Robot Experience for Embodied Foundation Models",
-      "url": "https://huggingface.co/papers/2611.06817",
-      "desc": "Egocentric human video offers a scalable source of manipulation priors for robot learning, yet translating raw data scale into generalizable robot policies demands rigorous data curation and training recipes.",
-      "upvotes": 31,
-      "rank": 33.01029995663981,
-      "relevant": true
-    },
-    {
-      "title": "Towards Foundation Decision Models: Drex",
-      "url": "https://huggingface.co/papers/2611.07854",
-      "desc": "Autoregressive approaches with large language models, such as long chain-of-thought reasoning, have become the default for new AI applications because they reach higher accuracy on a wide range of tasks.",
-      "upvotes": 22,
-      "rank": 32.723455672035186,
-      "relevant": true
-    },
-    {
-      "title": "D3D: Decoupled Diffusion Drafting for Asynchronous Speculative Decoding",
-      "url": "https://huggingface.co/papers/2611.06425",
-      "desc": "Target-conditioned diffusion drafters predict candidate tokens in parallel, yet each new block must wait for updated target-model hidden states.",
+      "title": "EvoWorld: Towards Out-of-Sight World Evolution in Generative Video Models",
+      "url": "https://huggingface.co/papers/2611.06748",
+      "desc": "Generative video models are increasingly used as visual world simulators, yet their primary strength lies in rendering plausible pixels rather than reasoning about how a world should evolve.",
       "upvotes": 19,
       "rank": 32.60205999132796,
       "relevant": true
     },
     {
-      "title": "EDGAR: Efficient Diffusion-Driven Gaussian Avatar Refinement via Synthetic Failure",
-      "url": "https://huggingface.co/papers/2611.07909",
-      "desc": "Recent advances in Gaussian splatting have enabled efficient and photorealistic head avatar reconstruction, yet monocular video-based or image-based methods still suffer from under-constrained geometr",
-      "upvotes": 15,
-      "rank": 32.40823996531185,
+      "title": "Frontier3DBench: Benchmarking Coding Agents for 3D Creation across Objects, Scenes, and Interactive Open Worlds",
+      "url": "https://huggingface.co/papers/2611.09017",
+      "desc": "Coding agents combine visual understanding with program execution, offering a new route to automated 3D creation.",
+      "upvotes": 9,
+      "rank": 32,
       "relevant": true
     }
   ],
   "arxiv": [
     {
-      "title": "Towards Practical 20 kbps Generative Video Compression via Adaptive Tokenization and Entropy Modeling",
-      "url": "http://arxiv.org/abs/2611.08099v1",
-      "desc": "Video compression at ultra-low bitrates remains challenging due to the loss of perceptually important details under limited bit budgets.",
+      "title": "Flow-Guided Target-Space Alignment via Path Consistency",
+      "url": "http://arxiv.org/abs/2611.09863v1",
+      "desc": "Many multimodal alignment problems require mapping a source modality into a fixed space defined by a target modality, where the target space is not merely an intermediate embedding but is used directl",
       "rank": 80
     },
     {
-      "title": "Do You Miss the Nights We Spent Crafting Figures? Rethinking Teaser and Framework Figures in the Age of Generative AI",
-      "url": "http://arxiv.org/abs/2611.08486v1",
-      "desc": "Scientific figures give research ideas a visual form through choices of abstraction, composition, and emphasis.",
+      "title": "Super-resolved digital terrain models for GEDI geolocation correction: agreement with airborne LiDAR DTM-based corrections at the beam level, not the footprint level",
+      "url": "http://arxiv.org/abs/2611.09854v1",
+      "desc": "The Global Ecosystem Dynamics Investigation (GEDI) mission measures three-dimensional forest structure with a LiDAR aboard the International Space Station.",
+      "rank": 80
+    },
+    {
+      "title": "Embedding Predictive Adaptation and Refinement for Multi-Modal Industrial Anomaly Detection",
+      "url": "http://arxiv.org/abs/2611.09521v1",
+      "desc": "Industrial Anomaly Detection (IAD) has evolved from 2D image-based approaches to multi-modal methods that leverage the complementary nature of RGB images and 3D point clouds.",
+      "rank": 80
+    },
+    {
+      "title": "AdaptivePnP: Fast Auto-Tuned Plug-and-Play for Deconvolution",
+      "url": "http://arxiv.org/abs/2611.09845v1",
+      "desc": "Plug-and-play (PnP) methods reconstruct images by alternating a data-fitting step with an image denoiser.",
       "rank": 60
     },
     {
-      "title": "SM4RT: Cascaded Feed-forward Model for 4D Reconstruction",
-      "url": "http://arxiv.org/abs/2611.08436v1",
-      "desc": "We introduce SM4RT, a multi-task cascade feed-forward model for dynamic scene reconstruction from RGB videos.",
+      "title": "Overview of the ImageCLEFmedical 2026 GANs task: Exploring fingerprint detection, privacy leakage, and synthetic medical image generation",
+      "url": "http://arxiv.org/abs/2611.09455v1",
+      "desc": "The 2026 ImageCLEFmedical GANs Task Exploring Fingerprint Detection, Privacy Leakage, and Synthetic Medical Image Generation continues to investigate privacy and security concerns around using patient",
       "rank": 60
     },
     {
-      "title": "Social Humanoid: Socially Responsive Human-Humanoid Interaction",
-      "url": "http://arxiv.org/abs/2611.08407v1",
-      "desc": "Humanoid robots are typically trained as solitary agents, leaving them unable to coordinate physically with human partners who naturally anticipate and adjust to one another.",
-      "rank": 60
+      "title": "Video-Coder: Reinforcing Agentic Coding for Video Generation",
+      "url": "http://arxiv.org/abs/2611.09894v1",
+      "desc": "Recent years have witnessed remarkable progress in video generation in terms of visual quality and temporal consistency.",
+      "rank": 50
     },
     {
-      "title": "ControlAnything: Generative UI and On-Demand Device Integration for Mixed-Reality Hand Interaction by a Coding Agent",
-      "url": "http://arxiv.org/abs/2611.08321v1",
-      "desc": "Connecting hand input in mixed reality (MR) to a nearby physical device typically requires an integration written in advance for that device, its transport and the mapping.",
-      "rank": 60
+      "title": "Assessing the Impact of Retrieval-Augmented Generation on Algorithmic Problem-Solving",
+      "url": "http://arxiv.org/abs/2611.09791v1",
+      "desc": "Competitive programming problems pose distinctive challenges for Large Language Models, as they demand not only proficient code generation but also advanced algorithmic reasoning.",
+      "rank": 50
     },
     {
-      "title": "REACT: Towards Real-Time Completion of Skeletal Motion Signals",
-      "url": "http://arxiv.org/abs/2611.08301v1",
-      "desc": "Tracking user motion in interactive and immersive applications is increasingly common (e.g., video games, XR systems, smartphones).",
-      "rank": 60
-    },
-    {
-      "title": "\"Blind Compliance\": Coercive Control in AI Jailbreaking",
-      "url": "http://arxiv.org/abs/2611.08226v1",
-      "desc": "The explosion of generative AI systems and concerns surrounding their rapidly scaling capabilities has led to an adversarial cycle between increasingly narrow content restrictions (\"guardrails\") and i",
-      "rank": 60
-    },
-    {
-      "title": "Edge-Assisted Crowdsensing for Explainable Cyclist Safety Perception",
-      "url": "http://arxiv.org/abs/2611.08441v1",
-      "desc": "Cyclist fatality rates remain high despite policy support for active travel, and autonomous vehicles add complexity to mixed traffic.",
+      "title": "The Role Of Recurrent Refinement In Medical Image Segmentation",
+      "url": "http://arxiv.org/abs/2611.09436v1",
+      "desc": "While feed-forward segmentation networks perform well on large cohorts, they degrade in constrained clinical settings with few training samples and imaging artifacts.",
       "rank": 50
     }
   ],
   "itch": [
     {
-      "title": "How to date a Sleep Paralysis Demon- Part 2(Demo) [Free] [Visual Novel]",
-      "url": "https://sfour-s4.itch.io/how-to-date-a-sleep-paralysis-demon",
+      "title": "Paper Game [Free] [Other]",
+      "url": "https://dulllamp.itch.io/paper-game",
       "desc": ""
     },
     {
-      "title": "Dating Killmulator [Free] [Visual Novel] [Windows] [macOS] [Linux] [Android]",
-      "url": "https://coolom-games.itch.io/datingkillmulator",
-      "desc": "A comedy dating sim about a serial killer, a popular guy, and a psychologist."
+      "title": "Häxlarm [Free] [Action]",
+      "url": "https://arekku.itch.io/hxlarm-prototype",
+      "desc": "Keep the turbine spinning"
     },
     {
-      "title": "Kritsana [Free] [Simulation]",
-      "url": "https://debuz.itch.io/kritsana",
-      "desc": "Mental Illness... or Something Worse?"
+      "title": "Droschke Hubble [Free] [Shooter] [Windows]",
+      "url": "https://producciones-marte.itch.io/droschke-hubble",
+      "desc": "¡Lleva el contrabando a las estrellas!"
     },
     {
-      "title": "Martin: No Filter Fighters (Unofficial Fan Game). [Free] [Fighting]",
-      "url": "https://trey2k23.itch.io/martin-no-filter-fighters-unofficial-fan-game",
+      "title": "motorcycle [Free]",
+      "url": "https://xvibyt.itch.io/motorcycle",
+      "desc": "a simple game about driving a motorcycle"
+    },
+    {
+      "title": "First Rain [Free] [Strategy]",
+      "url": "https://cy-3lo.itch.io/first-rain",
+      "desc": "One dead island. Two arks. Three ways to win. Shape land and water, and let life spread on its own."
+    },
+    {
+      "title": "Puppy Trainer: Clicker Training Game [Free] [Simulation]",
+      "url": "https://jinnilab.itch.io/puppy-trainer",
+      "desc": "Raise a puppy and teach it 35 tricks with real clicker-training timing."
+    },
+    {
+      "title": "Killer Complex [Free] [Role Playing]",
+      "url": "https://joshmoon1512.itch.io/killer-complex",
+      "desc": "He has your wife. He's watching your every move. Deliver the packages, and hack him before he finds out."
+    },
+    {
+      "title": "Fusion chess [Free] [Other]",
+      "url": "https://corterz.itch.io/fusion-chess",
       "desc": ""
     },
     {
-      "title": "Dominion of Darkness [Free] [Interactive Fiction]",
-      "url": "https://adeptus7.itch.io/dominion",
-      "desc": "Story-driven simulator of the Dark Lord/Lady. Use your armies, cunning and magic to conquer Free Peoples."
-    },
-    {
-      "title": "Bloody Flower of Teyvat [Genshin Impact Fangame] [Free] [Visual Novel] [Windows] [macOS] [Linux] [Android]",
-      "url": "https://xogua.itch.io/bloody-flower-of-teyvat",
-      "desc": "A Genshin Impact dark dating sim. Obsessive romance, interactive mini-games, and multiple endings."
-    },
-    {
-      "title": "Path of the idle cultivator [Free] [Role Playing] [Windows] [Android]",
-      "url": "https://wuxiadev.itch.io/idle-cultivation-path",
-      "desc": "Idle wuxia incremental. Cultivate, die, rebirth stronger. Defy the Heavens."
-    },
-    {
-      "title": "Gospel Drift Demo [Free] [Action]",
-      "url": "https://retromagine.itch.io/gospel-drift-demo",
-      "desc": "Drift over demons, crush them under your wheels, harvest souls, upgrade, and become unstoppable."
-    },
-    {
-      "title": "Tower-Defense [Free] [Strategy] [Windows]",
-      "url": "https://r-f.itch.io/tower-defense",
-      "desc": "Tower Defense is a simple game. The goal is to​ kill all the enemies before they reach the end of the path."
+      "title": "Leash Line: Dog Tangle Puzzle [Free] [Puzzle]",
+      "url": "https://jinnilab.itch.io/leash-line",
+      "desc": "Untangle a pile of puppy leashes and send every pup out for a walk, one tap at a time."
     }
   ],
   "kaggle": []
