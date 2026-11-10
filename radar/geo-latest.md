@@ -1,15 +1,15 @@
-# Mapzimus Geospatial Radar — 2026-11-09
+# Mapzimus Geospatial Radar — 2026-11-10
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Contoured Fuji](http://googlemapsmania.blogspot.com/2026/11/contoured-fuji.html)
+- [Has a Satellite Been Watching You?](http://googlemapsmania.blogspot.com/2026/11/has-satellite-been-watching-you.html)
 - [Blowing in the Wind](http://googlemapsmania.blogspot.com/2026/11/blowing-in-wind.html)
 - [Utopian London](http://googlemapsmania.blogspot.com/2026/11/utopian-london.html)
 - [Axis Maps Contours](http://googlemapsmania.blogspot.com/2026/11/axis-maps-contours.html)
 - [Noah's Ark found on Vintage Maps](http://googlemapsmania.blogspot.com/2026/11/noahs-ark-found-on-vintage-maps.html)
 - [Collect Birds, Not Beers](http://googlemapsmania.blogspot.com/2026/11/collect-birds-not-beers.html)
 - [Can You See the Fire Beacon?](http://googlemapsmania.blogspot.com/2026/11/can-you-see-fire-beacon.html)
-- [The Alleyways of Britain](http://googlemapsmania.blogspot.com/2026/11/the-alleyways-of-britain.html)
-- [U.S. Midterm Election Maps](http://googlemapsmania.blogspot.com/2026/11/us-midterm-election-maps.html)
 
 ## Geography Realm
 
@@ -31,14 +31,14 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
+- [Bankfull width detection](https://plugins.qgis.org/plugins/BankFullDetection/)
+- [Q-LandslideDam](https://plugins.qgis.org/plugins/q_landslide_dam/)
 - [USGS DEM Tile Finder](https://plugins.qgis.org/plugins/usgs_dem_tile_finder/)
 - [US Parcel / APN Data Manager](https://plugins.qgis.org/plugins/parcel_apn_manager/)
 - [Waveshed](https://plugins.qgis.org/plugins/waveshed/)
 - [Adjacent Polygon Attribute Checker](https://plugins.qgis.org/plugins/AdjacentPolygonAttributeChecker/)
 - [KMZ to SHP Converter](https://plugins.qgis.org/plugins/kmz_to_shp_converter/)
 - [ESDL QGIS Plugin](https://plugins.qgis.org/plugins/esdl_qgis_plugin/)
-- [Geodetic-Geocentric Converter](https://plugins.qgis.org/plugins/GeodeticGeocentricConverter/)
-- [NetAnal](https://plugins.qgis.org/plugins/net_anal/)
 
 ## Library releases
 
@@ -53,39 +53,40 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
+- [Developer/Debugging tools write to external file in QGIS](https://gis.stackexchange.com/questions/501699/developer-debugging-tools-write-to-external-file-in-qgis) (▲ 1 · 1 answers)
+- [QGIS Error: Column type not supported using v.surf.idw, v.surf.rst,](https://gis.stackexchange.com/questions/501697/qgis-error-column-type-not-supported-using-v-surf-idw-v-surf-rst) (▲ 2 · 0 answers)
 - [ArcGIS Pro failing to listFields() of layers within Group Layer](https://gis.stackexchange.com/questions/501687/arcgis-pro-failing-to-listfields-of-layers-within-group-layer) (▲ 4 · 1 answers)
+- [QGIS 4.2.3 in r.stream.extract there is no longer the option of creating the stream in vector polylines, only option is the points](https://gis.stackexchange.com/questions/501686/qgis-4-2-3-in-r-stream-extract-there-is-no-longer-the-option-of-creating-the-str) (▲ 0 · 0 answers)
 - [I use Google Maps images](https://gis.stackexchange.com/questions/501692/i-use-google-maps-images) (▲ -4 · 0 answers)
 - [Saving geographical map as HTML with R](https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r) (▲ 4 · 1 answers)
 - [Share board QGIS](https://gis.stackexchange.com/questions/501691/share-board-qgis) (▲ 1 · 0 answers)
 - [OSRM for two far-apart cities: one merged graph + one speed file, or two instances?](https://gis.stackexchange.com/questions/501685/osrm-for-two-far-apart-cities-one-merged-graph-one-speed-file-or-two-instanc) (▲ 0 · 1 answers)
 - [QGIS layout export returns Could not transform bounding box for geocentric CRS EPSG:7658](https://gis.stackexchange.com/questions/501681/qgis-layout-export-returns-could-not-transform-bounding-box-for-geocentric-crs-e) (▲ 1 · 0 answers)
-- [QGIS 4.2.3 in r.stream.extract there is no longer the option of creating the stream in vector polylines, only option is the points](https://gis.stackexchange.com/questions/501686/qgis-4-2-3-in-r-stream-extract-there-is-no-longer-the-option-of-creating-the-str) (▲ 0 · 0 answers)
 - [Seeking WMS/WMTS basemap alternative to Carto Positron](https://gis.stackexchange.com/questions/501675/seeking-wms-wmts-basemap-alternative-to-carto-positron) (▲ 0 · 0 answers)
-- [Layer not showing/invisible after 'Rasterize (vector to raster)' in QGIS](https://gis.stackexchange.com/questions/501678/layer-not-showing-invisible-after-rasterize-vector-to-raster-in-qgis) (▲ 1 · 0 answers)
-- [What are common data formats used in GIS?](https://gis.stackexchange.com/questions/501669/what-are-common-data-formats-used-in-gis) (▲ -2 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [PACE-PAX R/V Shearwater Pandora Data](https://search.earthdata.nasa.gov/search?q=PACE-PAX_RV-Shearwater_Pandora_Data) — PACE-PAX_RV-Shearwater_Pandora_Data is the Pandora spectrometer data collected onboard the Research Vessel (R/V) Shearwater during the Plankton, Aerosol, Clo…
-- [Ground-Based Satellite Laser Ranging (SLR) Observation Data (full-rate, daily, 24 hour files) from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=SLR_dly_frd_data) — This dataset consists of ground-based Satellite Laser Ranging observation data (full-rate, daily 24 hour files) from the NASA Crustal Dynamics Data Informati…
-- [Satellite Laser Ranging (SLR) data from NASA CDDIS](https://search.earthdata.nasa.gov/search?q=SLR_data) — In Satellite Laser Ranging (SLR), a short pulse of coherent light generated by a laser (Light Amplification by Stimulated Emission of Radiation) is transmitt…
-- [ASIA-AQ DC-8 In-Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=ASIA-AQ_TraceGas_AircraftInSitu_DC8_Data) — ASIA-AQ_TraceGas_AircraftInSitu_DC8_Data is the in-situ trace gas data collected onboard the DC-8 aircraft during the Airborne and Satellite Investigation of…
-- [CDDIS MEaSUREs SESES products Change in Water Storage Time Series](https://search.earthdata.nasa.gov/search?q=MEaSUREs_SESES_wtr_strge_time_series_chg) — Making Earth System Data Records for Use in Research Environments (MEaSUREs) empowers the research community to participate in developing and generating data…
-- [ASIA-AQ DC-8 In-Situ Meteorology and Navigation Data](https://search.earthdata.nasa.gov/search?q=ASIA-AQ_MetNav_AircraftInSitu_DC8_Data) — ASIA-AQ_MetNav_AircraftInSitu_DC8_Data is the in-situ meteorology and navigation data collected onboard the DC-8 aircraft during the Airborne and Satellite I…
-- [ASIA-AQ DC-8 In-Situ Aerosol Data](https://search.earthdata.nasa.gov/search?q=ASIA-AQ_Aerosol_AircraftInSitu_DC8_Data) — ASIA-AQ_Aerosol_AircraftInSitu_DC8_Data is the in-situ aerosol data collected onboard the DC-8 aircraft during the Airborne and Satellite Investigation of As…
-- [ASIA-AQ DC-8 In-Situ Cloud Data](https://search.earthdata.nasa.gov/search?q=ASIA-AQ_Cloud_AircraftInSitu_DC8_Data) — ASIA-AQ_Cloud_AircraftInSitu_DC8_Data is the in-situ cloud data collected onboard the DC-8 aircraft during the Airborne and Satellite Investigation of Asian…
-- [ASIA-AQ Analysis Data](https://search.earthdata.nasa.gov/search?q=ASIA-AQ_Analysis_DC8_Data) — ASIA-AQ_Analysis_DC8_Data are analysis flag files derived from data products onboard the DC-8 aircraft during the Airborne and Satellite Investigation of Asi…
-- [PACE-PAX Ivanpah Playa Data](https://search.earthdata.nasa.gov/search?q=PACE-PAX_Ivanpah-Playa_Data) — PACE-PAX_Ivanpah-Playa_Data is the Ivanpah Playa ground site data collected during the Plankton, Aerosol, Cloud, ocean Ecosystem Postlaunch Airborne eXperime…
+- [SEAC4RS DC-8 Aircraft In-Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_TraceGas_AircraftInSitu_DC8_Data) — SEAC4RS_TraceGas_AircraftInSitu_DC8_Data are in-situ trace gas data collected onboard the DC8 aircraft during the Studies of Emissions and Atmospheric Compos…
+- [SEAC4RS DC-8 Aircraft In-Situ Photolysis Rate Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_jValue_AircraftInSitu_DC8_Data) — SEAC4RS_jValue_AircraftInSitu_DC8_Data are in-situ photolysis rate (j value) data collected onboard the DC8 aircraft during the Studies of Emissions and Atmo…
+- [SEAC4RS ER-2 Aircraft In-Situ Radiation Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_Radiation_AircraftInSitu_ER2_Data) — SEAC4RS_Radiation_AircraftInSitu_ER2_Data are in-situ radiation data collected onboard the ER-2 aircraft during the Studies of Emissions and Atmospheric Comp…
+- [SEAC4RS DC-8 Aircraft In-Situ Radiation Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_Radiation_AircraftInSitu_DC8_Data) — SEAC4RS_Radiation_AircraftInSitu_DC8_Data are in-situ radiation data collected onboard the DC8 aircraft during the Studies of Emissions and Atmospheric Compo…
+- [SEAC4RS ER-2 Aircraft In-Situ Meteorological and Navigational Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_MetNav_AircraftInSitu_ER2_Data) — SEAC4RS_MetNav_AircraftInSitu_ER2_Data are in-situ meteorological and navigational data collected onboard the ER-2 aircraft during the Studies of Emissions a…
+- [SEAC4RS ER-2 Aircraft In-Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_TraceGas_AircraftInSitu_ER2_Data) — SEAC4RS_TraceGas_AircraftInSitu_ER2_Data are in-situ trace gas data collected onboard the ER-2 aircraft during the Studies of Emissions and Atmospheric Compo…
+- [SEAC4RS DC-8 Aircraft In-Situ Meteorological and Navigational Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_MetNav_AircraftInSitu_DC8_Data) — SEAC4RS_MetNav_AircraftInSitu_DC8_Data are in-situ meteorological and navigation data collected onboard the DC8 aircraft during the Studies of Emissions and…
+- [SEAC4RS DC-8 Aircraft Miscellaneous Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_Miscellaneous_DC8_Data) — SEAC4RS_Miscellaneous_AircraftInSitu_DC8_Data are miscellaneous ancillary data collected onboard the DC8 aircraft during the Studies of Emissions and Atmosph…
+- [SEAC4RS Radiosonde/Ozonesonde Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_Sondes_Data) — SEAC4RS_Sondes_Data are data collected via ozonesonde and radiosonde launches at ground locations in Houston, TX, Idabel, OK, Ellington, TX, Boulder, CO, Smi…
+- [SEAC4RS ER-2 Aircraft Miscellaneous Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_Miscellaneous_ER2_Data) — SEAC4RS_Miscellaneous_ER2_Data are miscellaneous ancillary data collected onboard the ER-2 aircraft during the Studies of Emissions and Atmospheric Compositi…
 
 ## Data.gov — new geodata
 
 - [Inventory of Owned and Leased Properties (IOLP)](https://catalog.data.gov/dataset/inventory-of-owned-and-leased-properties-iolp) — The Inventory of Owned and Leased Properties (IOLP) allows users to search properties owned and leased by the General Services Administration (GSA) across the U
 - [Crimes - 2001 to Present](https://catalog.data.gov/dataset/crimes-2001-to-present) — This dataset reflects reported incidents of crime (with the exception of murders where data exists for each victim) that occurred in the City of Chicago from 20
-- [2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection](https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-by-basis-category-civil-rights-data-collection) — The 2015-16 tables are based on data collected from all of the nation’s school districts and schools—approximately 17,300 school districts and 96,300 schools.
 - [Baby Names from Social Security Card Applications - National Data](https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-data) — The data (name, year of birth, sex, and number) are from a 100 percent sample of Social Security card applications for 1880 on.
-- [Harmonized Tariff Schedule of the United States (2026)](https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2025) — This dataset is the current 2026 Harmonized Tariff Schedule plus all revisions for the current year.
+- [College Scorecard](https://catalog.data.gov/dataset/college-scorecard) — Download the data that appears on the College Scorecard, as well as supporting data on student completion, debt and repayment, earnings, and more.
+- [2015-16 Harassment or Bullying by Basis Category Civil Rights Data Collection](https://catalog.data.gov/dataset/2015-16-harassment-or-bullying-by-basis-category-civil-rights-data-collection) — The 2015-16 tables are based on data collected from all of the nation’s school districts and schools—approximately 17,300 school districts and 96,300 schools.
 - [NPS Visitor Use Statistics Data Package, 2024](https://catalog.data.gov/dataset/nps-visitor-use-statistics-data-package-2024) — The NPS Social Science Program is responsible for coordinating visitor use statistics reporting for units administered by the NPS.
-- [2017-18 Arrests Civil Rights Data Collection](https://catalog.data.gov/dataset/2017-18-arrests-civil-rights-data-collection) — This set of Excel file contains data on student referrals to law enforcement by disability and student-related arrests by disability for all states.
+- [NPS Visitor Use Statistics Data Package, 2025](https://catalog.data.gov/dataset/nps-visitor-use-statistics-data-package-2025) — The NPS Social Science Program is responsible for coordinating visitor use statistics reporting for units administered by the NPS.
+- [Harmonized Tariff Schedule of the United States (2026)](https://catalog.data.gov/dataset/harmonized-tariff-schedule-of-the-united-states-2025) — This dataset is the current 2026 Harmonized Tariff Schedule plus all revisions for the current year.
 
 ## OSM pulse
 

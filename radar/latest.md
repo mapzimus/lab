@@ -1,135 +1,134 @@
-# Mapzimus Radar — 2026-11-09
+# Mapzimus Radar — 2026-11-10
 Daily scan of GitHub and Hugging Face, ranked for the lab: maps & GIS, browser data tools, generative design, math viz, teaching tools, games, and the Cloudflare/vanilla-JS stack.
 ## GitHub — relevant to the lab
 
-- [developmentseed/lonboard](https://github.com/developmentseed/lonboard) (Python · ★ 975) — Fast, interactive geospatial data visualization in Jupyter.
 - [eurostat/gridviz](https://github.com/eurostat/gridviz) (JavaScript · ★ 248) — A library for visualizing gridded data 🌐
-- [muimsd/map-gl-offline](https://github.com/muimsd/map-gl-offline) (TypeScript · ★ 31) — A TypeScript npm package for MapLibre GL JS and Mapbox GL JS to enable offline tiles.
-- [bilawalsidhu/gods-eye-view](https://github.com/bilawalsidhu/gods-eye-view) (JavaScript · ★ 63921) — A spy satellite simulator in your browser, except the data is real. Live open source spatial intelligence on a photorealistic 3D globe.
-- [CesiumGS/cesium](https://github.com/CesiumGS/cesium) (JavaScript · ★ 15933) — An open-source JavaScript library for world-class 3D globes and maps :earth_americas:
-- [visgl/deck.gl](https://github.com/visgl/deck.gl) (TypeScript · ★ 14743) — WebGL2 powered visualization framework
-- [mapbox/mapbox-gl-js](https://github.com/mapbox/mapbox-gl-js) (TypeScript · ★ 12472) — Interactive, thoroughly customizable maps in the browser, powered by vector tiles and WebGL
+- [dohoon84/bumpinto-world](https://github.com/dohoon84/bumpinto-world) (JavaScript · ★ 13 · 🆕 new) — Open-source 3D real-world metaverse built with Three.js, OpenStreetMap & Cloudflare Durable Objects (https://bumpinto.world)
+- [reearth/ezu](https://github.com/reearth/ezu) (Rust · ★ 18) — Painterly cartography — render MVT/PMTiles vector tiles as paintings (watercolor, ink wash, pencil sketch, …) on a pure-Rust GPU-free CPU renderer, with a typed node-DAG style language and first-class MapLibre compatibility
+- [bilawalsidhu/gods-eye-view](https://github.com/bilawalsidhu/gods-eye-view) (JavaScript · ★ 64110) — A spy satellite simulator in your browser, except the data is real. Live open source spatial intelligence on a photorealistic 3D globe.
+- [CesiumGS/cesium](https://github.com/CesiumGS/cesium) (JavaScript · ★ 15939) — An open-source JavaScript library for world-class 3D globes and maps :earth_americas:
+- [visgl/deck.gl](https://github.com/visgl/deck.gl) (TypeScript · ★ 14748) — WebGL2 powered visualization framework
+- [mapbox/mapbox-gl-js](https://github.com/mapbox/mapbox-gl-js) (TypeScript · ★ 12474) — Interactive, thoroughly customizable maps in the browser, powered by vector tiles and WebGL
 - [ianTPE/tetra-unfold](https://github.com/ianTPE/tetra-unfold) (HTML · ★ 84 · 🆕 new) — Seamless tetrahedral world map with a multi-stop flight trip planner in 9 languages. Also unfolds 360° photos for AI vision and drone attitude. 四面體世界地圖與出差航線規劃。
-- [meodai/heerich](https://github.com/meodai/heerich) (JavaScript · ★ 631) — Tiny engine for 3D voxel scenes rendered to SVG — boolean ops, oblique/perspective cameras, zero dependencies. Inspired by the geometric cardboard sculptures of Erwin Heerich.
-- [dekart-xyz/dekart](https://github.com/dekart-xyz/dekart) (JavaScript · ★ 438) — Open-source backend for Kepler.gl. Self-hosted alternative to CARTO and Foursquare Studio.
-- [timschmidt/csgrs](https://github.com/timschmidt/csgrs) (Rust · ★ 264) — Multi-modal exact geometric computation CAD/CAM kernel in Rust
-- [ingelibre/ingecad](https://github.com/ingelibre/ingecad) (Python · ★ 149) — Free 2D DWG/DXF CAD for Linux in the spirit of classic AutoCAD — keyboard drafting with acad.pgp aliases, faithful DWG round-trip, paper space and dimensions, plus surveying and terrain plugins (points, construction chart, contours, profiles, earthworks, UTM georeferencing, global DEM, satellite imagery, Google Earth KML)
+- [iTowns/itowns](https://github.com/iTowns/itowns) (JavaScript · ★ 1280) — A Three.js-based framework written in Javascript/WebGL for visualizing 3D geospatial data
+- [openglobus/openglobus](https://github.com/openglobus/openglobus) (TypeScript · ★ 951) — TypeScript/JavaScript 3D maps and geospatial data visualization engine library
+- [Universite-Gustave-Eiffel/NoiseModelling](https://github.com/Universite-Gustave-Eiffel/NoiseModelling) (Java · ★ 245) — An open-source model for calculating noise maps.
+- [NASA-AMMOS/MMGIS](https://github.com/NASA-AMMOS/MMGIS) (JavaScript · ★ 237) — Multi-Mission Geographic Information System - A Web-based Mapping and Spatial Data Infrastructure for Earth, Lunar and Planetary Visualization, Research, Science, Planning and Operations.
 - [eurostat/eurostat-map](https://github.com/eurostat/eurostat-map) (JavaScript · ★ 109) — Data-driven web maps based on D3 🗺️
-- [Aurtechmx/openlidarviewer](https://github.com/Aurtechmx/openlidarviewer) (TypeScript · ★ 29) — LiDAR and point-cloud viewer that runs in the browser. Open LAS, LAZ, E57, PLY, OBJ, glTF and PCD files, or stream COPC, EPT and 3D Tiles. Measure, classify, cut profiles, build terrain models and contours, compare epochs and export reports. Renders on WebGPU with a WebGL 2 fallback. Local files stay on your device.
+- [yashveeeeeeer/india-geodata](https://github.com/yashveeeeeeer/india-geodata) (Python · ★ 88) — Download India's open GIS data — district boundaries, electoral maps, census geometries, shapefiles, GeoJSON, Parquet. Includes India Map Maker, a free online map maker for India: spreadsheet in, state or district map out, no watermark.
 - [DougLau/earthwyrm](https://github.com/DougLau/earthwyrm) (Rust · ★ 28) — Vector tile maps in Rust
+- [hosseinnarimanirad/Maptor](https://github.com/hosseinnarimanirad/Maptor) (C# · ★ 22) — Maptor (MakanNegar): Open-source .NET GIS library for spatial data processing, analysis, and visualization
 - [AysanZ/alidade](https://github.com/AysanZ/alidade) (TypeScript · ★ 17) — Open-source Web-GIS: PostGIS vector tiles, satellite imagery, 3D models on terrain, and a live asset layer. No API keys.
+- [yahyabedirhan/topographic](https://github.com/yahyabedirhan/topographic) (TypeScript · ★ 9) — Topographic terrain rendered with WebGL. Generate a land or turn a real place into a topographic terrain.
 - [AtelierCartographie/khartis-v3](https://github.com/AtelierCartographie/khartis-v3) (TypeScript · ★ 6) — Outil de cartographie thématique open source. Sciences Po Atelier de cartographie
 - [palavido-dev/gratis-gis](https://github.com/palavido-dev/gratis-gis) (TypeScript · ★ 33) — Self-hosted, open source GIS portal: web maps, PostGIS data layers, forms, an app builder with dashboards, an offline field PWA, OGC APIs, and a QGIS plugin. PostGIS + MapLibre + Keycloak on Docker Compose.
-- [Leaflet/Leaflet](https://github.com/Leaflet/Leaflet) (JavaScript · ★ 45900) — 🍃 number one JavaScript library for interactive maps 🇺🇦
-- [organicmaps/organicmaps](https://github.com/organicmaps/organicmaps) (C++ · ★ 15919) — 🍃 Organic Maps is a free Android & iOS offline maps app for more than 12M travelers, tourists, hikers, and cyclists. It uses crowd-sourced OpenStreetMap data and is developed with love by the community. No ads, no tracking, no data collection, no crapware. Please donate to support the development!
 
 ## GitHub — trending everywhere (new this fortnight)
 
-- [storytold/craft-anything](https://github.com/storytold/craft-anything) (Rust · ★ 24348 · 🆕 new) — Craft Anything: understand how any software works, and craft your own.
-- [deepseek-ai/dsh-superagent-prototype](https://github.com/deepseek-ai/dsh-superagent-prototype) (TypeScript · ★ 21730 · 🆕 new) — Towards a More Autonomous Agent System
-- [heydamir/unslop](https://github.com/heydamir/unslop) (JavaScript · ★ 12715 · 🆕 new) — A Claude skill that turns vibecoded, AI-looking UI into a designed interface
-- [zortos293/Lichii](https://github.com/zortos293/Lichii) (C++ · ★ 7558 · 🆕 new) — VERY experimental Nintendo Switch 2 emulator
-- [valentderah/totk-pc-recomp](https://github.com/valentderah/totk-pc-recomp) (C · ★ 6173 · 🆕 new) — Static recompilation of The Legend of Zelda: Tears of the Kingdom to native Windows and Linux x86-64, with a Vulkan renderer. Game files not included.
-- [Minireel/HGhub](https://github.com/Minireel/HGhub) (TypeScript · ★ 5743 · 🆕 new) — YellowFruit third-party client
-- [Eglantine-Community/Eglantine](https://github.com/Eglantine-Community/Eglantine) (C++ · ★ 5631 · 🆕 new) — VERY experimental Nintendo Switch 2 emulator
-- [JuneYaooo/rea-video](https://github.com/JuneYaooo/rea-video) (Python · ★ 5441 · 🆕 new) — Reverse-engineer any video, shot by shot: filmed, AI-generated or coded, and how to remake it. 逆向一切视频，逐个镜头看是拍的、AI 生成的还是代码做的，再告诉你怎么复刻。
-- [NotRexed/Hookshot](https://github.com/NotRexed/Hookshot) (C++ · ★ 4838 · 🆕 new) — A Native Recompilation Of The Legend Of Zelda: Ocarina Of Time Nintendo Switch 2 Remake
-- [BryceYuuu/RUN](https://github.com/BryceYuuu/RUN) (Python · ★ 4355 · 🆕 new) — RUN · 润：中国护照持有人的海外移居手册。欧洲 36 国 110 条移民路线 + 13 个主要移民地区：数字游民签证、欧盟蓝卡、技术移民、留学转工作、创业自雇、投资居留，每条附官方来源，持续更新。
+- [storytold/craft-anything](https://github.com/storytold/craft-anything) (Rust · ★ 25997 · 🆕 new) — Craft Anything: understand how any software works, and craft your own.
+- [deepseek-ai/dsh-superagent-prototype](https://github.com/deepseek-ai/dsh-superagent-prototype) (TypeScript · ★ 22151 · 🆕 new) — Towards a More Autonomous Agent System
+- [heydamir/unslop](https://github.com/heydamir/unslop) (JavaScript · ★ 13597 · 🆕 new) — A Claude skill that turns vibecoded, AI-looking UI into a designed interface
+- [zortos293/Lichii](https://github.com/zortos293/Lichii) (C++ · ★ 8100 · 🆕 new) — VERY experimental Nintendo Switch 2 emulator
+- [Minireel/HGhub](https://github.com/Minireel/HGhub) (★ 8072 · 🆕 new) — YellowFruit third-party client
+- [valentderah/totk-pc-recomp](https://github.com/valentderah/totk-pc-recomp) (C · ★ 6381 · 🆕 new) — Static recompilation of The Legend of Zelda: Tears of the Kingdom to native Windows and Linux x86-64, with a Vulkan renderer. Game files not included.
+- [NotRexed/Hookshot](https://github.com/NotRexed/Hookshot) (C++ · ★ 6321 · 🆕 new) — A Native Recompilation Of The Legend Of Zelda: Ocarina Of Time Nintendo Switch 2 Remake
+- [JuneYaooo/rea-video](https://github.com/JuneYaooo/rea-video) (Python · ★ 6259 · 🆕 new) — Reverse-engineer any video, shot by shot: filmed, AI-generated or coded, and how to remake it. 逆向一切视频，逐个镜头看是拍的、AI 生成的还是代码做的，再告诉你怎么复刻。
+- [Eglantine-Community/Eglantine](https://github.com/Eglantine-Community/Eglantine) (C++ · ★ 5757 · 🆕 new) — VERY experimental Nintendo Switch 2 emulator
+- [anefzaoui/misterdownloadmanager](https://github.com/anefzaoui/misterdownloadmanager) (Rust · ★ 5383 · 🆕 new) — misterdownloadmanager: The ultimate open-source, clean-room download manager written from scratch in pure Rust for Windows, Mac, and Linux
 
 ## Hugging Face — models
 
-- [PrunaAI/P-H3-Image-Comfy](https://huggingface.co/PrunaAI/P-H3-Image-Comfy) (text-to-image · ♥ 264 · 704,467 dl) — ComfyUI files for P-H3-Image, based on MiniMax-H3
-- [Viggle/Viggle-Remake](https://huggingface.co/Viggle/Viggle-Remake) (video-to-video · ♥ 232 · 97,356 dl) — Remake any video. Just ask.
-- [PrunaAI/P-H3-Image](https://huggingface.co/PrunaAI/P-H3-Image) (text-to-image · ♥ 183 · 1,016 dl) — Image generation and editing based on MiniMax-H3
-- [ccore/Qwen3.5-4B-3D-Coder](https://huggingface.co/ccore/Qwen3.5-4B-3D-Coder) (♥ 948 · 289,466 dl) — Early preview · General coding with a focus on 3D
-- [Pika-Labs/Pika-H3-Flex](https://huggingface.co/Pika-Labs/Pika-H3-Flex) (image-to-video · ♥ 528 · 1,083 dl) — Built for professional iteration.
-- [FusionCow/Sulphur-3](https://huggingface.co/FusionCow/Sulphur-3) (♥ 426 · 1,022 dl)
-- [VideoRebirthAI/hyperflow-h3-flash](https://huggingface.co/VideoRebirthAI/hyperflow-h3-flash) (image-text-to-video · ♥ 131 · 64,221 dl) — By downloading or using these weights, you accept the MiniMax H3 Community License Agreement.
-- [Lightricks/LTX-2.5](https://huggingface.co/Lightricks/LTX-2.5) (image-to-video · ♥ 11254 · 2,720,096 dl)
+- [PrunaAI/P-H3-Image-Comfy](https://huggingface.co/PrunaAI/P-H3-Image-Comfy) (text-to-image · ♥ 281 · 782,946 dl) — ComfyUI files for P-H3-Image, based on MiniMax-H3
+- [Comfy-Org/MiniMax-H3-Image](https://huggingface.co/Comfy-Org/MiniMax-H3-Image) (text-to-image · ♥ 111 · 18 dl) — Repackaged model files for ComfyUI.
+- [MiniMaxAI/MiniMax-H3-Image](https://huggingface.co/MiniMaxAI/MiniMax-H3-Image) (text-to-image · ♥ 288 · 667 dl) — Use MiniMax-H3-Image directly via API.
+- [Viggle/Viggle-Remake](https://huggingface.co/Viggle/Viggle-Remake) (video-to-video · ♥ 260 · 115,384 dl) — Remake any video. Just ask.
+- [VideoRebirthAI/hyperflow-h3-flash](https://huggingface.co/VideoRebirthAI/hyperflow-h3-flash) (image-text-to-video · ♥ 166 · 110,752 dl) — By downloading or using these weights, you accept the MiniMax H3 Community License Agreement.
+- [PrunaAI/P-H3-Image](https://huggingface.co/PrunaAI/P-H3-Image) (text-to-image · ♥ 194 · 1,180 dl) — Image generation and editing based on MiniMax-H3
+- [MiniMaxAI/MiniMax-H3](https://huggingface.co/MiniMaxAI/MiniMax-H3) (image-text-to-video · ♥ 6720 · 6,440,305 dl) — Offical skills to improve prompt writing: skills on github
+- [ccore/Qwen3.5-4B-3D-Coder](https://huggingface.co/ccore/Qwen3.5-4B-3D-Coder) (♥ 968 · 319,405 dl) — Early preview · General coding with a focus on 3D
 
 ## Hugging Face — datasets
 
-- [Angais/pixel-art-atlas-1.4m](https://huggingface.co/datasets/Angais/pixel-art-atlas-1.4m) (♥ 211 · 9,427 dl) — Pixel Art Atlas · 1.4M Synthetic Sprites
-- [ccore/ThreeJS-3D-Scenes](https://huggingface.co/datasets/ccore/ThreeJS-3D-Scenes) (♥ 100 · 8,172 dl) — 4,146 high-quality 3D scene examples with prompts, full thinking traces, and complete HTML/JavaScript responses.
-- [ccore/ThreeJS-3D-GLB-Assets](https://huggingface.co/datasets/ccore/ThreeJS-3D-GLB-Assets) (♥ 24 · 2,046 dl) — CCORE Three.js 3D GLB Assets
-- [open-index/hacker-news](https://huggingface.co/datasets/open-index/hacker-news) (♥ 562 · 481,430 dl) — Hacker News - Complete Archive
-- [codepawl/abo-glb](https://huggingface.co/datasets/codepawl/abo-glb) (♥ 103 · 27,676 dl) — prettyname: Amazon Berkeley Objects GLB
-- [codepawl/scanned-objects-glb](https://huggingface.co/datasets/codepawl/scanned-objects-glb) (♥ 54 · 12,689 dl) — prettyname: Scanned Objects GLB
-- [scenario-labs/3d-collection](https://huggingface.co/datasets/scenario-labs/3d-collection) (♥ 394 · 45,687 dl) — 1,342 selected AI-generated 3D examples, with all 1,500 output files downloaded.
-- [codepawl/plateau-city-glb](https://huggingface.co/datasets/codepawl/plateau-city-glb) (♥ 38 · 5,638 dl) — licenselink: https://www.mlit.go.jp/plateau/site-policy/
+- [codepawl/pixel-atlas-glb](https://huggingface.co/datasets/codepawl/pixel-atlas-glb) (♥ 23 · 1,403 dl) — 6,194 Low-Poly 3D Pixel game objects built from the 6,194 subjects of Pixel Art Atlas (1.4M 16x16 sprites by Angais, CC0).
+- [Angais/pixel-art-atlas-1.4m](https://huggingface.co/datasets/Angais/pixel-art-atlas-1.4m) (♥ 309 · 30,689 dl) — Pixel Art Atlas · 1.4M Synthetic Sprites
+- [codepawl/abo-glb](https://huggingface.co/datasets/codepawl/abo-glb) (♥ 106 · 40,394 dl) — Amazon Berkeley Objects GLB
+- [ccore/ThreeJS-3D-Scenes](https://huggingface.co/datasets/ccore/ThreeJS-3D-Scenes) (♥ 104 · 8,923 dl) — 4,146 high-quality 3D scene examples with prompts, full thinking traces, and complete HTML/JavaScript responses.
+- [codepawl/scanned-objects-glb](https://huggingface.co/datasets/codepawl/scanned-objects-glb) (♥ 54 · 13,619 dl) — Web-ready glTF binary (.glb) copies of the 1,033 household products in
+- [codepawl/plateau-city-glb](https://huggingface.co/datasets/codepawl/plateau-city-glb) (♥ 40 · 8,039 dl) — PLATEAU Japan City Tiles as GLB
+- [codepawl/simready-glb](https://huggingface.co/datasets/codepawl/simready-glb) (♥ 81 · 30,540 dl) — Open the 3D viewer to search all 2,595 models and
+- [ccore/ThreeJS-3D-GLB-Assets](https://huggingface.co/datasets/ccore/ThreeJS-3D-GLB-Assets) (♥ 27 · 2,393 dl) — CCORE Three.js 3D GLB Assets
 
 ## Hugging Face — spaces
 
-- [wank3r/minimax-h3](https://huggingface.co/spaces/wank3r/minimax-h3) (♥ 336) — MiniMax-H3 — unquantized, split across two Spaces
-- [PrunaAI/P-H3-Image](https://huggingface.co/spaces/PrunaAI/P-H3-Image) (♥ 73) — and Edit modes with prompt upsampling, aspect-ratio and resolution controls (4 / 8 / 16 MP
-- [umaircxnd/MiniMax-H3-Turbo-Lora-UNCENSORED-Workflow](https://huggingface.co/spaces/umaircxnd/MiniMax-H3-Turbo-Lora-UNCENSORED-Workflow) (♥ 90) — MiniMax-H3 — unquantized, split across two Spaces
-- [Pika-Labs/pika-h3-flex](https://huggingface.co/spaces/Pika-Labs/pika-h3-flex) (♥ 96) — Pika H3 Flex — Pika's six-evaluation post-training of MiniMax-H3 (two rank-128 LoRA adapters,
-- [baka999/MiniMax-H3-Turbo-Lora-UNCENSORED](https://huggingface.co/spaces/baka999/MiniMax-H3-Turbo-Lora-UNCENSORED) (♥ 127)
-- [observantdistressed/minimax-h3-turbo](https://huggingface.co/spaces/observantdistressed/minimax-h3-turbo) (♥ 76)
-- [LiquidAI/LFM3-Omni-2B-WebGPU](https://huggingface.co/spaces/LiquidAI/LFM3-Omni-2B-WebGPU) (♥ 143)
-- [townbox/motionbricks-playground](https://huggingface.co/spaces/townbox/motionbricks-playground) (♥ 44)
+- [PrunaAI/P-H3-Image](https://huggingface.co/spaces/PrunaAI/P-H3-Image) (♥ 88) — and Edit modes with prompt upsampling, aspect-ratio and resolution controls (4 / 8 / 16 MP
+- [umaircxnd/MiniMax-H3-Turbo-Lora-UNCENSORED-Workflow](https://huggingface.co/spaces/umaircxnd/MiniMax-H3-Turbo-Lora-UNCENSORED-Workflow) (♥ 114) — MiniMax-H3 — unquantized, split across two Spaces
+- [wank3r/minimax-h3](https://huggingface.co/spaces/wank3r/minimax-h3) (♥ 344) — MiniMax-H3 — unquantized, split across two Spaces
+- [Pika-Labs/pika-h3-flex](https://huggingface.co/spaces/Pika-Labs/pika-h3-flex) (♥ 98) — Pika H3 Flex — Pika's six-evaluation post-training of MiniMax-H3 (two rank-128 LoRA adapters,
+- [baka999/MiniMax-H3-Turbo-Lora-UNCENSORED](https://huggingface.co/spaces/baka999/MiniMax-H3-Turbo-Lora-UNCENSORED) (♥ 132)
+- [observantdistressed/minimax-h3-turbo](https://huggingface.co/spaces/observantdistressed/minimax-h3-turbo) (♥ 78)
+- [LiquidAI/LFM3-Omni-2B-WebGPU](https://huggingface.co/spaces/LiquidAI/LFM3-Omni-2B-WebGPU) (♥ 149)
 
 ## Hugging Face — trending everywhere
 
-- [speridlabs/idol](https://huggingface.co/speridlabs/idol) (image-to-3d · ♥ 1607 · 24,747 dl)
-- [xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic](https://huggingface.co/xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic) (text-generation · ♥ 1030 · 11,755 dl)
-- [moonshotai/Kimi-K3.1-Pro](https://huggingface.co/moonshotai/Kimi-K3.1-Pro) (image-text-to-text · ♥ 1792 · 27,926 dl)
-- [huggingface/moe-blogpost](https://huggingface.co/spaces/huggingface/moe-blogpost) (♥ 462)
-- [ricursiveAI/Ripple-65B-Preview](https://huggingface.co/ricursiveAI/Ripple-65B-Preview) (♥ 448 · 5,835 dl)
-- [DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NEO-CODER-MAX-MTP-GGUF](https://huggingface.co/DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NEO-CODER-MAX-MTP-GGUF) (image-text-to-text · ♥ 2771 · 1,530,688 dl)
-- [Qwen/Qwen3.8-27B](https://huggingface.co/Qwen/Qwen3.8-27B) (image-text-to-text · ♥ 19484 · 7,508,158 dl)
-- [NousResearch/Arete-27B](https://huggingface.co/NousResearch/Arete-27B) (text-generation · ♥ 358 · 2,407 dl)
+- [speridlabs/idol](https://huggingface.co/speridlabs/idol) (image-to-3d · ♥ 1827 · 26,470 dl)
+- [xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic](https://huggingface.co/xtools-at/DeepSeek-V4-Pro-Qwen3.5-9B-UNCENSORED-heretic) (text-generation · ♥ 1163 · 14,378 dl)
+- [moonshotai/Kimi-K3.1-Pro](https://huggingface.co/moonshotai/Kimi-K3.1-Pro) (image-text-to-text · ♥ 1856 · 30,721 dl)
+- [huggingface/moe-blogpost](https://huggingface.co/spaces/huggingface/moe-blogpost) (♥ 519)
+- [ricursiveAI/Ripple-65B-Preview](https://huggingface.co/ricursiveAI/Ripple-65B-Preview) (♥ 475 · 6,480 dl)
+- [NousResearch/Arete-27B](https://huggingface.co/NousResearch/Arete-27B) (text-generation · ♥ 390 · 3,431 dl)
+- [DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NEO-CODER-MAX-MTP-GGUF](https://huggingface.co/DavidAU/Qwen3.8-27B-TURBO-Fable-Cold-Fusion-735-882-Heretic-Uncensored-NEO-CODER-MAX-MTP-GGUF) (image-text-to-text · ♥ 2829 · 1,459,029 dl)
+- [Qwen/Qwen3.8-27B](https://huggingface.co/Qwen/Qwen3.8-27B) (image-text-to-text · ♥ 19557 · 7,443,748 dl)
 
 ## Hacker News — relevant to the lab
 
-- [We compressed a 31B video+audio diffusion model to 14B, 6 steps, INT8](https://github.com/Video-Rebirth/hyperflow-h3-flash) (▲ 82 · [14 comments](https://news.ycombinator.com/item?id=50405263) · Show HN)
-- [JavaScript web apps with WASM layout and GPU rendering in 280 KB](https://github.com/rkaehn/uniform) (▲ 45 · [21 comments](https://news.ycombinator.com/item?id=50401844) · Show HN)
+- [We compressed a 31B video+audio diffusion model to 14B, 6 steps, INT8](https://github.com/Video-Rebirth/hyperflow-h3-flash) (▲ 83 · [14 comments](https://news.ycombinator.com/item?id=50405263) · Show HN)
+- [JavaScript web apps with WASM layout and GPU rendering in 280 KB](https://github.com/rkaehn/uniform) (▲ 46 · [23 comments](https://news.ycombinator.com/item?id=50401844) · Show HN)
 
 ## Hacker News — front page
 
-- [Coldframe, a honeypot that poses as a supermarket fridge controller](https://github.com/hedgerow-dev/coldframe) (▲ 285 · [68 comments](https://news.ycombinator.com/item?id=50406292) · Show HN)
-- [Every satellite that passed over any place this week, and its photos](https://www.watched.earth) (▲ 161 · [33 comments](https://news.ycombinator.com/item?id=50428907) · Show HN)
-- [Flide: Make Jev-like decision models up to 9.5x faster](https://github.com/OmniJev/Flide) (▲ 116 · [27 comments](https://news.ycombinator.com/item?id=50421155) · Show HN)
-- [DBDelve – Open-Source DB Client Made with Rust and GPUI](https://news.ycombinator.com/item?id=50427934) (▲ 81 · [30 comments](https://news.ycombinator.com/item?id=50427934) · Show HN)
-- [Claude Fable 5.2 and Mythos 5.2](https://www.anthropic.com/claude-fable-and-mythos-5-2) (▲ 776 · [453 comments](https://news.ycombinator.com/item?id=50429906))
-- [Fold Epic Paper Airplanes](https://www.foldableflight.com) (▲ 763 · [129 comments](https://news.ycombinator.com/item?id=50424581))
-- [Is Opus 5.5 nerfed? Thinking patterns changed on November 3](https://twitter.com/shanemelaugh/status/2119192075505893695) (▲ 668 · [438 comments](https://news.ycombinator.com/item?id=50422069))
-- [MeowDisplay Is iPhone Mirroring, but in Reverse](https://meowdisplay.app/) (▲ 56 · [22 comments](https://news.ycombinator.com/item?id=50429636) · Show HN)
-- [Where Were We](https://wherewerewe.app/) (▲ 56 · [19 comments](https://news.ycombinator.com/item?id=50408082) · Show HN)
-- [Payments Canada announces launch of Canada's Real-Time Rail (RTR) payment system](https://www.payments.ca/canada-launches-real-time-rail-bringing-247-payment-infrastructure-national-economy) (▲ 425 · [231 comments](https://news.ycombinator.com/item?id=50427362))
+- [Every satellite that passed over any place this week, and its photos](https://www.watched.earth) (▲ 440 · [79 comments](https://news.ycombinator.com/item?id=50428907) · Show HN)
+- [Coldframe, a honeypot that poses as a supermarket fridge controller](https://github.com/hedgerow-dev/coldframe) (▲ 288 · [69 comments](https://news.ycombinator.com/item?id=50406292) · Show HN)
+- [A 15 MB self-hosted Netflix and Spotify for your media server](https://github.com/HolyArrs/HolyArrs) (▲ 158 · [125 comments](https://news.ycombinator.com/item?id=50439000) · Show HN)
+- [Flide: Make Jev-like decision models up to 9.5x faster](https://github.com/OmniJev/Flide) (▲ 124 · [29 comments](https://news.ycombinator.com/item?id=50421155) · Show HN)
+- [DBDelve – Open-Source DB Client Made with Rust and GPUI](https://news.ycombinator.com/item?id=50427934) (▲ 119 · [47 comments](https://news.ycombinator.com/item?id=50427934) · Show HN)
+- [MeowDisplay Is iPhone Mirroring, but in Reverse](https://meowdisplay.app/) (▲ 114 · [44 comments](https://news.ycombinator.com/item?id=50429636) · Show HN)
+- [Someone Was Here – Find out who used your Mac while you were away](https://someonewashere.app/) (▲ 112 · [42 comments](https://news.ycombinator.com/item?id=50429812) · Show HN)
+- [STE80 Humanizer – de-AI text by writing 80% of the way to ASD-STE100](https://github.com/Dodaios/ste80-humanizer) (▲ 104 · [38 comments](https://news.ycombinator.com/item?id=50429144) · Show HN)
+- [Valencia, Spain in Sim City/Isometric View](https://tinyvalencia.com/) (▲ 103 · [29 comments](https://news.ycombinator.com/item?id=50441518) · Show HN)
+- [Ghanaian street games you can play in the browser](https://www.ghanastreetgames.com/) (▲ 98 · [18 comments](https://news.ycombinator.com/item?id=50414117) · Show HN)
 
 ## Papers
 
-- [PREEN: Exemplar-Based Color Style Transfer with Smartphone Editor Presets](https://huggingface.co/papers/2610.36896) (▲ 4) — We present PREEN (Preset Regression via an Exemplar-based Editor Network), which casts color style transfer as regression onto the 29 parameters of a deterministic image editor.
-- [PCBRouteAgent: How Close Are LLM Agents to Becoming PCB Routing Engineers?](https://huggingface.co/papers/2611.08175) (▲ 23) — Automating printed circuit board (PCB) routing requires coordinating board-level connectivity decisions with geometric execution under strict design rules.
-- [OmniLatent: Unified Latent for 3D Part Modeling](https://huggingface.co/papers/2611.09055) (▲ 3) — 3D part decomposition is a central capability for editable asset creation, yet existing workflows typically segment a completed mesh as a post-processing step, making the result sensitive to geometric
-- [Video-Coder: Reinforcing Agentic Coding for Video Generation](https://huggingface.co/papers/2611.09894) (▲ 16) — Recent years have witnessed remarkable progress in video generation in terms of visual quality and temporal consistency.
-- [Muir: Linear Attention with Sensitivity-Allocated Gating and Matched-Filter Readout](https://huggingface.co/papers/2611.08376) (▲ 13) — Linear attention compresses context into a fixed-size key-value state for linear-time training and constant-memory inference.
-- [Signed but Steerable: Measuring and Closing the Text-Vector Integrity Gap in Offline Retrieval-Augmented Generation](https://huggingface.co/papers/2611.06498) (▲ 5) — Offline retrieval-augmented generation (RAG) on edge devices is updated through signed knowledge packs that carry text and precomputed embedding vectors.
-- [SplatAnything: Gaussian Spacing Normalization for Feed-forward 3DGS across Arbitrary Scenes](https://huggingface.co/papers/2611.08264) (▲ 60) — We identify a key limitation of existing feed-forward 3DGS methods: Gaussian attributes are typically predicted in a radial-distance-normalized space that canonicalizes a global radial statistic of th
-- [TailSteer: Trajectory-Tail Steering for Drift-Resistant Multi-turn Image Editing](https://huggingface.co/papers/2611.06741) (▲ 41) — Strong single-turn editing performance does not guarantee reliable multi-turn interaction: as edited outputs are repeatedly reused, small unintended changes can accumulate into severe visual drift.
-- [EvoWorld: Towards Out-of-Sight World Evolution in Generative Video Models](https://huggingface.co/papers/2611.06748) (▲ 19) — Generative video models are increasingly used as visual world simulators, yet their primary strength lies in rendering plausible pixels rather than reasoning about how a world should evolve.
-- [Frontier3DBench: Benchmarking Coding Agents for 3D Creation across Objects, Scenes, and Interactive Open Worlds](https://huggingface.co/papers/2611.09017) (▲ 9) — Coding agents combine visual understanding with program execution, offering a new route to automated 3D creation.
+- [RidgeFill: Training-Free Late-Layer Cache Fill for Faster Prefill](https://huggingface.co/papers/2611.09709) (▲ 2) — RidgeFill shortens prefill by not computing most of a model's upper layers for the prompt.
+- [FlyHash for LLM Agent Memory: An Empirical Validation and a New Application](https://huggingface.co/papers/2611.05791) (▲ 5) — Large language model (LLM) agents increasingly rely on external memory stores to retain information across conversations, typically via dense vector embeddings searched with approximate nearest-neighbor methods.
+- [onóna: Twin Embeddings with Tied Unembeddings](https://huggingface.co/papers/2611.10556) (▲ 2) — Weight tying reduces the parameter cost of language models, but the usual tied output head is limited to a single softmax.
+- [PCBRouteAgent: How Close Are LLM Agents to Becoming PCB Routing Engineers?](https://huggingface.co/papers/2611.08175) (▲ 40) — Automating printed circuit board (PCB) routing requires coordinating board-level connectivity decisions with geometric execution under strict design rules.
+- [Stochastic Deep Supervision for Gallery-Consistent Early-Exit Face Recognition](https://huggingface.co/papers/2611.09987) (▲ 2) — Vision Transformers (ViTs) perform strongly in face recognition (FR), yet their fixed-depth inference limits deployment in resource-constrained settings.
+- [Learning Heterogeneous Tactile Representation for General Dexterous Manipulation](https://huggingface.co/papers/2611.12806) (▲ 92) — Tactile sensing is an indispensable modality for contact-rich dexterous manipulation, a capability that hints at the ultimate frontiers of embodied intelligence.
+- [WorldFoundry: Towards Unified Infrastructure for World Intelligence](https://huggingface.co/papers/2611.10771) (▲ 52) — Visual generative models increasingly blur the line between synthesizing observations and simulating environments.
+- [InfraRSI: Harnessing Recursive Self-Improvement for Training Infrastructure](https://huggingface.co/papers/2611.11558) (▲ 14) — While Recursive Self-Improvement (RSI) accelerates isolated algorithm and kernel synthesis, distributed LLM training depends on tightly coupled launch settings, operator kernels, and communication sch
+- [SIRIS: Can LLMs Tell When Simulation Errors Matter in AI-Driven Systems Research](https://huggingface.co/papers/2611.10329) (▲ 12) — LLM agents increasingly drive systems research and rely on simulators to evaluate candidate designs at scale.
+- [How Much Training-Inference Mismatch Can On-Policy Distillation Tolerate?](https://huggingface.co/papers/2611.11450) (▲ 11) — On-policy distillation (OPD) trains a student language model on its own responses, guided by a fixed teacher.
 
 ## arXiv — fresh and relevant
 
-- [Flow-Guided Target-Space Alignment via Path Consistency](http://arxiv.org/abs/2611.09863v1) — Many multimodal alignment problems require mapping a source modality into a fixed space defined by a target modality, where the target space is not merely an intermediate embedding but is used directl
-- [Super-resolved digital terrain models for GEDI geolocation correction: agreement with airborne LiDAR DTM-based corrections at the beam level, not the footprint level](http://arxiv.org/abs/2611.09854v1) — The Global Ecosystem Dynamics Investigation (GEDI) mission measures three-dimensional forest structure with a LiDAR aboard the International Space Station.
-- [Embedding Predictive Adaptation and Refinement for Multi-Modal Industrial Anomaly Detection](http://arxiv.org/abs/2611.09521v1) — Industrial Anomaly Detection (IAD) has evolved from 2D image-based approaches to multi-modal methods that leverage the complementary nature of RGB images and 3D point clouds.
-- [AdaptivePnP: Fast Auto-Tuned Plug-and-Play for Deconvolution](http://arxiv.org/abs/2611.09845v1) — Plug-and-play (PnP) methods reconstruct images by alternating a data-fitting step with an image denoiser.
-- [Overview of the ImageCLEFmedical 2026 GANs task: Exploring fingerprint detection, privacy leakage, and synthetic medical image generation](http://arxiv.org/abs/2611.09455v1) — The 2026 ImageCLEFmedical GANs Task Exploring Fingerprint Detection, Privacy Leakage, and Synthetic Medical Image Generation continues to investigate privacy and security concerns around using patient
-- [Video-Coder: Reinforcing Agentic Coding for Video Generation](http://arxiv.org/abs/2611.09894v1) — Recent years have witnessed remarkable progress in video generation in terms of visual quality and temporal consistency.
-- [Assessing the Impact of Retrieval-Augmented Generation on Algorithmic Problem-Solving](http://arxiv.org/abs/2611.09791v1) — Competitive programming problems pose distinctive challenges for Large Language Models, as they demand not only proficient code generation but also advanced algorithmic reasoning.
-- [The Role Of Recurrent Refinement In Medical Image Segmentation](http://arxiv.org/abs/2611.09436v1) — While feed-forward segmentation networks perform well on large cohorts, they degrade in constrained clinical settings with few training samples and imaging artifacts.
+- [National-Scale Crop Type Mapping in Morocco Using Google AlphaEarth Foundations Embeddings and the Fields of the World Field Boundary Map](http://arxiv.org/abs/2611.12681v1) — Recent geospatial foundation models have introduced a new paradigm for large-scale Earth observation by providing pretrained embedding representations that can be directly exploited for downstream tasks.
+- [Spaghetti Splatting: Differentiating Curvilinear Dirac Masses via Convolution](http://arxiv.org/abs/2611.12716v1) — In production systems, 3D geometry is represented by primitives such as points, lines, and triangles, as rendering hardware is optimized to generate images from them very efficiently.
+- [V3DSAM: Semantic-Geometric Loop Verification and Geometry-Anchored Persistent Instance Mapping for Feed-Forward Dense SLAM](http://arxiv.org/abs/2611.12452v1) — To address unreliable cross-view association in long-sequence feed-forward dense SLAM, this letter presents V3DSAM, an open-vocabulary semantic dense SLAM system that establishes physical corresponden
+- [GeoScope: Training-Free Program Execution beyond the Counting Horizon for Ultra-High-Resolution Remote Sensing Question Answering](http://arxiv.org/abs/2611.12699v1) — In ultra-high-resolution (UHR) remote sensing images, the objects that questions count in a region or relate by direction often span only a few pixels.
+- [TMT: Adapting CLIP to Infrared Imagery via Text-Derived Modality Knowledge Transfer](http://arxiv.org/abs/2611.12345v1) — Vision-language models such as CLIP achieve strong performance across computer vision tasks, yet their image-text alignment is less reliable for infrared (IR) imagery because large-scale pre-training 
+- [World In-Context Learning for Agentic Robot Manipulation](http://arxiv.org/abs/2611.12885v1) — Trained action policies write manipulation skill into network weights, tying what is learned to the distribution it is learned from.
+- [Grasping the Future: Joint 3D Hand-Object Forecasting From Internet Videos](http://arxiv.org/abs/2611.12879v1) — To interact with an object, we need to anticipate both how it will move and how our hands should move with it.
+- [AI-based characterization of lymphoid structures and the tumor microenvironment reveals lower mature tertiary lymphoid structures, lymph-node follicles, and plasma cells after neoadjuvant therapy in lung squamous cell carcinoma](http://arxiv.org/abs/2611.12855v1) — Mature, germinal centre-bearing tertiary lymphoid structures (TLS) and mature lymph node follicles (secondary lymphoid structures, SLS) sustain the plasma cell response that shapes outcome and immunot
 
 ## itch.io — new browser games
 
-- [Paper Game [Free] [Other]](https://dulllamp.itch.io/paper-game)
-- [Häxlarm [Free] [Action]](https://arekku.itch.io/hxlarm-prototype) — Keep the turbine spinning
-- [Droschke Hubble [Free] [Shooter] [Windows]](https://producciones-marte.itch.io/droschke-hubble) — ¡Lleva el contrabando a las estrellas!
-- [motorcycle [Free]](https://xvibyt.itch.io/motorcycle) — a simple game about driving a motorcycle
-- [First Rain [Free] [Strategy]](https://cy-3lo.itch.io/first-rain) — One dead island. Two arks. Three ways to win. Shape land and water, and let life spread on its own.
-- [Puppy Trainer: Clicker Training Game [Free] [Simulation]](https://jinnilab.itch.io/puppy-trainer) — Raise a puppy and teach it 35 tricks with real clicker-training timing.
-- [Killer Complex [Free] [Role Playing]](https://joshmoon1512.itch.io/killer-complex) — He has your wife. He's watching your every move. Deliver the packages, and hack him before he finds out.
-- [Fusion chess [Free] [Other]](https://corterz.itch.io/fusion-chess)
-- [Leash Line: Dog Tangle Puzzle [Free] [Puzzle]](https://jinnilab.itch.io/leash-line) — Untangle a pile of puppy leashes and send every pup out for a walk, one tap at a time.
+- [Earth ReGen [Free] [Simulation]](https://disagreeg.itch.io/earth-regen) — Wire machines together and bring a dead planet back. A factory-building incremental.
+- [Idlecraft [Free] [Action] [Windows]](https://nearlydonegames.itch.io/idlecraft) — A cozy Voxel-themed idle incremental. Hover to mine, upgrade, repeat.
+- [Logo Idle [Free] [Simulation]](https://brainfog-games.itch.io/logo-idle)
+- [How to date a Sleep Paralysis Demon- Part 2(Demo) [Free] [Visual Novel]](https://sfour-s4.itch.io/how-to-date-a-sleep-paralysis-demon)
+- [Supermarket Spree DX [Free] [Puzzle]](https://pacdude.itch.io/supermarket-spree-dx) — Go wild in the aisles in this fun retro throwback!
+- [Season Shift [Free] [Puzzle]](https://emlise.itch.io/seasonshift) — Shift the world
+- [guesthour [Free] [Role Playing] [Windows]](https://mymadnessworks.itch.io/guesthour) — It is good etiquette to honor your guest
+- [Dating Killmulator [Free] [Visual Novel] [Windows] [macOS] [Linux] [Android]](https://coolom-games.itch.io/datingkillmulator) — A comedy dating sim about a serial killer, a popular guy, and a psychologist.
+- [Eco Power Towns [Free] [Puzzle]](https://crevasse.itch.io/eco-power-towns) — A cozy game about green energy
