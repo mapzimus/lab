@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-10
+# Mapzimus Geospatial Radar — 2026-11-11
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [The Hills are Alive with the Sound of Music](http://googlemapsmania.blogspot.com/2026/11/the-hills-are-alive-with-sound-of-music.html)
 - [Contoured Fuji](http://googlemapsmania.blogspot.com/2026/11/contoured-fuji.html)
 - [Has a Satellite Been Watching You?](http://googlemapsmania.blogspot.com/2026/11/has-satellite-been-watching-you.html)
 - [Blowing in the Wind](http://googlemapsmania.blogspot.com/2026/11/blowing-in-wind.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Axis Maps Contours](http://googlemapsmania.blogspot.com/2026/11/axis-maps-contours.html)
 - [Noah's Ark found on Vintage Maps](http://googlemapsmania.blogspot.com/2026/11/noahs-ark-found-on-vintage-maps.html)
 - [Collect Birds, Not Beers](http://googlemapsmania.blogspot.com/2026/11/collect-birds-not-beers.html)
-- [Can You See the Fire Beacon?](http://googlemapsmania.blogspot.com/2026/11/can-you-see-fire-beacon.html)
 
 ## Geography Realm
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Developer/Debugging tools write to external file in QGIS](https://gis.stackexchange.com/questions/501699/developer-debugging-tools-write-to-external-file-in-qgis) (▲ 1 · 1 answers)
+- [Why is there a difference in parcel area measurements when using the QFIELD tool (with errors) versus a differential GPS (DGPS)?](https://gis.stackexchange.com/questions/501713/why-is-there-a-difference-in-parcel-area-measurements-when-using-the-qfield-tool) (▲ 0 · 0 answers)
+- [Some projections produce strange results in QGIS](https://gis.stackexchange.com/questions/501705/some-projections-produce-strange-results-in-qgis) (▲ 3 · 2 answers)
+- [Features from GDB file all disappear when one is selected in QGIS](https://gis.stackexchange.com/questions/501707/features-from-gdb-file-all-disappear-when-one-is-selected-in-qgis) (▲ 2 · 1 answers)
+- [Defining class Property in QGIS plugin](https://gis.stackexchange.com/questions/501706/defining-class-property-in-qgis-plugin) (▲ 1 · 0 answers)
+- [Developer/Debugging tools write to external file in QGIS](https://gis.stackexchange.com/questions/501699/developer-debugging-tools-write-to-external-file-in-qgis) (▲ 2 · 1 answers)
+- [How to measure points along a line and add that in the attribute table](https://gis.stackexchange.com/questions/501703/how-to-measure-points-along-a-line-and-add-that-in-the-attribute-table) (▲ 2 · 1 answers)
 - [QGIS Error: Column type not supported using v.surf.idw, v.surf.rst,](https://gis.stackexchange.com/questions/501697/qgis-error-column-type-not-supported-using-v-surf-idw-v-surf-rst) (▲ 2 · 0 answers)
 - [ArcGIS Pro failing to listFields() of layers within Group Layer](https://gis.stackexchange.com/questions/501687/arcgis-pro-failing-to-listfields-of-layers-within-group-layer) (▲ 4 · 1 answers)
 - [QGIS 4.2.3 in r.stream.extract there is no longer the option of creating the stream in vector polylines, only option is the points](https://gis.stackexchange.com/questions/501686/qgis-4-2-3-in-r-stream-extract-there-is-no-longer-the-option-of-creating-the-str) (▲ 0 · 0 answers)
-- [I use Google Maps images](https://gis.stackexchange.com/questions/501692/i-use-google-maps-images) (▲ -4 · 0 answers)
 - [Saving geographical map as HTML with R](https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r) (▲ 4 · 1 answers)
-- [Share board QGIS](https://gis.stackexchange.com/questions/501691/share-board-qgis) (▲ 1 · 0 answers)
-- [OSRM for two far-apart cities: one merged graph + one speed file, or two instances?](https://gis.stackexchange.com/questions/501685/osrm-for-two-far-apart-cities-one-merged-graph-one-speed-file-or-two-instanc) (▲ 0 · 1 answers)
-- [QGIS layout export returns Could not transform bounding box for geocentric CRS EPSG:7658](https://gis.stackexchange.com/questions/501681/qgis-layout-export-returns-could-not-transform-bounding-box-for-geocentric-crs-e) (▲ 1 · 0 answers)
-- [Seeking WMS/WMTS basemap alternative to Carto Positron](https://gis.stackexchange.com/questions/501675/seeking-wms-wmts-basemap-alternative-to-carto-positron) (▲ 0 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [SEAC4RS DC-8 Aircraft In-Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_TraceGas_AircraftInSitu_DC8_Data) — SEAC4RS_TraceGas_AircraftInSitu_DC8_Data are in-situ trace gas data collected onboard the DC8 aircraft during the Studies of Emissions and Atmospheric Compos…
-- [SEAC4RS DC-8 Aircraft In-Situ Photolysis Rate Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_jValue_AircraftInSitu_DC8_Data) — SEAC4RS_jValue_AircraftInSitu_DC8_Data are in-situ photolysis rate (j value) data collected onboard the DC8 aircraft during the Studies of Emissions and Atmo…
-- [SEAC4RS ER-2 Aircraft In-Situ Radiation Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_Radiation_AircraftInSitu_ER2_Data) — SEAC4RS_Radiation_AircraftInSitu_ER2_Data are in-situ radiation data collected onboard the ER-2 aircraft during the Studies of Emissions and Atmospheric Comp…
-- [SEAC4RS DC-8 Aircraft In-Situ Radiation Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_Radiation_AircraftInSitu_DC8_Data) — SEAC4RS_Radiation_AircraftInSitu_DC8_Data are in-situ radiation data collected onboard the DC8 aircraft during the Studies of Emissions and Atmospheric Compo…
-- [SEAC4RS ER-2 Aircraft In-Situ Meteorological and Navigational Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_MetNav_AircraftInSitu_ER2_Data) — SEAC4RS_MetNav_AircraftInSitu_ER2_Data are in-situ meteorological and navigational data collected onboard the ER-2 aircraft during the Studies of Emissions a…
-- [SEAC4RS ER-2 Aircraft In-Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_TraceGas_AircraftInSitu_ER2_Data) — SEAC4RS_TraceGas_AircraftInSitu_ER2_Data are in-situ trace gas data collected onboard the ER-2 aircraft during the Studies of Emissions and Atmospheric Compo…
-- [SEAC4RS DC-8 Aircraft In-Situ Meteorological and Navigational Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_MetNav_AircraftInSitu_DC8_Data) — SEAC4RS_MetNav_AircraftInSitu_DC8_Data are in-situ meteorological and navigation data collected onboard the DC8 aircraft during the Studies of Emissions and…
-- [SEAC4RS DC-8 Aircraft Miscellaneous Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_Miscellaneous_DC8_Data) — SEAC4RS_Miscellaneous_AircraftInSitu_DC8_Data are miscellaneous ancillary data collected onboard the DC8 aircraft during the Studies of Emissions and Atmosph…
-- [SEAC4RS Radiosonde/Ozonesonde Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_Sondes_Data) — SEAC4RS_Sondes_Data are data collected via ozonesonde and radiosonde launches at ground locations in Houston, TX, Idabel, OK, Ellington, TX, Boulder, CO, Smi…
-- [SEAC4RS ER-2 Aircraft Miscellaneous Data](https://search.earthdata.nasa.gov/search?q=SEAC4RS_Miscellaneous_ER2_Data) — SEAC4RS_Miscellaneous_ER2_Data are miscellaneous ancillary data collected onboard the ER-2 aircraft during the Studies of Emissions and Atmospheric Compositi…
+- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
+- [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
+- [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
+- [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
 
 ## Data.gov — new geodata
 

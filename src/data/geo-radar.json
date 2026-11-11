@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-11-10",
+  "generatedAt": "2026-11-11",
   "news": {
     "mapsmania": [
+      {
+        "title": "The Hills are Alive with the Sound of Music",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/the-hills-are-alive-with-sound-of-music.html",
+        "desc": ""
+      },
       {
         "title": "Contoured Fuji",
         "url": "http://googlemapsmania.blogspot.com/2026/11/contoured-fuji.html",
@@ -35,11 +40,6 @@
       {
         "title": "Collect Birds, Not Beers",
         "url": "http://googlemapsmania.blogspot.com/2026/11/collect-birds-not-beers.html",
-        "desc": ""
-      },
-      {
-        "title": "Can You See the Fire Beacon?",
-        "url": "http://googlemapsmania.blogspot.com/2026/11/can-you-see-fire-beacon.html",
         "desc": ""
       }
     ],
@@ -210,9 +210,39 @@
   ],
   "gisse": [
     {
+      "title": "Why is there a difference in parcel area measurements when using the QFIELD tool (with errors) versus a differential GPS (DGPS)?",
+      "url": "https://gis.stackexchange.com/questions/501713/why-is-there-a-difference-in-parcel-area-measurements-when-using-the-qfield-tool",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Some projections produce strange results in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501705/some-projections-produce-strange-results-in-qgis",
+      "score": 3,
+      "answers": 2
+    },
+    {
+      "title": "Features from GDB file all disappear when one is selected in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501707/features-from-gdb-file-all-disappear-when-one-is-selected-in-qgis",
+      "score": 2,
+      "answers": 1
+    },
+    {
+      "title": "Defining class Property in QGIS plugin",
+      "url": "https://gis.stackexchange.com/questions/501706/defining-class-property-in-qgis-plugin",
+      "score": 1,
+      "answers": 0
+    },
+    {
       "title": "Developer/Debugging tools write to external file in QGIS",
       "url": "https://gis.stackexchange.com/questions/501699/developer-debugging-tools-write-to-external-file-in-qgis",
-      "score": 1,
+      "score": 2,
+      "answers": 1
+    },
+    {
+      "title": "How to measure points along a line and add that in the attribute table",
+      "url": "https://gis.stackexchange.com/questions/501703/how-to-measure-points-along-a-line-and-add-that-in-the-attribute-table",
+      "score": 2,
       "answers": 1
     },
     {
@@ -234,102 +264,72 @@
       "answers": 0
     },
     {
-      "title": "I use Google Maps images",
-      "url": "https://gis.stackexchange.com/questions/501692/i-use-google-maps-images",
-      "score": -4,
-      "answers": 0
-    },
-    {
       "title": "Saving geographical map as HTML with R",
       "url": "https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r",
       "score": 4,
       "answers": 1
-    },
-    {
-      "title": "Share board QGIS",
-      "url": "https://gis.stackexchange.com/questions/501691/share-board-qgis",
-      "score": 1,
-      "answers": 0
-    },
-    {
-      "title": "OSRM for two far-apart cities: one merged graph + one speed file, or two instances?",
-      "url": "https://gis.stackexchange.com/questions/501685/osrm-for-two-far-apart-cities-one-merged-graph-one-speed-file-or-two-instanc",
-      "score": 0,
-      "answers": 1
-    },
-    {
-      "title": "QGIS layout export returns Could not transform bounding box for geocentric CRS EPSG:7658",
-      "url": "https://gis.stackexchange.com/questions/501681/qgis-layout-export-returns-could-not-transform-bounding-box-for-geocentric-crs-e",
-      "score": 1,
-      "answers": 0
-    },
-    {
-      "title": "Seeking WMS/WMTS basemap alternative to Carto Positron",
-      "url": "https://gis.stackexchange.com/questions/501675/seeking-wms-wmts-basemap-alternative-to-carto-positron",
-      "score": 0,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "SEAC4RS DC-8 Aircraft In-Situ Trace Gas Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SEAC4RS_TraceGas_AircraftInSitu_DC8_Data",
-      "desc": "SEAC4RS_TraceGas_AircraftInSitu_DC8_Data are in-situ trace gas data collected onboard the DC8 aircraft during the Studies of Emissions and Atmospheric Compos…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
+      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "SEAC4RS DC-8 Aircraft In-Situ Photolysis Rate Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SEAC4RS_jValue_AircraftInSitu_DC8_Data",
-      "desc": "SEAC4RS_jValue_AircraftInSitu_DC8_Data are in-situ photolysis rate (j value) data collected onboard the DC8 aircraft during the Studies of Emissions and Atmo…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
+      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "SEAC4RS ER-2 Aircraft In-Situ Radiation Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SEAC4RS_Radiation_AircraftInSitu_ER2_Data",
-      "desc": "SEAC4RS_Radiation_AircraftInSitu_ER2_Data are in-situ radiation data collected onboard the ER-2 aircraft during the Studies of Emissions and Atmospheric Comp…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
+      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "SEAC4RS DC-8 Aircraft In-Situ Radiation Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SEAC4RS_Radiation_AircraftInSitu_DC8_Data",
-      "desc": "SEAC4RS_Radiation_AircraftInSitu_DC8_Data are in-situ radiation data collected onboard the DC8 aircraft during the Studies of Emissions and Atmospheric Compo…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
+      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "SEAC4RS ER-2 Aircraft In-Situ Meteorological and Navigational Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SEAC4RS_MetNav_AircraftInSitu_ER2_Data",
-      "desc": "SEAC4RS_MetNav_AircraftInSitu_ER2_Data are in-situ meteorological and navigational data collected onboard the ER-2 aircraft during the Studies of Emissions a…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
+      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "SEAC4RS ER-2 Aircraft In-Situ Trace Gas Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SEAC4RS_TraceGas_AircraftInSitu_ER2_Data",
-      "desc": "SEAC4RS_TraceGas_AircraftInSitu_ER2_Data are in-situ trace gas data collected onboard the ER-2 aircraft during the Studies of Emissions and Atmospheric Compo…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
+      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "SEAC4RS DC-8 Aircraft In-Situ Meteorological and Navigational Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SEAC4RS_MetNav_AircraftInSitu_DC8_Data",
-      "desc": "SEAC4RS_MetNav_AircraftInSitu_DC8_Data are in-situ meteorological and navigation data collected onboard the DC8 aircraft during the Studies of Emissions and…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL03LL",
+      "desc": "ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "SEAC4RS DC-8 Aircraft Miscellaneous Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SEAC4RS_Miscellaneous_DC8_Data",
-      "desc": "SEAC4RS_Miscellaneous_AircraftInSitu_DC8_Data are miscellaneous ancillary data collected onboard the DC8 aircraft during the Studies of Emissions and Atmosph…",
-      "org": "LARC_CLOUD"
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Version 3",
+      "org": "ASF"
     },
     {
-      "title": "SEAC4RS Radiosonde/Ozonesonde Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SEAC4RS_Sondes_Data",
-      "desc": "SEAC4RS_Sondes_Data are data collected via ozonesonde and radiosonde launches at ground locations in Houston, TX, Idabel, OK, Ellington, TX, Boulder, CO, Smi…",
-      "org": "LARC_CLOUD"
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Data Quality Information Version 3",
+      "org": "ASF"
     },
     {
-      "title": "SEAC4RS ER-2 Aircraft Miscellaneous Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SEAC4RS_Miscellaneous_ER2_Data",
-      "desc": "SEAC4RS_Miscellaneous_ER2_Data are miscellaneous ancillary data collected onboard the ER-2 aircraft during the Studies of Emissions and Atmospheric Compositi…",
-      "org": "LARC_CLOUD"
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Metadata Version 3",
+      "org": "ASF"
     }
   ],
   "datagov": [
