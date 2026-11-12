@@ -22,10 +22,17 @@ jobs:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: node scripts/radar.mjs
+      - name: Video stats snapshot
+        continue-on-error: true
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: node scripts/video-stats.mjs
       - name: Commit digest
         run: |
           git config user.name "mapzimus-radar[bot]"
           git config user.email "actions@github.com"
-          git add radar/ src/data/radar.json src/data/geo-radar.json
+          git add radar/ src/data/radar.json src/data/geo-radar.json src/data/video-stats.json
           git diff --cached --quiet || git commit -m "Radar digest $(date -u +%F)"
           git push
