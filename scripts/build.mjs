@@ -65,6 +65,7 @@ const hostedProjectRoutes = {
   "orbit-to-street": "/lab/orbit-to-street/",
   "population-globe": "/lab/population-globe/",
   "hurricane-globe": "/lab/hurricane-globe/",
+  "life-expectancy-globe": "/lab/life-expectancy-globe/",
   "category-five": "/c5/",
   optitrek: "/optitrek/",
   appalachians: "/appalachians/",
