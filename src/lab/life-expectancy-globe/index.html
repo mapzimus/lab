@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Life Expectancy Globe · Mapzimus Lab</title>
+  <meta name="description" content="Life expectancy at birth in 2026 for 237 countries and territories on a 3D globe, with the years each has gained since 1950.">
+  <link rel="canonical" href="https://mapzimus.com/lab/life-expectancy-globe/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Life Expectancy Globe · Mapzimus Lab">
+  <meta property="og:description" content="Life expectancy at birth in 2026 for 237 countries and territories on a 3D globe, with the years each has gained since 1950.">
+  <meta property="og:url" content="https://mapzimus.com/lab/life-expectancy-globe/">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#070a12">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/lab/life-expectancy-globe/styles.css">
+  <script src="/lab/life-expectancy-globe/vendor/three.min.js" defer></script>
+  <script src="/lab/life-expectancy-globe/vendor/OrbitControls.js" defer></script>
+  <script src="/lab/life-expectancy-globe/app.js" defer></script>
+</head>
+<body>
+<div id="stage"></div>
+
+<aside class="sheet" id="sheet">
+  <a class="back" href="/lab/">← Lab</a>
+  <header>
+    <div>
+      <div class="eyebrow">Life expectancy at birth · 2026</div>
+      <h1 class="display-narrow">How long the world lives</h1>
+    </div>
+    <button id="toggle" aria-expanded="true">Hide</button>
+  </header>
+  <p class="lede">A baby born in 2026 can expect <strong id="world-le"></strong> years, <strong id="world-gain"></strong> more than one born in 1950. Drag to spin, scroll to zoom, hover or tap a country.</p>
+
+  <div class="group">
+    <div class="eyebrow">Colour by</div>
+    <div class="seg" role="group" aria-label="Metric">
+      <button id="m-le" aria-pressed="true">Years in 2026</button>
+      <button id="m-gain" aria-pressed="false">Gain since 1950</button>
+    </div>
+    <div class="ramp" id="ramp"></div>
+    <div class="ticks" id="ticks"></div>
+    <p class="note"><i class="sw nodata"></i>No figure in the table. Dots are places too small to see as a shape.</p>
+  </div>
+
+  <div class="group" id="card" hidden>
+    <div class="eyebrow" id="card-rank"></div>
+    <div class="card-name" id="card-name"></div>
+    <div class="card-nums">
+      <div><span class="big" id="card-le"></span><span class="note">years in 2026</span></div>
+      <div><span class="big" id="card-gain"></span><span class="note">since 1950</span></div>
+    </div>
+    <p class="note" id="card-vs"></p>
+  </div>
+
+  <div class="group">
+    <label class="eyebrow" for="filter" id="list-title">Ranked</label>
+    <input id="filter" placeholder="Filter countries" autocomplete="off">
+    <ol class="rank" id="rank"></ol>
+  </div>
+
+  <p class="foot">Data: United Nations, <a href="https://population.un.org/wpp/" target="_blank" rel="noopener">World Population Prospects 2024</a>. 2026 figures are medium projections and 1950 figures are estimates, as tabulated by <a href="https://www.visualcapitalist.com/" target="_blank" rel="noopener">Visual Capitalist</a>. Borders: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> 50m.</p>
+</aside>
+
+<div id="tip" hidden></div>
+</body>
+</html>
