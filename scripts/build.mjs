@@ -446,7 +446,22 @@ for (const [key, page] of Object.entries(pages)) {
   const browseClass = isHome ? "browse browse-home" : "browse";
   // The stat tiles under the intro link to Maps, Games, and Tools, so the hero
   // needs no second set of buttons for the same three tabs.
-  const heroActions = "";
+  const heroActions = isHome
+    ? `<p class="nerta-hero"><a href="https://nerta.fun/">nerta.fun</a> — cosplaying the MBTA's successor in the future →</p>`
+    : "";
+  const nertaStop = `<a href="https://nerta.fun/">nerta.fun</a><span aria-hidden="true">●</span><span>cosplaying the MBTA's successor in the future</span><span aria-hidden="true">●</span>`;
+  const nertaStrip = isHome
+    ? `<div class="nerta-strip" role="note" aria-label="nerta.fun"><div class="nerta-track">${nertaStop.repeat(8)}</div></div>`
+    : "";
+  const nertaBand = isHome
+    ? `<section class="nerta-band" aria-labelledby="nertaHeading">
+      <div>
+        <h2 id="nertaHeading">nerta.fun</h2>
+        <p>Cosplaying the MBTA's successor in the future.</p>
+      </div>
+      <a class="nerta-link" href="https://nerta.fun/">Ride NERTA →</a>
+    </section>`
+    : "";
   let html = template
     .replaceAll("{{VIEW}}", view)
     .replaceAll("{{CATEGORY}}", page.category || "")
@@ -462,6 +477,9 @@ for (const [key, page] of Object.entries(pages)) {
     .replaceAll("{{HEADING}}", page.heading)
     .replaceAll("{{INTRO}}", page.intro)
     .replaceAll("{{HERO_ACTIONS}}", heroActions)
+    .replaceAll("{{NERTA_STRIP}}", nertaStrip)
+    .replaceAll("{{NERTA_BAND}}", nertaBand)
+    .replaceAll("{{NERTA_FOOTER}}", isHome ? ` <a href="https://nerta.fun/">nerta.fun</a>` : "")
     .replaceAll("{{CATALOG_HEADING}}", page.catalogHeading)
     .replaceAll("{{RESULT_COUNT}}", isHome ? "" : `${items.length} ${items.length === 1 ? "item" : "items"}`)
     .replaceAll("{{FILTERS}}", isHome ? "" : filtersHtml(view, page.category || ""))
