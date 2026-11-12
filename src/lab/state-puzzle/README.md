@@ -19,9 +19,16 @@ Everything runs in the browser (`puzzle.js`), on a raster grid at 2.5 km/px:
    and the whole coast gets a final closing so inlets under 120 km fill in.
    Enclosed gaps under 5,000 km² silt up; bigger ones become lakes. This runs
    at half resolution with the distance field interpolated back up.
-4. The result is painted as paper on water, cities drawn on top, and the
-   player's ink is scored against the state outlines that ended up inland.
-   Coasts and lake shores are free.
+4. The land gets fictional relief (height from distance to the sea plus
+   fractal noise, hillshaded, coloured hypsometrically) and the water a
+   shallows ramp. That raster is wrapped onto an Earth-sized three.js planet
+   through a Lambert azimuthal equal-area projection centred on the
+   continent, done per fragment in the shader, so areas stay true.
+5. Ink is drawn straight onto the globe (ray-sphere hit, projected back into
+   the raster) and scored against the state outlines that ended up inland.
+   Coasts and lake shores are free. Cities are screen-space labels.
+
+three.js r147 is vendored in `vendor/` (same files as Population Globe).
 
 `?seed=…` fixes the landmass (the default is today's date, so everyone gets
 the same one each day); `&rot=1` lets pieces turn.
