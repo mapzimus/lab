@@ -9,7 +9,8 @@
  *      against the boundary of what is already there.
  *   3. The union is "closed" (dilate, then erode) to heal the narrow cracks.
  *      Enclosed gaps become land when small and lakes when large.
- *   4. The result is painted as paper on water; cities are drawn on top.
+ *   4. The result gets fictional relief and is wrapped onto a planet with
+ *      three.js; ink is drawn straight onto the globe.
  */
 (() => {
   "use strict";
@@ -30,8 +31,7 @@
   const INF = 1e9;       // "no feature": far beyond any squared distance on the grid
 
   const $ = (id) => document.getElementById(id);
-  const landC = $("land"), resultC = $("result"), marksC = $("marks"), inkC = $("ink");
-  const frame = $("frame"), statusEl = $("status");
+  const statusEl = $("status");
 
   // ---------------------------------------------------------------- random
   function hashSeed(str) {
@@ -507,94 +507,286 @@
       shrink = next;
     }
 
-    // The land layer: paper with a dark hairline coast, transparent water.
-    const img = new ImageData(vw, vh);
-    const px = img.data;
-    for (let i = 0; i < vw * vh; i++) {
+
+    return { W, H, view, lv, land, nearWater, lakeCount, landKm2: landArea * KM * KM };
+  }
+
+  // ---------------------------------------------------------------- terrain
+  // The continent is fictional, so its relief is too: height rises with
+  // distance from the sea and is broken up by fractal noise, then hillshaded
+  // and coloured hypsometrically. Water gets a shallows ramp out to deep sea.
+  const DEEP = [20, 52, 92];
+  function terrain(w, salt) {
+    const { view, lv } = w, vw = view.w, vh = view.h, N = vw * vh;
+    const dl = Float32Array.from(edt(lv, vw, vh, 0));   // land: squared px to water
+    const dw = edt(lv, vw, vh, 1);                       // water: squared px to land
+    const hash = (x, y) => {
+      let h = Math.imul(x, 374761393) + Math.imul(y, 668265263) + salt | 0;
+      h = Math.imul(h ^ (h >>> 13), 1274126177);
+      return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+    };
+    const vnoise = (x, y) => {
+      const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi;
+      const u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
+      const a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);
+      return (a + (b - a) * u) * (1 - v) + (c + (d - c) * u) * v;
+    };
+    const fbm = (x, y) => {
+      let s = 0, a = 0.5, f = 1;
+      for (let o = 0; o < 5; o++) { s += a * vnoise(x * f, y * f); f *= 2.03; a *= 0.5; }
+      return s / 0.97;
+    };
+    const ht = new Float32Array(N), wet = new Float32Array(N);
+    for (let y = 0; y < vh; y++) for (let x = 0; x < vw; x++) {
+      const i = y * vw + x;
       if (!lv[i]) continue;
-      const o = i * 4;
-      if (hairline[i]) { px[o] = 122; px[o + 1] = 104; px[o + 2] = 74; }
-      else { px[o] = 232; px[o + 1] = 222; px[o + 2] = 196; }
-      px[o + 3] = 255;
+      const d = Math.sqrt(dl[i]);
+      const n = fbm(x / 140, y / 140);
+      const ridge = 1 - Math.abs(2 * fbm(x / 70 + 31.7, y / 70 - 12.3) - 1);
+      const inland = 1 - Math.exp(-d / 45);
+      ht[i] = Math.max(0, Math.min(1, inland * (0.15 + 0.75 * n * n * 1.6 + 0.35 * ridge * ridge * n)));
+      wet[i] = fbm(x / 260 + 100, y / 260 + 100) + 0.25 * Math.exp(-d / 30);
     }
-    return { W, H, view, img, land, nearWater, lakeCount, landKm2: landArea * KM * KM };
+    const STOPS = [
+      [0.00, [104, 140, 82]], [0.12, [122, 150, 88]], [0.28, [160, 164, 104]],
+      [0.45, [178, 150, 100]], [0.62, [150, 118, 86]], [0.80, [126, 104, 88]],
+      [0.92, [196, 192, 186]], [1.00, [242, 242, 240]],
+    ];
+    const ramp = (t, out) => {
+      let k = 0; while (k < STOPS.length - 2 && t > STOPS[k + 1][0]) k++;
+      const [t0, c0] = STOPS[k], [t1, c1] = STOPS[k + 1];
+      const f = Math.max(0, Math.min(1, (t - t0) / (t1 - t0)));
+      for (let j = 0; j < 3; j++) out[j] = c0[j] + (c1[j] - c0[j]) * f;
+    };
+    const L = [-0.55, -0.6, 0.58], c = [0, 0, 0];
+    const data = new Uint8Array(N * 4);
+    for (let y = 0; y < vh; y++) for (let x = 0; x < vw; x++) {
+      const i = y * vw + x, o = i * 4;
+      if (lv[i]) {
+        ramp(ht[i], c);
+        // Dry interiors go ochre, wet ones stay green.
+        const dry = Math.max(0, Math.min(1, (0.55 - wet[i]) * 2.2)) * (1 - Math.min(1, ht[i] * 1.4));
+        c[0] += (196 - c[0]) * dry * 0.55; c[1] += (170 - c[1]) * dry * 0.55; c[2] += (118 - c[2]) * dry * 0.55;
+        const hx = (ht[Math.min(i + 1, i - x + vw - 1)] - ht[Math.max(i - 1, i - x)]) * 14;
+        const hy = (ht[Math.min(i + vw, N - vw + x)] - ht[Math.max(i - vw, x)]) * 14;
+        const nl = Math.hypot(hx, hy, 1);
+        const shade = (-hx * L[0] - hy * L[1] + L[2]) / nl;
+        const k = 0.62 + 0.62 * shade;
+        const beach = Math.sqrt(dl[i]) < 1.6 ? 0.5 : 0;
+        for (let j = 0; j < 3; j++) data[o + j] = Math.max(0, Math.min(255, (c[j] + ([214, 200, 160][j] - c[j]) * beach) * k));
+        data[o + 3] = 255;
+      } else {
+        const d = Math.sqrt(dw[i]);
+        const t = Math.pow(Math.min(1, d / 26), 0.7);
+        const foam = d < 1.5 ? 0.35 : 0;
+        const sh = [86, 168, 178];
+        for (let j = 0; j < 3; j++) {
+          const v = sh[j] + (DEEP[j] - sh[j]) * t;
+          data[o + j] = v + (235 - v) * foam;
+        }
+        data[o + 3] = 0;
+      }
+    }
+    return data;
+  }
+
+  // ------------------------------------------------------------------ globe
+  // The continent sits on an Earth-sized planet through a Lambert azimuthal
+  // equal-area projection centred on it, so areas stay true. The fragment
+  // shader projects every point of the sphere into the raster to sample it.
+  const T = window.THREE;
+  const glC = $("globe"), labC = $("labels");
+  const renderer = new T.WebGLRenderer({ canvas: glC, antialias: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  const scene = new T.Scene();
+  const camera = new T.PerspectiveCamera(32, 1, 0.001, 200);
+  const controls = new T.OrbitControls(camera, glC);
+  controls.enableDamping = true; controls.dampingFactor = 0.12;
+  controls.enablePan = false; controls.minDistance = 1.06; controls.maxDistance = 7;
+
+  const LAT0 = 18 * D2R, LON0 = -28 * D2R;
+  const vC = new T.Vector3(Math.cos(LAT0) * Math.sin(LON0), Math.sin(LAT0), Math.cos(LAT0) * Math.cos(LON0));
+  const vE = new T.Vector3(Math.cos(LON0), 0, -Math.sin(LON0));
+  const vN = new T.Vector3(-Math.sin(LAT0) * Math.sin(LON0), Math.cos(LAT0), -Math.sin(LAT0) * Math.cos(LON0));
+  const PX_PER_RAD = R_EARTH / KM;
+
+  const blank = new T.DataTexture(new Uint8Array(4), 1, 1); blank.needsUpdate = true;
+  const overC = document.createElement("canvas");
+  let overTex = new T.CanvasTexture(overC);
+  const uniforms = {
+    uLand: { value: blank }, uOver: { value: overTex },
+    uC: { value: vC }, uE: { value: vE }, uN: { value: vN },
+    uSize: { value: new T.Vector2(1, 1) }, uScale: { value: PX_PER_RAD },
+    uSun: { value: new T.Vector3(-0.45, 0.55, 0.7).normalize() },
+    uDeep: { value: new T.Vector3(DEEP[0] / 255, DEEP[1] / 255, DEEP[2] / 255) },
+  };
+  const planet = new T.Mesh(new T.SphereGeometry(1, 192, 96), new T.ShaderMaterial({
+    uniforms,
+    vertexShader: `
+      varying vec3 vPos; varying vec3 vNrm; varying vec3 vView;
+      void main() {
+        vPos = position;
+        vNrm = normalize(normalMatrix * normal);
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vView = -mv.xyz;
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform sampler2D uLand; uniform sampler2D uOver;
+      uniform vec3 uC; uniform vec3 uE; uniform vec3 uN; uniform vec3 uSun; uniform vec3 uDeep;
+      uniform vec2 uSize; uniform float uScale;
+      varying vec3 vPos; varying vec3 vNrm; varying vec3 vView;
+      float h3(vec3 p) { return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }
+      float n3(vec3 p) {
+        vec3 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(mix(h3(i), h3(i + vec3(1,0,0)), f.x), mix(h3(i + vec3(0,1,0)), h3(i + vec3(1,1,0)), f.x), f.y),
+                   mix(mix(h3(i + vec3(0,0,1)), h3(i + vec3(1,0,1)), f.x), mix(h3(i + vec3(0,1,1)), h3(i + vec3(1,1,1)), f.x), f.y), f.z);
+      }
+      void main() {
+        vec3 p = normalize(vPos);
+        float swell = n3(p * 6.0) * 0.6 + n3(p * 17.0) * 0.4;
+        vec3 col = uDeep * (0.82 + 0.3 * swell);
+        float land = 0.0;
+        float cosc = dot(p, uC);
+        if (cosc > -0.2) {
+          float k = sqrt(2.0 / (1.0 + cosc));
+          vec2 uv = vec2(0.5 + k * dot(p, uE) * uScale / uSize.x, 0.5 - k * dot(p, uN) * uScale / uSize.y);
+          if (uv.x > 0.0 && uv.y > 0.0 && uv.x < 1.0 && uv.y < 1.0) {
+            vec4 t = texture2D(uLand, uv);
+            vec2 e = min(uv, 1.0 - uv) * uSize;
+            float f = smoothstep(0.0, 14.0, min(e.x, e.y));
+            col = mix(col, t.rgb, f);
+            land = t.a * f;
+            vec4 o = texture2D(uOver, uv);
+            col = mix(col, o.rgb, o.a);
+          }
+        }
+        vec3 n = normalize(vNrm), v = normalize(vView);
+        float diff = max(dot(n, uSun), 0.0);
+        col *= 0.42 + 0.78 * diff;
+        vec3 hv = normalize(uSun + v);
+        col += vec3(1.0, 0.96, 0.85) * pow(max(dot(n, hv), 0.0), 140.0) * 0.18 * (1.0 - land);
+        float fres = pow(1.0 - max(dot(n, v), 0.0), 2.6);
+        col = mix(col, vec3(0.45, 0.68, 1.0), fres * 0.4);
+        gl_FragColor = vec4(col, 1.0);
+      }`,
+  }));
+  scene.add(planet);
+
+  // Atmosphere: a back-facing shell that glows at the limb.
+  scene.add(new T.Mesh(new T.SphereGeometry(1.06, 96, 48), new T.ShaderMaterial({
+    side: T.BackSide, blending: T.AdditiveBlending, transparent: true, depthWrite: false,
+    vertexShader: `varying vec3 vN; varying vec3 vV;
+      void main() { vN = normalize(normalMatrix * normal); vec4 mv = modelViewMatrix * vec4(position, 1.0); vV = normalize(-mv.xyz); gl_Position = projectionMatrix * mv; }`,
+    fragmentShader: `varying vec3 vN; varying vec3 vV;
+      void main() { float r = 1.0 - abs(dot(vN, vV)); float i = pow(smoothstep(0.0, 1.0, r * 1.02), 6.0) * 0.9; gl_FragColor = vec4(vec3(0.35, 0.62, 1.0) * i, i); }`,
+  })));
+
+  // Stars.
+  {
+    const n = 2400, pos = new Float32Array(n * 3), rng = mulberry32(7);
+    for (let i = 0; i < n; i++) {
+      const z = rng() * 2 - 1, a = rng() * Math.PI * 2, r = Math.sqrt(1 - z * z);
+      pos.set([r * Math.cos(a) * 90, z * 90, r * Math.sin(a) * 90], i * 3);
+    }
+    const g = new T.BufferGeometry(); g.setAttribute("position", new T.BufferAttribute(pos, 3));
+    scene.add(new T.Points(g, new T.PointsMaterial({ color: 0xbfd0ff, size: 1.3, sizeAttenuation: false, transparent: true, opacity: 0.7 })));
+  }
+
+  const inkGroup = new T.Group(); scene.add(inkGroup);
+  const inkMat = new T.MeshBasicMaterial({ color: 0xff3b5c, side: T.DoubleSide, polygonOffset: true, polygonOffsetFactor: -4 });
+
+  // Raster (view px) <-> sphere.
+  function toSphere(x, y, r = 1, out = new T.Vector3()) {
+    const X = (x - world.view.w / 2) / PX_PER_RAD, Y = -(y - world.view.h / 2) / PX_PER_RAD;
+    const rho = Math.hypot(X, Y);
+    if (rho < 1e-12) return out.copy(vC).multiplyScalar(r);
+    const c = 2 * Math.asin(Math.min(1, rho / 2)), s = Math.sin(c) / rho;
+    return out.copy(vC).multiplyScalar(Math.cos(c)).addScaledVector(vE, X * s).addScaledVector(vN, Y * s).multiplyScalar(r);
+  }
+  function toRaster(p) {
+    const cosc = p.dot(vC); if (cosc < -0.5) return null;
+    const k = Math.sqrt(2 / (1 + cosc));
+    return [world.view.w / 2 + k * p.dot(vE) * PX_PER_RAD, world.view.h / 2 - k * p.dot(vN) * PX_PER_RAD];
   }
 
   // ------------------------------------------------------------------ state
   let STATES = null, CITIES = null;
-  let world = null;      // { pieces, W, H, view, img, ... }
-  let strokes = [];      // arrays of [x, y] in view grid coords
+  let world = null;      // { pieces, W, H, view, lv, ... }
+  let strokes = [];      // { pts: [[x, y], …] in view grid coords, w, mesh }
   let current = null;
   let revealed = false;
-  let lastCheck = null;
+  let lastCheck = null;  // ImageData of the verdict, view-sized
   let seed = "", rotate = false;
+  let cities3 = [], abbr3 = [];
+  let mode = "draw", spaceHeld = false;
+  let labelsDirty = true;
 
   function setStatus(msg) { statusEl.textContent = msg; statusEl.hidden = !msg; }
 
   async function generate() {
     setStatus("Assembling the continent…");
     $("new").disabled = true;
-    await new Promise((r) => setTimeout(r, 20));
+    await new Promise((r) => setTimeout(r, 30));
     const rng = mulberry32(hashSeed(seed + (rotate ? "|rot" : "")));
     const t0 = performance.now();
     const pieces = STATES.map((st) => buildPiece(st, rotate ? rng() * Math.PI * 2 : 0));
-    const t1 = performance.now();
     let order;
     try { order = pack(pieces, rng); }
     catch (e) { console.error(e); setStatus("That one would not fit. Try another landmass."); $("new").disabled = false; return; }
-    const t2 = performance.now();
     const w = assemble(order);
-    console.debug(`state-puzzle: pieces ${(t1 - t0) | 0} ms, pack ${(t2 - t1) | 0} ms, assemble ${(performance.now() - t2) | 0} ms`);
     world = { ...w, pieces: order };
-    strokes = []; lastCheck = null; revealed = false;
+    const tex = terrain(w, hashSeed(seed));
+    console.debug(`state-puzzle: ${w.view.w}×${w.view.h} px, built in ${(performance.now() - t0) | 0} ms`);
+
+    const max = renderer.capabilities.maxTextureSize;
+    if (w.view.w > max || w.view.h > max) console.warn("state-puzzle: land texture exceeds GPU limit");
+    if (uniforms.uLand.value !== blank) uniforms.uLand.value.dispose();
+    const lt = new T.DataTexture(tex, w.view.w, w.view.h, T.RGBAFormat);
+    lt.magFilter = T.LinearFilter; lt.minFilter = T.LinearMipmapLinearFilter; lt.generateMipmaps = true;
+    lt.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    lt.needsUpdate = true;
+    uniforms.uLand.value = lt;
+    uniforms.uSize.value.set(w.view.w, w.view.h);
+    const os = Math.min(2, 4096 / Math.max(w.view.w, w.view.h));
+    overC.width = Math.round(w.view.w * os); overC.height = Math.round(w.view.h * os);
+    overC.scale = os;
+    overTex.dispose();   // a texture cannot change size once uploaded
+    overTex = new T.CanvasTexture(overC);
+    overTex.flipY = false;   // raster rows run top-down, like the land texture
+    uniforms.uOver.value = overTex;
+
+    clearInk(); lastCheck = null; revealed = false;
     $("reveal").setAttribute("aria-pressed", "false");
     $("numbers").hidden = true;
-    frame.style.aspectRatio = `${w.view.w} / ${w.view.h}`;
-    paintLand(w);
-    resultC.width = w.view.w; resultC.height = w.view.h;
-    resultC.getContext("2d").clearRect(0, 0, w.view.w, w.view.h);
+    cities3 = [];
+    for (const p of order) for (const c of CITIES[p.st.abbr] || []) {
+      const [gx, gy] = cityPoint(p, c);
+      cities3.push({ pos: toSphere(gx, gy), name: c[0], capital: c[3] === 1 });
+    }
+    cities3.sort((a, b) => b.capital - a.capital);
+    abbr3 = order.map((p) => ({ pos: toSphere(p.cx + p.fx - w.view.x0, p.cy + p.fy - w.view.y0), name: p.st.abbr }));
+    drawOverlay();
+    frameCamera(w);
+
     $("seed-label").textContent = seed + (rotate ? " (rotated)" : "");
-    $("meta").textContent = `${(w.landKm2 / 1e6).toFixed(2)} million km² of land · ${w.lakeCount} lake${w.lakeCount === 1 ? "" : "s"} · built in ${((performance.now() - t0) / 1000).toFixed(1)} s`;
+    $("meta").textContent = `${(w.landKm2 / 1e6).toFixed(2)} M km² · ${w.lakeCount} lake${w.lakeCount === 1 ? "" : "s"}`;
     await document.fonts.load("600 12px Archivo").catch(() => {});
-    layout();
+    labelsDirty = true;
     setStatus("");
     $("new").disabled = false;
   }
 
-  // ---------------------------------------------------------------- drawing
-  function paintLand(w) {
-    const { view, img } = w;
-    landC.width = view.w; landC.height = view.h;
-    const ctx = landC.getContext("2d");
-    ctx.fillStyle = "#94b6cc";
-    ctx.fillRect(0, 0, view.w, view.h);
-    const layer = document.createElement("canvas");
-    layer.width = view.w; layer.height = view.h;
-    layer.getContext("2d").putImageData(img, 0, 0);
-    // Shallows: the land, blurred and faded, lightens the water along the coast.
-    if ("filter" in ctx) {
-      ctx.save();
-      ctx.filter = "blur(7px)";
-      ctx.globalAlpha = 0.55;
-      ctx.drawImage(layer, 0, 0);
-      ctx.restore();
-    }
-    ctx.drawImage(layer, 0, 0);
-  }
-  function screenScale() {
-    const rect = frame.getBoundingClientRect();
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    return { rect, dpr, k: (rect.width * dpr) / world.view.w };
-  }
-  function sizeCanvas(c, rect, dpr) {
-    const w = Math.round(rect.width * dpr), h = Math.round(rect.height * dpr);
-    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
-  }
-  function layout() {
-    if (!world) return;
-    const { rect, dpr } = screenScale();
-    sizeCanvas(marksC, rect, dpr); sizeCanvas(inkC, rect, dpr);
-    drawMarks(); drawInk();
+  function frameCamera(w) {
+    const half = Math.max(w.view.w, w.view.h) / 2 / PX_PER_RAD;
+    const a = Math.min(1.3, half);
+    const fov = camera.fov * D2R / 2;
+    const fit = Math.min(Math.tan(fov), Math.tan(fov) * camera.aspect) * 0.78;
+    const d = Math.cos(a) + Math.sin(a) / fit;
+    camera.position.copy(vC).multiplyScalar(Math.max(1.6, d));
+    camera.up.set(0, 1, 0);
+    controls.target.set(0, 0, 0);
+    controls.update();
   }
 
   function cityPoint(p, city) {
@@ -602,125 +794,196 @@
     return [x - p.ox + p.fx - world.view.x0, y - p.oy + p.fy - world.view.y0];
   }
 
-  function drawMarks() {
-    const { dpr, k } = screenScale();
-    const ctx = marksC.getContext("2d");
-    ctx.clearRect(0, 0, marksC.width, marksC.height);
-
-    if (revealed) {
-      ctx.save();
-      ctx.scale(k, k);
-      ctx.lineWidth = 1.4 / k * dpr;
-      ctx.strokeStyle = "rgba(60, 40, 20, 0.85)";
-      ctx.setLineDash([4 / k * dpr, 3 / k * dpr]);
+  // Overlay texture: the verdict and the revealed borders, in raster space.
+  function drawOverlay() {
+    const ctx = overC.getContext("2d"), s = overC.scale;
+    ctx.clearRect(0, 0, overC.width, overC.height);
+    if (lastCheck) {
+      const tmp = document.createElement("canvas"); tmp.width = lastCheck.width; tmp.height = lastCheck.height;
+      tmp.getContext("2d").putImageData(lastCheck, 0, 0);
+      ctx.drawImage(tmp, 0, 0, overC.width, overC.height);
+    }
+    if (revealed && world) {
+      ctx.save(); ctx.scale(s, s);
+      const rings = new Path2D();
       for (const p of world.pieces) {
-        ctx.beginPath();
         const tx = p.fx - world.view.x0 - p.ox, ty = p.fy - world.view.y0 - p.oy;
         for (const pts of p.rings) {
           if (ringArea(pts) < MIN_RING) continue;
-          ctx.moveTo(pts[0] + tx, pts[1] + ty);
-          for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i] + tx, pts[i + 1] + ty);
-          ctx.closePath();
+          rings.moveTo(pts[0] + tx, pts[1] + ty);
+          for (let i = 2; i < pts.length; i += 2) rings.lineTo(pts[i] + tx, pts[i + 1] + ty);
+          rings.closePath();
         }
-        ctx.stroke();
       }
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 3; ctx.strokeStyle = "rgba(15, 20, 30, 0.45)"; ctx.stroke(rings);
+      ctx.lineWidth = 1.5; ctx.strokeStyle = "rgba(255, 244, 210, 0.95)"; ctx.setLineDash([6, 3]); ctx.stroke(rings);
       ctx.restore();
-      ctx.font = `700 ${12 * dpr}px Archivo, sans-serif`;
+    }
+    overTex.needsUpdate = true;
+    labelsDirty = true;
+  }
+
+  // Screen-space labels: cities, plus state abbreviations when revealed.
+  const vtmp = new T.Vector3(), vcam = new T.Vector3();
+  function drawLabels() {
+    const dpr = renderer.getPixelRatio();
+    const W = labC.width, H = labC.height;
+    const ctx = labC.getContext("2d");
+    ctx.clearRect(0, 0, W, H);
+    if (!world) return;
+    const project = (pos) => {
+      vcam.copy(camera.position).sub(pos).normalize();
+      if (vcam.dot(pos) < 0.12) return null;
+      vtmp.copy(pos).project(camera);
+      if (vtmp.z > 1) return null;
+      return [(vtmp.x + 1) / 2 * W, (1 - vtmp.y) / 2 * H];
+    };
+    const placed = [];
+    if (revealed) {
+      ctx.font = `800 ${13 * dpr}px Archivo, sans-serif`;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillStyle = "rgba(60, 40, 20, 0.9)";
-      ctx.strokeStyle = "rgba(240, 232, 210, 0.9)"; ctx.lineWidth = 3 * dpr;
-      for (const p of world.pieces) {
-        const x = (p.cx + p.fx - world.view.x0) * k, y = (p.cy + p.fy - world.view.y0) * k;
-        ctx.strokeText(p.st.abbr, x, y); ctx.fillText(p.st.abbr, x, y);
+      ctx.lineJoin = "round";
+      for (const a of abbr3) {
+        const q = project(a.pos); if (!q) continue;
+        ctx.lineWidth = 4 * dpr; ctx.strokeStyle = "rgba(10, 16, 28, 0.75)";
+        ctx.strokeText(a.name, q[0], q[1]);
+        ctx.fillStyle = "#ffe9a8"; ctx.fillText(a.name, q[0], q[1]);
+        const m = ctx.measureText(a.name).width;
+        placed.push([q[0] - m / 2, q[1] - 8 * dpr, q[0] + m / 2, q[1] + 8 * dpr]);
       }
     }
-
-    // Cities: dots for everyone, labels where there is room.
-    const placed = [];
-    const fontPx = 11 * dpr;
-    ctx.font = `500 ${fontPx}px Archivo, sans-serif`;
-    ctx.textBaseline = "middle";
+    const fontPx = 11.5 * dpr;
+    ctx.textBaseline = "middle"; ctx.lineJoin = "round";
+    const pts = [];
+    for (const c of cities3) {
+      const q = project(c.pos); if (!q) continue;
+      pts.push({ c, x: q[0], y: q[1] });
+      ctx.beginPath();
+      ctx.arc(q[0], q[1], (c.capital ? 3.4 : 2.4) * dpr, 0, Math.PI * 2);
+      ctx.fillStyle = c.capital ? "#ffd166" : "#f4f1ea";
+      ctx.fill();
+      ctx.lineWidth = 1.3 * dpr; ctx.strokeStyle = "rgba(10, 16, 28, 0.85)"; ctx.stroke();
+      placed.push([q[0] - 4 * dpr, q[1] - 4 * dpr, q[0] + 4 * dpr, q[1] + 4 * dpr]);
+    }
     const tryLabel = (x, y, text, capital) => {
-      const w = ctx.measureText(text).width, h = fontPx * 1.15, gap = 5 * dpr;
-      const slots = [
-        [x + gap, y, "left"], [x - gap, y, "right"],
-        [x, y - gap - h / 2, "center"], [x, y + gap + h / 2, "center"],
-      ];
+      const w = ctx.measureText(text).width, h = fontPx * 1.15, gap = 6 * dpr;
+      const slots = [[x + gap, y, "left"], [x - gap, y, "right"], [x, y - gap - h / 2, "center"], [x, y + gap + h / 2, "center"]];
       for (const [lx, ly, align] of slots) {
         const left = align === "left" ? lx : align === "right" ? lx - w : lx - w / 2;
-        const box = [left - 1, ly - h / 2, left + w + 1, ly + h / 2];
-        if (box[0] < 0 || box[1] < 0 || box[2] > marksC.width || box[3] > marksC.height) continue;
+        const box = [left - 2, ly - h / 2, left + w + 2, ly + h / 2];
+        if (box[0] < 0 || box[1] < 0 || box[2] > W || box[3] > H) continue;
         if (placed.some((b) => b[0] < box[2] && b[2] > box[0] && b[1] < box[3] && b[3] > box[1])) continue;
         placed.push(box);
         ctx.textAlign = align;
-        ctx.lineWidth = 3 * dpr; ctx.strokeStyle = "rgba(240, 232, 210, 0.85)";
+        ctx.lineWidth = 3.2 * dpr; ctx.strokeStyle = "rgba(10, 16, 28, 0.78)";
         ctx.strokeText(text, lx, ly);
-        ctx.fillStyle = capital ? "#3a2a12" : "#4e4231";
+        ctx.fillStyle = capital ? "#ffe2a0" : "#f1efe8";
         ctx.fillText(text, lx, ly);
         return;
       }
     };
-    const cities = [];
-    for (const p of world.pieces) for (const c of CITIES[p.st.abbr] || []) {
-      const [gx, gy] = cityPoint(p, c);
-      cities.push({ x: gx * k, y: gy * k, name: c[0], capital: c[3] === 1 });
-    }
-    cities.sort((a, b) => (b.capital - a.capital));
-    for (const c of cities) {
-      ctx.beginPath();
-      ctx.arc(c.x, c.y, (c.capital ? 3.2 : 2.3) * dpr, 0, Math.PI * 2);
-      ctx.fillStyle = c.capital ? "#b3261e" : "#3a2a12";
-      ctx.fill();
-      if (c.capital) { ctx.lineWidth = 1.2 * dpr; ctx.strokeStyle = "#f4ecd8"; ctx.stroke(); }
-      placed.push([c.x - 4 * dpr, c.y - 4 * dpr, c.x + 4 * dpr, c.y + 4 * dpr]);
-    }
-    ctx.font = `600 ${fontPx}px Archivo, sans-serif`;
-    for (const c of cities) if (c.capital) tryLabel(c.x, c.y, c.name, true);
+    ctx.font = `700 ${fontPx}px Archivo, sans-serif`;
+    for (const p of pts) if (p.c.capital) tryLabel(p.x, p.y, p.c.name, true);
     ctx.font = `500 ${fontPx}px Archivo, sans-serif`;
-    for (const c of cities) if (!c.capital) tryLabel(c.x, c.y, c.name, false);
+    for (const p of pts) if (!p.c.capital) tryLabel(p.x, p.y, p.c.name, false);
   }
 
-  function drawInk() {
-    const { dpr, k } = screenScale();
-    const ctx = inkC.getContext("2d");
-    ctx.clearRect(0, 0, inkC.width, inkC.height);
-    ctx.lineWidth = 2.4 * dpr; ctx.lineCap = "round"; ctx.lineJoin = "round";
-    ctx.strokeStyle = "rgba(170, 30, 40, 0.9)";
-    for (const s of strokes) {
-      if (s.length < 2) { ctx.beginPath(); ctx.arc(s[0][0] * k, s[0][1] * k, 1.2 * dpr, 0, 7); ctx.fillStyle = ctx.strokeStyle; ctx.fill(); continue; }
-      ctx.beginPath();
-      ctx.moveTo(s[0][0] * k, s[0][1] * k);
-      for (let i = 1; i < s.length; i++) ctx.lineTo(s[i][0] * k, s[i][1] * k);
-      ctx.stroke();
+  // -------------------------------------------------------------------- ink
+  function ribbon(s) {
+    const n = s.pts.length, hw = s.w / 2;
+    const pos = new Float32Array(Math.max(2, n) * 2 * 3), v = new T.Vector3();
+    const idx = [];
+    const R = 1.0004;
+    for (let i = 0; i < n; i++) {
+      const a = s.pts[Math.max(0, i - 1)], b = s.pts[Math.min(n - 1, i + 1)];
+      let tx = b[0] - a[0], ty = b[1] - a[1];
+      const l = Math.hypot(tx, ty) || 1; tx /= l; ty /= l;
+      if (n === 1) { tx = 1; ty = 0; }
+      const [x, y] = s.pts[i];
+      toSphere(x - ty * hw, y + tx * hw, R, v); pos.set([v.x, v.y, v.z], i * 6);
+      toSphere(x + ty * hw, y - tx * hw, R, v); pos.set([v.x, v.y, v.z], i * 6 + 3);
+      if (i > 0) { const k = i * 2; idx.push(k - 2, k - 1, k, k - 1, k + 1, k); }
     }
+    if (n === 1) { // a dot: a short dash
+      const [x, y] = s.pts[0];
+      toSphere(x + hw, y - hw, R, v); pos.set([v.x, v.y, v.z], 6);
+      toSphere(x + hw, y + hw, R, v); pos.set([v.x, v.y, v.z], 9);
+      idx.push(0, 1, 2, 1, 3, 2);
+    }
+    const g = new T.BufferGeometry();
+    g.setAttribute("position", new T.BufferAttribute(pos, 3));
+    g.setIndex(idx);
+    if (s.mesh) { s.mesh.geometry.dispose(); s.mesh.geometry = g; }
+    else { s.mesh = new T.Mesh(g, inkMat); inkGroup.add(s.mesh); }
+  }
+  function clearInk() {
+    for (const s of strokes) { inkGroup.remove(s.mesh); s.mesh.geometry.dispose(); }
+    strokes = [];
   }
 
-  // ------------------------------------------------------------------- input
-  function gridPoint(ev) {
-    const rect = frame.getBoundingClientRect();
-    return [(ev.clientX - rect.left) / rect.width * world.view.w, (ev.clientY - rect.top) / rect.height * world.view.h];
+  // ------------------------------------------------------------------ input
+  const ray = new T.Raycaster(), ndc = new T.Vector2();
+  function pick(ev) {
+    const r = glC.getBoundingClientRect();
+    ndc.set((ev.clientX - r.left) / r.width * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const o = ray.ray.origin, d = ray.ray.direction;
+    const b = o.dot(d), c = o.lengthSq() - 1, disc = b * b - c;
+    if (disc < 0) return null;
+    const t = -b - Math.sqrt(disc);
+    const p = o.clone().addScaledVector(d, t);
+    const g = toRaster(p);
+    if (!g || g[0] < 0 || g[1] < 0 || g[0] >= world.view.w || g[1] >= world.view.h) return null;
+    return g;
   }
-  inkC.addEventListener("pointerdown", (ev) => {
-    if (!world || ev.button > 0) return;
-    inkC.setPointerCapture(ev.pointerId);
-    current = [gridPoint(ev)];
-    strokes.push(current);
-    drawInk();
+  // Raster px per screen px at the centre of the view, to keep ink a steady width.
+  function rasterPerScreenPx() {
+    const d = camera.position.length() - 1;
+    const px = glC.getBoundingClientRect().height;
+    const worldPerPx = 2 * d * Math.tan(camera.fov * D2R / 2) / px;
+    return worldPerPx * PX_PER_RAD;
+  }
+  const drawing = () => mode === "draw" && !spaceHeld;
+  const touches = new Set();
+  glC.addEventListener("pointerdown", (ev) => {
+    if (ev.pointerType === "touch") touches.add(ev.pointerId);
+    if (touches.size > 1 && current) { // second finger: this was a pinch, not a stroke
+      const s = strokes.pop(); inkGroup.remove(s.mesh); s.mesh.geometry.dispose(); current = null; return;
+    }
+    if (!world || !drawing() || ev.button > 0 || touches.size > 1) return;
+    const g = pick(ev); if (!g) return;
+    current = { pts: [g], w: Math.max(0.8, 2.6 * rasterPerScreenPx()), mesh: null, id: ev.pointerId };
+    strokes.push(current); ribbon(current);
   });
-  inkC.addEventListener("pointermove", (ev) => {
-    if (!current) return;
-    const p = gridPoint(ev), last = current[current.length - 1];
-    if (Math.hypot(p[0] - last[0], p[1] - last[1]) < 0.6) return;
-    current.push(p);
-    const { dpr, k } = screenScale();
-    const ctx = inkC.getContext("2d");
-    ctx.lineWidth = 2.4 * dpr; ctx.lineCap = "round"; ctx.lineJoin = "round";
-    ctx.strokeStyle = "rgba(170, 30, 40, 0.9)";
-    ctx.beginPath(); ctx.moveTo(last[0] * k, last[1] * k); ctx.lineTo(p[0] * k, p[1] * k); ctx.stroke();
+  glC.addEventListener("pointermove", (ev) => {
+    if (!current || ev.pointerId !== current.id) return;
+    const g = pick(ev); if (!g) return;
+    const last = current.pts[current.pts.length - 1];
+    if (Math.hypot(g[0] - last[0], g[1] - last[1]) < current.w * 0.4) return;
+    current.pts.push(g); ribbon(current);
   });
-  const endStroke = () => { current = null; };
-  inkC.addEventListener("pointerup", endStroke);
-  inkC.addEventListener("pointercancel", endStroke);
+  const endStroke = (ev) => { touches.delete(ev.pointerId); if (current && ev.pointerId === current.id) current = null; };
+  window.addEventListener("pointerup", endStroke);
+  window.addEventListener("pointercancel", endStroke);
+
+  function setMode(m) {
+    mode = m;
+    $("mode-draw").setAttribute("aria-pressed", String(m === "draw"));
+    $("mode-spin").setAttribute("aria-pressed", String(m === "spin"));
+    applyMode();
+  }
+  function applyMode() {
+    const d = drawing();
+    controls.mouseButtons = { LEFT: d ? null : T.MOUSE.ROTATE, MIDDLE: T.MOUSE.DOLLY, RIGHT: T.MOUSE.ROTATE };
+    controls.touches = { ONE: d ? null : T.TOUCH.ROTATE, TWO: T.TOUCH.DOLLY_ROTATE };
+    glC.style.cursor = d ? "crosshair" : "grab";
+  }
+  window.addEventListener("keydown", (ev) => {
+    if (ev.code === "Space" && !ev.repeat && ev.target === document.body) { spaceHeld = true; applyMode(); ev.preventDefault(); }
+  });
+  window.addEventListener("keyup", (ev) => { if (ev.code === "Space") { spaceHeld = false; applyMode(); } });
+  glC.addEventListener("contextmenu", (ev) => ev.preventDefault());
 
   // ------------------------------------------------------------------- check
   function check() {
@@ -756,7 +1019,7 @@
     const ic = document.createElement("canvas"); ic.width = w; ic.height = h;
     const ictx = ic.getContext("2d", { willReadFrequently: true });
     ictx.lineWidth = 2; ictx.lineCap = "round"; ictx.lineJoin = "round"; ictx.strokeStyle = "#000"; ictx.fillStyle = "#000";
-    for (const s of strokes) {
+    for (const { pts: s } of strokes) {
       ictx.beginPath();
       ictx.moveTo(s[0][0], s[0][1]);
       for (let i = 1; i < s.length; i++) ictx.lineTo(s[i][0], s[i][1]);
@@ -776,13 +1039,12 @@
     const recall = total ? hit / total : 0;
     const strayF = inkPx ? stray / inkPx : 0;
     const score = Math.round(100 * recall * (1 - 0.5 * strayF));
-    lastCheck = { recall, strayF, score };
     $("n-score").textContent = String(score);
     $("n-found").textContent = `${Math.round(recall * 100)}%`;
     $("n-stray").textContent = `${Math.round(strayF * 100)}%`;
     $("numbers").hidden = false;
 
-    // Paint the verdict: teal where the ink found a border, red where it did not.
+    // Paint the verdict: teal where the ink found a border, orange where it did not.
     const img = new ImageData(w, h), px = img.data;
     const paint = (i, r, g, b) => {
       const x = i % w, y = (i / w) | 0;
@@ -790,12 +1052,13 @@
         const xx = x + dx, yy = y + dy;
         if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue;
         const o = (yy * w + xx) * 4;
-        px[o] = r; px[o + 1] = g; px[o + 2] = b; px[o + 3] = 230;
+        px[o] = r; px[o + 1] = g; px[o + 2] = b; px[o + 3] = 235;
       }
     };
-    for (let i = 0; i < w * h; i++) if (target[i] && !found[i]) paint(i, 230, 70, 50);
-    for (let i = 0; i < w * h; i++) if (found[i]) paint(i, 30, 170, 140);
-    resultC.getContext("2d").putImageData(img, 0, 0);
+    for (let i = 0; i < w * h; i++) if (target[i] && !found[i]) paint(i, 255, 120, 60);
+    for (let i = 0; i < w * h; i++) if (found[i]) paint(i, 40, 230, 190);
+    lastCheck = img;
+    drawOverlay();
   }
 
   // --------------------------------------------------------------- controls
@@ -806,19 +1069,22 @@
     syncUrl(); generate();
   });
   $("share").addEventListener("click", async (ev) => {
-    try { await navigator.clipboard.writeText(location.href); ev.currentTarget.textContent = "Copied"; }
-    catch { ev.currentTarget.textContent = location.href; }
-    setTimeout(() => { ev.currentTarget.textContent = "Copy link"; }, 1500);
+    const b = ev.currentTarget;
+    try { await navigator.clipboard.writeText(location.href); b.textContent = "Copied"; }
+    catch { b.textContent = "Copy failed"; }
+    setTimeout(() => { b.textContent = "Copy link"; }, 1500);
   });
-  $("undo").addEventListener("click", () => { strokes.pop(); drawInk(); });
-  $("clear").addEventListener("click", () => { strokes = []; drawInk(); resultC.getContext("2d").clearRect(0, 0, resultC.width, resultC.height); $("numbers").hidden = true; });
+  $("undo").addEventListener("click", () => { const s = strokes.pop(); if (s) { inkGroup.remove(s.mesh); s.mesh.geometry.dispose(); } });
+  $("clear").addEventListener("click", () => { clearInk(); lastCheck = null; drawOverlay(); $("numbers").hidden = true; });
   $("check").addEventListener("click", () => { setStatus("Checking…"); setTimeout(() => { check(); setStatus(""); }, 10); });
   $("reveal").addEventListener("click", (ev) => {
     revealed = ev.currentTarget.getAttribute("aria-pressed") !== "true";
     ev.currentTarget.setAttribute("aria-pressed", String(revealed));
-    drawMarks();
+    drawOverlay();
   });
-  window.addEventListener("resize", layout);
+  $("recenter").addEventListener("click", () => world && frameCamera(world));
+  $("mode-draw").addEventListener("click", () => setMode("draw"));
+  $("mode-spin").addEventListener("click", () => setMode("spin"));
 
   function syncUrl() {
     const u = new URL(location.href);
@@ -826,6 +1092,28 @@
     if (rotate) u.searchParams.set("rot", "1"); else u.searchParams.delete("rot");
     history.replaceState(null, "", u);
   }
+
+  // ------------------------------------------------------------- render loop
+  function resize() {
+    const w = window.innerWidth, h = window.innerHeight, dpr = renderer.getPixelRatio();
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    labC.width = Math.round(w * dpr); labC.height = Math.round(h * dpr);
+    labelsDirty = true;
+  }
+  window.addEventListener("resize", resize);
+  controls.addEventListener("change", () => {
+    labelsDirty = true;
+    // Slow the spin as the camera nears the ground.
+    controls.rotateSpeed = Math.min(1, 0.15 + 0.6 * (camera.position.length() - 1));
+  });
+  function loop() {
+    controls.update();
+    renderer.render(scene, camera);
+    if (labelsDirty) { labelsDirty = false; drawLabels(); }
+    requestAnimationFrame(loop);
+  }
+  resize(); setMode("draw"); loop();
 
   // ------------------------------------------------------------------- boot
   (async () => {
