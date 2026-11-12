@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-11
+# Mapzimus Geospatial Radar — 2026-11-12
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [GeoGuessr in Space](http://googlemapsmania.blogspot.com/2026/11/geoguessr-in-space.html)
 - [The Hills are Alive with the Sound of Music](http://googlemapsmania.blogspot.com/2026/11/the-hills-are-alive-with-sound-of-music.html)
 - [Contoured Fuji](http://googlemapsmania.blogspot.com/2026/11/contoured-fuji.html)
 - [Has a Satellite Been Watching You?](http://googlemapsmania.blogspot.com/2026/11/has-satellite-been-watching-you.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Utopian London](http://googlemapsmania.blogspot.com/2026/11/utopian-london.html)
 - [Axis Maps Contours](http://googlemapsmania.blogspot.com/2026/11/axis-maps-contours.html)
 - [Noah's Ark found on Vintage Maps](http://googlemapsmania.blogspot.com/2026/11/noahs-ark-found-on-vintage-maps.html)
-- [Collect Birds, Not Beers](http://googlemapsmania.blogspot.com/2026/11/collect-birds-not-beers.html)
 
 ## Geography Realm
 
@@ -42,7 +42,7 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## Library releases
 
-- [maplibre-gl-js v6.17.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.17.0) (2026-11-07) — ### ✨ Features and improvements - feat: Add experimental `sparse` vector source option so a missing tile is sliced from an ancestor ([#8335](https://github.c…
+- [maplibre-gl-js v6.18.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.18.0) (2026-11-11) — ### ✨ Features and improvements - Add `raster-layer-blend` support ([#8986](https://github.com/maplibre/maplibre-gl-js/pull/8986)) (by [@birkskyum](https://g…
 - [deck.gl v9.3.12](https://github.com/visgl/deck.gl/releases/tag/v9.3.12) (2026-10-30) — - fix(core): eliminate 300ms click delay and fix runtime controller prop changes (#10422) - fix(heatmap): compilation failure on Qualcomm Adreno 660 (#10301)…
 - [duckdb v2.0.0](https://github.com/duckdb/duckdb/releases/tag/v2.0.0) (2026-10-21) — This release of DuckDB is named "Cyanoptera" after Spatula Cyanoptera, a species of duck found in western North and South America.
 - [QGIS final-3_44_15](https://github.com/qgis/QGIS/releases/tag/final-3_44_15) (2026-09-25) — https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Why is there a difference in parcel area measurements when using the QFIELD tool (with errors) versus a differential GPS (DGPS)?](https://gis.stackexchange.com/questions/501713/why-is-there-a-difference-in-parcel-area-measurements-when-using-the-qfield-tool) (▲ 0 · 0 answers)
+- [How could I "wrap" a country .shp around the Moon in Blender?](https://gis.stackexchange.com/questions/501722/how-could-i-wrap-a-country-shp-around-the-moon-in-blender) (▲ 3 · 0 answers)
+- [Changed CRS in QGIS, changed back and now have 'tilted' view](https://gis.stackexchange.com/questions/501720/changed-crs-in-qgis-changed-back-and-now-have-tilted-view) (▲ 0 · 0 answers)
+- [Importing Pandas DataFrame to ArcGIS Pro via ArcPy](https://gis.stackexchange.com/questions/501715/importing-pandas-dataframe-to-arcgis-pro-via-arcpy) (▲ 3 · 2 answers)
+- [Measuring points along line and adding that in the attribute table in ArcGIS Pro](https://gis.stackexchange.com/questions/501703/measuring-points-along-line-and-adding-that-in-the-attribute-table-in-arcgis-pro) (▲ 3 · 2 answers)
+- [Why is there a difference in parcel area values between QField (with errors) and using a differential GPS (DGPS)?](https://gis.stackexchange.com/questions/501714/why-is-there-a-difference-in-parcel-area-values-between-qfield-with-errors-and) (▲ 0 · 0 answers)
 - [Some projections produce strange results in QGIS](https://gis.stackexchange.com/questions/501705/some-projections-produce-strange-results-in-qgis) (▲ 3 · 2 answers)
 - [Features from GDB file all disappear when one is selected in QGIS](https://gis.stackexchange.com/questions/501707/features-from-gdb-file-all-disappear-when-one-is-selected-in-qgis) (▲ 2 · 1 answers)
+- [Developer/Debugging tools write to external file in QGIS](https://gis.stackexchange.com/questions/501699/developer-debugging-tools-write-to-external-file-in-qgis) (▲ 3 · 1 answers)
+- [QGIS Error: Column type not supported using v.surf.idw, v.surf.rst,](https://gis.stackexchange.com/questions/501697/qgis-error-column-type-not-supported-using-v-surf-idw-v-surf-rst) (▲ 2 · 1 answers)
 - [Defining class Property in QGIS plugin](https://gis.stackexchange.com/questions/501706/defining-class-property-in-qgis-plugin) (▲ 1 · 0 answers)
-- [Developer/Debugging tools write to external file in QGIS](https://gis.stackexchange.com/questions/501699/developer-debugging-tools-write-to-external-file-in-qgis) (▲ 2 · 1 answers)
-- [How to measure points along a line and add that in the attribute table](https://gis.stackexchange.com/questions/501703/how-to-measure-points-along-a-line-and-add-that-in-the-attribute-table) (▲ 2 · 1 answers)
-- [QGIS Error: Column type not supported using v.surf.idw, v.surf.rst,](https://gis.stackexchange.com/questions/501697/qgis-error-column-type-not-supported-using-v-surf-idw-v-surf-rst) (▲ 2 · 0 answers)
-- [ArcGIS Pro failing to listFields() of layers within Group Layer](https://gis.stackexchange.com/questions/501687/arcgis-pro-failing-to-listfields-of-layers-within-group-layer) (▲ 4 · 1 answers)
-- [QGIS 4.2.3 in r.stream.extract there is no longer the option of creating the stream in vector polylines, only option is the points](https://gis.stackexchange.com/questions/501686/qgis-4-2-3-in-r-stream-extract-there-is-no-longer-the-option-of-creating-the-str) (▲ 0 · 0 answers)
-- [Saving geographical map as HTML with R](https://gis.stackexchange.com/questions/501682/saving-geographical-map-as-html-with-r) (▲ 4 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
+- [CERES and GEO-Enhanced TOA, Within-Atmosphere and Surface Fluxes, Clouds and Aerosols Monthly Terra-Aqua-NOAA20 Edition4B](https://search.earthdata.nasa.gov/search?q=CER_SYN1deg-Month_Terra-Aqua-NOAA20) — CER_SYN1deg-Month_Terra-Aqua-NOAA20_Edition4B is the Clouds and the Earth's Radiant Energy System (CERES) and geostationary (GEO)-Enhanced Top of Atmosphere…
+- [EPIC Cloud Height](https://search.earthdata.nasa.gov/search?q=DSCOVR_EPIC_L2_CLOUDHEIGHT) — DSCOVR_EPIC_L2_CLOUDHEIGHT_01 visualizes the Deep Space Climate Observatory (DSCOVR) Earth Polychromatic Imaging Camera (EPIC) Level 2 Cloud version 03 data…
+- [CALIPSO Wide Field Camera Level 1B Science data, Standard V4-00](https://search.earthdata.nasa.gov/search?q=CAL_WFC_L1_IIR-Standard-V4-00) — CAL_WFC_L1_IIR-Standard-V4-00 is the Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observation (CALIPSO) Wide Field Camera (WFC)Level 1B IIR Version…
+- [CALIPSO Wide Field Camera Level 1B Calibration data, V4-00](https://search.earthdata.nasa.gov/search?q=CAL_WFC_L1_Cal-Standard-V4-00) — CAL_WFC_L1_Cal-Standard-V4-00 is the Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observation (CALIPSO) Wide Field Camera (WFC)Level 1B Calibration…
+- [CALIPSO Wide Field Camera Level 1B Assembler data, V4-00](https://search.earthdata.nasa.gov/search?q=CAL_WFC_L1_Asm-Standard-V4-00) — CAL_WFC_L1_Asm-Standard-V4-00 is the Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observation (CALIPSO) Wide Field Camera (WFC)Level 1B Assembler Ve…
+- [CALIPSO Lidar Level 3 Tropospheric Aerosol Profiles, Cloudy Sky Opaque Data, Standard V5-00](https://search.earthdata.nasa.gov/search?q=CAL_LID_L3_Tropospheric_APro_CloudySkyOpaque-Standard-V5-00) — CAL_LID_L3_Tropospheric_APro_CloudSkyOpaque-Standard-V5-00 is the Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observation (CALIPSO) Lidar Level 3 T…
+- [CALIPSO Lidar Level 3 Tropospheric Aerosol Profiles, Cloudy Sky Transparent Data, Standard V5-00](https://search.earthdata.nasa.gov/search?q=CAL_LID_L3_Tropospheric_APro_CloudySkyTransparent-Standard-V5-00) — CAL_LID_L3_Tropospheric_APro_CloudSkyTransparent-Standard-V5-00 is the Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observation (CALIPSO) Lidar Leve…
+- [CALIPSO Lidar Level 3 Tropospheric Aerosol Profiles, Cloud Free Data, Standard V5-00](https://search.earthdata.nasa.gov/search?q=CAL_LID_L3_Tropospheric_APro_CloudFree-Standard-V5-00) — CAL_LID_L3_Tropospheric_APro_CloudFree-Standard-V5-00 is the Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observation(CALIPSO) Lidar Level 3 Troposp…
+- [CALIPSO Lidar Level 3 Tropospheric Aerosol Profiles, All Sky Data, Standard V5-00](https://search.earthdata.nasa.gov/search?q=CAL_LID_L3_Tropospheric_APro_AllSky-Standard-V5-00) — CAL_LID_L3_Tropospheric_APro_AllSky-Standard-V5-00 is the Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observation (CALIPSO) Lidar Level 3 Troposphe…
+- [CALIPSO Lidar Level 3 Stratospheric Aerosol Profiles Standard V2-00](https://search.earthdata.nasa.gov/search?q=CAL_LID_L3_Stratospheric_APro-Standard-V2-00) — CAL_LID_L3_Stratospheric_APro-Standard-V2-00 is the Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observation (CALIPSO) Lidar Level 3 Stratospheric A…
 
 ## Data.gov — new geodata
 
