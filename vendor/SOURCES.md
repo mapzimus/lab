@@ -13,7 +13,6 @@ The files in this directory are deployable snapshots of projects maintained in s
 | `/concord-war/` | built from `mapzimus/concord-war` | |
 | `/transit/` | `transit/` in `mapzimus/maxwellhowegis` | |
 | `/interstate-challenge/` | `interstate-challenge/` in `mapzimus/maxwellhowegis` | `121f2af` — was on the portfolio site; now first-party. |
-| `/mapzimus-board/` | `mapzimus/mapzimus-board` | `acdb429` — was `mapzimus.github.io/mapzimus-board/`. Deployable `index.html` + `app.js` + `data.js` only. |
 | `/motion/` | `mapzimus/Motion` | `c6c7a55` (Vite + Preact + MapLibre 6). Built with `npx vite build --base=/motion/` after applying `vendor/patches/motion-gzip-routes.patch`; then `data/regional-routes.geojson` (74 MB, over Pages' 25 MiB file limit) is replaced by `regional-routes.geojson.gz` (5.4 MB), which the patched loader inflates in the browser. Was Boston in Motion at `/boston-in-motion/` (now a redirect) and `mapzimus.github.io/Motion/`. Its gateways (`motion-gateway` Worker, `motion-aircraft-gateway` on Vercel) must list `https://mapzimus.com` in their allowed origins for the live feeds that go through them. |
 | `/where-the-games-go/` | `mapzimus/where-the-games-go` (`public/`) | `128a261` (sales through 2026-08-20) — was `mapzimus.github.io/where-the-games-go/`. A `<link rel="canonical">` to mapzimus.com is added on copy. |
 | `/citynario/` | `mapzimus/Citynario` | Static Next export. |
