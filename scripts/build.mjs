@@ -618,7 +618,7 @@ fillStatic("skills/index.html", { SKILL_CARDS: skillCards });
 
 // ---- Sitemap ----
 
-const staticPages = ["radars", "radar", "geo-radar", "soccer-radar", "stocks-radar", "politics-radar", "skills", "links", "about"];
+const staticPages = ["radars", "radar", "geo-radar", "soccer-radar", "stocks-radar", "politics-radar", "stats", "skills", "links", "about"];
 const sitemapUrls = [
   ...Object.values(pages).map((page) => page.canonical),
   ...staticPages.map((s) => `https://mapzimus.com/${s}/`),
