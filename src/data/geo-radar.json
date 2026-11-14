@@ -1,7 +1,17 @@
 {
-  "generatedAt": "2026-11-13",
+  "generatedAt": "2026-11-14",
   "news": {
     "mapsmania": [
+      {
+        "title": "The Never-Ending Coastline",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/the-never-ending-coastline.html",
+        "desc": ""
+      },
+      {
+        "title": "Explore Britain's Hidden Archaeology",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/explore-britains-hidden-archaeology.html",
+        "desc": ""
+      },
       {
         "title": "How to Make Interactive Maps for Free",
         "url": "http://googlemapsmania.blogspot.com/2026/11/how-to-make-interactive-maps-for-free.html",
@@ -30,16 +40,6 @@
       {
         "title": "Blowing in the Wind",
         "url": "http://googlemapsmania.blogspot.com/2026/11/blowing-in-wind.html",
-        "desc": ""
-      },
-      {
-        "title": "Utopian London",
-        "url": "http://googlemapsmania.blogspot.com/2026/11/utopian-london.html",
-        "desc": ""
-      },
-      {
-        "title": "Axis Maps Contours",
-        "url": "http://googlemapsmania.blogspot.com/2026/11/axis-maps-contours.html",
         "desc": ""
       }
     ],
@@ -212,8 +212,20 @@
     {
       "title": "Finding divergence points for lines in QGIS",
       "url": "https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis",
-      "score": 2,
+      "score": 3,
       "answers": 1
+    },
+    {
+      "title": "Importing Pandas DataFrame to ArcGIS Pro via ArcPy",
+      "url": "https://gis.stackexchange.com/questions/501715/importing-pandas-dataframe-to-arcgis-pro-via-arcpy",
+      "score": 5,
+      "answers": 2
+    },
+    {
+      "title": "Features from GDB file all disappear when one is selected in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501707/features-from-gdb-file-all-disappear-when-one-is-selected-in-qgis",
+      "score": 3,
+      "answers": 2
     },
     {
       "title": "Changed CRS in QGIS, changed back and now have 'tilted' view",
@@ -222,14 +234,8 @@
       "answers": 0
     },
     {
-      "title": "Importing Pandas DataFrame to ArcGIS Pro via ArcPy",
-      "url": "https://gis.stackexchange.com/questions/501715/importing-pandas-dataframe-to-arcgis-pro-via-arcpy",
-      "score": 3,
-      "answers": 2
-    },
-    {
-      "title": "Features from GDB file all disappear when one is selected in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501707/features-from-gdb-file-all-disappear-when-one-is-selected-in-qgis",
+      "title": "Some projections produce strange results in QGIS",
+      "url": "https://gis.stackexchange.com/questions/501705/some-projections-produce-strange-results-in-qgis",
       "score": 3,
       "answers": 2
     },
@@ -240,22 +246,10 @@
       "answers": 2
     },
     {
-      "title": "Some projections produce strange results in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501705/some-projections-produce-strange-results-in-qgis",
-      "score": 3,
-      "answers": 2
-    },
-    {
       "title": "Why is there a difference in parcel area values between QField (with errors) and using a differential GPS (DGPS)?",
       "url": "https://gis.stackexchange.com/questions/501714/why-is-there-a-difference-in-parcel-area-values-between-qfield-with-errors-and",
       "score": 0,
       "answers": 0
-    },
-    {
-      "title": "GEE - Inconsistent shardSize behavior between toDrive and toAsset",
-      "url": "https://gis.stackexchange.com/questions/501704/gee-inconsistent-shardsize-behavior-between-todrive-and-toasset",
-      "score": 1,
-      "answers": 1
     },
     {
       "title": "Developer/Debugging tools write to external file in QGIS",
@@ -264,72 +258,78 @@
       "answers": 1
     },
     {
-      "title": "Defining class Property in QGIS plugin",
-      "url": "https://gis.stackexchange.com/questions/501706/defining-class-property-in-qgis-plugin",
+      "title": "GEE - Inconsistent shardSize behavior between toDrive and toAsset",
+      "url": "https://gis.stackexchange.com/questions/501704/gee-inconsistent-shardsize-behavior-between-todrive-and-toasset",
       "score": 1,
-      "answers": 0
+      "answers": 1
+    },
+    {
+      "title": "QGIS Error: Column type not supported using v.surf.idw, v.surf.rst,",
+      "url": "https://gis.stackexchange.com/questions/501697/qgis-error-column-type-not-supported-using-v-surf-idw-v-surf-rst",
+      "score": 2,
+      "answers": 1
     }
   ],
   "nasa": [
     {
-      "title": "NCEP/CPC L3 Half Hourly 4km Global (60S - 60N) Merged IR V1 (GPM_MERGIR)",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_MERGIR",
-      "desc": "These data originate from NOAA/NCEP.",
-      "org": "GES_DISC"
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Version 3",
+      "org": "ASF"
     },
     {
-      "title": "GPM IMERG Early Precipitation L3 Half Hourly 0.1 degree x 0.1 degree V07 (GPM_3IMERGHHE)",
-      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3IMERGHHE",
-      "desc": "Version 07B is the current version of the IMERG data sets.",
-      "org": "GES_DISC"
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Data Quality Information Version 3",
+      "org": "ASF"
     },
     {
-      "title": "Carbon Monitoring System Lake Superior Primary Production Yearly V1 (CMSLakeSuperiorPPY)",
-      "url": "https://search.earthdata.nasa.gov/search?q=CMSLakeSuperiorPPY",
-      "desc": "Yearly Average primary production/carbon fixation data for Lake Superior.",
-      "org": "GES_DISC"
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Metadata Version 3",
+      "org": "ASF"
     },
     {
-      "title": "Carbon Monitoring System Lake Superior Primary Production Monthly V1 (CMSLakeSuperiorPPM)",
-      "url": "https://search.earthdata.nasa.gov/search?q=CMSLakeSuperiorPPM",
-      "desc": "Monthly Average primary production/carbon fixation data for Lake Superior.",
-      "org": "GES_DISC"
+      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
+      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "Carbon Monitoring System Lake Michigan Primary Production Yearly V1 (CMSLakeMichiganPPY)",
-      "url": "https://search.earthdata.nasa.gov/search?q=CMSLakeMichiganPPY",
-      "desc": "Yearly Average primary production/carbon fixation data for Lake Michigan.",
-      "org": "GES_DISC"
+      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
+      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "Carbon Monitoring System Lake Michigan Primary Production Monthly V1 (CMSLakeMichiganPPM)",
-      "url": "https://search.earthdata.nasa.gov/search?q=CMSLakeMichiganPPM",
-      "desc": "Monthly Average primary production/carbon fixation data for Lake Michigan.",
-      "org": "GES_DISC"
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL10QL",
+      "desc": "ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "Carbon Monitoring System Lake Huron Primary Production Yearly V1 (CMSLakeHuronPPY)",
-      "url": "https://search.earthdata.nasa.gov/search?q=CMSLakeHuronPPY",
-      "desc": "Yearly Average primary production/carbon fixation data for Lake Huron.",
-      "org": "GES_DISC"
+      "title": "ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL09QL",
+      "desc": "ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "Carbon Monitoring System Lake Huron Primary Production Monthly V1 (CMSLakeHuronPPM)",
-      "url": "https://search.earthdata.nasa.gov/search?q=CMSLakeHuronPPM",
-      "desc": "Monthly Average primary production/carbon fixation data for Lake Huron.",
-      "org": "GES_DISC"
+      "title": "ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL08QL",
+      "desc": "ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "DC3 In-Situ NSF/NCAR GV-HIAPER Photolysis Rate Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=DC3_jValue_AircraftInSitu_NSF-GV-HIAPER_Data",
-      "desc": "DC3_jValue_AircraftInSitu_NSF-GV-HIAPER_Data are in-situ photolysis rate data collected onboard the NSF/NCAR GV-HIAPER aircraft during the Deep Convective Cl…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL07QL",
+      "desc": "ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.",
+      "org": "NSIDC_CPRD"
     },
     {
-      "title": "DC3 In-Situ NSF/NCAR GV-HIAPER Trace Gas Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=DC3_TraceGas_AircraftInSitu_NSF-GV-HIAPER_Data",
-      "desc": "DC3_TraceGas_AircraftInSitu_NSF-GV-HIAPER_Data are in-situ trace gas data collected onboard the NSF/NCAR GV-HIAPER aircraft during the Deep Convective Clouds…",
-      "org": "LARC_CLOUD"
+      "title": "ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATL03LL",
+      "desc": "ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…",
+      "org": "NSIDC_CPRD"
     }
   ],
   "datagov": [
