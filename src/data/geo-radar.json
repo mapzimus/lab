@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-11-14",
+  "generatedAt": "2026-11-15",
   "news": {
     "mapsmania": [
+      {
+        "title": "An Inverted Earth You Can Explore",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/an-inverted-earth-you-can-explore.html",
+        "desc": ""
+      },
       {
         "title": "The Never-Ending Coastline",
         "url": "http://googlemapsmania.blogspot.com/2026/11/the-never-ending-coastline.html",
@@ -35,11 +40,6 @@
       {
         "title": "Has a Satellite Been Watching You?",
         "url": "http://googlemapsmania.blogspot.com/2026/11/has-satellite-been-watching-you.html",
-        "desc": ""
-      },
-      {
-        "title": "Blowing in the Wind",
-        "url": "http://googlemapsmania.blogspot.com/2026/11/blowing-in-wind.html",
         "desc": ""
       }
     ],
@@ -210,9 +210,21 @@
   ],
   "gisse": [
     {
+      "title": "Building 3D geological model and estimating mineral resources using only open-source tools",
+      "url": "https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so",
+      "score": 0,
+      "answers": 0
+    },
+    {
+      "title": "Unusual error never before encountered even in prior unzipping of folder: Lock folder name too long",
+      "url": "https://gis.stackexchange.com/questions/501731/unusual-error-never-before-encountered-even-in-prior-unzipping-of-folder-lock-f",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Finding divergence points for lines in QGIS",
       "url": "https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis",
-      "score": 3,
+      "score": 4,
       "answers": 1
     },
     {
@@ -228,16 +240,16 @@
       "answers": 2
     },
     {
-      "title": "Changed CRS in QGIS, changed back and now have 'tilted' view",
-      "url": "https://gis.stackexchange.com/questions/501720/changed-crs-in-qgis-changed-back-and-now-have-tilted-view",
-      "score": 1,
-      "answers": 0
-    },
-    {
       "title": "Some projections produce strange results in QGIS",
       "url": "https://gis.stackexchange.com/questions/501705/some-projections-produce-strange-results-in-qgis",
       "score": 3,
       "answers": 2
+    },
+    {
+      "title": "Changed CRS in QGIS, changed back and now have 'tilted' view",
+      "url": "https://gis.stackexchange.com/questions/501720/changed-crs-in-qgis-changed-back-and-now-have-tilted-view",
+      "score": 1,
+      "answers": 0
     },
     {
       "title": "Measuring points along line and adding that in the attribute table in ArcGIS Pro",
@@ -256,39 +268,9 @@
       "url": "https://gis.stackexchange.com/questions/501699/developer-debugging-tools-write-to-external-file-in-qgis",
       "score": 3,
       "answers": 1
-    },
-    {
-      "title": "GEE - Inconsistent shardSize behavior between toDrive and toAsset",
-      "url": "https://gis.stackexchange.com/questions/501704/gee-inconsistent-shardsize-behavior-between-todrive-and-toasset",
-      "score": 1,
-      "answers": 1
-    },
-    {
-      "title": "QGIS Error: Column type not supported using v.surf.idw, v.surf.rst,",
-      "url": "https://gis.stackexchange.com/questions/501697/qgis-error-column-type-not-supported-using-v-surf-idw-v-surf-rst",
-      "score": 2,
-      "answers": 1
     }
   ],
   "nasa": [
-    {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
-      "desc": "SMAP Level 1A Radar Receive Only Product Version 3",
-      "org": "ASF"
-    },
-    {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003",
-      "desc": "SMAP Level 1A Radar Receive Only Data Quality Information Version 3",
-      "org": "ASF"
-    },
-    {
-      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003",
-      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003",
-      "desc": "SMAP Level 1A Radar Receive Only Product Metadata Version 3",
-      "org": "ASF"
-    },
     {
       "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
       "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
@@ -330,6 +312,24 @@
       "url": "https://search.earthdata.nasa.gov/search?q=ATL03LL",
       "desc": "ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…",
       "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Version 3",
+      "org": "ASF"
+    },
+    {
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Data Quality Information Version 3",
+      "org": "ASF"
+    },
+    {
+      "title": "SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003",
+      "url": "https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003",
+      "desc": "SMAP Level 1A Radar Receive Only Product Metadata Version 3",
+      "org": "ASF"
     }
   ],
   "datagov": [

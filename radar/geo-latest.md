@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-14
+# Mapzimus Geospatial Radar — 2026-11-15
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [An Inverted Earth You Can Explore](http://googlemapsmania.blogspot.com/2026/11/an-inverted-earth-you-can-explore.html)
 - [The Never-Ending Coastline](http://googlemapsmania.blogspot.com/2026/11/the-never-ending-coastline.html)
 - [Explore Britain's Hidden Archaeology](http://googlemapsmania.blogspot.com/2026/11/explore-britains-hidden-archaeology.html)
 - [How to Make Interactive Maps for Free](http://googlemapsmania.blogspot.com/2026/11/how-to-make-interactive-maps-for-free.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [The Hills are Alive with the Sound of Music](http://googlemapsmania.blogspot.com/2026/11/the-hills-are-alive-with-sound-of-music.html)
 - [Contoured Fuji](http://googlemapsmania.blogspot.com/2026/11/contoured-fuji.html)
 - [Has a Satellite Been Watching You?](http://googlemapsmania.blogspot.com/2026/11/has-satellite-been-watching-you.html)
-- [Blowing in the Wind](http://googlemapsmania.blogspot.com/2026/11/blowing-in-wind.html)
 
 ## Geography Realm
 
@@ -53,22 +53,19 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Finding divergence points for lines in QGIS](https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis) (▲ 3 · 1 answers)
+- [Building 3D geological model and estimating mineral resources using only open-source tools](https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so) (▲ 0 · 0 answers)
+- [Unusual error never before encountered even in prior unzipping of folder: Lock folder name too long](https://gis.stackexchange.com/questions/501731/unusual-error-never-before-encountered-even-in-prior-unzipping-of-folder-lock-f) (▲ 0 · 0 answers)
+- [Finding divergence points for lines in QGIS](https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis) (▲ 4 · 1 answers)
 - [Importing Pandas DataFrame to ArcGIS Pro via ArcPy](https://gis.stackexchange.com/questions/501715/importing-pandas-dataframe-to-arcgis-pro-via-arcpy) (▲ 5 · 2 answers)
 - [Features from GDB file all disappear when one is selected in QGIS](https://gis.stackexchange.com/questions/501707/features-from-gdb-file-all-disappear-when-one-is-selected-in-qgis) (▲ 3 · 2 answers)
-- [Changed CRS in QGIS, changed back and now have 'tilted' view](https://gis.stackexchange.com/questions/501720/changed-crs-in-qgis-changed-back-and-now-have-tilted-view) (▲ 1 · 0 answers)
 - [Some projections produce strange results in QGIS](https://gis.stackexchange.com/questions/501705/some-projections-produce-strange-results-in-qgis) (▲ 3 · 2 answers)
+- [Changed CRS in QGIS, changed back and now have 'tilted' view](https://gis.stackexchange.com/questions/501720/changed-crs-in-qgis-changed-back-and-now-have-tilted-view) (▲ 1 · 0 answers)
 - [Measuring points along line and adding that in the attribute table in ArcGIS Pro](https://gis.stackexchange.com/questions/501703/measuring-points-along-line-and-adding-that-in-the-attribute-table-in-arcgis-pro) (▲ 3 · 2 answers)
 - [Why is there a difference in parcel area values between QField (with errors) and using a differential GPS (DGPS)?](https://gis.stackexchange.com/questions/501714/why-is-there-a-difference-in-parcel-area-values-between-qfield-with-errors-and) (▲ 0 · 0 answers)
 - [Developer/Debugging tools write to external file in QGIS](https://gis.stackexchange.com/questions/501699/developer-debugging-tools-write-to-external-file-in-qgis) (▲ 3 · 1 answers)
-- [GEE - Inconsistent shardSize behavior between toDrive and toAsset](https://gis.stackexchange.com/questions/501704/gee-inconsistent-shardsize-behavior-between-todrive-and-toasset) (▲ 1 · 1 answers)
-- [QGIS Error: Column type not supported using v.surf.idw, v.surf.rst,](https://gis.stackexchange.com/questions/501697/qgis-error-column-type-not-supported-using-v-surf-idw-v-surf-rst) (▲ 2 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
 - [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
 - [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
 - [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
@@ -76,6 +73,9 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
 - [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
 - [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
+- [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
+- [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
+- [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
 
 ## Data.gov — new geodata
 
