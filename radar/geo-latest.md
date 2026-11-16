@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-15
+# Mapzimus Geospatial Radar — 2026-11-16
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Map or Simulation? - Turning Maps into Games](http://googlemapsmania.blogspot.com/2026/11/map-or-simulation-turning-maps-into.html)
 - [An Inverted Earth You Can Explore](http://googlemapsmania.blogspot.com/2026/11/an-inverted-earth-you-can-explore.html)
 - [The Never-Ending Coastline](http://googlemapsmania.blogspot.com/2026/11/the-never-ending-coastline.html)
 - [Explore Britain's Hidden Archaeology](http://googlemapsmania.blogspot.com/2026/11/explore-britains-hidden-archaeology.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [GeoGuessr in Space](http://googlemapsmania.blogspot.com/2026/11/geoguessr-in-space.html)
 - [The Hills are Alive with the Sound of Music](http://googlemapsmania.blogspot.com/2026/11/the-hills-are-alive-with-sound-of-music.html)
 - [Contoured Fuji](http://googlemapsmania.blogspot.com/2026/11/contoured-fuji.html)
-- [Has a Satellite Been Watching You?](http://googlemapsmania.blogspot.com/2026/11/has-satellite-been-watching-you.html)
 
 ## Geography Realm
 
@@ -31,14 +31,14 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
-- [Contour Completeness Checker](https://plugins.qgis.org/plugins/ContourCompletenessChecker/)
-- [KK_Layer_Fuzzy_Search](https://plugins.qgis.org/plugins/KK_Layer_Fuzzy_Search/)
-- [Netz-QA](https://plugins.qgis.org/plugins/netz_qa/)
-- [Quick Landscape Analysis Explorer](https://plugins.qgis.org/plugins/quick_landscape_analysis_explorer/)
-- [FjBa Live Map Branding](https://plugins.qgis.org/plugins/FjBa_QGIS_Live_Map_Branding_V1_1/)
-- [Zanieczyszczenie światłem nocnym (Night-time Light Pollution)](https://plugins.qgis.org/plugins/zanieczyszczenie_swiatla_nocnego/)
-- [Disconnected Islands Modified](https://plugins.qgis.org/plugins/disconnected_islands_modified/)
-- [Building Connect & 3D Publish for PLATEAU](https://plugins.qgis.org/plugins/building_3d_html/)
+- [REGULA RURAL GEO](https://plugins.qgis.org/plugins/regula_rural_geo/)
+- [OpenAddresses Downloader](https://plugins.qgis.org/plugins/openaddresses_downloader/)
+- [GlobalML Buildings Downloader](https://plugins.qgis.org/plugins/globalml_buildings_downloader/)
+- [urban_cross_section](https://plugins.qgis.org/plugins/urban_cross_section/)
+- [SGeMS Workbench](https://plugins.qgis.org/plugins/sgems_export/)
+- [FjBa Basic Scale Grid Generator](https://plugins.qgis.org/plugins/FjBa_Basic_Grid_Generator/)
+- [Tasking Manager](https://plugins.qgis.org/plugins/tasking_manager/)
+- [QGIS Copilot](https://plugins.qgis.org/plugins/qgis_copilot/)
 
 ## Library releases
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Building 3D geological model and estimating mineral resources using only open-source tools](https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so) (▲ 0 · 0 answers)
+- [How to override an EPSG parameter on the proj command line?](https://gis.stackexchange.com/questions/501735/how-to-override-an-epsg-parameter-on-the-proj-command-line) (▲ 2 · 2 answers)
+- [Creating a monthly mean NDBI composite from HLSS30 and HLSL30](https://gis.stackexchange.com/questions/501734/creating-a-monthly-mean-ndbi-composite-from-hlss30-and-hlsl30) (▲ 0 · 0 answers)
+- [Building 3D geological model and estimating mineral resources using only open-source tools](https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so) (▲ -1 · 0 answers)
 - [Unusual error never before encountered even in prior unzipping of folder: Lock folder name too long](https://gis.stackexchange.com/questions/501731/unusual-error-never-before-encountered-even-in-prior-unzipping-of-folder-lock-f) (▲ 0 · 0 answers)
-- [Finding divergence points for lines in QGIS](https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis) (▲ 4 · 1 answers)
+- [Finding divergence points for lines in QGIS](https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis) (▲ 5 · 1 answers)
 - [Importing Pandas DataFrame to ArcGIS Pro via ArcPy](https://gis.stackexchange.com/questions/501715/importing-pandas-dataframe-to-arcgis-pro-via-arcpy) (▲ 5 · 2 answers)
 - [Features from GDB file all disappear when one is selected in QGIS](https://gis.stackexchange.com/questions/501707/features-from-gdb-file-all-disappear-when-one-is-selected-in-qgis) (▲ 3 · 2 answers)
 - [Some projections produce strange results in QGIS](https://gis.stackexchange.com/questions/501705/some-projections-produce-strange-results-in-qgis) (▲ 3 · 2 answers)
-- [Changed CRS in QGIS, changed back and now have 'tilted' view](https://gis.stackexchange.com/questions/501720/changed-crs-in-qgis-changed-back-and-now-have-tilted-view) (▲ 1 · 0 answers)
 - [Measuring points along line and adding that in the attribute table in ArcGIS Pro](https://gis.stackexchange.com/questions/501703/measuring-points-along-line-and-adding-that-in-the-attribute-table-in-arcgis-pro) (▲ 3 · 2 answers)
-- [Why is there a difference in parcel area values between QField (with errors) and using a differential GPS (DGPS)?](https://gis.stackexchange.com/questions/501714/why-is-there-a-difference-in-parcel-area-values-between-qfield-with-errors-and) (▲ 0 · 0 answers)
-- [Developer/Debugging tools write to external file in QGIS](https://gis.stackexchange.com/questions/501699/developer-debugging-tools-write-to-external-file-in-qgis) (▲ 3 · 1 answers)
+- [Changed CRS in QGIS, changed back and now have 'tilted' view](https://gis.stackexchange.com/questions/501720/changed-crs-in-qgis-changed-back-and-now-have-tilted-view) (▲ 1 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
-- [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
+- [VIIRS/NPP Snow Cover Daily L3 Global 375m CMG V002](https://search.earthdata.nasa.gov/search?q=VNP10D1F) — VNP10D1F is a daily global view of cloud-gap-filled (CGF) snow cover at 375 m resolution.
+- [VIIRS/NPP CGF Snow Cover Daily L3 Global 375m SIN Grid V002](https://search.earthdata.nasa.gov/search?q=VNP10A1F) — This data set contains daily 'cloud-free' snow cover produced from the VIIRS/NPP Snow Cover Daily L3 Global 375m SIN Grid, Version 2 snow cover product.
+- [VIIRS/NPP Snow Cover Daily L3 Global 375m SIN Grid V002](https://search.earthdata.nasa.gov/search?q=VNP10A1) — This data set contains daily snow cover derived from radiance data acquired by the Visible Infrared Imaging Radiometer Suite (VIIRS) on board the Suomi Natio…
+- [VIIRS/NPP Ice Surface Temperature 6-Min L2 Swath 750m V002](https://search.earthdata.nasa.gov/search?q=VNP30) — This data set reports sea ice surface temperature (IST) derived from radiance data acquired by the Visible Infrared Imager Radiometer Suite (VIIRS) onboard t…
+- [VIIRS/NPP Sea Ice Cover 6-Min L2 Swath 375m V002](https://search.earthdata.nasa.gov/search?q=VNP29) — This data set reports the location of sea ice cover derived from radiance data acquired by the Visible Infrared Imager Radiometer Suite (VIIRS) onboard the S…
+- [VIIRS/NPP Snow Cover 6-Min L2 Swath 375m V002](https://search.earthdata.nasa.gov/search?q=VNP10) — This data set reports snow cover using radiance data acquired by the Visible Infrared Imager Radiometer Suite (VIIRS) on board the Suomi National Polar-orbit…
+- [VIIRS/NPP Snow Cover Daily L3 Global 0.05Deg CMG V002](https://search.earthdata.nasa.gov/search?q=VNP10C1) — This global Level-3 data set provides the percentage of snow-covered land and cloud-covered land observed daily, within 0.05° (approx.
+- [Lidar-derived Digital Elevation Models for Coastal Pohnpei, FSM](https://search.earthdata.nasa.gov/search?q=Lidar_DEM_DTM_Veg_Pohnpei_2496) — This dataset includes a 10-m resolution digital terrain model (DTM) of much of the island of Pohnpei, the largest and highest of the islands in the Federated…
+- [VIIRS/NPP Sea Ice Cover Daily L3 Global 375m EASE-Grid 2.0 Day V002](https://search.earthdata.nasa.gov/search?q=VNP29P1D) — This data set reports sea ice cover/extent derived from radiance data acquired by the Visible Infrared Imager Radiometer Suite (VIIRS).
+- [VIIRS/NPP Ice Surface Temperature Daily L3 Global 750m EASE-Grid 2.0 Day V002](https://search.earthdata.nasa.gov/search?q=VNP30P1D) — This data set estimates of sea ice surface temperature (IST) derived from radiance data acquired by the Visible Infrared Imager Radiometer Suite (VIIRS).
 
 ## Data.gov — new geodata
 
@@ -90,6 +90,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## OSM pulse
 
+- [weeklyOSM 851](https://weeklyosm.eu/archives/0851/)
 - [weeklyOSM 850](https://weeklyosm.eu/archives/0850/)
 - [weeklyOSM 849](https://weeklyosm.eu/archives/0849/)
-- [weeklyOSM 848](https://weeklyosm.eu/archives/0848/)
