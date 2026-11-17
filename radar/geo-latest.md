@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-16
+# Mapzimus Geospatial Radar — 2026-11-17
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [The Interactive Shapes of Rivers](http://googlemapsmania.blogspot.com/2026/11/the-interactive-shapes-of-rivers.html)
 - [Map or Simulation? - Turning Maps into Games](http://googlemapsmania.blogspot.com/2026/11/map-or-simulation-turning-maps-into.html)
 - [An Inverted Earth You Can Explore](http://googlemapsmania.blogspot.com/2026/11/an-inverted-earth-you-can-explore.html)
 - [The Never-Ending Coastline](http://googlemapsmania.blogspot.com/2026/11/the-never-ending-coastline.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [How to Make Interactive Maps for Free](http://googlemapsmania.blogspot.com/2026/11/how-to-make-interactive-maps-for-free.html)
 - [GeoGuessr in Space](http://googlemapsmania.blogspot.com/2026/11/geoguessr-in-space.html)
 - [The Hills are Alive with the Sound of Music](http://googlemapsmania.blogspot.com/2026/11/the-hills-are-alive-with-sound-of-music.html)
-- [Contoured Fuji](http://googlemapsmania.blogspot.com/2026/11/contoured-fuji.html)
 
 ## Geography Realm
 
@@ -31,18 +31,18 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
+- [Netz-Report](https://plugins.qgis.org/plugins/netz_report/)
+- [GeoUtility AI Copilot](https://plugins.qgis.org/plugins/geoutility_copilot/)
+- [Detectability](https://plugins.qgis.org/plugins/detectability_qgis/)
 - [REGULA RURAL GEO](https://plugins.qgis.org/plugins/regula_rural_geo/)
 - [OpenAddresses Downloader](https://plugins.qgis.org/plugins/openaddresses_downloader/)
 - [GlobalML Buildings Downloader](https://plugins.qgis.org/plugins/globalml_buildings_downloader/)
 - [urban_cross_section](https://plugins.qgis.org/plugins/urban_cross_section/)
 - [SGeMS Workbench](https://plugins.qgis.org/plugins/sgems_export/)
-- [FjBa Basic Scale Grid Generator](https://plugins.qgis.org/plugins/FjBa_Basic_Grid_Generator/)
-- [Tasking Manager](https://plugins.qgis.org/plugins/tasking_manager/)
-- [QGIS Copilot](https://plugins.qgis.org/plugins/qgis_copilot/)
 
 ## Library releases
 
-- [maplibre-gl-js v6.18.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.18.0) (2026-11-11) — ### ✨ Features and improvements - Add `raster-layer-blend` support ([#8986](https://github.com/maplibre/maplibre-gl-js/pull/8986)) (by [@birkskyum](https://g…
+- [maplibre-gl-js v6.19.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.19.0) (2026-11-17) — ### ✨ Features and improvements - Add `oklab()` colors and the `interpolate-oklab` expression ([#9051](https://github.com/maplibre/maplibre-gl-js/pull/9051))…
 - [deck.gl v9.3.12](https://github.com/visgl/deck.gl/releases/tag/v9.3.12) (2026-10-30) — - fix(core): eliminate 300ms click delay and fix runtime controller prop changes (#10422) - fix(heatmap): compilation failure on Qualcomm Adreno 660 (#10301)…
 - [duckdb v2.0.0](https://github.com/duckdb/duckdb/releases/tag/v2.0.0) (2026-10-21) — This release of DuckDB is named "Cyanoptera" after Spatula Cyanoptera, a species of duck found in western North and South America.
 - [QGIS final-3_44_15](https://github.com/qgis/QGIS/releases/tag/final-3_44_15) (2026-09-25) — https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [How to override an EPSG parameter on the proj command line?](https://gis.stackexchange.com/questions/501735/how-to-override-an-epsg-parameter-on-the-proj-command-line) (▲ 2 · 2 answers)
+- [Why does QGIS report overlaps=True for two valid polygons sharing an identical boundary segment?](https://gis.stackexchange.com/questions/501744/why-does-qgis-report-overlaps-true-for-two-valid-polygons-sharing-an-identical-b) (▲ 0 · 0 answers)
+- [gdal issue (missing or missing permissions)](https://gis.stackexchange.com/questions/501742/gdal-issue-missing-or-missing-permissions) (▲ 1 · 0 answers)
+- [Overriding EPSG parameter on the proj command line](https://gis.stackexchange.com/questions/501735/overriding-epsg-parameter-on-the-proj-command-line) (▲ 2 · 2 answers)
+- [Applying fixed raster grid in lasR rasterize](https://gis.stackexchange.com/questions/501740/applying-fixed-raster-grid-in-lasr-rasterize) (▲ 2 · 0 answers)
 - [Creating a monthly mean NDBI composite from HLSS30 and HLSL30](https://gis.stackexchange.com/questions/501734/creating-a-monthly-mean-ndbi-composite-from-hlss30-and-hlsl30) (▲ 0 · 0 answers)
-- [Building 3D geological model and estimating mineral resources using only open-source tools](https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so) (▲ -1 · 0 answers)
-- [Unusual error never before encountered even in prior unzipping of folder: Lock folder name too long](https://gis.stackexchange.com/questions/501731/unusual-error-never-before-encountered-even-in-prior-unzipping-of-folder-lock-f) (▲ 0 · 0 answers)
+- [Building 3D geological model and estimating mineral resources using only open-source tools](https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so) (▲ 0 · 0 answers)
 - [Finding divergence points for lines in QGIS](https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis) (▲ 5 · 1 answers)
+- [Unusual error never before encountered even in prior unzipping of folder: Lock folder name too long](https://gis.stackexchange.com/questions/501731/unusual-error-never-before-encountered-even-in-prior-unzipping-of-folder-lock-f) (▲ 0 · 0 answers)
 - [Importing Pandas DataFrame to ArcGIS Pro via ArcPy](https://gis.stackexchange.com/questions/501715/importing-pandas-dataframe-to-arcgis-pro-via-arcpy) (▲ 5 · 2 answers)
 - [Features from GDB file all disappear when one is selected in QGIS](https://gis.stackexchange.com/questions/501707/features-from-gdb-file-all-disappear-when-one-is-selected-in-qgis) (▲ 3 · 2 answers)
-- [Some projections produce strange results in QGIS](https://gis.stackexchange.com/questions/501705/some-projections-produce-strange-results-in-qgis) (▲ 3 · 2 answers)
-- [Measuring points along line and adding that in the attribute table in ArcGIS Pro](https://gis.stackexchange.com/questions/501703/measuring-points-along-line-and-adding-that-in-the-attribute-table-in-arcgis-pro) (▲ 3 · 2 answers)
-- [Changed CRS in QGIS, changed back and now have 'tilted' view](https://gis.stackexchange.com/questions/501720/changed-crs-in-qgis-changed-back-and-now-have-tilted-view) (▲ 1 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [VIIRS/NPP Snow Cover Daily L3 Global 375m CMG V002](https://search.earthdata.nasa.gov/search?q=VNP10D1F) — VNP10D1F is a daily global view of cloud-gap-filled (CGF) snow cover at 375 m resolution.
-- [VIIRS/NPP CGF Snow Cover Daily L3 Global 375m SIN Grid V002](https://search.earthdata.nasa.gov/search?q=VNP10A1F) — This data set contains daily 'cloud-free' snow cover produced from the VIIRS/NPP Snow Cover Daily L3 Global 375m SIN Grid, Version 2 snow cover product.
-- [VIIRS/NPP Snow Cover Daily L3 Global 375m SIN Grid V002](https://search.earthdata.nasa.gov/search?q=VNP10A1) — This data set contains daily snow cover derived from radiance data acquired by the Visible Infrared Imaging Radiometer Suite (VIIRS) on board the Suomi Natio…
-- [VIIRS/NPP Ice Surface Temperature 6-Min L2 Swath 750m V002](https://search.earthdata.nasa.gov/search?q=VNP30) — This data set reports sea ice surface temperature (IST) derived from radiance data acquired by the Visible Infrared Imager Radiometer Suite (VIIRS) onboard t…
-- [VIIRS/NPP Sea Ice Cover 6-Min L2 Swath 375m V002](https://search.earthdata.nasa.gov/search?q=VNP29) — This data set reports the location of sea ice cover derived from radiance data acquired by the Visible Infrared Imager Radiometer Suite (VIIRS) onboard the S…
-- [VIIRS/NPP Snow Cover 6-Min L2 Swath 375m V002](https://search.earthdata.nasa.gov/search?q=VNP10) — This data set reports snow cover using radiance data acquired by the Visible Infrared Imager Radiometer Suite (VIIRS) on board the Suomi National Polar-orbit…
-- [VIIRS/NPP Snow Cover Daily L3 Global 0.05Deg CMG V002](https://search.earthdata.nasa.gov/search?q=VNP10C1) — This global Level-3 data set provides the percentage of snow-covered land and cloud-covered land observed daily, within 0.05° (approx.
-- [Lidar-derived Digital Elevation Models for Coastal Pohnpei, FSM](https://search.earthdata.nasa.gov/search?q=Lidar_DEM_DTM_Veg_Pohnpei_2496) — This dataset includes a 10-m resolution digital terrain model (DTM) of much of the island of Pohnpei, the largest and highest of the islands in the Federated…
-- [VIIRS/NPP Sea Ice Cover Daily L3 Global 375m EASE-Grid 2.0 Day V002](https://search.earthdata.nasa.gov/search?q=VNP29P1D) — This data set reports sea ice cover/extent derived from radiance data acquired by the Visible Infrared Imager Radiometer Suite (VIIRS).
-- [VIIRS/NPP Ice Surface Temperature Daily L3 Global 750m EASE-Grid 2.0 Day V002](https://search.earthdata.nasa.gov/search?q=VNP30P1D) — This data set estimates of sea ice surface temperature (IST) derived from radiance data acquired by the Visible Infrared Imager Radiometer Suite (VIIRS).
+- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
+- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
+- [NARSTO Texas Particulate Matter (PM) 2.5 Sampling and Analysis Study: 1997-1998 Data](https://search.earthdata.nasa.gov/search?q=NARSTO_Texas_PM2.5_Sampling_and_Analysis_Study_1997-1998) — NARSTO_Texas_PM2.5_Sampling_and_Analysis_Study_1997-1998_ is the North American Research Strategy for Tropospheric Ozone (NARSTO) Texas Particulate Matter (P…
+- [NARSTO Supersite Transboundary Intensive Field Study (STIFS) Particulate Matter (PM) Inorganic Volatile Organic Compounds Data](https://search.earthdata.nasa.gov/search?q=NARSTO_STIFS_CANADA_PM_INORG_VOC_DATA) — NARSTO_STIFS_CANADA_PM_INORG_VOC_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) Supersite Transboundary Intensive Field Study (…
+- [NARSTO SOS99 Nashville WP-3D Orion Air Chemistry Data](https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_WP3D_CHEMISTRY_DATA) — NARSTO_SOS99NASH_WP3D_CHEMISTRY_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) SOS99 Nashville WP-3D Orion Air Chemistry Data p…
+- [NARSTO_SOS_SC_UPSTATE PM2.5 Composition Data](https://search.earthdata.nasa.gov/search?q=NARSTO_SOS_SC_UPSTATE_PM25_COMPOSITION) — The NARSTO_SOS_SC_UPSTATE_PM25_COMPOSITION data were collected during July 2001 and January of 2002 to elucidate the seasonal variability of the aerosols.
+- [NARSTO SOS99NASH Wind Profiler Data](https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_WIND_PROFILER_DATA) — The NARSTO_SOS99NASH_WIND_PROFILER_DATA were obtained between May 19 and August 4, 1999.
+- [NARSTO SOS99 Nashville Tennessee Valley Authority (TVA) Surface Meteorology and Chemistry Data](https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_SURFACE_MET_CHEM_DATA) — NARSTO_SOS99NASH_SURFACE_MET_CHEM_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) SOS99 Nashville Tennessee Valley Authority (TV…
+- [NARSTO SOS99NASH DOE G-1 Air Chemistry Data](https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_G-1_AIR_CHEMISTRY_DATA) — NARSTO_SOS99NASH_G-1_AIR_CHEMISTRY_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) SOS99 Nashville Department of Energy (DOE) G-…
 
 ## Data.gov — new geodata
 
