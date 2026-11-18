@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-17
+# Mapzimus Geospatial Radar — 2026-11-18
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Should the USA Give Texas to Russia?](http://googlemapsmania.blogspot.com/2026/11/should-usa-give-texas-to-russia.html)
 - [The Interactive Shapes of Rivers](http://googlemapsmania.blogspot.com/2026/11/the-interactive-shapes-of-rivers.html)
 - [Map or Simulation? - Turning Maps into Games](http://googlemapsmania.blogspot.com/2026/11/map-or-simulation-turning-maps-into.html)
 - [An Inverted Earth You Can Explore](http://googlemapsmania.blogspot.com/2026/11/an-inverted-earth-you-can-explore.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Explore Britain's Hidden Archaeology](http://googlemapsmania.blogspot.com/2026/11/explore-britains-hidden-archaeology.html)
 - [How to Make Interactive Maps for Free](http://googlemapsmania.blogspot.com/2026/11/how-to-make-interactive-maps-for-free.html)
 - [GeoGuessr in Space](http://googlemapsmania.blogspot.com/2026/11/geoguessr-in-space.html)
-- [The Hills are Alive with the Sound of Music](http://googlemapsmania.blogspot.com/2026/11/the-hills-are-alive-with-sound-of-music.html)
 
 ## Geography Realm
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Why does QGIS report overlaps=True for two valid polygons sharing an identical boundary segment?](https://gis.stackexchange.com/questions/501744/why-does-qgis-report-overlaps-true-for-two-valid-polygons-sharing-an-identical-b) (▲ 0 · 0 answers)
+- [Adding vector items from ArcGIS REST FeatureServer on QGIS 4.2](https://gis.stackexchange.com/questions/501745/adding-vector-items-from-arcgis-rest-featureserver-on-qgis-4-2) (▲ 3 · 1 answers)
+- [Why does QGIS report overlaps=True for two valid polygons sharing an identical boundary segment?](https://gis.stackexchange.com/questions/501744/why-does-qgis-report-overlaps-true-for-two-valid-polygons-sharing-an-identical-b) (▲ 1 · 0 answers)
 - [gdal issue (missing or missing permissions)](https://gis.stackexchange.com/questions/501742/gdal-issue-missing-or-missing-permissions) (▲ 1 · 0 answers)
 - [Overriding EPSG parameter on the proj command line](https://gis.stackexchange.com/questions/501735/overriding-epsg-parameter-on-the-proj-command-line) (▲ 2 · 2 answers)
+- [Display OS DataHub Leisure mapping (EPSG:27700 1:50K and 1:25K) using MapLibre GL JS](https://gis.stackexchange.com/questions/501746/display-os-datahub-leisure-mapping-epsg27700-150k-and-125k-using-maplibre-g) (▲ 0 · 0 answers)
 - [Applying fixed raster grid in lasR rasterize](https://gis.stackexchange.com/questions/501740/applying-fixed-raster-grid-in-lasr-rasterize) (▲ 2 · 0 answers)
-- [Creating a monthly mean NDBI composite from HLSS30 and HLSL30](https://gis.stackexchange.com/questions/501734/creating-a-monthly-mean-ndbi-composite-from-hlss30-and-hlsl30) (▲ 0 · 0 answers)
-- [Building 3D geological model and estimating mineral resources using only open-source tools](https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so) (▲ 0 · 0 answers)
 - [Finding divergence points for lines in QGIS](https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis) (▲ 5 · 1 answers)
+- [Building 3D geological model and estimating mineral resources using only open-source tools](https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so) (▲ -1 · 0 answers)
+- [Creating a monthly mean NDBI composite from HLSS30 and HLSL30](https://gis.stackexchange.com/questions/501734/creating-a-monthly-mean-ndbi-composite-from-hlss30-and-hlsl30) (▲ 0 · 0 answers)
 - [Unusual error never before encountered even in prior unzipping of folder: Lock folder name too long](https://gis.stackexchange.com/questions/501731/unusual-error-never-before-encountered-even-in-prior-unzipping-of-folder-lock-f) (▲ 0 · 0 answers)
-- [Importing Pandas DataFrame to ArcGIS Pro via ArcPy](https://gis.stackexchange.com/questions/501715/importing-pandas-dataframe-to-arcgis-pro-via-arcpy) (▲ 5 · 2 answers)
-- [Features from GDB file all disappear when one is selected in QGIS](https://gis.stackexchange.com/questions/501707/features-from-gdb-file-all-disappear-when-one-is-selected-in-qgis) (▲ 3 · 2 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
-- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
-- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
-- [NARSTO Texas Particulate Matter (PM) 2.5 Sampling and Analysis Study: 1997-1998 Data](https://search.earthdata.nasa.gov/search?q=NARSTO_Texas_PM2.5_Sampling_and_Analysis_Study_1997-1998) — NARSTO_Texas_PM2.5_Sampling_and_Analysis_Study_1997-1998_ is the North American Research Strategy for Tropospheric Ozone (NARSTO) Texas Particulate Matter (P…
-- [NARSTO Supersite Transboundary Intensive Field Study (STIFS) Particulate Matter (PM) Inorganic Volatile Organic Compounds Data](https://search.earthdata.nasa.gov/search?q=NARSTO_STIFS_CANADA_PM_INORG_VOC_DATA) — NARSTO_STIFS_CANADA_PM_INORG_VOC_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) Supersite Transboundary Intensive Field Study (…
-- [NARSTO SOS99 Nashville WP-3D Orion Air Chemistry Data](https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_WP3D_CHEMISTRY_DATA) — NARSTO_SOS99NASH_WP3D_CHEMISTRY_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) SOS99 Nashville WP-3D Orion Air Chemistry Data p…
-- [NARSTO_SOS_SC_UPSTATE PM2.5 Composition Data](https://search.earthdata.nasa.gov/search?q=NARSTO_SOS_SC_UPSTATE_PM25_COMPOSITION) — The NARSTO_SOS_SC_UPSTATE_PM25_COMPOSITION data were collected during July 2001 and January of 2002 to elucidate the seasonal variability of the aerosols.
-- [NARSTO SOS99NASH Wind Profiler Data](https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_WIND_PROFILER_DATA) — The NARSTO_SOS99NASH_WIND_PROFILER_DATA were obtained between May 19 and August 4, 1999.
-- [NARSTO SOS99 Nashville Tennessee Valley Authority (TVA) Surface Meteorology and Chemistry Data](https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_SURFACE_MET_CHEM_DATA) — NARSTO_SOS99NASH_SURFACE_MET_CHEM_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) SOS99 Nashville Tennessee Valley Authority (TV…
-- [NARSTO SOS99NASH DOE G-1 Air Chemistry Data](https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_G-1_AIR_CHEMISTRY_DATA) — NARSTO_SOS99NASH_G-1_AIR_CHEMISTRY_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) SOS99 Nashville Department of Energy (DOE) G-…
+- [Global Inventory of Methane Emissions from Fuel Exploitation V1 (GFEI_CH4)](https://search.earthdata.nasa.gov/search?q=GFEI_CH4) — This is a global inventory of methane emissions from fuel exploitation (GFEI) created for the NASA Carbon Monitoring System (CMS).
+- [High-resolution mean North American methane fluxes for 2010-2015 optimized with GOSAT satellite data V1 (CMS_HR_MNA_CH4_FLUX)](https://search.earthdata.nasa.gov/search?q=CMS_HR_MNA_CH4_FLUX) — This data set contains estimates of methane emission in North America based on an inversion of the GEOS-Chem chemical transport model constrained by Greenhou…
+- [Methane (CH4) Flux for North America L4 Daily V1 (CMS_CH4_FLX_NAD)](https://search.earthdata.nasa.gov/search?q=CMS_CH4_FLX_NAD) — The CMS Methane (CH4) Flux for North America data set contains estimates of methane emission in North America based on an inversion of the GEOS-Chem chemical…
+- [Global methane fluxes optimized with GOSAT data for 2010-2018 V1 (CMSGCH4F)](https://search.earthdata.nasa.gov/search?q=CMSGCH4F) — This dataset provides global methane fluxes optimized with GOSAT data for 2010-2018.
+- [Sentinel-5P TROPOMI Aerosol Layer Height 1-Orbit L2 5.5km x 3.5km V3 (S5P_L2__AER_LH_HiR)](https://search.earthdata.nasa.gov/search?q=S5P_L2__AER_LH_HiR) — The Copernicus Sentinel-5 Precursor (Sentinel-5P or S5P) satellite mission is one of the European Space Agency's (ESA) new mission family - Sentinels, and it…
+- [Sentinel-5P TROPOMI Near-Real-Time (NRT) Aerosol Index 1-Orbit L2 5.5km x 3.5km V3 (S5P_L2__AER_AI_HiR_NRT)](https://search.earthdata.nasa.gov/search?q=S5P_L2__AER_AI_HiR_NRT) — The Copernicus Sentinel-5 Precursor (Sentinel-5P or S5P) satellite mission is one of the European Space Agency's (ESA) new mission family - Sentinels, and it…
+- [Sentinel-5P TROPOMI Aerosol Index 1-Orbit L2 5.5km x 3.5km V3 (S5P_L2__AER_AI_HiR)](https://search.earthdata.nasa.gov/search?q=S5P_L2__AER_AI_HiR) — The Copernicus Sentinel-5 Precursor (Sentinel-5P or S5P) satellite mission is one of the European Space Agency's (ESA) new mission family - Sentinels, and it…
+- [OCO-2 Level 2 bias-corrected solar-induced fluorescence and other select fields from the IMAP-DOAS algorithm, Forward processing V11.4 (O…](https://search.earthdata.nasa.gov/search?q=OCO2_L2_Fwd_SIF) — Version 11.4 is the current version of the data set.
+- [GPM PR on TRMM Reflectivity, Precipitation Statistics, Histograms, at Surface and Fixed Heights, Descending, 1 day 5x5 and 0.25x0.25 degr…](https://search.earthdata.nasa.gov/search?q=GPM_3PR_DES) — This a new (GPM-formated) TRMM product.
+- [GPM PR on TRMM Reflectivity, Precipitation Statistics, Histograms, at Surface and Fixed Heights, Ascending, 1 day 5x5 and 0.25x0.25 degre…](https://search.earthdata.nasa.gov/search?q=GPM_3PR_ASC) — This a new (GPM-formated) TRMM product.
 
 ## Data.gov — new geodata
 

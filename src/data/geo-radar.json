@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-11-17",
+  "generatedAt": "2026-11-18",
   "news": {
     "mapsmania": [
+      {
+        "title": "Should the USA Give Texas to Russia?",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/should-usa-give-texas-to-russia.html",
+        "desc": ""
+      },
       {
         "title": "The Interactive Shapes of Rivers",
         "url": "http://googlemapsmania.blogspot.com/2026/11/the-interactive-shapes-of-rivers.html",
@@ -35,11 +40,6 @@
       {
         "title": "GeoGuessr in Space",
         "url": "http://googlemapsmania.blogspot.com/2026/11/geoguessr-in-space.html",
-        "desc": ""
-      },
-      {
-        "title": "The Hills are Alive with the Sound of Music",
-        "url": "http://googlemapsmania.blogspot.com/2026/11/the-hills-are-alive-with-sound-of-music.html",
         "desc": ""
       }
     ],
@@ -210,9 +210,15 @@
   ],
   "gisse": [
     {
+      "title": "Adding vector items from ArcGIS REST FeatureServer on QGIS 4.2",
+      "url": "https://gis.stackexchange.com/questions/501745/adding-vector-items-from-arcgis-rest-featureserver-on-qgis-4-2",
+      "score": 3,
+      "answers": 1
+    },
+    {
       "title": "Why does QGIS report overlaps=True for two valid polygons sharing an identical boundary segment?",
       "url": "https://gis.stackexchange.com/questions/501744/why-does-qgis-report-overlaps-true-for-two-valid-polygons-sharing-an-identical-b",
-      "score": 0,
+      "score": 1,
       "answers": 0
     },
     {
@@ -228,21 +234,15 @@
       "answers": 2
     },
     {
+      "title": "Display OS DataHub Leisure mapping (EPSG:27700 1:50K and 1:25K) using MapLibre GL JS",
+      "url": "https://gis.stackexchange.com/questions/501746/display-os-datahub-leisure-mapping-epsg27700-150k-and-125k-using-maplibre-g",
+      "score": 0,
+      "answers": 0
+    },
+    {
       "title": "Applying fixed raster grid in lasR rasterize",
       "url": "https://gis.stackexchange.com/questions/501740/applying-fixed-raster-grid-in-lasr-rasterize",
       "score": 2,
-      "answers": 0
-    },
-    {
-      "title": "Creating a monthly mean NDBI composite from HLSS30 and HLSL30",
-      "url": "https://gis.stackexchange.com/questions/501734/creating-a-monthly-mean-ndbi-composite-from-hlss30-and-hlsl30",
-      "score": 0,
-      "answers": 0
-    },
-    {
-      "title": "Building 3D geological model and estimating mineral resources using only open-source tools",
-      "url": "https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so",
-      "score": 0,
       "answers": 0
     },
     {
@@ -252,84 +252,84 @@
       "answers": 1
     },
     {
-      "title": "Unusual error never before encountered even in prior unzipping of folder: Lock folder name too long",
-      "url": "https://gis.stackexchange.com/questions/501731/unusual-error-never-before-encountered-even-in-prior-unzipping-of-folder-lock-f",
+      "title": "Building 3D geological model and estimating mineral resources using only open-source tools",
+      "url": "https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so",
+      "score": -1,
+      "answers": 0
+    },
+    {
+      "title": "Creating a monthly mean NDBI composite from HLSS30 and HLSL30",
+      "url": "https://gis.stackexchange.com/questions/501734/creating-a-monthly-mean-ndbi-composite-from-hlss30-and-hlsl30",
       "score": 0,
       "answers": 0
     },
     {
-      "title": "Importing Pandas DataFrame to ArcGIS Pro via ArcPy",
-      "url": "https://gis.stackexchange.com/questions/501715/importing-pandas-dataframe-to-arcgis-pro-via-arcpy",
-      "score": 5,
-      "answers": 2
-    },
-    {
-      "title": "Features from GDB file all disappear when one is selected in QGIS",
-      "url": "https://gis.stackexchange.com/questions/501707/features-from-gdb-file-all-disappear-when-one-is-selected-in-qgis",
-      "score": 3,
-      "answers": 2
+      "title": "Unusual error never before encountered even in prior unzipping of folder: Lock folder name too long",
+      "url": "https://gis.stackexchange.com/questions/501731/unusual-error-never-before-encountered-even-in-prior-unzipping-of-folder-lock-f",
+      "score": 0,
+      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL03LL",
-      "desc": "ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…",
-      "org": "NSIDC_CPRD"
+      "title": "Global Inventory of Methane Emissions from Fuel Exploitation V1 (GFEI_CH4)",
+      "url": "https://search.earthdata.nasa.gov/search?q=GFEI_CH4",
+      "desc": "This is a global inventory of methane emissions from fuel exploitation (GFEI) created for the NASA Carbon Monitoring System (CMS).",
+      "org": "GES_DISC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL20QL",
-      "desc": "ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "High-resolution mean North American methane fluxes for 2010-2015 optimized with GOSAT satellite data V1 (CMS_HR_MNA_CH4_FLUX)",
+      "url": "https://search.earthdata.nasa.gov/search?q=CMS_HR_MNA_CH4_FLUX",
+      "desc": "This data set contains estimates of methane emission in North America based on an inversion of the GEOS-Chem chemical transport model constrained by Greenhou…",
+      "org": "GES_DISC"
     },
     {
-      "title": "ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007",
-      "url": "https://search.earthdata.nasa.gov/search?q=ATL13QL",
-      "desc": "ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.",
-      "org": "NSIDC_CPRD"
+      "title": "Methane (CH4) Flux for North America L4 Daily V1 (CMS_CH4_FLX_NAD)",
+      "url": "https://search.earthdata.nasa.gov/search?q=CMS_CH4_FLX_NAD",
+      "desc": "The CMS Methane (CH4) Flux for North America data set contains estimates of methane emission in North America based on an inversion of the GEOS-Chem chemical…",
+      "org": "GES_DISC"
     },
     {
-      "title": "NARSTO Texas Particulate Matter (PM) 2.5 Sampling and Analysis Study: 1997-1998 Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=NARSTO_Texas_PM2.5_Sampling_and_Analysis_Study_1997-1998",
-      "desc": "NARSTO_Texas_PM2.5_Sampling_and_Analysis_Study_1997-1998_ is the North American Research Strategy for Tropospheric Ozone (NARSTO) Texas Particulate Matter (P…",
-      "org": "LARC_CLOUD"
+      "title": "Global methane fluxes optimized with GOSAT data for 2010-2018 V1 (CMSGCH4F)",
+      "url": "https://search.earthdata.nasa.gov/search?q=CMSGCH4F",
+      "desc": "This dataset provides global methane fluxes optimized with GOSAT data for 2010-2018.",
+      "org": "GES_DISC"
     },
     {
-      "title": "NARSTO Supersite Transboundary Intensive Field Study (STIFS) Particulate Matter (PM) Inorganic Volatile Organic Compounds Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=NARSTO_STIFS_CANADA_PM_INORG_VOC_DATA",
-      "desc": "NARSTO_STIFS_CANADA_PM_INORG_VOC_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) Supersite Transboundary Intensive Field Study (…",
-      "org": "LARC_CLOUD"
+      "title": "Sentinel-5P TROPOMI Aerosol Layer Height 1-Orbit L2 5.5km x 3.5km V3 (S5P_L2__AER_LH_HiR)",
+      "url": "https://search.earthdata.nasa.gov/search?q=S5P_L2__AER_LH_HiR",
+      "desc": "The Copernicus Sentinel-5 Precursor (Sentinel-5P or S5P) satellite mission is one of the European Space Agency's (ESA) new mission family - Sentinels, and it…",
+      "org": "GES_DISC"
     },
     {
-      "title": "NARSTO SOS99 Nashville WP-3D Orion Air Chemistry Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_WP3D_CHEMISTRY_DATA",
-      "desc": "NARSTO_SOS99NASH_WP3D_CHEMISTRY_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) SOS99 Nashville WP-3D Orion Air Chemistry Data p…",
-      "org": "LARC_CLOUD"
+      "title": "Sentinel-5P TROPOMI Near-Real-Time (NRT) Aerosol Index 1-Orbit L2 5.5km x 3.5km V3 (S5P_L2__AER_AI_HiR_NRT)",
+      "url": "https://search.earthdata.nasa.gov/search?q=S5P_L2__AER_AI_HiR_NRT",
+      "desc": "The Copernicus Sentinel-5 Precursor (Sentinel-5P or S5P) satellite mission is one of the European Space Agency's (ESA) new mission family - Sentinels, and it…",
+      "org": "GES_DISC"
     },
     {
-      "title": "NARSTO_SOS_SC_UPSTATE PM2.5 Composition Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=NARSTO_SOS_SC_UPSTATE_PM25_COMPOSITION",
-      "desc": "The NARSTO_SOS_SC_UPSTATE_PM25_COMPOSITION data were collected during July 2001 and January of 2002 to elucidate the seasonal variability of the aerosols.",
-      "org": "LARC_CLOUD"
+      "title": "Sentinel-5P TROPOMI Aerosol Index 1-Orbit L2 5.5km x 3.5km V3 (S5P_L2__AER_AI_HiR)",
+      "url": "https://search.earthdata.nasa.gov/search?q=S5P_L2__AER_AI_HiR",
+      "desc": "The Copernicus Sentinel-5 Precursor (Sentinel-5P or S5P) satellite mission is one of the European Space Agency's (ESA) new mission family - Sentinels, and it…",
+      "org": "GES_DISC"
     },
     {
-      "title": "NARSTO SOS99NASH Wind Profiler Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_WIND_PROFILER_DATA",
-      "desc": "The NARSTO_SOS99NASH_WIND_PROFILER_DATA were obtained between May 19 and August 4, 1999.",
-      "org": "LARC_CLOUD"
+      "title": "OCO-2 Level 2 bias-corrected solar-induced fluorescence and other select fields from the IMAP-DOAS algorithm, Forward processing V11.4 (O…",
+      "url": "https://search.earthdata.nasa.gov/search?q=OCO2_L2_Fwd_SIF",
+      "desc": "Version 11.4 is the current version of the data set.",
+      "org": "GES_DISC"
     },
     {
-      "title": "NARSTO SOS99 Nashville Tennessee Valley Authority (TVA) Surface Meteorology and Chemistry Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_SURFACE_MET_CHEM_DATA",
-      "desc": "NARSTO_SOS99NASH_SURFACE_MET_CHEM_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) SOS99 Nashville Tennessee Valley Authority (TV…",
-      "org": "LARC_CLOUD"
+      "title": "GPM PR on TRMM Reflectivity, Precipitation Statistics, Histograms, at Surface and Fixed Heights, Descending, 1 day 5x5 and 0.25x0.25 degr…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3PR_DES",
+      "desc": "This a new (GPM-formated) TRMM product.",
+      "org": "GES_DISC"
     },
     {
-      "title": "NARSTO SOS99NASH DOE G-1 Air Chemistry Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=NARSTO_SOS99NASH_G-1_AIR_CHEMISTRY_DATA",
-      "desc": "NARSTO_SOS99NASH_G-1_AIR_CHEMISTRY_DATA is the North American Research Strategy for Tropospheric Ozone (NARSTO) SOS99 Nashville Department of Energy (DOE) G-…",
-      "org": "LARC_CLOUD"
+      "title": "GPM PR on TRMM Reflectivity, Precipitation Statistics, Histograms, at Surface and Fixed Heights, Ascending, 1 day 5x5 and 0.25x0.25 degre…",
+      "url": "https://search.earthdata.nasa.gov/search?q=GPM_3PR_ASC",
+      "desc": "This a new (GPM-formated) TRMM product.",
+      "org": "GES_DISC"
     }
   ],
   "datagov": [
