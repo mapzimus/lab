@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-18
+# Mapzimus Geospatial Radar — 2026-11-19
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [How to Build a Free Flight Sim](http://googlemapsmania.blogspot.com/2026/11/how-to-build-free-flight-sim.html)
 - [Should the USA Give Texas to Russia?](http://googlemapsmania.blogspot.com/2026/11/should-usa-give-texas-to-russia.html)
 - [The Interactive Shapes of Rivers](http://googlemapsmania.blogspot.com/2026/11/the-interactive-shapes-of-rivers.html)
 - [Map or Simulation? - Turning Maps into Games](http://googlemapsmania.blogspot.com/2026/11/map-or-simulation-turning-maps-into.html)
@@ -9,16 +10,15 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [The Never-Ending Coastline](http://googlemapsmania.blogspot.com/2026/11/the-never-ending-coastline.html)
 - [Explore Britain's Hidden Archaeology](http://googlemapsmania.blogspot.com/2026/11/explore-britains-hidden-archaeology.html)
 - [How to Make Interactive Maps for Free](http://googlemapsmania.blogspot.com/2026/11/how-to-make-interactive-maps-for-free.html)
-- [GeoGuessr in Space](http://googlemapsmania.blogspot.com/2026/11/geoguessr-in-space.html)
 
 ## Geography Realm
 
-- [Good Governance Needs a Strong Code of Conduct](https://www.geographyrealm.com/good-governance-code-of-conduct/) — UPDATE, October 21, 2026: Read my op-ed in San José Spotlight: “Midpen board votes to free directors from being required to respect the public.” Editorial: M…
+- [How to Use MPKX Files in QGIS](https://www.geographyrealm.com/how-to-use-mpkx-files-in-qgis/) — QGIS can’t open an MPKX map package directly.
+- [GIS File Formats](https://www.geographyrealm.com/how-to-tell-gis-file-formats/) — Learn the common GIS file formats and what each extension means, from shapefiles and GeoPackages to ArcGIS Pro and QGIS project files.
+- [Good Governance Needs a Strong Code of Conduct](https://www.geographyrealm.com/good-governance-code-of-conduct/) — Midpen Open Space manages 77,000 acres of public land.
 - [Alaska’s Coastline is Longer Than All the Other 49 States Combined](https://www.geographyrealm.com/alaskas-coastline-is-longer-than-all-the-other-49-states-combined/) — Alaska has the longest U.S.
 - [Geography Facts about the World’s Continents](https://www.geographyrealm.com/continents/) — How many continents are there?
 - [X is Longitude, Y is Latitude](https://www.geographyrealm.com/x-longitude-y-latitude/) — Why is X longitude and Y latitude in GIS?
-- [Unique Geography Facts About Every U.S.](https://www.geographyrealm.com/only-state-geography-facts/) — From Alaska's Arctic coastline to Delaware's colonial hundreds, discover the geographic features and characteristics that make every U.S.
-- [Highest Point in Every U.S.](https://www.geographyrealm.com/highest-point-in-every-u-s-state/) — Every U.S. state's highest point, from Denali to Britton Hill, with elevations, maps, and geographic facts.
 
 ## Geospatial World
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
+- [Union processing of polygons, but create a feature for each unique multi-feature overlap](https://gis.stackexchange.com/questions/501750/union-processing-of-polygons-but-create-a-feature-for-each-unique-multi-feature) (▲ 0 · 0 answers)
+- [Shift all points in a georeference over a small distance in one move](https://gis.stackexchange.com/questions/501749/shift-all-points-in-a-georeference-over-a-small-distance-in-one-move) (▲ 1 · 0 answers)
 - [Adding vector items from ArcGIS REST FeatureServer on QGIS 4.2](https://gis.stackexchange.com/questions/501745/adding-vector-items-from-arcgis-rest-featureserver-on-qgis-4-2) (▲ 3 · 1 answers)
 - [Why does QGIS report overlaps=True for two valid polygons sharing an identical boundary segment?](https://gis.stackexchange.com/questions/501744/why-does-qgis-report-overlaps-true-for-two-valid-polygons-sharing-an-identical-b) (▲ 1 · 0 answers)
-- [gdal issue (missing or missing permissions)](https://gis.stackexchange.com/questions/501742/gdal-issue-missing-or-missing-permissions) (▲ 1 · 0 answers)
-- [Overriding EPSG parameter on the proj command line](https://gis.stackexchange.com/questions/501735/overriding-epsg-parameter-on-the-proj-command-line) (▲ 2 · 2 answers)
+- [gdal issue (missing or missing permissions)](https://gis.stackexchange.com/questions/501742/gdal-issue-missing-or-missing-permissions) (▲ 1 · 1 answers)
+- [Overriding EPSG parameter on the proj command line](https://gis.stackexchange.com/questions/501735/overriding-epsg-parameter-on-the-proj-command-line) (▲ 3 · 2 answers)
 - [Display OS DataHub Leisure mapping (EPSG:27700 1:50K and 1:25K) using MapLibre GL JS](https://gis.stackexchange.com/questions/501746/display-os-datahub-leisure-mapping-epsg27700-150k-and-125k-using-maplibre-g) (▲ 0 · 0 answers)
 - [Applying fixed raster grid in lasR rasterize](https://gis.stackexchange.com/questions/501740/applying-fixed-raster-grid-in-lasr-rasterize) (▲ 2 · 0 answers)
 - [Finding divergence points for lines in QGIS](https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis) (▲ 5 · 1 answers)
 - [Building 3D geological model and estimating mineral resources using only open-source tools](https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so) (▲ -1 · 0 answers)
-- [Creating a monthly mean NDBI composite from HLSS30 and HLSL30](https://gis.stackexchange.com/questions/501734/creating-a-monthly-mean-ndbi-composite-from-hlss30-and-hlsl30) (▲ 0 · 0 answers)
-- [Unusual error never before encountered even in prior unzipping of folder: Lock folder name too long](https://gis.stackexchange.com/questions/501731/unusual-error-never-before-encountered-even-in-prior-unzipping-of-folder-lock-f) (▲ 0 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [Global Inventory of Methane Emissions from Fuel Exploitation V1 (GFEI_CH4)](https://search.earthdata.nasa.gov/search?q=GFEI_CH4) — This is a global inventory of methane emissions from fuel exploitation (GFEI) created for the NASA Carbon Monitoring System (CMS).
-- [High-resolution mean North American methane fluxes for 2010-2015 optimized with GOSAT satellite data V1 (CMS_HR_MNA_CH4_FLUX)](https://search.earthdata.nasa.gov/search?q=CMS_HR_MNA_CH4_FLUX) — This data set contains estimates of methane emission in North America based on an inversion of the GEOS-Chem chemical transport model constrained by Greenhou…
-- [Methane (CH4) Flux for North America L4 Daily V1 (CMS_CH4_FLX_NAD)](https://search.earthdata.nasa.gov/search?q=CMS_CH4_FLX_NAD) — The CMS Methane (CH4) Flux for North America data set contains estimates of methane emission in North America based on an inversion of the GEOS-Chem chemical…
-- [Global methane fluxes optimized with GOSAT data for 2010-2018 V1 (CMSGCH4F)](https://search.earthdata.nasa.gov/search?q=CMSGCH4F) — This dataset provides global methane fluxes optimized with GOSAT data for 2010-2018.
-- [Sentinel-5P TROPOMI Aerosol Layer Height 1-Orbit L2 5.5km x 3.5km V3 (S5P_L2__AER_LH_HiR)](https://search.earthdata.nasa.gov/search?q=S5P_L2__AER_LH_HiR) — The Copernicus Sentinel-5 Precursor (Sentinel-5P or S5P) satellite mission is one of the European Space Agency's (ESA) new mission family - Sentinels, and it…
-- [Sentinel-5P TROPOMI Near-Real-Time (NRT) Aerosol Index 1-Orbit L2 5.5km x 3.5km V3 (S5P_L2__AER_AI_HiR_NRT)](https://search.earthdata.nasa.gov/search?q=S5P_L2__AER_AI_HiR_NRT) — The Copernicus Sentinel-5 Precursor (Sentinel-5P or S5P) satellite mission is one of the European Space Agency's (ESA) new mission family - Sentinels, and it…
-- [Sentinel-5P TROPOMI Aerosol Index 1-Orbit L2 5.5km x 3.5km V3 (S5P_L2__AER_AI_HiR)](https://search.earthdata.nasa.gov/search?q=S5P_L2__AER_AI_HiR) — The Copernicus Sentinel-5 Precursor (Sentinel-5P or S5P) satellite mission is one of the European Space Agency's (ESA) new mission family - Sentinels, and it…
-- [OCO-2 Level 2 bias-corrected solar-induced fluorescence and other select fields from the IMAP-DOAS algorithm, Forward processing V11.4 (O…](https://search.earthdata.nasa.gov/search?q=OCO2_L2_Fwd_SIF) — Version 11.4 is the current version of the data set.
-- [GPM PR on TRMM Reflectivity, Precipitation Statistics, Histograms, at Surface and Fixed Heights, Descending, 1 day 5x5 and 0.25x0.25 degr…](https://search.earthdata.nasa.gov/search?q=GPM_3PR_DES) — This a new (GPM-formated) TRMM product.
-- [GPM PR on TRMM Reflectivity, Precipitation Statistics, Histograms, at Surface and Fixed Heights, Ascending, 1 day 5x5 and 0.25x0.25 degre…](https://search.earthdata.nasa.gov/search?q=GPM_3PR_ASC) — This a new (GPM-formated) TRMM product.
+- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) DC-8 In-Situ Meteorological and Navigation Data](https://search.earthdata.nasa.gov/search?q=SONEX_MetNav_AircraftInSitu_DC8_Data) — SONEX_MetNav_AircraftInSitu_DC8_Data is the in-situ meteorological and navigation data collected onboard the DC-8 aircraft during the SASS (Subsonics Assessm…
+- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) DC-8 In-Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=SONEX_TraceGas_AircraftInSitu_DC8_Data) — SONEX_TraceGas_AircraftInSitu_DC8_Data is the in-situ trace gas data collected onboard the DC-8 aircraft during the SASS (Subsonics Assessment) Ozone and NOx…
+- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Photolysis Frequencies (J-Values)](https://search.earthdata.nasa.gov/search?q=SONEX_jValue_AircraftInSitu_DC8_Data) — SONEX_jValue_AircraftInSitu_DC8_Data is the photolysis frequencies (j-values) measured along the DC-8 flight by the Scanning Actinic Flux Spectroradiometers…
+- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Satellite Data](https://search.earthdata.nasa.gov/search?q=SONEX_Satellite_Data) — SONEX_Satellite_Data is the satellite data used to support the SONEX suborbital campaign.
+- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Model Data](https://search.earthdata.nasa.gov/search?q=SONEX_Model_Data) — SONEX_Model_Data contains all of the model data used for the SONEX suborbital campaign.
+- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Supplementary Data](https://search.earthdata.nasa.gov/search?q=SONEX_Other_Data) — SONEX_Other_Data is the supplementary datasets for the SONEx suborbital campaign.
+- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Ancillary Data](https://search.earthdata.nasa.gov/search?q=SONEX_Miscellaneous_DC8_Data) — SONEX_Miscellaneous_DC8_Data is the ancillary datasets from the SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX).
+- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Merge Data Files](https://search.earthdata.nasa.gov/search?q=SONEX_Merge_DC8_Data) — SONEX_Merge_DC8_Data is all of the project generated merge files for the SONEX suborbital campaign.
+- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) DC-8 In-Situ Aerosol Data](https://search.earthdata.nasa.gov/search?q=SONEX_Aerosol_AircraftInSitu_DC8_Data) — SONEX_Aerosol_AircraftInSitu_DC8_Data is the in-situ aerosol data collected onboard the DC-8 aircraft during the SASS (Subsonics Assessment) Ozone and NOx Ex…
+- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Differential Absorption Lidar (DIAL) Remotely Sensed Data](https://search.earthdata.nasa.gov/search?q=SONEX_AircraftRemoteSensing_DC8_DIAL_Data) — SONEX_AircraftRemoteSensing_DC8_DIAL_Data is the Differential Absorption Lidar (DIAL) remotely sensed data collected onboard the DC-8 aircraft during the SON…
 
 ## Data.gov — new geodata
 
