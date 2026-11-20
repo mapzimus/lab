@@ -1,7 +1,12 @@
 {
-  "generatedAt": "2026-11-19",
+  "generatedAt": "2026-11-20",
   "news": {
     "mapsmania": [
+      {
+        "title": "Madrid's Architectural Time Machine",
+        "url": "http://googlemapsmania.blogspot.com/2026/11/madrids-architectural-time-machine.html",
+        "desc": ""
+      },
       {
         "title": "How to Build a Free Flight Sim",
         "url": "http://googlemapsmania.blogspot.com/2026/11/how-to-build-free-flight-sim.html",
@@ -36,14 +41,14 @@
         "title": "Explore Britain's Hidden Archaeology",
         "url": "http://googlemapsmania.blogspot.com/2026/11/explore-britains-hidden-archaeology.html",
         "desc": ""
-      },
-      {
-        "title": "How to Make Interactive Maps for Free",
-        "url": "http://googlemapsmania.blogspot.com/2026/11/how-to-make-interactive-maps-for-free.html",
-        "desc": ""
       }
     ],
     "georealm": [
+      {
+        "title": "Why U.S. Islands Are Important for Biodiversity",
+        "url": "https://www.geographyrealm.com/u-s-islands-biodiversity/",
+        "desc": "A new GIS inventory maps more than 19,000 U.S."
+      },
       {
         "title": "How to Use MPKX Files in QGIS",
         "url": "https://www.geographyrealm.com/how-to-use-mpkx-files-in-qgis/",
@@ -68,11 +73,6 @@
         "title": "Geography Facts about the World’s Continents",
         "url": "https://www.geographyrealm.com/continents/",
         "desc": "How many continents are there?"
-      },
-      {
-        "title": "X is Longitude, Y is Latitude",
-        "url": "https://www.geographyrealm.com/x-longitude-y-latitude/",
-        "desc": "Why is X longitude and Y latitude in GIS?"
       }
     ],
     "geoworld": [
@@ -110,39 +110,55 @@
   },
   "qgis": [
     {
-      "title": "Netz-Report",
-      "url": "https://plugins.qgis.org/plugins/netz_report/"
+      "title": "Pixel Energy",
+      "url": "https://plugins.qgis.org/plugins/pixel_analyse_qgis/"
     },
     {
-      "title": "GeoUtility AI Copilot",
-      "url": "https://plugins.qgis.org/plugins/geoutility_copilot/"
+      "title": "FjBa Basic Split Engine",
+      "url": "https://plugins.qgis.org/plugins/FjBa_Basic_Split_Line_Take_Polyinformation/"
     },
     {
-      "title": "Detectability",
-      "url": "https://plugins.qgis.org/plugins/detectability_qgis/"
+      "title": "FjBa_DualMode_Point_Generator",
+      "url": "https://plugins.qgis.org/plugins/FjBa_DualMode_Point_Generator/"
     },
     {
-      "title": "REGULA RURAL GEO",
-      "url": "https://plugins.qgis.org/plugins/regula_rural_geo/"
+      "title": "Freehand Digitize",
+      "url": "https://plugins.qgis.org/plugins/freehand_digitize/"
     },
     {
-      "title": "OpenAddresses Downloader",
-      "url": "https://plugins.qgis.org/plugins/openaddresses_downloader/"
+      "title": "MD_Tree",
+      "url": "https://plugins.qgis.org/plugins/md_tree/"
     },
     {
-      "title": "GlobalML Buildings Downloader",
-      "url": "https://plugins.qgis.org/plugins/globalml_buildings_downloader/"
+      "title": "GEM-15 Elevation Downloader",
+      "url": "https://plugins.qgis.org/plugins/gem15_elevation_downloader/"
     },
     {
-      "title": "urban_cross_section",
-      "url": "https://plugins.qgis.org/plugins/urban_cross_section/"
+      "title": "GroundSurf Geothermal",
+      "url": "https://plugins.qgis.org/plugins/groundsurf_geothermal/"
     },
     {
-      "title": "SGeMS Workbench",
-      "url": "https://plugins.qgis.org/plugins/sgems_export/"
+      "title": "GeoDrafter Pro Swipe",
+      "url": "https://plugins.qgis.org/plugins/geodrafter_pro_swipe/"
     }
   ],
   "releases": [
+    {
+      "repo": "duckdb/duckdb",
+      "title": "duckdb v2.0.1",
+      "url": "https://github.com/duckdb/duckdb/releases/tag/v2.0.1",
+      "desc": "This is a bug fix release for various issues discovered after we released v2.0.0.",
+      "publishedAt": "2026-11-20",
+      "isFresh": true
+    },
+    {
+      "repo": "qgis/QGIS",
+      "title": "QGIS final-3_44_16",
+      "url": "https://github.com/qgis/QGIS/releases/tag/final-3_44_16",
+      "desc": "https://github.com/qgis/QGIS/compare/final-3_44_15%5E...final-3_44_16",
+      "publishedAt": "2026-11-20",
+      "isFresh": true
+    },
     {
       "repo": "maplibre/maplibre-gl-js",
       "title": "maplibre-gl-js v6.19.0",
@@ -158,22 +174,6 @@
       "desc": "- fix(core): eliminate 300ms click delay and fix runtime controller prop changes (#10422) - fix(heatmap): compilation failure on Qualcomm Adreno 660 (#10301)…",
       "publishedAt": "2026-10-30",
       "isFresh": true
-    },
-    {
-      "repo": "duckdb/duckdb",
-      "title": "duckdb v2.0.0",
-      "url": "https://github.com/duckdb/duckdb/releases/tag/v2.0.0",
-      "desc": "This release of DuckDB is named \"Cyanoptera\" after Spatula Cyanoptera, a species of duck found in western North and South America.",
-      "publishedAt": "2026-10-21",
-      "isFresh": true
-    },
-    {
-      "repo": "qgis/QGIS",
-      "title": "QGIS final-3_44_15",
-      "url": "https://github.com/qgis/QGIS/releases/tag/final-3_44_15",
-      "desc": "https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15",
-      "publishedAt": "2026-09-25",
-      "isFresh": false
     },
     {
       "repo": "OSGeo/gdal",
@@ -212,6 +212,12 @@
     {
       "title": "Union processing of polygons, but create a feature for each unique multi-feature overlap",
       "url": "https://gis.stackexchange.com/questions/501750/union-processing-of-polygons-but-create-a-feature-for-each-unique-multi-feature",
+      "score": 3,
+      "answers": 2
+    },
+    {
+      "title": "Bulk exporting result rasters from HECRAS 2025",
+      "url": "https://gis.stackexchange.com/questions/501751/bulk-exporting-result-rasters-from-hecras-2025",
       "score": 0,
       "answers": 0
     },
@@ -224,7 +230,7 @@
     {
       "title": "Adding vector items from ArcGIS REST FeatureServer on QGIS 4.2",
       "url": "https://gis.stackexchange.com/questions/501745/adding-vector-items-from-arcgis-rest-featureserver-on-qgis-4-2",
-      "score": 3,
+      "score": 4,
       "answers": 1
     },
     {
@@ -262,74 +268,68 @@
       "url": "https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis",
       "score": 5,
       "answers": 1
-    },
-    {
-      "title": "Building 3D geological model and estimating mineral resources using only open-source tools",
-      "url": "https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so",
-      "score": -1,
-      "answers": 0
     }
   ],
   "nasa": [
     {
-      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) DC-8 In-Situ Meteorological and Navigation Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_MetNav_AircraftInSitu_DC8_Data",
-      "desc": "SONEX_MetNav_AircraftInSitu_DC8_Data is the in-situ meteorological and navigation data collected onboard the DC-8 aircraft during the SASS (Subsonics Assessm…",
+      "title": "NISAR Validated Geocoded Unwrapped Interferogram Product (Version 1)",
+      "url": "https://search.earthdata.nasa.gov/search?q=NISAR_L2_GUNW_V1",
+      "desc": "The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocode Unwrapped Interferogram (GUNW) product is a Level 2 product derived from the Range Doppler Wrapped Int…",
+      "org": "ASF"
+    },
+    {
+      "title": "NISAR Validated Geocoded Single Look Complex Product (Version 1)",
+      "url": "https://search.earthdata.nasa.gov/search?q=NISAR_L2_GSLC_V1",
+      "desc": "The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocoded Single Look Complex (GSLC) product is a Level 2 product derived from the Level 1 Range Doppler Single…",
+      "org": "ASF"
+    },
+    {
+      "title": "SnowEx20 Grand Mesa Airborne SWESARR Calibrated Backscatter Intensity V001",
+      "url": "https://search.earthdata.nasa.gov/search?q=SNEX20_GM_SWESARR_BS",
+      "desc": "This data set contains calibrated airborne microwave observations from the Goddard Space Flight Center SWESARR (Snow Water Equivalent Synthetic Aperture Rada…",
+      "org": "NSIDC_CPRD"
+    },
+    {
+      "title": "Atlantic-THORpex Observing System Test",
+      "url": "https://search.earthdata.nasa.gov/search?q=ATOST_ER2_MAS",
+      "desc": "ATOST_ER2_MAS is the MODIS Airborne Simulartor data taken aboard the NASA ER-2 aircraft for the ATOST campaign.",
       "org": "LARC_CLOUD"
     },
     {
-      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) DC-8 In-Situ Trace Gas Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_TraceGas_AircraftInSitu_DC8_Data",
-      "desc": "SONEX_TraceGas_AircraftInSitu_DC8_Data is the in-situ trace gas data collected onboard the DC-8 aircraft during the SASS (Subsonics Assessment) Ozone and NOx…",
+      "title": "ARM Enhanced Shortwave Experiment (ARESE) Solar Radiation Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=ARESE_ER2_MAS",
+      "desc": "ARESE_ER2_MAS is the MODIS Airborne Simulator Data taken aboard the ER-2 aircraft during the ARESE campaign.",
       "org": "LARC_CLOUD"
     },
     {
-      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Photolysis Frequencies (J-Values)",
-      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_jValue_AircraftInSitu_DC8_Data",
-      "desc": "SONEX_jValue_AircraftInSitu_DC8_Data is the photolysis frequencies (j-values) measured along the DC-8 flight by the Scanning Actinic Flux Spectroradiometers…",
+      "title": "Aerosol Research Branch (ARB) 48 inch Lidar Data",
+      "url": "https://search.earthdata.nasa.gov/search?q=ARB_48_IN_LIDAR",
+      "desc": "The ARB_48_IN_LIDAR data set contains data collected from a 48-inch lidar system located at NASA Langley Research Center.",
       "org": "LARC_CLOUD"
     },
     {
-      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Satellite Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_Satellite_Data",
-      "desc": "SONEX_Satellite_Data is the satellite data used to support the SONEX suborbital campaign.",
-      "org": "LARC_CLOUD"
+      "title": "NISAR Validated Geocoded Pixel Offsets (Version 1)",
+      "url": "https://search.earthdata.nasa.gov/search?q=NISAR_L2_GOFF_V1",
+      "desc": "The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocoded Pixel Offsets (GOFF) product is a Level 2 product derived from the Range Doppler Pixel Offsets (ROFF)…",
+      "org": "ASF"
     },
     {
-      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Model Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_Model_Data",
-      "desc": "SONEX_Model_Data contains all of the model data used for the SONEX suborbital campaign.",
-      "org": "LARC_CLOUD"
+      "title": "NISAR Validated Geocoded Polarimetric Covariance Product (Version 1)",
+      "url": "https://search.earthdata.nasa.gov/search?q=NISAR_L2_GCOV_V1",
+      "desc": "The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocoded Polarimetric Covariance (GCOV) product is a Level 2 product derived from the Level 1 Range Doppler Si…",
+      "org": "ASF"
     },
     {
-      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Supplementary Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_Other_Data",
-      "desc": "SONEX_Other_Data is the supplementary datasets for the SONEx suborbital campaign.",
-      "org": "LARC_CLOUD"
+      "title": "NISAR Validated Range Doppler Unwrapped Interferogram Product (Version 1)",
+      "url": "https://search.earthdata.nasa.gov/search?q=NISAR_L1_RUNW_V1",
+      "desc": "The NASA-ISRO Synthetic Aperture Radar (NISAR) Range Doppler Unwrapped Interferogram (RUNW) product represents the unwrapped, ellipsoid- and topography-flatt…",
+      "org": "ASF"
     },
     {
-      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Ancillary Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_Miscellaneous_DC8_Data",
-      "desc": "SONEX_Miscellaneous_DC8_Data is the ancillary datasets from the SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX).",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Merge Data Files",
-      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_Merge_DC8_Data",
-      "desc": "SONEX_Merge_DC8_Data is all of the project generated merge files for the SONEX suborbital campaign.",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) DC-8 In-Situ Aerosol Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_Aerosol_AircraftInSitu_DC8_Data",
-      "desc": "SONEX_Aerosol_AircraftInSitu_DC8_Data is the in-situ aerosol data collected onboard the DC-8 aircraft during the SASS (Subsonics Assessment) Ozone and NOx Ex…",
-      "org": "LARC_CLOUD"
-    },
-    {
-      "title": "SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Differential Absorption Lidar (DIAL) Remotely Sensed Data",
-      "url": "https://search.earthdata.nasa.gov/search?q=SONEX_AircraftRemoteSensing_DC8_DIAL_Data",
-      "desc": "SONEX_AircraftRemoteSensing_DC8_DIAL_Data is the Differential Absorption Lidar (DIAL) remotely sensed data collected onboard the DC-8 aircraft during the SON…",
-      "org": "LARC_CLOUD"
+      "title": "Tropical Rainfall Measuring Mission (TRMM) Lightning Imaging Sensor (LIS) Annual Thunder Hour",
+      "url": "https://search.earthdata.nasa.gov/search?q=trmmlisath",
+      "desc": "This thunder hour dataset is based on lightning observations from the Lightning Imaging Sensor (LIS) that operated aboard the Tropical Rainfall Measuring Mis…",
+      "org": "GHRC_DAAC"
     }
   ],
   "datagov": [

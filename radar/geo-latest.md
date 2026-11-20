@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-19
+# Mapzimus Geospatial Radar — 2026-11-20
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Madrid's Architectural Time Machine](http://googlemapsmania.blogspot.com/2026/11/madrids-architectural-time-machine.html)
 - [How to Build a Free Flight Sim](http://googlemapsmania.blogspot.com/2026/11/how-to-build-free-flight-sim.html)
 - [Should the USA Give Texas to Russia?](http://googlemapsmania.blogspot.com/2026/11/should-usa-give-texas-to-russia.html)
 - [The Interactive Shapes of Rivers](http://googlemapsmania.blogspot.com/2026/11/the-interactive-shapes-of-rivers.html)
@@ -9,16 +10,15 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [An Inverted Earth You Can Explore](http://googlemapsmania.blogspot.com/2026/11/an-inverted-earth-you-can-explore.html)
 - [The Never-Ending Coastline](http://googlemapsmania.blogspot.com/2026/11/the-never-ending-coastline.html)
 - [Explore Britain's Hidden Archaeology](http://googlemapsmania.blogspot.com/2026/11/explore-britains-hidden-archaeology.html)
-- [How to Make Interactive Maps for Free](http://googlemapsmania.blogspot.com/2026/11/how-to-make-interactive-maps-for-free.html)
 
 ## Geography Realm
 
+- [Why U.S. Islands Are Important for Biodiversity](https://www.geographyrealm.com/u-s-islands-biodiversity/) — A new GIS inventory maps more than 19,000 U.S.
 - [How to Use MPKX Files in QGIS](https://www.geographyrealm.com/how-to-use-mpkx-files-in-qgis/) — QGIS can’t open an MPKX map package directly.
 - [GIS File Formats](https://www.geographyrealm.com/how-to-tell-gis-file-formats/) — Learn the common GIS file formats and what each extension means, from shapefiles and GeoPackages to ArcGIS Pro and QGIS project files.
 - [Good Governance Needs a Strong Code of Conduct](https://www.geographyrealm.com/good-governance-code-of-conduct/) — Midpen Open Space manages 77,000 acres of public land.
 - [Alaska’s Coastline is Longer Than All the Other 49 States Combined](https://www.geographyrealm.com/alaskas-coastline-is-longer-than-all-the-other-49-states-combined/) — Alaska has the longest U.S.
 - [Geography Facts about the World’s Continents](https://www.geographyrealm.com/continents/) — How many continents are there?
-- [X is Longitude, Y is Latitude](https://www.geographyrealm.com/x-longitude-y-latitude/) — Why is X longitude and Y latitude in GIS?
 
 ## Geospatial World
 
@@ -31,21 +31,21 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## QGIS — new & updated plugins
 
-- [Netz-Report](https://plugins.qgis.org/plugins/netz_report/)
-- [GeoUtility AI Copilot](https://plugins.qgis.org/plugins/geoutility_copilot/)
-- [Detectability](https://plugins.qgis.org/plugins/detectability_qgis/)
-- [REGULA RURAL GEO](https://plugins.qgis.org/plugins/regula_rural_geo/)
-- [OpenAddresses Downloader](https://plugins.qgis.org/plugins/openaddresses_downloader/)
-- [GlobalML Buildings Downloader](https://plugins.qgis.org/plugins/globalml_buildings_downloader/)
-- [urban_cross_section](https://plugins.qgis.org/plugins/urban_cross_section/)
-- [SGeMS Workbench](https://plugins.qgis.org/plugins/sgems_export/)
+- [Pixel Energy](https://plugins.qgis.org/plugins/pixel_analyse_qgis/)
+- [FjBa Basic Split Engine](https://plugins.qgis.org/plugins/FjBa_Basic_Split_Line_Take_Polyinformation/)
+- [FjBa_DualMode_Point_Generator](https://plugins.qgis.org/plugins/FjBa_DualMode_Point_Generator/)
+- [Freehand Digitize](https://plugins.qgis.org/plugins/freehand_digitize/)
+- [MD_Tree](https://plugins.qgis.org/plugins/md_tree/)
+- [GEM-15 Elevation Downloader](https://plugins.qgis.org/plugins/gem15_elevation_downloader/)
+- [GroundSurf Geothermal](https://plugins.qgis.org/plugins/groundsurf_geothermal/)
+- [GeoDrafter Pro Swipe](https://plugins.qgis.org/plugins/geodrafter_pro_swipe/)
 
 ## Library releases
 
+- [duckdb v2.0.1](https://github.com/duckdb/duckdb/releases/tag/v2.0.1) (2026-11-20) — This is a bug fix release for various issues discovered after we released v2.0.0.
+- [QGIS final-3_44_16](https://github.com/qgis/QGIS/releases/tag/final-3_44_16) (2026-11-20) — https://github.com/qgis/QGIS/compare/final-3_44_15%5E...final-3_44_16
 - [maplibre-gl-js v6.19.0](https://github.com/maplibre/maplibre-gl-js/releases/tag/v6.19.0) (2026-11-17) — ### ✨ Features and improvements - Add `oklab()` colors and the `interpolate-oklab` expression ([#9051](https://github.com/maplibre/maplibre-gl-js/pull/9051))…
 - [deck.gl v9.3.12](https://github.com/visgl/deck.gl/releases/tag/v9.3.12) (2026-10-30) — - fix(core): eliminate 300ms click delay and fix runtime controller prop changes (#10422) - fix(heatmap): compilation failure on Qualcomm Adreno 660 (#10301)…
-- [duckdb v2.0.0](https://github.com/duckdb/duckdb/releases/tag/v2.0.0) (2026-10-21) — This release of DuckDB is named "Cyanoptera" after Spatula Cyanoptera, a species of duck found in western North and South America.
-- [QGIS final-3_44_15](https://github.com/qgis/QGIS/releases/tag/final-3_44_15) (2026-09-25) — https://github.com/qgis/QGIS/compare/final-3_44_14%5E...final-3_44_15
 - [gdal v3.13.3](https://github.com/OSGeo/gdal/releases/tag/v3.13.3) (2026-08-18) — Bug fix release. See release notes: https://github.com/OSGeo/gdal/blob/v3.13.3/NEWS.md
 - [turf v7.4.0](https://github.com/Turfjs/turf/releases/tag/v7.4.0) (2026-08-03) — ## What's Changed ⚠️ Due to correctness fixes, behavior across the boolean-* methods has changed.
 - [tippecanoe 2.79.0](https://github.com/felt/tippecanoe/releases/tag/2.79.0) (2025-07-24) — # 2.79.0 * When deduplicating features by ID in tippecanoe-overzoom, be careful to track even features that have been clipped away.
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Union processing of polygons, but create a feature for each unique multi-feature overlap](https://gis.stackexchange.com/questions/501750/union-processing-of-polygons-but-create-a-feature-for-each-unique-multi-feature) (▲ 0 · 0 answers)
+- [Union processing of polygons, but create a feature for each unique multi-feature overlap](https://gis.stackexchange.com/questions/501750/union-processing-of-polygons-but-create-a-feature-for-each-unique-multi-feature) (▲ 3 · 2 answers)
+- [Bulk exporting result rasters from HECRAS 2025](https://gis.stackexchange.com/questions/501751/bulk-exporting-result-rasters-from-hecras-2025) (▲ 0 · 0 answers)
 - [Shift all points in a georeference over a small distance in one move](https://gis.stackexchange.com/questions/501749/shift-all-points-in-a-georeference-over-a-small-distance-in-one-move) (▲ 1 · 0 answers)
-- [Adding vector items from ArcGIS REST FeatureServer on QGIS 4.2](https://gis.stackexchange.com/questions/501745/adding-vector-items-from-arcgis-rest-featureserver-on-qgis-4-2) (▲ 3 · 1 answers)
+- [Adding vector items from ArcGIS REST FeatureServer on QGIS 4.2](https://gis.stackexchange.com/questions/501745/adding-vector-items-from-arcgis-rest-featureserver-on-qgis-4-2) (▲ 4 · 1 answers)
 - [Why does QGIS report overlaps=True for two valid polygons sharing an identical boundary segment?](https://gis.stackexchange.com/questions/501744/why-does-qgis-report-overlaps-true-for-two-valid-polygons-sharing-an-identical-b) (▲ 1 · 0 answers)
 - [gdal issue (missing or missing permissions)](https://gis.stackexchange.com/questions/501742/gdal-issue-missing-or-missing-permissions) (▲ 1 · 1 answers)
 - [Overriding EPSG parameter on the proj command line](https://gis.stackexchange.com/questions/501735/overriding-epsg-parameter-on-the-proj-command-line) (▲ 3 · 2 answers)
 - [Display OS DataHub Leisure mapping (EPSG:27700 1:50K and 1:25K) using MapLibre GL JS](https://gis.stackexchange.com/questions/501746/display-os-datahub-leisure-mapping-epsg27700-150k-and-125k-using-maplibre-g) (▲ 0 · 0 answers)
 - [Applying fixed raster grid in lasR rasterize](https://gis.stackexchange.com/questions/501740/applying-fixed-raster-grid-in-lasr-rasterize) (▲ 2 · 0 answers)
 - [Finding divergence points for lines in QGIS](https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis) (▲ 5 · 1 answers)
-- [Building 3D geological model and estimating mineral resources using only open-source tools](https://gis.stackexchange.com/questions/501732/building-3d-geological-model-and-estimating-mineral-resources-using-only-open-so) (▲ -1 · 0 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) DC-8 In-Situ Meteorological and Navigation Data](https://search.earthdata.nasa.gov/search?q=SONEX_MetNav_AircraftInSitu_DC8_Data) — SONEX_MetNav_AircraftInSitu_DC8_Data is the in-situ meteorological and navigation data collected onboard the DC-8 aircraft during the SASS (Subsonics Assessm…
-- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) DC-8 In-Situ Trace Gas Data](https://search.earthdata.nasa.gov/search?q=SONEX_TraceGas_AircraftInSitu_DC8_Data) — SONEX_TraceGas_AircraftInSitu_DC8_Data is the in-situ trace gas data collected onboard the DC-8 aircraft during the SASS (Subsonics Assessment) Ozone and NOx…
-- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Photolysis Frequencies (J-Values)](https://search.earthdata.nasa.gov/search?q=SONEX_jValue_AircraftInSitu_DC8_Data) — SONEX_jValue_AircraftInSitu_DC8_Data is the photolysis frequencies (j-values) measured along the DC-8 flight by the Scanning Actinic Flux Spectroradiometers…
-- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Satellite Data](https://search.earthdata.nasa.gov/search?q=SONEX_Satellite_Data) — SONEX_Satellite_Data is the satellite data used to support the SONEX suborbital campaign.
-- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Model Data](https://search.earthdata.nasa.gov/search?q=SONEX_Model_Data) — SONEX_Model_Data contains all of the model data used for the SONEX suborbital campaign.
-- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Supplementary Data](https://search.earthdata.nasa.gov/search?q=SONEX_Other_Data) — SONEX_Other_Data is the supplementary datasets for the SONEx suborbital campaign.
-- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Ancillary Data](https://search.earthdata.nasa.gov/search?q=SONEX_Miscellaneous_DC8_Data) — SONEX_Miscellaneous_DC8_Data is the ancillary datasets from the SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX).
-- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Merge Data Files](https://search.earthdata.nasa.gov/search?q=SONEX_Merge_DC8_Data) — SONEX_Merge_DC8_Data is all of the project generated merge files for the SONEX suborbital campaign.
-- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) DC-8 In-Situ Aerosol Data](https://search.earthdata.nasa.gov/search?q=SONEX_Aerosol_AircraftInSitu_DC8_Data) — SONEX_Aerosol_AircraftInSitu_DC8_Data is the in-situ aerosol data collected onboard the DC-8 aircraft during the SASS (Subsonics Assessment) Ozone and NOx Ex…
-- [SASS (Subsonics Assessment) Ozone and NOx Experiment (SONEX) Differential Absorption Lidar (DIAL) Remotely Sensed Data](https://search.earthdata.nasa.gov/search?q=SONEX_AircraftRemoteSensing_DC8_DIAL_Data) — SONEX_AircraftRemoteSensing_DC8_DIAL_Data is the Differential Absorption Lidar (DIAL) remotely sensed data collected onboard the DC-8 aircraft during the SON…
+- [NISAR Validated Geocoded Unwrapped Interferogram Product (Version 1)](https://search.earthdata.nasa.gov/search?q=NISAR_L2_GUNW_V1) — The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocode Unwrapped Interferogram (GUNW) product is a Level 2 product derived from the Range Doppler Wrapped Int…
+- [NISAR Validated Geocoded Single Look Complex Product (Version 1)](https://search.earthdata.nasa.gov/search?q=NISAR_L2_GSLC_V1) — The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocoded Single Look Complex (GSLC) product is a Level 2 product derived from the Level 1 Range Doppler Single…
+- [SnowEx20 Grand Mesa Airborne SWESARR Calibrated Backscatter Intensity V001](https://search.earthdata.nasa.gov/search?q=SNEX20_GM_SWESARR_BS) — This data set contains calibrated airborne microwave observations from the Goddard Space Flight Center SWESARR (Snow Water Equivalent Synthetic Aperture Rada…
+- [Atlantic-THORpex Observing System Test](https://search.earthdata.nasa.gov/search?q=ATOST_ER2_MAS) — ATOST_ER2_MAS is the MODIS Airborne Simulartor data taken aboard the NASA ER-2 aircraft for the ATOST campaign.
+- [ARM Enhanced Shortwave Experiment (ARESE) Solar Radiation Data](https://search.earthdata.nasa.gov/search?q=ARESE_ER2_MAS) — ARESE_ER2_MAS is the MODIS Airborne Simulator Data taken aboard the ER-2 aircraft during the ARESE campaign.
+- [Aerosol Research Branch (ARB) 48 inch Lidar Data](https://search.earthdata.nasa.gov/search?q=ARB_48_IN_LIDAR) — The ARB_48_IN_LIDAR data set contains data collected from a 48-inch lidar system located at NASA Langley Research Center.
+- [NISAR Validated Geocoded Pixel Offsets (Version 1)](https://search.earthdata.nasa.gov/search?q=NISAR_L2_GOFF_V1) — The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocoded Pixel Offsets (GOFF) product is a Level 2 product derived from the Range Doppler Pixel Offsets (ROFF)…
+- [NISAR Validated Geocoded Polarimetric Covariance Product (Version 1)](https://search.earthdata.nasa.gov/search?q=NISAR_L2_GCOV_V1) — The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocoded Polarimetric Covariance (GCOV) product is a Level 2 product derived from the Level 1 Range Doppler Si…
+- [NISAR Validated Range Doppler Unwrapped Interferogram Product (Version 1)](https://search.earthdata.nasa.gov/search?q=NISAR_L1_RUNW_V1) — The NASA-ISRO Synthetic Aperture Radar (NISAR) Range Doppler Unwrapped Interferogram (RUNW) product represents the unwrapped, ellipsoid- and topography-flatt…
+- [Tropical Rainfall Measuring Mission (TRMM) Lightning Imaging Sensor (LIS) Annual Thunder Hour](https://search.earthdata.nasa.gov/search?q=trmmlisath) — This thunder hour dataset is based on lightning observations from the Lightning Imaging Sensor (LIS) that operated aboard the Tropical Rainfall Measuring Mis…
 
 ## Data.gov — new geodata
 
