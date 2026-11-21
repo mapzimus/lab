@@ -1,7 +1,8 @@
-# Mapzimus Geospatial Radar — 2026-11-20
+# Mapzimus Geospatial Radar — 2026-11-21
 Daily sweep of geospatial news, tools, releases, data, and community.
 ## Maps Mania
 
+- [Search the Planet with AI](http://googlemapsmania.blogspot.com/2026/11/search-planet-with-ai.html)
 - [Madrid's Architectural Time Machine](http://googlemapsmania.blogspot.com/2026/11/madrids-architectural-time-machine.html)
 - [How to Build a Free Flight Sim](http://googlemapsmania.blogspot.com/2026/11/how-to-build-free-flight-sim.html)
 - [Should the USA Give Texas to Russia?](http://googlemapsmania.blogspot.com/2026/11/should-usa-give-texas-to-russia.html)
@@ -9,7 +10,6 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 - [Map or Simulation? - Turning Maps into Games](http://googlemapsmania.blogspot.com/2026/11/map-or-simulation-turning-maps-into.html)
 - [An Inverted Earth You Can Explore](http://googlemapsmania.blogspot.com/2026/11/an-inverted-earth-you-can-explore.html)
 - [The Never-Ending Coastline](http://googlemapsmania.blogspot.com/2026/11/the-never-ending-coastline.html)
-- [Explore Britain's Hidden Archaeology](http://googlemapsmania.blogspot.com/2026/11/explore-britains-hidden-archaeology.html)
 
 ## Geography Realm
 
@@ -53,29 +53,29 @@ Daily sweep of geospatial news, tools, releases, data, and community.
 
 ## GIS Stack Exchange — hot questions
 
-- [Union processing of polygons, but create a feature for each unique multi-feature overlap](https://gis.stackexchange.com/questions/501750/union-processing-of-polygons-but-create-a-feature-for-each-unique-multi-feature) (▲ 3 · 2 answers)
+- [creating lines than poligons](https://gis.stackexchange.com/questions/501756/creating-lines-than-poligons) (▲ 0 · 0 answers)
+- [Google Earth leaving hole in KML polygon fill](https://gis.stackexchange.com/questions/501754/google-earth-leaving-hole-in-kml-polygon-fill) (▲ 0 · 1 answers)
+- [Union processing of polygons, but create a feature for each unique multi-feature overlap](https://gis.stackexchange.com/questions/501750/union-processing-of-polygons-but-create-a-feature-for-each-unique-multi-feature) (▲ 5 · 2 answers)
 - [Bulk exporting result rasters from HECRAS 2025](https://gis.stackexchange.com/questions/501751/bulk-exporting-result-rasters-from-hecras-2025) (▲ 0 · 0 answers)
 - [Shift all points in a georeference over a small distance in one move](https://gis.stackexchange.com/questions/501749/shift-all-points-in-a-georeference-over-a-small-distance-in-one-move) (▲ 1 · 0 answers)
 - [Adding vector items from ArcGIS REST FeatureServer on QGIS 4.2](https://gis.stackexchange.com/questions/501745/adding-vector-items-from-arcgis-rest-featureserver-on-qgis-4-2) (▲ 4 · 1 answers)
 - [Why does QGIS report overlaps=True for two valid polygons sharing an identical boundary segment?](https://gis.stackexchange.com/questions/501744/why-does-qgis-report-overlaps-true-for-two-valid-polygons-sharing-an-identical-b) (▲ 1 · 0 answers)
-- [gdal issue (missing or missing permissions)](https://gis.stackexchange.com/questions/501742/gdal-issue-missing-or-missing-permissions) (▲ 1 · 1 answers)
 - [Overriding EPSG parameter on the proj command line](https://gis.stackexchange.com/questions/501735/overriding-epsg-parameter-on-the-proj-command-line) (▲ 3 · 2 answers)
+- [gdal issue (missing or missing permissions)](https://gis.stackexchange.com/questions/501742/gdal-issue-missing-or-missing-permissions) (▲ 1 · 1 answers)
 - [Display OS DataHub Leisure mapping (EPSG:27700 1:50K and 1:25K) using MapLibre GL JS](https://gis.stackexchange.com/questions/501746/display-os-datahub-leisure-mapping-epsg27700-150k-and-125k-using-maplibre-g) (▲ 0 · 0 answers)
-- [Applying fixed raster grid in lasR rasterize](https://gis.stackexchange.com/questions/501740/applying-fixed-raster-grid-in-lasr-rasterize) (▲ 2 · 0 answers)
-- [Finding divergence points for lines in QGIS](https://gis.stackexchange.com/questions/501728/finding-divergence-points-for-lines-in-qgis) (▲ 5 · 1 answers)
 
 ## NASA Earthdata — recently updated collections
 
-- [NISAR Validated Geocoded Unwrapped Interferogram Product (Version 1)](https://search.earthdata.nasa.gov/search?q=NISAR_L2_GUNW_V1) — The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocode Unwrapped Interferogram (GUNW) product is a Level 2 product derived from the Range Doppler Wrapped Int…
-- [NISAR Validated Geocoded Single Look Complex Product (Version 1)](https://search.earthdata.nasa.gov/search?q=NISAR_L2_GSLC_V1) — The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocoded Single Look Complex (GSLC) product is a Level 2 product derived from the Level 1 Range Doppler Single…
-- [SnowEx20 Grand Mesa Airborne SWESARR Calibrated Backscatter Intensity V001](https://search.earthdata.nasa.gov/search?q=SNEX20_GM_SWESARR_BS) — This data set contains calibrated airborne microwave observations from the Goddard Space Flight Center SWESARR (Snow Water Equivalent Synthetic Aperture Rada…
-- [Atlantic-THORpex Observing System Test](https://search.earthdata.nasa.gov/search?q=ATOST_ER2_MAS) — ATOST_ER2_MAS is the MODIS Airborne Simulartor data taken aboard the NASA ER-2 aircraft for the ATOST campaign.
-- [ARM Enhanced Shortwave Experiment (ARESE) Solar Radiation Data](https://search.earthdata.nasa.gov/search?q=ARESE_ER2_MAS) — ARESE_ER2_MAS is the MODIS Airborne Simulator Data taken aboard the ER-2 aircraft during the ARESE campaign.
-- [Aerosol Research Branch (ARB) 48 inch Lidar Data](https://search.earthdata.nasa.gov/search?q=ARB_48_IN_LIDAR) — The ARB_48_IN_LIDAR data set contains data collected from a 48-inch lidar system located at NASA Langley Research Center.
-- [NISAR Validated Geocoded Pixel Offsets (Version 1)](https://search.earthdata.nasa.gov/search?q=NISAR_L2_GOFF_V1) — The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocoded Pixel Offsets (GOFF) product is a Level 2 product derived from the Range Doppler Pixel Offsets (ROFF)…
-- [NISAR Validated Geocoded Polarimetric Covariance Product (Version 1)](https://search.earthdata.nasa.gov/search?q=NISAR_L2_GCOV_V1) — The NASA-ISRO Synthetic Aperture Radar (NISAR) Geocoded Polarimetric Covariance (GCOV) product is a Level 2 product derived from the Level 1 Range Doppler Si…
-- [NISAR Validated Range Doppler Unwrapped Interferogram Product (Version 1)](https://search.earthdata.nasa.gov/search?q=NISAR_L1_RUNW_V1) — The NASA-ISRO Synthetic Aperture Radar (NISAR) Range Doppler Unwrapped Interferogram (RUNW) product represents the unwrapped, ellipsoid- and topography-flatt…
-- [Tropical Rainfall Measuring Mission (TRMM) Lightning Imaging Sensor (LIS) Annual Thunder Hour](https://search.earthdata.nasa.gov/search?q=trmmlisath) — This thunder hour dataset is based on lightning observations from the Lightning Imaging Sensor (LIS) that operated aboard the Tropical Rainfall Measuring Mis…
+- [ATLAS/ICESat-2 L3B Gridded Sea Ice Freeboard Quick Look V005](https://search.earthdata.nasa.gov/search?q=ATL20QL) — ATL20QL is the Quick Look (QL) version of ATL20 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Along Track Inland Surface Water Data Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL13QL) — ATL13QL is the Quick Look (QL) version of ATL13 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Freeboard Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL10QL) — ATL10QL is the Quick Look (QL) version of ATL10 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Calibrated Backscatter Profiles and Atmospheric Layer Characteristics Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL09QL) — ATL09QL is the Quick Look (QL) version of ATL09 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Land and Vegetation Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL08QL) — ATL08QL is the Quick Look (QL) version of ATL08 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L3A Sea Ice Height Quick Look V007](https://search.earthdata.nasa.gov/search?q=ATL07QL) — ATL07QL is the Quick Look (QL) version of ATL07 with an expedited latency of 3‒5 days.
+- [ATLAS/ICESat-2 L2A Global Geolocated Photon Data Low Latency V007](https://search.earthdata.nasa.gov/search?q=ATL03LL) — ATL03 Low Latency (ATL03LL) is an expedited version of ATL03, where the data acquisition and algorithm are the same, but the geolocation processing has been…
+- [SMAP_L1A_RADAR_RECEIVE_ONLY_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_003) — SMAP Level 1A Radar Receive Only Product Version 3
+- [SMAP_L1A_RADAR_RECEIVE_ONLY_QA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_QA_003) — SMAP Level 1A Radar Receive Only Data Quality Information Version 3
+- [SMAP_L1A_RADAR_RECEIVE_ONLY_METADATA_V003](https://search.earthdata.nasa.gov/search?q=SPL1A_RO_METADATA_003) — SMAP Level 1A Radar Receive Only Product Metadata Version 3
 
 ## Data.gov — new geodata
 
